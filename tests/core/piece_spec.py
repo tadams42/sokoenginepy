@@ -30,12 +30,14 @@ class DescribePiece(object):
         with pytest.raises(InvalidPieceIdError):
             PieceFactory(id=Piece.DEFAULT_ID - 1)
         with pytest.raises(InvalidPieceIdError):
-
             piece.id = Piece.DEFAULT_ID - 1
+        with pytest.raises(InvalidPieceIdError):
+            piece.id = None
 
     def test_it_raises_on_invalid_plus_id(self, piece):
         with pytest.raises(InvalidPiecePlusIdError):
             PieceFactory(plus_id=Piece.DEFAULT_PLUS_ID - 1)
-
         with pytest.raises(InvalidPiecePlusIdError):
             piece.plus_id = Piece.DEFAULT_PLUS_ID - 1
+        with pytest.raises(InvalidPiecePlusIdError):
+            piece.plus_id = None

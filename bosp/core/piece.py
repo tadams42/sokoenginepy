@@ -32,11 +32,15 @@ class Piece(PrettyPrintable, EqualityComparable):
 
     @classmethod
     def is_valid_id(cls, id):
-        return id >= cls.DEFAULT_ID
+        return (
+            id is not None and id >= cls.DEFAULT_ID
+        )
 
     @classmethod
-    def is_valid_plus_id(cls, id):
-        return id >= cls.DEFAULT_PLUS_ID
+    def is_valid_plus_id(cls, plus_id):
+        return (
+            plus_id is not None and plus_id >= cls.DEFAULT_PLUS_ID
+        )
 
     @property
     def id(self):
