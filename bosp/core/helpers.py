@@ -1,3 +1,7 @@
+class SokoengineError(RuntimeError):
+    pass
+
+
 class PrettyPrintable(object):
 
     def __representation_attributes__(self):

@@ -17,7 +17,7 @@ class DescribeAtomicMove(object):
             assert_that(atomic_move._pusher_selected, equal_to(False))
             assert_that(atomic_move._pusher_jumped, equal_to(False))
             assert_that(atomic_move._pusher_id, equal_to(Pusher.DEFAULT_ID))
-            assert_that(atomic_move._moved_box_id, equal_to(None))
+            assert_that(atomic_move._moved_box_id, is_(none()))
             assert_that(atomic_move.group_id, equal_to(0))
 
     class Describe_moved_box_id(object):

@@ -38,6 +38,7 @@ setup(
     install_requires = [
         'Unipath ==1.1',
         'pytz',
+        'pyparsing ==2.0.3',
     ],
 
     tests_require = [
