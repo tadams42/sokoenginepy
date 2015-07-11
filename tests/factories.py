@@ -5,7 +5,8 @@ from helpers import fake
 
 from unittest.mock import MagicMock, Mock
 
-from bosp.core import Piece, AtomicMove, Direction
+from bosp.core import Piece, AtomicMove, Direction, BoardCell
+from bosp.io import BoardEncodingCharacters
 
 
 class PieceFactory(factory.Factory):
@@ -43,3 +44,15 @@ class AtomicMoveFactory(factory.Factory):
 @pytest.fixture
 def atomic_move():
     return AtomicMoveFactory()
+
+
+class BoardCellFactory(factory.Factory):
+    class Meta:
+        model = BoardCell
+
+    chr = factory.LazyAttribute(
+        lambda x: BoardEncodingCharacters.FLOOR.value
+    )
+@pytest.fixture
+def board_cell():
+    return BoardCellFactory()
