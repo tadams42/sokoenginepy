@@ -24,6 +24,7 @@ class TriobanTessellation(Tessellation):
                 CellOrientation.TRIANGLE_DOWN
             )
 
+            dx, dy = 0, 0
             if direction == Direction.LEFT:
                 dy = 0
                 dx = -1
@@ -61,7 +62,6 @@ class TriobanTessellation(Tessellation):
             else:
                 raise IllegalDirectionError(direction)
 
-            dx, dy = 0, 0
             row += dy
             column += dx
 
