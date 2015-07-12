@@ -32,7 +32,7 @@ setup(
     license = "GPLv3",
     keywords = "game sokoban hexoban octoban trioban",
 
-    packages = ['bosp'],
+    packages = ['sokoengine'],
     # packages = find_packages(),
 
     install_requires = [
@@ -55,7 +55,6 @@ setup(
     cmdclass = {'test': PyTest},
 
     classifiers = [
-        "Programming Language :: Python",
         "Programming Language :: Python :: 3",
 
         "Development Status :: 2 - Pre-Alpha",

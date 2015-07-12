@@ -1,9 +1,9 @@
 import pytest
 import copy
-from hamcrest import assert_that, equal_to, is_, none
+from hamcrest import assert_that, equal_to
 from factories import BoardCellFactory
-from bosp.core import BoardCell, SokoengineError
-from bosp.io import BoardEncodingCharacters
+from sokoengine.core import BoardCell, SokoengineError
+from sokoengine.io import BoardEncodingCharacters
 
 class DescribeBoardCell(object):
 

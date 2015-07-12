@@ -5,6 +5,7 @@ from .text_utils import (
     is_snapshot_string, rle_encode, rle_decode, BoardConversionError,
     drop_blank, normalize_width,
 )
+from .output_settings import OutuputSettings
 
 __all__ = [
     'BoardEncodingCharacters', 'SpecialSnapshotCharacters',
@@ -12,5 +13,6 @@ __all__ = [
     'is_empty_floor', 'is_wall', 'is_blank', 'is_board_string',
     'is_sokoban_plus_string', 'parse_board_string', 'is_snapshot_string',
     'rle_encode', 'rle_decode', 'BoardConversionError', 'drop_blank',
-    'normalize_width'
+    'normalize_width',
+    'OutuputSettings',
 ]

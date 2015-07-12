@@ -1,0 +1,231 @@
+from enum import Enum
+from abc import ABC, abstractmethod
+from .helpers import SokoengineError
+
+
+class IllegalDirectionError(SokoengineError):
+    pass
+
+
+class UnknownTessellationError(SokoengineError):
+    pass
+
+
+class Direction(Enum):
+    UP         = 0
+    NORTH_EAST = 1
+    RIGHT      = 2
+    SOUTH_EAST = 3
+    DOWN       = 4
+    SOUTH_WEST = 5
+    LEFT       = 6
+    NORTH_WEST = 7
+
+    @property
+    def opposite(self):
+        if self == Direction.UP:
+            return Direction.DOWN
+        elif self == Direction.DOWN:
+            return Direction.UP
+        elif self == Direction.LEFT:
+            return Direction.RIGHT
+        elif self == Direction.RIGHT:
+            return Direction.LEFT
+        elif self == Direction.NORTH_WEST:
+            return Direction.SOUTH_EAST
+        elif self == Direction.NORTH_EAST:
+            return Direction.SOUTH_WEST
+        elif self == Direction.SOUTH_WEST:
+            return Direction.NORTH_EAST
+        elif self == Direction.SOUTH_EAST:
+            return Direction.NORTH_WEST
+
+
+class GameSolvingMode(Enum):
+    FORWARD = 0
+    REVERSE = 1
+
+
+class CellOrientation(Enum):
+    """
+    Dynamic board cell property that depends on cell position in some
+    tessellations. ie. in Trioban, coordinate origin is triangle pointig upwards.
+    This means that orientation of all other triangles depends on their position.
+    Methods that calculate orientation return one of these values.
+    """
+    DEFAULT = 0
+    TRIANGLE_DOWN = 1
+    OCTAGON = 2
+
+
+class TessellationType(Enum):
+    """
+    Enumerates implemented tessellation types. All classes that are tessellation
+    dependant have attribute tessellation_type whose value is one of these.
+    """
+
+    """
+    Board is laid out on squares.
+    Direction <-> character mapping:
+
+    |   LEFT  |  RIGHT  |    UP   |   DOWN  |
+    |:-------:|:-------:|:-------:|:-------:|
+    |   l, L  |   r, R  |   u, U  |  d, D   |
+    """
+    SOKOBAN = 0
+
+
+    """
+    Board is laid out on alternating triangles with origin triangle poiting up.
+    Direction <-> character mapping:
+
+    | LEFT | RIGHT | NORTH_EAST | NORTH_WEST | SOUTH_EAST | SOUTH_WEST |
+    |:----:|:-----:|:----------:|:----------:|:----------:|:----------:|
+    | l, L |  r, R |    n, N    |    u, U    |    d, D    |    s, S    |
+
+    Depending on current pusher position, some moves are not allowed:
+
+    ![Trioban movement](docs/images/trioban_am.png)
+    """
+    TRIOBAN = 1
+
+
+    """
+    Board space is laid out on vertical hexagons with following coordinate system:
+
+    ![Hexoban coordinates](docs/images/hexoban_coordinates.png)
+
+    Textual representation uses two characters for each hexagon. This allows
+    different encoding schemes.
+
+    |            Scheme 1          |            Scheme 2          |
+    | :--------------------------: |:----------------------------:|
+    | ![Scheme 1][hexoban_scheme1] | ![Scheme 2][hexoban_scheme2] |
+
+    [hexoban_scheme1]:docs/images/hexoban_scheme1.png
+    [hexoban_scheme2]:docs/images/hexoban_scheme2.png
+
+    As long as encoding of single board is consistent, all methods handle any
+    scheme transparently - parsing of board strings 'Just Works (TM)'
+
+    Direction <-> character mapping:
+
+    | LEFT | RIGHT | NORTH_WEST | SOUTH_WEST | NORTH_EAST | SOUTH_EAST |
+    |:----:|:-----:|:----------:|:----------:|:----------:|:----------:|
+    | l, L |  r, R |    u, U    |    d, D    |    n, N    |    s, S    |
+    """
+    HEXOBAN = 2
+
+    """
+    Board space is laid out on alternating squares and octagons with
+    origin of coordinate system being octagon. Tessellation allows all
+    8 directions of movement from Direction and depending on current
+    pusher position some of these directions do not result in successful
+    move.
+
+    Direction <-> character mapping:
+
+    |  UP  | NORTH_EAST | RIGHT | SOUTH_EAST | DOWN | SOUTH_WEST | LEFT | NORTH_WEST |
+    |:----:|:----------:|:-----:|:----------:|:----:|:----------:|:----:|:----------:|
+    | u, U |    n, N    |  r, R |    e, E    | d, D |    s, S    | l, L |    w, W    |
+    """
+    OCTOBAN = 3
+
+    @classmethod
+    def factory(cls, description):
+        tmp = description.strip().lower() if description else ""
+        if tmp == "sokoban":
+            return cls.SOKOBAN
+        elif tmp == 'trioban':
+            return cls.TRIOBAN
+        elif tmp == 'hexoban':
+            return cls.HEXOBAN
+        elif tmp == 'octoban':
+            return cls.OCTOBAN
+        else:
+            raise UnknownTessellationError(description)
+
+
+class Tessellated(object):
+
+    _tessellation_type = None
+    _tessellation = None
+
+    def __init__(self, tessellation_type):
+        assert tessellation_type is not None, "Tessellation type must be speciffied!"
+        self._tessellation_type = tessellation_type
+        self._tessellation = Tessellation.factory(tessellation_type)
+
+    @property
+    def tessellation_type(self):
+        return self._tessellation_type
+
+
+class Tessellation(ABC):
+
+    _TESSELATION_REGISTER = {
+        TessellationType.SOKOBAN: "sokoban",
+        TessellationType.TRIOBAN: "sokoban",
+        TessellationType.HEXOBAN: "sokoban",
+        TessellationType.OCTOBAN: "sokoban",
+    }
+
+    @classmethod
+    def factory(cls, tessellation_type):
+        retv = cls._TESSELATION_REGISTER.get(tessellation_type, None)
+        if not retv:
+            raise UnknownTessellationError(tessellation_type)
+        return retv
+
+    @property
+    @abstractmethod
+    def legal_directions(self):
+        """
+        Directions generally accepted by Tessellation.
+        """
+        pass
+
+    @abstractmethod
+    def neighbor_position(self, position, direction, board_width, board_height):
+        """
+        Neighbor position in given direction or off-board position. Rises
+        IllegalDirection in case direction is not one of self.legal_directions
+        """
+        pass
+
+    @abstractmethod
+    def char_to_atomic_move(self, chr):
+        pass
+
+    @abstractmethod
+    def atomic_move_to_char(self, chr):
+        pass
+
+    def cell_orientation(self, positionpos, board_idth, board_height):
+        return CellOrientation.DEFAULT
+
+
+def INDEX(x, y, board_width):
+    return y * board_width + x
+
+def X(index, board_width):
+    return 0 if board_width == 0 else index % board_width
+
+def Y(index, board_width):
+    return 0 if board_width == 0 else int(index / board_width)
+
+def ROW(index, board_width):
+    return Y(index, board_width)
+
+def COLUMN(index, board_width):
+    return X(index, board_width)
+
+def on_board_2D(x, y, board_width, board_height):
+    return x >= 0 and y >= 0 and x < board_width and y < board_height
+
+def on_board_1D(index, board_width, board_height):
+    return index >= 0 and on_board_2D(
+        X(index, board_width),
+        Y(index, board_width),
+        board_width, board_height
+    )
