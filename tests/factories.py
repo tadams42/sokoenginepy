@@ -5,8 +5,8 @@ from helpers import fake
 
 from unittest.mock import MagicMock, Mock
 
-from sokoengine.core import Piece, AtomicMove, Direction, BoardCell
-from sokoengine.io import BoardEncodingCharacters
+from sokoengine import Piece, AtomicMove, Direction, BoardCell
+from sokoengine.io.text_utils import BoardEncodingCharacters
 
 
 class PieceFactory(factory.Factory):

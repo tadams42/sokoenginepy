@@ -2,8 +2,8 @@ import pytest
 import copy
 from hamcrest import assert_that, equal_to
 from factories import BoardCellFactory
-from sokoengine.core import BoardCell, SokoengineError
-from sokoengine.io import BoardEncodingCharacters
+from sokoengine import BoardCell, SokoengineError
+from sokoengine.io.text_utils import BoardEncodingCharacters
 
 class DescribeBoardCell(object):
 

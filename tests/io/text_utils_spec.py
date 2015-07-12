@@ -1,10 +1,11 @@
 import pytest
 from hamcrest import assert_that, equal_to
-from sokoengine.io import is_board_string, is_snapshot_string, is_pusher, is_box,\
-    is_goal, is_empty_floor, BoardEncodingCharacters, is_wall,\
-    parse_board_string, BoardConversionError, rle_encode, rle_decode
 
-from sokoengine.io.text_utils import Rle
+from sokoengine import BoardConversionError
+
+from sokoengine.io.text_utils import is_board_string, is_snapshot_string,\
+    is_pusher, is_box, is_goal, is_empty_floor, BoardEncodingCharacters,\
+    is_wall, parse_board_string, rle_encode, rle_decode, Rle
 
 
 class Describe_is_board_string(object):

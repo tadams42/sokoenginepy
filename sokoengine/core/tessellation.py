@@ -163,15 +163,26 @@ class Tessellated(object):
 
 class Tessellation(ABC):
 
-    _TESSELATION_REGISTER = {
-        TessellationType.SOKOBAN: "sokoban",
-        TessellationType.TRIOBAN: "sokoban",
-        TessellationType.HEXOBAN: "sokoban",
-        TessellationType.OCTOBAN: "sokoban",
-    }
+    _TESSELATION_REGISTER = None
 
     @classmethod
     def factory(cls, tessellation_type):
+        if cls._TESSELATION_REGISTER is None:
+            from ..variant.sokoban_tessellation import SokobanTessellation
+            from ..variant.hexoban_tessellation import HexobanTessellation
+            from ..variant.trioban_tessellation import TriobanTessellation
+            from ..variant.octoban_tessellation import OctobanTessellation
+
+            cls._TESSELATION_REGISTER = {
+                TessellationType.SOKOBAN: SokobanTessellation(),
+                TessellationType.TRIOBAN: TriobanTessellation(),
+                TessellationType.HEXOBAN: HexobanTessellation(),
+                TessellationType.OCTOBAN: OctobanTessellation(),
+            }
+
+        if isinstance(tessellation_type, str):
+            tessellation_type = TessellationType.factory(tessellation_type)
+
         retv = cls._TESSELATION_REGISTER.get(tessellation_type, None)
         if not retv:
             raise UnknownTessellationError(tessellation_type)
@@ -193,15 +204,44 @@ class Tessellation(ABC):
         """
         pass
 
+    @property
     @abstractmethod
+    def char_to_atomic_move_dict(self):
+        pass
+
     def char_to_atomic_move(self, chr):
-        pass
+        from .atomic_move import AtomicMove
+        from ..io.text_utils import AtomicMoveCharacters
 
+        if isinstance(chr, AtomicMoveCharacters):
+            chr = chr.value
+
+        direction, box_moved = self.char_to_atomic_move_dict.get(
+            chr, (None, None)
+        )
+
+        if direction is None:
+            raise IllegalDirectionError(chr)
+
+        return AtomicMove(direction=direction, box_moved=box_moved)
+
+    @property
     @abstractmethod
-    def atomic_move_to_char(self, chr):
+    def atomic_move_to_char_dict(self):
         pass
 
-    def cell_orientation(self, positionpos, board_idth, board_height):
+    def atomic_move_to_char(self, atomic_move):
+        chr = self.atomic_move_to_char_dict.get(
+            (atomic_move.direction, atomic_move.is_push_or_pull),
+            None
+        )
+
+        if chr is None:
+            raise IllegalDirectionError(atomic_move)
+
+        return chr
+
+    def cell_orientation(self, position, board_width, board_height):
         return CellOrientation.DEFAULT
 
 
@@ -224,7 +264,7 @@ def on_board_2D(x, y, board_width, board_height):
     return x >= 0 and y >= 0 and x < board_width and y < board_height
 
 def on_board_1D(index, board_width, board_height):
-    return index >= 0 and on_board_2D(
+    return index is not None and index >= 0 and on_board_2D(
         X(index, board_width),
         Y(index, board_width),
         board_width, board_height

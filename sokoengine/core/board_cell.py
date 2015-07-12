@@ -1,6 +1,7 @@
 from .helpers import PrettyPrintable, EqualityComparable, SokoengineError
-from ..io import BoardEncodingCharacters, is_wall, is_pusher, is_goal,\
-    is_empty_floor, is_box
+from ..io.text_utils import BoardEncodingCharacters, is_wall, is_pusher, \
+    is_goal, is_empty_floor, is_box
+
 
 class BoardCell(PrettyPrintable, EqualityComparable):
     """

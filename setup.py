@@ -50,6 +50,8 @@ setup(
         'colored-traceback >=0.2.1',
         'ipython >=3.2.0',
         'ipdb >=0.8.1',
+        'pyexcel-ods3 ==0.0.8',
+        'lxml ==3.4.4',
     ],
 
     cmdclass = {'test': PyTest},

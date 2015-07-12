@@ -1,7 +1,7 @@
 import pytest
 from factories import AtomicMoveFactory
 from hamcrest import assert_that, equal_to, is_, none
-from sokoengine.core import Direction, Pusher, Box, InvalidPieceIdError
+from sokoengine import Direction, Pusher, Box, InvalidPieceIdError
 
 
 class DescribeAtomicMove(object):
