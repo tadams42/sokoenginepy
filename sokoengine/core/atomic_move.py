@@ -2,17 +2,17 @@ from .helpers import PrettyPrintable, EqualityComparable
 from .tessellation import Direction
 from .piece import Box, Pusher, InvalidPieceIdError
 
+
 class AtomicMove(PrettyPrintable, EqualityComparable):
 
-    direction = Direction.LEFT
-    _box_moved = False
-    _pusher_selected = False
-    _pusher_jumped = False
-    _pusher_id = Pusher.DEFAULT_ID
-    _moved_box_id = None
-    group_id = 0
-
     def __init__(self, direction = Direction.LEFT, box_moved = False):
+        self._box_moved = False
+        self._pusher_selected = False
+        self._pusher_jumped = False
+        self._pusher_id = Pusher.DEFAULT_ID
+        self._moved_box_id = None
+        self.group_id = 0
+
         self.direction = direction
         if box_moved:
             self.is_push_or_pull = True

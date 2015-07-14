@@ -14,13 +14,13 @@ class Describe_is_board_string(object):
     def test_it_recognizes_board_string(self):
         assert_that(is_board_string(self.input), equal_to(True))
 
-    def test_it_recognizes_illegal_characters(self):
+    def test_it_fails_on_illegal_characters(self):
         assert_that(is_board_string(self.input + "z"), equal_to(False))
 
-    def test_it_doesnt_recognize_numeric_string(self):
+    def test_it_fails_on_numeric_string(self):
         assert_that(is_board_string("42"), equal_to(False))
 
-    def test_it_doesnt_recognize_blank_string(self):
+    def test_it_fails_on_blank_string(self):
         assert_that(is_board_string(""), equal_to(False))
         assert_that(is_board_string("    "), equal_to(False))
         assert_that(is_board_string("   \r\n "), equal_to(False))
@@ -32,13 +32,13 @@ class Describe_is_snapshot_string(object):
     def test_it_recognizes_snapshot_string(self):
         assert_that(is_snapshot_string(self.input), equal_to(True))
 
-    def test_it_recognizes_illegal_characters(self):
+    def test_it_fails_on_illegal_characters(self):
         assert_that(is_board_string(self.input + "z"), equal_to(False))
 
-    def test_it_doesnt_recognize_numeric_string(self):
+    def test_it_fails_on_numeric_string(self):
         assert_that(is_board_string("42"), equal_to(False))
 
-    def test_it_doesnt_recognize_blank_string(self):
+    def test_it_fails_on_blank_string(self):
         assert_that(is_board_string(""), equal_to(False))
         assert_that(is_board_string("    "), equal_to(False))
         assert_that(is_board_string("   \r\n "), equal_to(False))
@@ -92,9 +92,16 @@ class Describe_parse_board_string(object):
               "##  $ ####\n" +\
               "# $.+ #\n" +\
               "#######\n"
+        result = [
+            " ##########",
+            "           ",
+            " ## @ *   #",
+            "##  $ #### ",
+            "# $.+ #    ",
+            "#######    ",
+        ]
         parsed = parse_board_string(src)
-        assert_that(len(parsed), equal_to(6))
-        assert_that(len(parsed[0]), equal_to(11))
+        assert_that(parsed, equal_to(result))
 
     def test_it_parses_RLE_board(self):
         src = " ##########   |" +\
@@ -102,9 +109,15 @@ class Describe_parse_board_string(object):
               "##  $ ####|" +\
               "# $.+ #|||" +\
               "#######   |"
+        result = [
+            " ##########   ",
+            " ## @ *   #   ",
+            "##  $ ####    ",
+            "# $.+ #       ",
+            "#######       ",
+        ]
         parsed = parse_board_string(src)
-        assert_that(len(parsed), equal_to(5))
-        assert_that(len(parsed[0]), equal_to(14))
+        assert_that(parsed, equal_to(result))
 
     def test_it_raises_on_illegal_characters(self):
         src = " ##########\n\n" +\
@@ -121,9 +134,16 @@ class Describe_parse_board_string(object):
               "##  $ ####\n\n" +\
               "# $.+ #\n\n" +\
               "#######\n\n"
+        result = [
+            " ##########",
+            "           ",
+            " ## @ *   #",
+            "##  $ #### ",
+            "# $.+ #    ",
+            "#######    ",
+        ]
         parsed = parse_board_string(src)
-        assert_that(len(parsed), equal_to(6))
-        assert_that(len(parsed[0]), equal_to(11))
+        assert_that(parsed, equal_to(result))
 
     def test_id_discards_blank_boards(self):
         src = "              "

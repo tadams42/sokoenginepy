@@ -3,8 +3,6 @@ import factory
 
 from helpers import fake
 
-from unittest.mock import MagicMock, Mock
-
 from sokoengine import Piece, AtomicMove, Direction, BoardCell
 from sokoengine.io.text_utils import BoardEncodingCharacters
 

@@ -134,7 +134,7 @@ class TessellationType(Enum):
     @classmethod
     def factory(cls, description):
         tmp = description.strip().lower() if description else ""
-        if tmp == "sokoban":
+        if tmp == "sokoban" or tmp == "":
             return cls.SOKOBAN
         elif tmp == 'trioban':
             return cls.TRIOBAN
@@ -147,9 +147,6 @@ class TessellationType(Enum):
 
 
 class Tessellated(object):
-
-    _tessellation_type = None
-    _tessellation = None
 
     def __init__(self, tessellation_type):
         assert tessellation_type is not None, "Tessellation type must be speciffied!"

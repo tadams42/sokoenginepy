@@ -10,15 +10,13 @@ class InvalidPiecePlusIdError(AttributeError):
 
 
 class Piece(PrettyPrintable, EqualityComparable):
-
     DEFAULT_ID      = 1
     DEFAULT_PLUS_ID = 0
 
-    position = 0
-    _id       = DEFAULT_ID
-    _plus_id  = DEFAULT_PLUS_ID
-
     def __init__(self, position = 0, id = DEFAULT_ID, plus_id = DEFAULT_PLUS_ID):
+        self._id       = None
+        self._plus_id  = None
+
         self.position = position
         self.id       = id
         self.plus_id  = plus_id

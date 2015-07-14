@@ -11,14 +11,15 @@ class BoardCell(PrettyPrintable, EqualityComparable):
     This is by design: BoardCell is value class, not game logic class.
     """
 
-    _has_box      = False
-    _has_pusher   = False
-    _has_goal     = False
-    _is_wall     = False
-    is_in_playable_area = False
-    is_deadlock = False
-
     def __init__(self, chr = BoardEncodingCharacters.FLOOR.value):
+
+        self._has_box            = False
+        self._has_pusher         = False
+        self._has_goal           = False
+        self._is_wall            = False
+        self.is_in_playable_area = False
+        self.is_deadlock         = False
+
         if is_wall(chr):
             self.is_wall = True
         elif is_pusher(chr):

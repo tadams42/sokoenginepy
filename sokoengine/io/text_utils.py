@@ -8,14 +8,19 @@ import re
 from enum import Enum
 from itertools import groupby
 from functools import reduce
-from pyparsing import Regex, nestedExpr, ZeroOrMore, ParseBaseException
+from pyparsing import (
+    Regex, nestedExpr, ZeroOrMore, ParseBaseException, CharsNotIn, oneOf, Group
+)
+from ..core.helpers import SokoengineError
+from ..core.tessellation import GameSolvingMode
 
 
-class BoardConversionError(RuntimeError):
-    CONVERSION_OK         = 1
-    RLE_ERROR             = 2
-    NON_BOARD_CHARS_FOUND = 4
-    INVALID_LAYOUT        = 8
+class BoardConversionError(SokoengineError):
+    RLE_DECODING_ERROR    = "Rle decoding board string failed"
+    NON_BOARD_CHARS_FOUND = "Illegal characters found in board string"
+    INVALID_LAYOUT        = "Board string has invalid layout for tessellation with multiple characters per single board cell"
+
+
 
 
 class BoardEncodingCharacters(Enum):
@@ -254,23 +259,16 @@ class Rle(object):
         """
         return re_rle_replacer.sub(lambda m: m.group(2) * int(m.group(1)), rle_token)
 
-    rle_token = Regex(
-        "([^" +
-        re.escape(RleCharacters.GROUP_LEFT_DELIM.value) +
-        re.escape(RleCharacters.GROUP_RIGHT_DELIM.value) +
-        "])+"
+    rle_token = CharsNotIn(
+        RleCharacters.GROUP_LEFT_DELIM.value +
+        RleCharacters.GROUP_RIGHT_DELIM.value
     )
     grouped_rle = nestedExpr(
         RleCharacters.GROUP_LEFT_DELIM.value,
         RleCharacters.GROUP_RIGHT_DELIM.value
     )
-    token_then_group = rle_token + grouped_rle
-    group_then_token = grouped_rle + rle_token
     token_or_group = rle_token | grouped_rle
-    grammar = ZeroOrMore(token_or_group) +\
-        ZeroOrMore(token_then_group) +\
-        ZeroOrMore(group_then_token) +\
-        ZeroOrMore(token_or_group)
+    grammar = ZeroOrMore(token_or_group)
 
     @classmethod
     def tokenize_grouped_rle(cls, line):
@@ -333,8 +331,10 @@ rle_splitter = re.compile(
 )
 def parse_board_string(line):
     """
-    Tries to parse string as Sokoban board as defined in SOK
-    format specification
+    Tries to parse string as board string (defined in SOK format specification)
+    Note that this only constructs list of valid board lines, but this list is
+    still not usable board. To use it as board, it needs to be fed into one of
+    board classes.
     """
     if is_blank(line):
         return []
