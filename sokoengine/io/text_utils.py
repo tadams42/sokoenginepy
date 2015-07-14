@@ -21,6 +21,13 @@ class BoardConversionError(SokoengineError):
     INVALID_LAYOUT        = "Board string has invalid layout for tessellation with multiple characters per single board cell"
 
 
+class SnapshotConversionError(SokoengineError):
+    RLE_DECODING_ERROR = "Rle decoding board string failed"
+    NON_SNAPSHOT_CHARACTERS_FOUND = "Illegal characters found in snapshot string"
+    TOKENIZATION_ERROR = "Tokenizing snapshot string elements failed. Maybe there are unmatched parentheses"
+    NON_VARIANT_CHARACTERS_FOUND = "Snapshot string contains directions not supported by requested tessellation"
+    PUSHER_CHANGE_CONTAINS_PUSHES = "Pusher change sequence in snapshot string contains atomic pushes. This is not allowed"
+    JUMP_CONTAINS_PUSHES = "Jump sequence in snapshot string contains atomic pushes. This is not allowed"
 
 
 class BoardEncodingCharacters(Enum):
@@ -343,3 +350,145 @@ def parse_board_string(line):
 
     line = rle_decode(line)
     return normalize_width(drop_empty(rle_splitter.split(line)))
+
+
+re_snapshot_string_cleanup = re.compile(
+    "([" +
+    re.escape(SpecialSnapshotCharacters.CURENT_POSITION_CH.value) +
+    r"\s])+"
+)
+
+class SnapshotStringParser(object):
+    atomic_moves = Regex(
+        "([" +
+        "".join([c.value for c in AtomicMoveCharacters]) +
+        "])+"
+    )
+    jump = Group(
+        oneOf(SpecialSnapshotCharacters.JUMP_BEGIN.value) +
+        ZeroOrMore(atomic_moves) +
+        oneOf(SpecialSnapshotCharacters.JUMP_END.value)
+    )
+    pusher_change = Group(
+        oneOf(SpecialSnapshotCharacters.PUSHER_CHANGE_BEGIN.value) +
+        ZeroOrMore(atomic_moves) +
+        oneOf(SpecialSnapshotCharacters.PUSHER_CHANGE_END.value)
+    )
+    grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
+
+    def __init__(self):
+        self._first_encountered_error = None
+        self._resulting_solving_mode = None
+        self._resulting_moves = None
+
+    @property
+    def first_encountered_error(self):
+        return self._first_encountered_error
+
+    @property
+    def resulting_solving_mode(self):
+        return self._resulting_solving_mode
+
+    @property
+    def resulting_moves(self):
+        return self._resulting_moves
+
+    def tokenize_moves_data(cls, line):
+        retv = []
+        try:
+            retv = cls.grammar.parseString(line).asList()
+        except ParseBaseException:
+            retv = []
+        return retv
+
+    def convert(self, moves_string, tessellation):
+        """
+        - Parses moves_string into sequence of AtomicMove using provided
+          tessellation
+        - Sets parser state detailing the first error encountered in parsing
+        - returns boolean value signaling parsing success or failure
+        """
+        self._first_encountered_error = None
+        self._resulting_solving_mode = None
+        self._resulting_moves = None
+
+        moves_string = re_snapshot_string_cleanup.sub("", moves_string)
+        if is_blank(moves_string):
+            self._resulting_solving_mode = GameSolvingMode.FORWARD
+            self._resulting_moves = []
+            return True
+
+        if not is_snapshot_string(moves_string):
+            self._first_encountered_error = SnapshotConversionError.NON_SNAPSHOT_CHARACTERS_FOUND
+            return False
+
+        if (
+            SpecialSnapshotCharacters.JUMP_BEGIN.value in moves_string or
+            SpecialSnapshotCharacters.JUMP_END.value in moves_string
+        ):
+            self._resulting_solving_mode = GameSolvingMode.REVERSE
+        else:
+            self._resulting_solving_mode = GameSolvingMode.FORWARD
+
+        moves_string = rle_decode(moves_string)
+        if is_blank(moves_string):
+            self._first_encountered_error = SnapshotConversionError.RLE_DECODING_ERROR
+            return False
+
+        tokens = self.tokenize_moves_data(moves_string)
+        if len(tokens) == 0:
+            self._first_encountered_error = SnapshotConversionError.TOKENIZATION_ERROR
+            return False
+
+        self._resulting_moves = []
+        for token in tokens:
+            if isinstance(token, list):
+                if len(token) < 3:
+                    # Skip empty tokens
+                    continue
+                convert_success = self._convert_token(
+                    token=token[1],
+                    tessellation=tessellation,
+                    is_jump=(token[0] == SpecialSnapshotCharacters.JUMP_BEGIN.value),
+                    is_pusher_change=(token[0] == SpecialSnapshotCharacters.PUSHER_CHANGE_BEGIN.value),
+                )
+            else:
+                convert_success = self._convert_token(
+                    token=token,
+                    tessellation=tessellation
+                )
+            if not convert_success:
+                return False
+
+        return True
+
+    def _convert_token(
+        self, token, tessellation, is_jump=False, is_pusher_change=False
+    ):
+        for chr in token:
+            atomic_move = None
+            try:
+                atomic_move = tessellation.char_to_atomic_move(chr)
+            except SokoengineError:
+                atomic_move = None
+
+            if atomic_move is None:
+                self._first_encountered_error = SnapshotConversionError.NON_VARIANT_CHARACTERS_FOUND
+                return False
+
+            if is_jump:
+                if atomic_move.is_push_or_pull:
+                    self._first_encountered_error = SnapshotConversionError.JUMP_CONTAINS_PUSHES
+                    return False
+                else:
+                    atomic_move.is_jump = True
+            elif is_pusher_change:
+                if atomic_move.is_push_or_pull:
+                    self._first_encountered_error = SnapshotConversionError.PUSHER_CHANGE_CONTAINS_PUSHES
+                    return False
+                else:
+                    atomic_move.is_pusher_selection = True
+
+            self._resulting_moves.append(atomic_move)
+
+        return True

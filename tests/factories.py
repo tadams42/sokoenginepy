@@ -3,7 +3,11 @@ import factory
 
 from helpers import fake
 
-from sokoengine import Piece, AtomicMove, Direction, BoardCell
+from sokoengine import (
+    AtomicMove, Direction, BoardCell, GameSnapshot, TessellationType,
+    GameSolvingMode
+)
+from sokoengine.core.piece import Piece
 from sokoengine.io.text_utils import BoardEncodingCharacters
 
 
@@ -24,6 +28,7 @@ class PieceFactory(factory.Factory):
             min=Piece.DEFAULT_PLUS_ID, max=Piece.DEFAULT_PLUS_ID + 100
         )
     )
+
 @pytest.fixture
 def piece():
     return PieceFactory()
@@ -39,9 +44,26 @@ class AtomicMoveFactory(factory.Factory):
     direction = factory.LazyAttribute(
         lambda x: fake.random_element(list(Direction))
     )
+
 @pytest.fixture
 def atomic_move():
-    return AtomicMoveFactory()
+    return AtomicMoveFactory(direction=Direction.LEFT, box_moved=False)
+
+@pytest.fixture
+def atomic_push():
+    return AtomicMoveFactory(direction=Direction.LEFT, box_moved=True)
+
+@pytest.fixture
+def atomic_jump():
+    retv = AtomicMoveFactory(direction=Direction.LEFT)
+    retv.is_jump = True
+    return retv
+
+@pytest.fixture
+def atomic_pusher_selection():
+    retv = AtomicMoveFactory(direction=Direction.LEFT)
+    retv.is_pusher_selection = True
+    return retv
 
 
 class BoardCellFactory(factory.Factory):
@@ -51,6 +73,24 @@ class BoardCellFactory(factory.Factory):
     chr = factory.LazyAttribute(
         lambda x: BoardEncodingCharacters.FLOOR.value
     )
+
 @pytest.fixture
 def board_cell():
     return BoardCellFactory()
+
+
+class GameSnapshotFactory(factory.Factory):
+    class Meta:
+        model = GameSnapshot
+
+    tessellation_type = factory.LazyAttribute(
+        lambda x: fake.random_element(list(TessellationType))
+    )
+    solving_mode = factory.LazyAttribute(
+        lambda x: fake.random_element(list(GameSolvingMode))
+    )
+    moves_data = ""
+
+@pytest.fixture
+def game_snapshot():
+    return GameSnapshotFactory(moves_data="lurdLURD{lurd}LURD")

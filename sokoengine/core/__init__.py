@@ -5,6 +5,7 @@ from .tessellation import Direction, GameSolvingMode, TessellationType,\
     IllegalDirectionError, UnknownTessellationError, CellOrientation
 from .atomic_move import AtomicMove
 from .board_cell import BoardCell
+from .game_snapshot import GameSnapshot
 
 __all__ = [
     'SokoengineError',
@@ -17,4 +18,6 @@ __all__ = [
     'AtomicMove',
 
     'BoardCell',
+
+    'GameSnapshot'
 ]

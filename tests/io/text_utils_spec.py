@@ -1,11 +1,15 @@
 import pytest
 from hamcrest import assert_that, equal_to
 
-from sokoengine import BoardConversionError
+from sokoengine import BoardConversionError, GameSolvingMode, AtomicMove,\
+    Direction
+
+from sokoengine.core.tessellation import Tessellation
 
 from sokoengine.io.text_utils import is_board_string, is_snapshot_string,\
     is_pusher, is_box, is_goal, is_empty_floor, BoardEncodingCharacters,\
-    is_wall, parse_board_string, rle_encode, rle_decode, Rle
+    is_wall, parse_board_string, rle_encode, rle_decode, Rle,\
+    SnapshotStringParser, SnapshotConversionError
 
 
 class Describe_is_board_string(object):
@@ -289,3 +293,154 @@ class Describe_rle_decode(object):
             rle_decode("efgh(ab3cd)"),
             equal_to("efghabcccd")
         )
+
+
+@pytest.fixture
+def parser():
+    return SnapshotStringParser()
+
+class DescribeSnapshotTextParser(object):
+
+    class Describe_convert(object):
+        def test_it_ignores_spaces_and_current_position_character(self, parser):
+            success = parser.convert("  \n **  \t l ", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(True))
+            assert_that(
+                parser._resulting_solving_mode,
+                equal_to(GameSolvingMode.FORWARD)
+            )
+            assert_that(
+                parser._resulting_moves,
+                equal_to([AtomicMove(Direction.LEFT)])
+            )
+
+        def test_it_accepts_blank_input_as_empty_forward_snapshot(self, parser):
+            success = parser.convert("  \n   \t  ", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(True))
+            assert_that(
+                parser._resulting_solving_mode,
+                equal_to(GameSolvingMode.FORWARD)
+            )
+            assert_that(
+                parser._resulting_moves, equal_to([])
+            )
+
+        def test_it_fails_on_non_snapshot_characters(self, parser):
+            success = parser.convert("ZOMG! ", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(False))
+            assert_that(
+                parser._first_encountered_error,
+                equal_to(SnapshotConversionError.NON_SNAPSHOT_CHARACTERS_FOUND)
+            )
+
+        def test_it_sets_mode_to_reverse_if_jumps_are_found(self, parser):
+            success = parser.convert("[lurd] ", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(True))
+            for atomic_move in parser._resulting_moves:
+                assert_that(atomic_move.is_jump, equal_to(True))
+
+        def test_it_ignores_empty_jump_and_pusher_selection_sequences(
+            self, parser
+        ):
+            success = parser.convert("[]lurd", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(True))
+            assert_that(len(parser._resulting_moves), equal_to(4))
+
+        def test_it_detects_reverse_snapshot_while_ignoring_empty_jumps(
+            self, parser
+        ):
+            success = parser.convert("[]lurd", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(True))
+            assert_that(
+                parser._resulting_solving_mode,
+                equal_to(GameSolvingMode.REVERSE)
+            )
+
+        def test_it_fails_on_rle_errors(self, parser):
+            success = parser.convert("((4l)", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(False))
+            assert_that(
+                parser._first_encountered_error,
+                equal_to(SnapshotConversionError.RLE_DECODING_ERROR)
+            )
+
+        def test_it_fails_on_non_matched_sequence_separators(
+            self, parser
+        ):
+            success = parser.convert("[lurd", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(False))
+            assert_that(
+                parser._first_encountered_error,
+                equal_to(SnapshotConversionError.TOKENIZATION_ERROR)
+            )
+
+        def test_it_fails_on_moves_illegal_in_context_of_requested_tessellation(
+            self, parser
+        ):
+            success = parser.convert("Nlurd", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(False))
+            assert_that(
+                parser._first_encountered_error,
+                equal_to(SnapshotConversionError.NON_VARIANT_CHARACTERS_FOUND)
+            )
+
+        def test_it_correctly_detects_jumps(self, parser):
+            success = parser.convert("[lurd] ", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(True))
+            for atomic_move in parser._resulting_moves:
+                assert_that(atomic_move.is_jump, equal_to(True))
+
+        def test_it_correctly_detects_pusher_selections(self, parser):
+            success = parser.convert("{lurd} ", Tessellation.factory("Sokoban"))
+            assert_that(success, equal_to(True))
+            for atomic_move in parser._resulting_moves:
+                assert_that(atomic_move.is_pusher_selection, equal_to(True))
+
+    class Describe_convert_token(object):
+        def test_it_fails_on_moves_illegal_in_context_of_requested_tessellation(
+            self, parser
+        ):
+            parser._convert_token("Nlurd", Tessellation.factory("Sokoban"))
+            assert_that(
+                parser._first_encountered_error,
+                equal_to(SnapshotConversionError.NON_VARIANT_CHARACTERS_FOUND)
+            )
+
+        def test_it_fails_on_jumps_that_contain_pushes(self, parser):
+            parser._resulting_moves = []
+            parser._convert_token(
+                "lurD", Tessellation.factory("Sokoban"), is_jump=True
+            )
+            assert_that(
+                parser._first_encountered_error,
+                equal_to(SnapshotConversionError.JUMP_CONTAINS_PUSHES)
+            )
+
+        def test_it_fails_on_pusher_selections_that_contain_pushes(
+            self, parser
+        ):
+            parser._resulting_moves = []
+            parser._convert_token(
+                "lurD", Tessellation.factory("Sokoban"), is_pusher_change=True
+            )
+            assert_that(
+                parser._first_encountered_error,
+                equal_to(SnapshotConversionError.PUSHER_CHANGE_CONTAINS_PUSHES)
+            )
+
+        def test_it_appends_converted_moves_to_parser_resulting_moves(
+            self, parser
+        ):
+            parser._resulting_moves = []
+            parser._convert_token(
+                "lurD", Tessellation.factory("Sokoban")
+            )
+            assert_that(
+                parser._resulting_moves,
+                equal_to([
+                    AtomicMove(Direction.LEFT),
+                    AtomicMove(Direction.UP),
+                    AtomicMove(Direction.RIGHT),
+                    AtomicMove(Direction.DOWN, box_moved=True),
+                ])
+            )
