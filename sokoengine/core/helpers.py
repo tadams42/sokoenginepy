@@ -1,6 +1,3 @@
-class SokoengineError(RuntimeError):
-    pass
-
 
 class PrettyPrintable(object):
 

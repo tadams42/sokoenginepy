@@ -1,23 +1,23 @@
-from .helpers import SokoengineError
-from .piece import InvalidPieceIdError, InvalidPiecePlusIdError,\
-    Box, Pusher, Goal
+from .exceptions import SokoengineError, InvalidPieceIdError, \
+    InvalidPiecePlusIdError, IllegalDirectionError, UnknownTessellationError
+from .piece import Box, Pusher, Goal
 from .tessellation import Direction, GameSolvingMode, TessellationType,\
-    IllegalDirectionError, UnknownTessellationError, CellOrientation
+    CellOrientation
 from .atomic_move import AtomicMove
 from .board_cell import BoardCell
 from .game_snapshot import GameSnapshot
 
 __all__ = [
-    'SokoengineError',
+    'SokoengineError', 'InvalidPieceIdError', 'InvalidPiecePlusIdError',
+    'IllegalDirectionError', 'UnknownTessellationError',
 
-    'Box', 'Pusher', 'Goal', 'InvalidPieceIdError', 'InvalidPiecePlusIdError',
+    'Box', 'Pusher', 'Goal',
 
-    'Direction', 'GameSolvingMode', 'TessellationType', 'IllegalDirectionError',
-    'UnknownTessellationError', 'CellOrientation',
+    'Direction', 'GameSolvingMode', 'TessellationType', 'CellOrientation',
 
     'AtomicMove',
 
     'BoardCell',
 
-    'GameSnapshot'
+    'GameSnapshot',
 ]

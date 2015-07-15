@@ -1,6 +1,7 @@
 from ..core.tessellation import Tessellation, on_board_2D, on_board_1D, ROW, \
     COLUMN, INDEX
-from ..core import Direction, IllegalDirectionError, CellOrientation
+from ..core.exceptions import IllegalDirectionError
+from ..core import Direction, CellOrientation
 from ..io.text_utils import AtomicMoveCharacters
 
 

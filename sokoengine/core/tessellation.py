@@ -1,15 +1,6 @@
 from enum import Enum
 from abc import ABC, abstractmethod
-from .helpers import SokoengineError
-
-
-class IllegalDirectionError(SokoengineError):
-    pass
-
-
-class UnknownTessellationError(SokoengineError):
-    pass
-
+from .exceptions import UnknownTessellationError, IllegalDirectionError
 
 class Direction(Enum):
     UP         = 0

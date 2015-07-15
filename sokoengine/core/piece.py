@@ -1,13 +1,5 @@
 from .helpers import PrettyPrintable, EqualityComparable
-
-
-class InvalidPieceIdError(AttributeError):
-    pass
-
-
-class InvalidPiecePlusIdError(AttributeError):
-    pass
-
+from .exceptions import InvalidPieceIdError, InvalidPiecePlusIdError
 
 class Piece(PrettyPrintable, EqualityComparable):
     DEFAULT_ID      = 1

@@ -1,4 +1,5 @@
-from .helpers import PrettyPrintable, EqualityComparable, SokoengineError
+from .helpers import PrettyPrintable, EqualityComparable
+from .exceptions import SokoengineError
 from ..io.text_utils import BoardEncodingCharacters, is_wall, is_pusher, \
     is_goal, is_empty_floor, is_box
 

@@ -1,6 +1,7 @@
 from .helpers import PrettyPrintable, EqualityComparable
 from .tessellation import Direction
-from .piece import Box, Pusher, InvalidPieceIdError
+from .piece import Box, Pusher
+from .exceptions import InvalidPieceIdError
 
 
 class AtomicMove(PrettyPrintable, EqualityComparable):

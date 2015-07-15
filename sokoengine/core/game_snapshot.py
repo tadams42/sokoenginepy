@@ -1,8 +1,10 @@
 from collections.abc import MutableSequence, Iterable
-from .helpers import PrettyPrintable, EqualityComparable, SokoengineError
-from .tessellation import GameSolvingMode, Tessellated, \
-    TessellationType, IllegalDirectionError
-from ..io import OutuputSettings, SnapshotConversionError
+
+from .helpers import PrettyPrintable, EqualityComparable
+from .exceptions import SnapshotConversionError, IllegalDirectionError, \
+    SokoengineError
+from .tessellation import GameSolvingMode, Tessellated, TessellationType
+from ..io import OutuputSettings
 from ..io.text_utils import SpecialSnapshotCharacters, rle_encode, is_blank
 
 
