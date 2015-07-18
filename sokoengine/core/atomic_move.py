@@ -20,7 +20,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         else:
             self.is_move = True
 
-    def __representation_attributes__(self):
+    def _representation_attributes(self):
         return {
             'direction': self.direction,
             'is_push_or_pull': self.is_push_or_pull,
@@ -31,7 +31,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
             'group_id': self.group_id,
         }
 
-    def __equality_attributes__(self):
+    def _equality_attributes(self):
         return (
             self.direction, self.is_push_or_pull,
             self.is_pusher_selection, self.is_jump,

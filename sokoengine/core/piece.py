@@ -1,6 +1,7 @@
 from .helpers import PrettyPrintable, EqualityComparable
 from .exceptions import InvalidPieceIdError, InvalidPiecePlusIdError
 
+
 class Piece(PrettyPrintable, EqualityComparable):
     DEFAULT_ID      = 1
     DEFAULT_PLUS_ID = 0
@@ -13,7 +14,7 @@ class Piece(PrettyPrintable, EqualityComparable):
         self.id       = id
         self.plus_id  = plus_id
 
-    def __representation_attributes__(self):
+    def _representation_attributes(self):
         return {
             'position': self.position,
             'id': self.id,

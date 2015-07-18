@@ -5,9 +5,9 @@ from helpers import fake
 
 from sokoengine import (
     AtomicMove, Direction, BoardCell, GameSnapshot, TessellationType,
-    GameSolvingMode
+    GameSolvingMode, SokobanPlus, Piece
 )
-from sokoengine.core.piece import Piece
+from sokoengine.core.sokoban_plus import SokobanPlusValidator
 from sokoengine.io.text_utils import BoardEncodingCharacters
 
 
@@ -94,3 +94,29 @@ class GameSnapshotFactory(factory.Factory):
 @pytest.fixture
 def game_snapshot():
     return GameSnapshotFactory(moves_data="lurdLURD{lurd}LURD")
+
+
+class SokobanPlusFactory(factory.Factory):
+    class Meta:
+        model = SokobanPlus
+
+    pieces_count = factory.LazyAttribute(
+        lambda x: 5
+    )
+
+    boxorder = factory.LazyAttribute(
+        lambda x: "42 24 4 2"
+    )
+
+    goalorder = factory.LazyAttribute(
+        lambda x: "2 24 42 4"
+    )
+
+@pytest.fixture
+def sokoban_plus():
+    return SokobanPlusFactory()
+
+@pytest.fixture
+def sokoban_plus_validator(sokoban_plus):
+    sokoban_plus._parse()
+    return SokobanPlusValidator(sokoban_plus)

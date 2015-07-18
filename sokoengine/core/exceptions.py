@@ -31,3 +31,7 @@ class InvalidPieceIdError(SokoengineError):
 
 class InvalidPiecePlusIdError(SokoengineError):
     pass
+
+
+class SokobanPlusDataError(SokoengineError):
+    pass

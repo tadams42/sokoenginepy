@@ -92,7 +92,7 @@ class GameSnapshot(
         self._moves.insert(index, atomic_move)
 
     # PrettyPrintable
-    def __representation_attributes__(self):
+    def _representation_attributes(self):
         return {
             'solving_mode': self.solving_mode,
             'tessellation': self.tessellation_type,
@@ -102,7 +102,7 @@ class GameSnapshot(
         }
 
     # EqualityComparable
-    def __equality_attributes__(self):
+    def _equality_attributes(self):
         return (
             self.tessellation_type, len(self._moves), self.solving_mode,
             self.moves_count, self.pushes_count, self.jumps_count,

@@ -1,7 +1,7 @@
 
 class PrettyPrintable(object):
 
-    def __representation_attributes__(self):
+    def _representation_attributes(self):
         return self.__dict__
 
     def __str__(self):
@@ -10,16 +10,16 @@ class PrettyPrintable(object):
             hex(id(self)),
             ", ".join([
                 "{0}: {1}".format(k, v)
-                for k, v in self.__representation_attributes__().items()
+                for k, v in self._representation_attributes().items()
             ])
         )
 
 
 class EqualityComparable(object):
-    def __equality_attributes__(self):
+    def _equality_attributes(self):
         return self.__dict__
 
     def __eq__(self, other):
         return (
-            self.__equality_attributes__() == other.__equality_attributes__()
+            self._equality_attributes() == other._equality_attributes()
         )

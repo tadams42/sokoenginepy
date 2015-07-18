@@ -38,7 +38,7 @@ class BoardCell(PrettyPrintable, EqualityComparable):
         else:
             raise SokoengineError("Invalid character in BoardCell initializer!")
 
-    def __representation_attributes__(self):
+    def _representation_attributes(self):
         return {
             'has_pusher': self.has_pusher,
             'has_box': self.has_box,
@@ -48,7 +48,7 @@ class BoardCell(PrettyPrintable, EqualityComparable):
             'is_deadlock': self.is_deadlock,
         }
 
-    def __equality_attributes__(self):
+    def _equality_attributes(self):
         return (self.is_wall, self.has_pusher, self.has_box, self.has_goal,)
 
     def to_s(self, use_visible_floor = False):

@@ -12,7 +12,7 @@ from pyparsing import (
     Regex, nestedExpr, ZeroOrMore, ParseBaseException, CharsNotIn, oneOf, Group
 )
 from ..core.exceptions import SokoengineError, BoardConversionError,\
-    SnapshotConversionError
+    SnapshotConversionError, SokobanPlusDataError
 from ..core.tessellation import GameSolvingMode
 
 
@@ -478,3 +478,16 @@ class SnapshotStringParser(object):
             self._resulting_moves.append(atomic_move)
 
         return True
+
+
+def parse_sokoban_plus_data(line):
+    parsed_plus_ids = []
+    try:
+        parsed_plus_ids = [int(j) for j in line.split()]
+    except ValueError:
+        raise SokobanPlusDataError(
+            "Can't parse Sokoban+ string! Illegal characters found. "
+            "Only digits and spaces allowed."
+        )
+
+    return parsed_plus_ids
