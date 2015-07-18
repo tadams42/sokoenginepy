@@ -1,6 +1,7 @@
 from enum import Enum
 from abc import ABC, abstractmethod
-from .exceptions import UnknownTessellationError, IllegalDirectionError
+from ..core.exceptions import UnknownTessellationError, IllegalDirectionError
+
 
 class Direction(Enum):
     UP         = 0
@@ -30,11 +31,6 @@ class Direction(Enum):
             return Direction.NORTH_EAST
         elif self == Direction.SOUTH_EAST:
             return Direction.NORTH_WEST
-
-
-class GameSolvingMode(Enum):
-    FORWARD = 0
-    REVERSE = 1
 
 
 class CellOrientation(Enum):
@@ -156,10 +152,10 @@ class Tessellation(ABC):
     @classmethod
     def factory(cls, tessellation_type):
         if cls._TESSELATION_REGISTER is None:
-            from ..variant.sokoban_tessellation import SokobanTessellation
-            from ..variant.hexoban_tessellation import HexobanTessellation
-            from ..variant.trioban_tessellation import TriobanTessellation
-            from ..variant.octoban_tessellation import OctobanTessellation
+            from .sokoban_tessellation import SokobanTessellation
+            from .hexoban_tessellation import HexobanTessellation
+            from .trioban_tessellation import TriobanTessellation
+            from .octoban_tessellation import OctobanTessellation
 
             cls._TESSELATION_REGISTER = {
                 TessellationType.SOKOBAN: SokobanTessellation(),
@@ -198,8 +194,8 @@ class Tessellation(ABC):
         pass
 
     def char_to_atomic_move(self, chr):
-        from .atomic_move import AtomicMove
         from ..io.text_utils import AtomicMoveCharacters
+        from ..core.atomic_move import AtomicMove
 
         if isinstance(chr, AtomicMoveCharacters):
             chr = chr.value

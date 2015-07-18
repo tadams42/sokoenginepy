@@ -2,7 +2,7 @@
 
 import pytest
 from hamcrest import assert_that, equal_to
-from sokoengine.core.tessellation import Tessellation, INDEX, on_board_1D
+from sokoengine.variant.tessellation import Tessellation, INDEX, on_board_1D
 from sokoengine import IllegalDirectionError
 from sokoengine import CellOrientation, Direction
 

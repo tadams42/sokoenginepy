@@ -13,7 +13,7 @@ from pyparsing import (
 )
 from ..core.exceptions import SokoengineError, BoardConversionError,\
     SnapshotConversionError, SokobanPlusDataError
-from ..core.tessellation import GameSolvingMode
+from ..game.common import GameSolvingMode
 
 
 class BoardEncodingCharacters(Enum):

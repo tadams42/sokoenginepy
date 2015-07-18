@@ -39,6 +39,9 @@ setup(
         'Unipath ==1.1',
         'pytz',
         'pyparsing ==2.0.3',
+        # Alternative that might be faster but doesn't work on Python 3.4
+        # graph-tool
+        'networkx ==1.9.1',
     ],
 
     tests_require = [

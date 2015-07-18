@@ -1,5 +1,5 @@
 from .helpers import PrettyPrintable, EqualityComparable
-from .tessellation import Direction
+from ..variant.tessellation import Direction
 from .piece import Box, Pusher
 from .exceptions import InvalidPieceIdError
 

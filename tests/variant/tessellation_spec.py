@@ -1,6 +1,6 @@
 
 from hamcrest import assert_that, equal_to
-from sokoengine.core.tessellation import INDEX, X, Y, on_board_2D, on_board_1D
+from sokoengine.variant.tessellation import INDEX, X, Y, on_board_2D, on_board_1D
 from sokoengine import Direction
 
 

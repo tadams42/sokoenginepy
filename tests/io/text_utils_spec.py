@@ -4,7 +4,7 @@ from hamcrest import assert_that, equal_to
 from sokoengine import BoardConversionError, GameSolvingMode, AtomicMove,\
     Direction
 
-from sokoengine.core.tessellation import Tessellation
+from sokoengine.variant.tessellation import Tessellation
 
 from sokoengine.io.text_utils import is_board_string, is_snapshot_string,\
     is_pusher, is_box, is_goal, is_empty_floor, BoardEncodingCharacters,\
