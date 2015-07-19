@@ -1,3 +1,5 @@
+from .version import *
+
 from .core.atomic_move import AtomicMove
 from .core.board_cell import BoardCell
 from .core.exceptions import (

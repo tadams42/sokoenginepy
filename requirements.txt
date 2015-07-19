@@ -1,0 +1,15 @@
+Unipath>=1.1
+pytz>=2015.4
+pyparsing>=2.0.3
+networkx>=1.9.1
+
+colored-traceback>=0.2.1
+ipython>=3.2.0,<4
+ipdb>=0.8.1
+pytest>=2.7.2
+pytest-spec>=0.2.24
+factory-boy>=2.5.2
+fake-factory>=0.5.2
+PyHamcrest>=1.8.3
+pyexcel-ods3>=0.0.8
+lxml>=3.4.4

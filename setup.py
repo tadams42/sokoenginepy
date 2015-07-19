@@ -1,6 +1,20 @@
 import sys
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
+# To use a consistent encoding
+from codecs import open
+from os import path
+
+
+here = path.abspath(path.dirname(__file__))
+version = {}
+
+
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
+with open(path.join(here, 'sokoengine/version.py'), encoding='utf-8') as f:
+    exec(f.read(), version)
 
 
 class PyTest(TestCommand):
@@ -22,45 +36,73 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
+# Always installed
+requirements = [
+    'Unipath>=1.1',
+    'pytz>=2015.4',
+    'pyparsing>=2.0.3',
+    # Alternative that is A LOT faster but hard to install
+    # graph-tool
+    'networkx>=1.9.1',
+]
+
+# $ pip install -e .[dev,test]
+requirements_dev = [
+    'colored-traceback>=0.2.1',
+    'ipython>=3.2.0,<4',
+    'ipdb>=0.8.1',
+]
+
+# $ pip install -e .[dev,test]
+# Also, automatically installed by setup.py test
+requirements_test = [
+    'pytest>=2.7.2',
+    'pytest-spec>=0.2.24',
+    'factory-boy>=2.5.2',
+    'fake-factory>=0.5.2',
+    'PyHamcrest>=1.8.3',
+    'pyexcel-ods3>=0.0.8',
+    'lxml>=3.4.4',
+]
+
+
 setup(
-    name = "bosp",
-    description = "Bunch Of Sokoban Programs",
-    version = "0.0.1",
-    author = "Tomislav Adamic",
-    author_email = "tomislav.adamic@gmail.com",
-    url = "https://github.com/tadamic/bosp",
-    license = "GPLv3",
-    keywords = "game sokoban hexoban octoban trioban",
 
-    packages = ['sokoengine'],
-    # packages = find_packages(),
+    name             = "bosp",
+    description      = "Bunch Of Sokoban Programs",
+    version          = version['__version__'],
+    author           = "Tomislav Adamic",
+    author_email     = "tomislav.adamic@gmail.com",
+    url              = "https://github.com/tadamic/bosp",
+    license          = "GPLv3",
+    keywords         = "game sokoban hexoban octoban trioban",
+    packages         = ['sokoengine'],
+    install_requires = requirements,
+    long_description = long_description,
 
-    install_requires = [
-        'Unipath ==1.1',
-        'pytz',
-        'pyparsing ==2.0.3',
-        # Alternative that might be faster but doesn't work on Python 3.4
-        # graph-tool
-        'networkx ==1.9.1',
-    ],
+    cmdclass         = {'test': PyTest},
 
-    tests_require = [
-        'pytest >=2.7.2',
-        'pytest-spec >=0.2.24',
-        'factory-boy >=2.5.2',
-        'fake-factory >=0.5.2',
-        'PyHamcrest >=1.8.3',
-        'colored-traceback >=0.2.1',
-        'ipython >=3.2.0',
-        'ipdb >=0.8.1',
-        'pyexcel-ods3 ==0.0.8',
-        'lxml ==3.4.4',
-    ],
-
-    cmdclass = {'test': PyTest},
+    extras_require = {
+        'dev': requirements_dev,
+        'test': requirements_test,
+    },
+    tests_require = requirements_test,
 
     classifiers = [
-        "Programming Language :: Python :: 3",
+        # 'Programming Language :: Python :: 2'
+        # 'Programming Language :: Python :: 2.3'
+        # 'Programming Language :: Python :: 2.4'
+        # 'Programming Language :: Python :: 2.5'
+        # 'Programming Language :: Python :: 2.6'
+        # 'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 3'
+        'Programming Language :: Python :: 3.0'
+        'Programming Language :: Python :: 3.1'
+        'Programming Language :: Python :: 3.2'
+        'Programming Language :: Python :: 3.3'
+        'Programming Language :: Python :: 3.4'
+        'Programming Language :: Python :: 3.5'
+        'Programming Language :: Python :: 3 :: Only',
 
         "Development Status :: 2 - Pre-Alpha",
 
@@ -76,10 +118,4 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Games/Entertainment :: Puzzle Games",
     ],
-
-    long_description = """\
-
-    Not so long for now...
-
-"""
 )
