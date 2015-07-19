@@ -65,6 +65,10 @@ requirements_test = [
     'lxml>=3.4.4',
 ]
 
+with open(path.join(here, 'requirements.txt'), encoding='utf-8', mode='w') as f:
+    for requirement in (requirements + requirements_dev + requirements_test):
+        f.write(requirement + "\n")
+
 
 setup(
 

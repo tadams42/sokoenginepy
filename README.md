@@ -30,4 +30,6 @@ python setup.py develop --uninstall
 python setup.py test -a "tests"
 # or
 python setup.py test -a "--spec tests"
+# or for multiple interpreters
+tox
 ~~~
