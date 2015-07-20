@@ -3,3 +3,5 @@
 .directory
 .tox/
 .eggs/
+.ipynb_checkpoints/
+Untitled.ipynb

@@ -59,6 +59,10 @@ class SpecGenerator(object):
             f.write("from hamcrest import assert_that, equal_to\n")
             f.write("from sokoengine.variant.tessellation import Tessellation, INDEX, on_board_1D\n")
             f.write("from sokoengine import IllegalDirectionError\n")
+            f.write("from sokoengine.variant.sokoban_board import SokobanBoard\n")
+            f.write("from sokoengine.variant.hexoban_board import HexobanBoard\n")
+            f.write("from sokoengine.variant.trioban_board import TrobanBoard\n")
+            f.write("from sokoengine.variant.octoban_board import OctobanBoard\n")
             f.write("from sokoengine import CellOrientation, Direction\n\n\n")
 
             f.write("def triangle_points_down(position, board_width, board_height):\n")

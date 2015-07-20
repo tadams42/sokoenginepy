@@ -51,6 +51,13 @@ requirements_dev = [
     'colored-traceback>=0.2.1',
     'ipython>=3.2.0,<4',
     'ipdb>=0.8.1',
+    'scipy>=0.15.1',
+    'moviepy>=0.2.2.11',
+    'matplotlib>=1.4.3',
+    'pyzmq>=14.7.0',
+    'Jinja2>=2.7.3',
+    'tornado>=4.2.1',
+    'jsonschema>=2.5.1',
 ]
 
 # $ pip install -e .[dev,test]

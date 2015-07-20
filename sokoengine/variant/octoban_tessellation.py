@@ -1,3 +1,4 @@
+import networkx as nx
 from .tessellation import Tessellation, on_board_2D, on_board_1D, ROW, \
     COLUMN, INDEX, Direction, CellOrientation
 from ..core.exceptions import IllegalDirectionError
@@ -14,6 +15,10 @@ class OctobanTessellation(Tessellation):
     @property
     def legal_directions(self):
         return type(self)._LEGAL_DIRECTIONS
+
+    @property
+    def graph_type(self):
+        return nx.DiGraph
 
     _NEIGHBOR_SHIFT = {
         Direction.LEFT      : (0, -1),

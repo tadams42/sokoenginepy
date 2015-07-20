@@ -183,14 +183,24 @@ class Tessellation(ABC):
     @abstractmethod
     def neighbor_position(self, position, direction, board_width, board_height):
         """
-        Neighbor position in given direction or off-board position. Rises
-        IllegalDirection in case direction is not one of self.legal_directions
+        Calculates neighbor position in given direction and verifies calculated
+        position.
+
+        If position would lead off-board, returns None
+
+        Raises IllegalDirection in case direction is not one of
+        self.legal_directions
         """
         pass
 
     @property
     @abstractmethod
     def char_to_atomic_move_dict(self):
+        pass
+
+    @property
+    @abstractmethod
+    def graph_type(self):
         pass
 
     def char_to_atomic_move(self, chr):

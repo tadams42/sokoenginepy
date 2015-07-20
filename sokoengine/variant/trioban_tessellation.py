@@ -1,3 +1,4 @@
+import networkx as nx
 from .tessellation import Tessellation, on_board_2D, on_board_1D, ROW, \
     COLUMN, INDEX, Direction, CellOrientation
 from ..core.exceptions import IllegalDirectionError
@@ -14,6 +15,10 @@ class TriobanTessellation(Tessellation):
     @property
     def legal_directions(self):
         return type(self)._LEGAL_DIRECTIONS
+
+    @property
+    def graph_type(self):
+        return nx.MultiDiGraph
 
     def neighbor_position(self, position, direction, board_width, board_height):
         if on_board_1D(position, board_width, board_height):
