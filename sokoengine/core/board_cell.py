@@ -21,22 +21,21 @@ class BoardCell(PrettyPrintable, EqualityComparable):
         self.is_in_playable_area = False
         self.is_deadlock         = False
 
-        if is_wall(chr):
-            self.is_wall = True
-        elif is_pusher(chr):
-            self.has_pusher = True
-            if is_goal(chr):
+        if not is_empty_floor(chr):
+            if is_wall(chr):
+                self.is_wall = True
+            elif is_pusher(chr):
+                self.has_pusher = True
+                if is_goal(chr):
+                    self.has_goal = True
+            elif is_box(chr):
+                self.has_box = True
+                if is_goal(chr):
+                    self.has_goal = True
+            elif is_goal(chr):
                 self.has_goal = True
-        elif is_box(chr):
-            self.has_box = True
-            if is_goal(chr):
-                self.has_goal = True
-        elif is_goal(chr):
-            self.has_goal = True
-        elif is_empty_floor(chr):
-            self.clear()
-        else:
-            raise SokoengineError("Invalid character in BoardCell initializer!")
+            else:
+                raise SokoengineError("Invalid character in BoardCell initializer!")
 
     def _representation_attributes(self):
         return {
