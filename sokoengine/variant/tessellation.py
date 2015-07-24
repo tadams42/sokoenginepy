@@ -134,15 +134,28 @@ class TessellationType(Enum):
 
 
 class Tessellated(object):
+    """
+    Mixin that marks class depending on Tessellation specifics. This means that
+    class will have to be initialized with TessellationType and it will
+    (internally) use one of Tessellation subclass instances.
+    """
 
     def __init__(self, tessellation_type):
-        assert tessellation_type is not None, "Tessellation type must be speciffied!"
+        """
+        tessellation_type - either case insensitive  string naming tessellation
+        (ie. "hexoban") or one of TessellationType members
+        """
+        assert tessellation_type is not None, "Tessellation type must be specified!"
         self._tessellation_type = tessellation_type
-        self._tessellation = Tessellation.factory(tessellation_type)
+        self._tessellation_instance = Tessellation.factory(tessellation_type)
 
     @property
     def tessellation_type(self):
         return self._tessellation_type
+
+    @property
+    def _tessellation(self):
+        return self._tessellation_instance
 
 
 class Tessellation(ABC):
@@ -190,6 +203,9 @@ class Tessellation(ABC):
 
         Raises IllegalDirection in case direction is not one of
         self.legal_directions
+
+        Position is always expressed as int index of board graph vertice. To
+        convert 2D coordinates into vertice index, use INDEX method
         """
         pass
 

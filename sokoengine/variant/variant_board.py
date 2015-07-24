@@ -59,6 +59,8 @@ class VariantBoard(PrettyPrintable, EqualityComparable, BoardGraph):
     def _parse_string(self, board_str):
         """
         Override this in subclass to handle tessellation speciffic strings
+        Should return list of strings where each string represents all BoardCell
+        in single line of game board.
         """
         return parse_board_string(board_str)
 

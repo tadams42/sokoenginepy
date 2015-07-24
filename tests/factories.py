@@ -9,6 +9,7 @@ from sokoengine import (
 )
 from sokoengine.core.sokoban_plus import SokobanPlusValidator
 from sokoengine.io.text_utils import BoardEncodingCharacters
+from sokoengine.variant.board_graph import BoardGraph
 
 
 class PieceFactory(factory.Factory):
@@ -120,3 +121,22 @@ def sokoban_plus():
 def sokoban_plus_validator(sokoban_plus):
     sokoban_plus._parse()
     return SokobanPlusValidator(sokoban_plus)
+
+
+class BoardGraphFactory(factory.Factory):
+    class Meta:
+        model = BoardGraph
+
+    board_width = factory.LazyAttribute(
+        lambda x: fake.random_int(min=10, max=30)
+    )
+    board_height = factory.LazyAttribute(
+        lambda x: fake.random_int(min=10, max=30)
+    )
+    tessellation_type = factory.LazyAttribute(
+        lambda x: fake.random_element(list(TessellationType))
+    )
+
+@pytest.fixture
+def board_graph():
+    return BoardGraphFactory()

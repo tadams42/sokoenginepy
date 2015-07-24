@@ -1,5 +1,5 @@
 from collections import deque
-from .tessellation import Tessellated, Direction, INDEX
+from .tessellation import Tessellated, Direction
 from ..core.board_cell import BoardCell
 
 
@@ -7,6 +7,9 @@ class BoardGraph(Tessellated):
     """
     Encapsulates graph implemenetation for any Tessellation.
     Intended to be used as mixin for objects that represent concrete game boards.
+
+    Board positions are always expressed as int index of board graph vertice. To
+    convert 2D coordinates into vertice index, use INDEX method
     """
 
     def __init__(self, board_width, board_height, tessellation_type):
@@ -21,14 +24,14 @@ class BoardGraph(Tessellated):
         self._configure_edges()
 
     def __getitem__(self, index):
-        if isinstance(index, tuple):
-            index = INDEX(index[0], index[1], self.width)
-        return self._graph.node[index]['cell']
+        return self._graph.node[
+            self._normalize_index(index)
+        ]['cell']
 
     def __setitem__(self, index, board_cell):
-        if isinstance(index, tuple):
-            index = INDEX(index[0], index[1], self.width)
-        self._graph.node[index]['cell'] = board_cell
+        self._graph.node[
+            self._normalize_index(index)
+        ]['cell'] = board_cell
 
     @property
     def width(self):
@@ -40,7 +43,7 @@ class BoardGraph(Tessellated):
 
     @property
     def size(self):
-        return self.width * self.height
+        return self._width * self._height
 
     def _has_edge(self, source_vertice, dest_vertice, direction):
         """
@@ -48,6 +51,7 @@ class BoardGraph(Tessellated):
         direction
         """
         retv = False
+
         for out_edge in self._graph.out_edges_iter(source_vertice, data=True):
             retv = retv or (
                 out_edge[1] == dest_vertice and
@@ -61,13 +65,12 @@ class BoardGraph(Tessellated):
         """
         if self._are_edges_configured:
             return
-        self._are_edges_configured = True
 
         for source_vertice in self._graph.nodes_iter():
             for direction in self._tessellation.legal_directions:
                 neighbor_vertice = self._tessellation.neighbor_position(
                     source_vertice, direction,
-                    board_width=self.width, board_height=self.height
+                    board_width=self._width, board_height=self._height
                 )
                 if (
                     neighbor_vertice is not None and
@@ -76,6 +79,8 @@ class BoardGraph(Tessellated):
                     self._graph.add_edge(
                         source_vertice, neighbor_vertice, direction=direction
                     )
+
+        self._are_edges_configured = True
 
     def _out_edge_weight(self, edge, force_value=None):
         """
@@ -99,7 +104,7 @@ class BoardGraph(Tessellated):
         Calculates or sets weights on all edges in graph.
         """
         self._configure_edges()
-        for source_vertice in self._graph:
+        for source_vertice in self._graph.nodes_iter():
             for out_edge in self._graph.out_edges_iter(source_vertice):
                 weight = self._out_edge_weight(out_edge, force_value)
 
@@ -177,8 +182,30 @@ class BoardGraph(Tessellated):
             self._graph.node[node]['cell'].clear()
 
     def mark_play_area(self):
-        # TODO
-        pass
+        for node in self._graph.nodes_iter():
+            self._graph.node[node]['cell'].is_in_playable_area = False
+
+        def is_obstacle(vertice):
+            return (
+                self._graph.node[vertice]['cell'].is_wall or
+                self._graph.node[vertice]['cell'].is_in_playable_area
+            )
+
+        marked = []
+        for vertice in self._graph.nodes_iter():
+            cell = self._graph.node[vertice]['cell']
+            should_analyze = not cell.is_in_playable_area and cell.has_piece
+
+            if should_analyze:
+                reachables = self._reachables(
+                    root=vertice, excluded_positions=marked,
+                    is_obstacle_callable=is_obstacle
+                )
+                for reachable_vertice in reachables:
+                    reachable_cell = self._graph.node[reachable_vertice]['cell']
+                    if reachable_cell.has_piece or reachable_vertice == vertice:
+                        reachable_cell.is_in_playable_area = True
+                        marked.append(reachable_vertice)
 
     def positions_reachable_by_pusher(
         self, pusher_position, excluded_positions=[]
@@ -270,5 +297,5 @@ class BoardGraph(Tessellated):
 
     def cell_orientation(self, cell_position):
         return self._tessellation.cell_orientation(
-            cell_position, self.width, self.height
+            cell_position, self._width, self._height
         )

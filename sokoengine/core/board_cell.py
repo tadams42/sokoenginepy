@@ -21,6 +21,10 @@ class BoardCell(PrettyPrintable, EqualityComparable):
         self.is_in_playable_area = False
         self.is_deadlock         = False
 
+        # Most of the board space consists of empty floors, thus a chance this
+        # first test succeeds if larger than for other cases. This means that
+        # other branches will not be executed most of the time, which means whole
+        # method runs faster.
         if not is_empty_floor(chr):
             if is_wall(chr):
                 self.is_wall = True
