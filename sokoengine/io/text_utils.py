@@ -11,9 +11,10 @@ from functools import reduce
 from pyparsing import (
     Regex, nestedExpr, ZeroOrMore, ParseBaseException, CharsNotIn, oneOf, Group
 )
-from ..core.exceptions import SokoengineError, BoardConversionError,\
-    SnapshotConversionError, SokobanPlusDataError
-from ..game.common import GameSolvingMode
+from ..core import (
+    SokoengineError, BoardConversionError, SnapshotConversionError,
+    SokobanPlusDataError
+)
 
 
 class BoardEncodingCharacters(Enum):
@@ -154,22 +155,51 @@ def is_atomic_move_char(chr):
         chr == AtomicMoveCharacters.UPPER_SW.value
     )
 
-re_only_digits_and_spaces = re.compile(r"^([0-9\s])*$")
+
+class Regexes(object):
+
+    only_digits_and_spaces = re.compile(r"^([0-9\s])*$")
+
+    board_string = re.compile(
+        "^([0-9\s" +
+        re.escape("".join([c.value for c in BoardEncodingCharacters])) +
+        re.escape("".join([c.value for c in RleCharacters])) +
+        "])*$"
+    )
+
+    snapshot_string = re.compile(
+        "^([0-9\s" +
+        re.escape("".join([c.value for c in AtomicMoveCharacters])) +
+        re.escape("".join([c.value for c in SpecialSnapshotCharacters])) +
+        re.escape("".join([c.value for c in RleCharacters])) +
+        "])*$"
+    )
+
+    ending_digits = re.compile(r"(\d+)$")
+
+    contains_any_digit = re.compile(r"([0-9])+")
+    rle_replacer = re.compile(r"(\d+)(\D)")
+
+    rle_splitter = re.compile(
+        '|'.join(map(re.escape, [RleCharacters.RLE_ROW_SEPARATOR.value, '\n']))
+    )
+
+    snapshot_string_cleanup = re.compile(
+        "([" +
+        re.escape(SpecialSnapshotCharacters.CURENT_POSITION_CH.value) +
+        r"\s])+"
+    )
+
+
 def contains_only_digits_and_spaces(line):
     return reduce(lambda x, y: x and y, [
-        True if re_only_digits_and_spaces.match(l) else False
+        True if Regexes.only_digits_and_spaces.match(l) else False
         for l in line.splitlines()
     ], True)
 
 def is_blank(line):
     return line.strip() == ""
 
-re_board_string = re.compile(
-    "^([0-9\s" +
-    re.escape("".join([c.value for c in BoardEncodingCharacters])) +
-    re.escape("".join([c.value for c in RleCharacters])) +
-    "])*$"
-)
 def is_board_string(line):
     """
     Checks if line contains only characters legal in textual representation of
@@ -182,7 +212,7 @@ def is_board_string(line):
     return (
         not contains_only_digits_and_spaces(line) and
         reduce(lambda x, y: x and y, [
-            True if re_board_string.match(l) else False
+            True if Regexes.board_string.match(l) else False
             for l in line.splitlines()
         ], True)
     )
@@ -190,13 +220,6 @@ def is_board_string(line):
 def is_sokoban_plus_string(line):
     return contains_only_digits_and_spaces(line) and not is_blank(line)
 
-re_snapshot_string = re.compile(
-    "^([0-9\s" +
-    re.escape("".join([c.value for c in AtomicMoveCharacters])) +
-    re.escape("".join([c.value for c in SpecialSnapshotCharacters])) +
-    re.escape("".join([c.value for c in RleCharacters])) +
-    "])*$"
-)
 def is_snapshot_string(line):
     """
     Checks if @a tline is snapshot string: contains only digits,
@@ -213,21 +236,18 @@ def is_snapshot_string(line):
         not is_blank(line) and
         not contains_only_digits_and_spaces(line) and
         reduce(lambda x, y: x and y, [
-            True if re_snapshot_string.match(l) else False
+            True if Regexes.snapshot_string.match(l) else False
             for l in line.splitlines()
         ], True)
     )
 
-re_ending_digits = re.compile(r"(\d+)$")
 def ending_digits(line):
-    retv = re_ending_digits.findall(line)
+    retv = Regexes.ending_digits.findall(line)
     if retv:
-        return re_ending_digits.sub("", line), retv[-1]
+        return Regexes.ending_digits.sub("", line), retv[-1]
     return line, None
 
 
-re_contains_any_digit = re.compile(r"([0-9])+")
-re_rle_replacer = re.compile(r"(\d+)(\D)")
 class Rle(object):
     @classmethod
     def encode(cls, line):
@@ -251,7 +271,9 @@ class Rle(object):
         decode('3(a2b)4b') == "abbabbabbbbbb"
         decode('3a4b44') == "aaabbb44"
         """
-        return re_rle_replacer.sub(lambda m: m.group(2) * int(m.group(1)), rle_token)
+        return Regexes.rle_replacer.sub(
+            lambda m: m.group(2) * int(m.group(1)), rle_token
+        )
 
     rle_token = CharsNotIn(
         RleCharacters.GROUP_LEFT_DELIM.value +
@@ -320,9 +342,6 @@ def normalize_width(string_list):
         l + (" " * (width - len(l))) for l in string_list
     ]
 
-rle_splitter = re.compile(
-    '|'.join(map(re.escape, [RleCharacters.RLE_ROW_SEPARATOR.value, '\n']))
-)
 def parse_board_string(line):
     """
     Tries to parse string as board string (defined in SOK format specification)
@@ -336,14 +355,8 @@ def parse_board_string(line):
         raise BoardConversionError(BoardConversionError.NON_BOARD_CHARS_FOUND)
 
     line = rle_decode(line)
-    return normalize_width(drop_empty(rle_splitter.split(line)))
+    return normalize_width(drop_empty(Regexes.rle_splitter.split(line)))
 
-
-re_snapshot_string_cleanup = re.compile(
-    "([" +
-    re.escape(SpecialSnapshotCharacters.CURENT_POSITION_CH.value) +
-    r"\s])+"
-)
 
 class SnapshotStringParser(object):
     """
@@ -402,9 +415,9 @@ class SnapshotStringParser(object):
         self._resulting_solving_mode = None
         self._resulting_moves = None
 
-        moves_string = re_snapshot_string_cleanup.sub("", moves_string)
+        moves_string = Regexes.snapshot_string_cleanup.sub("", moves_string)
         if is_blank(moves_string):
-            self._resulting_solving_mode = GameSolvingMode.FORWARD
+            self._resulting_solving_mode = 'forward'
             self._resulting_moves = []
             return True
 
@@ -416,9 +429,9 @@ class SnapshotStringParser(object):
             SpecialSnapshotCharacters.JUMP_BEGIN.value in moves_string or
             SpecialSnapshotCharacters.JUMP_END.value in moves_string
         ):
-            self._resulting_solving_mode = GameSolvingMode.REVERSE
+            self._resulting_solving_mode = 'reverse'
         else:
-            self._resulting_solving_mode = GameSolvingMode.FORWARD
+            self._resulting_solving_mode = 'forward'
 
         moves_string = rle_decode(moves_string)
         if is_blank(moves_string):

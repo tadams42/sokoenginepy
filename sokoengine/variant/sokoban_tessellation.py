@@ -1,8 +1,9 @@
 import networkx as nx
-from .tessellation import Tessellation, on_board_2D, on_board_1D, ROW, \
-    COLUMN, INDEX, Direction
-from ..core.exceptions import IllegalDirectionError
-from ..io.text_utils import AtomicMoveCharacters
+from ..core import (
+    Tessellation, on_board_2D, on_board_1D, ROW, COLUMN, INDEX, Direction,
+    IllegalDirectionError
+)
+from ..io import AtomicMoveCharacters
 
 
 class SokobanTessellation(Tessellation):

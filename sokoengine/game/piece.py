@@ -1,5 +1,7 @@
-from .helpers import PrettyPrintable, EqualityComparable
-from .exceptions import InvalidPieceIdError, InvalidPiecePlusIdError
+from ..core import (
+    PrettyPrintable, EqualityComparable, InvalidPieceIdError,
+    InvalidPiecePlusIdError
+)
 
 
 class Piece(PrettyPrintable, EqualityComparable):
@@ -11,9 +13,6 @@ class Piece(PrettyPrintable, EqualityComparable):
     DEFAULT_PLUS_ID = 0
 
     def __init__(self, position = 0, id = DEFAULT_ID, plus_id = DEFAULT_PLUS_ID):
-        self._id       = None
-        self._plus_id  = None
-
         self.position = position
         self.id       = id
         self.plus_id  = plus_id
@@ -28,13 +27,13 @@ class Piece(PrettyPrintable, EqualityComparable):
     @classmethod
     def is_valid_id(cls, id):
         return (
-            id is not None and id >= cls.DEFAULT_ID
+            isinstance(id, int) and id >= cls.DEFAULT_ID
         )
 
     @classmethod
     def is_valid_plus_id(cls, plus_id):
         return (
-            plus_id is not None and plus_id >= cls.DEFAULT_PLUS_ID
+            isinstance(plus_id, int) and plus_id >= cls.DEFAULT_PLUS_ID
         )
 
     @property

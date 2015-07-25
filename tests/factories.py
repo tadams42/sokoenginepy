@@ -7,9 +7,9 @@ from sokoengine import (
     AtomicMove, Direction, BoardCell, GameSnapshot, TessellationType,
     GameSolvingMode, SokobanPlus, Piece
 )
-from sokoengine.core.sokoban_plus import SokobanPlusValidator
-from sokoengine.io.text_utils import BoardEncodingCharacters
-from sokoengine.variant.board_graph import BoardGraph
+from sokoengine.game import SokobanPlusValidator
+from sokoengine.io import BoardEncodingCharacters
+from sokoengine.variant import BoardGraph
 
 
 class PieceFactory(factory.Factory):

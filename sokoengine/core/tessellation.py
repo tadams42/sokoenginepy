@@ -1,6 +1,6 @@
 from enum import Enum
 from abc import ABC, abstractmethod
-from ..core.exceptions import UnknownTessellationError, IllegalDirectionError
+from .exceptions import UnknownTessellationError, IllegalDirectionError
 
 
 class Direction(Enum):
@@ -148,7 +148,7 @@ class Tessellated(object):
         tessellation_type - either case insensitive  string naming tessellation
         (ie. "hexoban") or one of TessellationType members
         """
-        assert tessellation_type is not None, "Tessellation type must be specified!"
+        assert tessellation_type in TessellationType
         self._tessellation_type = tessellation_type
         self._tessellation_instance = Tessellation.factory(tessellation_type)
 
@@ -171,10 +171,10 @@ class Tessellation(ABC):
     @classmethod
     def factory(cls, tessellation_type):
         if cls._TESSELATION_REGISTER is None:
-            from .sokoban_tessellation import SokobanTessellation
-            from .hexoban_tessellation import HexobanTessellation
-            from .trioban_tessellation import TriobanTessellation
-            from .octoban_tessellation import OctobanTessellation
+            from ..variant import (
+                SokobanTessellation, HexobanTessellation, TriobanTessellation,
+                OctobanTessellation
+            )
 
             cls._TESSELATION_REGISTER = {
                 TessellationType.SOKOBAN: SokobanTessellation(),
@@ -236,8 +236,8 @@ class Tessellation(ABC):
         Converts string to AtomicMove instance or raises exception if conversion
         not possible.
         """
-        from ..io.text_utils import AtomicMoveCharacters
-        from ..core.atomic_move import AtomicMove
+        from ..io import AtomicMoveCharacters
+        from ..game import AtomicMove
 
         if isinstance(chr, AtomicMoveCharacters):
             chr = chr.value

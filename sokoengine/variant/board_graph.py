@@ -1,9 +1,11 @@
 from collections import deque
-from .tessellation import Tessellated, Direction
-from ..core.board_cell import BoardCell
+from collections.abc import Container
+
+from ..core import Tessellated, Direction
+from ..game import BoardCell
 
 
-class BoardGraph(Tessellated):
+class BoardGraph(Container, Tessellated):
     """
     Implements board graph representation, vertice/edge management and board
     space searching. Works for any tessellation.
@@ -24,14 +26,16 @@ class BoardGraph(Tessellated):
         self._configure_edges()
 
     def __getitem__(self, index):
-        return self._graph.node[
-            self._normalize_index(index)
-        ]['cell']
+        return self._graph.node[index]['cell']
 
     def __setitem__(self, index, board_cell):
-        self._graph.node[
-            self._normalize_index(index)
-        ]['cell'] = board_cell
+        self._graph.node[index]['cell'] = board_cell
+
+    def __contains__(self, position):
+        """
+        Checks if position is on board
+        """
+        return position in self._graph
 
     @property
     def width(self):
@@ -212,18 +216,33 @@ class BoardGraph(Tessellated):
     def positions_reachable_by_pusher(
         self, pusher_position, excluded_positions=[]
     ):
-        # TODO
-        pass
+        def is_obstacle(position):
+            return self._graph[position]['cell'].can_put_pusher_or_box
+        return self._reachables(
+            pusher_position,
+            is_obstacle_callable=is_obstacle,
+            excluded_positions=excluded_positions
+        )
 
-    def normalized_pusher_position(
-        self, pusher_position, excluded_positions=[]
-    ):
-        # TODO
-        pass
+    def normalized_pusher_position(self, pusher_position, excluded_positions=[]):
+        reachables = self.positions_reachable_by_pusher(
+            pusher_position=pusher_position,
+            excluded_positions=excluded_positions
+        )
+        if reachables:
+            return min(reachables)
+        else:
+            return pusher_position
 
     def path_destination(self, start_position, path):
-        # TODO
-        pass
+        retv = start_position
+        for direction in path:
+            next_target = self.neighbor(retv, direction)
+            if next_target:
+                retv = next_target
+            else:
+                break
+        return retv
 
     def find_jump_path(self, start_position, end_position):
         # TODO

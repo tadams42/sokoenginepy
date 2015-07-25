@@ -1,4 +1,3 @@
-
 class OutuputSettings(object):
     """
     Settings that control string output of boards and snapshots.

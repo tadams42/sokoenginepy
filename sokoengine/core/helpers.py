@@ -1,4 +1,3 @@
-
 class PrettyPrintable(object):
     """
     Convenience class.

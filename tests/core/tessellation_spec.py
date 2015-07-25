@@ -1,7 +1,7 @@
 
 from hamcrest import assert_that, equal_to
-from sokoengine.variant.tessellation import INDEX, X, Y, on_board_2D, on_board_1D
 from sokoengine import Direction
+from sokoengine.core import INDEX, X, Y, on_board_2D, on_board_1D
 
 
 class Describe_INDEX(object):

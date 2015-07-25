@@ -2,7 +2,7 @@ import pytest
 from hamcrest import assert_that, equal_to, is_, empty, is_not
 from unittest.mock import Mock, call
 from sokoengine import SokobanPlus, Piece, SokobanPlusDataError
-from sokoengine.core.sokoban_plus import SokobanPlusValidator
+from sokoengine.game import SokobanPlusValidator
 from factories import SokobanPlusFactory
 
 
@@ -115,31 +115,31 @@ class DescribeSokobanPlus(object):
 
 class DescribeSokobanPlusValidator(object):
     def test_is_valid_calls_all_validators(self, sokoban_plus_validator):
-        sokoban_plus_validator.validate_plus_ids_by_piece = Mock()
-        sokoban_plus_validator.validate_piece_count = Mock()
-        sokoban_plus_validator.validate_ids_counts = Mock()
-        sokoban_plus_validator.validate_id_sets_equality = Mock()
+        sokoban_plus_validator._validate_plus_ids_by_piece = Mock()
+        sokoban_plus_validator._validate_piece_count = Mock()
+        sokoban_plus_validator._validate_ids_counts = Mock()
+        sokoban_plus_validator._validate_id_sets_equality = Mock()
         sokoban_plus_validator.is_valid
 
         assert_that(
-            sokoban_plus_validator.validate_plus_ids_by_piece.call_count,
+            sokoban_plus_validator._validate_plus_ids_by_piece.call_count,
             equal_to(2)
         )
         assert_that(
-            sokoban_plus_validator.validate_plus_ids_by_piece.call_args_list,
+            sokoban_plus_validator._validate_plus_ids_by_piece.call_args_list,
             equal_to([
                 call(sokoban_plus_validator.sokoban_plus._box_plus_ids),
                 call(sokoban_plus_validator.sokoban_plus._goal_plus_ids),
             ])
         )
         assert_that(
-            sokoban_plus_validator.validate_piece_count.called, equal_to(True)
+            sokoban_plus_validator._validate_piece_count.called, equal_to(True)
         )
         assert_that(
-            sokoban_plus_validator.validate_ids_counts.called, equal_to(True)
+            sokoban_plus_validator._validate_ids_counts.called, equal_to(True)
         )
         assert_that(
-            sokoban_plus_validator.validate_id_sets_equality.called,
+            sokoban_plus_validator._validate_id_sets_equality.called,
             equal_to(True)
         )
 
@@ -147,7 +147,7 @@ class DescribeSokobanPlusValidator(object):
         method_backup = Piece.is_valid_plus_id
 
         Piece.is_valid_plus_id = Mock(return_value=True)
-        sokoban_plus_validator.validate_plus_ids_by_piece(
+        sokoban_plus_validator._validate_plus_ids_by_piece(
             sokoban_plus_validator.sokoban_plus._box_plus_ids
         )
         assert_that(
@@ -160,7 +160,7 @@ class DescribeSokobanPlusValidator(object):
         assert_that(sokoban_plus_validator.errors, is_(empty()))
 
         Piece.is_valid_plus_id = Mock(return_value=False)
-        sokoban_plus_validator.validate_plus_ids_by_piece(
+        sokoban_plus_validator._validate_plus_ids_by_piece(
             sokoban_plus_validator.sokoban_plus._box_plus_ids
         )
         assert_that(sokoban_plus_validator.errors, is_not(empty()))
@@ -170,30 +170,30 @@ class DescribeSokobanPlusValidator(object):
     def test_validates_piece_count_is_greater_than_zero(
         self, sokoban_plus_validator
     ):
-        sokoban_plus_validator.validate_piece_count()
+        sokoban_plus_validator._validate_piece_count()
         assert_that(sokoban_plus_validator.errors, is_(empty()))
         sokoban_plus_validator.sokoban_plus._pieces_count = -42
-        sokoban_plus_validator.validate_piece_count()
+        sokoban_plus_validator._validate_piece_count()
         assert_that(sokoban_plus_validator.errors, is_not(empty()))
 
     def test_validates_ids_lengths_are_equal_to_piece_count(
         self, sokoban_plus_validator
     ):
-        sokoban_plus_validator.validate_ids_counts()
+        sokoban_plus_validator._validate_ids_counts()
         assert_that(sokoban_plus_validator.errors, is_(empty()))
         sokoban_plus_validator.sokoban_plus._pieces_count = -42
-        sokoban_plus_validator.validate_ids_counts()
+        sokoban_plus_validator._validate_ids_counts()
         assert_that(sokoban_plus_validator.errors, is_not(empty()))
 
     def test_validates_same_id_set_is_defined_for_both_piece_types(
         self, sokoban_plus_validator
     ):
-        sokoban_plus_validator.validate_id_sets_equality()
+        sokoban_plus_validator._validate_id_sets_equality()
         assert_that(sokoban_plus_validator.errors, is_(empty()))
         sokoban_plus_validator.sokoban_plus._box_plus_ids = (
             sokoban_plus_validator.sokoban_plus._goal_plus_ids + [1, 2, 3]
         )
-        sokoban_plus_validator.validate_id_sets_equality()
+        sokoban_plus_validator._validate_id_sets_equality()
         assert_that(sokoban_plus_validator.errors, is_not(empty()))
 
 

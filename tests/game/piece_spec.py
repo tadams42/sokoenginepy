@@ -1,8 +1,7 @@
 import pytest
 from factories import PieceFactory
 from hamcrest import assert_that
-from sokoengine import InvalidPieceIdError, InvalidPiecePlusIdError
-from sokoengine.core.piece import Piece
+from sokoengine import InvalidPieceIdError, InvalidPiecePlusIdError, Piece
 
 
 class DescribePiece(object):

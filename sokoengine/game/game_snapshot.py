@@ -1,11 +1,14 @@
 from collections.abc import MutableSequence, Iterable
 
-from ..core.exceptions import SnapshotConversionError, IllegalDirectionError,\
-    SokoengineError
-from ..core.helpers import PrettyPrintable, EqualityComparable
-from ..variant.tessellation import Tessellated, TessellationType
-from ..io.output_settings import OutuputSettings
-from ..io.text_utils import SpecialSnapshotCharacters, rle_encode, is_blank
+from ..core import (
+    SnapshotConversionError, IllegalDirectionError, SokoengineError,
+    PrettyPrintable, EqualityComparable, Tessellated, TessellationType,
+)
+from ..io import (
+    OutuputSettings, SpecialSnapshotCharacters, rle_encode, is_blank,
+    SnapshotStringParser
+)
+
 from .common import GameSolvingMode
 
 
@@ -275,11 +278,17 @@ class GameSnapshot(
         return retv
 
     def _parse_string(self, moves_data):
-        from ..io.text_utils import SnapshotStringParser
         parser = SnapshotStringParser()
         if not parser.convert(moves_data, self._tessellation):
             raise SnapshotConversionError(parser.first_encountered_error)
         self.clear()
-        self._solving_mode = parser.resulting_solving_mode
+
+        if parser.resulting_solving_mode == 'forward':
+            self._solving_mode = GameSolvingMode.FORWARD
+        elif parser.resulting_solving_mode == 'reverse':
+            self._solving_mode = GameSolvingMode.REVERSE
+        else:
+            raise SokoengineError('Unknown parsed solving mode!')
+
         for atomic_move in parser.resulting_moves:
             self.append(atomic_move)

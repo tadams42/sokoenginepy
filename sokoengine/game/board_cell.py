@@ -1,7 +1,7 @@
-from .helpers import PrettyPrintable, EqualityComparable
-from .exceptions import SokoengineError
-from ..io.text_utils import BoardEncodingCharacters, is_wall, is_pusher, \
-    is_goal, is_empty_floor, is_box
+from ..core import PrettyPrintable, EqualityComparable, SokoengineError
+from ..io import (
+    BoardEncodingCharacters, is_wall, is_pusher, is_goal, is_empty_floor, is_box
+)
 
 
 class BoardCell(PrettyPrintable, EqualityComparable):
@@ -21,9 +21,6 @@ class BoardCell(PrettyPrintable, EqualityComparable):
         self._is_wall            = False
         self.is_in_playable_area = False
         self.is_deadlock         = False
-
-        if isinstance(chr, BoardEncodingCharacters):
-            chr = chr.value
 
         # Most of the board space consists of empty floors, thus a chance this
         # first test succeeds if larger than for other cases. This means that

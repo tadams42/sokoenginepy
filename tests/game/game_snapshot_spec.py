@@ -3,10 +3,9 @@ from factories import GameSnapshotFactory
 from hamcrest import assert_that, equal_to, instance_of, is_, none, is_not
 from sokoengine import (
     GameSnapshot, TessellationType, GameSolvingMode, AtomicMove, Direction,
-    SokoengineError
+    SokoengineError, SnapshotConversionError
 )
 from unittest.mock import Mock
-from sokoengine.io.text_utils import SnapshotConversionError
 
 
 @pytest.fixture

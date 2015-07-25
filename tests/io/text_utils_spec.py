@@ -2,14 +2,12 @@ import pytest
 from hamcrest import assert_that, equal_to
 
 from sokoengine import BoardConversionError, GameSolvingMode, AtomicMove,\
-    Direction
+    Direction, SnapshotConversionError
 
-from sokoengine.variant.tessellation import Tessellation
+from sokoengine.core import Tessellation
 
-from sokoengine.io.text_utils import is_board_string, is_snapshot_string,\
-    is_pusher, is_box, is_goal, is_empty_floor, BoardEncodingCharacters,\
-    is_wall, parse_board_string, rle_encode, rle_decode, Rle,\
-    SnapshotStringParser, SnapshotConversionError
+from sokoengine.io import *
+from sokoengine.io.text_utils import Rle
 
 
 class Describe_is_board_string(object):
@@ -307,7 +305,7 @@ class DescribeSnapshotTextParser(object):
             assert_that(success, equal_to(True))
             assert_that(
                 parser._resulting_solving_mode,
-                equal_to(GameSolvingMode.FORWARD)
+                equal_to('forward')
             )
             assert_that(
                 parser._resulting_moves,
@@ -319,7 +317,7 @@ class DescribeSnapshotTextParser(object):
             assert_that(success, equal_to(True))
             assert_that(
                 parser._resulting_solving_mode,
-                equal_to(GameSolvingMode.FORWARD)
+                equal_to('forward')
             )
             assert_that(
                 parser._resulting_moves, equal_to([])
@@ -353,7 +351,7 @@ class DescribeSnapshotTextParser(object):
             assert_that(success, equal_to(True))
             assert_that(
                 parser._resulting_solving_mode,
-                equal_to(GameSolvingMode.REVERSE)
+                equal_to('reverse')
             )
 
         def test_it_fails_on_rle_errors(self, parser):

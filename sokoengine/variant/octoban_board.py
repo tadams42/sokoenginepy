@@ -1,4 +1,5 @@
-from .tessellation import TessellationType
+from ..core import TessellationType
+
 from .variant_board import VariantBoard
 
 

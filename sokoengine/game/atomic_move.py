@@ -1,7 +1,8 @@
-from .helpers import PrettyPrintable, EqualityComparable
-from ..variant.tessellation import Direction
+from ..core import (
+    PrettyPrintable, EqualityComparable, InvalidPieceIdError, Direction
+)
+
 from .piece import Box, Pusher
-from .exceptions import InvalidPieceIdError
 
 
 class AtomicMove(PrettyPrintable, EqualityComparable):
@@ -59,18 +60,17 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
     @moved_box_id.setter
     def moved_box_id(self, value):
         """
-        Setting box ID to not None make this atomic move a push/pull. It also
-        validates value and requires it to be valid Piece id.
-        Setting ID to None, makes this a non-push.
+        Updates ID of moved box and if this ID is valid, also changes this to
+        push/pull. If removing ID, changes this to not-push/not-pull
         """
-        if value is None:
-            self._moved_box_id = value
-            self.is_push_or_pull = False
-        else:
+        if value or value == 0:
             if not Box.is_valid_id(value):
-                raise InvalidPieceIdError
+                raise InvalidPieceIdError(value)
             self._moved_box_id = value
             self.is_push_or_pull = True
+        else:
+            self._moved_box_id = value
+            self.is_push_or_pull = False
 
     @property
     def pusher_id(self):

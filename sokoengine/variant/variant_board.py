@@ -1,9 +1,10 @@
-from ..core.helpers import PrettyPrintable, EqualityComparable
-from ..core.board_cell import BoardCell
-from .tessellation import TessellationType, INDEX
+from ..core import (
+    PrettyPrintable, EqualityComparable, TessellationType, INDEX
+)
+from ..game import BoardCell
+from ..io import OutuputSettings, rle_encode, is_blank, parse_board_string
+
 from .board_graph import BoardGraph
-from ..io.output_settings import OutuputSettings
-from ..io.text_utils import rle_encode, is_blank, parse_board_string
 
 
 class VariantBoard(PrettyPrintable, EqualityComparable, BoardGraph):
@@ -33,7 +34,7 @@ class VariantBoard(PrettyPrintable, EqualityComparable, BoardGraph):
             )
             for y, row in enumerate(board_cells):
                 for x, chr in enumerate(row):
-                    self[x, y] = BoardCell(chr)
+                    self[INDEX(x, y, self.width)] = BoardCell(chr)
         else:
             super().__init__(board_width, board_height, tessellation_type)
 
