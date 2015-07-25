@@ -5,11 +5,11 @@ from ..core.board_cell import BoardCell
 
 class BoardGraph(Tessellated):
     """
-    Encapsulates graph implemenetation for any Tessellation.
-    Intended to be used as mixin for objects that represent concrete game boards.
+    Implements board graph representation, vertice/edge management and board
+    space searching. Works for any tessellation.
 
-    Board positions are always expressed as int index of board graph vertice. To
-    convert 2D coordinates into vertice index, use INDEX method
+    All positions are int indexes of graph vertices. To convert 2D coordinate
+    into vertice index, use INDEX method
     """
 
     def __init__(self, board_width, board_height, tessellation_type):
@@ -82,13 +82,10 @@ class BoardGraph(Tessellated):
 
         self._are_edges_configured = True
 
-    def _out_edge_weight(self, edge, force_value=None):
+    def _out_edge_weight(self, edge):
         """
-        Calculates weight of single dependng on contents of its vertices.
+        Calculates weight of single edge dependng on contents of its vertices.
         """
-        if force_value:
-            return int(force_value)
-
         target_vertice = edge[1]
         target_cell = self._graph.node[target_vertice]['cell']
 
@@ -106,7 +103,11 @@ class BoardGraph(Tessellated):
         self._configure_edges()
         for source_vertice in self._graph.nodes_iter():
             for out_edge in self._graph.out_edges_iter(source_vertice):
-                weight = self._out_edge_weight(out_edge, force_value)
+                weight = (
+                    force_value
+                    if force_value or (force_value and force_value == 0)
+                    else self._out_edge_weight(out_edge, force_value)
+                )
 
                 target_vertice = out_edge[1]
                 if self._graph.is_multigraph():
@@ -122,12 +123,13 @@ class BoardGraph(Tessellated):
         """
         Returns list of all positions reachable from root
 
-        excluded_positions - these positions will be marked as unreachable no
-            without calculatting their status
+        excluded_positions - these positions will be marked as unreachable
+            without calculating their status
         is_obstacle_callable - callable that checks if given position on graph
             is obstacle
         add_animation_frame_hook - if not None, this callable will be caled
             after each step oof search. Usefull for visualization of algorithm
+            and debugging
         """
         reachables = deque()
         visited = len(self._graph) * [False]
@@ -228,70 +230,6 @@ class BoardGraph(Tessellated):
         pass
 
     def find_move_path(self, start_position, end_position):
-        # TODO
-        pass
-
-    def add_row_top(self):
-        # TODO
-        pass
-
-    def add_row_bottom(self):
-        # TODO
-        pass
-
-    def add_column_left(self):
-        # TODO
-        pass
-
-    def add_column_right(self):
-        # TODO
-        pass
-
-    def remove_row_top(self):
-        # TODO
-        pass
-
-    def remove_row_bottom(self):
-        # TODO
-        pass
-
-    def remove_column_left(self):
-        # TODO
-        pass
-
-    def remove_column_right(self):
-        # TODO
-        pass
-
-    def resize(self, new_width, new_height):
-        # TODO
-        pass
-
-    def trim(self):
-        # TODO
-        pass
-
-    def trim_left(self):
-        # TODO
-        pass
-
-    def trim_right(self):
-        # TODO
-        pass
-
-    def trim_top(self):
-        # TODO
-        pass
-
-    def trim_bottom(self):
-        # TODO
-        pass
-
-    def reverse_rows(self):
-        # TODO
-        pass
-
-    def reverse_columns(self):
         # TODO
         pass
 

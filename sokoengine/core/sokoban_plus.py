@@ -8,7 +8,7 @@ class SokobanPlus(PrettyPrintable):
     """
     Manages Sokoban+ data for game board
 
-    <b> Sokoban+ rules </b>
+    **Sokoban+ rules**
 
     In this variant of game rules, each box and each goal on board get number
     tag (color). Game objective changes slightly: board is considered solved
@@ -24,7 +24,8 @@ class SokobanPlus(PrettyPrintable):
     For example, boxorder "13 24 3 122 1" would give plus_id = 13 to box id = 1,
     plus_id = 24 to box ID = 2, etc...
 
-    <b> Valid Sokoban+ id sequences</b
+    **Valid Sokoban+ id sequences**
+
     Boxorder and goalorder must define ids for equal number of boxes and goals.
     This means that in case of boxorder asigning plus id "42" to two boxes,
     goalorder must also contain number 42 twice.
@@ -32,7 +33,7 @@ class SokobanPlus(PrettyPrintable):
     encouraged to use small numbers because they are prettier once board is
     rendered with displayed Sokoban+ IDs.
 
-    <b> Default plus_id in Sokoban+ strings </b>
+    **Default plus_id in Sokoban+ strings**
 
     Original implementation used number 99 for default plus ID. As there can be
     more than 99 boxes on board, sokoengine changes this detail and uses

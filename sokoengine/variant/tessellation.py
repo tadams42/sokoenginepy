@@ -4,6 +4,9 @@ from ..core.exceptions import UnknownTessellationError, IllegalDirectionError
 
 
 class Direction(Enum):
+    """
+    Directions of movement
+    """
     UP         = 0
     NORTH_EAST = 1
     RIGHT      = 2
@@ -159,6 +162,9 @@ class Tessellated(object):
 
 
 class Tessellation(ABC):
+    """
+    Base class for all variant tessellation implementations.
+    """
 
     _TESSELATION_REGISTER = None
 
@@ -212,14 +218,24 @@ class Tessellation(ABC):
     @property
     @abstractmethod
     def char_to_atomic_move_dict(self):
+        """
+        Dict mapping string to AtomicMove parameters
+        """
         pass
 
     @property
     @abstractmethod
     def graph_type(self):
+        """
+        Graph class usable in given tessellation.
+        """
         pass
 
     def char_to_atomic_move(self, chr):
+        """
+        Converts string to AtomicMove instance or raises exception if conversion
+        not possible.
+        """
         from ..io.text_utils import AtomicMoveCharacters
         from ..core.atomic_move import AtomicMove
 
@@ -238,9 +254,16 @@ class Tessellation(ABC):
     @property
     @abstractmethod
     def atomic_move_to_char_dict(self):
+        """
+        Dict mapping AtomicMove parameters to string representation.
+        """
         pass
 
     def atomic_move_to_char(self, atomic_move):
+        """
+        Converts AtomicMove to string or raises exception if conversion
+        not possible.
+        """
         chr = self.atomic_move_to_char_dict.get(
             (atomic_move.direction, atomic_move.is_push_or_pull),
             None
@@ -252,10 +275,16 @@ class Tessellation(ABC):
         return chr
 
     def cell_orientation(self, position, board_width, board_height):
+        """
+        Calculates board cell orientation for given position.
+        """
         return CellOrientation.DEFAULT
 
 
 def INDEX(x, y, board_width):
+    """
+    Converts 2D coordinate to board position index.
+    """
     return y * board_width + x
 
 def X(index, board_width):

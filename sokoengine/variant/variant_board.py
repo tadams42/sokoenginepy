@@ -11,9 +11,11 @@ class VariantBoard(PrettyPrintable, EqualityComparable, BoardGraph):
     Base board class for variant specific implementations.
     Implements concerns of
         - direct board editing
-        - board-space searching
         - string (de)serialization
         - resizing
+
+    All positions are int indexes of graph vertices. To convert 2D coordinate
+    into vertice index, use INDEX method
     """
 
     def __init__(
@@ -68,4 +70,69 @@ class VariantBoard(PrettyPrintable, EqualityComparable, BoardGraph):
         """
         Override this in subclass to handle tessellation speciffic strings
         """
+        # TODO
+        pass
+
+    def add_row_top(self):
+        # TODO
+        pass
+
+    def add_row_bottom(self):
+        # TODO
+        pass
+
+    def add_column_left(self):
+        # TODO
+        pass
+
+    def add_column_right(self):
+        # TODO
+        pass
+
+    def remove_row_top(self):
+        # TODO
+        pass
+
+    def remove_row_bottom(self):
+        # TODO
+        pass
+
+    def remove_column_left(self):
+        # TODO
+        pass
+
+    def remove_column_right(self):
+        # TODO
+        pass
+
+    def resize(self, new_width, new_height):
+        # TODO
+        pass
+
+    def trim(self):
+        # TODO
+        pass
+
+    def trim_left(self):
+        # TODO
+        pass
+
+    def trim_right(self):
+        # TODO
+        pass
+
+    def trim_top(self):
+        # TODO
+        pass
+
+    def trim_bottom(self):
+        # TODO
+        pass
+
+    def reverse_rows(self):
+        # TODO
+        pass
+
+    def reverse_columns(self):
+        # TODO
         pass

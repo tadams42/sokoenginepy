@@ -3,6 +3,10 @@ from .exceptions import InvalidPieceIdError, InvalidPiecePlusIdError
 
 
 class Piece(PrettyPrintable, EqualityComparable):
+    """
+    Game piece (pusher, box or goal) with its ID and plusID.
+    """
+
     DEFAULT_ID      = 1
     DEFAULT_PLUS_ID = 0
 
@@ -55,12 +59,21 @@ class Piece(PrettyPrintable, EqualityComparable):
 
 
 class Box(Piece):
+    """
+    Alias class
+    """
     pass
 
 
 class Goal(Piece):
+    """
+    Alias class
+    """
     pass
 
 
 class Pusher(Piece):
+    """
+    Alias class
+    """
     pass

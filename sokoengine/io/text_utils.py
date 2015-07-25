@@ -248,6 +248,7 @@ class Rle(object):
         """
         Decodes rle encoded strings without grouping support. ie.
         decode('3a4b') == "aaabbb"
+        decode('3(a2b)4b') == "abbabbabbbbbb"
         decode('3a4b44') == "aaabbb44"
         """
         return re_rle_replacer.sub(lambda m: m.group(2) * int(m.group(1)), rle_token)
@@ -345,6 +346,9 @@ re_snapshot_string_cleanup = re.compile(
 )
 
 class SnapshotStringParser(object):
+    """
+    Parses and validates game snapshot string into sequence of AtomicMoves
+    """
     atomic_moves = Regex(
         "([" +
         "".join([c.value for c in AtomicMoveCharacters]) +
@@ -481,6 +485,9 @@ class SnapshotStringParser(object):
 
 
 def parse_sokoban_plus_data(line):
+    """
+    Prses and validates Sokoban+ order string.
+    """
     parsed_plus_ids = []
     try:
         parsed_plus_ids = [int(j) for j in line.split()]

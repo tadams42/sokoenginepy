@@ -6,6 +6,10 @@ from ..io.text_utils import AtomicMoveCharacters
 
 
 class SokobanTessellation(Tessellation):
+    """
+    Implements Tessellation for Sokoban variant.
+    """
+
     _LEGAL_DIRECTIONS = (
         Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN
     )

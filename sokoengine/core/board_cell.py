@@ -7,19 +7,23 @@ from ..io.text_utils import BoardEncodingCharacters, is_wall, is_pusher, \
 class BoardCell(PrettyPrintable, EqualityComparable):
     """
     Stores properties of one cell in board layout.
-    Note that there is no game logic encoded in this class. It is perfectly fine
-    to put pusher on wall cell (in which case wall will be replaced by pusher).
-    This is by design: BoardCell is value class, not game logic class.
+
+    Note that there is mostly no game logic encoded in this class. It is
+    perfectly fine to put pusher on wall cell (in which case wall will be
+    replaced by pusher). This is by design: BoardCell is value class, not game
+    logic class.
     """
 
-    def __init__(self, chr = BoardEncodingCharacters.FLOOR.value):
-
+    def __init__(self, chr = BoardEncodingCharacters.FLOOR):
         self._has_box            = False
         self._has_pusher         = False
         self._has_goal           = False
         self._is_wall            = False
         self.is_in_playable_area = False
         self.is_deadlock         = False
+
+        if isinstance(chr, BoardEncodingCharacters):
+            chr = chr.value
 
         # Most of the board space consists of empty floors, thus a chance this
         # first test succeeds if larger than for other cases. This means that
@@ -56,7 +60,7 @@ class BoardCell(PrettyPrintable, EqualityComparable):
 
     def to_s(self, use_visible_floor = False):
         """
-        Converts self to printable character (BoardEncondingCharacters value)
+        Converts self to string (for printing boards in standard format)
         """
         retv = BoardEncodingCharacters.FLOOR.value
 
@@ -83,10 +87,17 @@ class BoardCell(PrettyPrintable, EqualityComparable):
         return retv
 
     def clear(self):
+        """
+        Clears cell, converting it to empty floor.
+        """
         self._is_wall = self._has_box = self._has_goal = self._has_pusher = False
         return self
 
     def switch_box_and_goal(self):
+        """
+        Changes box into goal and vice versa. In case there is pusher on goal,
+        does nothing.
+        """
         if self.has_box and not self.has_goal:
             self._has_box = False
             self._has_goal = True
@@ -97,10 +108,16 @@ class BoardCell(PrettyPrintable, EqualityComparable):
 
     @property
     def has_piece(self):
+        """
+        True if there is pusher, box or goal on this cell.
+        """
         return self.has_pusher or self.has_box or self.has_goal
 
     @property
     def is_empty_floor(self):
+        """
+        True if there is no pieces and no wall on this cell.
+        """
         return (
             not self.has_pusher and
             not self.has_box and
@@ -117,6 +134,12 @@ class BoardCell(PrettyPrintable, EqualityComparable):
 
     @property
     def can_put_pusher_or_box(self):
+        """
+        True if this cell allows putting box or pusher on self. Note that this
+        method isn't called by others in class, thus nothing prevents putting
+        box on wall (which replaces that wall with box). This method can be used
+        by higher game logic classes to implement actual game logic.
+        """
         return (
             not self.has_box and
             not self.has_pusher and

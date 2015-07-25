@@ -1,5 +1,8 @@
 
 class OutuputSettings(object):
+    """
+    Settings that control string output of boards and snapshots.
+    """
 
     def __init__(
         self, break_long_lines=True, rle_encode=False, use_visible_floors=False,

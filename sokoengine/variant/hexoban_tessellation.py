@@ -6,6 +6,10 @@ from ..io.text_utils import AtomicMoveCharacters
 
 
 class HexobanTessellation(Tessellation):
+    """
+    Implements Tessellation for Hexoban variant.
+    """
+
     _LEGAL_DIRECTIONS = (
         Direction.LEFT, Direction.RIGHT, Direction.NORTH_EAST,
         Direction.NORTH_WEST, Direction.SOUTH_EAST, Direction.SOUTH_WEST,

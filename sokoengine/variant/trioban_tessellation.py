@@ -6,6 +6,10 @@ from ..io.text_utils import AtomicMoveCharacters
 
 
 class TriobanTessellation(Tessellation):
+    """
+    Implements Tessellation for Trioban variant.
+    """
+
     _LEGAL_DIRECTIONS = (
         Direction.LEFT, Direction.RIGHT,
         Direction.NORTH_EAST, Direction.NORTH_WEST,

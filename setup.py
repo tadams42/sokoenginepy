@@ -58,6 +58,7 @@ requirements_dev = [
     'Jinja2>=2.7.3',
     'tornado>=4.2.1',
     'jsonschema>=2.5.1',
+    'Sphinx>=1.3.1',
 ]
 
 # $ pip install -e .[dev,test]

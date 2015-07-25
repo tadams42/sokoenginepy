@@ -6,3 +6,4 @@
 .ipynb_checkpoints/
 Untitled.ipynb
 *.prof
+build/

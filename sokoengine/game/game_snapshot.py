@@ -12,6 +12,10 @@ from .common import GameSolvingMode
 class GameSnapshot(
     MutableSequence, PrettyPrintable, EqualityComparable, Tessellated
 ):
+    """
+    Sequence of AtomicMove representing snapshot of game.
+    """
+
     def __init__(
         self,
         tessellation_type = TessellationType.SOKOBAN,
@@ -117,9 +121,8 @@ class GameSnapshot(
     @property
     def moves_count(self):
         """
-        Number of atomic moves in self that are not pushes.
-        Note This doesn't account moves that are used for pusher selection in
-        Multiban games.
+        Number of atomic moves in self that are not pushes. Note This doesn't
+        account moves that are used for pusher selection in Multiban games.
         """
         return self._moves_count
 
@@ -140,6 +143,9 @@ class GameSnapshot(
         self._moves = []
 
     def to_s(self, output_settings = OutuputSettings()):
+        """
+        Converts self to string (for printing snapshots in standard format)
+        """
         retv = ""
         conversion_ok = True
 

@@ -6,6 +6,10 @@ from ..io.text_utils import AtomicMoveCharacters
 
 
 class OctobanTessellation(Tessellation):
+    """
+    Implements Tessellation for Octoban variant.
+    """
+
     _LEGAL_DIRECTIONS = (
         Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN,
         Direction.NORTH_EAST, Direction.NORTH_WEST,

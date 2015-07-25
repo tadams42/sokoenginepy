@@ -20,7 +20,8 @@ from .game.game_snapshot import GameSnapshot
 
 from .io.output_settings import OutuputSettings
 
-from .variant.tessellation import Direction, TessellationType, CellOrientation
+from .variant.tessellation import Direction, TessellationType, CellOrientation,\
+    INDEX
 
 __all__ = [
     'AtomicMove',
@@ -43,4 +44,5 @@ __all__ = [
     'Direction',
     'TessellationType',
     'CellOrientation',
+    'INDEX',
 ]

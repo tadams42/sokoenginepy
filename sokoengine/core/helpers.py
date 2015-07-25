@@ -1,5 +1,9 @@
 
 class PrettyPrintable(object):
+    """
+    Convenience class.
+    Default implementation for __str__ that gives uniform representation.
+    """
 
     def _representation_attributes(self):
         return self.__dict__
@@ -16,6 +20,11 @@ class PrettyPrintable(object):
 
 
 class EqualityComparable(object):
+    """
+    Provides default __eq__ implementation that compares objects by subset of
+    their attributes.
+    """
+
     def _equality_attributes(self):
         return self.__dict__
 
