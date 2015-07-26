@@ -78,6 +78,7 @@ class BoardGraph(Container, Tessellated):
         retv = False
 
         for out_edge in self._graph.out_edges_iter(source_vertice, data=True):
+            # edge: (source, target, data)
             retv = retv or (
                 out_edge[1] == dest_vertice and
                 out_edge[2]['direction'] == direction
@@ -98,10 +99,8 @@ class BoardGraph(Container, Tessellated):
                     source_vertice, direction,
                     board_width=self._width, board_height=self._height
                 )
-                if (
-                    neighbor_vertice is not None and
-                    not self._has_edge(source_vertice, neighbor_vertice, direction)
-                ):
+                if neighbor_vertice is not None:
+                    # and not self._has_edge(source_vertice, neighbor_vertice, direction)
                     self._graph.add_edge(
                         source_vertice, neighbor_vertice, direction=direction
                     )
@@ -128,15 +127,8 @@ class BoardGraph(Container, Tessellated):
         """
         self._configure_edges()
         for source_vertice in self._graph.nodes_iter():
-            for out_edge in self._graph.out_edges_iter(source_vertice):
-                weight = self._out_edge_weight(out_edge)
-
-                target_vertice = out_edge[1]
-                if self._graph.is_multigraph():
-                    for edge_key in self._graph[source_vertice][target_vertice].keys():
-                        self._graph[source_vertice][target_vertice][edge_key]['weight'] = weight
-                else:
-                    self._graph[source_vertice][target_vertice]['weight'] = weight
+            for out_edge in self._graph.out_edges_iter(source_vertice, data=True):
+                out_edge[2]['weight'] = self._out_edge_weight(out_edge)
 
     @normalize_index_errors
     def _reachables(
