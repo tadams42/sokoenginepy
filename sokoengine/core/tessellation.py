@@ -64,7 +64,6 @@ class TessellationType(Enum):
     """
     SOKOBAN = 0
 
-
     """
     Board is laid out on alternating triangles with origin triangle poiting up.
     Direction <-> character mapping:
@@ -78,7 +77,6 @@ class TessellationType(Enum):
     ![Trioban movement](docs/images/trioban_am.png)
     """
     TRIOBAN = 1
-
 
     """
     Board space is laid out on vertical hexagons with following coordinate system:
@@ -166,27 +164,31 @@ class Tessellation(ABC):
     Base class for all variant tessellation implementations.
     """
 
-    _TESSELATION_REGISTER = None
+    _TESSELLATION_REGISTER = None
 
     @classmethod
-    def factory(cls, tessellation_type):
-        if cls._TESSELATION_REGISTER is None:
+    def _init_register(cls):
+        if cls._TESSELLATION_REGISTER is None:
             from ..variant import (
                 SokobanTessellation, HexobanTessellation, TriobanTessellation,
                 OctobanTessellation
             )
 
-            cls._TESSELATION_REGISTER = {
+            cls._TESSELLATION_REGISTER = {
                 TessellationType.SOKOBAN: SokobanTessellation(),
                 TessellationType.TRIOBAN: TriobanTessellation(),
                 TessellationType.HEXOBAN: HexobanTessellation(),
                 TessellationType.OCTOBAN: OctobanTessellation(),
             }
 
+    @classmethod
+    def factory(cls, tessellation_type):
+        cls._init_register()
+
         if isinstance(tessellation_type, str):
             tessellation_type = TessellationType.factory(tessellation_type)
 
-        retv = cls._TESSELATION_REGISTER.get(tessellation_type, None)
+        retv = cls._TESSELLATION_REGISTER.get(tessellation_type, None)
         if not retv:
             raise UnknownTessellationError(tessellation_type)
         return retv
@@ -205,7 +207,7 @@ class Tessellation(ABC):
         Calculates neighbor position in given direction and verifies calculated
         position.
 
-        If position would lead off-board, returns None
+        If resulting position is off-board returns None
 
         Raises IllegalDirection in case direction is not one of
         self.legal_directions
@@ -217,7 +219,7 @@ class Tessellation(ABC):
 
     @property
     @abstractmethod
-    def char_to_atomic_move_dict(self):
+    def _char_to_atomic_move_dict(self):
         """
         Dict mapping string to AtomicMove parameters
         """
@@ -242,7 +244,7 @@ class Tessellation(ABC):
         if isinstance(chr, AtomicMoveCharacters):
             chr = chr.value
 
-        direction, box_moved = self.char_to_atomic_move_dict.get(
+        direction, box_moved = self._char_to_atomic_move_dict.get(
             chr, (None, None)
         )
 
@@ -253,7 +255,7 @@ class Tessellation(ABC):
 
     @property
     @abstractmethod
-    def atomic_move_to_char_dict(self):
+    def _atomic_move_to_char_dict(self):
         """
         Dict mapping AtomicMove parameters to string representation.
         """
@@ -264,7 +266,7 @@ class Tessellation(ABC):
         Converts AtomicMove to string or raises exception if conversion
         not possible.
         """
-        chr = self.atomic_move_to_char_dict.get(
+        chr = self._atomic_move_to_char_dict.get(
             (atomic_move.direction, atomic_move.is_push_or_pull),
             None
         )

@@ -37,31 +37,33 @@ class OctobanTessellation(Tessellation):
     }
 
     def neighbor_position(self, position, direction, board_width, board_height):
-        if on_board_1D(position, board_width, board_height):
-            if self.cell_orientation(
-                position, board_width, board_height
-            ) != CellOrientation.OCTAGON and (
-                direction == Direction.NORTH_EAST or
-                direction == Direction.NORTH_WEST or
-                direction == Direction.SOUTH_EAST or
-                direction == Direction.SOUTH_WEST
-            ):
-                return None
+        # if not on_board_1D(position, board_width, board_height):
+        #     return None
 
-            row = ROW(position, board_width)
-            column = COLUMN(position, board_width)
-            row_shift, column_shift = type(self)._NEIGHBOR_SHIFT.get(
-                direction, (None, None)
-            )
+        if self.cell_orientation(
+            position, board_width, board_height
+        ) != CellOrientation.OCTAGON and (
+            direction == Direction.NORTH_EAST or
+            direction == Direction.NORTH_WEST or
+            direction == Direction.SOUTH_EAST or
+            direction == Direction.SOUTH_WEST
+        ):
+            return None
 
-            if row_shift is None:
-                raise IllegalDirectionError(direction)
+        row = ROW(position, board_width)
+        column = COLUMN(position, board_width)
+        row_shift, column_shift = type(self)._NEIGHBOR_SHIFT.get(
+            direction, (None, None)
+        )
 
-            row += row_shift
-            column += column_shift
+        if row_shift is None:
+            raise IllegalDirectionError(direction)
 
-            if on_board_2D(column, row, board_width, board_height):
-                return INDEX(column, row, board_width)
+        row += row_shift
+        column += column_shift
+
+        if on_board_2D(column, row, board_width, board_height):
+            return INDEX(column, row, board_width)
 
         return None
 
@@ -85,13 +87,13 @@ class OctobanTessellation(Tessellation):
     }
 
     @property
-    def char_to_atomic_move_dict(self):
+    def _char_to_atomic_move_dict(self):
         return type(self)._CHR_TO_ATOMIC_MOVE
 
     _ATOMIC_MOVE_TO_CHR = dict((v, k) for k, v in _CHR_TO_ATOMIC_MOVE.items())
 
     @property
-    def atomic_move_to_char_dict(self):
+    def _atomic_move_to_char_dict(self):
         return type(self)._ATOMIC_MOVE_TO_CHR
 
     def cell_orientation(self, position, board_width, board_height):

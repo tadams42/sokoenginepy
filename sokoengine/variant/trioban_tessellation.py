@@ -25,57 +25,59 @@ class TriobanTessellation(Tessellation):
         return nx.MultiDiGraph
 
     def neighbor_position(self, position, direction, board_width, board_height):
-        if on_board_1D(position, board_width, board_height):
-            row = ROW(position, board_width)
-            column = COLUMN(position, board_width)
-            tpd = (  # triangle_points_down
-                self.cell_orientation(position, board_width, board_height) ==
-                CellOrientation.TRIANGLE_DOWN
-            )
+        # if not on_board_1D(position, board_width, board_height):
+        #     return None
 
-            dx, dy = 0, 0
-            if direction == Direction.LEFT:
-                dy = 0
-                dx = -1
-            elif direction == Direction.RIGHT:
+        row = ROW(position, board_width)
+        column = COLUMN(position, board_width)
+        triangle_points_down = (
+            self.cell_orientation(position, board_width, board_height) ==
+            CellOrientation.TRIANGLE_DOWN
+        )
+
+        dx, dy = 0, 0
+        if direction == Direction.LEFT:
+            dy = 0
+            dx = -1
+        elif direction == Direction.RIGHT:
+            dy = 0
+            dx = 1
+        elif direction == Direction.NORTH_EAST:
+            if triangle_points_down:
+                dy = -1
+                dx = 0
+            else:
                 dy = 0
                 dx = 1
-            elif direction == Direction.NORTH_EAST:
-                if tpd:
-                    dy = -1
-                    dx = 0
-                else:
-                    dy = 0
-                    dx = 1
-            elif direction == Direction.NORTH_WEST:
-                if tpd:
-                    dy = -1
-                    dx = 0
-                else:
-                    dy = 0
-                    dx = -1
-            elif direction == Direction.SOUTH_EAST:
-                if tpd:
-                    dy = 0
-                    dx = 1
-                else:
-                    dy = 1
-                    dx = 0
-            elif direction == Direction.SOUTH_WEST:
-                if tpd:
-                    dy = 0
-                    dx = -1
-                else:
-                    dy = 1
-                    dx = 0
+        elif direction == Direction.NORTH_WEST:
+            if triangle_points_down:
+                dy = -1
+                dx = 0
             else:
-                raise IllegalDirectionError(direction)
+                dy = 0
+                dx = -1
+        elif direction == Direction.SOUTH_EAST:
+            if triangle_points_down:
+                dy = 0
+                dx = 1
+            else:
+                dy = 1
+                dx = 0
+        elif direction == Direction.SOUTH_WEST:
+            if triangle_points_down:
+                dy = 0
+                dx = -1
+            else:
+                dy = 1
+                dx = 0
+        else:
+            raise IllegalDirectionError(direction)
 
-            row += dy
-            column += dx
+        row += dy
+        column += dx
 
-            if on_board_2D(column, row, board_width, board_height):
-                return INDEX(column, row, board_width)
+        if on_board_2D(column, row, board_width, board_height):
+            return INDEX(column, row, board_width)
 
         return None
 
@@ -95,13 +97,13 @@ class TriobanTessellation(Tessellation):
     }
 
     @property
-    def char_to_atomic_move_dict(self):
+    def _char_to_atomic_move_dict(self):
         return type(self)._CHR_TO_ATOMIC_MOVE
 
     _ATOMIC_MOVE_TO_CHR = dict((v, k) for k, v in _CHR_TO_ATOMIC_MOVE.items())
 
     @property
-    def atomic_move_to_char_dict(self):
+    def _atomic_move_to_char_dict(self):
         return type(self)._ATOMIC_MOVE_TO_CHR
 
     def cell_orientation(self, position, board_width, board_height):

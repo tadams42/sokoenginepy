@@ -25,31 +25,33 @@ class HexobanTessellation(Tessellation):
         return nx.DiGraph
 
     def neighbor_position(self, position, direction, board_width, board_height):
-        if on_board_1D(position, board_width, board_height):
-            row = ROW(position, board_width)
-            column = COLUMN(position, board_width)
+        # if not on_board_1D(position, board_width, board_height):
+        #     return None
 
-            if direction == Direction.LEFT:
-                column -= 1
-            elif direction == Direction.RIGHT:
-                column += 1
-            elif direction == Direction.NORTH_EAST:
-                column += row % 2
-                row -= 1
-            elif direction == Direction.NORTH_WEST:
-                column -= (row + 1) % 2
-                row -= 1
-            elif direction == Direction.SOUTH_EAST:
-                column += row % 2
-                row += 1
-            elif direction == Direction.SOUTH_WEST:
-                column -= (row + 1) % 2
-                row += 1
-            else:
-                raise IllegalDirectionError(direction)
+        row = ROW(position, board_width)
+        column = COLUMN(position, board_width)
 
-            if on_board_2D(column, row, board_width, board_height):
-                return INDEX(column, row, board_width)
+        if direction == Direction.LEFT:
+            column -= 1
+        elif direction == Direction.RIGHT:
+            column += 1
+        elif direction == Direction.NORTH_EAST:
+            column += row % 2
+            row -= 1
+        elif direction == Direction.NORTH_WEST:
+            column -= (row + 1) % 2
+            row -= 1
+        elif direction == Direction.SOUTH_EAST:
+            column += row % 2
+            row += 1
+        elif direction == Direction.SOUTH_WEST:
+            column -= (row + 1) % 2
+            row += 1
+        else:
+            raise IllegalDirectionError(direction)
+
+        if on_board_2D(column, row, board_width, board_height):
+            return INDEX(column, row, board_width)
         return None
 
     _CHR_TO_ATOMIC_MOVE = {
@@ -68,11 +70,11 @@ class HexobanTessellation(Tessellation):
     }
 
     @property
-    def char_to_atomic_move_dict(self):
+    def _char_to_atomic_move_dict(self):
         return type(self)._CHR_TO_ATOMIC_MOVE
 
     _ATOMIC_MOVE_TO_CHR = dict((v, k) for k, v in _CHR_TO_ATOMIC_MOVE.items())
 
     @property
-    def atomic_move_to_char_dict(self):
+    def _atomic_move_to_char_dict(self):
         return type(self)._ATOMIC_MOVE_TO_CHR
