@@ -41,24 +41,37 @@ requirements = [
     'Unipath>=1.1',
     'pytz>=2015.4',
     'pyparsing>=2.0.3',
-    # Alternative that is A LOT faster but hard to install
+    # Alternative that is A LOT faster but ard fails install on Python 3.4
     # graph-tool
     'networkx>=1.9.1',
 ]
 
 # $ pip install -e .[dev,test]
 requirements_dev = [
-    'colored-traceback>=0.2.1',
+    # IPython stuff
     'ipython>=3.2.0,<4',
-    'ipdb>=0.8.1',
-    'scipy>=0.15.1',
-    'moviepy>=0.2.2.11',
-    'matplotlib>=1.4.3',
     'pyzmq>=14.7.0',
     'Jinja2>=2.7.3',
     'tornado>=4.2.1',
     'jsonschema>=2.5.1',
+    'terminado>=0.5'
+    'ipdb>=0.8.1',
+
+    # Petty stacktrace
+    'colored-traceback>=0.2.1',
+
+    # Animation and graph debugging
+    'scipy>=0.15.1',
+    'moviepy>=0.2.2.11',
+    'matplotlib>=1.4.3',
+
+    # Docs and viewers
     'Sphinx>=1.3.1',
+    'restview>=2.4.0',
+    'grip>=3.3.0',
+
+    # Profiler
+    'snakeviz>=0.4.0',
 ]
 
 # $ pip install -e .[dev,test]

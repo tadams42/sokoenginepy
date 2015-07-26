@@ -5,7 +5,7 @@ from ..core import (
     PrettyPrintable, EqualityComparable, Tessellated, TessellationType,
 )
 from ..io import (
-    OutuputSettings, SpecialSnapshotCharacters, rle_encode, is_blank,
+    OutputSettings, SpecialSnapshotCharacters, rle_encode, is_blank,
     SnapshotStringParser
 )
 
@@ -145,7 +145,7 @@ class GameSnapshot(
         self._jumps_count_invalidated = False
         self._moves = []
 
-    def to_s(self, output_settings = OutuputSettings()):
+    def to_s(self, output_settings = OutputSettings()):
         """
         Converts self to string (for printing snapshots in standard format)
         """

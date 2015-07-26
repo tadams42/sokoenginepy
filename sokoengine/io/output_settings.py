@@ -1,4 +1,4 @@
-class OutuputSettings(object):
+class OutputSettings(object):
     """
     Settings that control string output of boards and snapshots.
     """
@@ -22,3 +22,29 @@ class OutuputSettings(object):
             retv = (at_position % self.line_break_at) == 0
 
         return retv
+
+    @property
+    def use_visible_floors(self):
+        return self._use_visible_floors
+
+    @use_visible_floors.setter
+    def use_visible_floors(self, value):
+        if self._rle_encode:
+            self._use_visible_floors = True
+        else:
+            if value:
+                self._use_visible_floors = True
+            else:
+                self._use_visible_floors = False
+
+    @property
+    def rle_encode(self):
+        return self._rle_encode
+
+    @rle_encode.setter
+    def rle_encode(self, value):
+        if value:
+            self._rle_encode = True
+            self._use_visible_floors = True
+        else:
+            self._rle_encode = False

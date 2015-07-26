@@ -1,4 +1,4 @@
-from .output_settings import OutuputSettings
+from .output_settings import OutputSettings
 from .text_utils import (
     BoardEncodingCharacters, SpecialSnapshotCharacters, AtomicMoveCharacters,
     RleCharacters, is_pusher, is_box, is_goal, is_empty_floor, is_wall,
@@ -9,7 +9,7 @@ from .text_utils import (
 )
 
 __all__ = [
-    'OutuputSettings',
+    'OutputSettings',
 
     'BoardEncodingCharacters',
     'SpecialSnapshotCharacters',

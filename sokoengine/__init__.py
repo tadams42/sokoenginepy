@@ -17,7 +17,7 @@ from .game import (
     Piece, SokobanPlus,
 )
 
-from .io import OutuputSettings
+from .io import OutputSettings
 
 __all__ = [
     '__version__',
@@ -42,5 +42,5 @@ __all__ = [
     'SokobanPlus',
     'GameSnapshot',
 
-    'OutuputSettings',
+    'OutputSettings',
 ]

@@ -7,6 +7,7 @@ from .sokoban_board import SokobanBoard
 from .sokoban_tessellation import SokobanTessellation
 from .trioban_board import TriobanBoard
 from .trioban_tessellation import TriobanTessellation
+from .variant_board import VariantBoard
 
 __all__ = [
     'BoardGraph',
@@ -18,4 +19,5 @@ __all__ = [
     'SokobanTessellation',
     'TriobanBoard',
     'TriobanTessellation',
+    'VariantBoard',
 ]

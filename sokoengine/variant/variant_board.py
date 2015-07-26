@@ -2,7 +2,8 @@ from ..core import (
     PrettyPrintable, EqualityComparable, TessellationType, INDEX
 )
 from ..game import BoardCell
-from ..io import OutuputSettings, rle_encode, is_blank, parse_board_string
+from ..io import OutputSettings, rle_encode, is_blank, parse_board_string,\
+    RleCharacters
 
 from .board_graph import BoardGraph
 
@@ -67,12 +68,34 @@ class VariantBoard(PrettyPrintable, EqualityComparable, BoardGraph):
         """
         return parse_board_string(board_str)
 
-    def to_s(self, output_settings = OutuputSettings()):
+    def to_s(self, output_settings = OutputSettings()):
         """
         Override this in subclass to handle tessellation speciffic strings
         """
-        # TODO
-        pass
+        rows = []
+        for y in range(0, self.height):
+            row = "".join([
+                cell.to_s(output_settings.use_visible_floors)
+                for cell in [
+                    self._graph.node[INDEX(x, y, self.width)]['cell']
+                    for x in range(0, self.width)
+                ]
+            ])
+            if output_settings.rle_encode:
+                row = rle_encode(row)
+            rows.append(row)
+
+        if output_settings.rle_encode:
+            return RleCharacters.RLE_ROW_SEPARATOR.value.join(rows)
+        else:
+            return "\n".join(rows)
+
+    def _debug_draw_positions(self, positions):
+        tmp = self._graph.copy()
+        for vertice in positions:
+            self[vertice] = BoardCell('@')
+        print(self.to_s(OutputSettings(use_visible_floors=True)))
+        self._graph = tmp
 
     def add_row_top(self):
         # TODO
