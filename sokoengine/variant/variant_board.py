@@ -51,32 +51,31 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         super().__init__(tessellation_type)
 
         if not is_blank(board_str):
-            board_cells = self._parse_string(board_str)
-            width = len(board_cells[0]) if len(board_cells) > 0 else 0
-            height = len(board_cells)
-            self._reinit(board_width=width, board_height=height)
-            for y, row in enumerate(board_cells):
+            board_rows = self._parse_string(board_str)
+            width = len(board_rows[0]) if len(board_rows) > 0 else 0
+            height = len(board_rows)
+            self._reinit(width, height)
+            for y, row in enumerate(board_rows):
                 for x, chr in enumerate(row):
                     self[INDEX(x, y, self.width)] = BoardCell(chr)
         else:
-            self._reinit(width=board_width, height=board_height)
+            self._reinit(board_width, board_height)
 
-    def _reinit(self, width, height):
+    def _reinit(self, width, height, reconfigure_edges=True):
         self._graph = self._tessellation.graph_type()
 
         if width <= 0 or height <= 0:
             self._width = 0
             self._height = 0
-            self._are_edges_configured = True
         else:
             self._width = width
             self._height = height
-            self._are_edges_configured = False
 
-            for vertice in range(0, self.size):
-                self._graph.add_node(vertice, cell=BoardCell())
+        for vertice in range(0, self.size):
+            self._graph.add_node(vertice, cell=BoardCell())
 
-            self._configure_edges()
+        if reconfigure_edges:
+            self._reconfigure_edges()
 
     def _representation_attributes(self):
         return {
@@ -118,12 +117,6 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
     def __contains__(self, position):
         return position in self._graph
 
-    def _copy_graph_without_edges(self):
-        retv = nx.create_empty_copy(self._graph, with_nodes=True)
-        for vertice in self._graph.nodes_iter():
-            retv.node[vertice]['cell'] = self._graph.node[vertice]['cell']
-        return retv
-
     def to_s(self, output_settings = OutputSettings()):
         """
         Override this in subclass to handle tessellation speciffic strings
@@ -158,29 +151,27 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
     def size(self):
         return self._width * self._height
 
-    def _has_edge(self, source_vertice, dest_vertice, direction):
+    def _has_edge(self, source_vertice, target_vertice, direction):
         """
-        Checks if there is edge between source_vertice and dest_vertice in given
+        Checks if there is edge between source_vertice and target_vertice in given
         direction
         """
         retv = False
 
         for out_edge in self._graph.out_edges_iter(source_vertice, data=True):
-            # edge: (source, target, data)
+            # edge: (source, target, data_dict)
             retv = retv or (
-                out_edge[1] == dest_vertice and
+                out_edge[1] == target_vertice and
                 out_edge[2]['direction'] == direction
             )
 
         return retv
 
-    def _configure_edges(self):
+    def _reconfigure_edges(self):
         """
         Uses tessellation object to create all edges in graph.
         """
-        if self._are_edges_configured:
-            return
-
+        self._graph.remove_edges_from(self._graph.edges())
         for source_vertice in self._graph.nodes_iter():
             for direction in self._tessellation.legal_directions:
                 neighbor_vertice = self._tessellation.neighbor_position(
@@ -188,12 +179,9 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
                     board_width=self._width, board_height=self._height
                 )
                 if neighbor_vertice is not None:
-                    # and not self._has_edge(source_vertice, neighbor_vertice, direction)
                     self._graph.add_edge(
                         source_vertice, neighbor_vertice, direction=direction
                     )
-
-        self._are_edges_configured = True
 
     def _out_edge_weight(self, edge):
         """
@@ -213,7 +201,6 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         """
         Calculates and sets weights to all edges in board graph.
         """
-        self._configure_edges()
         for source_vertice in self._graph.nodes_iter():
             for out_edge in self._graph.out_edges_iter(source_vertice, data=True):
                 out_edge[2]['weight'] = self._out_edge_weight(out_edge)
@@ -270,6 +257,7 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
     @normalize_index_errors
     def neighbor(self, from_position, direction):
         for out_edge in self._graph.out_edges_iter(from_position, data=True):
+            # edge: (source, target, data_dict)
             if out_edge[2]['direction'] == direction:
                 return out_edge[1]
         return None
@@ -286,6 +274,9 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         return self._graph.neighbors(from_position)
 
     def clear(self):
+        """
+        Empties all board cells.
+        """
         for node in self._graph.nodes_iter():
             self._graph.node[node]['cell'].clear()
 
@@ -378,12 +369,12 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
     def position_path_to_direction_path(self, position_path):
         retv = []
         src_vertice_index = 0
-        for dest_vertice in position_path[1:]:
+        for target_vertice in position_path[1:]:
             src_vertice = position_path[src_vertice_index]
             src_vertice_index += 1
 
             for out_edge in self._graph.out_edges_iter(src_vertice, data=True):
-                if out_edge[1] == dest_vertice:
+                if out_edge[1] == target_vertice:
                     retv.append(out_edge[2]['direction'])
 
         return {
@@ -474,172 +465,320 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         self._graph = tmp
 
     def add_row_top(self):
-        old_body = self._graph
-        old_height = self.height
-
-        self._reinit(self.width, self.height + 1)
-
-        for x in range(0, self.width):
-            for y in range(0, old_height):
-                self._graph.node[INDEX(x, y + 1, self.width)]['cell'] =\
-                    old_body.node[INDEX(x, y, self.width)]['cell']
+        resizer = VariantBoardResizer(self)
+        resizer.add_row_top(reconfigure_edges=True)
 
     def add_row_bottom(self):
-        old_body = self._graph
-        old_height = self.height
-
-        self._reinit(self.width, self.height + 1)
-
-        for x in range(0, self.width):
-            for y in range(0, old_height):
-                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
-                    old_body.node[INDEX(x, y, self.width)]['cell']
+        resizer = VariantBoardResizer(self)
+        resizer.add_row_bottom(reconfigure_edges=True)
 
     def add_column_left(self):
-        old_body = self._graph
-        old_width = self.width
-
-        self._reinit(self.width + 1, self.height)
-
-        for x in range(0, old_width):
-            for y in range(0, self.height):
-                self._graph.node[INDEX(x + 1, y, self.width)]['cell'] =\
-                    old_body.node[INDEX(x, y, old_width)]['cell']
+        resizer = VariantBoardResizer(self)
+        resizer.add_column_left(reconfigure_edges=True)
 
     def add_column_right(self):
-        old_body = self._graph
-        old_width = self.width
-
-        self._reinit(self.width + 1, self.height)
-
-        for x in range(0, old_width):
-            for y in range(0, self.height):
-                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
-                    old_body.node[INDEX(x, y, old_width)]['cell']
+        resizer = VariantBoardResizer(self)
+        resizer.add_column_right(reconfigure_edges=True)
 
     def remove_row_top(self):
-        old_body = self._graph
-
-        self._reinit(self.width, self.height - 1)
-
-        for x in range(0, self.width):
-            for y in range(0, self.height):
-                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
-                    old_body.node[INDEX(x, y + 1, self.width)]['cell']
+        resizer = VariantBoardResizer(self)
+        resizer.remove_row_top(reconfigure_edges=True)
 
     def remove_row_bottom(self):
-        old_body = self._graph
-
-        self._reinit(self.width, self.height - 1)
-
-        for x in range(0, self.width):
-            for y in range(0, self.height):
-                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
-                    old_body.node[INDEX(x, y, self.width)]['cell']
+        resizer = VariantBoardResizer(self)
+        resizer.remove_row_bottom(reconfigure_edges=True)
 
     def remove_column_left(self):
-        old_body = self._graph
-        old_width = self.width
-
-        self._reinit(self.width - 1, self.height)
-
-        for x in range(0, self.width):
-            for y in range(0, self.height):
-                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
-                    old_body.node[INDEX(x + 1, y, old_width)]['cell']
+        resizer = VariantBoardResizer(self)
+        resizer.remove_column_left(reconfigure_edges=True)
 
     def remove_column_right(self):
-        old_body = self._graph
-        old_width = self.width
-
-        self._reinit(self.width - 1, self.height)
-
-        for x in range(0, self.width):
-            for y in range(0, self.height):
-                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
-                    old_body.node[INDEX(x, y, old_width)]['cell']
-
-    def resize(self, new_width, new_height):
-        if new_height != self.height:
-            if new_height > self.height:
-                amount = new_height - self.height
-                for i in range(0, amount):
-                    self.add_row_bottom()
-            else:
-                amount = self.height - new_height
-                for i in range(0, amount):
-                    self.remove_row_bottom()
-
-        if new_width != self.width:
-            if new_width > self.width:
-                amount = new_width - self.width
-                for i in range(0, amount):
-                    self.add_column_right()
-            else:
-                amount = self.width - new_width
-                for i in range(0, amount):
-                    self.remove_column_right()
-
-    def trim(self):
-        self.trim_top()
-        self.trim_bottom()
-        self.trim_left()
-        self.trim_right()
+        resizer = VariantBoardResizer(self)
+        resizer.remove_column_right(reconfigure_edges=True)
 
     def trim_left(self):
-        amount = self.width
-        for y in range(0, self.height):
+        resizer = VariantBoardResizer(self)
+        resizer.trim_left(reconfigure_edges=True)
+
+    def trim_right(self):
+        resizer = VariantBoardResizer(self)
+        resizer.trim_right(reconfigure_edges=True)
+
+    def trim_top(self):
+        resizer = VariantBoardResizer(self)
+        resizer.trim_top(reconfigure_edges=True)
+
+    def trim_bottom(self):
+        resizer = VariantBoardResizer(self)
+        resizer.trim_bottom(reconfigure_edges=True)
+
+    def reverse_rows(self):
+        resizer = VariantBoardResizer(self)
+        resizer.reverse_rows(reconfigure_edges=True)
+
+    def reverse_columns(self):
+        resizer = VariantBoardResizer(self)
+        resizer.reverse_columns(reconfigure_edges=True)
+
+    def resize(self, new_width, new_height):
+        old_width = self.width
+        old_height = self.height
+
+        resizer = VariantBoardResizer(self)
+        if new_height != old_height:
+            if new_height > old_height:
+                amount = new_height - old_height
+                for i in range(0, amount):
+                    resizer.add_row_bottom(reconfigure_edges=False)
+            else:
+                amount = old_height - new_height
+                for i in range(0, amount):
+                    resizer.remove_row_bottom(reconfigure_edges=False)
+
+        if new_width != old_width:
+            if new_width > old_width:
+                amount = new_width - old_width
+                for i in range(0, amount):
+                    resizer.add_column_right(reconfigure_edges=False)
+            else:
+                amount = old_width - new_width
+                for i in range(0, amount):
+                    resizer.remove_column_right(reconfigure_edges=False)
+
+        if old_width != self.width or old_height != self.height:
+            self._reconfigure_edges()
+
+    def resize_and_center(self, new_width, new_height):
+        left = right = top = bottom = 0
+
+        if new_width > self.width:
+            left = int((new_width - self.width) / 2)
+            right = new_width - self.width - left
+
+        if new_height > self.height:
+            top = int((new_height - self.height) / 2)
+            bottom = new_height - self.height - top
+
+        if (left, right, top, bottom) != (0, 0, 0, 0):
+            resizer = VariantBoardResizer(self)
+            for i in range(0, left):
+                resizer.add_column_left(reconfigure_edges=False)
+            for i in range(0, top):
+                resizer.add_row_top(reconfigure_edges=False)
+
+            self.resize(self.width + right, self.height + bottom)
+
+    def trim(self):
+        old_width = self.width
+        old_height = self.height
+
+        resizer = VariantBoardResizer(self)
+        resizer.trim_top(reconfigure_edges=False)
+        resizer.trim_bottom(reconfigure_edges=False)
+        resizer.trim_left(reconfigure_edges=False)
+        resizer.trim_right(reconfigure_edges=False)
+
+        if old_width != self.width or old_height != old_height:
+            self._reconfigure_edges()
+
+
+class VariantBoardResizer(object):
+
+    def __init__(self, variant_board):
+        self.board = variant_board
+
+    def add_row_top(self, reconfigure_edges):
+        old_body = self.board._graph
+        old_height = self.board.height
+
+        self.board._reinit(
+            self.board.width, self.board.height + 1,
+            reconfigure_edges=reconfigure_edges
+        )
+
+        for x in range(0, self.board.width):
+            for y in range(0, old_height):
+                self.board[INDEX(x, y + 1, self.board.width)] =\
+                    old_body.node[INDEX(x, y, self.board.width)]['cell']
+
+    def add_row_bottom(self, reconfigure_edges):
+        old_body = self.board._graph
+        old_height = self.board.height
+
+        self.board._reinit(
+            self.board.width, self.board.height + 1,
+            reconfigure_edges=reconfigure_edges
+        )
+
+        for x in range(0, self.board.width):
+            for y in range(0, old_height):
+                self.board[INDEX(x, y, self.board.width)] =\
+                    old_body.node[INDEX(x, y, self.board.width)]['cell']
+
+    def add_column_left(self, reconfigure_edges):
+        old_body = self.board._graph
+        old_width = self.board.width
+
+        self.board._reinit(
+            self.board.width + 1, self.board.height,
+            reconfigure_edges=reconfigure_edges
+        )
+
+        for x in range(0, old_width):
+            for y in range(0, self.board.height):
+                self.board[INDEX(x + 1, y, self.board.width)] =\
+                    old_body.node[INDEX(x, y, old_width)]['cell']
+
+    def add_column_right(self, reconfigure_edges):
+        old_body = self.board._graph
+        old_width = self.board.width
+
+        self.board._reinit(
+            self.board.width + 1, self.board.height,
+            reconfigure_edges=reconfigure_edges
+        )
+
+        for x in range(0, old_width):
+            for y in range(0, self.board.height):
+                self.board[INDEX(x, y, self.board.width)] =\
+                    old_body.node[INDEX(x, y, old_width)]['cell']
+
+    def remove_row_top(self, reconfigure_edges):
+        old_body = self.board._graph
+
+        self.board._reinit(
+            self.board.width, self.board.height - 1,
+            reconfigure_edges=reconfigure_edges
+        )
+
+        for x in range(0, self.board.width):
+            for y in range(0, self.board.height):
+                self.board[INDEX(x, y, self.board.width)] =\
+                    old_body.node[INDEX(x, y + 1, self.board.width)]['cell']
+
+    def remove_row_bottom(self, reconfigure_edges):
+        old_body = self.board._graph
+
+        self.board._reinit(
+            self.board.width, self.board.height - 1,
+            reconfigure_edges=reconfigure_edges
+        )
+
+        for x in range(0, self.board.width):
+            for y in range(0, self.board.height):
+                self.board[INDEX(x, y, self.board.width)] =\
+                    old_body.node[INDEX(x, y, self.board.width)]['cell']
+
+    def remove_column_left(self, reconfigure_edges):
+        old_body = self.board._graph
+        old_width = self.board.width
+
+        self.board._reinit(
+            self.board.width - 1, self.board.height,
+            reconfigure_edges=reconfigure_edges
+        )
+
+        for x in range(0, self.board.width):
+            for y in range(0, self.board.height):
+                self.board[INDEX(x, y, self.board.width)] =\
+                    old_body.node[INDEX(x + 1, y, old_width)]['cell']
+
+    def remove_column_right(self, reconfigure_edges):
+        old_body = self.board._graph
+        old_width = self.board.width
+
+        self.board._reinit(
+            self.board.width - 1, self.board.height,
+            reconfigure_edges=reconfigure_edges
+        )
+
+        for x in range(0, self.board.width):
+            for y in range(0, self.board.height):
+                self.board[INDEX(x, y, self.board.width)] =\
+                    old_body.node[INDEX(x, y, old_width)]['cell']
+
+    def trim_left(self, reconfigure_edges):
+        amount = self.board.width
+        for y in range(0, self.board.height):
             border_found = False
-            for x in range(0, self.width):
-                border_found = self[INDEX(x, y, self.width)].is_border_element
+            for x in range(0, self.board.width):
+                border_found = self.board[
+                    INDEX(x, y, self.board.width)
+                ].is_border_element
                 if border_found:
                     if x < amount:
                         amount = x
                     break
 
         for i in range(0, amount):
-            self.remove_column_left()
+            self.remove_column_left(reconfigure_edges=False)
 
-    def trim_right(self):
-        self.reverse_columns()
-        self.trim_left()
-        self.reverse_columns()
+        if reconfigure_edges:
+            self.board._reconfigure_edges()
 
-    def trim_top(self):
-        amount = self.height
-        for x in range(0, self.width):
+    def trim_right(self, reconfigure_edges):
+        self.reverse_columns(reconfigure_edges=False)
+        self.trim_left(reconfigure_edges=False)
+        self.reverse_columns(reconfigure_edges=False)
+
+        if reconfigure_edges:
+            self.board._reconfigure_edges()
+
+    def trim_top(self, reconfigure_edges):
+        amount = self.board.height
+        for x in range(0, self.board.width):
             border_found = False
-            for y in range(0, self.height):
-                border_found = self[INDEX(x, y, self.width)].is_border_element
+            for y in range(0, self.board.height):
+                border_found = self.board[
+                    INDEX(x, y, self.board.width)
+                ].is_border_element
                 if border_found:
                     if y < amount:
                         amount = y
                     break
 
         for i in range(0, amount):
-            self.remove_row_top()
+            self.remove_row_top(reconfigure_edges=False)
 
-    def trim_bottom(self):
-        self.reverse_rows()
-        self.trim_top()
-        self.reverse_rows()
+        if reconfigure_edges:
+            self.board._reconfigure_edges()
 
-    def reverse_rows(self):
-        old_body = self._graph
+    def trim_bottom(self, reconfigure_edges):
+        self.reverse_rows(reconfigure_edges=False)
+        self.trim_top(reconfigure_edges=False)
+        self.reverse_rows(reconfigure_edges=False)
 
-        self._reinit(self.width, self.height)
+        if reconfigure_edges:
+            self.board._reconfigure_edges()
 
-        for x in range(0, self.width):
-            for y in range(0, self.height):
-                self[INDEX(x, y, self.width)] = \
-                    old_body.node[INDEX(x, self.height - y - 1, self.width)]['cell']
+    def reverse_rows(self, reconfigure_edges):
+        old_body = self.board._graph
 
-    def reverse_columns(self):
-        old_body = self._graph
+        self.board._reinit(
+            self.board.width, self.board.height,
+            reconfigure_edges=False
+        )
 
-        self._reinit(self.width, self.height)
+        for x in range(0, self.board.width):
+            for y in range(0, self.board.height):
+                self.board[INDEX(x, y, self.board.width)] = \
+                    old_body.node[INDEX(x, self.board.height - y - 1, self.board.width)]['cell']
 
-        for x in range(0, self.width):
-            for y in range(0, self.height):
-                self[INDEX(x, y, self.width)] = \
-                    old_body.node[INDEX(self.width - x - 1, y, self.width)]['cell']
+        if reconfigure_edges:
+            self.board._reconfigure_edges()
+
+    def reverse_columns(self, reconfigure_edges):
+        old_body = self.board._graph
+
+        self.board._reinit(
+            self.board.width, self.board.height,
+            reconfigure_edges=False
+        )
+
+        for x in range(0, self.board.width):
+            for y in range(0, self.board.height):
+                self.board[INDEX(x, y, self.board.width)] = \
+                    old_body.node[INDEX(self.board.width - x - 1, y, self.board.width)]['cell']
+
+        if reconfigure_edges:
+            self.board._reconfigure_edges()
