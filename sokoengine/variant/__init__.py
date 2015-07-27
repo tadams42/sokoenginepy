@@ -1,4 +1,3 @@
-from .board_graph import BoardGraph
 from .hexoban_board import HexobanBoard
 from .hexoban_tessellation import HexobanTessellation
 from .octoban_board import OctobanBoard
@@ -10,7 +9,6 @@ from .trioban_tessellation import TriobanTessellation
 from .variant_board import VariantBoard
 
 __all__ = [
-    'BoardGraph',
     'HexobanBoard',
     'HexobanTessellation',
     'OctobanBoard',
