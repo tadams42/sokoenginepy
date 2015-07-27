@@ -98,65 +98,172 @@ class VariantBoard(PrettyPrintable, EqualityComparable, BoardGraph):
         self._graph = tmp
 
     def add_row_top(self):
-        # TODO
-        pass
+        old_body = self._graph
+        old_height = self.height
+
+        self._reinit(self.width, self.height + 1)
+
+        for x in range(0, self.width):
+            for y in range(0, old_height):
+                self._graph.node[INDEX(x, y + 1, self.width)]['cell'] =\
+                    old_body.node[INDEX(x, y, self.width)]['cell']
 
     def add_row_bottom(self):
-        # TODO
-        pass
+        old_body = self._graph
+        old_height = self.height
+
+        self._reinit(self.width, self.height + 1)
+
+        for x in range(0, self.width):
+            for y in range(0, old_height):
+                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
+                    old_body.node[INDEX(x, y, self.width)]['cell']
 
     def add_column_left(self):
-        # TODO
-        pass
+        old_body = self._graph
+        old_width = self.width
+
+        self._reinit(self.width + 1, self.height)
+
+        for x in range(0, old_width):
+            for y in range(0, self.height):
+                self._graph.node[INDEX(x + 1, y, self.width)]['cell'] =\
+                    old_body.node[INDEX(x, y, old_width)]['cell']
 
     def add_column_right(self):
-        # TODO
-        pass
+        old_body = self._graph
+        old_width = self.width
+
+        self._reinit(self.width + 1, self.height)
+
+        for x in range(0, old_width):
+            for y in range(0, self.height):
+                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
+                    old_body.node[INDEX(x, y, old_width)]['cell']
 
     def remove_row_top(self):
-        # TODO
-        pass
+        old_body = self._graph
+
+        self._reinit(self.width, self.height - 1)
+
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
+                    old_body.node[INDEX(x, y + 1, self.width)]['cell']
 
     def remove_row_bottom(self):
-        # TODO
-        pass
+        old_body = self._graph
+
+        self._reinit(self.width, self.height - 1)
+
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
+                    old_body.node[INDEX(x, y, self.width)]['cell']
 
     def remove_column_left(self):
-        # TODO
-        pass
+        old_body = self._graph
+        old_width = self.width
+
+        self._reinit(self.width - 1, self.height)
+
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
+                    old_body.node[INDEX(x + 1, y, old_width)]['cell']
 
     def remove_column_right(self):
-        # TODO
-        pass
+        old_body = self._graph
+        old_width = self.width
+
+        self._reinit(self.width - 1, self.height)
+
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+                self._graph.node[INDEX(x, y, self.width)]['cell'] =\
+                    old_body.node[INDEX(x, y, old_width)]['cell']
 
     def resize(self, new_width, new_height):
-        # TODO
-        pass
+        if new_height != self.height:
+            if new_height > self.height:
+                amount = new_height - self.height
+                for i in range(0, amount):
+                    self.add_row_bottom()
+            else:
+                amount = self.height - new_height
+                for i in range(0, amount):
+                    self.remove_row_bottom()
+
+        if new_width != self.width:
+            if new_width > self.width:
+                amount = new_width - self.width
+                for i in range(0, amount):
+                    self.add_column_right()
+            else:
+                amount = self.width - new_width
+                for i in range(0, amount):
+                    self.remove_column_right()
 
     def trim(self):
-        # TODO
-        pass
+        self.trim_top()
+        self.trim_bottom()
+        self.trim_left()
+        self.trim_right()
 
     def trim_left(self):
-        # TODO
-        pass
+        amount = self.width
+        for y in range(0, self.height):
+            border_found = False
+            for x in range(0, self.width):
+                border_found = self[INDEX(x, y, self.width)].is_border_element
+                if border_found:
+                    if x < amount:
+                        amount = x
+                    break
+
+        for i in range(0, amount):
+            self.remove_column_left()
 
     def trim_right(self):
-        # TODO
-        pass
+        self.reverse_columns()
+        self.trim_left()
+        self.reverse_columns()
 
     def trim_top(self):
-        # TODO
-        pass
+        amount = self.height
+        for x in range(0, self.width):
+            border_found = False
+            for y in range(0, self.height):
+                border_found = self[INDEX(x, y, self.width)].is_border_element
+                if border_found:
+                    if y < amount:
+                        amount = y
+                    break
+
+        for i in range(0, amount):
+            self.remove_row_top()
 
     def trim_bottom(self):
-        # TODO
-        pass
+        self.reverse_rows()
+        self.trim_top()
+        self.reverse_rows()
 
     def reverse_rows(self):
-        # TODO
-        pass
+        old_body = self._graph
+
+        self._reinit(self.width, self.height)
+
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+                self[INDEX(x, y, self.width)] = \
+                    old_body.node[INDEX(x, self.height - y - 1, self.width)]['cell']
 
     def reverse_columns(self):
-        # TODO
-        pass
+        old_body = self._graph
+
+        self._reinit(self.width, self.height)
+
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+                self[INDEX(x, y, self.width)] = \
+                    old_body.node[INDEX(self.width - x - 1, y, self.width)]['cell']

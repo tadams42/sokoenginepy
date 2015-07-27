@@ -35,14 +35,7 @@ class BoardGraph(Container, Tessellated):
 
     def __init__(self, board_width, board_height, tessellation_type):
         super().__init__(tessellation_type)
-        self._graph = self._tessellation.graph_type()
-        self._width = board_width
-        self._height = board_height
-        self._are_edges_configured = False
-
-        for vertice in range(0, self.size):
-            self._graph.add_node(vertice, cell=BoardCell())
-        self._configure_edges()
+        self._reinit(board_width, board_height)
 
     @normalize_index_errors
     def __getitem__(self, position):
@@ -57,6 +50,29 @@ class BoardGraph(Container, Tessellated):
         Checks if position is on board
         """
         return position in self._graph
+
+    def _copy_graph_without_edges(self):
+        retv = nx.create_empty_copy(self._graph, with_nodes=True)
+        for vertice in self._graph.nodes_iter():
+            retv.node[vertice]['cell'] = self._graph.node[vertice]['cell']
+        return retv
+
+    def _reinit(self, width, height):
+        self._graph = self._tessellation.graph_type()
+
+        if width <= 0 or height <= 0:
+            self._width = 0
+            self._height = 0
+            self._are_edges_configured = True
+        else:
+            self._width = width
+            self._height = height
+
+            self._are_edges_configured = False
+            for vertice in range(0, self.size):
+                self._graph.add_node(vertice, cell=BoardCell())
+            self._are_edges_configured = False
+            self._configure_edges()
 
     @property
     def width(self):
