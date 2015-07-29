@@ -9,6 +9,7 @@ from sokoengine import (
 )
 from sokoengine.game import SokobanPlusValidator
 from sokoengine.io import BoardEncodingCharacters
+from sokoengine.variant import VariantBoard
 
 
 class PieceFactory(factory.Factory):
@@ -120,3 +121,49 @@ def sokoban_plus():
 def sokoban_plus_validator(sokoban_plus):
     sokoban_plus._parse()
     return SokobanPlusValidator(sokoban_plus)
+
+@pytest.fixture
+def board_str():
+    return "\n".join([
+        # 123456789012345678
+        "    #####",            # 0
+        "    #   #",            # 1
+        "    #$  #",            # 2
+        "  ###  $##",           # 3
+        "  #  $ $ #",           # 4
+        "### # ## #   ######",  # 5
+        "#   # ## #####  ..#",  # 6
+        "# $  $          ..#",  # 7
+        "##### ### #@##  ..#",  # 8
+        "    #     #########",  # 9
+        "    #######",          # 0
+    ])
+
+@pytest.fixture
+def board_str_width():
+    return 19
+
+@pytest.fixture
+def board_str_height():
+    return 11
+
+class VariantBoardFactory(factory.Factory):
+    class Meta:
+        model = VariantBoard
+
+    board_width = factory.LazyAttribute(
+        lambda x: fake.random_int(min=10, max=30)
+    )
+    board_height = factory.LazyAttribute(
+        lambda x: fake.random_int(min=10, max=30)
+    )
+    tessellation_type = factory.LazyAttribute(
+        lambda x: fake.random_element(list(TessellationType))
+    )
+
+@pytest.fixture
+def variant_board(board_str):
+    return VariantBoard(
+        board_str=board_str,
+        tessellation_type=TessellationType.SOKOBAN
+    )

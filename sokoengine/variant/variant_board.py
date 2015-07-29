@@ -5,7 +5,7 @@ import networkx as nx
 
 from ..core import (
     PrettyPrintable, EqualityComparable, TessellationType, INDEX,
-    Tessellated, Direction
+    Tessellated, Direction, IllegalDirectionError
 )
 from ..game import BoardCell
 from ..io import (
@@ -33,6 +33,8 @@ def normalize_index_errors(method):
 class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
     """
     Base board class for variant specific implementations.
+    Internally it is stored as directed graph structure.
+
     Implements concerns of
         - board cell access/editing
         - string (de)serialization
@@ -42,6 +44,8 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
     All positions are int indexes of graph vertices. To convert 2D coordinate
     into vertice index, use INDEX method
     """
+
+    _MAX_EDGE_WEIGHT = len(Direction) + 1
 
     def __init__(
         self, board_width=0, board_height=0,
@@ -130,6 +134,7 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
                     for x in range(0, self.width)
                 ]
             ])
+            row = row.rstrip()
             if output_settings.rle_encode:
                 row = rle_encode(row)
             rows.append(row)
@@ -191,9 +196,9 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         target_cell = self._graph.node[target_vertice]['cell']
 
         weight = 1
-        if (target_cell.is_deadlock or target_cell.is_wall or
-                target_cell.has_box or target_cell.has_pusher):
-            weight = len(Direction) + 1
+        if (target_cell.is_wall or target_cell.has_box or
+                target_cell.has_pusher):
+            weight = type(self)._MAX_EDGE_WEIGHT
 
         return weight
 
@@ -201,9 +206,8 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         """
         Calculates and sets weights to all edges in board graph.
         """
-        for source_vertice in self._graph.nodes_iter():
-            for out_edge in self._graph.out_edges_iter(source_vertice, data=True):
-                out_edge[2]['weight'] = self._out_edge_weight(out_edge)
+        for edge in self._graph.edges_iter(data=True):
+            edge[2]['weight'] = self._out_edge_weight(edge)
 
     @normalize_index_errors
     def _reachables(
@@ -252,7 +256,10 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
                     excluded=excluded_positions
                 )
 
-        return reachables
+        if root in excluded_positions:
+            return [pos for pos in reachables if pos != root]
+        else:
+            return list(reachables)
 
     @normalize_index_errors
     def neighbor(self, from_position, direction):
@@ -281,39 +288,33 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
             self._graph.node[node]['cell'].clear()
 
     def mark_play_area(self):
-        for node in self._graph.nodes_iter():
-            self._graph.node[node]['cell'].is_in_playable_area = False
+        piece_positions = []
+        for vertice in self._graph.nodes_iter():
+            if self[vertice].has_box or self[vertice].has_pusher:
+                self[vertice].is_in_playable_area = True
+                piece_positions.append(vertice)
+            else:
+                self[vertice].is_in_playable_area = False
 
         def is_obstacle(vertice):
-            return (
-                self._graph.node[vertice]['cell'].is_wall or
-                self._graph.node[vertice]['cell'].is_in_playable_area
+            return self[vertice].is_wall
+
+        for piece_position in piece_positions:
+            reachables = self._reachables(
+                root=piece_position, is_obstacle_callable=is_obstacle
             )
 
-        marked = []
-        for vertice in self._graph.nodes_iter():
-            cell = self._graph.node[vertice]['cell']
-            should_analyze = not cell.is_in_playable_area and cell.has_piece
-
-            if should_analyze:
-                reachables = self._reachables(
-                    root=vertice, excluded_positions=marked,
-                    is_obstacle_callable=is_obstacle
-                )
-                for reachable_vertice in reachables:
-                    reachable_cell = self._graph.node[reachable_vertice]['cell']
-                    if reachable_cell.has_piece or reachable_vertice == vertice:
-                        reachable_cell.is_in_playable_area = True
-                        marked.append(reachable_vertice)
+            for reachable_vertice in reachables:
+                self[reachable_vertice].is_in_playable_area = True
 
     @normalize_index_errors
     def positions_reachable_by_pusher(
         self, pusher_position, excluded_positions=[]
     ):
         def is_obstacle(position):
-            return self._graph[position]['cell'].can_put_pusher_or_box
+            return not self[position].can_put_pusher_or_box
         return self._reachables(
-            pusher_position,
+            root=pusher_position,
             is_obstacle_callable=is_obstacle,
             excluded_positions=excluded_positions
         )
@@ -330,9 +331,12 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
             return pusher_position
 
     @normalize_index_errors
-    def path_destination(self, start_position, path):
+    def path_destination(self, start_position, direction_path):
+        if start_position not in self:
+            raise IndexError('Board index out of range')
+
         retv = start_position
-        for direction in path:
+        for direction in direction_path:
             next_target = self.neighbor(retv, direction)
             if next_target:
                 retv = next_target
@@ -341,7 +345,7 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         return retv
 
     def find_jump_path(self, start_position, end_position):
-        if start_position not in self or end_position not in self:
+        if start_position not in self:
             raise IndexError('Board index out of range')
         try:
             return nx.shortest_path(self._graph, start_position, end_position, 1)
@@ -349,20 +353,27 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
             return []
 
     def find_move_path(self, start_position, end_position):
-        if start_position not in self or end_position not in self:
+        if start_position not in self:
             raise IndexError('Board index out of range')
 
         self._calculate_edge_weights()
         try:
-            return nx.dijkstra_path(self._graph, start_position, end_position)
+            path = nx.dijkstra_path(self._graph, start_position, end_position)
+            retv = path[:1]
+            for position in path[1:]:
+                if self[position].can_put_pusher_or_box:
+                    retv.append(position)
+                else:
+                    break
+            if retv != path:
+                return[]
+            return path
         except nx.NetworkXNoPath:
             return []
 
-    def cell_orientation(self, cell_position):
-        if not cell_position in self:
-            raise IndexError('Board index out of range')
+    def cell_orientation(self, position):
         return self._tessellation.cell_orientation(
-            cell_position, self._width, self._height
+            position, self._width, self._height
         )
 
     @normalize_index_errors

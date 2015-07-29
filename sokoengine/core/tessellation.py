@@ -65,7 +65,7 @@ class TessellationType(Enum):
     SOKOBAN = 0
 
     """
-    Board is laid out on alternating triangles with origin triangle poiting up.
+    Board is laid out on alternating triangles with origin triangle poiting down.
     Direction <-> character mapping:
 
     | LEFT | RIGHT | NORTH_EAST | NORTH_WEST | SOUTH_EAST | SOUTH_WEST |
