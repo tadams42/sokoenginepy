@@ -2,14 +2,14 @@ import pytest
 from sokoengine import (
     TessellationType, BoardConversionError, Direction, INDEX, IllegalDirectionError
 )
-from sokoengine.variant import VariantBoard
+from sokoengine.variant import SokobanBoard, VariantBoard, TriobanBoard
 from hamcrest import assert_that, equal_to, greater_than, is_, none
 
 
 class DescribeVariantBoard(object):
     class describe_init(object):
         def test_creates_board_of_specified_size_and_tessellation(self):
-            b = VariantBoard(4, 2, TessellationType.TRIOBAN)
+            b = TriobanBoard(4, 2)
             assert_that(b.width, equal_to(4))
             assert_that(b.height, equal_to(2))
             assert_that(b.tessellation_type, equal_to(TessellationType.TRIOBAN))
@@ -17,17 +17,14 @@ class DescribeVariantBoard(object):
         def test_ignores_specified_size_if_string_given_and_parses_string_instead(
             self, board_str, board_str_width, board_str_height
         ):
-            b = VariantBoard(
-                4, 2, board_str=board_str,
-                tessellation_type=TessellationType.SOKOBAN
-            )
+            b = SokobanBoard(4, 2, board_str=board_str)
             assert_that(b.width, equal_to(board_str_width))
             assert_that(b.height, equal_to(board_str_height))
             assert_that(b.to_s(), equal_to(board_str))
 
         def test_raises_on_illegal_board_string(self):
             with pytest.raises(BoardConversionError):
-                VariantBoard(board_str="ZOOMG!")
+                SokobanBoard(board_str="ZOOMG!")
 
     class describe__reinit(object):
         def test_reinitializes_graph_vertices(self, variant_board):
@@ -60,9 +57,7 @@ class DescribeVariantBoard(object):
 
     class describe__reconfigure_edges(object):
         def test_reconfigures_all_edges_in_board(self):
-            variant_board = VariantBoard(
-                2, 2, tessellation_type=TessellationType.SOKOBAN
-            )
+            variant_board = SokobanBoard(2, 2)
             assert_that(variant_board._graph.number_of_edges(), equal_to(8))
             assert_that(
                 variant_board._has_edge(0, 1, Direction.RIGHT), equal_to(True)
@@ -91,7 +86,7 @@ class DescribeVariantBoard(object):
 
         def test_doesnt_create_duplicate_direction_edges_in_multidigraph(self):
             # Trioban is only tessellation that requires multidigraph
-            variant_board = VariantBoard(2, 2, TessellationType.TRIOBAN)
+            variant_board = TriobanBoard(2, 2)
             assert_that(len(variant_board._graph[0][1]), equal_to(2))
             assert_that(len(variant_board._graph[1][0]), equal_to(2))
 
@@ -127,7 +122,7 @@ class DescribeVariantBoard(object):
             variant_board[1].has_goal = True
             assert_that(variant_board._out_edge_weight([0, 1]), equal_to(1))
 
-    class describe_reachables(object):
+    class describe__reachables(object):
         board_str = "\n".join([
             # 123456
             "#######",  # 0
@@ -136,7 +131,7 @@ class DescribeVariantBoard(object):
             "#     #",  # 3
             "#######",  # 4
         ])
-        variant_board = VariantBoard(board_str=board_str)
+        variant_board = SokobanBoard(board_str=board_str)
 
         def test_calculates_all_positions_reachable_from_root(self):
             root = INDEX(5, 1, 7)
@@ -202,7 +197,7 @@ class DescribeVariantBoard(object):
             "#     #",  # 3
             "#######",  # 4
         ])
-        variant_board = VariantBoard(board_str=board_str)
+        variant_board = SokobanBoard(board_str=board_str)
 
         expected_playable_cells = [
             INDEX(1, 1, 7),
@@ -232,7 +227,7 @@ class DescribeVariantBoard(object):
             "#   #  ",  # 3
             "#####  ",  # 4
         ])
-        variant_board = VariantBoard(board_str=board_str)
+        variant_board = SokobanBoard(board_str=board_str)
 
         def test_returns_list_of_positions_reachable_by_pusher_movement_only(self):
             expected = [
@@ -306,7 +301,7 @@ class DescribeVariantBoard(object):
             "#   #  ",  # 3
             "#####  ",  # 4
         ])
-        variant_board = VariantBoard(board_str=board_str)
+        variant_board = SokobanBoard(board_str=board_str)
 
         def test_returns_top_left_position_of_pusher_in_his_reachable_area(self):
             assert_that(

@@ -4,6 +4,8 @@ from ..core import (
     IllegalDirectionError, CellOrientation
 )
 from ..io import AtomicMoveCharacters
+from .trioban_board import TriobanBoardResizer
+
 
 class TriobanTessellation(Tessellation):
     """
@@ -23,6 +25,10 @@ class TriobanTessellation(Tessellation):
     @property
     def graph_type(self):
         return nx.MultiDiGraph
+
+    @property
+    def board_resizer(self):
+        return TriobanBoardResizer
 
     def neighbor_position(self, position, direction, board_width, board_height):
         # if not on_board_1D(position, board_width, board_height):

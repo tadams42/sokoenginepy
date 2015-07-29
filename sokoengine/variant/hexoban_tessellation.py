@@ -4,6 +4,7 @@ from ..core import (
     IllegalDirectionError
 )
 from ..io import AtomicMoveCharacters
+from .hexoban_board import HexobanBoardResizer
 
 
 class HexobanTessellation(Tessellation):
@@ -23,6 +24,10 @@ class HexobanTessellation(Tessellation):
     @property
     def graph_type(self):
         return nx.DiGraph
+
+    @property
+    def board_resizer(self):
+        return HexobanBoardResizer
 
     def neighbor_position(self, position, direction, board_width, board_height):
         # if not on_board_1D(position, board_width, board_height):

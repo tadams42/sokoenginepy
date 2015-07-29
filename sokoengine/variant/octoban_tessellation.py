@@ -4,6 +4,7 @@ from ..core import (
     IllegalDirectionError, CellOrientation
 )
 from ..io import AtomicMoveCharacters
+from .octoban_board import OctobanBoardResizer
 
 
 class OctobanTessellation(Tessellation):
@@ -24,6 +25,10 @@ class OctobanTessellation(Tessellation):
     @property
     def graph_type(self):
         return nx.DiGraph
+
+    @property
+    def board_resizer(self):
+        return OctobanBoardResizer
 
     _NEIGHBOR_SHIFT = {
         Direction.LEFT      : (0, -1),

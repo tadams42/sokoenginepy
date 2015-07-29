@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Container
 from functools import wraps
@@ -30,7 +31,9 @@ def normalize_index_errors(method):
     return method_wrapper
 
 
-class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
+class VariantBoard(
+    PrettyPrintable, EqualityComparable, Container, Tessellated, ABC
+):
     """
     Base board class for variant specific implementations.
     Internally it is stored as directed graph structure.
@@ -102,6 +105,7 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         else:
             return False
 
+    @abstractmethod
     def _parse_string(self, board_str):
         """
         Override this in subclass to handle tessellation speciffic strings
@@ -121,6 +125,7 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
     def __contains__(self, position):
         return position in self._graph
 
+    @abstractmethod
     def to_s(self, output_settings = OutputSettings()):
         """
         Override this in subclass to handle tessellation speciffic strings
@@ -476,66 +481,66 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         self._graph = tmp
 
     def add_row_top(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.add_row_top(reconfigure_edges=True)
 
     def add_row_bottom(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.add_row_bottom(reconfigure_edges=True)
 
     def add_column_left(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.add_column_left(reconfigure_edges=True)
 
     def add_column_right(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.add_column_right(reconfigure_edges=True)
 
     def remove_row_top(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.remove_row_top(reconfigure_edges=True)
 
     def remove_row_bottom(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.remove_row_bottom(reconfigure_edges=True)
 
     def remove_column_left(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.remove_column_left(reconfigure_edges=True)
 
     def remove_column_right(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.remove_column_right(reconfigure_edges=True)
 
     def trim_left(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.trim_left(reconfigure_edges=True)
 
     def trim_right(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.trim_right(reconfigure_edges=True)
 
     def trim_top(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.trim_top(reconfigure_edges=True)
 
     def trim_bottom(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.trim_bottom(reconfigure_edges=True)
 
     def reverse_rows(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.reverse_rows(reconfigure_edges=True)
 
     def reverse_columns(self):
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.reverse_columns(reconfigure_edges=True)
 
     def resize(self, new_width, new_height):
         old_width = self.width
         old_height = self.height
 
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         if new_height != old_height:
             if new_height > old_height:
                 amount = new_height - old_height
@@ -571,7 +576,7 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
             bottom = new_height - self.height - top
 
         if (left, right, top, bottom) != (0, 0, 0, 0):
-            resizer = VariantBoardResizer(self)
+            resizer = self._tessellation.board_resizer(self)
             for i in range(0, left):
                 resizer.add_column_left(reconfigure_edges=False)
             for i in range(0, top):
@@ -583,7 +588,7 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
         old_width = self.width
         old_height = self.height
 
-        resizer = VariantBoardResizer(self)
+        resizer = self._tessellation.board_resizer(self)
         resizer.trim_top(reconfigure_edges=False)
         resizer.trim_bottom(reconfigure_edges=False)
         resizer.trim_left(reconfigure_edges=False)
@@ -593,7 +598,7 @@ class VariantBoard(PrettyPrintable, EqualityComparable, Container, Tessellated):
             self._reconfigure_edges()
 
 
-class VariantBoardResizer(object):
+class VariantBoardResizer(ABC):
 
     def __init__(self, variant_board):
         self.board = variant_board

@@ -9,7 +9,7 @@ from sokoengine import (
 )
 from sokoengine.game import SokobanPlusValidator
 from sokoengine.io import BoardEncodingCharacters
-from sokoengine.variant import VariantBoard
+from sokoengine.variant import SokobanBoard
 
 
 class PieceFactory(factory.Factory):
@@ -147,23 +147,8 @@ def board_str_width():
 def board_str_height():
     return 11
 
-class VariantBoardFactory(factory.Factory):
-    class Meta:
-        model = VariantBoard
-
-    board_width = factory.LazyAttribute(
-        lambda x: fake.random_int(min=10, max=30)
-    )
-    board_height = factory.LazyAttribute(
-        lambda x: fake.random_int(min=10, max=30)
-    )
-    tessellation_type = factory.LazyAttribute(
-        lambda x: fake.random_element(list(TessellationType))
-    )
-
 @pytest.fixture
 def variant_board(board_str):
-    return VariantBoard(
-        board_str=board_str,
-        tessellation_type=TessellationType.SOKOBAN
-    )
+    # We could use mock here, but it is not neccessary as long as we test only
+    # common behavior."
+    return SokobanBoard(board_str=board_str)

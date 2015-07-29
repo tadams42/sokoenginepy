@@ -233,6 +233,14 @@ class Tessellation(ABC):
         """
         pass
 
+    @property
+    @abstractmethod
+    def board_resizer(self):
+        """
+        VariantBoardResizer subclass
+        """
+        pass
+
     def char_to_atomic_move(self, chr):
         """
         Converts string to AtomicMove instance or raises exception if conversion

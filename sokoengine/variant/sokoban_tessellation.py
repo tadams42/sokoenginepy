@@ -4,6 +4,7 @@ from ..core import (
     IllegalDirectionError
 )
 from ..io import AtomicMoveCharacters
+from .sokoban_board import SokobanBoardResizer
 
 
 class SokobanTessellation(Tessellation):
@@ -22,6 +23,10 @@ class SokobanTessellation(Tessellation):
     @property
     def graph_type(self):
         return nx.DiGraph
+
+    @property
+    def board_resizer(self):
+        return SokobanBoardResizer
 
     _NEIGHBOR_SHIFT = {
         Direction.LEFT: (0, -1),
