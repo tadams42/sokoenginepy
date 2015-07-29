@@ -148,7 +148,7 @@ class Tessellated(object):
         """
         assert variant in Variant
         self._variant = variant
-        self._tessellation_instance = Tessellation.factory(variant)
+        self._tessellation = Tessellation.factory(variant)
 
     @property
     def variant(self):
@@ -156,7 +156,7 @@ class Tessellated(object):
 
     @property
     def tessellation(self):
-        return self._tessellation_instance
+        return self._tessellation
 
 
 class Tessellation(ABC):

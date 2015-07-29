@@ -405,6 +405,7 @@ class VariantBoard(
         from functools import partial
         from ..core import INDEX, X, Y, Variant
         from ..io import parse_board_string
+        from .sokoban_board import SokobanBoard
 
         WHITE = (255, 255, 255)
         BLACK = (0, 0, 0)
@@ -432,8 +433,7 @@ class VariantBoard(
         width = len(board_cells[0])
         height = len(board_cells)
         root = INDEX(11, 8, width)
-        bg = cls(board_width=width, board_height=height,
-                 variant=Variant.SOKOBAN)
+        bg = SokobanBoard(board_width=width, board_height=height)
 
         for y, row in enumerate(board_cells):
             for x, chr in enumerate(row):
