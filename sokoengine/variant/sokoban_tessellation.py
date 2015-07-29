@@ -25,7 +25,7 @@ class SokobanTessellation(Tessellation):
         return nx.DiGraph
 
     @property
-    def board_resizer(self):
+    def board_resizer_type(self):
         return SokobanBoardResizer
 
     _NEIGHBOR_SHIFT = {

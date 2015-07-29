@@ -48,10 +48,10 @@ class CellOrientation(Enum):
     OCTAGON = 2
 
 
-class TessellationType(Enum):
+class Variant(Enum):
     """
     Enumerates implemented tessellation types. All classes that are tessellation
-    dependant have attribute tessellation_type whose value is one of these.
+    dependant have attribute variant whose value is one of these.
     """
 
     """
@@ -137,25 +137,25 @@ class TessellationType(Enum):
 class Tessellated(object):
     """
     Mixin that marks class depending on Tessellation specifics. This means that
-    class will have to be initialized with TessellationType and it will
-    (internally) use one of Tessellation subclass instances.
+    class will have to be initialized with Variant and it will use one of
+    Tessellation subclass instances.
     """
 
-    def __init__(self, tessellation_type):
+    def __init__(self, variant):
         """
-        tessellation_type - either case insensitive  string naming tessellation
-        (ie. "hexoban") or one of TessellationType members
+        variant - either case insensitive  string naming tessellation
+        (ie. "hexoban") or one of Variant members
         """
-        assert tessellation_type in TessellationType
-        self._tessellation_type = tessellation_type
-        self._tessellation_instance = Tessellation.factory(tessellation_type)
+        assert variant in Variant
+        self._variant = variant
+        self._tessellation_instance = Tessellation.factory(variant)
 
     @property
-    def tessellation_type(self):
-        return self._tessellation_type
+    def variant(self):
+        return self._variant
 
     @property
-    def _tessellation(self):
+    def tessellation(self):
         return self._tessellation_instance
 
 
@@ -175,22 +175,22 @@ class Tessellation(ABC):
             )
 
             cls._TESSELLATION_REGISTER = {
-                TessellationType.SOKOBAN: SokobanTessellation(),
-                TessellationType.TRIOBAN: TriobanTessellation(),
-                TessellationType.HEXOBAN: HexobanTessellation(),
-                TessellationType.OCTOBAN: OctobanTessellation(),
+                Variant.SOKOBAN: SokobanTessellation(),
+                Variant.TRIOBAN: TriobanTessellation(),
+                Variant.HEXOBAN: HexobanTessellation(),
+                Variant.OCTOBAN: OctobanTessellation(),
             }
 
     @classmethod
-    def factory(cls, tessellation_type):
+    def factory(cls, variant):
         cls._init_register()
 
-        if isinstance(tessellation_type, str):
-            tessellation_type = TessellationType.factory(tessellation_type)
+        if isinstance(variant, str):
+            variant = Variant.factory(variant)
 
-        retv = cls._TESSELLATION_REGISTER.get(tessellation_type, None)
+        retv = cls._TESSELLATION_REGISTER.get(variant, None)
         if not retv:
-            raise UnknownTessellationError(tessellation_type)
+            raise UnknownTessellationError(variant)
         return retv
 
     @property
@@ -235,7 +235,7 @@ class Tessellation(ABC):
 
     @property
     @abstractmethod
-    def board_resizer(self):
+    def board_resizer_type(self):
         """
         VariantBoardResizer subclass
         """

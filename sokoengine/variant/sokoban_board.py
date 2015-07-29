@@ -1,4 +1,4 @@
-from ..core import TessellationType
+from ..core import Variant
 from ..io import OutputSettings
 
 from .variant_board import VariantBoard, VariantBoardResizer
@@ -12,7 +12,7 @@ class SokobanBoard(VariantBoard):
     def __init__(self, board_width=0, board_height=0, board_str = ""):
         super().__init__(
             board_width = board_width, board_height = board_height,
-            tessellation_type = TessellationType.SOKOBAN,
+            variant = Variant.SOKOBAN,
             board_str = board_str
         )
 

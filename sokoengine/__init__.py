@@ -9,7 +9,7 @@ from .core import (
     InvalidPieceIdError,
     InvalidPiecePlusIdError,
     SokobanPlusDataError,
-    Direction, TessellationType, CellOrientation, INDEX
+    Direction, Variant, CellOrientation, INDEX
 )
 
 from .game import (
@@ -31,7 +31,7 @@ __all__ = [
     'InvalidPiecePlusIdError',
     'SokobanPlusDataError',
     'Direction',
-    'TessellationType',
+    'Variant',
     'CellOrientation',
     'INDEX',
 

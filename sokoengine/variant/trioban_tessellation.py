@@ -27,7 +27,7 @@ class TriobanTessellation(Tessellation):
         return nx.MultiDiGraph
 
     @property
-    def board_resizer(self):
+    def board_resizer_type(self):
         return TriobanBoardResizer
 
     def neighbor_position(self, position, direction, board_width, board_height):

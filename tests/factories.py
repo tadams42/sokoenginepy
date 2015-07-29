@@ -4,7 +4,7 @@ import factory
 from helpers import fake
 
 from sokoengine import (
-    AtomicMove, Direction, BoardCell, GameSnapshot, TessellationType,
+    AtomicMove, Direction, BoardCell, GameSnapshot, Variant,
     GameSolvingMode, SokobanPlus, Piece
 )
 from sokoengine.game import SokobanPlusValidator
@@ -84,8 +84,8 @@ class GameSnapshotFactory(factory.Factory):
     class Meta:
         model = GameSnapshot
 
-    tessellation_type = factory.LazyAttribute(
-        lambda x: fake.random_element(list(TessellationType))
+    variant = factory.LazyAttribute(
+        lambda x: fake.random_element(list(Variant))
     )
     solving_mode = factory.LazyAttribute(
         lambda x: fake.random_element(list(GameSolvingMode))

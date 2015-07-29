@@ -5,7 +5,7 @@ from functools import wraps
 import networkx as nx
 
 from ..core import (
-    PrettyPrintable, EqualityComparable, TessellationType, INDEX,
+    PrettyPrintable, EqualityComparable, Variant, INDEX,
     Tessellated, Direction, IllegalDirectionError
 )
 from ..game import BoardCell
@@ -52,10 +52,10 @@ class VariantBoard(
 
     def __init__(
         self, board_width=0, board_height=0,
-        tessellation_type = TessellationType.SOKOBAN,
+        variant = Variant.SOKOBAN,
         board_str = ""
     ):
-        super().__init__(tessellation_type)
+        super().__init__(variant)
 
         if not is_blank(board_str):
             board_rows = self._parse_string(board_str)
@@ -69,7 +69,7 @@ class VariantBoard(
             self._reinit(board_width, board_height)
 
     def _reinit(self, width, height, reconfigure_edges=True):
-        self._graph = self._tessellation.graph_type()
+        self._graph = self.tessellation.graph_type()
 
         if width <= 0 or height <= 0:
             self._width = 0
@@ -86,7 +86,7 @@ class VariantBoard(
 
     def _representation_attributes(self):
         return {
-            'tessellation': self.tessellation_type,
+            'tessellation': self.variant,
             'width': self.width,
             'height': self.height,
             'board': self.to_s,
@@ -94,7 +94,7 @@ class VariantBoard(
 
     def __eq__(self, other):
         if (
-            self.tessellation_type == other.tessellation_type and
+            self.variant == other.variant and
             self.width == other.width and
             self.height == other.height
         ):
@@ -183,8 +183,8 @@ class VariantBoard(
         """
         self._graph.remove_edges_from(self._graph.edges())
         for source_vertice in self._graph.nodes_iter():
-            for direction in self._tessellation.legal_directions:
-                neighbor_vertice = self._tessellation.neighbor_position(
+            for direction in self.tessellation.legal_directions:
+                neighbor_vertice = self.tessellation.neighbor_position(
                     source_vertice, direction,
                     board_width=self._width, board_height=self._height
                 )
@@ -377,7 +377,7 @@ class VariantBoard(
             return []
 
     def cell_orientation(self, position):
-        return self._tessellation.cell_orientation(
+        return self.tessellation.cell_orientation(
             position, self._width, self._height
         )
 
@@ -403,7 +403,7 @@ class VariantBoard(
         import numpy as np
         from moviepy.editor import ImageSequenceClip
         from functools import partial
-        from ..core import INDEX, X, Y, TessellationType
+        from ..core import INDEX, X, Y, Variant
         from ..io import parse_board_string
 
         WHITE = (255, 255, 255)
@@ -433,7 +433,7 @@ class VariantBoard(
         height = len(board_cells)
         root = INDEX(11, 8, width)
         bg = cls(board_width=width, board_height=height,
-                 tessellation_type=TessellationType.SOKOBAN)
+                 variant=Variant.SOKOBAN)
 
         for y, row in enumerate(board_cells):
             for x, chr in enumerate(row):
@@ -481,66 +481,66 @@ class VariantBoard(
         self._graph = tmp
 
     def add_row_top(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.add_row_top(reconfigure_edges=True)
 
     def add_row_bottom(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.add_row_bottom(reconfigure_edges=True)
 
     def add_column_left(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.add_column_left(reconfigure_edges=True)
 
     def add_column_right(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.add_column_right(reconfigure_edges=True)
 
     def remove_row_top(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.remove_row_top(reconfigure_edges=True)
 
     def remove_row_bottom(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.remove_row_bottom(reconfigure_edges=True)
 
     def remove_column_left(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.remove_column_left(reconfigure_edges=True)
 
     def remove_column_right(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.remove_column_right(reconfigure_edges=True)
 
     def trim_left(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.trim_left(reconfigure_edges=True)
 
     def trim_right(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.trim_right(reconfigure_edges=True)
 
     def trim_top(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.trim_top(reconfigure_edges=True)
 
     def trim_bottom(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.trim_bottom(reconfigure_edges=True)
 
     def reverse_rows(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.reverse_rows(reconfigure_edges=True)
 
     def reverse_columns(self):
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.reverse_columns(reconfigure_edges=True)
 
     def resize(self, new_width, new_height):
         old_width = self.width
         old_height = self.height
 
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         if new_height != old_height:
             if new_height > old_height:
                 amount = new_height - old_height
@@ -576,7 +576,7 @@ class VariantBoard(
             bottom = new_height - self.height - top
 
         if (left, right, top, bottom) != (0, 0, 0, 0):
-            resizer = self._tessellation.board_resizer(self)
+            resizer = self.tessellation.board_resizer_type(self)
             for i in range(0, left):
                 resizer.add_column_left(reconfigure_edges=False)
             for i in range(0, top):
@@ -588,7 +588,7 @@ class VariantBoard(
         old_width = self.width
         old_height = self.height
 
-        resizer = self._tessellation.board_resizer(self)
+        resizer = self.tessellation.board_resizer_type(self)
         resizer.trim_top(reconfigure_edges=False)
         resizer.trim_bottom(reconfigure_edges=False)
         resizer.trim_left(reconfigure_edges=False)

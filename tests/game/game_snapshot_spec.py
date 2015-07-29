@@ -2,7 +2,7 @@ import pytest
 from factories import GameSnapshotFactory
 from hamcrest import assert_that, equal_to, instance_of, is_, none, is_not
 from sokoengine import (
-    GameSnapshot, TessellationType, GameSolvingMode, AtomicMove, Direction,
+    GameSnapshot, Variant, GameSolvingMode, AtomicMove, Direction,
     SokoengineError, SnapshotConversionError
 )
 from unittest.mock import Mock
@@ -11,7 +11,7 @@ from unittest.mock import Mock
 @pytest.fixture
 def forward_game_snapshot():
     return GameSnapshotFactory(
-        tessellation_type=TessellationType.SOKOBAN,
+        variant=Variant.SOKOBAN,
         moves_data="lurdLURD{lurd}LURD"
     )
 
@@ -30,7 +30,7 @@ def pusher_selections_count():
 @pytest.fixture
 def reverse_game_snapshot():
     return GameSnapshotFactory(
-        tessellation_type=TessellationType.SOKOBAN,
+        variant=Variant.SOKOBAN,
         moves_data="lurdLURD{lurd}[lurd]LURD"
     )
 
@@ -41,7 +41,7 @@ def jumps_count():
 @pytest.fixture
 def sokoban_game_snapshot():
     return GameSnapshotFactory(
-        tessellation_type=TessellationType.SOKOBAN,
+        variant=Variant.SOKOBAN,
         moves_data="lurdLURD{lurd}LURD"
     )
 
@@ -61,8 +61,8 @@ class DescribeGameSnapshot(object):
     class Describe_init(object):
         def test_it_creates_sokoban_snapshot_by_default(self):
             assert_that(
-                GameSnapshot().tessellation_type,
-                equal_to(TessellationType.SOKOBAN)
+                GameSnapshot().variant,
+                equal_to(Variant.SOKOBAN)
             )
 
         def test_it_creates_forward_snaphost_by_default(self):

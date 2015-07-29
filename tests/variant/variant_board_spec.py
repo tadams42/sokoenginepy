@@ -1,6 +1,6 @@
 import pytest
 from sokoengine import (
-    TessellationType, BoardConversionError, Direction, INDEX, IllegalDirectionError
+    Variant, BoardConversionError, Direction, INDEX, IllegalDirectionError
 )
 from sokoengine.variant import SokobanBoard, VariantBoard, TriobanBoard
 from hamcrest import assert_that, equal_to, greater_than, is_, none
@@ -12,7 +12,7 @@ class DescribeVariantBoard(object):
             b = TriobanBoard(4, 2)
             assert_that(b.width, equal_to(4))
             assert_that(b.height, equal_to(2))
-            assert_that(b.tessellation_type, equal_to(TessellationType.TRIOBAN))
+            assert_that(b.variant, equal_to(Variant.TRIOBAN))
 
         def test_ignores_specified_size_if_string_given_and_parses_string_instead(
             self, board_str, board_str_width, board_str_height

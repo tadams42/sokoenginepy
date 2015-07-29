@@ -26,7 +26,7 @@ class HexobanTessellation(Tessellation):
         return nx.DiGraph
 
     @property
-    def board_resizer(self):
+    def board_resizer_type(self):
         return HexobanBoardResizer
 
     def neighbor_position(self, position, direction, board_width, board_height):
