@@ -28,6 +28,7 @@ python setup.py develop --uninstall
 
 ~~~sh
 python setup.py test -a "tests"
+py.test --cov=sokoengine --cov-report=html tests/
 # or
 python setup.py test -a "--spec tests"
 # or for multiple interpreters

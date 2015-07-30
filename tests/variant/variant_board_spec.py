@@ -1,9 +1,10 @@
 import pytest
 from sokoengine import (
-    Variant, BoardConversionError, Direction, INDEX, IllegalDirectionError
+    Variant, BoardConversionError, Direction, INDEX, OutputSettings
 )
-from sokoengine.variant import SokobanBoard, TriobanBoard
+from sokoengine.variant import SokobanBoard, TriobanBoard, BoardGraph
 from hamcrest import assert_that, equal_to, greater_than, is_, none
+from unittest.mock import Mock, patch
 
 
 class DescribeVariantBoard(object):
@@ -319,4 +320,188 @@ class DescribeVariantBoard(object):
             assert_that(
                 variant_board.neighbor(0, Direction.NORTH_WEST),
                 is_(none())
+            )
+
+    class describe_resize(object):
+        def test_adds_right_columns_and_bottom_rows_when_enlarging(
+            self, variant_board
+        ):
+            output = "\n".join([
+                "----#####------------",
+                "----#---#------------",
+                "----#$--#------------",
+                "--###--$##-----------",
+                "--#--$-$-#-----------",
+                "###-#-##-#---######--",
+                "#---#-##-#####--..#--",
+                "#-$--$----------..#--",
+                "#####-###-#@##--..#--",
+                "----#-----#########--",
+                "----#######----------",
+                "---------------------",
+                "---------------------",
+            ])
+            old_width = variant_board.width
+            old_height = variant_board.height
+            variant_board.resize(old_width + 2, old_height + 2)
+            assert_that(variant_board.width, equal_to(old_width + 2))
+            assert_that(variant_board.height, equal_to(old_height + 2))
+            assert_that(
+                variant_board.to_s(OutputSettings(use_visible_floors=True)),
+                equal_to(output)
+            )
+
+        def test_removes_right_columns_and_bottom_rows_when_compacting(
+            self, variant_board
+        ):
+            output = "\n".join([
+                "----#####--------",
+                "----#---#--------",
+                "----#$--#--------",
+                "--###--$##-------",
+                "--#--$-$-#-------",
+                "###-#-##-#---####",
+                "#---#-##-#####--.",
+                "#-$--$----------.",
+                "#####-###-#@##--.",
+            ])
+            old_width = variant_board.width
+            old_height = variant_board.height
+            variant_board.resize(old_width - 2, old_height - 2)
+            assert_that(variant_board.width, equal_to(old_width - 2))
+            assert_that(variant_board.height, equal_to(old_height - 2))
+            assert_that(
+                variant_board.to_s(OutputSettings(use_visible_floors=True)),
+                equal_to(output)
+            )
+
+        def test_reconfigures_graph_edges_only_once(self, variant_board):
+            with patch.object(BoardGraph, 'reconfigure_edges', return_value=None) as mock_method:
+                variant_board.resize(2, 2)
+            assert_that(mock_method.call_count, equal_to(1))
+
+    class describe_resize_and_center(object):
+        def test_adds_columns_and_rows_when_enlarging(
+            self, variant_board
+        ):
+            output = "\n".join([
+                "------------------------",
+                "------------------------",
+                "------#####-------------",
+                "------#---#-------------",
+                "------#$--#-------------",
+                "----###--$##------------",
+                "----#--$-$-#------------",
+                "--###-#-##-#---######---",
+                "--#---#-##-#####--..#---",
+                "--#-$--$----------..#---",
+                "--#####-###-#@##--..#---",
+                "------#-----#########---",
+                "------#######-----------",
+                "------------------------",
+                "------------------------",
+                "------------------------",
+            ])
+            old_width = variant_board.width
+            old_height = variant_board.height
+            variant_board.resize_and_center(old_width + 5, old_height + 5)
+            assert_that(variant_board.width, equal_to(old_width + 5))
+            assert_that(variant_board.height, equal_to(old_height + 5))
+            assert_that(
+                variant_board.to_s(OutputSettings(use_visible_floors=True)),
+                equal_to(output)
+            )
+
+        def test_removes_right_columns_and_bottom_rows_when_compacting(
+            self, variant_board
+        ):
+            output = "\n".join([
+                "----#####--------",
+                "----#---#--------",
+                "----#$--#--------",
+                "--###--$##-------",
+                "--#--$-$-#-------",
+                "###-#-##-#---####",
+                "#---#-##-#####--.",
+                "#-$--$----------.",
+                "#####-###-#@##--.",
+            ])
+            old_width = variant_board.width
+            old_height = variant_board.height
+            variant_board.resize(old_width - 2, old_height - 2)
+            assert_that(variant_board.width, equal_to(old_width - 2))
+            assert_that(variant_board.height, equal_to(old_height - 2))
+            assert_that(
+                variant_board.to_s(OutputSettings(use_visible_floors=True)),
+                equal_to(output)
+            )
+
+        def test_reconfigures_graph_edges_only_once(self, variant_board):
+            with patch.object(BoardGraph, 'reconfigure_edges', return_value=None) as mock_method:
+                variant_board.resize(2, 2)
+            assert_that(mock_method.call_count, equal_to(1))
+
+    class describe_trim(object):
+        def test_removes_empty_outer_rows_and_columns(
+            self, variant_board
+        ):
+            output = variant_board.to_s(OutputSettings(use_visible_floors=True))
+            old_width = variant_board.width
+            old_height = variant_board.height
+
+            variant_board.resize_and_center(old_width + 5, old_height + 5)
+            variant_board.trim()
+
+            assert_that(variant_board.width, equal_to(old_width))
+            assert_that(variant_board.height, equal_to(old_height))
+            assert_that(
+                variant_board.to_s(OutputSettings(use_visible_floors=True)),
+                equal_to(output)
+            )
+
+        def test_reconfigures_graph_edges_only_once(self, variant_board):
+            with patch.object(BoardGraph, 'reconfigure_edges', return_value=None) as mock_method:
+                variant_board.resize(2, 2)
+            assert_that(mock_method.call_count, equal_to(1))
+
+    class describe_reverse_rows(object):
+        def test_mirrors_board_up_down(self, variant_board):
+            output = "\n".join([
+                "----#######--------",
+                "----#-----#########",
+                "#####-###-#@##--..#",
+                "#-$--$----------..#",
+                "#---#-##-#####--..#",
+                "###-#-##-#---######",
+                "--#--$-$-#---------",
+                "--###--$##---------",
+                "----#$--#----------",
+                "----#---#----------",
+                "----#####----------",
+            ])
+            variant_board.reverse_rows()
+            assert_that(
+                variant_board.to_s(OutputSettings(use_visible_floors=True)),
+                equal_to(output)
+            )
+
+    class describe_reverse_columns(object):
+        def test_mirrors_board_left_rightt(self, variant_board):
+            output = "\n".join([
+                "----------#####----",
+                "----------#---#----",
+                "----------#--$#----",
+                "---------##$--###--",
+                "---------#-$-$--#--",
+                "######---#-##-#-###",
+                "#..--#####-##-#---#",
+                "#..----------$--$-#",
+                "#..--##@#-###-#####",
+                "#########-----#----",
+                "--------#######----",
+            ])
+            variant_board.reverse_columns()
+            assert_that(
+                variant_board.to_s(OutputSettings(use_visible_floors=True)),
+                equal_to(output)
             )

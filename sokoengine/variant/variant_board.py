@@ -49,14 +49,13 @@ class VariantBoard(
     into vertice index, use INDEX method
     """
 
-    _MAX_EDGE_WEIGHT = len(Direction) + 1
-
     def __init__(
         self, board_width=0, board_height=0,
         variant = Variant.SOKOBAN,
         board_str = ""
     ):
         super().__init__(variant)
+        self._resizer = self.tessellation.board_resizer_type(self)
 
         if not is_blank(board_str):
             board_rows = self._parse_string(board_str)
@@ -71,14 +70,14 @@ class VariantBoard(
 
     def _reinit(self, width, height, reconfigure_edges=True):
         self._graph = BoardGraph(width * height,
-                                 self._tessellation.graph_type)
+                                 self.tessellation.graph_type)
 
         self._width = width
         self._height = height
 
         if reconfigure_edges:
             self._graph.reconfigure_edges(
-                self.width, self.height, self._tessellation
+                self.width, self.height, self.tessellation
             )
 
     def _representation_attributes(self):
@@ -136,6 +135,7 @@ class VariantBoard(
                     for x in range(0, self.width)
                 ]
             ])
+            # Intentionally rstripping only if not using visible floors
             row = row.rstrip()
             if output_settings.rle_encode:
                 row = rle_encode(row)
@@ -265,89 +265,74 @@ class VariantBoard(
         return self._graph.position_path_to_direction_path(position_path)
 
     def add_row_top(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.add_row_top(reconfigure_edges=True)
+        self._resizer.add_row_top(reconfigure_edges=True)
 
     def add_row_bottom(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.add_row_bottom(reconfigure_edges=True)
+        self._resizer.add_row_bottom(reconfigure_edges=True)
 
     def add_column_left(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.add_column_left(reconfigure_edges=True)
+        self._resizer.add_column_left(reconfigure_edges=True)
 
     def add_column_right(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.add_column_right(reconfigure_edges=True)
+        self._resizer.add_column_right(reconfigure_edges=True)
 
     def remove_row_top(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.remove_row_top(reconfigure_edges=True)
+        self._resizer.remove_row_top(reconfigure_edges=True)
 
     def remove_row_bottom(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.remove_row_bottom(reconfigure_edges=True)
+        self._resizer.remove_row_bottom(reconfigure_edges=True)
 
     def remove_column_left(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.remove_column_left(reconfigure_edges=True)
+        self._resizer.remove_column_left(reconfigure_edges=True)
 
     def remove_column_right(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.remove_column_right(reconfigure_edges=True)
+        self._resizer.remove_column_right(reconfigure_edges=True)
 
     def trim_left(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.trim_left(reconfigure_edges=True)
+        self._resizer.trim_left(reconfigure_edges=True)
 
     def trim_right(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.trim_right(reconfigure_edges=True)
+        self._resizer.trim_right(reconfigure_edges=True)
 
     def trim_top(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.trim_top(reconfigure_edges=True)
+        self._resizer.trim_top(reconfigure_edges=True)
 
     def trim_bottom(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.trim_bottom(reconfigure_edges=True)
+        self._resizer.trim_bottom(reconfigure_edges=True)
 
     def reverse_rows(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.reverse_rows(reconfigure_edges=True)
+        self._resizer.reverse_rows(reconfigure_edges=True)
 
     def reverse_columns(self):
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.reverse_columns(reconfigure_edges=True)
+        self._resizer.reverse_columns(reconfigure_edges=True)
 
     def resize(self, new_width, new_height):
         old_width = self.width
         old_height = self.height
 
-        resizer = self.tessellation.board_resizer_type(self)
         if new_height != old_height:
             if new_height > old_height:
                 amount = new_height - old_height
                 for i in range(0, amount):
-                    resizer.add_row_bottom(reconfigure_edges=False)
+                    self._resizer.add_row_bottom(reconfigure_edges=False)
             else:
                 amount = old_height - new_height
                 for i in range(0, amount):
-                    resizer.remove_row_bottom(reconfigure_edges=False)
+                    self._resizer.remove_row_bottom(reconfigure_edges=False)
 
         if new_width != old_width:
             if new_width > old_width:
                 amount = new_width - old_width
                 for i in range(0, amount):
-                    resizer.add_column_right(reconfigure_edges=False)
+                    self._resizer.add_column_right(reconfigure_edges=False)
             else:
                 amount = old_width - new_width
                 for i in range(0, amount):
-                    resizer.remove_column_right(reconfigure_edges=False)
+                    self._resizer.remove_column_right(reconfigure_edges=False)
 
         if old_width != self.width or old_height != self.height:
             self._graph.reconfigure_edges(
-                self.width, self.height, self._tessellation
+                self.width, self.height, self.tessellation
             )
 
     def resize_and_center(self, new_width, new_height):
@@ -362,11 +347,10 @@ class VariantBoard(
             bottom = new_height - self.height - top
 
         if (left, right, top, bottom) != (0, 0, 0, 0):
-            resizer = self.tessellation.board_resizer_type(self)
             for i in range(0, left):
-                resizer.add_column_left(reconfigure_edges=False)
+                self._resizer.add_column_left(reconfigure_edges=False)
             for i in range(0, top):
-                resizer.add_row_top(reconfigure_edges=False)
+                self._resizer.add_row_top(reconfigure_edges=False)
 
             self.resize(self.width + right, self.height + bottom)
 
@@ -374,15 +358,14 @@ class VariantBoard(
         old_width = self.width
         old_height = self.height
 
-        resizer = self.tessellation.board_resizer_type(self)
-        resizer.trim_top(reconfigure_edges=False)
-        resizer.trim_bottom(reconfigure_edges=False)
-        resizer.trim_left(reconfigure_edges=False)
-        resizer.trim_right(reconfigure_edges=False)
+        self._resizer.trim_top(reconfigure_edges=False)
+        self._resizer.trim_bottom(reconfigure_edges=False)
+        self._resizer.trim_left(reconfigure_edges=False)
+        self._resizer.trim_right(reconfigure_edges=False)
 
         if old_width != self.width or old_height != old_height:
             self._graph.reconfigure_edges(
-                self.width, self.height, self._tessellation
+                self.width, self.height, self.tessellation
             )
 
 
@@ -518,7 +501,7 @@ class VariantBoardResizer(ABC):
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(
-                self.width, self.height, self._tessellation
+                self.board.width, self.board.height, self.board.tessellation
             )
 
     def trim_right(self, reconfigure_edges):
@@ -528,7 +511,7 @@ class VariantBoardResizer(ABC):
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(
-                self.width, self.height, self._tessellation
+                self.board.width, self.board.height, self.board.tessellation
             )
 
     def trim_top(self, reconfigure_edges):
@@ -549,7 +532,7 @@ class VariantBoardResizer(ABC):
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(
-                self.width, self.height, self._tessellation
+                self.board.width, self.board.height, self.board.tessellation
             )
 
     def trim_bottom(self, reconfigure_edges):
@@ -559,7 +542,7 @@ class VariantBoardResizer(ABC):
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(
-                self.width, self.height, self._tessellation
+                self.board.width, self.board.height, self.board.tessellation
             )
 
     def reverse_rows(self, reconfigure_edges):
@@ -577,7 +560,7 @@ class VariantBoardResizer(ABC):
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(
-                self.width, self.height, self._tessellation
+                self.board.width, self.board.height, self.board.tessellation
             )
 
     def reverse_columns(self, reconfigure_edges):
@@ -595,5 +578,5 @@ class VariantBoardResizer(ABC):
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(
-                self.width, self.height, self._tessellation
+                self.board.width, self.board.height, self.board.tessellation
             )

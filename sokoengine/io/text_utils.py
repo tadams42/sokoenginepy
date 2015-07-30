@@ -252,7 +252,7 @@ class Rle(object):
     @classmethod
     def encode(cls, line):
         if len(line) == 0:
-            line
+            return line
 
         encoded = [(len(list(g)), k) for k, g in groupby(line)]
         return "".join([

@@ -38,52 +38,55 @@ class PyTest(TestCommand):
 
 # Always installed
 requirements = [
-    'Unipath>=1.1',
-    'pytz>=2015.4',
-    'pyparsing>=2.0.3',
+    'Unipath >=1.1',
+    'pytz >=2015.4',
+    'pyparsing >=2.0.3',
     # Alternative that is A LOT faster but ard fails install on Python 3.4
     # graph-tool
-    'networkx>=1.9.1',
+    'networkx >=1.9.1',
 ]
 
 # $ pip install -e .[dev,test]
 requirements_dev = [
     # IPython stuff
-    'ipython>=3.2.0,<4',
-    'pyzmq>=14.7.0',
-    'Jinja2>=2.7.3',
-    'tornado>=4.2.1',
-    'jsonschema>=2.5.1',
-    'terminado>=0.5'
-    'ipdb>=0.8.1',
+    'ipython >=3.2.0, <4',
+    'pyzmq >=14.7.0',
+    'Jinja2 >=2.7.3',
+    'tornado >=4.2.1',
+    'jsonschema >=2.5.1',
+    'terminado >=0.5',
+    'ipdb >=0.8.1',
 
     # Petty stacktrace
-    'colored-traceback>=0.2.1',
+    'colored-traceback >=0.2.1',
 
     # Animation and graph debugging
-    'scipy>=0.15.1',
-    'moviepy>=0.2.2.11',
-    'matplotlib>=1.4.3',
+    'scipy >=0.15.1',
+    'moviepy >=0.2.2.11',
+    'matplotlib >=1.4.3',
 
     # Docs and viewers
-    'Sphinx>=1.3.1',
-    'restview>=2.4.0',
-    'grip>=3.3.0',
+    'Sphinx >=1.3.1',
+    'restview >=2.4.0',
+    'grip >=3.3.0',
 
     # Profiler
-    'snakeviz>=0.4.0',
+    'snakeviz >=0.4.0',
+
+    # Tests coverage
+    'pytest-cov >=2.0.0',
 ]
 
 # $ pip install -e .[dev,test]
 # Also, automatically installed by setup.py test
 requirements_test = [
-    'pytest>=2.7.2',
-    'pytest-spec>=0.2.24',
-    'factory-boy>=2.5.2',
-    'fake-factory>=0.5.2',
-    'PyHamcrest>=1.8.3',
-    'pyexcel-ods3>=0.0.8',
-    'lxml>=3.4.4',
+    'pytest >=2.7.2',
+    'pytest-spec >=0.2.24',
+    'factory-boy >=2.5.2',
+    'fake-factory >=0.5.2',
+    'PyHamcrest >=1.8.3',
+    'pyexcel-ods3 >=0.0.8',
+    'lxml >=3.4.4',
 ]
 
 with open(path.join(here, 'requirements.txt'), encoding='utf-8', mode='w') as f:
