@@ -1,2 +1,11 @@
 *.pyc
 **.egg-info/
+.directory
+.tox/
+.eggs/
+.ipynb_checkpoints/
+*.prof
+build/
+.idea
+htmlcov
+.coverage
