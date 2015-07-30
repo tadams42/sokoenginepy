@@ -2,7 +2,7 @@ import pytest
 from sokoengine import (
     Variant, BoardConversionError, Direction, INDEX, IllegalDirectionError
 )
-from sokoengine.variant import SokobanBoard, VariantBoard, TriobanBoard
+from sokoengine.variant import SokobanBoard, TriobanBoard
 from hamcrest import assert_that, equal_to, greater_than, is_, none
 
 
@@ -30,8 +30,7 @@ class DescribeVariantBoard(object):
         def test_reinitializes_graph_vertices(self, variant_board):
             variant_board._reinit(width=2, height=3)
             assert_that(
-                len(variant_board._graph.nodes()),
-                equal_to(2 * 3)
+                variant_board._graph.vertices_count(), equal_to(2 * 3)
             )
 
             for position in range(0, variant_board.size):
@@ -44,136 +43,9 @@ class DescribeVariantBoard(object):
 
         def test_optionally_recreates_all_adges(self, variant_board):
             variant_board._reinit(width=4, height=5, reconfigure_edges=False)
-            assert_that(len(variant_board._graph.edges()), equal_to(0))
+            assert_that(variant_board._graph.edges_count(), equal_to(0))
             variant_board._reinit(width=4, height=5)
-            assert_that(len(variant_board._graph.edges()), greater_than(0))
-
-    class describe__has_edge(object):
-        def test_true_if_edge_in_given_direction_exists(self, variant_board):
-            assert_that(
-                variant_board._has_edge(0, 1, Direction.RIGHT),
-                equal_to(True)
-            )
-
-    class describe__reconfigure_edges(object):
-        def test_reconfigures_all_edges_in_board(self):
-            variant_board = SokobanBoard(2, 2)
-            assert_that(variant_board._graph.number_of_edges(), equal_to(8))
-            assert_that(
-                variant_board._has_edge(0, 1, Direction.RIGHT), equal_to(True)
-            )
-            assert_that(
-                variant_board._has_edge(1, 0, Direction.LEFT), equal_to(True)
-            )
-            assert_that(
-                variant_board._has_edge(0, 2, Direction.DOWN), equal_to(True)
-            )
-            assert_that(
-                variant_board._has_edge(2, 0, Direction.UP), equal_to(True)
-            )
-            assert_that(
-                variant_board._has_edge(2, 3, Direction.RIGHT), equal_to(True)
-            )
-            assert_that(
-                variant_board._has_edge(3, 2, Direction.LEFT), equal_to(True)
-            )
-            assert_that(
-                variant_board._has_edge(1, 3, Direction.DOWN), equal_to(True)
-            )
-            assert_that(
-                variant_board._has_edge(3, 1, Direction.UP), equal_to(True)
-            )
-
-        def test_doesnt_create_duplicate_direction_edges_in_multidigraph(self):
-            # Trioban is only tessellation that requires multidigraph
-            variant_board = TriobanBoard(2, 2)
-            assert_that(len(variant_board._graph[0][1]), equal_to(2))
-            assert_that(len(variant_board._graph[1][0]), equal_to(2))
-
-            variant_board._reconfigure_edges()
-            assert_that(len(variant_board._graph[0][1]), equal_to(2))
-            assert_that(len(variant_board._graph[1][0]), equal_to(2))
-
-    class describe__out_edge_weight(object):
-        def test_returns_max_weigth_for_wall_cell_target(self, variant_board):
-            variant_board[1].is_wall = True
-            assert_that(
-                variant_board._out_edge_weight([0, 1]),
-                equal_to(VariantBoard._MAX_EDGE_WEIGHT)
-            )
-
-        def test_returns_max_weigth_for_pusher_cell_target(self, variant_board):
-            variant_board[1].has_pusher = True
-            assert_that(
-                variant_board._out_edge_weight([0, 1]),
-                equal_to(VariantBoard._MAX_EDGE_WEIGHT)
-            )
-
-        def test_returns_max_weigth_for_box_cell_target(self, variant_board):
-            variant_board[1].has_box = True
-            assert_that(
-                variant_board._out_edge_weight([0, 1]),
-                equal_to(VariantBoard._MAX_EDGE_WEIGHT)
-            )
-
-        def test_returns_one_for_other_cells(self, variant_board):
-            variant_board[1].clear()
-            assert_that(variant_board._out_edge_weight([0, 1]), equal_to(1))
-            variant_board[1].has_goal = True
-            assert_that(variant_board._out_edge_weight([0, 1]), equal_to(1))
-
-    class describe__reachables(object):
-        board_str = "\n".join([
-            # 123456
-            "#######",  # 0
-            "#.$# @#",  # 1
-            "#######",  # 2
-            "#     #",  # 3
-            "#######",  # 4
-        ])
-        variant_board = SokobanBoard(board_str=board_str)
-
-        def test_calculates_all_positions_reachable_from_root(self):
-            root = INDEX(5, 1, 7)
-            assert_that(
-                self.variant_board._reachables(root),
-                equal_to([
-                    root, INDEX(4, 1, 7)
-                ])
-            )
-
-        def test_skips_explicitly_excluded_positions(self):
-            root = INDEX(5, 1, 7)
-            assert_that(
-                self.variant_board._reachables(root, excluded_positions=[root]),
-                equal_to([INDEX(4, 1, 7)])
-            )
-
-            root = INDEX(5, 1, 7)
-            assert_that(
-                self.variant_board._reachables(root, excluded_positions=[INDEX(4, 1, 7)]),
-                equal_to([root])
-            )
-
-    class describe_neighbor(object):
-        def test_returns_neighbor_position_in_given_direction(self, variant_board):
-            assert_that(variant_board.neighbor(0, Direction.RIGHT), equal_to(1))
-
-        def test_returns_none_for_of_board_target_position(self, variant_board):
-            assert_that(
-                variant_board.neighbor(0, Direction.UP),
-                is_(none())
-            )
-
-        def test_raises_for_of_board_source_position(self, variant_board):
-            with pytest.raises(IndexError):
-                variant_board.neighbor(42000, Direction.UP)
-
-        def test_returns_none_for_illegal_direction(self, variant_board):
-            assert_that(
-                variant_board.neighbor(0, Direction.NORTH_WEST),
-                is_(none())
-            )
+            assert_that(variant_board._graph.edges_count(), greater_than(0))
 
     class describe_clear(object):
         def test_clears_board_cells_in_all_nodes(self, variant_board):
@@ -427,4 +299,24 @@ class DescribeVariantBoard(object):
                 variant_board.find_move_path(
                     INDEX(11, 8, variant_board.width), 0
                 ), equal_to([])
+            )
+
+    class describe_neighbor(object):
+        def test_returns_neighbor_position_in_given_direction(self, variant_board):
+            assert_that(variant_board.neighbor(0, Direction.RIGHT), equal_to(1))
+
+        def test_returns_none_for_of_board_target_position(self, variant_board):
+            assert_that(
+                variant_board.neighbor(0, Direction.UP),
+                is_(none())
+            )
+
+        def test_raises_for_of_board_source_position(self, variant_board):
+            with pytest.raises(IndexError):
+                variant_board.neighbor(42000, Direction.UP)
+
+        def test_returns_none_for_illegal_direction(self, variant_board):
+            assert_that(
+                variant_board.neighbor(0, Direction.NORTH_WEST),
+                is_(none())
             )

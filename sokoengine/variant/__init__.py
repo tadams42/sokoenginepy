@@ -7,6 +7,7 @@ from .sokoban_tessellation import SokobanTessellation
 from .trioban_board import TriobanBoard, TriobanBoardResizer
 from .trioban_tessellation import TriobanTessellation
 from .variant_board import VariantBoard, VariantBoardResizer
+from .board_graph import BoardGraph, GraphType
 
 __all__ = [
     'HexobanBoard',
@@ -23,4 +24,6 @@ __all__ = [
     'TriobanTessellation',
     'VariantBoard',
     'VariantBoardResizer',
+    'BoardGraph',
+    'GraphType',
 ]

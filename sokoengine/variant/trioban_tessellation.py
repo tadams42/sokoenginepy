@@ -1,10 +1,10 @@
-import networkx as nx
 from ..core import (
     Tessellation, on_board_2D, on_board_1D, ROW, COLUMN, INDEX, Direction,
     IllegalDirectionError, CellOrientation
 )
 from ..io import AtomicMoveCharacters
 from .trioban_board import TriobanBoardResizer
+from .board_graph import GraphType
 
 
 class TriobanTessellation(Tessellation):
@@ -24,7 +24,7 @@ class TriobanTessellation(Tessellation):
 
     @property
     def graph_type(self):
-        return nx.MultiDiGraph
+        return GraphType.DIRECTED_MULTI
 
     @property
     def board_resizer_type(self):

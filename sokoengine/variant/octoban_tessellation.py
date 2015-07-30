@@ -1,10 +1,10 @@
-import networkx as nx
 from ..core import (
     Tessellation, on_board_2D, on_board_1D, ROW, COLUMN, INDEX, Direction,
     IllegalDirectionError, CellOrientation
 )
 from ..io import AtomicMoveCharacters
 from .octoban_board import OctobanBoardResizer
+from .board_graph import GraphType
 
 
 class OctobanTessellation(Tessellation):
@@ -24,7 +24,7 @@ class OctobanTessellation(Tessellation):
 
     @property
     def graph_type(self):
-        return nx.DiGraph
+        return GraphType.DIRECTED
 
     @property
     def board_resizer_type(self):

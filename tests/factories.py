@@ -10,6 +10,7 @@ from sokoengine import (
 from sokoengine.game import SokobanPlusValidator
 from sokoengine.io import BoardEncodingCharacters
 from sokoengine.variant import SokobanBoard
+from sokoengine.core import Tessellation
 
 
 class PieceFactory(factory.Factory):
@@ -152,3 +153,15 @@ def variant_board(board_str):
     # We could use mock here, but it is not neccessary as long as we test only
     # common behavior."
     return SokobanBoard(board_str=board_str)
+
+@pytest.fixture
+def board_graph(variant_board):
+    return variant_board._graph
+
+@pytest.fixture
+def sokoban_tessellation():
+    return Tessellation.factory('sokoban')
+
+@pytest.fixture
+def trioban_tessellation():
+    return Tessellation.factory('trioban')

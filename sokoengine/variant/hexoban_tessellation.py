@@ -1,10 +1,10 @@
-import networkx as nx
 from ..core import (
     Tessellation, on_board_2D, on_board_1D, ROW, COLUMN, INDEX, Direction,
     IllegalDirectionError
 )
 from ..io import AtomicMoveCharacters
 from .hexoban_board import HexobanBoardResizer
+from .board_graph import GraphType
 
 
 class HexobanTessellation(Tessellation):
@@ -23,7 +23,7 @@ class HexobanTessellation(Tessellation):
 
     @property
     def graph_type(self):
-        return nx.DiGraph
+        return GraphType.DIRECTED
 
     @property
     def board_resizer_type(self):

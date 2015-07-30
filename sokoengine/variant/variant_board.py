@@ -1,17 +1,18 @@
 from abc import ABC, abstractmethod
-from collections import deque
 from collections.abc import Container
 from functools import wraps
 import networkx as nx
 
 from ..core import (
     PrettyPrintable, EqualityComparable, Variant, INDEX,
-    Tessellated, Direction, IllegalDirectionError
+    Tessellated, Direction
 )
 from ..game import BoardCell
 from ..io import (
     OutputSettings, rle_encode, is_blank, parse_board_string, RleCharacters
 )
+
+from .board_graph import BoardGraph
 
 
 def normalize_index_errors(method):
@@ -64,25 +65,21 @@ class VariantBoard(
             self._reinit(width, height)
             for y, row in enumerate(board_rows):
                 for x, chr in enumerate(row):
-                    self[INDEX(x, y, self.width)] = BoardCell(chr)
+                    self._graph[INDEX(x, y, self._width)] = BoardCell(chr)
         else:
             self._reinit(board_width, board_height)
 
     def _reinit(self, width, height, reconfigure_edges=True):
-        self._graph = self.tessellation.graph_type()
+        self._graph = BoardGraph(width * height,
+                                 self._tessellation.graph_type)
 
-        if width <= 0 or height <= 0:
-            self._width = 0
-            self._height = 0
-        else:
-            self._width = width
-            self._height = height
-
-        for vertice in range(0, self.size):
-            self._graph.add_node(vertice, cell=BoardCell())
+        self._width = width
+        self._height = height
 
         if reconfigure_edges:
-            self._reconfigure_edges()
+            self._graph.reconfigure_edges(
+                self.width, self.height, self._tessellation
+            )
 
     def _representation_attributes(self):
         return {
@@ -116,11 +113,11 @@ class VariantBoard(
 
     @normalize_index_errors
     def __getitem__(self, position):
-        return self._graph.node[position]['cell']
+        return self._graph[position]
 
     @normalize_index_errors
     def __setitem__(self, position, board_cell):
-        self._graph.node[position]['cell'] = board_cell
+        self._graph[position] = board_cell
 
     def __contains__(self, position):
         return position in self._graph
@@ -135,7 +132,7 @@ class VariantBoard(
             row = "".join([
                 cell.to_s(output_settings.use_visible_floors)
                 for cell in [
-                    self._graph.node[INDEX(x, y, self.width)]['cell']
+                    self[INDEX(x, y, self.width)]
                     for x in range(0, self.width)
                 ]
             ])
@@ -161,140 +158,28 @@ class VariantBoard(
     def size(self):
         return self._width * self._height
 
-    def _has_edge(self, source_vertice, target_vertice, direction):
-        """
-        Checks if there is edge between source_vertice and target_vertice in given
-        direction
-        """
-        retv = False
-
-        for out_edge in self._graph.out_edges_iter(source_vertice, data=True):
-            # edge: (source, target, data_dict)
-            retv = retv or (
-                out_edge[1] == target_vertice and
-                out_edge[2]['direction'] == direction
-            )
-
-        return retv
-
-    def _reconfigure_edges(self):
-        """
-        Uses tessellation object to create all edges in graph.
-        """
-        self._graph.remove_edges_from(self._graph.edges())
-        for source_vertice in self._graph.nodes_iter():
-            for direction in self.tessellation.legal_directions:
-                neighbor_vertice = self.tessellation.neighbor_position(
-                    source_vertice, direction,
-                    board_width=self._width, board_height=self._height
-                )
-                if neighbor_vertice is not None:
-                    self._graph.add_edge(
-                        source_vertice, neighbor_vertice, direction=direction
-                    )
-
-    def _out_edge_weight(self, edge):
-        """
-        Calculates weight of single edge dependng on contents of its vertices.
-        """
-        target_vertice = edge[1]
-        target_cell = self._graph.node[target_vertice]['cell']
-
-        weight = 1
-        if (target_cell.is_wall or target_cell.has_box or
-                target_cell.has_pusher):
-            weight = type(self)._MAX_EDGE_WEIGHT
-
-        return weight
-
-    def _calculate_edge_weights(self):
-        """
-        Calculates and sets weights to all edges in board graph.
-        """
-        for edge in self._graph.edges_iter(data=True):
-            edge[2]['weight'] = self._out_edge_weight(edge)
-
-    @normalize_index_errors
-    def _reachables(
-        self, root, excluded_positions=[], is_obstacle_callable=None,
-        add_animation_frame_hook=None
-    ):
-        """
-        Returns list of all positions reachable from root
-
-        excluded_positions - these positions will be marked as unreachable
-            without calculating their status
-        is_obstacle_callable - callable that checks if given position on graph
-            is obstacle
-        add_animation_frame_hook - if not None, this callable will be caled
-            after each step oof search. Usefull for visualization of algorithm
-            and debugging
-        """
-        visited = len(self._graph) * [False]
-        visited[root] = True
-        reachables = deque()
-        to_inspect = deque([root])
-
-        if is_obstacle_callable is None:
-            is_obstacle_callable = (
-                lambda x: not self._graph.node[x]['cell'].can_put_pusher_or_box
-            )
-
-        while len(to_inspect) > 0:
-            current_position = to_inspect.popleft()
-
-            if (current_position == root or
-                    current_position not in excluded_positions):
-                reachables.append(current_position)
-
-            for neighbor in self._graph.neighbors(current_position):
-                if not visited[neighbor]:
-                    if not is_obstacle_callable(neighbor):
-                        to_inspect.append(neighbor)
-                    visited[neighbor] = True
-
-            if add_animation_frame_hook is not None:
-                add_animation_frame_hook(
-                    current_position=current_position,
-                    reachables=reachables,
-                    to_inspect=to_inspect,
-                    excluded=excluded_positions
-                )
-
-        if root in excluded_positions:
-            return [pos for pos in reachables if pos != root]
-        else:
-            return list(reachables)
-
     @normalize_index_errors
     def neighbor(self, from_position, direction):
-        for out_edge in self._graph.out_edges_iter(from_position, data=True):
-            # edge: (source, target, data_dict)
-            if out_edge[2]['direction'] == direction:
-                return out_edge[1]
-        return None
+        return self._graph.neighbor(from_position, direction)
 
     @normalize_index_errors
     def wall_neighbors(self, from_position):
-        return [
-            n for n in self._graph.neighbors_iter(from_position)
-            if self[n].is_wall
-        ]
+        return self._graph.wall_neighbors(from_position)
 
     @normalize_index_errors
     def all_neighbors(self, from_position):
-        return self._graph.neighbors(from_position)
+        return self._graph.all_neighbors(from_position)
 
     def clear(self):
         """
         Empties all board cells.
         """
-        for node in self._graph.nodes_iter():
-            self._graph.node[node]['cell'].clear()
+        for vertice in range(0, self.size):
+            self[vertice].clear()
 
     def mark_play_area(self):
         piece_positions = []
-        for vertice in self._graph.nodes_iter():
+        for vertice in range(0, self.size):
             if self[vertice].has_box or self[vertice].has_pusher:
                 self[vertice].is_in_playable_area = True
                 piece_positions.append(vertice)
@@ -305,7 +190,7 @@ class VariantBoard(
             return self[vertice].is_wall
 
         for piece_position in piece_positions:
-            reachables = self._reachables(
+            reachables = self._graph.reachables(
                 root=piece_position, is_obstacle_callable=is_obstacle
             )
 
@@ -318,7 +203,7 @@ class VariantBoard(
     ):
         def is_obstacle(position):
             return not self[position].can_put_pusher_or_box
-        return self._reachables(
+        return self._graph.reachables(
             root=pusher_position,
             is_obstacle_callable=is_obstacle,
             excluded_positions=excluded_positions
@@ -352,29 +237,23 @@ class VariantBoard(
     def find_jump_path(self, start_position, end_position):
         if start_position not in self:
             raise IndexError('Board index out of range')
-        try:
-            return nx.shortest_path(self._graph, start_position, end_position, 1)
-        except nx.NetworkXNoPath:
-            return []
+        return self._graph.shortest_path(start_position, end_position)
 
     def find_move_path(self, start_position, end_position):
         if start_position not in self:
             raise IndexError('Board index out of range')
 
-        self._calculate_edge_weights()
-        try:
-            path = nx.dijkstra_path(self._graph, start_position, end_position)
-            retv = path[:1]
-            for position in path[1:]:
-                if self[position].can_put_pusher_or_box:
-                    retv.append(position)
-                else:
-                    break
-            if retv != path:
-                return[]
-            return path
-        except nx.NetworkXNoPath:
+        path = self._graph.dijkstra_path(start_position, end_position)
+
+        retv = path[:1]
+        for position in path[1:]:
+            if self[position].can_put_pusher_or_box:
+                retv.append(position)
+            else:
+                break
+        if retv != path:
             return []
+        return path
 
     def cell_orientation(self, position):
         return self.tessellation.cell_orientation(
@@ -383,102 +262,7 @@ class VariantBoard(
 
     @normalize_index_errors
     def position_path_to_direction_path(self, position_path):
-        retv = []
-        src_vertice_index = 0
-        for target_vertice in position_path[1:]:
-            src_vertice = position_path[src_vertice_index]
-            src_vertice_index += 1
-
-            for out_edge in self._graph.out_edges_iter(src_vertice, data=True):
-                if out_edge[1] == target_vertice:
-                    retv.append(out_edge[2]['direction'])
-
-        return {
-            'source_position': position_path[0] if position_path else None,
-            'path': retv
-        }
-
-    @classmethod
-    def _debug_animate_board_graph_reachables(cls, output_gif_path="/tmp/reachables.gif"):
-        import numpy as np
-        from moviepy.editor import ImageSequenceClip
-        from functools import partial
-        from ..core import INDEX, X, Y, Variant
-        from ..io import parse_board_string
-        from .sokoban_board import SokobanBoard
-
-        WHITE = (255, 255, 255)
-        BLACK = (0, 0, 0)
-        GRAY = (128, 128, 128)
-        RED = (255, 0, 0)
-        GREEN = (0, 255, 0)
-
-        animation_frames = []
-
-        board_str = "\n".join([
-            # 123456789012345678
-            "    #####",            # 0
-            "    #   #",            # 1
-            "    #$  #",            # 2
-            "  ###  $##",           # 3
-            "  #  $ $ #",           # 4
-            "### # ## #   ######",  # 5
-            "#   # ## #####  ..#",  # 6
-            "# $  $          ..#",  # 7
-            "##### ### #@##  ..#",  # 8
-            "    #     #########",  # 9
-            "    #######",          # 10
-        ])
-        board_cells = parse_board_string(board_str)
-        width = len(board_cells[0])
-        height = len(board_cells)
-        root = INDEX(11, 8, width)
-        bg = SokobanBoard(board_width=width, board_height=height)
-
-        for y, row in enumerate(board_cells):
-            for x, chr in enumerate(row):
-                bg[INDEX(x, y, bg.width)] = BoardCell(chr)
-
-        def add_animation_frame(
-            current_position, reachables, to_inspect, excluded, frames, width, height
-        ):
-            row_data = width * [WHITE]
-            matrix = np.array(height * [row_data])
-
-            for i in reachables:
-                x, y = X(i, width), Y(i, width)
-                matrix[y, x] = GREEN
-
-            for i in to_inspect:
-                x, y = X(i, width), Y(i, width)
-                matrix[y, x] = GRAY
-
-            for i in excluded:
-                x, y = X(i, width), Y(i, width)
-                matrix[y, x] = BLACK
-
-            x, y = X(current_position, width), Y(current_position, width)
-            matrix[y, x] = RED
-
-            frames.append(matrix)
-
-        bg._reachables(
-            root,
-            add_animation_frame_hook=partial(
-                add_animation_frame,
-                width=width, height=height, frames=animation_frames
-            )
-        )
-
-        animation = ImageSequenceClip(animation_frames, fps=2)
-        animation.write_gif(output_gif_path)
-
-    def _debug_draw_positions(self, positions):
-        tmp = self._graph.copy()
-        for vertice in positions:
-            self[vertice] = BoardCell('@')
-        print(self.to_s(OutputSettings(use_visible_floors=True)))
-        self._graph = tmp
+        return self._graph.position_path_to_direction_path(position_path)
 
     def add_row_top(self):
         resizer = self.tessellation.board_resizer_type(self)
@@ -562,7 +346,9 @@ class VariantBoard(
                     resizer.remove_column_right(reconfigure_edges=False)
 
         if old_width != self.width or old_height != self.height:
-            self._reconfigure_edges()
+            self._graph.reconfigure_edges(
+                self.width, self.height, self._tessellation
+            )
 
     def resize_and_center(self, new_width, new_height):
         left = right = top = bottom = 0
@@ -595,11 +381,12 @@ class VariantBoard(
         resizer.trim_right(reconfigure_edges=False)
 
         if old_width != self.width or old_height != old_height:
-            self._reconfigure_edges()
+            self._graph.reconfigure_edges(
+                self.width, self.height, self._tessellation
+            )
 
 
 class VariantBoardResizer(ABC):
-
     def __init__(self, variant_board):
         self.board = variant_board
 
@@ -615,7 +402,7 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, old_height):
                 self.board[INDEX(x, y + 1, self.board.width)] =\
-                    old_body.node[INDEX(x, y, self.board.width)]['cell']
+                    old_body[INDEX(x, y, self.board.width)]
 
     def add_row_bottom(self, reconfigure_edges):
         old_body = self.board._graph
@@ -629,7 +416,7 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, old_height):
                 self.board[INDEX(x, y, self.board.width)] =\
-                    old_body.node[INDEX(x, y, self.board.width)]['cell']
+                    old_body[INDEX(x, y, self.board.width)]
 
     def add_column_left(self, reconfigure_edges):
         old_body = self.board._graph
@@ -643,7 +430,7 @@ class VariantBoardResizer(ABC):
         for x in range(0, old_width):
             for y in range(0, self.board.height):
                 self.board[INDEX(x + 1, y, self.board.width)] =\
-                    old_body.node[INDEX(x, y, old_width)]['cell']
+                    old_body[INDEX(x, y, old_width)]
 
     def add_column_right(self, reconfigure_edges):
         old_body = self.board._graph
@@ -657,7 +444,7 @@ class VariantBoardResizer(ABC):
         for x in range(0, old_width):
             for y in range(0, self.board.height):
                 self.board[INDEX(x, y, self.board.width)] =\
-                    old_body.node[INDEX(x, y, old_width)]['cell']
+                    old_body[INDEX(x, y, old_width)]
 
     def remove_row_top(self, reconfigure_edges):
         old_body = self.board._graph
@@ -670,7 +457,7 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
                 self.board[INDEX(x, y, self.board.width)] =\
-                    old_body.node[INDEX(x, y + 1, self.board.width)]['cell']
+                    old_body[INDEX(x, y + 1, self.board.width)]
 
     def remove_row_bottom(self, reconfigure_edges):
         old_body = self.board._graph
@@ -683,7 +470,7 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
                 self.board[INDEX(x, y, self.board.width)] =\
-                    old_body.node[INDEX(x, y, self.board.width)]['cell']
+                    old_body[INDEX(x, y, self.board.width)]
 
     def remove_column_left(self, reconfigure_edges):
         old_body = self.board._graph
@@ -697,7 +484,7 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
                 self.board[INDEX(x, y, self.board.width)] =\
-                    old_body.node[INDEX(x + 1, y, old_width)]['cell']
+                    old_body[INDEX(x + 1, y, old_width)]
 
     def remove_column_right(self, reconfigure_edges):
         old_body = self.board._graph
@@ -711,7 +498,7 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
                 self.board[INDEX(x, y, self.board.width)] =\
-                    old_body.node[INDEX(x, y, old_width)]['cell']
+                    old_body[INDEX(x, y, old_width)]
 
     def trim_left(self, reconfigure_edges):
         amount = self.board.width
@@ -730,7 +517,9 @@ class VariantBoardResizer(ABC):
             self.remove_column_left(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board._graph.reconfigure_edges(
+                self.width, self.height, self._tessellation
+            )
 
     def trim_right(self, reconfigure_edges):
         self.reverse_columns(reconfigure_edges=False)
@@ -738,7 +527,9 @@ class VariantBoardResizer(ABC):
         self.reverse_columns(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board._graph.reconfigure_edges(
+                self.width, self.height, self._tessellation
+            )
 
     def trim_top(self, reconfigure_edges):
         amount = self.board.height
@@ -757,7 +548,9 @@ class VariantBoardResizer(ABC):
             self.remove_row_top(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board._graph.reconfigure_edges(
+                self.width, self.height, self._tessellation
+            )
 
     def trim_bottom(self, reconfigure_edges):
         self.reverse_rows(reconfigure_edges=False)
@@ -765,7 +558,9 @@ class VariantBoardResizer(ABC):
         self.reverse_rows(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board._graph.reconfigure_edges(
+                self.width, self.height, self._tessellation
+            )
 
     def reverse_rows(self, reconfigure_edges):
         old_body = self.board._graph
@@ -778,10 +573,12 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
                 self.board[INDEX(x, y, self.board.width)] = \
-                    old_body.node[INDEX(x, self.board.height - y - 1, self.board.width)]['cell']
+                    old_body[INDEX(x, self.board.height - y - 1, self.board.width)]
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board._graph.reconfigure_edges(
+                self.width, self.height, self._tessellation
+            )
 
     def reverse_columns(self, reconfigure_edges):
         old_body = self.board._graph
@@ -794,7 +591,9 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
                 self.board[INDEX(x, y, self.board.width)] = \
-                    old_body.node[INDEX(self.board.width - x - 1, y, self.board.width)]['cell']
+                    old_body[INDEX(self.board.width - x - 1, y, self.board.width)]
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board._graph.reconfigure_edges(
+                self.width, self.height, self._tessellation
+            )
