@@ -7,12 +7,11 @@ from inspect import getsourcefile
 from os.path import abspath
 
 # Directory where this file is found
-
 basedir = Path(abspath(getsourcefile(lambda: 0))).ancestor(1)
 SOURCE_ROOT = basedir.ancestor(1)
-RES_DIR = SOURCE_ROOT.child('res')
-TEST_CASES_DIR = RES_DIR.child('test_cases')
 TESTS_DIR = SOURCE_ROOT.child('tests')
+RES_DIR = TESTS_DIR.child('res')
+TEST_CASES_DIR = RES_DIR.child('test_cases')
 VARIANT_TESTS_DIR = TESTS_DIR.child('variant')
 
 

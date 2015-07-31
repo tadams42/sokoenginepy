@@ -121,14 +121,18 @@ class Variant(Enum):
 
     @classmethod
     def factory(cls, description):
-        tmp = description.strip().lower() if description else ""
-        if tmp == "sokoban" or tmp == "":
+        if isinstance(description, str):
+            description = description.strip().lower()
+
+        if (description == "sokoban" or
+                description == "" or
+                description == cls.SOKOBAN):
             return cls.SOKOBAN
-        elif tmp == 'trioban':
+        elif description == 'trioban' or description == cls.TRIOBAN:
             return cls.TRIOBAN
-        elif tmp == 'hexoban':
+        elif description == 'hexoban' or description == cls.HEXOBAN:
             return cls.HEXOBAN
-        elif tmp == 'octoban':
+        elif description == 'octoban' or description == cls.OCTOBAN:
             return cls.OCTOBAN
         else:
             raise UnknownTessellationError(description)
