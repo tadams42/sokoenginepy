@@ -1,4 +1,4 @@
-include COPYING pytest.ini tox.ini
+include LICENSE.md pytest.ini tox.ini
 recursive-include scripts *
 recursive-include tests *
 recursive-exclude tests *.pyc
