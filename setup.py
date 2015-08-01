@@ -82,11 +82,13 @@ requirements_dev = [
 requirements_test = [
     'pytest >=2.7.2',
     'pytest-spec >=0.2.24',
+    'pytest-cov >=2.0.0',
     'factory-boy >=2.5.2',
     'fake-factory >=0.5.2',
     'PyHamcrest >=1.8.3',
     'pyexcel-ods3 >=0.0.8',
     'lxml >=3.4.4',
+    'tox >=2.1.1',
 ]
 
 # with open(path.join(here, 'requirements.txt'), encoding='utf-8', mode='w') as f:
