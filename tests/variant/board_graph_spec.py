@@ -1,5 +1,5 @@
 from sokoengine import (
-    Variant, BoardConversionError, Direction, INDEX, IllegalDirectionError
+    Variant, BoardConversionError, Direction, index_1d, IllegalDirectionError
 )
 from sokoengine.variant import BoardGraph, GraphType, SokobanBoard
 from hamcrest import assert_that, equal_to
@@ -99,23 +99,23 @@ class DescribeBoardGraph(object):
         board_graph = SokobanBoard(board_str=board_str)._graph
 
         def test_calculates_all_positions_reachable_from_root(self):
-            root = INDEX(5, 1, 7)
+            root = index_1d(5, 1, 7)
             assert_that(
                 self.board_graph.reachables(root),
                 equal_to([
-                    root, INDEX(4, 1, 7)
+                    root, index_1d(4, 1, 7)
                 ])
             )
 
         def test_skips_explicitly_excluded_positions(self):
-            root = INDEX(5, 1, 7)
+            root = index_1d(5, 1, 7)
             assert_that(
                 self.board_graph.reachables(root, excluded_positions=[root]),
-                equal_to([INDEX(4, 1, 7)])
+                equal_to([index_1d(4, 1, 7)])
             )
 
-            root = INDEX(5, 1, 7)
+            root = index_1d(5, 1, 7)
             assert_that(
-                self.board_graph.reachables(root, excluded_positions=[INDEX(4, 1, 7)]),
+                self.board_graph.reachables(root, excluded_positions=[index_1d(4, 1, 7)]),
                 equal_to([root])
             )

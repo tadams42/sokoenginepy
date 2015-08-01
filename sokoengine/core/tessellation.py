@@ -229,7 +229,7 @@ class Tessellation(ABC):
         self.legal_directions
 
         Position is always expressed as int index of board graph vertice. To
-        convert 2D coordinates into vertice index, use INDEX method
+        convert 2D coordinates into vertice index, use index_1d method
         """
         pass
 
@@ -307,7 +307,7 @@ class Tessellation(ABC):
         return CellOrientation.DEFAULT
 
 
-def INDEX(x, y, board_width):
+def index_1d(x, y, board_width):
     """
     Converts 2D coordinate to board position index.
     """

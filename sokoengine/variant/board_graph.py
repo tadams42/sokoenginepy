@@ -194,7 +194,7 @@ class BoardGraph(object):
     #     import numpy as np
     #     from moviepy.editor import ImageSequenceClip
     #     from functools import partial
-    #     from ..core import INDEX, X, Y, Tessellation
+    #     from ..core import index_1d, X, Y, Tessellation
     #     from ..io import parse_board_string
 
     #     WHITE = (255, 255, 255)
@@ -222,13 +222,13 @@ class BoardGraph(object):
     #     board_cells = parse_board_string(board_str)
     #     width = 19
     #     height = 11
-    #     root = INDEX(11, 8, width)
+    #     root = index_1d(11, 8, width)
     #     bg = BoardGraph(width * height, GraphType.DIRECTED)
     #     bg.reconfigure_edges(width, height, Tessellation.factory('sokoban'))
 
     #     for y, row in enumerate(board_cells):
     #         for x, chr in enumerate(row):
-    #             bg[INDEX(x, y, width)] = BoardCell(chr)
+    #             bg[index_1d(x, y, width)] = BoardCell(chr)
 
     #     def add_animation_frame(
     #         current_position, reachables, to_inspect, excluded, frames, width, height

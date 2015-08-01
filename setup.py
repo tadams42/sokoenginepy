@@ -89,19 +89,18 @@ requirements_test = [
     'lxml >=3.4.4',
 ]
 
-with open(path.join(here, 'requirements.txt'), encoding='utf-8', mode='w') as f:
-    for requirement in (requirements + requirements_dev + requirements_test):
-        f.write(requirement + "\n")
-
+# with open(path.join(here, 'requirements.txt'), encoding='utf-8', mode='w') as f:
+#     for requirement in (requirements + requirements_dev + requirements_test):
+#         f.write(requirement + "\n")
 
 setup(
 
-    name             = "bosp",
-    description      = "Bunch Of Sokoban Programs",
+    name             = "sokoenginepy",
+    description      = "Sokoban and variants game engine",
     version          = version['__version__'],
     author           = "Tomislav Adamic",
     author_email     = "tomislav.adamic@gmail.com",
-    url              = "https://github.com/tadamic/bosp",
+    url              = "https://github.com/tadamic/sokoenginepy",
     license          = "GPLv3",
     keywords         = "game sokoban hexoban octoban trioban",
     packages         = ['sokoengine'],
@@ -117,16 +116,6 @@ setup(
     tests_require = requirements_test,
 
     classifiers = [
-        # 'Programming Language :: Python :: 2'
-        # 'Programming Language :: Python :: 2.3'
-        # 'Programming Language :: Python :: 2.4'
-        # 'Programming Language :: Python :: 2.5'
-        # 'Programming Language :: Python :: 2.6'
-        # 'Programming Language :: Python :: 2.7'
-        'Programming Language :: Python :: 3'
-        'Programming Language :: Python :: 3.0'
-        'Programming Language :: Python :: 3.1'
-        'Programming Language :: Python :: 3.2'
         'Programming Language :: Python :: 3.3'
         'Programming Language :: Python :: 3.4'
         'Programming Language :: Python :: 3.5'
@@ -134,10 +123,7 @@ setup(
 
         "Development Status :: 2 - Pre-Alpha",
 
-        "Environment :: X11 Applications :: KDE",
-
         "Intended Audience :: Developers",
-        "Intended Audience :: End Users/Desktop",
 
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
 

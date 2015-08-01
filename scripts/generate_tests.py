@@ -57,7 +57,7 @@ class SpecGenerator(object):
             f.write("import pytest\n")
             f.write("from hamcrest import assert_that, equal_to\n")
             f.write("from sokoengine import IllegalDirectionError\n")
-            f.write("from sokoengine.core import Tessellation, INDEX, on_board_1D\n")
+            f.write("from sokoengine.core import Tessellation, index_1d, on_board_1D\n")
             f.write("from sokoengine.variant import SokobanBoard\n")
             f.write("from sokoengine.variant import HexobanBoard\n")
             f.write("from sokoengine.variant import TriobanBoard\n")
@@ -106,7 +106,7 @@ class SpecGenerator(object):
         self.output.append('            height = {0}\n'.format(test_case['height']))
         self.output.append('            row = {0}\n'.format(test_case['row']))
         self.output.append('            column = {0}\n'.format(test_case['column']))
-        self.output.append('            index = INDEX(column, row, width)\n')
+        self.output.append('            index = index_1d(column, row, width)\n')
 
         if test_case['test_type'] == 'tessellation':
             self.output.append('            t = Tessellation.factory("{0}")'.format(test_case['variant']))
@@ -138,7 +138,7 @@ class SpecGenerator(object):
                 else:
                     self.output.append("            assert_that(\n")
                     self.output.append("                t.neighbor_position(index, {0}, width, height) == \n".format(self.DIRECTIONS_HASH[direction]))
-                    self.output.append("                INDEX({0}, width)\n".format(test_case[self.RESULTS_HASH[direction]]))
+                    self.output.append("                index_1d({0}, width)\n".format(test_case[self.RESULTS_HASH[direction]]))
                     self.output.append("            )\n")
             else:
                 if (
@@ -152,7 +152,7 @@ class SpecGenerator(object):
                 else:
                     self.output.append("            assert_that(\n")
                     self.output.append("                b.neighbor(index, {0}) == \n".format(self.DIRECTIONS_HASH[direction]))
-                    self.output.append("                INDEX({0}, width)\n".format(test_case[self.RESULTS_HASH[direction]]))
+                    self.output.append("                index_1d({0}, width)\n".format(test_case[self.RESULTS_HASH[direction]]))
                     self.output.append("            )\n")
 
         self.output.append('\n')

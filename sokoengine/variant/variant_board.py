@@ -4,7 +4,7 @@ from functools import wraps
 import networkx as nx
 
 from ..core import (
-    PrettyPrintable, EqualityComparable, Variant, INDEX,
+    PrettyPrintable, EqualityComparable, Variant, index_1d,
     Tessellated, Direction
 )
 from ..game import BoardCell
@@ -46,7 +46,7 @@ class VariantBoard(
         - board-space searching
 
     All positions are int indexes of graph vertices. To convert 2D coordinate
-    into vertice index, use INDEX method
+    into vertice index, use index_1d method
     """
 
     def __init__(
@@ -64,7 +64,7 @@ class VariantBoard(
             self._reinit(width, height)
             for y, row in enumerate(board_rows):
                 for x, chr in enumerate(row):
-                    self._graph[INDEX(x, y, self._width)] = BoardCell(chr)
+                    self._graph[index_1d(x, y, self._width)] = BoardCell(chr)
         else:
             self._reinit(board_width, board_height)
 
@@ -131,7 +131,7 @@ class VariantBoard(
             row = "".join([
                 cell.to_s(output_settings.use_visible_floors)
                 for cell in [
-                    self[INDEX(x, y, self.width)]
+                    self[index_1d(x, y, self.width)]
                     for x in range(0, self.width)
                 ]
             ])
@@ -384,8 +384,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, self.board.width):
             for y in range(0, old_height):
-                self.board[INDEX(x, y + 1, self.board.width)] =\
-                    old_body[INDEX(x, y, self.board.width)]
+                self.board[index_1d(x, y + 1, self.board.width)] =\
+                    old_body[index_1d(x, y, self.board.width)]
 
     def add_row_bottom(self, reconfigure_edges):
         old_body = self.board._graph
@@ -398,8 +398,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, self.board.width):
             for y in range(0, old_height):
-                self.board[INDEX(x, y, self.board.width)] =\
-                    old_body[INDEX(x, y, self.board.width)]
+                self.board[index_1d(x, y, self.board.width)] =\
+                    old_body[index_1d(x, y, self.board.width)]
 
     def add_column_left(self, reconfigure_edges):
         old_body = self.board._graph
@@ -412,8 +412,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, old_width):
             for y in range(0, self.board.height):
-                self.board[INDEX(x + 1, y, self.board.width)] =\
-                    old_body[INDEX(x, y, old_width)]
+                self.board[index_1d(x + 1, y, self.board.width)] =\
+                    old_body[index_1d(x, y, old_width)]
 
     def add_column_right(self, reconfigure_edges):
         old_body = self.board._graph
@@ -426,8 +426,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, old_width):
             for y in range(0, self.board.height):
-                self.board[INDEX(x, y, self.board.width)] =\
-                    old_body[INDEX(x, y, old_width)]
+                self.board[index_1d(x, y, self.board.width)] =\
+                    old_body[index_1d(x, y, old_width)]
 
     def remove_row_top(self, reconfigure_edges):
         old_body = self.board._graph
@@ -439,8 +439,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[INDEX(x, y, self.board.width)] =\
-                    old_body[INDEX(x, y + 1, self.board.width)]
+                self.board[index_1d(x, y, self.board.width)] =\
+                    old_body[index_1d(x, y + 1, self.board.width)]
 
     def remove_row_bottom(self, reconfigure_edges):
         old_body = self.board._graph
@@ -452,8 +452,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[INDEX(x, y, self.board.width)] =\
-                    old_body[INDEX(x, y, self.board.width)]
+                self.board[index_1d(x, y, self.board.width)] =\
+                    old_body[index_1d(x, y, self.board.width)]
 
     def remove_column_left(self, reconfigure_edges):
         old_body = self.board._graph
@@ -466,8 +466,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[INDEX(x, y, self.board.width)] =\
-                    old_body[INDEX(x + 1, y, old_width)]
+                self.board[index_1d(x, y, self.board.width)] =\
+                    old_body[index_1d(x + 1, y, old_width)]
 
     def remove_column_right(self, reconfigure_edges):
         old_body = self.board._graph
@@ -480,8 +480,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[INDEX(x, y, self.board.width)] =\
-                    old_body[INDEX(x, y, old_width)]
+                self.board[index_1d(x, y, self.board.width)] =\
+                    old_body[index_1d(x, y, old_width)]
 
     def trim_left(self, reconfigure_edges):
         amount = self.board.width
@@ -489,7 +489,7 @@ class VariantBoardResizer(ABC):
             border_found = False
             for x in range(0, self.board.width):
                 border_found = self.board[
-                    INDEX(x, y, self.board.width)
+                    index_1d(x, y, self.board.width)
                 ].is_border_element
                 if border_found:
                     if x < amount:
@@ -520,7 +520,7 @@ class VariantBoardResizer(ABC):
             border_found = False
             for y in range(0, self.board.height):
                 border_found = self.board[
-                    INDEX(x, y, self.board.width)
+                    index_1d(x, y, self.board.width)
                 ].is_border_element
                 if border_found:
                     if y < amount:
@@ -555,8 +555,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[INDEX(x, y, self.board.width)] = \
-                    old_body[INDEX(x, self.board.height - y - 1, self.board.width)]
+                self.board[index_1d(x, y, self.board.width)] = \
+                    old_body[index_1d(x, self.board.height - y - 1, self.board.width)]
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(
@@ -573,8 +573,8 @@ class VariantBoardResizer(ABC):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[INDEX(x, y, self.board.width)] = \
-                    old_body[INDEX(self.board.width - x - 1, y, self.board.width)]
+                self.board[index_1d(x, y, self.board.width)] = \
+                    old_body[index_1d(self.board.width - x - 1, y, self.board.width)]
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(

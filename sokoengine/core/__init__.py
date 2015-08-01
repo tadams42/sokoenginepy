@@ -16,7 +16,7 @@ from .helpers import (
 
 from .tessellation import (
     Direction, CellOrientation, Variant, Tessellated, Tessellation,
-    INDEX, X, Y, ROW, COLUMN, on_board_1D, on_board_2D,
+    index_1d, X, Y, ROW, COLUMN, on_board_1D, on_board_2D,
 )
 
 __all__ = [
@@ -32,7 +32,7 @@ __all__ = [
     'Variant',
     'Tessellated',
     'Tessellation',
-    'INDEX',
+    'index_1d',
     'X',
     'Y',
     'ROW',

@@ -1,5 +1,5 @@
 from ..core import (
-    Tessellation, on_board_2D, on_board_1D, ROW, COLUMN, INDEX, Direction,
+    Tessellation, on_board_2D, on_board_1D, ROW, COLUMN, index_1d, Direction,
     IllegalDirectionError
 )
 from ..io import AtomicMoveCharacters
@@ -52,7 +52,7 @@ class SokobanTessellation(Tessellation):
         column += column_shift
 
         if on_board_2D(column, row, board_width, board_height):
-            return INDEX(column, row, board_width)
+            return index_1d(column, row, board_width)
 
         return None
 

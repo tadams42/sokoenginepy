@@ -1,14 +1,14 @@
 
 from hamcrest import assert_that, equal_to
 from sokoengine import Direction
-from sokoengine.core import INDEX, X, Y, on_board_2D, on_board_1D
+from sokoengine.core import index_1d, X, Y, on_board_2D, on_board_1D
 
 
 class Describe_INDEX(object):
     def test_it_calculates_1D_index_from_2D_coordinates(self):
-        assert_that(INDEX(0, 0, 5), equal_to(0))
-        assert_that(INDEX(4, 5, 5), equal_to(29))
-        assert_that(INDEX(3, 3, 5), equal_to(18))
+        assert_that(index_1d(0, 0, 5), equal_to(0))
+        assert_that(index_1d(4, 5, 5), equal_to(29))
+        assert_that(index_1d(3, 3, 5), equal_to(18))
 
 
 class Describe_X(object):
