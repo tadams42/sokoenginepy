@@ -1,6 +1,6 @@
-===============================================
-sokoenginepy - Sokoban and variants game engine
-===============================================
+============
+sokoenginepy
+============
 
 .. image:: https://img.shields.io/pypi/v/sokoenginepy.svg
     :target: https://pypi.python.org/pypi/sokoenginepy
@@ -8,8 +8,8 @@ sokoenginepy - Sokoban and variants game engine
 .. image:: https://travis-ci.org/tadamic/sokoenginepy.svg?branch=development
     :target: https://travis-ci.org/tadamic/sokoenginepy
 
-.. image:: https://coveralls.io/repos/sokoenginepy/sokoenginepy/badge.svg?branch=master
-    :target: https://coveralls.io/r/sokoenginepy/sokoenginepy?branch=master
+.. image:: https://coveralls.io/repos/tadamic/sokoenginepy/badge.svg?branch=development&service=github
+    :target: https://coveralls.io/github/tadamic/sokoenginepy?branch=development
 
 .. image:: https://img.shields.io/badge/language-Python3-blue.svg
     :target: https://www.python.org/
@@ -17,6 +17,9 @@ sokoenginepy - Sokoban and variants game engine
 .. image:: https://img.shields.io/badge/license-GPLv3-brightgreen.svg
     :target: http://opensource.org/licenses/GPL-3.0
 
+
+Sokoban and variants game engine
+--------------------------------
 
 sokoenginepy is game engine for Sokoban and variants written in Python and
 loaded with features:
