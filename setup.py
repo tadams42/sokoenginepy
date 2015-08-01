@@ -1,5 +1,5 @@
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 # To use a consistent encoding
 from codecs import open
@@ -10,7 +10,7 @@ here = path.abspath(path.dirname(__file__))
 version = {}
 
 
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 with open(path.join(here, 'sokoenginepy/version.py'), encoding='utf-8') as f:
@@ -103,7 +103,8 @@ setup(
     url              = "https://github.com/tadamic/sokoenginepy",
     license          = "GPLv3",
     keywords         = "game sokoban hexoban octoban trioban",
-    packages         = ['sokoenginepy'],
+    # packagemds         = ['sokoenginepy'],
+    packages         = find_packages(),
     install_requires = requirements,
     long_description = long_description,
 
@@ -115,10 +116,14 @@ setup(
     },
     tests_require = requirements_test,
 
+    package_data = {
+        'sokoenginepy': ['res/*'],
+    },
+
     classifiers = [
-        'Programming Language :: Python :: 3.3'
-        'Programming Language :: Python :: 3.4'
-        'Programming Language :: Python :: 3.5'
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3 :: Only',
 
         "Development Status :: 2 - Pre-Alpha",

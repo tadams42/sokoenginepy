@@ -56,3 +56,34 @@ or to generate tests coverage::
 and finally, tests can be run with tox::
 
     tox
+
+Uploading to PyPI
+-----------------
+
+::
+    pip install -U twine
+
+Prepare ``~/.pypirc``::
+
+    [distutils]
+    index-servers=
+        pypi
+        pypitest
+
+    [pypitest]
+    repository = https://testpypi.python.org/pypi
+    username = <username>
+    password = <password>
+
+    [pypi]
+    repository = https://pypi.python.org/pypi
+    username = <username>
+    password = <password>
+
+Create dist::
+
+    python setup.py sdist
+
+An upload it::
+
+    twine upload -r pypitest dist/*
