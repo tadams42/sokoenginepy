@@ -1,0 +1,13 @@
+language: python
+
+# branches:
+#   except:
+#     - gh-pages
+
+python:
+  - "3.3"
+
+install:
+  - pip install tox --use-mirrors
+
+script: tox
