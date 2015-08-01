@@ -8,7 +8,7 @@ sokoenginepy
 .. image:: https://travis-ci.org/tadamic/sokoenginepy.svg?branch=development
     :target: https://travis-ci.org/tadamic/sokoenginepy
 
-.. image:: https://coveralls.io/repos/tadamic/sokoenginepy/badge.svg?branch=development&service=github
+.. image:: https://coveralls.io/repos/tadamic/sokoenginepy/badge.svg?branch=development
     :target: https://coveralls.io/github/tadamic/sokoenginepy?branch=development
 
 .. image:: https://img.shields.io/badge/language-Python3-blue.svg

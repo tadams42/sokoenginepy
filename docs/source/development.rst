@@ -37,6 +37,10 @@ Later, to uninstall it::
 
     python setup.py develop --uninstall
 
+To install extra packages usefull in development::
+
+    pip install -e .[dev, test]
+
 
 Running tests
 -------------
