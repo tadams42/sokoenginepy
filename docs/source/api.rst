@@ -1,6 +1,20 @@
 API Reference
 =============
 
-.. automodule:: sokoengine
-    :members:
-    :undoc-members:
+.. module:: sokoenginepy
+
+Core
+----
+
+I/O
+---
+
+Game
+----
+
+Variant
+-------
+
+Exceptions
+----------
+

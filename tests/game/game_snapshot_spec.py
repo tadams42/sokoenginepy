@@ -1,7 +1,7 @@
 import pytest
 from factories import GameSnapshotFactory
 from hamcrest import assert_that, equal_to, instance_of, is_, none, is_not
-from sokoengine import (
+from sokoenginepy import (
     GameSnapshot, Variant, GameSolvingMode, AtomicMove, Direction,
     SokoengineError, SnapshotConversionError
 )

@@ -4,7 +4,7 @@ from inspect import getsourcefile
 from os.path import abspath
 from faker import Faker
 from hamcrest import assert_that, equal_to
-from sokoengine import IllegalDirectionError, AtomicMove
+from sokoenginepy import IllegalDirectionError, AtomicMove
 
 
 TEST_RESOURCES_ROOT = (

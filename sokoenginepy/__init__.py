@@ -9,7 +9,7 @@ from .core import (
     InvalidPieceIdError,
     InvalidPiecePlusIdError,
     SokobanPlusDataError,
-    Direction, Variant, CellOrientation, INDEX
+    Direction, Variant, CellOrientation, index_1d
 )
 
 from .game import (
@@ -33,7 +33,7 @@ __all__ = [
     'Direction',
     'Variant',
     'CellOrientation',
-    'INDEX',
+    'index_1d',
 
     'GameSolvingMode',
     'AtomicMove',

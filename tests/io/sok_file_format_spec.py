@@ -1,6 +1,6 @@
 from hamcrest import assert_that, equal_to
-from sokoengine.io import is_blank, SOKFileFormat
-from sokoengine import PuzzlesCollection, Variant
+from sokoenginepy.io import is_blank, SOKFileFormat
+from sokoenginepy import PuzzlesCollection, Variant
 from helpers import TEST_RESOURCES_ROOT
 
 
