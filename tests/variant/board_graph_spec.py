@@ -1,7 +1,7 @@
-from sokoengine import (
+from sokoenginepy import (
     Variant, BoardConversionError, Direction, index_1d, IllegalDirectionError
 )
-from sokoengine.variant import BoardGraph, GraphType, SokobanBoard
+from sokoenginepy.variant import BoardGraph, GraphType, SokobanBoard
 from hamcrest import assert_that, equal_to
 
 

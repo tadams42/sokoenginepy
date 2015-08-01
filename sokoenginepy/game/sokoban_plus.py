@@ -36,7 +36,7 @@ class SokobanPlus(PrettyPrintable):
     **Default plus_id in Sokoban+ strings**
 
     Original implementation used number 99 for default plus ID. As there can be
-    more than 99 boxes on board, sokoengine changes this detail and uses
+    more than 99 boxes on board, sokoenginepy changes this detail and uses
     Piece.DEFAULT_PLUS_ID as default plus ID. When loading older puzzles with
     Sokoban+, legacy default value is converted transparently.
     """

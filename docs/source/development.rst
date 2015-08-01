@@ -51,7 +51,7 @@ or to get more verbose output::
 
 or to generate tests coverage::
 
-    py.test --cov=sokoengine --cov-report=html tests/
+    py.test --cov=sokoenginepy --cov-report=html tests/
 
 and finally, tests can be run with tox::
 

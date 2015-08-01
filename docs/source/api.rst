@@ -1,6 +1,6 @@
 API Reference
 =============
 
-.. automodule:: sokoengine
+.. automodule:: sokoenginepy
     :members:
     :undoc-members:

@@ -1,8 +1,8 @@
 import pytest
-from sokoengine import (
+from sokoenginepy import (
     Variant, BoardConversionError, Direction, index_1d, OutputSettings
 )
-from sokoengine.variant import SokobanBoard, TriobanBoard, BoardGraph
+from sokoenginepy.variant import SokobanBoard, TriobanBoard, BoardGraph
 from hamcrest import assert_that, equal_to, greater_than, is_, none
 from unittest.mock import Mock, patch
 

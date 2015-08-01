@@ -2,13 +2,13 @@
 
 import pytest
 from hamcrest import assert_that, equal_to
-from sokoengine import IllegalDirectionError
-from sokoengine.core import Tessellation, index_1d, on_board_1D
-from sokoengine.variant import SokobanBoard
-from sokoengine.variant import HexobanBoard
-from sokoengine.variant import TriobanBoard
-from sokoengine.variant import OctobanBoard
-from sokoengine import CellOrientation, Direction
+from sokoenginepy import IllegalDirectionError
+from sokoenginepy.core import Tessellation, index_1d, on_board_1D
+from sokoenginepy.variant import SokobanBoard
+from sokoenginepy.variant import HexobanBoard
+from sokoenginepy.variant import TriobanBoard
+from sokoenginepy.variant import OctobanBoard
+from sokoenginepy import CellOrientation, Direction
 
 
 def triangle_points_down(position, board_width, board_height):

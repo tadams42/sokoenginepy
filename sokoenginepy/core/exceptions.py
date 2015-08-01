@@ -1,6 +1,6 @@
 class SokoengineError(RuntimeError):
     """
-    Base class for all sokoengine exceptions.
+    Base class for all sokoenginepy exceptions.
     """
     pass
 

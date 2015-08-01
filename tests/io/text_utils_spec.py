@@ -1,13 +1,13 @@
 import pytest
 from hamcrest import assert_that, equal_to
 
-from sokoengine import BoardConversionError, GameSolvingMode, AtomicMove,\
+from sokoenginepy import BoardConversionError, GameSolvingMode, AtomicMove,\
     Direction, SnapshotConversionError
 
-from sokoengine.core import Tessellation
+from sokoenginepy.core import Tessellation
 
-from sokoengine.io import *
-from sokoengine.io.text_utils import Rle
+from sokoenginepy.io import *
+from sokoenginepy.io.text_utils import Rle
 
 
 class Describe_is_board_string(object):

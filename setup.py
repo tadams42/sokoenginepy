@@ -13,7 +13,7 @@ version = {}
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-with open(path.join(here, 'sokoengine/version.py'), encoding='utf-8') as f:
+with open(path.join(here, 'sokoenginepy/version.py'), encoding='utf-8') as f:
     exec(f.read(), version)
 
 
@@ -103,7 +103,7 @@ setup(
     url              = "https://github.com/tadamic/sokoenginepy",
     license          = "GPLv3",
     keywords         = "game sokoban hexoban octoban trioban",
-    packages         = ['sokoengine'],
+    packages         = ['sokoenginepy'],
     install_requires = requirements,
     long_description = long_description,
 
