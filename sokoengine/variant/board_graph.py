@@ -104,8 +104,8 @@ class BoardGraph(object):
             without calculating their status
         is_obstacle_callable - callable that checks if given position on graph
             is obstacle
-        add_animation_frame_hook - if not None, this callable will be caled
-            after each step oof search. Usefull for visualization of algorithm
+        add_animation_frame_hook - if not None, this callable will be called
+            after each step oof search. Useful for visualization of algorithm
             and debugging
         """
         visited = len(self._graph) * [False]

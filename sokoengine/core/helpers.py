@@ -1,3 +1,15 @@
+import pytz
+from datetime import datetime
+from unipath import Path
+from inspect import getsourcefile
+from os.path import abspath
+
+
+RESOURCES_ROOT = (
+    Path(abspath(getsourcefile(lambda: 0))).ancestor(1).ancestor(1).child('res')
+)
+
+
 class PrettyPrintable(object):
     """
     Convenience class.
@@ -31,3 +43,22 @@ class EqualityComparable(object):
         return (
             self._equality_attributes() == other._equality_attributes()
         )
+
+
+def utcnow():
+    return pytz.utc.localize(datetime.utcnow())
+
+
+def first_index_of(lst, predicate):
+    return next(
+        (
+            index for index, elem in enumerate(lst)
+            if predicate(elem)
+        ), None
+    )
+
+def last_index_of(lst, predicate):
+    candidate_index = first_index_of(reversed(lst), predicate)
+    if candidate_index is not None:
+        return len(lst) - candidate_index - 1
+    return None

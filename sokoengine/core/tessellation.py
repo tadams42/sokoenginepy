@@ -119,6 +119,18 @@ class Variant(Enum):
     """
     OCTOBAN = 3
 
+    def to_s(self):
+        if self == type(self).SOKOBAN:
+            return "Sokoban"
+        elif self == type(self).HEXOBAN:
+            return "Hexoban"
+        elif self == type(self).TRIOBAN:
+            return "Trioban"
+        elif self == type(self).OCTOBAN:
+            return "Octoban"
+        else:
+            raise UnknownTessellationError(self)
+
     @classmethod
     def factory(cls, description):
         if isinstance(description, str):

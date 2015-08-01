@@ -1,8 +1,15 @@
 import pytest
+from unipath import Path
+from inspect import getsourcefile
+from os.path import abspath
 from faker import Faker
 from hamcrest import assert_that, equal_to
 from sokoengine import IllegalDirectionError, AtomicMove
 
+
+TEST_RESOURCES_ROOT = (
+    Path(abspath(getsourcefile(lambda: 0))).ancestor(1).child('res')
+)
 
 fake = Faker()
 

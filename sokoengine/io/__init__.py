@@ -7,6 +7,9 @@ from .text_utils import (
     rle_decode, drop_blank, drop_empty, normalize_width, parse_board_string,
     SnapshotStringParser, parse_sokoban_plus_data,
 )
+from .puzzle import Puzzle, PuzzleSnapshot
+from .puzzles_collection import PuzzlesCollection
+from .sok_file_format import SOKFileFormat, SOKReader, SOKWriter, SOKTags
 
 __all__ = [
     'OutputSettings',
@@ -34,4 +37,11 @@ __all__ = [
     'parse_board_string',
     'SnapshotStringParser',
     'parse_sokoban_plus_data',
+    'Puzzle',
+    'PuzzleSnapshot',
+    'PuzzlesCollection',
+    'SOKFileFormat',
+    'SOKReader',
+    'SOKWriter',
+    'SOKTags',
 ]

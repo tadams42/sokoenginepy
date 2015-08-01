@@ -10,3 +10,6 @@ build/
 htmlcov
 .coverage
 .venv/
+Untitled.ipynb
+main.py
+dist

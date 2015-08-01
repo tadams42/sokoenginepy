@@ -9,7 +9,10 @@ from .exceptions import (
     SokobanPlusDataError,
 )
 
-from .helpers import PrettyPrintable, EqualityComparable
+from .helpers import (
+    PrettyPrintable, EqualityComparable, RESOURCES_ROOT, utcnow, first_index_of,
+    last_index_of
+)
 
 from .tessellation import (
     Direction, CellOrientation, Variant, Tessellated, Tessellation,
@@ -19,6 +22,10 @@ from .tessellation import (
 __all__ = [
     'PrettyPrintable',
     'EqualityComparable',
+    'RESOURCES_ROOT',
+    'utcnow',
+    'first_index_of',
+    'last_index_of',
 
     'Direction ',
     'CellOrientation',

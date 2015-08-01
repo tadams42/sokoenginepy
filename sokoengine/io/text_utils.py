@@ -198,7 +198,7 @@ def contains_only_digits_and_spaces(line):
     ], True)
 
 def is_blank(line):
-    return line.strip() == ""
+    return line is None or line.strip() == ""
 
 def is_board_string(line):
     """
