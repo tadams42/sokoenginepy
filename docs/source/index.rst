@@ -30,7 +30,7 @@ Installing sokoenginepy should be as simple as::
 
     pip install sokoenginepy
 
-Note that sokoenginepy requires Python 3.3 or newer.
+Note that sokoenginepy requires Python 3.4 or newer.
 
 
 User's Guide
