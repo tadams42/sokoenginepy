@@ -70,7 +70,7 @@ class SokobanPlus(PrettyPrintable):
     def boxorder(self):
         if self._is_validated:
             return self._rstrip_default_plus_ids(
-                " ".join([str(i) for i in self._box_plus_ids])
+                " ".join(str(i) for i in self._box_plus_ids)
             )
         else:
             return self._boxorder
@@ -79,7 +79,7 @@ class SokobanPlus(PrettyPrintable):
     def goalorder(self):
         if self._is_validated:
             return self._rstrip_default_plus_ids(
-                " ".join([str(i) for i in self._goal_plus_ids])
+                " ".join(str(i) for i in self._goal_plus_ids)
             )
         else:
             return self._goalorder
@@ -131,7 +131,7 @@ class SokobanPlus(PrettyPrintable):
         trimmed = [
             int(id) for id in
             self._rstrip_default_plus_ids(
-                " ".join([str(i) for i in ids_list])
+                " ".join(str(i) for i in ids_list)
             ).split()
         ]
 

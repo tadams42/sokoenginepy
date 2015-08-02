@@ -366,9 +366,9 @@ class SOKReader(object):
         if i is not None:
             lst = lst[:i + 1]
 
-        return "\n".join([
+        return "\n".join(
             line.strip() for line in lst
-        ])
+        )
 
 class SOKWriter(object):
     def __init__(self, dest_stream):

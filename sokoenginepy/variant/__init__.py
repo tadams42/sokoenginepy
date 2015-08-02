@@ -1,4 +1,4 @@
-from .hexoban_board import HexobanBoard, HexobanBoardResizer
+from .hexoban_board import HexobanBoard, HexobanBoardResizer, HexobanTextConverter
 from .hexoban_tessellation import HexobanTessellation
 from .octoban_board import OctobanBoard, OctobanBoardResizer
 from .octoban_tessellation import OctobanTessellation
@@ -12,6 +12,7 @@ from .board_graph import BoardGraph, GraphType
 __all__ = [
     'HexobanBoard',
     'HexobanBoardResizer',
+    'HexobanTextConverter',
     'HexobanTessellation',
     'OctobanBoard',
     'OctobanBoardResizer',

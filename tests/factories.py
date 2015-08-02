@@ -5,7 +5,7 @@ from helpers import fake
 
 from sokoenginepy import (
     AtomicMove, Direction, BoardCell, GameSnapshot, Variant,
-    GameSolvingMode, SokobanPlus, Piece
+    GameSolvingMode, SokobanPlus, Piece, OutputSettings
 )
 from sokoenginepy.game import SokobanPlusValidator
 from sokoenginepy.io import BoardEncodingCharacters
@@ -165,3 +165,7 @@ def sokoban_tessellation():
 @pytest.fixture
 def trioban_tessellation():
     return Tessellation.factory('trioban')
+
+@pytest.fixture
+def output_settings():
+    return OutputSettings(use_visible_floors=True)

@@ -58,13 +58,7 @@ class VariantBoard(
         self._resizer = self.tessellation.board_resizer_type(self)
 
         if not is_blank(board_str):
-            board_rows = self._parse_string(board_str)
-            width = len(board_rows[0]) if len(board_rows) > 0 else 0
-            height = len(board_rows)
-            self._reinit(width, height)
-            for y, row in enumerate(board_rows):
-                for x, chr in enumerate(row):
-                    self._graph[index_1d(x, y, self._width)] = BoardCell(chr)
+            self._reinit_with_string(board_str)
         else:
             self._reinit(board_width, board_height)
 
@@ -79,6 +73,16 @@ class VariantBoard(
             self._graph.reconfigure_edges(
                 self.width, self.height, self.tessellation
             )
+
+    def _reinit_with_string(self, board_str, reconfigure_edges=True):
+        if not is_blank(board_str):
+            board_rows = self._parse_string(board_str)
+            width = len(board_rows[0]) if len(board_rows) > 0 else 0
+            height = len(board_rows)
+            self._reinit(width, height, reconfigure_edges)
+            for y, row in enumerate(board_rows):
+                for x, chr in enumerate(row):
+                    self._graph[index_1d(x, y, self._width)] = BoardCell(chr)
 
     def _representation_attributes(self):
         return {
@@ -128,13 +132,13 @@ class VariantBoard(
         """
         rows = []
         for y in range(0, self.height):
-            row = "".join([
+            row = "".join(
                 cell.to_s(output_settings.use_visible_floors)
-                for cell in [
+                for cell in (
                     self[index_1d(x, y, self.width)]
                     for x in range(0, self.width)
-                ]
-            ])
+                )
+            )
             # Intentionally rstripping only if not using visible floors
             row = row.rstrip()
             if output_settings.rle_encode:

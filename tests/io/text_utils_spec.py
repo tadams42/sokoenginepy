@@ -101,6 +101,7 @@ class Describe_parse_board_string(object):
             "##  $ #### ",
             "# $.+ #    ",
             "#######    ",
+            "           ",
         ]
         parsed = parse_board_string(src)
         assert_that(parsed, equal_to(result))
@@ -116,7 +117,10 @@ class Describe_parse_board_string(object):
             " ## @ *   #   ",
             "##  $ ####    ",
             "# $.+ #       ",
+            "              ",
+            "              ",
             "#######       ",
+            "              ",
         ]
         parsed = parse_board_string(src)
         assert_that(parsed, equal_to(result))
@@ -139,10 +143,16 @@ class Describe_parse_board_string(object):
         result = [
             " ##########",
             "           ",
+            "           ",
             " ## @ *   #",
+            "           ",
             "##  $ #### ",
+            "           ",
             "# $.+ #    ",
+            "           ",
             "#######    ",
+            "           ",
+            "           ",
         ]
         parsed = parse_board_string(src)
         assert_that(parsed, equal_to(result))

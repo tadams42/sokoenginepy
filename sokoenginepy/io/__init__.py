@@ -5,7 +5,7 @@ from .text_utils import (
     is_atomic_move_char, contains_only_digits_and_spaces, is_blank,
     is_board_string, is_sokoban_plus_string, is_snapshot_string, rle_encode,
     rle_decode, drop_blank, drop_empty, normalize_width, parse_board_string,
-    SnapshotStringParser, parse_sokoban_plus_data,
+    SnapshotStringParser, parse_sokoban_plus_data, calculate_width
 )
 from .puzzle import Puzzle, PuzzleSnapshot
 from .puzzles_collection import PuzzlesCollection
@@ -37,6 +37,7 @@ __all__ = [
     'parse_board_string',
     'SnapshotStringParser',
     'parse_sokoban_plus_data',
+    'calculate_width',
     'Puzzle',
     'PuzzleSnapshot',
     'PuzzlesCollection',

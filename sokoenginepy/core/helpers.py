@@ -23,10 +23,10 @@ class PrettyPrintable(object):
         return "<{0} ({1}) {2}>".format(
             type(self).__name__,
             hex(id(self)),
-            ", ".join([
+            ", ".join(
                 "{0}: {1}".format(k, v)
                 for k, v in self._representation_attributes().items()
-            ])
+            )
         )
 
 

@@ -162,16 +162,16 @@ class Regexes(object):
 
     board_string = re.compile(
         "^([0-9\s" +
-        re.escape("".join([c.value for c in BoardEncodingCharacters])) +
-        re.escape("".join([c.value for c in RleCharacters])) +
+        re.escape("".join(c.value for c in BoardEncodingCharacters)) +
+        re.escape("".join(c.value for c in RleCharacters)) +
         "])*$"
     )
 
     snapshot_string = re.compile(
         "^([0-9\s" +
-        re.escape("".join([c.value for c in AtomicMoveCharacters])) +
-        re.escape("".join([c.value for c in SpecialSnapshotCharacters])) +
-        re.escape("".join([c.value for c in RleCharacters])) +
+        re.escape("".join(c.value for c in AtomicMoveCharacters)) +
+        re.escape("".join(c.value for c in SpecialSnapshotCharacters)) +
+        re.escape("".join(c.value for c in RleCharacters)) +
         "])*$"
     )
 
@@ -255,13 +255,10 @@ class Rle(object):
             return line
 
         encoded = [(len(list(g)), k) for k, g in groupby(line)]
-        return "".join([
-            "".join([
-                str(c) if c > 1 else "",
-                v
-            ])
+        return "".join(
+            "".join((str(c) if c > 1 else "", v,))
             for c, v in encoded
-        ])
+        )
 
     @classmethod
     def decode_rle_token(cls, rle_token):
@@ -333,14 +330,18 @@ def drop_blank(string_list):
 def drop_empty(string_list):
     return [l for l in string_list if len(l) > 0]
 
-def normalize_width(string_list):
-    width = 0
-    for l in string_list:
-        if len(l) > width:
-            width = len(l)
+def normalize_width(string_list, fill_chr = ' '):
+    width = calculate_width(string_list)
     return [
-        l + (" " * (width - len(l))) for l in string_list
+        l + (fill_chr * (width - len(l))) for l in string_list
     ]
+
+def calculate_width(string_list):
+    width = 0
+    for line in string_list:
+        if len(line) > width:
+            width = len(line)
+    return width
 
 def parse_board_string(line):
     """
@@ -355,7 +356,7 @@ def parse_board_string(line):
         raise BoardConversionError(BoardConversionError.NON_BOARD_CHARS_FOUND)
 
     line = rle_decode(line)
-    return normalize_width(drop_empty(Regexes.rle_splitter.split(line)))
+    return normalize_width(Regexes.rle_splitter.split(line))
 
 
 class SnapshotStringParser(object):
@@ -364,7 +365,7 @@ class SnapshotStringParser(object):
     """
     atomic_moves = Regex(
         "([" +
-        "".join([c.value for c in AtomicMoveCharacters]) +
+        "".join(c.value for c in AtomicMoveCharacters) +
         "])+"
     )
     jump = Group(
