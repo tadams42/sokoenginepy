@@ -1,0 +1,19 @@
+language: python
+
+# branches:
+#   except:
+#     - gh-pages
+
+python:
+  - "3.4"
+
+install:
+  - pip install -e .[test]
+  - pip install coveralls
+
+script:
+  - py.test --cov=sokoenginepy tests/
+  - tox
+
+after_success:
+  - coveralls

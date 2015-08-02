@@ -1,8 +1,8 @@
 import pytest
-from sokoengine import (
-    Variant, BoardConversionError, Direction, INDEX, OutputSettings
+from sokoenginepy import (
+    Variant, BoardConversionError, Direction, index_1d, OutputSettings
 )
-from sokoengine.variant import SokobanBoard, TriobanBoard, BoardGraph
+from sokoenginepy.variant import SokobanBoard, TriobanBoard, BoardGraph
 from hamcrest import assert_that, equal_to, greater_than, is_, none
 from unittest.mock import Mock, patch
 
@@ -73,10 +73,10 @@ class DescribeVariantBoard(object):
         variant_board = SokobanBoard(board_str=board_str)
 
         expected_playable_cells = [
-            INDEX(1, 1, 7),
-            INDEX(2, 1, 7),
-            INDEX(4, 1, 7),
-            INDEX(5, 1, 7),
+            index_1d(1, 1, 7),
+            index_1d(2, 1, 7),
+            index_1d(4, 1, 7),
+            index_1d(5, 1, 7),
         ]
 
         def test_calculates_playable_area_of_board_marking_all_playable_cells(self):
@@ -104,58 +104,58 @@ class DescribeVariantBoard(object):
 
         def test_returns_list_of_positions_reachable_by_pusher_movement_only(self):
             expected = [
-                INDEX(5, 1, 7),
-                INDEX(4, 1, 7),
-                INDEX(3, 1, 7),
-                INDEX(3, 2, 7),
-                INDEX(3, 3, 7),
-                INDEX(2, 3, 7),
-                INDEX(1, 3, 7),
-                INDEX(1, 2, 7),
-                INDEX(1, 1, 7),
+                index_1d(5, 1, 7),
+                index_1d(4, 1, 7),
+                index_1d(3, 1, 7),
+                index_1d(3, 2, 7),
+                index_1d(3, 3, 7),
+                index_1d(2, 3, 7),
+                index_1d(1, 3, 7),
+                index_1d(1, 2, 7),
+                index_1d(1, 1, 7),
             ]
             assert_that(
                 self.variant_board.positions_reachable_by_pusher(
-                    pusher_position=INDEX(5, 1, 7)
+                    pusher_position=index_1d(5, 1, 7)
                 ),
                 equal_to(expected)
             )
 
         def test_doesnt_require_that_start_position_actually_contain_pusher(self):
             expected = [
-                INDEX(4, 1, 7),
-                INDEX(3, 1, 7),
-                INDEX(3, 2, 7),
-                INDEX(3, 3, 7),
-                INDEX(2, 3, 7),
-                INDEX(1, 3, 7),
-                INDEX(1, 2, 7),
-                INDEX(1, 1, 7),
+                index_1d(4, 1, 7),
+                index_1d(3, 1, 7),
+                index_1d(3, 2, 7),
+                index_1d(3, 3, 7),
+                index_1d(2, 3, 7),
+                index_1d(1, 3, 7),
+                index_1d(1, 2, 7),
+                index_1d(1, 1, 7),
             ]
             assert_that(
                 self.variant_board.positions_reachable_by_pusher(
-                    pusher_position=INDEX(4, 1, 7)
+                    pusher_position=index_1d(4, 1, 7)
                 ),
                 equal_to(expected)
             )
 
         def test_can_exclude_some_positions(self):
             expected = [
-                INDEX(5, 1, 7),
-                INDEX(4, 1, 7),
-                INDEX(3, 1, 7),
-                INDEX(3, 2, 7),
+                index_1d(5, 1, 7),
+                index_1d(4, 1, 7),
+                index_1d(3, 1, 7),
+                index_1d(3, 2, 7),
             ]
             excluded = [
-                INDEX(3, 3, 7),
-                INDEX(2, 3, 7),
-                INDEX(1, 3, 7),
-                INDEX(1, 2, 7),
-                INDEX(1, 1, 7),
+                index_1d(3, 3, 7),
+                index_1d(2, 3, 7),
+                index_1d(1, 3, 7),
+                index_1d(1, 2, 7),
+                index_1d(1, 1, 7),
             ]
             assert_that(
                 self.variant_board.positions_reachable_by_pusher(
-                    pusher_position=INDEX(5, 1, 7),
+                    pusher_position=index_1d(5, 1, 7),
                     excluded_positions=excluded
                 ),
                 equal_to(expected)
@@ -179,26 +179,26 @@ class DescribeVariantBoard(object):
         def test_returns_top_left_position_of_pusher_in_his_reachable_area(self):
             assert_that(
                 self.variant_board.normalized_pusher_position(
-                    pusher_position=INDEX(5, 1, 7)
+                    pusher_position=index_1d(5, 1, 7)
                 ),
-                equal_to(INDEX(1, 1, 7))
+                equal_to(index_1d(1, 1, 7))
             )
 
         def test_doesnt_require_that_start_position_actually_contain_pusher(self):
             assert_that(
                 self.variant_board.normalized_pusher_position(
-                    pusher_position=INDEX(4, 1, 7)
+                    pusher_position=index_1d(4, 1, 7)
                 ),
-                equal_to(INDEX(1, 1, 7))
+                equal_to(index_1d(1, 1, 7))
             )
 
         def test_can_exclude_some_positions(self):
             assert_that(
                 self.variant_board.normalized_pusher_position(
-                    pusher_position=INDEX(4, 1, 7),
-                    excluded_positions=[INDEX(1, 1, 7)]
+                    pusher_position=index_1d(4, 1, 7),
+                    excluded_positions=[index_1d(1, 1, 7)]
                 ),
-                equal_to(INDEX(3, 1, 7))
+                equal_to(index_1d(3, 1, 7))
             )
 
         def test_raises_if_start_position_is_of_board(self):
@@ -212,10 +212,10 @@ class DescribeVariantBoard(object):
             direction_path = [
                 Direction.UP, Direction.RIGHT
             ]
-            start_position = INDEX(11, 8, variant_board.width)
+            start_position = index_1d(11, 8, variant_board.width)
             assert_that(
                 variant_board.path_destination(start_position, direction_path),
-                equal_to(INDEX(12, 7, variant_board.width))
+                equal_to(index_1d(12, 7, variant_board.width))
             )
 
         def test_silently_stops_search_on_first_of_board_position(
@@ -224,20 +224,20 @@ class DescribeVariantBoard(object):
             direction_path = [
                 Direction.DOWN, Direction.DOWN, Direction.DOWN
             ]
-            start_position = INDEX(11, 8, variant_board.width)
+            start_position = index_1d(11, 8, variant_board.width)
             assert_that(
                 variant_board.path_destination(start_position, direction_path),
-                equal_to(INDEX(11, 10, variant_board.width))
+                equal_to(index_1d(11, 10, variant_board.width))
             )
 
         def test_silently_stops_search_on_illegal_direction(self, variant_board):
             direction_path = [
                 Direction.DOWN, Direction.NORTH_WEST
             ]
-            start_position = INDEX(11, 8, variant_board.width)
+            start_position = index_1d(11, 8, variant_board.width)
             assert_that(
                 variant_board.path_destination(start_position, direction_path),
-                equal_to(INDEX(11, 9, variant_board.width))
+                equal_to(index_1d(11, 9, variant_board.width))
             )
 
         def test_raises_if_start_position_is_of_board(self, variant_board):
@@ -248,8 +248,8 @@ class DescribeVariantBoard(object):
         def test_returns_sequence_of_positions_defining_shortest_path_for_pusher_jump(
             self, variant_board
         ):
-            start_position = INDEX(11, 8, variant_board.width)
-            end_position = INDEX(8, 5, variant_board.width)
+            start_position = index_1d(11, 8, variant_board.width)
+            end_position = index_1d(8, 5, variant_board.width)
             expected = variant_board.position_path_to_direction_path(
                 variant_board.find_jump_path(start_position, end_position)
             )
@@ -273,8 +273,8 @@ class DescribeVariantBoard(object):
         def test_returns_sequence_of_positions_defining_shortest_path_for_pusher_movement_without_pushing_boxes(
             self, variant_board
         ):
-            start_position = INDEX(11, 8, variant_board.width)
-            end_position = INDEX(8, 5, variant_board.width)
+            start_position = index_1d(11, 8, variant_board.width)
+            end_position = index_1d(8, 5, variant_board.width)
             expected = variant_board.position_path_to_direction_path(
                 variant_board.find_move_path(start_position, end_position)
             )
@@ -298,7 +298,7 @@ class DescribeVariantBoard(object):
         def test_returns_empty_sequence_if_movement_is_blocked(self, variant_board):
             assert_that(
                 variant_board.find_move_path(
-                    INDEX(11, 8, variant_board.width), 0
+                    index_1d(11, 8, variant_board.width), 0
                 ), equal_to([])
             )
 

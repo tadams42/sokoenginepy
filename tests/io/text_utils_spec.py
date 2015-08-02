@@ -1,13 +1,13 @@
 import pytest
 from hamcrest import assert_that, equal_to
 
-from sokoengine import BoardConversionError, GameSolvingMode, AtomicMove,\
+from sokoenginepy import BoardConversionError, GameSolvingMode, AtomicMove,\
     Direction, SnapshotConversionError
 
-from sokoengine.core import Tessellation
+from sokoenginepy.core import Tessellation
 
-from sokoengine.io import *
-from sokoengine.io.text_utils import Rle
+from sokoenginepy.io import *
+from sokoenginepy.io.text_utils import Rle
 
 
 class Describe_is_board_string(object):
@@ -101,6 +101,7 @@ class Describe_parse_board_string(object):
             "##  $ #### ",
             "# $.+ #    ",
             "#######    ",
+            "           ",
         ]
         parsed = parse_board_string(src)
         assert_that(parsed, equal_to(result))
@@ -116,7 +117,10 @@ class Describe_parse_board_string(object):
             " ## @ *   #   ",
             "##  $ ####    ",
             "# $.+ #       ",
+            "              ",
+            "              ",
             "#######       ",
+            "              ",
         ]
         parsed = parse_board_string(src)
         assert_that(parsed, equal_to(result))
@@ -139,10 +143,16 @@ class Describe_parse_board_string(object):
         result = [
             " ##########",
             "           ",
+            "           ",
             " ## @ *   #",
+            "           ",
             "##  $ #### ",
+            "           ",
             "# $.+ #    ",
+            "           ",
             "#######    ",
+            "           ",
+            "           ",
         ]
         parsed = parse_board_string(src)
         assert_that(parsed, equal_to(result))

@@ -1,0 +1,8 @@
+include LICENSE.md pytest.ini tox.ini
+recursive-include tests *
+recursive-exclude tests *.pyc
+recursive-exclude tests *.pyo
+recursive-include docs *
+recursive-exclude docs *.pyc
+recursive-exclude docs *.pyo
+prune docs/build

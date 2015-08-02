@@ -9,3 +9,7 @@ build/
 .idea
 htmlcov
 .coverage
+.venv/
+Untitled.ipynb
+main.py
+dist

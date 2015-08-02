@@ -1,8 +1,8 @@
 import pytest
 from hamcrest import assert_that, equal_to, is_, empty, is_not
 from unittest.mock import Mock, call
-from sokoengine import SokobanPlus, Piece, SokobanPlusDataError
-from sokoengine.game import SokobanPlusValidator
+from sokoenginepy import SokobanPlus, Piece, SokobanPlusDataError
+from sokoenginepy.game import SokobanPlusValidator
 from factories import SokobanPlusFactory
 
 

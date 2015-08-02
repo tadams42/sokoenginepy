@@ -3,14 +3,14 @@ import factory
 
 from helpers import fake
 
-from sokoengine import (
+from sokoenginepy import (
     AtomicMove, Direction, BoardCell, GameSnapshot, Variant,
-    GameSolvingMode, SokobanPlus, Piece
+    GameSolvingMode, SokobanPlus, Piece, OutputSettings
 )
-from sokoengine.game import SokobanPlusValidator
-from sokoengine.io import BoardEncodingCharacters
-from sokoengine.variant import SokobanBoard
-from sokoengine.core import Tessellation
+from sokoenginepy.game import SokobanPlusValidator
+from sokoenginepy.io import BoardEncodingCharacters
+from sokoenginepy.variant import SokobanBoard
+from sokoenginepy.core import Tessellation
 
 
 class PieceFactory(factory.Factory):
@@ -165,3 +165,7 @@ def sokoban_tessellation():
 @pytest.fixture
 def trioban_tessellation():
     return Tessellation.factory('trioban')
+
+@pytest.fixture
+def output_settings():
+    return OutputSettings(use_visible_floors=True)
