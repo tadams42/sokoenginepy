@@ -23,9 +23,6 @@ loaded with features:
 sokoenginepy was inspired by `SokobanYASC`_, `JSoko`_, `MazezaM`_
 
 
-Install
--------
-
 Installing sokoenginepy should be as simple as::
 
     pip install sokoenginepy
@@ -33,32 +30,11 @@ Installing sokoenginepy should be as simple as::
 Note that sokoenginepy requires Python 3.4 or newer.
 
 
-User's Guide
-------------
-
 .. toctree::
    :maxdepth: 2
 
    tutorial
-
-
-API Reference
--------------
-
-.. toctree::
-   :maxdepth: 2
-
    api
-
-
-Additional notes
-----------------
-
-Design notes and legal information are here for the interested.
-
-.. toctree::
-   :maxdepth: 2
-
    license
    development
 

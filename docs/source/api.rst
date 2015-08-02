@@ -1,20 +1,19 @@
 API Reference
 =============
 
-.. module:: sokoenginepy
+.. toctree::
+   :maxdepth: 2
 
-Core
-----
+   api/core
+   api/exceptions
+   api/game
+   api/io
+   api/variant
 
-I/O
----
 
-Game
-----
+sokoenginepy
+------------
 
-Variant
--------
-
-Exceptions
-----------
-
+.. automodule:: sokoenginepy
+   :members:
+   :undoc-members:

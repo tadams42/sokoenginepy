@@ -3,19 +3,28 @@ sokoenginepy
 ============
 
 .. image:: https://img.shields.io/pypi/v/sokoenginepy.svg
-    :target: https://pypi.python.org/pypi/sokoenginepy
+  :target: https://pypi.python.org/pypi/sokoenginepy
+  :alt: PyPI release version
 
 .. image:: https://travis-ci.org/tadamic/sokoenginepy.svg?branch=development
-    :target: https://travis-ci.org/tadamic/sokoenginepy
+  :target: https://travis-ci.org/tadamic/sokoenginepy
+  :alt: TravisCI status
 
 .. image:: https://coveralls.io/repos/tadamic/sokoenginepy/badge.svg?branch=development
-    :target: https://coveralls.io/github/tadamic/sokoenginepy?branch=development
+  :target: https://coveralls.io/github/tadamic/sokoenginepy?branch=development
+  :alt: Coveralls status
+
+.. image:: https://readthedocs.org/projects/sokoenginepy/badge/
+  :target: http://sokoenginepy.readthedocs.org/
+  :alt: Documentation Status
 
 .. image:: https://img.shields.io/badge/language-Python3-blue.svg
-    :target: https://www.python.org/
+  :target: https://www.python.org/
+  :alt: Language
 
 .. image:: https://img.shields.io/badge/license-GPLv3-brightgreen.svg
-    :target: http://opensource.org/licenses/GPL-3.0
+  :target: http://opensource.org/licenses/GPL-3.0
+  :alt: License
 
 
 Sokoban and variants game engine
