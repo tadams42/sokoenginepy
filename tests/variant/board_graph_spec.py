@@ -56,36 +56,36 @@ class DescribeBoardGraph(object):
             board_graph = BoardGraph(4, GraphType.DIRECTED_MULTI)
             board_graph.reconfigure_edges(2, 2, trioban_tessellation)
 
-            assert_that(len(board_graph._graph[0][1]), equal_to(2))
-            assert_that(len(board_graph._graph[1][0]), equal_to(2))
+            assert_that(board_graph.out_edges_count(0, 1), equal_to(2))
+            assert_that(board_graph.out_edges_count(1, 0), equal_to(2))
 
     class describe__out_edge_weight(object):
         def test_returns_max_weigth_for_wall_cell_target(self, board_graph):
             board_graph[1].is_wall = True
             assert_that(
-                board_graph.out_edge_weight([0, 1]),
+                board_graph.out_edge_weight(1),
                 equal_to(BoardGraph.MAX_EDGE_WEIGHT)
             )
 
         def test_returns_max_weigth_for_pusher_cell_target(self, board_graph):
             board_graph[1].has_pusher = True
             assert_that(
-                board_graph.out_edge_weight([0, 1]),
+                board_graph.out_edge_weight(1),
                 equal_to(BoardGraph.MAX_EDGE_WEIGHT)
             )
 
         def test_returns_max_weigth_for_box_cell_target(self, board_graph):
             board_graph[1].has_box = True
             assert_that(
-                board_graph.out_edge_weight([0, 1]),
+                board_graph.out_edge_weight(1),
                 equal_to(BoardGraph.MAX_EDGE_WEIGHT)
             )
 
         def test_returns_one_for_other_cells(self, board_graph):
             board_graph[1].clear()
-            assert_that(board_graph.out_edge_weight([0, 1]), equal_to(1))
+            assert_that(board_graph.out_edge_weight(1), equal_to(1))
             board_graph[1].has_goal = True
-            assert_that(board_graph.out_edge_weight([0, 1]), equal_to(1))
+            assert_that(board_graph.out_edge_weight(1), equal_to(1))
 
     class describe__reachables(object):
         board_str = "\n".join([

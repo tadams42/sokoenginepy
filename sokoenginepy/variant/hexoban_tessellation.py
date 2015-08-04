@@ -4,7 +4,7 @@ from ..core import (
 )
 from ..io import AtomicMoveCharacters
 from .hexoban_board import HexobanBoardResizer
-from .board_graph import GraphType
+from .common import GraphType
 
 
 class HexobanTessellation(Tessellation):

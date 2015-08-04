@@ -4,7 +4,7 @@ from ..core import (
 )
 from ..io import AtomicMoveCharacters
 from .trioban_board import TriobanBoardResizer
-from .board_graph import GraphType
+from .common import GraphType
 
 
 class TriobanTessellation(Tessellation):
