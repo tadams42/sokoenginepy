@@ -1,7 +1,7 @@
 from ..core import PrettyPrintable, SokobanPlusDataError
 from ..io import parse_sokoban_plus_data
 
-from .piece import Piece
+from .common import PieceConstants
 
 
 class SokobanPlus(PrettyPrintable):
@@ -37,7 +37,7 @@ class SokobanPlus(PrettyPrintable):
 
     Original implementation used number 99 for default plus ID. As there can be
     more than 99 boxes on board, sokoenginepy changes this detail and uses
-    Piece.DEFAULT_PLUS_ID as default plus ID. When loading older puzzles with
+    PieceConstants.DEFAULT_PLUS_ID as default plus ID. When loading older puzzles with
     Sokoban+, legacy default value is converted transparently.
     """
 
@@ -51,6 +51,7 @@ class SokobanPlus(PrettyPrintable):
         self._goalorder = goalorder
         self._is_enabled = False
         self._is_validated = False
+        self._is_valid = False
 
     @property
     def pieces_count(self):
@@ -59,16 +60,16 @@ class SokobanPlus(PrettyPrintable):
     def _rstrip_default_plus_ids(self, plus_ids_str):
         if self.pieces_count < type(self)._LEGACY_DEFAULT_PLUS_ID:
             return plus_ids_str.rstrip(
-                str(Piece.DEFAULT_PLUS_ID) +
+                str(PieceConstants.DEFAULT_PLUS_ID) +
                 " " +
                 str(type(self)._LEGACY_DEFAULT_PLUS_ID)
             )
         else:
-            return plus_ids_str.rstrip(str(Piece.DEFAULT_PLUS_ID) + " ")
+            return plus_ids_str.rstrip(str(PieceConstants.DEFAULT_PLUS_ID) + " ")
 
     @property
     def boxorder(self):
-        if self._is_validated:
+        if self.is_valid:
             return self._rstrip_default_plus_ids(
                 " ".join(str(i) for i in self._box_plus_ids)
             )
@@ -77,7 +78,7 @@ class SokobanPlus(PrettyPrintable):
 
     @property
     def goalorder(self):
-        if self._is_validated:
+        if self.is_valid:
             return self._rstrip_default_plus_ids(
                 " ".join(str(i) for i in self._goal_plus_ids)
             )
@@ -92,13 +93,19 @@ class SokobanPlus(PrettyPrintable):
         }
 
     @property
+    def is_valid(self):
+        self._validate()
+        return self._is_valid
+
+    @property
     def is_enabled(self):
         return self._is_enabled
 
     @is_enabled.setter
     def is_enabled(self, value):
         if value:
-            self._validate()
+            if not self.is_valid:
+                raise SokobanPlusDataError(self.errors)
             self._is_enabled = True
         else:
             self._is_enabled = False
@@ -119,9 +126,9 @@ class SokobanPlus(PrettyPrintable):
 
     def _get_plus_id(self, for_id, from_where):
         if not self.is_enabled:
-            return Piece.DEFAULT_PLUS_ID
+            return PieceConstants.DEFAULT_PLUS_ID
         else:
-            return from_where[for_id - Piece.DEFAULT_PLUS_ID]
+            return from_where[for_id - PieceConstants.DEFAULT_PLUS_ID]
 
     def _normalize_ids_list(self, ids_list):
         """
@@ -136,14 +143,14 @@ class SokobanPlus(PrettyPrintable):
         ]
 
         replaced = [
-            Piece.DEFAULT_PLUS_ID
+            PieceConstants.DEFAULT_PLUS_ID
             if (i == type(self)._LEGACY_DEFAULT_PLUS_ID and
                 self.pieces_count < type(self)._LEGACY_DEFAULT_PLUS_ID)
             else i
             for i in trimmed
         ]
 
-        return replaced + [Piece.DEFAULT_PLUS_ID] * (
+        return replaced + [PieceConstants.DEFAULT_PLUS_ID] * (
             self.pieces_count - len(replaced)
         )
 
@@ -156,16 +163,15 @@ class SokobanPlus(PrettyPrintable):
         )
 
     def _validate(self):
-        if self._is_validated:
+        if self._is_validated and self._is_valid:
             return
 
         self._parse()
         self._is_validated = True
 
         validator = SokobanPlusValidator(self)
-
-        if not validator.is_valid:
-            raise SokobanPlusDataError(validator.errors)
+        self._is_valid = validator.is_valid()
+        self.errors = validator.errors
 
 
 class SokobanPlusValidator(object):
@@ -174,12 +180,11 @@ class SokobanPlusValidator(object):
         self._is_valid = False
         self.errors = []
 
-    @property
     def is_valid(self):
         self.errors = []
 
-        self._validate_plus_ids_by_piece(self.sokoban_plus._box_plus_ids)
-        self._validate_plus_ids_by_piece(self.sokoban_plus._goal_plus_ids)
+        self._validate_plus_ids(self.sokoban_plus._box_plus_ids)
+        self._validate_plus_ids(self.sokoban_plus._goal_plus_ids)
         self._validate_piece_count()
         self._validate_ids_counts()
         self._validate_id_sets_equality()
@@ -187,9 +192,14 @@ class SokobanPlusValidator(object):
         self._is_valid = len(self.errors) == 0
         return self._is_valid
 
-    def _validate_plus_ids_by_piece(self, ids):
+    def _is_valid_plus_id(self, plus_id):
+        return (
+            isinstance(plus_id, int) and plus_id >= PieceConstants.DEFAULT_PLUS_ID
+        )
+
+    def _validate_plus_ids(self, ids):
         for i in ids:
-            if not Piece.is_valid_plus_id(i):
+            if not self._is_valid_plus_id(i):
                 self.errors.append("Invalid Sokoban+ ID: {0}".format(i))
 
     def _validate_piece_count(self):
@@ -210,16 +220,16 @@ class SokobanPlusValidator(object):
             self.errors.append(error_template.format("goalorder"))
 
     def _validate_id_sets_equality(self):
-        self.sorted_boxorder = [
-            id for id in sorted(self.sokoban_plus._box_plus_ids)
-            if id != Piece.DEFAULT_PLUS_ID
-        ]
-        self.sorted_goalorder = [
-            id for id in sorted(self.sokoban_plus._goal_plus_ids)
-            if id != Piece.DEFAULT_PLUS_ID
-        ]
+        boxes = set(
+            id for id in self.sokoban_plus._box_plus_ids
+            if id != PieceConstants.DEFAULT_PLUS_ID
+        )
+        goals = set(
+            id for id in self.sokoban_plus._goal_plus_ids
+            if id != PieceConstants.DEFAULT_PLUS_ID
+        )
 
-        if self.sorted_boxorder != self.sorted_goalorder:
+        if boxes != goals:
             self.errors.append(
                 "Sokoban+ data doesn't define equal sets of IDs for boxes and goals"
             )

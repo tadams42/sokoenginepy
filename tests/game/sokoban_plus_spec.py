@@ -1,7 +1,7 @@
 import pytest
 from hamcrest import assert_that, equal_to, is_, empty, is_not
 from unittest.mock import Mock, call
-from sokoenginepy import SokobanPlus, Piece, SokobanPlusDataError
+from sokoenginepy import SokobanPlus, PieceConstants, SokobanPlusDataError
 from sokoenginepy.game import SokobanPlusValidator
 from factories import SokobanPlusFactory
 
@@ -36,14 +36,14 @@ class DescribeSokobanPlus(object):
             self, sokoban_plus
         ):
             assert_that(
-                sokoban_plus.box_plus_id(42), equal_to(Piece.DEFAULT_PLUS_ID)
+                sokoban_plus.box_plus_id(42), equal_to(PieceConstants.DEFAULT_PLUS_ID)
             )
 
         def test_it_returns_box_plus_id_for_enabled_sokoban_plus(self, sokoban_plus):
             sokoban_plus.is_enabled = True
             assert_that(
                 sokoban_plus.box_plus_id(2),
-                equal_to(sokoban_plus._box_plus_ids[2 - Piece.DEFAULT_PLUS_ID])
+                equal_to(sokoban_plus._box_plus_ids[2 - PieceConstants.DEFAULT_PLUS_ID])
             )
 
     class Describe_getter_for_goal_plus_id(object):
@@ -51,14 +51,14 @@ class DescribeSokobanPlus(object):
             self, sokoban_plus
         ):
             assert_that(
-                sokoban_plus.goal_plus_id(42), equal_to(Piece.DEFAULT_PLUS_ID)
+                sokoban_plus.goal_plus_id(42), equal_to(PieceConstants.DEFAULT_PLUS_ID)
             )
 
         def test_it_returns_goal_plus_id_for_enabled_sokoban_plus(self, sokoban_plus):
             sokoban_plus.is_enabled = True
             assert_that(
                 sokoban_plus.goal_plus_id(2),
-                equal_to(sokoban_plus._goal_plus_ids[2 - Piece.DEFAULT_PLUS_ID])
+                equal_to(sokoban_plus._goal_plus_ids[2 - PieceConstants.DEFAULT_PLUS_ID])
             )
 
     class When_it_is_set_to_enabled(object):
@@ -87,11 +87,11 @@ class DescribeSokobanPlus(object):
             sokoban_plus.is_enabled = True
             assert_that(
                 sokoban_plus.boxorder,
-                equal_to("1 5 42 {0} 23".format(Piece.DEFAULT_PLUS_ID))
+                equal_to("1 5 42 {0} 23".format(PieceConstants.DEFAULT_PLUS_ID))
             )
             assert_that(
                 sokoban_plus.goalorder,
-                equal_to("1 5 42 {0} 23".format(Piece.DEFAULT_PLUS_ID))
+                equal_to("1 5 42 {0} 23".format(PieceConstants.DEFAULT_PLUS_ID))
             )
 
         def test_it_doesnt_convert_legacy_plus_ids_if_piece_count_is_greater_than_legacy_plus_id(
@@ -115,18 +115,18 @@ class DescribeSokobanPlus(object):
 
 class DescribeSokobanPlusValidator(object):
     def test_is_valid_calls_all_validators(self, sokoban_plus_validator):
-        sokoban_plus_validator._validate_plus_ids_by_piece = Mock()
+        sokoban_plus_validator._validate_plus_ids = Mock()
         sokoban_plus_validator._validate_piece_count = Mock()
         sokoban_plus_validator._validate_ids_counts = Mock()
         sokoban_plus_validator._validate_id_sets_equality = Mock()
-        sokoban_plus_validator.is_valid
+        sokoban_plus_validator.is_valid()
 
         assert_that(
-            sokoban_plus_validator._validate_plus_ids_by_piece.call_count,
+            sokoban_plus_validator._validate_plus_ids.call_count,
             equal_to(2)
         )
         assert_that(
-            sokoban_plus_validator._validate_plus_ids_by_piece.call_args_list,
+            sokoban_plus_validator._validate_plus_ids.call_args_list,
             equal_to([
                 call(sokoban_plus_validator.sokoban_plus._box_plus_ids),
                 call(sokoban_plus_validator.sokoban_plus._goal_plus_ids),
@@ -143,15 +143,13 @@ class DescribeSokobanPlusValidator(object):
             equal_to(True)
         )
 
-    def test_validates_all_plus_ids_using_piece(self, sokoban_plus_validator):
-        method_backup = Piece.is_valid_plus_id
-
-        Piece.is_valid_plus_id = Mock(return_value=True)
-        sokoban_plus_validator._validate_plus_ids_by_piece(
+    def test_validates_all_plus_ids(self, sokoban_plus_validator):
+        sokoban_plus_validator._is_valid_plus_id = Mock(return_value=True)
+        sokoban_plus_validator._validate_plus_ids(
             sokoban_plus_validator.sokoban_plus._box_plus_ids
         )
         assert_that(
-            Piece.is_valid_plus_id.call_args_list,
+            sokoban_plus_validator._is_valid_plus_id.call_args_list,
             equal_to([
                 call(id)
                 for id in sokoban_plus_validator.sokoban_plus._box_plus_ids
@@ -159,13 +157,11 @@ class DescribeSokobanPlusValidator(object):
         )
         assert_that(sokoban_plus_validator.errors, is_(empty()))
 
-        Piece.is_valid_plus_id = Mock(return_value=False)
-        sokoban_plus_validator._validate_plus_ids_by_piece(
+        sokoban_plus_validator._is_valid_plus_id = Mock(return_value=False)
+        sokoban_plus_validator._validate_plus_ids(
             sokoban_plus_validator.sokoban_plus._box_plus_ids
         )
         assert_that(sokoban_plus_validator.errors, is_not(empty()))
-
-        Piece.is_valid_plus_id = method_backup
 
     def test_validates_piece_count_is_greater_than_zero(
         self, sokoban_plus_validator
@@ -208,4 +204,4 @@ class DescribeSokobanPlusValidator(object):
         sokoban_plus._parse()
         validator = SokobanPlusValidator(sokoban_plus)
 
-        assert_that(validator.is_valid, equal_to(True))
+        assert_that(validator.is_valid(), equal_to(True))

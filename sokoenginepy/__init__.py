@@ -13,8 +13,8 @@ from .core import (
 )
 
 from .game import (
-    GameSolvingMode, GameSnapshot, AtomicMove, BoardCell, Box, Pusher, Goal,
-    Piece, SokobanPlus,
+    GameSolvingMode, GameSnapshot, AtomicMove, BoardCell, PieceConstants,
+    SokobanPlus,
 )
 
 from .io import OutputSettings, Puzzle, PuzzleSnapshot, PuzzlesCollection
@@ -38,7 +38,7 @@ __all__ = [
     'GameSolvingMode',
     'AtomicMove',
     'BoardCell',
-    'Box', 'Pusher', 'Goal', 'Piece',
+    'PieceConstants',
     'SokobanPlus',
     'GameSnapshot',
 

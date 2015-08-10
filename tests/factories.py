@@ -5,35 +5,12 @@ from helpers import fake
 
 from sokoenginepy import (
     AtomicMove, Direction, BoardCell, GameSnapshot, Variant,
-    GameSolvingMode, SokobanPlus, Piece, OutputSettings
+    GameSolvingMode, SokobanPlus, PieceConstants, OutputSettings
 )
 from sokoenginepy.game import SokobanPlusValidator
 from sokoenginepy.io import BoardEncodingCharacters
 from sokoenginepy.variant import SokobanBoard
 from sokoenginepy.core import Tessellation
-
-
-class PieceFactory(factory.Factory):
-    class Meta:
-        model = Piece
-
-    position = factory.LazyAttribute(
-        lambda x: fake.random_int(min=-100, max=100)
-    )
-    id = factory.LazyAttribute(
-        lambda x: fake.random_int(
-            min=Piece.DEFAULT_ID, max=Piece.DEFAULT_ID + 100
-        )
-    )
-    plus_id = factory.LazyAttribute(
-        lambda x: fake.random_int(
-            min=Piece.DEFAULT_PLUS_ID, max=Piece.DEFAULT_PLUS_ID + 100
-        )
-    )
-
-@pytest.fixture
-def piece():
-    return PieceFactory()
 
 
 class AtomicMoveFactory(factory.Factory):

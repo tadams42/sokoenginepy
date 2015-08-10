@@ -2,7 +2,7 @@ from ..core import (
     PrettyPrintable, EqualityComparable, InvalidPieceIdError, Direction
 )
 
-from .piece import Box, Pusher
+from .common import PieceConstants
 
 
 class AtomicMove(PrettyPrintable, EqualityComparable):
@@ -22,7 +22,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         self._box_moved = False
         self._pusher_selected = False
         self._pusher_jumped = False
-        self._pusher_id = Pusher.DEFAULT_ID
+        self._pusher_id = PieceConstants.DEFAULT_ID
         self._moved_box_id = None
         self.group_id = 0
 
@@ -63,9 +63,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
-        if value or value == 0:
-            if not Box.is_valid_id(value):
-                raise InvalidPieceIdError(value)
+        if value is not None:
             self._moved_box_id = value
             self.is_push_or_pull = True
         else:
@@ -81,8 +79,6 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
 
     @pusher_id.setter
     def pusher_id(self, value):
-        if not Pusher.is_valid_id(value):
-            raise InvalidPieceIdError
         self._pusher_id = value
 
     @property
