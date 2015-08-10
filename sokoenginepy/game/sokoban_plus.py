@@ -71,7 +71,7 @@ class SokobanPlus(PrettyPrintable):
     def boxorder(self):
         if self.is_valid:
             return self._rstrip_default_plus_ids(
-                " ".join(str(i) for i in self._box_plus_ids)
+                " ".join(str(i) for i in self._box_plus_ids.values())
             )
         else:
             return self._boxorder
@@ -80,7 +80,7 @@ class SokobanPlus(PrettyPrintable):
     def goalorder(self):
         if self.is_valid:
             return self._rstrip_default_plus_ids(
-                " ".join(str(i) for i in self._goal_plus_ids)
+                " ".join(str(i) for i in self._goal_plus_ids.values())
             )
         else:
             return self._goalorder
@@ -128,9 +128,9 @@ class SokobanPlus(PrettyPrintable):
         if not self.is_enabled:
             return PieceConstants.DEFAULT_PLUS_ID
         else:
-            return from_where[for_id - PieceConstants.DEFAULT_PLUS_ID]
+            return from_where[for_id - PieceConstants.DEFAULT_ID]
 
-    def _normalize_ids_list(self, ids_list):
+    def _collect_ids_dict(self, ids_list):
         """
         Safely replaces legacy default plus ids with default ones and fills ids
         list to pieces_count length with default plus ids.
@@ -150,15 +150,21 @@ class SokobanPlus(PrettyPrintable):
             for i in trimmed
         ]
 
-        return replaced + [PieceConstants.DEFAULT_PLUS_ID] * (
+        expanded = replaced + [PieceConstants.DEFAULT_PLUS_ID] * (
             self.pieces_count - len(replaced)
         )
 
+        retv = dict()
+        for index, plus_id in enumerate(expanded):
+            retv[PieceConstants.DEFAULT_ID + index] = plus_id
+
+        return retv
+
     def _parse(self):
-        self._box_plus_ids = self._normalize_ids_list(
+        self._box_plus_ids = self._collect_ids_dict(
             parse_sokoban_plus_data(self._boxorder)
         )
-        self._goal_plus_ids = self._normalize_ids_list(
+        self._goal_plus_ids = self._collect_ids_dict(
             parse_sokoban_plus_data(self._goalorder)
         )
 
@@ -227,11 +233,11 @@ class SokobanPlusValidator(object):
 
     def _validate_id_sets_equality(self):
         boxes = set(
-            id for id in self.sokoban_plus._box_plus_ids
+            id for id in self.sokoban_plus._box_plus_ids.values()
             if id != PieceConstants.DEFAULT_PLUS_ID
         )
         goals = set(
-            id for id in self.sokoban_plus._goal_plus_ids
+            id for id in self.sokoban_plus._goal_plus_ids.values()
             if id != PieceConstants.DEFAULT_PLUS_ID
         )
 

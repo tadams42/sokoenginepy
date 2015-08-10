@@ -45,7 +45,7 @@ class DescribeSokobanPlus(object):
             sokoban_plus.is_enabled = True
             assert_that(
                 sokoban_plus.box_plus_id(2),
-                equal_to(sokoban_plus._box_plus_ids[2 - PieceConstants.DEFAULT_PLUS_ID])
+                equal_to(sokoban_plus._box_plus_ids[2 - PieceConstants.DEFAULT_ID])
             )
 
     class Describe_getter_for_goal_plus_id(object):
@@ -60,7 +60,7 @@ class DescribeSokobanPlus(object):
             sokoban_plus.is_enabled = True
             assert_that(
                 sokoban_plus.goal_plus_id(2),
-                equal_to(sokoban_plus._goal_plus_ids[2 - PieceConstants.DEFAULT_PLUS_ID])
+                equal_to(sokoban_plus._goal_plus_ids[2 - PieceConstants.DEFAULT_ID])
             )
 
     class When_it_is_set_to_enabled(object):
@@ -199,9 +199,11 @@ class DescribeSokobanPlusValidator(object):
     ):
         sokoban_plus_validator._validate_id_sets_equality()
         assert_that(sokoban_plus_validator.errors, is_(empty()))
-        sokoban_plus_validator.sokoban_plus._box_plus_ids = (
-            sokoban_plus_validator.sokoban_plus._goal_plus_ids + [1, 2, 3]
-        )
+
+        sokoban_plus_validator.sokoban_plus._box_plus_ids = \
+            sokoban_plus_validator.sokoban_plus._goal_plus_ids.copy()
+        sokoban_plus_validator.sokoban_plus._box_plus_ids[42000] = 24000
+
         sokoban_plus_validator._validate_id_sets_equality()
         assert_that(sokoban_plus_validator.errors, is_not(empty()))
 
