@@ -166,12 +166,18 @@ class SokobanPlus(PrettyPrintable):
         if self._is_validated and self._is_valid:
             return
 
-        self._parse()
-        self._is_validated = True
+        self._is_valid = True
+        self.errors = []
+        try:
+            self._parse()
+        except SokobanPlusDataError as e:
+            self.errors.append(str(e))
+            self._is_valid = False
 
         validator = SokobanPlusValidator(self)
-        self._is_valid = validator.is_valid()
+        self._is_valid = self._is_valid and validator.is_valid()
         self.errors = validator.errors
+        self._is_validated = True
 
 
 class SokobanPlusValidator(object):
@@ -203,7 +209,7 @@ class SokobanPlusValidator(object):
                 self.errors.append("Invalid Sokoban+ ID: {0}".format(i))
 
     def _validate_piece_count(self):
-        if self.sokoban_plus.pieces_count <= 0:
+        if self.sokoban_plus.pieces_count < 0:
             self.errors.append("Sokoban+ can't be applied to zero pieces count.")
 
     def _validate_ids_counts(self):

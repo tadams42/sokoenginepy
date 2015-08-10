@@ -18,16 +18,18 @@ class DescribeSokobanPlus(object):
             assert_that(sokoban_plus.is_enabled, equal_to(False))
 
     class Describe_boxorder_and_goalorder(object):
-        def test_they_return_order_object_from_init_if_sokoban_plus_is_not_validated(
+        def test_they_return_order_object_from_init_if_sokoban_plus_is_not_valid(
             self, sokoban_plus
         ):
-            assert_that(sokoban_plus._is_validated, equal_to(False))
-            assert_that(sokoban_plus.boxorder, equal_to(sokoban_plus._boxorder))
-            assert_that(sokoban_plus.goalorder, equal_to(sokoban_plus._goalorder))
+            sokoban_plus = SokobanPlus(5, "1 2 3 4 5 6", "6 5 4 3 2 1")
+            assert_that(sokoban_plus.boxorder, equal_to("1 2 3 4 5 6"))
+            assert_that(sokoban_plus.goalorder, equal_to("6 5 4 3 2 1"))
+            sokoban_plus = SokobanPlus(5, "foo", "bar")
+            assert_that(sokoban_plus.boxorder, equal_to("foo"))
+            assert_that(sokoban_plus.goalorder, equal_to("bar"))
 
-        def test_they_return_parsed_order_string_if_sokoban_plus_is_validated(self):
+        def test_they_return_parsed_order_string_if_sokoban_plus_is_valid(self):
             sokoban_plus = SokobanPlus(5, "1 2 0 3 0 ", "3 1 0 2 0 0 0")
-            sokoban_plus._validate()
             assert_that(sokoban_plus.boxorder, equal_to("1 2 0 3"))
             assert_that(sokoban_plus.goalorder, equal_to("3 1 0 2"))
 
@@ -163,7 +165,7 @@ class DescribeSokobanPlusValidator(object):
         )
         assert_that(sokoban_plus_validator.errors, is_not(empty()))
 
-    def test_validates_piece_count_is_greater_than_zero(
+    def test_validates_piece_count_is_greater_or_equal_than_zero(
         self, sokoban_plus_validator
     ):
         sokoban_plus_validator._validate_piece_count()
@@ -181,6 +183,17 @@ class DescribeSokobanPlusValidator(object):
         sokoban_plus_validator._validate_ids_counts()
         assert_that(sokoban_plus_validator.errors, is_not(empty()))
 
+    def test_validates_there_are_not_to_many_ids(self):
+        sokoban_plus = SokobanPlusFactory(
+            goalorder="1 2 3 4 5 6",
+            boxorder="5 4 3 2 1",
+            pieces_count=5
+        )
+        sokoban_plus._parse()
+        validator = SokobanPlusValidator(sokoban_plus)
+
+        assert_that(validator.is_valid(), equal_to(False))
+
     def test_validates_same_id_set_is_defined_for_both_piece_types(
         self, sokoban_plus_validator
     ):
@@ -191,7 +204,6 @@ class DescribeSokobanPlusValidator(object):
         )
         sokoban_plus_validator._validate_id_sets_equality()
         assert_that(sokoban_plus_validator.errors, is_not(empty()))
-
 
     def test_it_allows_that_there_are_duplicate_plus_ids_for_same_piece_type(
         self
