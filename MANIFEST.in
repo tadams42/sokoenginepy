@@ -1,4 +1,4 @@
-include LICENSE.md pytest.ini tox.ini scripts/cloc.sh scripts/generate_tests.py
+include LICENSE.md tox.ini .pylintrc .travis.yml scripts/cloc.sh scripts/generate_tests.py
 recursive-include tests *
 recursive-exclude tests *.pyc
 recursive-exclude tests *.pyo

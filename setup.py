@@ -28,64 +28,63 @@ setup_requirements = [
 ] + pytest_runner
 
 install_requirements = [
-    'Unipath >=1.1',
+    'Unipath >=1.1.0',
     'pytz >=2016.6.1',
-    'pyparsing >=2.1',
-    # Alternative that is A LOT faster but fails install on Python 3.4
+    'pyparsing >=2.1.0',
+    # Alternative that is A LOT faster but install through pip is not supported
     # 'graph-tool >=2.11'
     'networkx >=1.11',
 ]
 
 dev_requirements = [
-    'pep8 >=1.7',
-    'flake8 >=3.0',
-    # 'mccabe >=0.5',
-    # 'pep257 >=0.7',
-    # 'pylint >=1.6',
-    # 'pylama >=7.1',
-    # 'pylama-pylint',
-    'yapf >=0.11',
+    'pycodestyle >=2.0.0',  # (formerly called pep8)
+    'mccabe >=0.5.0',
+    'pylint >=1.6.0',
+    'yapf >=0.11.0',
+    # 'flake8 >=3.0.0',
+    # 'pep257 >=0.7.0',
+    # 'pylama >=7.1.0',
+    # 'pylama-pylint >=2.2.1',
 
     # IPython stuff
-    'ipython >=5.0',
-    'jupyter >=1.0',
-    'ipdb >=0.10',
+    'ipython >=5.0.0',
+    'jupyter >=1.0.0',
+    'ipdb >=0.10.0',
 
     # Petty stacktrace
-    'colored-traceback >=0.2',
+    'colored-traceback >=0.2.0',
 
     # Animation and graph debugging
-    'scipy >=0.18',
-    'moviepy >=0.2',
-    'matplotlib >=1.5',
+    'scipy >=0.18.0',
+    'moviepy >=0.2.0',
+    'matplotlib >=1.5.0',
 
     # Docs and viewers
-    'Sphinx >=1.4',
-    'restview >=2.6',
-    'grip >=4.3',
+    'Sphinx >=1.4.0',
+    'restview >=2.6.0',
+    'grip >=4.3.0',
 
     # Profiler
-    'snakeviz >=0.4',
+    'snakeviz >=0.4.0',
 
-    'check-manifest >= 0.33',
-    'pytest-colordots >=0.1',
+    'check-manifest >= 0.33.0',
+    'pytest-colordots >=0.1.0',
 ]
 
 test_requirements = [
-    'pytest>=3.0',
-    'pytest-spec>=1.0',
-    'pytest-cov>=2.3',
-    'factory-boy>=2.7',
-    'fake-factory>=0.6',
-    'PyHamcrest>=1.9',
-    'pyexcel-ods3>=0.2',
-    'lxml>=3.6',
-    'tox>=2.3',
-    'coverage>=4.2',
-    'flake8>=3.0',
-    'check-manifest>=0.33',
-    'docutils >=0.12',
-    'Pygments >=2.1.3'
+    'pytest>=3.0.0',
+    'pytest-spec>=1.0.0',
+    'pytest-cov>=2.3.0',
+    'factory-boy>=2.7.0',
+    'fake-factory>=0.6.0',
+    'PyHamcrest>=1.9.0',
+    'pyexcel-ods3>=0.2.0',
+    'lxml>=3.6.0',
+    'tox>=2.3.0',
+    'coverage>=4.2.0',
+    'check-manifest>=0.33.0',
+    'docutils >=0.12.0',
+    'Pygments >=2.1.0'
 ]
 
 setup(
