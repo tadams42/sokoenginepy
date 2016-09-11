@@ -9,11 +9,12 @@ env:
   - TOXENV=py35
 
 install:
-  - pip install coveralls
+  - pip install tox
 
 script:
   - tox
 
 after_success:
+  - pip install coveralls
   - python setup.py test --adopts='--cov=sokoenginepy'
   - coveralls
