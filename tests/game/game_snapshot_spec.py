@@ -15,17 +15,21 @@ def forward_game_snapshot():
         moves_data="lurdLURD{lurd}LURD"
     )
 
+
 @pytest.fixture
 def moves_count():
     return 4
+
 
 @pytest.fixture
 def pushes_count():
     return 8
 
+
 @pytest.fixture
 def pusher_selections_count():
     return 1
+
 
 @pytest.fixture
 def reverse_game_snapshot():
@@ -34,9 +38,11 @@ def reverse_game_snapshot():
         moves_data="lurdLURD{lurd}[lurd]LURD"
     )
 
+
 @pytest.fixture
 def jumps_count():
     return 1
+
 
 @pytest.fixture
 def sokoban_game_snapshot():
@@ -44,6 +50,7 @@ def sokoban_game_snapshot():
         variant=Variant.SOKOBAN,
         moves_data="lurdLURD{lurd}LURD"
     )
+
 
 class DescribeGameSnapshot(object):
     class Describe_moves_count(object):
@@ -209,7 +216,7 @@ class DescribeGameSnapshot(object):
         def test_it_calls_recalc_jumps_before_returning_value(self, game_snapshot):
             game_snapshot._recalc_jumps_count = Mock()
             game_snapshot.jumps_count
-            game_snapshot._recalc_jumps_count.assert_called_once()
+            assert game_snapshot._recalc_jumps_count.call_count == 1
 
     class Describe_clear(object):
         def test_it_resets_internal_counters(self, game_snapshot):
