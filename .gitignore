@@ -1,5 +1,5 @@
 *.pyc
-**.egg-info/
+*.egg-info/
 .directory
 .tox/
 .eggs/
@@ -13,3 +13,4 @@ htmlcov
 Untitled.ipynb
 main.py
 dist
+.cache/

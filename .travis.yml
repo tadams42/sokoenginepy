@@ -4,16 +4,16 @@ language: python
 #   except:
 #     - gh-pages
 
-python:
-  - "3.4"
+env:
+  - TOXENV=py34
+  - TOXENV=py35
 
 install:
-  - pip install -e .[test]
   - pip install coveralls
 
 script:
-  - py.test --cov=sokoenginepy tests/
   - tox
 
 after_success:
+  - python setup.py test --adopts='--cov=sokoenginepy'
   - coveralls

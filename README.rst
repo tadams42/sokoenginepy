@@ -53,6 +53,17 @@ Installing sokoenginepy should be as simple as::
 
 Note that sokoenginepy requires Python 3.4 or newer.
 
+Development environment
+-----------------------
+
+.. code-block:: shell
+
+    pyvenv .venv
+    source .venv/bin/activate
+    pip install --upgrade pip
+    pip install --upgrade setuptools wheel twine
+    pip install -e .[dev,test]
+
 .. _SokobanYASC: http://sourceforge.net/projects/sokobanyasc/
 .. _JSoko: http://www.sokoban-online.de/
 .. _MazezaM: http://webpages.dcu.ie/~tyrrelma/MazezaM/
