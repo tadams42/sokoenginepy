@@ -18,5 +18,5 @@ script:
 
 after_success:
   - pip install coveralls
-  - python setup.py test --adopts='--cov=sokoenginepy'
+  - python setup.py test --addopts='--cov=sokoenginepy'
   - coveralls
