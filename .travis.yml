@@ -5,7 +5,6 @@ language: python
 #     - gh-pages
 
 env:
-  - TOXENV=py34
   - TOXENV=py35
 
 install:

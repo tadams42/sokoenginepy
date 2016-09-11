@@ -51,7 +51,7 @@ Installing sokoenginepy should be as simple as::
 
     pip install sokoenginepy
 
-Note that sokoenginepy requires Python 3.4 or newer.
+Note that sokoenginepy requires Python 3.5 or newer.
 
 Development environment
 -----------------------
