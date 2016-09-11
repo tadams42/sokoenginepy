@@ -84,7 +84,8 @@ test_requirements = [
     'coverage>=4.2',
     'flake8>=3.0',
     'check-manifest>=0.33',
-    'docutils >=0.12'
+    'docutils >=0.12',
+    'Pygments >=2.1.3'
 ]
 
 setup(
