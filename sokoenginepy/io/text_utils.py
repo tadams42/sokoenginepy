@@ -161,7 +161,7 @@ def is_atomic_move_char(character):
     )
 
 
-class Regexes(object):
+class Regexes:
 
     only_digits_and_spaces = re.compile(r"^([0-9\s])*$")
 
@@ -258,7 +258,7 @@ def ending_digits(line):
     return line, None
 
 
-class Rle(object):
+class Rle:
 
     @classmethod
     def encode(cls, line):
@@ -371,7 +371,7 @@ def parse_board_string(line):
     return normalize_width(Regexes.rle_splitter.split(line))
 
 
-class SnapshotStringParser(object):
+class SnapshotStringParser:
     """
     Parses and validates game snapshot string into sequence of AtomicMoves
     """

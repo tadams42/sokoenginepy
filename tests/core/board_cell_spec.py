@@ -5,9 +5,9 @@ from sokoenginepy import BoardCell, SokoengineError
 from sokoenginepy.io import BoardEncodingCharacters
 
 
-class DescribeBoardCell(object):
+class DescribeBoardCell:
 
-    class Describe_init(object):
+    class Describe_init:
 
         def it_sets_all_attributes(self):
             board_cell = BoardCellFactory(
@@ -40,7 +40,7 @@ class DescribeBoardCell(object):
             with pytest.raises(SokoengineError):
                 BoardCell(character="4")
 
-    class Describe_equality_comparisson(object):
+    class Describe_equality_comparisson:
 
         def it_doesnt_compare_secondary_flags(self, board_cell):
             board_cell2 = copy.copy(board_cell)
@@ -51,7 +51,7 @@ class DescribeBoardCell(object):
             board_cell2.is_in_playable_area = False
             assert board_cell == board_cell2
 
-    class Describe_has_pusher(object):
+    class Describe_has_pusher:
 
         def test_setter_puts_or_removes_pusher_on_cell(self, board_cell):
             board_cell.has_pusher = False
@@ -88,7 +88,7 @@ class DescribeBoardCell(object):
             assert board_cell.is_deadlock
             assert board_cell.is_in_playable_area
 
-    class Describe_has_box(object):
+    class Describe_has_box:
 
         def test_setter_puts_or_removes_box_on_cell(self, board_cell):
             board_cell.has_box = False
@@ -125,7 +125,7 @@ class DescribeBoardCell(object):
             assert board_cell.is_deadlock
             assert board_cell.is_in_playable_area
 
-    class Describe_has_goal(object):
+    class Describe_has_goal:
 
         def test_setter_puts_or_removes_goal_on_cell(self, board_cell):
             board_cell.has_goal = False
@@ -166,7 +166,7 @@ class DescribeBoardCell(object):
             assert board_cell.is_deadlock
             assert board_cell.is_in_playable_area
 
-    class Describe_is_wall(object):
+    class Describe_is_wall:
 
         def test_setter_puts_wall_on_cell_if_setting_to_true(self, board_cell):
             board_cell.is_wall = False
@@ -204,7 +204,7 @@ class DescribeBoardCell(object):
             assert board_cell.is_deadlock
             assert board_cell.is_in_playable_area
 
-    class Describe_switch_box_and_goal(object):
+    class Describe_switch_box_and_goal:
 
         def it_switches_box_for_goal(self, board_cell):
             board_cell.has_box = True
@@ -243,7 +243,7 @@ class DescribeBoardCell(object):
             assert not board_cell.has_goal
             assert not board_cell.has_box
 
-    class Describe_can_put_pusher_or_box(object):
+    class Describe_can_put_pusher_or_box:
 
         def it_returns_true_for_empty_floor(self, board_cell):
             assert board_cell.can_put_pusher_or_box
@@ -264,7 +264,7 @@ class DescribeBoardCell(object):
             board_cell.has_pusher = True
             assert not board_cell.can_put_pusher_or_box
 
-    class Describe_to_s(object):
+    class Describe_to_s:
 
         def it_converts_board_cell_to_printable_character(self, board_cell):
             board_cell.clear()

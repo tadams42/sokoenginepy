@@ -19,7 +19,7 @@ class SOKFileFormat:
         SOKWriter(dest_stream).write(puzzle_or_collection)
 
 
-class SOKTags(object):
+class SOKTags:
     AUTHOR = 'Author'
     TITLE = 'Title'
     GOALORDER = 'goalorder'
@@ -34,7 +34,7 @@ class SOKTags(object):
     TAG_DELIMITERS = "=:"
 
 
-class SOKReader(object):
+class SOKReader:
 
     def __init__(self, src_stream, dest_collection, variant_hint):
         self.src_stream = src_stream
@@ -375,7 +375,7 @@ class SOKReader(object):
         return "\n".join(line.strip() for line in lst)
 
 
-class SOKWriter(object):
+class SOKWriter:
 
     def __init__(self, dest_stream):
         self.dest_stream = dest_stream

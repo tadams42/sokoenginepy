@@ -2,7 +2,7 @@ from sokoenginepy import Direction
 from sokoenginepy.core import index_1d, X, Y, on_board_2d, on_board_1d
 
 
-class Describe_INDEX(object):
+class Describe_INDEX:
 
     def it_calculates_1D_index_from_2D_coordinates(self):
         assert index_1d(0, 0, 5) == 0
@@ -10,7 +10,7 @@ class Describe_INDEX(object):
         assert index_1d(3, 3, 5) == 18
 
 
-class Describe_X(object):
+class Describe_X:
 
     def it_calculates_X_coordinate_from_1D_index(self):
         assert X(0, 5) == 0
@@ -18,7 +18,7 @@ class Describe_X(object):
         assert X(18, 5) == 3
 
 
-class Describe_Y(object):
+class Describe_Y:
 
     def it_calculates_Y_coordinate_from_1D_index(self):
         assert Y(0, 5) == 0
@@ -26,7 +26,7 @@ class Describe_Y(object):
         assert Y(18, 5) == 3
 
 
-class Describe_on_board_2d(object):
+class Describe_on_board_2d:
 
     def it_checks_if_2D_coordinate_is_on_board(self):
         assert on_board_2d(0, 0, 3, 3)
@@ -35,7 +35,7 @@ class Describe_on_board_2d(object):
         assert not on_board_2d(3, 3, 3, 3)
 
 
-class Describe_on_board_1d(object):
+class Describe_on_board_1d:
 
     def it_checks_if_1D_coordinate_is_on_board(self):
         assert on_board_1d(0, 3, 3)
@@ -44,7 +44,7 @@ class Describe_on_board_1d(object):
         assert not on_board_1d(9, 3, 3)
 
 
-class DesctibeDirection_opposite(object):
+class DesctibeDirection_opposite:
 
     def it_returns_opposite_direction(self):
         assert Direction.UP.opposite == Direction.DOWN

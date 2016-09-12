@@ -2,9 +2,9 @@ from sokoenginepy import Direction, index_1d
 from sokoenginepy.variant import BoardGraph, GraphType, SokobanBoard
 
 
-class DescribeBoardGraph(object):
+class DescribeBoardGraph:
 
-    class describe__has_edge(object):
+    class describe__has_edge:
 
         def it_returs_true_if_edge_in_given_direction_exists(
             self, sokoban_tessellation
@@ -13,7 +13,7 @@ class DescribeBoardGraph(object):
             board_graph.reconfigure_edges(2, 2, sokoban_tessellation)
             assert board_graph.has_edge(0, 1, Direction.RIGHT)
 
-    class describe__reconfigure_edges(object):
+    class describe__reconfigure_edges:
 
         def it_reconfigures_all_edges_in_board(self, sokoban_tessellation):
             board_graph = BoardGraph(4, GraphType.DIRECTED)
@@ -36,7 +36,7 @@ class DescribeBoardGraph(object):
             assert board_graph.out_edges_count(0, 1) == 2
             assert board_graph.out_edges_count(1, 0) == 2
 
-    class describe__out_edge_weight(object):
+    class describe__out_edge_weight:
 
         def it_returns_max_weigth_for_wall_cell_target(self, board_graph):
             board_graph[1].is_wall = True
@@ -56,7 +56,7 @@ class DescribeBoardGraph(object):
             board_graph[1].has_goal = True
             assert board_graph.out_edge_weight(1) == 1
 
-    class describe__reachables(object):
+    class describe__reachables:
         board_str = "\n".join([
             # 123456
             "#######",  # 0

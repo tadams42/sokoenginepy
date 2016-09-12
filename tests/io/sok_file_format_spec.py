@@ -5,7 +5,7 @@ from helpers import TEST_RESOURCES_ROOT
 INPUT_FILES_ROOT = TEST_RESOURCES_ROOT.child('test_data')
 
 
-class DescribeSOKReader(object):
+class DescribeSOKReader:
 
     def it_loads_regular_collection_file(self):
         collection = PuzzlesCollection()
@@ -53,7 +53,7 @@ class DescribeSOKReader(object):
         assert collection.puzzles[1].title == title
         assert collection.puzzles[1].notes == note
 
-    class describe_choosing_puzzle_variant(object):
+    class describe_choosing_puzzle_variant:
 
         def it_defaults_to_sokoban_if_not_specified(self):
             collection = PuzzlesCollection()

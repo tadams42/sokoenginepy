@@ -5,9 +5,9 @@ from sokoenginepy.core.sokoban_plus import SokobanPlusValidator
 from factories import SokobanPlusFactory
 
 
-class DescribeSokobanPlus(object):
+class DescribeSokobanPlus:
 
-    class Describe_init(object):
+    class Describe_init:
 
         def it_doesnt_validate_on_init(self):
             sokoban_plus = SokobanPlus(42, "foo bar", [4, 2])
@@ -17,7 +17,7 @@ class DescribeSokobanPlus(object):
             sokoban_plus = SokobanPlus(42, "foo bar", [4, 2])
             assert not sokoban_plus.is_enabled
 
-    class Describe_boxorder_and_goalorder(object):
+    class Describe_boxorder_and_goalorder:
 
         def test_they_return_order_object_from_init_if_sokoban_plus_is_not_valid(
             self, sokoban_plus
@@ -34,7 +34,7 @@ class DescribeSokobanPlus(object):
             assert sokoban_plus.boxorder == "1 2 0 3"
             assert sokoban_plus.goalorder == "3 1 0 2"
 
-    class Describe_getter_for_box_plus_id(object):
+    class Describe_getter_for_box_plus_id:
 
         def it_returns_default_plus_id_for_disabled_sokoban_plus(
             self, sokoban_plus
@@ -47,7 +47,7 @@ class DescribeSokobanPlus(object):
                 2 - Piece.DEFAULT_ID
             ]
 
-    class Describe_getter_for_goal_plus_id(object):
+    class Describe_getter_for_goal_plus_id:
 
         def it_returns_default_plus_id_for_disabled_sokoban_plus(
             self, sokoban_plus
@@ -62,7 +62,7 @@ class DescribeSokobanPlus(object):
                 2 - Piece.DEFAULT_ID
             ]
 
-    class When_it_is_set_to_enabled(object):
+    class When_it_is_set_to_enabled:
 
         def it_parses_init_data(self, sokoban_plus):
             assert not sokoban_plus._is_validated
@@ -79,7 +79,7 @@ class DescribeSokobanPlus(object):
             sokoban_plus.is_enabled = True
             assert sokoban_plus._is_enabled
 
-    class Describe_legacy_plus_id_handling(object):
+    class Describe_legacy_plus_id_handling:
 
         def it_converts_legacy_plus_ids_silently_if_piece_count_is_smaller_than_legacy_plus_id(
             self
@@ -118,7 +118,7 @@ class DescribeSokobanPlus(object):
             )
 
 
-class DescribeSokobanPlusValidator(object):
+class DescribeSokobanPlusValidator:
 
     def it_is_valid_calls_all_validators(self, sokoban_plus_validator):
         sokoban_plus_validator._validate_plus_ids = Mock()

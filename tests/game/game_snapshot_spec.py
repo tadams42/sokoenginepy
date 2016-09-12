@@ -48,9 +48,9 @@ def sokoban_game_snapshot():
     )
 
 
-class DescribeGameSnapshot(object):
+class DescribeGameSnapshot:
 
-    class Describe_moves_count(object):
+    class Describe_moves_count:
 
         def it_returns_total_count_of_atomic_non_pushes(
             self, forward_game_snapshot, moves_count
@@ -62,7 +62,7 @@ class DescribeGameSnapshot(object):
         ):
             assert forward_game_snapshot.moves_count == moves_count
 
-    class Describe_init(object):
+    class Describe_init:
 
         def it_creates_sokoban_snapshot_by_default(self):
             assert GameSnapshot().variant == Variant.SOKOBAN
@@ -84,7 +84,7 @@ class DescribeGameSnapshot(object):
                 solving_mode=GameSolvingMode.REVERSE, moves_data="lurd"
             ).solving_mode == GameSolvingMode.FORWARD
 
-    class Describe_get_item(object):
+    class Describe_get_item:
 
         def it_retrieves_single_atomic_move(self, forward_game_snapshot):
             assert forward_game_snapshot[0] == AtomicMove(Direction.LEFT)
@@ -102,7 +102,7 @@ class DescribeGameSnapshot(object):
             assert slice_of_snapshot.to_s() == '[]lurd'
             assert slice_of_snapshot.solving_mode == reverse_game_snapshot.solving_mode
 
-    class Describe_set_item(object):
+    class Describe_set_item:
 
         def it_calls_recalc_methods_before_replacing_atomic_move(
             self, game_snapshot
@@ -154,7 +154,7 @@ class DescribeGameSnapshot(object):
                 game_snapshot._before_inserting_move.call_args_list
             ] == new_moves
 
-    class Describe_del_item(object):
+    class Describe_del_item:
 
         def it_calls_recalc_methods_before_deleting_atomic_move(
             self, game_snapshot
@@ -183,7 +183,7 @@ class DescribeGameSnapshot(object):
                 game_snapshot._before_removing_move.call_args_list
             ] == old_moves
 
-    class Describe_insert(object):
+    class Describe_insert:
 
         def it_calls_recalc_methods_before_inserting_atomic_move(
             self, game_snapshot
@@ -197,14 +197,14 @@ class DescribeGameSnapshot(object):
                 new_move
             )
 
-    class Describe_jumps_count(object):
+    class Describe_jumps_count:
 
         def it_calls_recalc_jumps_before_returning_value(self, game_snapshot):
             game_snapshot._recalc_jumps_count = Mock()
             game_snapshot.jumps_count
             assert game_snapshot._recalc_jumps_count.call_count == 1
 
-    class Describe_clear(object):
+    class Describe_clear:
 
         def it_resets_internal_counters(self, game_snapshot):
             game_snapshot.clear()
@@ -212,7 +212,7 @@ class DescribeGameSnapshot(object):
             assert game_snapshot.pushes_count == 0
             assert game_snapshot.jumps_count == 0
 
-    class Describe_before_inserting_move(object):
+    class Describe_before_inserting_move:
 
         def it_increases_internal_counters_if_necessary(
             self, reverse_game_snapshot, atomic_move, atomic_push, atomic_jump,
@@ -249,7 +249,7 @@ class DescribeGameSnapshot(object):
                     AtomicMove(Direction.NORTH_WEST)
                 )
 
-    class Describe_before_removing_move(object):
+    class Describe_before_removing_move:
 
         def it_decreases_internal_counters_if_necessary(
             self, reverse_game_snapshot, atomic_move, atomic_push, atomic_jump,
@@ -276,7 +276,7 @@ class DescribeGameSnapshot(object):
             assert reverse_game_snapshot.pushes_count == before_pushes
             assert reverse_game_snapshot._jumps_count_invalidated == before_jumps_invalidate
 
-    class Describe_recalc_jumps_count(object):
+    class Describe_recalc_jumps_count:
 
         def it_recalcs_jumps_count_if_necessary(self, reverse_game_snapshot):
             reverse_game_snapshot._count_jumps = Mock()
@@ -294,7 +294,7 @@ class DescribeGameSnapshot(object):
             assert reverse_game_snapshot._jumps_count is not None
             assert not reverse_game_snapshot._jumps_count_invalidated
 
-    class Describe_parse_string(object):
+    class Describe_parse_string:
 
         def it_replaces_internal_data_with_atomic_moves_from_string(
             self, sokoban_game_snapshot
@@ -318,7 +318,7 @@ class DescribeGameSnapshot(object):
             with pytest.raises(SnapshotConversionError):
                 sokoban_game_snapshot._parse_string(moves_data="42")
 
-    class Describe_to_s(object):
+    class Describe_to_s:
 
         def it_ensures_starting_jump_sequence_for_reverse_mode_snapshots(
             self, reverse_game_snapshot, atomic_jump, atomic_move

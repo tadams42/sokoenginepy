@@ -2,9 +2,9 @@ from factories import AtomicMoveFactory
 from sokoenginepy import Direction, Piece
 
 
-class DescribeAtomicMove(object):
+class DescribeAtomicMove:
 
-    class Describe_init(object):
+    class Describe_init:
 
         def it_sets_all_attributes(self):
             atomic_move = AtomicMoveFactory(
@@ -19,7 +19,7 @@ class DescribeAtomicMove(object):
             assert atomic_move._moved_box_id is None
             assert atomic_move.group_id == 0
 
-    class Describe_moved_box_id(object):
+    class Describe_moved_box_id:
 
         def test_get_returns_none_if_move_is_not_push_or_pull(
             self, atomic_move
@@ -55,13 +55,13 @@ class DescribeAtomicMove(object):
             assert atomic_move.is_push_or_pull
             assert not atomic_move.is_move
 
-    class Describe_pusher_id(object):
+    class Describe_pusher_id:
 
         def it_returns_id_of_pusher_that_performed_movement(self, atomic_move):
             atomic_move.pusher_id = Piece.DEFAULT_ID + 42
             assert atomic_move.pusher_id == Piece.DEFAULT_ID + 42
 
-    class Describe_is_move(object):
+    class Describe_is_move:
 
         def it_returns_true_if_box_was_not_moved(self, atomic_move):
             atomic_move.is_move = True
@@ -113,7 +113,7 @@ class DescribeAtomicMove(object):
             assert not atomic_move.is_pusher_selection
             assert not atomic_move.is_jump
 
-    class Describe_is_push_or_pull(object):
+    class Describe_is_push_or_pull:
 
         def it_returns_true_if_box_was_moved(self, atomic_move):
             atomic_move.is_push_or_pull = True
@@ -174,7 +174,7 @@ class DescribeAtomicMove(object):
             atomic_move.is_push_or_pull = False
             assert atomic_move.is_jump
 
-    class Describe_is_pusher_selection(object):
+    class Describe_is_pusher_selection:
 
         def it_returns_true_if_pusher_was_selected(self, atomic_move):
             atomic_move.is_pusher_selection = True
@@ -235,7 +235,7 @@ class DescribeAtomicMove(object):
             atomic_move.is_pusher_selection = False
             assert atomic_move.is_jump
 
-    class Describe_is_jump(object):
+    class Describe_is_jump:
 
         def it_returns_true_if_pusher_jumped(self, atomic_move):
             atomic_move.is_jump = True

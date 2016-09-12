@@ -6,9 +6,9 @@ from sokoenginepy.variant import SokobanBoard, TriobanBoard, BoardGraph
 from unittest.mock import patch
 
 
-class DescribeVariantBoard(object):
+class DescribeVariantBoard:
 
-    class describe_init(object):
+    class describe_init:
 
         def it_creates_board_of_specified_size_and_tessellation(self):
             b = TriobanBoard(4, 2)
@@ -28,7 +28,7 @@ class DescribeVariantBoard(object):
             with pytest.raises(BoardConversionError):
                 SokobanBoard(board_str="ZOOMG!")
 
-    class describe__reinit(object):
+    class describe__reinit:
 
         def it_reinitializes_graph_vertices(self, variant_board):
             variant_board._reinit(width=2, height=3)
@@ -48,7 +48,7 @@ class DescribeVariantBoard(object):
             variant_board._reinit(width=4, height=5)
             assert variant_board._graph.edges_count() > 0
 
-    class describe_clear(object):
+    class describe_clear:
 
         def it_clears_board_cells_in_all_nodes(self, variant_board):
             variant_board.clear()
@@ -62,7 +62,7 @@ class DescribeVariantBoard(object):
             assert variant_board.width == old_width
             assert variant_board.height == old_height
 
-    class describe_mark_play_area(object):
+    class describe_mark_play_area:
         board_str = "\n".join([
             # 123456
             "#######",  # 0
@@ -90,7 +90,7 @@ class DescribeVariantBoard(object):
                 else:
                     assert not self.variant_board[pos].is_in_playable_area
 
-    class describe_positions_reachable_by_pusher(object):
+    class describe_positions_reachable_by_pusher:
         board_str = "\n".join([
             # 123456
             "#######",  # 0
@@ -156,7 +156,7 @@ class DescribeVariantBoard(object):
             with pytest.raises(IndexError):
                 self.variant_board.positions_reachable_by_pusher(42000)
 
-    class describe_normalized_pusher_position(object):
+    class describe_normalized_pusher_position:
         board_str = "\n".join([
             # 123456
             "#######",  # 0
@@ -191,7 +191,7 @@ class DescribeVariantBoard(object):
             with pytest.raises(IndexError):
                 self.variant_board.normalized_pusher_position(42000)
 
-    class describe_path_destination(object):
+    class describe_path_destination:
 
         def test_calculates_destination_position_from_source_and_direction_path(
             self, variant_board
@@ -224,7 +224,7 @@ class DescribeVariantBoard(object):
             with pytest.raises(IndexError):
                 variant_board.path_destination(42000, []),
 
-    class describe_find_jump_path(object):
+    class describe_find_jump_path:
 
         def test_returns_sequence_of_positions_defining_shortest_path_for_pusher_jump(
             self, variant_board
@@ -252,7 +252,7 @@ class DescribeVariantBoard(object):
         ):
             assert variant_board.find_jump_path(42, 42000) == []
 
-    class describe_find_move_path(object):
+    class describe_find_move_path:
 
         def test_returns_sequence_of_positions_defining_shortest_path_for_pusher_movement_without_pushing_boxes(
             self, variant_board
@@ -285,7 +285,7 @@ class DescribeVariantBoard(object):
                 index_1d(11, 8, variant_board.width), 0
             ) == []
 
-    class describe_neighbor(object):
+    class describe_neighbor:
 
         def test_returns_neighbor_position_in_given_direction(
             self, variant_board
@@ -302,7 +302,7 @@ class DescribeVariantBoard(object):
         def test_returns_none_for_illegal_direction(self, variant_board):
             assert variant_board.neighbor(0, Direction.NORTH_WEST) is None
 
-    class describe_resize(object):
+    class describe_resize:
 
         def test_adds_right_columns_and_bottom_rows_when_enlarging(
             self, variant_board
@@ -359,7 +359,7 @@ class DescribeVariantBoard(object):
                 variant_board.resize(2, 2)
             assert mock_method.call_count == 1
 
-    class describe_resize_and_center(object):
+    class describe_resize_and_center:
 
         def test_adds_columns_and_rows_when_enlarging(self, variant_board):
             output = "\n".join([
@@ -417,7 +417,7 @@ class DescribeVariantBoard(object):
                 variant_board.resize(2, 2)
             assert mock_method.call_count == 1
 
-    class describe_trim(object):
+    class describe_trim:
 
         def test_removes_empty_outer_rows_and_columns(self, variant_board):
             output = variant_board.to_s(OutputSettings(use_visible_floors=True))
@@ -439,7 +439,7 @@ class DescribeVariantBoard(object):
                 variant_board.resize(2, 2)
             assert mock_method.call_count == 1
 
-    class describe_reverse_rows(object):
+    class describe_reverse_rows:
 
         def test_mirrors_board_up_down(self, variant_board):
             output = "\n".join([
@@ -459,7 +459,7 @@ class DescribeVariantBoard(object):
             assert variant_board.to_s(OutputSettings(use_visible_floors=True)
                                      ) == output
 
-    class describe_reverse_columns(object):
+    class describe_reverse_columns:
 
         def test_mirrors_board_left_rightt(self, variant_board):
             output = "\n".join([

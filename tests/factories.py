@@ -10,7 +10,7 @@ from sokoenginepy import (
 from sokoenginepy.core.sokoban_plus import SokobanPlusValidator
 from sokoenginepy.io import BoardEncodingCharacters
 from sokoenginepy.variant import SokobanBoard
-from sokoenginepy.core import Tessellation
+from sokoenginepy.core import Tessellation, BoardState, HashedBoardState
 
 
 class AtomicMoveFactory(factory.Factory):
@@ -107,13 +107,14 @@ def sokoban_plus_validator(sokoban_plus):
 
 @pytest.fixture
 def board_str():
+    # yapf: disable
     return "\n".join([
         # 123456789012345678
-        "    #####",  # 0
-        "    #   #",  # 1
-        "    #$  #",  # 2
-        "  ###  $##",  # 3
-        "  #  $ $ #",  # 4
+        "    #####",           # 0
+        "    #   #",           # 1
+        "    #$  #",           # 2
+        "  ###  $##",          # 3
+        "  #  $ $ #",           # 4
         "### # ## #   ######",  # 5
         "#   # ## #####  ..#",  # 6
         "# $  $          ..#",  # 7
@@ -121,6 +122,7 @@ def board_str():
         "    #     #########",  # 9
         "    #######",  # 0
     ])
+    # yapf: enable
 
 
 @pytest.fixture
@@ -158,3 +160,13 @@ def trioban_tessellation():
 @pytest.fixture
 def output_settings():
     return OutputSettings(use_visible_floors=True)
+
+
+@pytest.fixture
+def board_state(variant_board):
+    return BoardState(variant_board)
+
+
+@pytest.fixture
+def hashed_board_state(variant_board):
+    return HashedBoardState(variant_board)

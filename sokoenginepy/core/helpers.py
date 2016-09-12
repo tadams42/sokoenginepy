@@ -19,8 +19,8 @@ class PrettyPrintable:
         return self.__dict__
 
     def __str__(self):
-        return "<{0} ({1}) {2}>".format(
-            self.__name__, hex(id(self)), ", ".join(
+        return "<{0}({1}); {2}>".format(
+            self.__class__.__name__, hex(id(self)), "; ".join(
                 "{0}: {1}".format(k, v)
                 for k, v in self._representation_attributes.items()
             )

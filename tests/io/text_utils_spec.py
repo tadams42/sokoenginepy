@@ -9,7 +9,7 @@ from sokoenginepy.io import *
 from sokoenginepy.io.text_utils import Rle
 
 
-class Describe_is_board_string(object):
+class Describe_is_board_string:
     input = "0123456789\n\t bB$*p_pmM@+#_-|"
 
     def it_recognizes_board_string(self):
@@ -27,7 +27,7 @@ class Describe_is_board_string(object):
         assert not is_board_string("   \r\n ")
 
 
-class Describe_is_snapshot_string(object):
+class Describe_is_snapshot_string:
     input = "0123456789\n\t lurdLURDnwseNWSE"
 
     def it_recognizes_snapshot_string(self):
@@ -45,7 +45,7 @@ class Describe_is_snapshot_string(object):
         assert not is_board_string("   \r\n ")
 
 
-class Describe_is_pusher(object):
+class Describe_is_pusher:
 
     def it_correctly_categorizes(self):
         assert is_pusher(BoardEncodingCharacters.PUSHER)
@@ -56,7 +56,7 @@ class Describe_is_pusher(object):
         assert is_pusher(BoardEncodingCharacters.ALT_PUSHER_ON_GOAL2)
 
 
-class Describe_is_box(object):
+class Describe_is_box:
 
     def it_correctly_categorizes(self):
         assert is_box(BoardEncodingCharacters.BOX)
@@ -65,7 +65,7 @@ class Describe_is_box(object):
         assert is_box(BoardEncodingCharacters.ALT_BOX_ON_GOAL1)
 
 
-class Describe_is_goal(object):
+class Describe_is_goal:
 
     def it_correctly_categorizes(self):
         assert is_goal(BoardEncodingCharacters.GOAL)
@@ -77,7 +77,7 @@ class Describe_is_goal(object):
         assert is_goal(BoardEncodingCharacters.ALT_BOX_ON_GOAL1)
 
 
-class Describe_is_empty_floor(object):
+class Describe_is_empty_floor:
 
     def it_correctly_categorizes(self):
         assert is_empty_floor(BoardEncodingCharacters.FLOOR)
@@ -85,13 +85,13 @@ class Describe_is_empty_floor(object):
         assert is_empty_floor(BoardEncodingCharacters.ALT_VISIBLE_FLOOR1)
 
 
-class Describe_is_wall(object):
+class Describe_is_wall:
 
     def it_correctly_categorizes(self):
         assert is_wall(BoardEncodingCharacters.WALL)
 
 
-class Describe_parse_board_string(object):
+class Describe_parse_board_string:
 
     def it_parses_regular_board(self):
         src = " ##########\n    \n" +\
@@ -168,9 +168,9 @@ class Describe_parse_board_string(object):
         assert parsed == []
 
 
-class DescribeRle(object):
+class DescribeRle:
 
-    class Describe_decode_rle_token(object):
+    class Describe_decode_rle_token:
 
         def it_decodes_rle_token(self):
             assert Rle.decode_rle_token("4a4b2cd3e") == "aaaabbbbccdeee"
@@ -189,7 +189,7 @@ class DescribeRle(object):
             assert Rle.decode_rle_token("3a4b44") == "aaabbbb44"
 
 
-class Describe_rle_encode(object):
+class Describe_rle_encode:
 
     def it_rle_encodes_string(self):
         assert rle_encode("aaaabbbbccdeee") == "4a4b2cd3e"
@@ -202,7 +202,7 @@ class Describe_rle_encode(object):
         assert rle_encode("1234567890") == "1234567890"
 
 
-class Describe_rle_decode(object):
+class Describe_rle_decode:
 
     def it_decodes_rle_string(self):
         assert rle_decode("4a4b2cd3e") == "aaaabbbbccdeee"
@@ -240,9 +240,9 @@ def parser():
     return SnapshotStringParser()
 
 
-class DescribeSnapshotTextParser(object):
+class DescribeSnapshotTextParser:
 
-    class Describe_convert(object):
+    class Describe_convert:
 
         def it_ignores_spaces_and_current_position_character(self, parser):
             success = parser.convert(
@@ -312,7 +312,7 @@ class DescribeSnapshotTextParser(object):
             for atomic_move in parser._resulting_moves:
                 assert atomic_move.is_pusher_selection
 
-    class Describe_convert_token(object):
+    class Describe_convert_token:
 
         def it_fails_on_moves_illegal_in_context_of_requested_tessellation(
             self, parser

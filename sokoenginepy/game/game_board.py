@@ -2,7 +2,7 @@ from ..core import Variant, SokobanPlus
 from ..variant import VariantBoard
 
 
-class GameBoard(object):
+class GameBoard:
 
     def __init__(
         self,

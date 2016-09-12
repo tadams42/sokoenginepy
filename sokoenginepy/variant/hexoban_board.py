@@ -71,7 +71,7 @@ class HexobanBoardResizer(VariantBoardResizer):
         self.board._reinit_with_string(tmp.to_s(), reconfigure_edges)
 
 
-class HexobanTextConverter(object):
+class HexobanTextConverter:
 
     def __init__(self, output_settings=OutputSettings()):
         self.output_settings = output_settings

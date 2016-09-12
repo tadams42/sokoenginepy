@@ -12,7 +12,7 @@ TEST_RESOURCES_ROOT = (
 fake = Faker()
 
 
-class TessellationSpecMixin(object):
+class TessellationSpecMixin:
 
     def test_converts_legal_atomic_moves_to_characters(self):
         for index, atomic_move in enumerate(self.legal_moves):
