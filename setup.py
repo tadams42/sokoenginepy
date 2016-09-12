@@ -77,7 +77,6 @@ test_requirements = [
     'pytest-cov>=2.3.0',
     'factory-boy>=2.7.0',
     'fake-factory>=0.6.0',
-    'PyHamcrest>=1.9.0',
     'pyexcel-ods3>=0.2.0',
     'lxml>=3.6.0',
     'tox>=2.3.0',

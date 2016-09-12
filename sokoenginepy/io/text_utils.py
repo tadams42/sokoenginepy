@@ -21,22 +21,22 @@ class BoardEncodingCharacters(Enum):
     """
     Characters used in textual representation of boards.
     """
-    WALL                = '#'
-    PUSHER              = '@'
-    PUSHER_ON_GOAL      = '+'
-    BOX                 = '$'
-    BOX_ON_GOAL         = '*'
-    GOAL                = '.'
-    FLOOR               = ' '
-    VISIBLE_FLOOR       = '-'
-    ALT_PUSHER1         = 'p'
-    ALT_PUSHER2         = 'm'
+    WALL = '#'
+    PUSHER = '@'
+    PUSHER_ON_GOAL = '+'
+    BOX = '$'
+    BOX_ON_GOAL = '*'
+    GOAL = '.'
+    FLOOR = ' '
+    VISIBLE_FLOOR = '-'
+    ALT_PUSHER1 = 'p'
+    ALT_PUSHER2 = 'm'
     ALT_PUSHER_ON_GOAL1 = 'P'
     ALT_PUSHER_ON_GOAL2 = 'M'
-    ALT_BOX1            = 'b'
-    ALT_BOX_ON_GOAL1    = 'B'
-    ALT_GOAL1           = 'o'
-    ALT_VISIBLE_FLOOR1  = '_'
+    ALT_BOX1 = 'b'
+    ALT_BOX_ON_GOAL1 = 'B'
+    ALT_GOAL1 = 'o'
+    ALT_VISIBLE_FLOOR1 = '_'
 
 
 class SpecialSnapshotCharacters(Enum):
@@ -44,11 +44,11 @@ class SpecialSnapshotCharacters(Enum):
     Some characters that can be found in textual representation of snapshots but
     do not represent atomic moves.
     """
-    JUMP_BEGIN            = '['
-    JUMP_END              = ']'
-    PUSHER_CHANGE_BEGIN   = '{'
-    PUSHER_CHANGE_END     = '}'
-    CURENT_POSITION_CH    = '*'
+    JUMP_BEGIN = '['
+    JUMP_END = ']'
+    PUSHER_CHANGE_BEGIN = '{'
+    PUSHER_CHANGE_END = '}'
+    CURENT_POSITION_CH = '*'
 
 
 class AtomicMoveCharacters(Enum):
@@ -57,14 +57,14 @@ class AtomicMoveCharacters(Enum):
     all characters. Also, fordifferent variants, same character may have
     different meaning.
     """
-    LOWER_L  = 'l'
-    LOWER_U  = 'u'
-    LOWER_R  = 'r'
-    LOWER_D  = 'd'
-    UPPER_L  = 'L'
-    UPPER_U  = 'U'
-    UPPER_R  = 'R'
-    UPPER_D  = 'D'
+    LOWER_L = 'l'
+    LOWER_U = 'u'
+    LOWER_R = 'r'
+    LOWER_D = 'd'
+    UPPER_L = 'L'
+    UPPER_U = 'U'
+    UPPER_R = 'R'
+    UPPER_D = 'D'
     LOWER_NW = 'w'
     UPPER_NW = 'W'
     LOWER_SE = 'e'
@@ -79,80 +79,85 @@ class RleCharacters(Enum):
     """
     Separators used in RLE encoded board and snapshot texts
     """
-    GROUP_LEFT_DELIM  = '('
+    GROUP_LEFT_DELIM = '('
     GROUP_RIGHT_DELIM = ')'
     RLE_ROW_SEPARATOR = '|'
 
 
-def is_pusher(chr):
-    if isinstance(chr, BoardEncodingCharacters):
-        chr = chr.value
+def is_pusher(character):
+    if isinstance(character, BoardEncodingCharacters):
+        character = character.value
     return (
-        chr == BoardEncodingCharacters.PUSHER.value or
-        chr == BoardEncodingCharacters.ALT_PUSHER1.value or
-        chr == BoardEncodingCharacters.ALT_PUSHER2.value or
-        chr == BoardEncodingCharacters.PUSHER_ON_GOAL.value or
-        chr == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL1.value or
-        chr == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL2.value
+        character == BoardEncodingCharacters.PUSHER.value or
+        character == BoardEncodingCharacters.ALT_PUSHER1.value or
+        character == BoardEncodingCharacters.ALT_PUSHER2.value or
+        character == BoardEncodingCharacters.PUSHER_ON_GOAL.value or
+        character == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL1.value or
+        character == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL2.value
     )
 
-def is_box(chr):
-    if isinstance(chr, BoardEncodingCharacters):
-        chr = chr.value
+
+def is_box(character):
+    if isinstance(character, BoardEncodingCharacters):
+        character = character.value
     return (
-        chr == BoardEncodingCharacters.BOX.value or
-        chr == BoardEncodingCharacters.ALT_BOX1.value or
-        chr == BoardEncodingCharacters.BOX_ON_GOAL.value or
-        chr == BoardEncodingCharacters.ALT_BOX_ON_GOAL1.value
+        character == BoardEncodingCharacters.BOX.value or
+        character == BoardEncodingCharacters.ALT_BOX1.value or
+        character == BoardEncodingCharacters.BOX_ON_GOAL.value or
+        character == BoardEncodingCharacters.ALT_BOX_ON_GOAL1.value
     )
 
-def is_goal(chr):
-    if isinstance(chr, BoardEncodingCharacters):
-        chr = chr.value
+
+def is_goal(character):
+    if isinstance(character, BoardEncodingCharacters):
+        character = character.value
     return (
-        chr == BoardEncodingCharacters.GOAL.value or
-        chr == BoardEncodingCharacters.ALT_GOAL1.value or
-        chr == BoardEncodingCharacters.BOX_ON_GOAL.value or
-        chr == BoardEncodingCharacters.ALT_BOX_ON_GOAL1.value or
-        chr == BoardEncodingCharacters.PUSHER_ON_GOAL.value or
-        chr == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL1.value or
-        chr == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL2.value
+        character == BoardEncodingCharacters.GOAL.value or
+        character == BoardEncodingCharacters.ALT_GOAL1.value or
+        character == BoardEncodingCharacters.BOX_ON_GOAL.value or
+        character == BoardEncodingCharacters.ALT_BOX_ON_GOAL1.value or
+        character == BoardEncodingCharacters.PUSHER_ON_GOAL.value or
+        character == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL1.value or
+        character == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL2.value
     )
 
-def is_empty_floor(chr):
-    if isinstance(chr, BoardEncodingCharacters):
-        chr = chr.value
+
+def is_empty_floor(character):
+    if isinstance(character, BoardEncodingCharacters):
+        character = character.value
     return (
-        chr == BoardEncodingCharacters.FLOOR.value or
-        chr == BoardEncodingCharacters.VISIBLE_FLOOR.value or
-        chr == BoardEncodingCharacters.ALT_VISIBLE_FLOOR1.value
+        character == BoardEncodingCharacters.FLOOR.value or
+        character == BoardEncodingCharacters.VISIBLE_FLOOR.value or
+        character == BoardEncodingCharacters.ALT_VISIBLE_FLOOR1.value
     )
 
-def is_wall(chr):
-    if isinstance(chr, BoardEncodingCharacters):
-        chr = chr.value
-    return chr == BoardEncodingCharacters.WALL.value
 
-def is_atomic_move_char(chr):
-    if isinstance(chr, AtomicMoveCharacters):
-        chr = chr.value
+def is_wall(character):
+    if isinstance(character, BoardEncodingCharacters):
+        character = character.value
+    return character == BoardEncodingCharacters.WALL.value
+
+
+def is_atomic_move_char(character):
+    if isinstance(character, AtomicMoveCharacters):
+        character = character.value
     return (
-        chr == AtomicMoveCharacters.LOWER_L.value or
-        chr == AtomicMoveCharacters.LOWER_U.value or
-        chr == AtomicMoveCharacters.LOWER_R.value or
-        chr == AtomicMoveCharacters.LOWER_D.value or
-        chr == AtomicMoveCharacters.LOWER_NW.value or
-        chr == AtomicMoveCharacters.LOWER_SE.value or
-        chr == AtomicMoveCharacters.LOWER_NE.value or
-        chr == AtomicMoveCharacters.LOWER_SW.value or
-        chr == AtomicMoveCharacters.UPPER_L.value or
-        chr == AtomicMoveCharacters.UPPER_U.value or
-        chr == AtomicMoveCharacters.UPPER_R.value or
-        chr == AtomicMoveCharacters.UPPER_D.value or
-        chr == AtomicMoveCharacters.UPPER_NW.value or
-        chr == AtomicMoveCharacters.UPPER_SE.value or
-        chr == AtomicMoveCharacters.UPPER_NE.value or
-        chr == AtomicMoveCharacters.UPPER_SW.value
+        character == AtomicMoveCharacters.LOWER_L.value or
+        character == AtomicMoveCharacters.LOWER_U.value or
+        character == AtomicMoveCharacters.LOWER_R.value or
+        character == AtomicMoveCharacters.LOWER_D.value or
+        character == AtomicMoveCharacters.LOWER_NW.value or
+        character == AtomicMoveCharacters.LOWER_SE.value or
+        character == AtomicMoveCharacters.LOWER_NE.value or
+        character == AtomicMoveCharacters.LOWER_SW.value or
+        character == AtomicMoveCharacters.UPPER_L.value or
+        character == AtomicMoveCharacters.UPPER_U.value or
+        character == AtomicMoveCharacters.UPPER_R.value or
+        character == AtomicMoveCharacters.UPPER_D.value or
+        character == AtomicMoveCharacters.UPPER_NW.value or
+        character == AtomicMoveCharacters.UPPER_SE.value or
+        character == AtomicMoveCharacters.UPPER_NE.value or
+        character == AtomicMoveCharacters.UPPER_SW.value
     )
 
 
@@ -161,18 +166,15 @@ class Regexes(object):
     only_digits_and_spaces = re.compile(r"^([0-9\s])*$")
 
     board_string = re.compile(
-        "^([0-9\s" +
-        re.escape("".join(c.value for c in BoardEncodingCharacters)) +
-        re.escape("".join(c.value for c in RleCharacters)) +
-        "])*$"
+        "^([0-9\s" + re.escape(
+            "".join(c.value for c in BoardEncodingCharacters)
+        ) + re.escape("".join(c.value for c in RleCharacters)) + "])*$"
     )
 
     snapshot_string = re.compile(
-        "^([0-9\s" +
-        re.escape("".join(c.value for c in AtomicMoveCharacters)) +
-        re.escape("".join(c.value for c in SpecialSnapshotCharacters)) +
-        re.escape("".join(c.value for c in RleCharacters)) +
-        "])*$"
+        "^([0-9\s" + re.escape("".join(c.value for c in AtomicMoveCharacters)) +
+        re.escape("".join(c.value for c in SpecialSnapshotCharacters)
+                 ) + re.escape("".join(c.value for c in RleCharacters)) + "])*$"
     )
 
     ending_digits = re.compile(r"(\d+)$")
@@ -185,20 +187,23 @@ class Regexes(object):
     )
 
     snapshot_string_cleanup = re.compile(
-        "([" +
-        re.escape(SpecialSnapshotCharacters.CURENT_POSITION_CH.value) +
+        "([" + re.escape(SpecialSnapshotCharacters.CURENT_POSITION_CH.value) +
         r"\s])+"
     )
 
 
 def contains_only_digits_and_spaces(line):
-    return reduce(lambda x, y: x and y, [
-        True if Regexes.only_digits_and_spaces.match(l) else False
-        for l in line.splitlines()
-    ], True)
+    return reduce(
+        lambda x, y: x and y, [
+            True if Regexes.only_digits_and_spaces.match(l) else False
+            for l in line.splitlines()
+        ], True
+    )
+
 
 def is_blank(line):
     return line is None or line.strip() == ""
+
 
 def is_board_string(line):
     """
@@ -210,15 +215,18 @@ def is_board_string(line):
     representation, it must be converted to actual GameBoard.
     """
     return (
-        not contains_only_digits_and_spaces(line) and
-        reduce(lambda x, y: x and y, [
-            True if Regexes.board_string.match(l) else False
-            for l in line.splitlines()
-        ], True)
+        not contains_only_digits_and_spaces(line) and reduce(
+            lambda x, y: x and y, [
+                True if Regexes.board_string.match(l) else False
+                for l in line.splitlines()
+            ], True
+        )
     )
+
 
 def is_sokoban_plus_string(line):
     return contains_only_digits_and_spaces(line) and not is_blank(line)
+
 
 def is_snapshot_string(line):
     """
@@ -233,13 +241,15 @@ def is_snapshot_string(line):
     to be converted to GameSnapshot.
     """
     return (
-        not is_blank(line) and
-        not contains_only_digits_and_spaces(line) and
-        reduce(lambda x, y: x and y, [
-            True if Regexes.snapshot_string.match(l) else False
-            for l in line.splitlines()
-        ], True)
+        not is_blank(line) and not contains_only_digits_and_spaces(line) and
+        reduce(
+            lambda x, y: x and y, [
+                True if Regexes.snapshot_string.match(l) else False
+                for l in line.splitlines()
+            ], True
+        )
     )
+
 
 def ending_digits(line):
     retv = Regexes.ending_digits.findall(line)
@@ -249,6 +259,7 @@ def ending_digits(line):
 
 
 class Rle(object):
+
     @classmethod
     def encode(cls, line):
         if len(line) == 0:
@@ -256,8 +267,8 @@ class Rle(object):
 
         encoded = [(len(list(g)), k) for k, g in groupby(line)]
         return "".join(
-            "".join((str(c) if c > 1 else "", v,))
-            for c, v in encoded
+            "".join((str(c) if c > 1 else "",
+                     v,)) for c, v in encoded
         )
 
     @classmethod
@@ -304,12 +315,9 @@ class Rle(object):
                 ending_digits_num = 1
             else:
                 token_contents, ending_digits_str = ending_digits(token)
-                retv = retv + cls.decode_rle_token(
-                    token_contents
-                )
+                retv = retv + cls.decode_rle_token(token_contents)
                 ending_digits_num = (
-                    int(ending_digits_str)
-                    if ending_digits_str else 1
+                    int(ending_digits_str) if ending_digits_str else 1
                 )
         return retv
 
@@ -321,20 +329,23 @@ class Rle(object):
 def rle_encode(line):
     return Rle.encode(line)
 
+
 def rle_decode(line):
     return Rle.decode(line)
+
 
 def drop_blank(string_list):
     return [l for l in string_list if len(l.strip()) > 0]
 
+
 def drop_empty(string_list):
     return [l for l in string_list if len(l) > 0]
 
-def normalize_width(string_list, fill_chr = ' '):
+
+def normalize_width(string_list, fill_chr=' '):
     width = calculate_width(string_list)
-    return [
-        l + (fill_chr * (width - len(l))) for l in string_list
-    ]
+    return [l + (fill_chr * (width - len(l))) for l in string_list]
+
 
 def calculate_width(string_list):
     width = 0
@@ -342,6 +353,7 @@ def calculate_width(string_list):
         if len(line) > width:
             width = len(line)
     return width
+
 
 def parse_board_string(line):
     """
@@ -364,19 +376,17 @@ class SnapshotStringParser(object):
     Parses and validates game snapshot string into sequence of AtomicMoves
     """
     atomic_moves = Regex(
-        "([" +
-        "".join(c.value for c in AtomicMoveCharacters) +
-        "])+"
+        "([" + "".join(c.value for c in AtomicMoveCharacters) + "])+"
     )
     jump = Group(
-        oneOf(SpecialSnapshotCharacters.JUMP_BEGIN.value) +
-        ZeroOrMore(atomic_moves) +
-        oneOf(SpecialSnapshotCharacters.JUMP_END.value)
+        oneOf(SpecialSnapshotCharacters.JUMP_BEGIN.value) + ZeroOrMore(
+            atomic_moves
+        ) + oneOf(SpecialSnapshotCharacters.JUMP_END.value)
     )
     pusher_change = Group(
-        oneOf(SpecialSnapshotCharacters.PUSHER_CHANGE_BEGIN.value) +
-        ZeroOrMore(atomic_moves) +
-        oneOf(SpecialSnapshotCharacters.PUSHER_CHANGE_END.value)
+        oneOf(SpecialSnapshotCharacters.PUSHER_CHANGE_BEGIN.value) + ZeroOrMore(
+            atomic_moves
+        ) + oneOf(SpecialSnapshotCharacters.PUSHER_CHANGE_END.value)
     )
     grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
 
@@ -397,10 +407,10 @@ class SnapshotStringParser(object):
     def resulting_moves(self):
         return self._resulting_moves
 
-    def tokenize_moves_data(cls, line):
+    def tokenize_moves_data(self, line):
         retv = []
         try:
-            retv = cls.grammar.parseString(line).asList()
+            retv = self.grammar.parseString(line).asList()
         except ParseBaseException:
             retv = []
         return retv
@@ -426,10 +436,8 @@ class SnapshotStringParser(object):
             self._first_encountered_error = SnapshotConversionError.NON_SNAPSHOT_CHARACTERS_FOUND
             return False
 
-        if (
-            SpecialSnapshotCharacters.JUMP_BEGIN.value in moves_string or
-            SpecialSnapshotCharacters.JUMP_END.value in moves_string
-        ):
+        if (SpecialSnapshotCharacters.JUMP_BEGIN.value in moves_string or
+                SpecialSnapshotCharacters.JUMP_END.value in moves_string):
             self._resulting_solving_mode = 'reverse'
         else:
             self._resulting_solving_mode = 'forward'
@@ -453,13 +461,17 @@ class SnapshotStringParser(object):
                 convert_success = self._convert_token(
                     token=token[1],
                     tessellation=tessellation,
-                    is_jump=(token[0] == SpecialSnapshotCharacters.JUMP_BEGIN.value),
-                    is_pusher_change=(token[0] == SpecialSnapshotCharacters.PUSHER_CHANGE_BEGIN.value),
+                    is_jump=(
+                        token[0] == SpecialSnapshotCharacters.JUMP_BEGIN.value
+                    ),
+                    is_pusher_change=(
+                        token[0] ==
+                        SpecialSnapshotCharacters.PUSHER_CHANGE_BEGIN.value
+                    ),
                 )
             else:
                 convert_success = self._convert_token(
-                    token=token,
-                    tessellation=tessellation
+                    token=token, tessellation=tessellation
                 )
             if not convert_success:
                 return False
@@ -469,10 +481,10 @@ class SnapshotStringParser(object):
     def _convert_token(
         self, token, tessellation, is_jump=False, is_pusher_change=False
     ):
-        for chr in token:
+        for character in token:
             atomic_move = None
             try:
-                atomic_move = tessellation.char_to_atomic_move(chr)
+                atomic_move = tessellation.char_to_atomic_move(character)
             except SokoengineError:
                 atomic_move = None
 

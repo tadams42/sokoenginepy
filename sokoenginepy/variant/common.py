@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class GraphType(Enum):
+class GraphType(IntEnum):
     DIRECTED = 0
     DIRECTED_MULTI = 1

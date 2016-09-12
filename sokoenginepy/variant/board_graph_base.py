@@ -52,9 +52,8 @@ class BoardGraphBase(ABC):
         target_cell = self[target_position]
 
         weight = 1
-        if (target_cell.is_wall or target_cell.has_box or
-                target_cell.has_pusher):
-            weight = type(self).MAX_EDGE_WEIGHT
+        if (target_cell.is_wall or target_cell.has_box or target_cell.has_pusher):
+            weight = self.MAX_EDGE_WEIGHT
 
         return weight
 
@@ -63,7 +62,10 @@ class BoardGraphBase(ABC):
         pass
 
     def reachables(
-        self, root, excluded_positions=[], is_obstacle_callable=None,
+        self,
+        root,
+        excluded_positions=None,
+        is_obstacle_callable=None,
         add_animation_frame_hook=None
     ):
         """
@@ -81,17 +83,16 @@ class BoardGraphBase(ABC):
         visited[root] = True
         reachables = deque()
         to_inspect = deque([root])
+        if not excluded_positions:
+            excluded_positions = []
 
         if is_obstacle_callable is None:
-            is_obstacle_callable = (
-                lambda x: not self[x].can_put_pusher_or_box
-            )
+            is_obstacle_callable = (lambda x: not self[x].can_put_pusher_or_box)
 
         while len(to_inspect) > 0:
             current_position = to_inspect.popleft()
 
-            if (current_position == root or
-                    current_position not in excluded_positions):
+            if (current_position == root or current_position not in excluded_positions):
                 reachables.append(current_position)
 
             for neighbor in self.all_neighbors(current_position):

@@ -1,42 +1,11 @@
-from enum import Enum
+from enum import IntEnum
 from abc import ABC, abstractmethod
+
+from .atomic_move import AtomicMove
 from .exceptions import UnknownTessellationError, IllegalDirectionError
 
 
-class Direction(Enum):
-    """
-    Directions of movement
-    """
-    UP         = 0
-    NORTH_EAST = 1
-    RIGHT      = 2
-    SOUTH_EAST = 3
-    DOWN       = 4
-    SOUTH_WEST = 5
-    LEFT       = 6
-    NORTH_WEST = 7
-
-    @property
-    def opposite(self):
-        if self == Direction.UP:
-            return Direction.DOWN
-        elif self == Direction.DOWN:
-            return Direction.UP
-        elif self == Direction.LEFT:
-            return Direction.RIGHT
-        elif self == Direction.RIGHT:
-            return Direction.LEFT
-        elif self == Direction.NORTH_WEST:
-            return Direction.SOUTH_EAST
-        elif self == Direction.NORTH_EAST:
-            return Direction.SOUTH_WEST
-        elif self == Direction.SOUTH_WEST:
-            return Direction.NORTH_EAST
-        elif self == Direction.SOUTH_EAST:
-            return Direction.NORTH_WEST
-
-
-class CellOrientation(Enum):
+class CellOrientation(IntEnum):
     """
     Dynamic board cell property that depends on cell position in some
     tessellations. ie. in Trioban, coordinate origin is triangle pointig upwards.
@@ -48,12 +17,11 @@ class CellOrientation(Enum):
     OCTAGON = 2
 
 
-class Variant(Enum):
+class Variant(IntEnum):
     """
     Enumerates implemented tessellation types. All classes that are tessellation
     dependant have attribute variant whose value is one of these.
     """
-
     """
     Board is laid out on squares.
     Direction <-> character mapping:
@@ -63,7 +31,6 @@ class Variant(Enum):
     |   l, L  |   r, R  |   u, U  |  d, D   |
     """
     SOKOBAN = 0
-
     """
     Board is laid out on alternating triangles with origin triangle poiting down.
     Direction <-> character mapping:
@@ -77,7 +44,6 @@ class Variant(Enum):
     ![Trioban movement](docs/images/trioban_am.png)
     """
     TRIOBAN = 1
-
     """
     Board space is laid out on vertical hexagons with following coordinate system:
 
@@ -103,7 +69,6 @@ class Variant(Enum):
     | l, L |  r, R |    u, U    |    d, D    |    n, N    |    s, S    |
     """
     HEXOBAN = 2
-
     """
     Board space is laid out on alternating squares and octagons with
     origin of coordinate system being octagon. Tessellation allows all
@@ -120,13 +85,13 @@ class Variant(Enum):
     OCTOBAN = 3
 
     def to_s(self):
-        if self == type(self).SOKOBAN:
+        if self == self.SOKOBAN:
             return "Sokoban"
-        elif self == type(self).HEXOBAN:
+        elif self == self.HEXOBAN:
             return "Hexoban"
-        elif self == type(self).TRIOBAN:
+        elif self == self.TRIOBAN:
             return "Trioban"
-        elif self == type(self).OCTOBAN:
+        elif self == self.OCTOBAN:
             return "Octoban"
         else:
             raise UnknownTessellationError(self)
@@ -136,9 +101,7 @@ class Variant(Enum):
         if isinstance(description, str):
             description = description.strip().lower()
 
-        if (description == "sokoban" or
-                description == "" or
-                description == cls.SOKOBAN):
+        if (description == "sokoban" or description == "" or description == cls.SOKOBAN):
             return cls.SOKOBAN
         elif description == 'trioban' or description == cls.TRIOBAN:
             return cls.TRIOBAN
@@ -150,7 +113,7 @@ class Variant(Enum):
             raise UnknownTessellationError(description)
 
 
-class Tessellated(object):
+class Tessellated:
     """
     Mixin that marks class depending on Tessellation specifics. This means that
     class will have to be initialized with Variant and it will use one of
@@ -200,10 +163,7 @@ class Tessellation(ABC):
     @classmethod
     def factory(cls, variant):
         cls._init_register()
-
-        if isinstance(variant, str):
-            variant = Variant.factory(variant)
-
+        variant = Variant.factory(variant)
         retv = cls._TESSELLATION_REGISTER.get(variant, None)
         if not retv:
             raise UnknownTessellationError(variant)
@@ -257,23 +217,22 @@ class Tessellation(ABC):
         """
         pass
 
-    def char_to_atomic_move(self, chr):
+    def char_to_atomic_move(self, input_chr):
         """
         Converts string to AtomicMove instance or raises exception if conversion
         not possible.
         """
         from ..io import AtomicMoveCharacters
-        from ..game import AtomicMove
 
-        if isinstance(chr, AtomicMoveCharacters):
-            chr = chr.value
+        if isinstance(input_chr, AtomicMoveCharacters):
+            input_chr = input_chr.value
 
         direction, box_moved = self._char_to_atomic_move_dict.get(
-            chr, (None, None)
+            input_chr, (None, None)
         )
 
         if direction is None:
-            raise IllegalDirectionError(chr)
+            raise IllegalDirectionError(input_chr)
 
         return AtomicMove(direction=direction, box_moved=box_moved)
 
@@ -290,15 +249,14 @@ class Tessellation(ABC):
         Converts AtomicMove to string or raises exception if conversion
         not possible.
         """
-        chr = self._atomic_move_to_char_dict.get(
-            (atomic_move.direction, atomic_move.is_push_or_pull),
-            None
+        retv = self._atomic_move_to_char_dict.get(
+            (atomic_move.direction, atomic_move.is_push_or_pull), None
         )
 
-        if chr is None:
+        if retv is None:
             raise IllegalDirectionError(atomic_move)
 
-        return chr
+        return retv
 
     def cell_orientation(self, position, board_width, board_height):
         """
@@ -313,24 +271,28 @@ def index_1d(x, y, board_width):
     """
     return y * board_width + x
 
+
 def X(index, board_width):
     return 0 if board_width == 0 else index % board_width
+
 
 def Y(index, board_width):
     return 0 if board_width == 0 else int(index / board_width)
 
+
 def ROW(index, board_width):
     return Y(index, board_width)
+
 
 def COLUMN(index, board_width):
     return X(index, board_width)
 
-def on_board_2D(x, y, board_width, board_height):
+
+def on_board_2d(x, y, board_width, board_height):
     return x >= 0 and y >= 0 and x < board_width and y < board_height
 
-def on_board_1D(index, board_width, board_height):
-    return index is not None and index >= 0 and on_board_2D(
-        X(index, board_width),
-        Y(index, board_width),
-        board_width, board_height
+
+def on_board_1d(index, board_width, board_height):
+    return index is not None and index >= 0 and on_board_2d(
+        X(index, board_width), Y(index, board_width), board_width, board_height
     )

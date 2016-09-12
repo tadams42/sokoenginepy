@@ -1,5 +1,5 @@
 from ..core import (
-    Tessellation, on_board_2D, on_board_1D, ROW, COLUMN, index_1d, Direction,
+    Tessellation, on_board_2d, ROW, COLUMN, index_1d, Direction,
     IllegalDirectionError
 )
 from ..io import AtomicMoveCharacters
@@ -18,7 +18,7 @@ class SokobanTessellation(Tessellation):
 
     @property
     def legal_directions(self):
-        return type(self)._LEGAL_DIRECTIONS
+        return self._LEGAL_DIRECTIONS
 
     @property
     def graph_type(self):
@@ -36,12 +36,12 @@ class SokobanTessellation(Tessellation):
     }
 
     def neighbor_position(self, position, direction, board_width, board_height):
-        # if not on_board_1D(position, board_width, board_height):
+        # if not on_board_1d(position, board_width, board_height):
         #     return None
 
         row = ROW(position, board_width)
         column = COLUMN(position, board_width)
-        row_shift, column_shift = type(self)._NEIGHBOR_SHIFT.get(
+        row_shift, column_shift = self._NEIGHBOR_SHIFT.get(
             direction, (None, None)
         )
 
@@ -51,7 +51,7 @@ class SokobanTessellation(Tessellation):
         row += row_shift
         column += column_shift
 
-        if on_board_2D(column, row, board_width, board_height):
+        if on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
 
         return None
@@ -69,10 +69,10 @@ class SokobanTessellation(Tessellation):
 
     @property
     def _char_to_atomic_move_dict(self):
-        return type(self)._CHR_TO_ATOMIC_MOVE
+        return self._CHR_TO_ATOMIC_MOVE
 
     _ATOMIC_MOVE_TO_CHR = dict((v, k) for k, v in _CHR_TO_ATOMIC_MOVE.items())
 
     @property
     def _atomic_move_to_char_dict(self):
-        return type(self)._ATOMIC_MOVE_TO_CHR
+        return self._ATOMIC_MOVE_TO_CHR

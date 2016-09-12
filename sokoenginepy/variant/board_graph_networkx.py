@@ -7,13 +7,14 @@ This is default and fall back implementation used in sokoenginepy.
 
 import networkx as nx
 
-from ..game import BoardCell
+from ..core import BoardCell
 
 from .common import GraphType
 from .board_graph_base import BoardGraphBase
 
 
 class BoardGraph(BoardGraphBase):
+
     def __init__(self, number_of_vertices, graph_type):
         assert graph_type in GraphType
 
@@ -67,8 +68,10 @@ class BoardGraph(BoardGraphBase):
         for source_vertice in self._graph.nodes_iter():
             for direction in tessellation.legal_directions:
                 neighbor_vertice = tessellation.neighbor_position(
-                    source_vertice, direction,
-                    board_width=width, board_height=height
+                    source_vertice,
+                    direction,
+                    board_width=width,
+                    board_height=height
                 )
                 if neighbor_vertice is not None:
                     self._graph.add_edge(
@@ -100,7 +103,9 @@ class BoardGraph(BoardGraphBase):
 
     def shortest_path(self, start_position, end_position):
         try:
-            return nx.shortest_path(self._graph, start_position, end_position, 1)
+            return nx.shortest_path(
+                self._graph, start_position, end_position, 1
+            )
         except nx.NetworkXNoPath:
             return []
 

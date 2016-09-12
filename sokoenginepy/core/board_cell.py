@@ -1,4 +1,6 @@
-from ..core import PrettyPrintable, EqualityComparable, SokoengineError
+from .helpers import PrettyPrintable, EqualityComparable
+from .exceptions import SokoengineError
+
 from ..io import (
     BoardEncodingCharacters, is_wall, is_pusher, is_goal, is_empty_floor, is_box
 )
@@ -14,34 +16,37 @@ class BoardCell(PrettyPrintable, EqualityComparable):
     logic class.
     """
 
-    def __init__(self, chr = BoardEncodingCharacters.FLOOR):
-        self._has_box            = False
-        self._has_pusher         = False
-        self._has_goal           = False
-        self._is_wall            = False
+    def __init__(self, character=BoardEncodingCharacters.FLOOR):
+        self._has_box = False
+        self._has_pusher = False
+        self._has_goal = False
+        self._is_wall = False
         self.is_in_playable_area = False
-        self.is_deadlock         = False
+        self.is_deadlock = False
 
         # Most of the board space consists of empty floors, thus a chance this
         # first test succeeds if larger than for other cases. This means that
         # other branches will not be executed most of the time, which means whole
         # method runs faster.
-        if not is_empty_floor(chr):
-            if is_wall(chr):
+        if not is_empty_floor(character):
+            if is_wall(character):
                 self.is_wall = True
-            elif is_pusher(chr):
+            elif is_pusher(character):
                 self.has_pusher = True
-                if is_goal(chr):
+                if is_goal(character):
                     self.has_goal = True
-            elif is_box(chr):
+            elif is_box(character):
                 self.has_box = True
-                if is_goal(chr):
+                if is_goal(character):
                     self.has_goal = True
-            elif is_goal(chr):
+            elif is_goal(character):
                 self.has_goal = True
             else:
-                raise SokoengineError("Invalid character in BoardCell initializer!")
+                raise SokoengineError(
+                    "Invalid character in BoardCell initializer!"
+                )
 
+    @property
     def _representation_attributes(self):
         return {
             'has_pusher': self.has_pusher,
@@ -52,10 +57,14 @@ class BoardCell(PrettyPrintable, EqualityComparable):
             'is_deadlock': self.is_deadlock,
         }
 
+    @property
     def _equality_attributes(self):
-        return (self.is_wall, self.has_pusher, self.has_box, self.has_goal,)
+        return (self.is_wall,
+                self.has_pusher,
+                self.has_box,
+                self.has_goal,)
 
-    def to_s(self, use_visible_floor = False):
+    def to_s(self, use_visible_floor=False):
         """
         Converts self to string (for printing boards in standard format)
         """
@@ -66,9 +75,8 @@ class BoardCell(PrettyPrintable, EqualityComparable):
                 retv = BoardEncodingCharacters.WALL.value
             else:
                 retv = (
-                    BoardEncodingCharacters.VISIBLE_FLOOR.value
-                    if use_visible_floor
-                    else BoardEncodingCharacters.FLOOR.value
+                    BoardEncodingCharacters.VISIBLE_FLOOR.value if
+                    use_visible_floor else BoardEncodingCharacters.FLOOR.value
                 )
         elif not self.has_box and not self.has_goal and self.has_pusher:
             retv = BoardEncodingCharacters.PUSHER.value
@@ -116,9 +124,7 @@ class BoardCell(PrettyPrintable, EqualityComparable):
         True if there is no pieces and no wall on this cell.
         """
         return (
-            not self.has_pusher and
-            not self.has_box and
-            not self.has_goal and
+            not self.has_pusher and not self.has_box and not self.has_goal and
             not self.is_wall
         )
 
@@ -137,11 +143,7 @@ class BoardCell(PrettyPrintable, EqualityComparable):
         box on wall (which replaces that wall with box). This method can be used
         by higher game logic classes to implement actual game logic.
         """
-        return (
-            not self.has_box and
-            not self.has_pusher and
-            not self.is_wall
-        )
+        return not self.has_box and not self.has_pusher and not self.is_wall
 
     @property
     def has_box(self):

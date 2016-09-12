@@ -2,7 +2,7 @@ from collections.abc import MutableSequence, Iterable
 
 from ..core import (
     SnapshotConversionError, IllegalDirectionError, SokoengineError,
-    PrettyPrintable, EqualityComparable, Tessellated, Variant,
+    PrettyPrintable, EqualityComparable, Tessellated, Variant
 )
 from ..io import (
     OutputSettings, SpecialSnapshotCharacters, rle_encode, is_blank,
@@ -21,9 +21,9 @@ class GameSnapshot(
 
     def __init__(
         self,
-        variant = Variant.SOKOBAN,
-        solving_mode = GameSolvingMode.FORWARD,
-        moves_data = ""
+        variant=Variant.SOKOBAN,
+        solving_mode=GameSolvingMode.FORWARD,
+        moves_data=""
     ):
         """
         moves_data: optional string that contains moves data. If not empty it
@@ -60,8 +60,7 @@ class GameSnapshot(
         retv = self._moves.__getitem__(index)
         if isinstance(retv, self._moves.__class__):
             game_snapshot = GameSnapshot(
-                variant = self.variant,
-                solving_mode = self.solving_mode
+                variant=self.variant, solving_mode=self.solving_mode
             )
             for atomic_move in retv:
                 game_snapshot.append(atomic_move)
@@ -100,6 +99,7 @@ class GameSnapshot(
         self._moves.insert(index, atomic_move)
 
     # PrettyPrintable
+    @property
     def _representation_attributes(self):
         return {
             'solving_mode': self.solving_mode,
@@ -110,11 +110,11 @@ class GameSnapshot(
         }
 
     # EqualityComparable
+    @property
     def _equality_attributes(self):
         return (
-            self.variant, len(self._moves), self.solving_mode,
-            self.moves_count, self.pushes_count, self.jumps_count,
-            self._moves
+            self.variant, len(self._moves), self.solving_mode, self.moves_count,
+            self.pushes_count, self.jumps_count, self._moves
         )
 
     @property
@@ -145,7 +145,7 @@ class GameSnapshot(
         self._jumps_count_invalidated = False
         self._moves = []
 
-    def to_s(self, output_settings = OutputSettings()):
+    def to_s(self, output_settings=OutputSettings()):
         """
         Converts self to string (for printing snapshots in standard format)
         """
@@ -177,9 +177,8 @@ class GameSnapshot(
             if jump_flag or pusher_selected_flag:
                 backup_flag = jump_flag
                 retv += (
-                    SpecialSnapshotCharacters.JUMP_BEGIN.value
-                    if jump_flag
-                    else SpecialSnapshotCharacters.PUSHER_CHANGE_BEGIN.value
+                    SpecialSnapshotCharacters.JUMP_BEGIN.value if jump_flag else
+                    SpecialSnapshotCharacters.PUSHER_CHANGE_BEGIN.value
                 )
 
                 while (
@@ -187,22 +186,26 @@ class GameSnapshot(
                     (jump_flag or pusher_selected_flag)
                 ):
                     try:
-                        retv += self.tessellation.atomic_move_to_char(self._moves[i])
+                        retv += self.tessellation.atomic_move_to_char(
+                            self._moves[i]
+                        )
                     except SokoengineError:
                         conversion_ok = False
                     i += 1
                     if i < iend:
                         jump_flag = self._moves[i].is_jump
-                        pusher_selected_flag = self._moves[i].is_pusher_selection
+                        pusher_selected_flag = self._moves[i
+                                                          ].is_pusher_selection
 
                 retv += (
-                    SpecialSnapshotCharacters.JUMP_END.value
-                    if backup_flag
-                    else SpecialSnapshotCharacters.PUSHER_CHANGE_END.value
+                    SpecialSnapshotCharacters.JUMP_END.value if backup_flag else
+                    SpecialSnapshotCharacters.PUSHER_CHANGE_END.value
                 )
             else:
                 try:
-                    retv += self.tessellation.atomic_move_to_char(self._moves[i])
+                    retv += self.tessellation.atomic_move_to_char(
+                        self._moves[i]
+                    )
                 except SokoengineError:
                     conversion_ok = False
                 i += 1
@@ -212,8 +215,8 @@ class GameSnapshot(
 
         if conversion_ok and output_settings.break_long_lines:
             tmp = ""
-            for i, chr in enumerate(retv):
-                tmp += chr
+            for i, character in enumerate(retv):
+                tmp += character
                 if output_settings.should_insert_line_break_at(i + 1):
                     tmp += "\n"
             retv = tmp
@@ -234,19 +237,14 @@ class GameSnapshot(
                 self._pushes_count -= 1
 
     def _before_inserting_move(self, atomic_move):
-        if (
-            self._solving_mode == GameSolvingMode.FORWARD and
-            atomic_move.is_jump
-        ):
+        if (self._solving_mode == GameSolvingMode.FORWARD and atomic_move.is_jump):
             raise SokoengineError(
                 "Forward mode snapshots are not allowed to contain jumps!"
             )
 
         if atomic_move.direction not in self.tessellation.legal_directions:
             raise IllegalDirectionError(
-                "Invalid direction for tessellation {0}".format(
-                    self.variant
-                )
+                "Invalid direction for tessellation {0}".format(self.variant)
             )
 
         if not atomic_move.is_pusher_selection:

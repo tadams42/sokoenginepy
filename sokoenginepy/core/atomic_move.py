@@ -1,8 +1,6 @@
-from ..core import (
-    PrettyPrintable, EqualityComparable, InvalidPieceIdError, Direction
-)
-
-from .common import PieceConstants
+from .helpers import PrettyPrintable, EqualityComparable
+from .direction import Direction
+from .piece import Piece
 
 
 class AtomicMove(PrettyPrintable, EqualityComparable):
@@ -18,11 +16,11 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
           active pusher in Multiban games
     """
 
-    def __init__(self, direction = Direction.LEFT, box_moved = False):
+    def __init__(self, direction=Direction.LEFT, box_moved=False):
         self._box_moved = False
         self._pusher_selected = False
         self._pusher_jumped = False
-        self._pusher_id = PieceConstants.DEFAULT_ID
+        self._pusher_id = Piece.DEFAULT_ID
         self._moved_box_id = None
         self.group_id = 0
 
@@ -32,6 +30,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         else:
             self.is_move = True
 
+    @property
     def _representation_attributes(self):
         return {
             'direction': self.direction,
@@ -43,10 +42,13 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
             'group_id': self.group_id,
         }
 
+    @property
     def _equality_attributes(self):
         return (
-            self.direction, self.is_push_or_pull,
-            self.is_pusher_selection, self.is_jump,
+            self.direction,
+            self.is_push_or_pull,
+            self.is_pusher_selection,
+            self.is_jump,
         )
 
     @property
@@ -63,11 +65,11 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
-        if value is not None:
+        if value is not None and value >= Piece.DEFAULT_ID:
             self._moved_box_id = value
             self.is_push_or_pull = True
         else:
-            self._moved_box_id = value
+            self._moved_box_id = None
             self.is_push_or_pull = False
 
     @property
@@ -79,7 +81,10 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
 
     @pusher_id.setter
     def pusher_id(self, value):
-        self._pusher_id = value
+        if value is not None and value >= Piece.DEFAULT_ID:
+            self._pusher_id = value
+        else:
+            self._pusher_id = Piece.DEFAULT_ID
 
     @property
     def is_move(self):
@@ -87,8 +92,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         True if pusher didn't move box, jump or changed focus to other pusher.
         """
         return (
-            not self._box_moved and
-            not self._pusher_selected and
+            not self._box_moved and not self._pusher_selected and
             not self._pusher_jumped
         )
 
@@ -98,8 +102,11 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
             self._box_moved = False
             self._pusher_jumped = False
             self._pusher_selected = False
-        else:
             self._moved_box_id = None
+        else:
+            self._box_moved = True
+            self._pusher_jumped = False
+            self._pusher_selected = False
 
     @property
     def is_push_or_pull(self):
@@ -107,8 +114,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         True if pusher also moved a box.
         """
         return (
-            self._box_moved and
-            not self._pusher_selected and
+            self._box_moved and not self._pusher_selected and
             not self._pusher_jumped
         )
 
@@ -129,8 +135,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         games.
         """
         return (
-            self._pusher_selected and
-            not self._pusher_jumped and
+            self._pusher_selected and not self._pusher_jumped and
             not self._box_moved
         )
 
@@ -150,8 +155,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         True if this move is part of pusher jump sequence in REVERSE games.
         """
         return (
-            self._pusher_jumped and
-            not self._box_moved and
+            self._pusher_jumped and not self._box_moved and
             not self._pusher_selected
         )
 

@@ -1,10 +1,8 @@
-from ..core import Variant, BoardConversionError
+from ..core import Variant, BoardConversionError, X, Y, index_1d
 from ..io import (
     OutputSettings, is_empty_floor, normalize_width, parse_board_string,
     calculate_width, BoardEncodingCharacters, RleCharacters, rle_encode
 )
-from ..core import X, Y, index_1d
-
 from .variant_board import VariantBoard, VariantBoardResizer
 from .sokoban_board import SokobanBoard
 
@@ -14,26 +12,29 @@ class HexobanBoard(VariantBoard):
     Implements VariantBoard for Hexoban variant.
     """
 
-    def __init__(self, board_width=0, board_height=0, board_str = ""):
+    def __init__(self, board_width=0, board_height=0, board_str=""):
         super().__init__(
-            board_width = board_width, board_height = board_height,
-            variant = Variant.HEXOBAN,
-            board_str = board_str
+            board_width=board_width,
+            board_height=board_height,
+            variant=Variant.HEXOBAN,
+            board_str=board_str
         )
 
     def _parse_string(self, board_str):
-        parsed, layout_ok = HexobanTextConverter().convert_to_internal(board_str)
+        parsed, layout_ok = HexobanTextConverter(
+        ).convert_to_internal(board_str)
 
         if layout_ok:
             return parsed
         else:
             raise BoardConversionError(BoardConversionError.INVALID_LAYOUT)
 
-    def to_s(self, output_settings = OutputSettings()):
+    def to_s(self, output_settings=OutputSettings()):
         return HexobanTextConverter().convert_to_string(self, output_settings)
 
 
 class HexobanBoardResizer(VariantBoardResizer):
+
     def __init__(self, hexoban_board):
         super().__init__(hexoban_board)
 
@@ -71,28 +72,30 @@ class HexobanBoardResizer(VariantBoardResizer):
 
 
 class HexobanTextConverter(object):
-    def __init__(self, output_settings = OutputSettings()):
+
+    def __init__(self, output_settings=OutputSettings()):
         self.output_settings = output_settings
 
     def _debug_print(self, input, expected):
-            print("{0:<30}{1:<30}{2:<30}{3:<30}".format(
-                "input", "expected", "converted", "internal")
-            )
+        print(
+            "{0:<30}{1:<30}{2:<30}{3:<30}".
+            format("input", "expected", "converted", "internal")
+        )
 
-            input_lines = input.splitlines()
-            expected_lines = expected.splitlines()
-            converted_lines = HexobanBoard(board_str=input).to_s(
-                output_settings=OutputSettings(use_visible_floors=True)
-            ).splitlines()
-            internal_lines = self.convert_to_internal(input)[0]
+        input_lines = input.splitlines()
+        expected_lines = expected.splitlines()
+        converted_lines = HexobanBoard(board_str=input).to_s(
+            output_settings=OutputSettings(use_visible_floors=True)
+        ).splitlines()
+        internal_lines = self.convert_to_internal(input)[0]
 
-            for i in range(0, len(internal_lines)):
-                print("{0:<30}{1:<30}{2:<30}{3:<30}".format(
-                    input_lines[i],
-                    expected_lines[i],
-                    converted_lines[i],
+        for i in range(0, len(internal_lines)):
+            print(
+                "{0:<30}{1:<30}{2:<30}{3:<30}".format(
+                    input_lines[i], expected_lines[i], converted_lines[i],
                     internal_lines[i]
-                ))
+                )
+            )
 
     def convert_to_internal(self, src_str):
         # Converts textual Hexoban into 2D array and validates textual layout
@@ -105,7 +108,8 @@ class HexobanTextConverter(object):
             return [], True
         elif even_row_x_parity < 0 or odd_row_x_parity < 0:
             internal = height * [
-                int(width / 2) * BoardEncodingCharacters.VISIBLE_FLOOR.value + '\n'
+                int(width / 2) * BoardEncodingCharacters.VISIBLE_FLOOR.value +
+                '\n'
             ]
             return internal, True
 
@@ -121,7 +125,11 @@ class HexobanTextConverter(object):
                     break
 
                 layout_ok, should_copy_cell = self._analyze_text_cell_position(
-                    (parsed[y][x], x, y, odd_row_x_parity, even_row_x_parity,)
+                    (parsed[y][x],
+                     x,
+                     y,
+                     odd_row_x_parity,
+                     even_row_x_parity,)
                 )
 
                 if layout_ok and should_copy_cell:
@@ -135,7 +143,9 @@ class HexobanTextConverter(object):
 
         return internal, layout_ok
 
-    def convert_to_string(self, hexoban_board, output_settings = OutputSettings()):
+    def convert_to_string(
+        self, hexoban_board, output_settings=OutputSettings()
+    ):
         self.output_settings = output_settings
 
         retv = []
@@ -148,9 +158,8 @@ class HexobanTextConverter(object):
             for col in range(0, hexoban_board.width):
                 line.append(self.floor_character)
                 line.append(
-                    hexoban_board[index_1d(col, row, hexoban_board.width)].to_s(
-                        self.output_settings.use_visible_floors
-                    )
+                    hexoban_board[index_1d(col, row, hexoban_board.width)]
+                    .to_s(self.output_settings.use_visible_floors)
                 )
 
             retv.append("".join(line))
@@ -217,7 +226,8 @@ class HexobanTextConverter(object):
 
         should_copy_cell = layout_ok and not is_cell_for_layout
 
-        return (layout_ok, should_copy_cell,)
+        return (layout_ok,
+                should_copy_cell,)
 
     def _preparse_board(self, board_string):
         parsed = []
@@ -257,14 +267,18 @@ class HexobanTextConverter(object):
 
                 odd_row_x_parity = (even_row_x_parity + 1) % 2
 
-        return (parsed, width, height, even_row_x_parity, odd_row_x_parity,)
+        return (parsed,
+                width,
+                height,
+                even_row_x_parity,
+                odd_row_x_parity,)
 
     @property
     def floor_character(self):
         return (
             BoardEncodingCharacters.VISIBLE_FLOOR.value
-            if self.output_settings.use_visible_floors
-            else BoardEncodingCharacters.FLOOR.value
+            if self.output_settings.use_visible_floors else
+            BoardEncodingCharacters.FLOOR.value
         )
 
     def _add_column_left(self, string_list):
@@ -294,10 +308,7 @@ class HexobanTextConverter(object):
                 if non_floor_found:
                     break
 
-                if (
-                    not is_empty_floor(normalized[row][column]) and
-                    (column > x or row > y)
-                ):
+                if (not is_empty_floor(normalized[row][column]) and (column > x or row > y)):
                     x = column
                     y = row
                     non_floor_found = True

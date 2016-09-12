@@ -6,7 +6,7 @@ from .output_settings import OutputSettings
 from .sok_file_format import SOKFileFormat
 
 
-class PuzzlesCollection(object):
+class PuzzlesCollection:
 
     def __init__(
         self, title="", author="", created_at="", updated_at="", notes=""
@@ -32,9 +32,7 @@ class PuzzlesCollection(object):
 
     def _extenstion_to_variant_hint(self, path):
         file_extension = Path(path).ext
-        if (file_extension == '.sok' or
-                file_extension == '.txt' or
-                file_extension == '.xsb'):
+        if (file_extension == '.sok' or file_extension == '.txt' or file_extension == '.xsb'):
             return Variant.SOKOBAN
         elif file_extension == '.tsb':
             return Variant.TRIOBAN

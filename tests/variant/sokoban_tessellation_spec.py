@@ -10,8 +10,8 @@ class DescribeSokobanTessellation(
 ):
 
     illegal_directions = [
-        Direction.NORTH_WEST, Direction.NORTH_EAST,
-        Direction.SOUTH_WEST, Direction.SOUTH_EAST
+        Direction.NORTH_WEST, Direction.NORTH_EAST, Direction.SOUTH_WEST,
+        Direction.SOUTH_EAST
     ]
 
     legal_directions = [
@@ -29,8 +29,6 @@ class DescribeSokobanTessellation(
         AtomicMove(Direction.DOWN, True),
     ]
 
-    legal_characters = [
-        'l', 'r', 'u', 'd', 'L', 'R', 'U', 'D'
-    ]
+    legal_characters = ['l', 'r', 'u', 'd', 'L', 'R', 'U', 'D']
 
     tessellation = Tessellation.factory('Sokoban')

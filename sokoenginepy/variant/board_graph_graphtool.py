@@ -12,13 +12,14 @@ NetworkX implementation is used
 from graph_tool import Graph
 from graph_tool.topology import shortest_path
 
-from ..game import BoardCell
+from ..core import BoardCell
 
 from .common import GraphType
 from .board_graph_base import BoardGraphBase
 
 
 class BoardGraph(BoardGraphBase):
+
     def __init__(self, number_of_vertices, graph_type):
         assert graph_type in GraphType
         # Graph tool creates directed multigraph by default.
@@ -27,12 +28,10 @@ class BoardGraph(BoardGraphBase):
         self._graph.vertex_properties["cell"] = self._graph.new_vertex_property(
             "object", number_of_vertices * [BoardCell()]
         )
-        self._graph.edge_properties["direction"] = self._graph.new_edge_property(
-            "object"
-        )
-        self._graph.edge_properties["weight"] = self._graph.new_edge_property(
-            "int"
-        )
+        self._graph.edge_properties["direction"
+                                   ] = self._graph.new_edge_property("object")
+        self._graph.edge_properties["weight"
+                                   ] = self._graph.new_edge_property("int")
 
     def __getitem__(self, position):
         return self._graph.vp.cell[self._graph.vertex(position)]
@@ -51,8 +50,7 @@ class BoardGraph(BoardGraphBase):
 
     def has_edge(self, source_vertice, target_vertice, direction):
         for e in self._graph.vertex(source_vertice).out_edges():
-            if (int(e.target()) == target_vertice and
-                self._graph.ep.direction[e] == direction):
+            if (int(e.target()) == target_vertice and self._graph.ep.direction[e] == direction):
                 return True
         return False
 
@@ -70,11 +68,13 @@ class BoardGraph(BoardGraphBase):
         for source_vertice in self._graph.vertices():
             for direction in tessellation.legal_directions:
                 neighbor_vertice = tessellation.neighbor_position(
-                    int(source_vertice), direction,
-                    board_width=width, board_height=height
+                    int(source_vertice),
+                    direction,
+                    board_width=width,
+                    board_height=height
                 )
                 if neighbor_vertice is not None:
-                    e  = self._graph.add_edge(
+                    e = self._graph.add_edge(
                         source_vertice, neighbor_vertice, add_missing=False
                     )
                     self._graph.ep.direction[e] = direction
@@ -145,10 +145,11 @@ class BoardGraph(BoardGraphBase):
     def shortest_path(self, start_position, end_position):
         try:
             return [
-                int(v) for v in shortest_path(
-                    g = self._graph,
-                    source = self._graph.vertex(start_position),
-                    target = self._graph.vertex(end_position),
+                int(v)
+                for v in shortest_path(
+                    g=self._graph,
+                    source=self._graph.vertex(start_position),
+                    target=self._graph.vertex(end_position),
                 )[0]
             ]
         except ValueError:
@@ -158,11 +159,12 @@ class BoardGraph(BoardGraphBase):
         try:
             self.calculate_edge_weights()
             return [
-                int(v) for v in shortest_path(
-                    g = self._graph,
-                    source = self._graph.vertex(start_position),
-                    target = self._graph.vertex(end_position),
-                    weights = self._graph.ep.weight,
+                int(v)
+                for v in shortest_path(
+                    g=self._graph,
+                    source=self._graph.vertex(start_position),
+                    target=self._graph.vertex(end_position),
+                    weights=self._graph.ep.weight,
                 )[0]
             ]
         except ValueError:

@@ -4,10 +4,9 @@ from functools import wraps
 import networkx as nx
 
 from ..core import (
-    PrettyPrintable, EqualityComparable, Variant, index_1d,
-    Tessellated, Direction
+    PrettyPrintable, EqualityComparable, Variant, index_1d, Tessellated,
+    UnknownTessellationError, BoardCell
 )
-from ..game import BoardCell
 from ..io import (
     OutputSettings, rle_encode, is_blank, parse_board_string, RleCharacters
 )
@@ -19,6 +18,7 @@ def normalize_index_errors(method):
     """
     Normalizes NetworkX index out of range errors into IndexError
     """
+
     @wraps(method)
     def method_wrapper(self, *args, **kwargs):
         try:
@@ -29,6 +29,7 @@ def normalize_index_errors(method):
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
             raise IndexError('Board index out of range')
+
     return method_wrapper
 
 
@@ -49,10 +50,40 @@ class VariantBoard(
     into vertice index, use index_1d method
     """
 
+    @classmethod
+    def factory(
+        cls,
+        board_width=0,
+        board_height=0,
+        variant=Variant.SOKOBAN,
+        board_str=""
+    ):
+        variant = Variant.factory(variant)
+
+        if variant == Variant.SOKOBAN:
+            from .sokoban_board import SokobanBoard
+            return SokobanBoard(board_width, board_height, board_str)
+
+        if variant == Variant.HEXOBAN:
+            from .hexoban_board import HexobanBoard
+            return HexobanBoard(board_width, board_height, board_str)
+
+        if variant == Variant.OCTOBAN:
+            from .octoban_board import OctobanBoard
+            return OctobanBoard(board_width, board_height, board_str)
+
+        if variant == Variant.TRIOBAN:
+            from .trioban_board import TriobanBoard
+            return TriobanBoard(board_width, board_height, board_str)
+
+        raise UnknownTessellationError(variant)
+
     def __init__(
-        self, board_width=0, board_height=0,
-        variant = Variant.SOKOBAN,
-        board_str = ""
+        self,
+        board_width=0,
+        board_height=0,
+        variant=Variant.SOKOBAN,
+        board_str=""
     ):
         super().__init__(variant)
         self._resizer = self.tessellation.board_resizer_type(self)
@@ -63,8 +94,7 @@ class VariantBoard(
             self._reinit(board_width, board_height)
 
     def _reinit(self, width, height, reconfigure_edges=True):
-        self._graph = BoardGraph(width * height,
-                                 self.tessellation.graph_type)
+        self._graph = BoardGraph(width * height, self.tessellation.graph_type)
 
         self._width = width
         self._height = height
@@ -81,9 +111,11 @@ class VariantBoard(
             height = len(board_rows)
             self._reinit(width, height, reconfigure_edges)
             for y, row in enumerate(board_rows):
-                for x, chr in enumerate(row):
-                    self._graph[index_1d(x, y, self._width)] = BoardCell(chr)
+                for x, character in enumerate(row):
+                    self._graph[index_1d(x, y, self._width)
+                               ] = BoardCell(character)
 
+    @property
     def _representation_attributes(self):
         return {
             'tessellation': self.variant,
@@ -93,11 +125,7 @@ class VariantBoard(
         }
 
     def __eq__(self, other):
-        if (
-            self.variant == other.variant and
-            self.width == other.width and
-            self.height == other.height
-        ):
+        if (self.variant == other.variant and self.width == other.width and self.height == other.height):
             for vertice in range(0, self.size):
                 if self[vertice] != other[vertice]:
                     return False
@@ -126,7 +154,7 @@ class VariantBoard(
         return position in self._graph
 
     @abstractmethod
-    def to_s(self, output_settings = OutputSettings()):
+    def to_s(self, output_settings=OutputSettings()):
         """
         Override this in subclass to handle tessellation speciffic strings
         """
@@ -203,10 +231,12 @@ class VariantBoard(
 
     @normalize_index_errors
     def positions_reachable_by_pusher(
-        self, pusher_position, excluded_positions=[]
+        self, pusher_position, excluded_positions=None
     ):
+
         def is_obstacle(position):
             return not self[position].can_put_pusher_or_box
+
         return self._graph.reachables(
             root=pusher_position,
             is_obstacle_callable=is_obstacle,
@@ -214,7 +244,9 @@ class VariantBoard(
         )
 
     @normalize_index_errors
-    def normalized_pusher_position(self, pusher_position, excluded_positions=[]):
+    def normalized_pusher_position(
+        self, pusher_position, excluded_positions=None
+    ):
         reachables = self.positions_reachable_by_pusher(
             pusher_position=pusher_position,
             excluded_positions=excluded_positions
@@ -374,6 +406,7 @@ class VariantBoard(
 
 
 class VariantBoardResizer(ABC):
+
     def __init__(self, variant_board):
         self.board = variant_board
 
@@ -382,7 +415,8 @@ class VariantBoardResizer(ABC):
         old_height = self.board.height
 
         self.board._reinit(
-            self.board.width, self.board.height + 1,
+            self.board.width,
+            self.board.height + 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -396,7 +430,8 @@ class VariantBoardResizer(ABC):
         old_height = self.board.height
 
         self.board._reinit(
-            self.board.width, self.board.height + 1,
+            self.board.width,
+            self.board.height + 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -410,7 +445,8 @@ class VariantBoardResizer(ABC):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width + 1, self.board.height,
+            self.board.width + 1,
+            self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -424,7 +460,8 @@ class VariantBoardResizer(ABC):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width + 1, self.board.height,
+            self.board.width + 1,
+            self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -437,7 +474,8 @@ class VariantBoardResizer(ABC):
         old_body = self.board._graph
 
         self.board._reinit(
-            self.board.width, self.board.height - 1,
+            self.board.width,
+            self.board.height - 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -450,7 +488,8 @@ class VariantBoardResizer(ABC):
         old_body = self.board._graph
 
         self.board._reinit(
-            self.board.width, self.board.height - 1,
+            self.board.width,
+            self.board.height - 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -464,7 +503,8 @@ class VariantBoardResizer(ABC):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width - 1, self.board.height,
+            self.board.width - 1,
+            self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -478,7 +518,8 @@ class VariantBoardResizer(ABC):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width - 1, self.board.height,
+            self.board.width - 1,
+            self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -492,9 +533,8 @@ class VariantBoardResizer(ABC):
         for y in range(0, self.board.height):
             border_found = False
             for x in range(0, self.board.width):
-                border_found = self.board[
-                    index_1d(x, y, self.board.width)
-                ].is_border_element
+                border_found = self.board[index_1d(x, y, self.board.width)
+                                         ].is_border_element
                 if border_found:
                     if x < amount:
                         amount = x
@@ -523,9 +563,8 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             border_found = False
             for y in range(0, self.board.height):
-                border_found = self.board[
-                    index_1d(x, y, self.board.width)
-                ].is_border_element
+                border_found = self.board[index_1d(x, y, self.board.width)
+                                         ].is_border_element
                 if border_found:
                     if y < amount:
                         amount = y
@@ -553,8 +592,7 @@ class VariantBoardResizer(ABC):
         old_body = self.board._graph
 
         self.board._reinit(
-            self.board.width, self.board.height,
-            reconfigure_edges=False
+            self.board.width, self.board.height, reconfigure_edges=False
         )
 
         for x in range(0, self.board.width):
@@ -571,8 +609,7 @@ class VariantBoardResizer(ABC):
         old_body = self.board._graph
 
         self.board._reinit(
-            self.board.width, self.board.height,
-            reconfigure_edges=False
+            self.board.width, self.board.height, reconfigure_edges=False
         )
 
         for x in range(0, self.board.width):

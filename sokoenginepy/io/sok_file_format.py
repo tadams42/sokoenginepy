@@ -5,12 +5,11 @@ from ..core import (
 )
 
 from .puzzle import Puzzle, PuzzleSnapshot
-from .text_utils import (
-    is_blank, is_board_string, is_snapshot_string
-)
+from .text_utils import (is_blank, is_board_string, is_snapshot_string)
 
 
-class SOKFileFormat(object):
+class SOKFileFormat:
+
     @classmethod
     def read(cls, src_stream, dest_collection, variant_hint=Variant.SOKOBAN):
         SOKReader(src_stream, dest_collection, variant_hint).read()
@@ -21,21 +20,22 @@ class SOKFileFormat(object):
 
 
 class SOKTags(object):
-    AUTHOR              = 'Author'
-    TITLE               = 'Title'
-    GOALORDER           = 'goalorder'
-    BOXORDER            = 'boxorder'
-    SOLVER              = 'Solver'
-    VARIANT             = 'Game'
-    CREATED_AT          = 'Date created'
+    AUTHOR = 'Author'
+    TITLE = 'Title'
+    GOALORDER = 'goalorder'
+    BOXORDER = 'boxorder'
+    SOLVER = 'Solver'
+    VARIANT = 'Game'
+    CREATED_AT = 'Date created'
     SNAPSHOT_CREATED_AT = 'Date'
-    UPDATED_AT          = 'Date of last change'
-    DURATION            = 'Time'
-    RAW_FILE_NOTES      = '::'
-    TAG_DELIMITERS      = "=:"
+    UPDATED_AT = 'Date of last change'
+    DURATION = 'Time'
+    RAW_FILE_NOTES = '::'
+    TAG_DELIMITERS = "=:"
 
 
 class SOKReader(object):
+
     def __init__(self, src_stream, dest_collection, variant_hint):
         self.src_stream = src_stream
         self.dest_collection = dest_collection
@@ -79,7 +79,9 @@ class SOKReader(object):
                 remaining_lines = []
 
             if len(remaining_lines) > 0:
-                first_board_line = first_index_of(remaining_lines, is_board_string)
+                first_board_line = first_index_of(
+                    remaining_lines, is_board_string
+                )
 
                 if first_board_line is not None:
                     puzzle.notes = remaining_lines[:first_board_line]
@@ -96,7 +98,9 @@ class SOKReader(object):
         for puzzle_index, puzzle in enumerate(self.dest_collection.puzzles):
             remaining_lines = puzzle.notes
 
-            first_moves_line = first_index_of(remaining_lines, is_snapshot_string)
+            first_moves_line = first_index_of(
+                remaining_lines, is_snapshot_string
+            )
             if first_moves_line is not None:
                 puzzle.notes = remaining_lines[:first_moves_line]
                 remaining_lines = remaining_lines[first_moves_line:]
@@ -114,14 +118,13 @@ class SOKReader(object):
                 )
                 if first_note_line is not None:
                     snapshot.moves = "".join(
-                        moves_line.strip() for moves_line in
-                        remaining_lines[:first_note_line]
+                        moves_line.strip()
+                        for moves_line in remaining_lines[:first_note_line]
                     )
                     remaining_lines = remaining_lines[first_note_line:]
                 else:
                     snapshot.moves = "".join(
-                        moves_line.strip() for moves_line in
-                        remaining_lines
+                        moves_line.strip() for moves_line in remaining_lines
                     )
                     remaining_lines = []
 
@@ -148,7 +151,7 @@ class SOKReader(object):
     def _get_tag_data(self, tag, line):
         # TODO: If tag data contains split char, it will not get collected
         # ie. "Date created: 2015-02-03 13:42:32"
-        components = type(self)._tag_splitter.split(str(line))
+        components = self._tag_splitter.split(str(line))
         if components[0].strip().lower() == tag.strip().lower():
             return components[1].strip()
         return None
@@ -161,7 +164,8 @@ class SOKReader(object):
 
     def _is_collection_tag_line(self, line):
         return any(
-            self._is_tagged_as(tag, line) for tag in (
+            self._is_tagged_as(tag, line)
+            for tag in (
                 SOKTags.AUTHOR, SOKTags.TITLE, SOKTags.VARIANT,
                 SOKTags.CREATED_AT, SOKTags.UPDATED_AT
             )
@@ -169,7 +173,8 @@ class SOKReader(object):
 
     def _is_puzzle_tag_line(self, line):
         return any(
-            self._is_tagged_as(tag, line) for tag in (
+            self._is_tagged_as(tag, line)
+            for tag in (
                 SOKTags.AUTHOR, SOKTags.VARIANT, SOKTags.TITLE,
                 SOKTags.BOXORDER, SOKTags.GOALORDER
             )
@@ -177,7 +182,8 @@ class SOKReader(object):
 
     def _is_snapshot_tag_line(self, line):
         return any(
-            self._is_tagged_as(tag, line) for tag in (
+            self._is_tagged_as(tag, line)
+            for tag in (
                 SOKTags.AUTHOR, SOKTags.SOLVER, SOKTags.CREATED_AT,
                 SOKTags.SNAPSHOT_CREATED_AT, SOKTags.DURATION
             )
@@ -234,7 +240,7 @@ class SOKReader(object):
 
         if preceeding_ok and following_ok:
             title_line = notes[candidate_index].strip()
-            del(notes[candidate_index])
+            del (notes[candidate_index])
             return title_line
 
         return ""
@@ -292,12 +298,10 @@ class SOKReader(object):
             for line in puzzle.notes:
                 if self._is_puzzle_tag_line(line):
                     variant = (
-                        variant or
-                        self._get_tag_data(SOKTags.VARIANT, line)
+                        variant or self._get_tag_data(SOKTags.VARIANT, line)
                     )
                     puzzle.title = (
-                        puzzle.title or
-                        self._get_tag_data(SOKTags.TITLE, line)
+                        puzzle.title or self._get_tag_data(SOKTags.TITLE, line)
                     )
                     puzzle.author = (
                         puzzle.author or
@@ -319,7 +323,9 @@ class SOKReader(object):
             if variant is not None:
                 puzzle.variant = Variant.factory(variant)
             elif self.collection_header_variant_hint is not None:
-                puzzle.variant = Variant.factory(self.collection_header_variant_hint)
+                puzzle.variant = Variant.factory(
+                    self.collection_header_variant_hint
+                )
             elif self.supplied_variant_hint is not None:
                 puzzle.variant = Variant.factory(self.supplied_variant_hint)
 
@@ -366,11 +372,11 @@ class SOKReader(object):
         if i is not None:
             lst = lst[:i + 1]
 
-        return "\n".join(
-            line.strip() for line in lst
-        )
+        return "\n".join(line.strip() for line in lst)
+
 
 class SOKWriter(object):
+
     def __init__(self, dest_stream):
         self.dest_stream = dest_stream
 
@@ -424,12 +430,12 @@ class SOKWriter(object):
             self.dest_stream.write(line.rstrip() + "\n")
 
         self._write_tagged(
-            SOKTags.CREATED_AT,
-            puzzle_collection.created_at.strip() or utcnow().isoformat()
+            SOKTags.CREATED_AT, puzzle_collection.created_at.strip() or
+            utcnow().isoformat()
         )
         self._write_tagged(
-            SOKTags.UPDATED_AT,
-            puzzle_collection.updated_at.strip() or utcnow().isoformat()
+            SOKTags.UPDATED_AT, puzzle_collection.updated_at.strip() or
+            utcnow().isoformat()
         )
 
         self.dest_stream.write(
@@ -462,9 +468,7 @@ class SOKWriter(object):
         self.dest_stream.write(snapshot.moves.strip() + "\n\n")
 
         written = True
-        written = self._write_tagged(
-            SOKTags.SOLVER, snapshot.solver
-        ) or written
+        written = self._write_tagged(SOKTags.SOLVER, snapshot.solver) or written
         written = self._write_tagged(
             SOKTags.SNAPSHOT_CREATED_AT, snapshot.created_at
         ) or written

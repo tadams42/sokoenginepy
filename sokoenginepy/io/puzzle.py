@@ -8,7 +8,7 @@ from .text_utils import (
 from .output_settings import OutputSettings
 
 
-class Puzzle(object):
+class Puzzle:
     """
     Board with all its meta data and snapshots.
 
@@ -18,9 +18,19 @@ class Puzzle(object):
     """
 
     def __init__(
-        self, board="", variant=Variant.SOKOBAN, title="", author="", boxorder="",
-        goalorder="", notes="", snapshots=[], created_at="", updated_at=""
+        self,
+        board="",
+        variant=Variant.SOKOBAN,
+        title="",
+        author="",
+        boxorder="",
+        goalorder="",
+        notes="",
+        snapshots=None,
+        created_at="",
+        updated_at=""
     ):
+        self._variant = None
         self.id = 1
         self.board = board
         self.variant = variant
@@ -29,7 +39,7 @@ class Puzzle(object):
         self.boxorder = boxorder
         self.goalorder = goalorder
         self.notes = notes
-        self.snapshots = snapshots
+        self.snapshots = snapshots or []
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -67,26 +77,23 @@ class Puzzle(object):
     def pushers_count(self):
         reduce(
             lambda x, y: x + y,
-            [1 if is_pusher(chr) else 0 for chr in self.board],
-            0
+            [1 if is_pusher(chr) else 0 for chr in self.board], 0
         )
 
     def boxes_count(self):
         reduce(
-            lambda x, y: x + y,
-            [1 if is_box(chr) else 0 for chr in self.board],
+            lambda x, y: x + y, [1 if is_box(chr) else 0 for chr in self.board],
             0
         )
 
     def goals_count(self):
         reduce(
             lambda x, y: x + y,
-            [1 if is_goal(chr) else 0 for chr in self.board],
-            0
+            [1 if is_goal(chr) else 0 for chr in self.board], 0
         )
 
 
-class PuzzleSnapshot(object):
+class PuzzleSnapshot:
     """
     Snapshot with all its meta data.
 
@@ -94,10 +101,19 @@ class PuzzleSnapshot(object):
     as possible. Proper validation is triggered when PuzzleSnapshot is
     converted into GameSnapshot.
     """
+
     def __init__(
-        self, moves="", title="", duration=None, solver="", notes="",
-        created_at="", updated_at="", variant = Variant.SOKOBAN
+        self,
+        moves="",
+        title="",
+        duration=None,
+        solver="",
+        notes="",
+        created_at="",
+        updated_at="",
+        variant=Variant.SOKOBAN
     ):
+        self._variant = None
         self.id = 1
         self.moves = moves
         self.title = title
@@ -118,7 +134,7 @@ class PuzzleSnapshot(object):
 
     def to_game_snapshot(self):
         from ..game import GameSnapshot
-        return GameSnapshot(variant = self.variant, moves_data = self.moves)
+        return GameSnapshot(variant=self.variant, moves_data=self.moves)
 
     def reformat(self, output_settings=OutputSettings()):
         self.moves = self.to_game_snapshot().to_s(output_settings)
@@ -135,8 +151,7 @@ class PuzzleSnapshot(object):
 
     def pushes_count(self):
         reduce(
-            lambda x, y: x + y,
-            [
+            lambda x, y: x + y, [
                 1 if is_atomic_move_char(chr) and chr.isupper() else 0
                 for chr in self.moves
             ], 0
@@ -149,8 +164,7 @@ class PuzzleSnapshot(object):
         selections.
         """
         reduce(
-            lambda x, y: x + y,
-            [
+            lambda x, y: x + y, [
                 1 if is_atomic_move_char(chr) and chr.islower() else 0
                 for chr in self.moves
             ], 0
@@ -158,10 +172,8 @@ class PuzzleSnapshot(object):
 
     def is_reverse(self):
         reduce(
-            lambda x, y: x or y,
-            [
+            lambda x, y: x or y, [
                 chr == SpecialSnapshotCharacters.JUMP_BEGIN or
-                chr == SpecialSnapshotCharacters.JUMP_END
-                for chr in self.moves
+                chr == SpecialSnapshotCharacters.JUMP_END for chr in self.moves
             ], False
         )
