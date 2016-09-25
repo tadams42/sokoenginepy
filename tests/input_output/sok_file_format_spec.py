@@ -1,4 +1,4 @@
-from sokoenginepy.io import is_blank, SOKFileFormat
+from sokoenginepy.input_output import is_blank, SOKFileFormat
 from sokoenginepy import PuzzlesCollection, Variant
 from helpers import TEST_RESOURCES_ROOT
 

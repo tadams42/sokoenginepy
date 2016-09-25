@@ -7,7 +7,7 @@ from ..core import (
     PrettyPrintable, EqualityComparable, Variant, index_1d, Tessellated,
     UnknownTessellationError, BoardCell
 )
-from ..io import (
+from ..input_output import (
     OutputSettings, rle_encode, is_blank, parse_board_string, RleCharacters
 )
 

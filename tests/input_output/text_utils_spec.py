@@ -5,8 +5,8 @@ from sokoenginepy import BoardConversionError, AtomicMove,\
 
 from sokoenginepy.core import Tessellation
 
-from sokoenginepy.io import *
-from sokoenginepy.io.text_utils import Rle
+from sokoenginepy.input_output import *
+from sokoenginepy.input_output.text_utils import Rle
 
 
 class Describe_is_board_string:

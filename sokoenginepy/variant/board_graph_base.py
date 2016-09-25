@@ -144,7 +144,7 @@ class BoardGraphBase(ABC):
     #     from moviepy.editor import ImageSequenceClip
     #     from functools import partial
     #     from ..core import index_1d, X, Y, Tessellation
-    #     from ..io import parse_board_string
+    #     from ..input_output import parse_board_string
 
     #     WHITE = (255, 255, 255)
     #     BLACK = (0, 0, 0)

@@ -2,7 +2,7 @@ from ..core import (
     Tessellation, on_board_2d, ROW, COLUMN, index_1d, Direction,
     IllegalDirectionError, CellOrientation
 )
-from ..io import AtomicMoveCharacters
+from ..input_output import AtomicMoveCharacters
 from .octoban_board import OctobanBoardResizer
 from .common import GraphType
 

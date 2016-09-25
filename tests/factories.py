@@ -8,7 +8,7 @@ from sokoenginepy import (
     SokobanPlus, OutputSettings
 )
 from sokoenginepy.core.sokoban_plus import SokobanPlusValidator
-from sokoenginepy.io import BoardEncodingCharacters
+from sokoenginepy.input_output import BoardEncodingCharacters
 from sokoenginepy.variant import SokobanBoard
 from sokoenginepy.core import Tessellation, BoardState, HashedBoardState
 

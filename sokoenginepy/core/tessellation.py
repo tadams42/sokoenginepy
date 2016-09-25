@@ -103,7 +103,7 @@ class Tessellation(ABC):
         Converts string to AtomicMove instance or raises exception if conversion
         not possible.
         """
-        from ..io import AtomicMoveCharacters
+        from ..input_output import AtomicMoveCharacters
 
         if isinstance(input_chr, AtomicMoveCharacters):
             input_chr = input_chr.value

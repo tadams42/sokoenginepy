@@ -2,7 +2,7 @@ import pytest
 import copy
 from factories import BoardCellFactory
 from sokoenginepy import BoardCell, SokoengineError
-from sokoenginepy.io import BoardEncodingCharacters
+from sokoenginepy.input_output import BoardEncodingCharacters
 
 
 class DescribeBoardCell:

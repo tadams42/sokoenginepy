@@ -1,5 +1,5 @@
 from ..core import Variant, BoardConversionError, X, Y, index_1d
-from ..io import (
+from ..input_output import (
     OutputSettings, is_empty_floor, normalize_width, parse_board_string,
     calculate_width, BoardEncodingCharacters, RleCharacters, rle_encode
 )

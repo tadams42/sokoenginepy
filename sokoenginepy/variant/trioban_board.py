@@ -1,5 +1,5 @@
 from ..core import Variant
-from ..io import OutputSettings
+from ..input_output import OutputSettings
 
 from .variant_board import VariantBoard, VariantBoardResizer
 

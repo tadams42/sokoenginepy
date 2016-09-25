@@ -1,7 +1,7 @@
 from .helpers import PrettyPrintable, EqualityComparable
 from .exceptions import SokoengineError
 
-from ..io import (
+from ..input_output import (
     BoardEncodingCharacters, is_wall, is_pusher, is_goal, is_empty_floor, is_box
 )
 

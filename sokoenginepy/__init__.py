@@ -9,4 +9,4 @@ from .core import (
 
 from .game import GameSolvingMode, GameSnapshot
 
-from .io import OutputSettings, Puzzle, PuzzleSnapshot, PuzzlesCollection
+from .input_output import OutputSettings, Puzzle, PuzzleSnapshot, PuzzlesCollection

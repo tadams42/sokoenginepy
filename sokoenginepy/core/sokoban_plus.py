@@ -1,7 +1,7 @@
 from .exceptions import SokobanPlusDataError
 from .helpers import PrettyPrintable
 from .piece import Piece
-from ..io import parse_sokoban_plus_data
+from ..input_output import parse_sokoban_plus_data
 
 
 class SokobanPlus(PrettyPrintable):

@@ -4,7 +4,7 @@ from ..core import (
     SnapshotConversionError, IllegalDirectionError, SokoengineError,
     PrettyPrintable, EqualityComparable, Tessellated, Variant
 )
-from ..io import (
+from ..input_output import (
     OutputSettings, SpecialSnapshotCharacters, rle_encode, is_blank,
     SnapshotStringParser
 )
