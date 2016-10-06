@@ -1,6 +1,6 @@
-from sokoenginepy.input_output import is_blank, SOKFileFormat
-from sokoenginepy import PuzzlesCollection, Variant
 from helpers import TEST_RESOURCES_ROOT
+from sokoenginepy.common import Variant, is_blank
+from sokoenginepy.input_output import PuzzlesCollection, SOKFileFormat
 
 INPUT_FILES_ROOT = TEST_RESOURCES_ROOT.child('test_data')
 

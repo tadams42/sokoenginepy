@@ -1,9 +1,12 @@
-import pytest
-from unipath import Path
 from inspect import getsourcefile
 from os.path import abspath
+
+import pytest
 from faker import Faker
-from sokoenginepy import IllegalDirectionError, AtomicMove
+from unipath import Path
+
+from sokoenginepy.common import UnknownDirectionError
+from sokoenginepy.snapshot import AtomicMove
 
 TEST_RESOURCES_ROOT = (
     Path(abspath(getsourcefile(lambda: 0))).ancestor(1).child('res')
@@ -29,14 +32,14 @@ class TessellationSpecMixin:
             )
 
     def test_it_raises_on_illegal_character(self):
-        with pytest.raises(IllegalDirectionError):
+        with pytest.raises(UnknownDirectionError):
             self.tessellation.char_to_atomic_move('z')
 
     def test_it_raises_when_converting_illegal_direction(self):
         for index, illegal_direction in enumerate(self.illegal_directions):
             move = AtomicMove(illegal_direction, False)
-            with pytest.raises(IllegalDirectionError):
+            with pytest.raises(UnknownDirectionError):
                 self.tessellation.atomic_move_to_char(move)
             push = AtomicMove(illegal_direction, True)
-            with pytest.raises(IllegalDirectionError):
+            with pytest.raises(UnknownDirectionError):
                 self.tessellation.atomic_move_to_char(push)

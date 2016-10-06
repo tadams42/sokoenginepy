@@ -1,5 +1,6 @@
-from ..core import Variant, SokobanPlus
-from ..variant import VariantBoard
+from ..board import SokobanPlus
+from ..common import Variant
+from ..tessellation import board_factory
 
 
 class GameBoard:
@@ -11,7 +12,7 @@ class GameBoard:
         variant=Variant.SOKOBAN,
         board_str=""
     ):
-        self._variant_board = VariantBoard.factory(
+        self._variant_board = board_factory(
             board_width=board_width,
             board_height=board_height,
             variant=variant,

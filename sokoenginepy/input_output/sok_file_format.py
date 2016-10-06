@@ -1,11 +1,10 @@
 import re
 
-from ..core import (
-    Variant, RESOURCES_ROOT, utcnow, first_index_of, last_index_of
-)
-
+from ..board import is_board_string
+from ..common import (RESOURCES_ROOT, Variant, first_index_of, is_blank,
+                      last_index_of, utcnow)
+from ..snapshot import is_snapshot_string
 from .puzzle import Puzzle, PuzzleSnapshot
-from .text_utils import (is_blank, is_board_string, is_snapshot_string)
 
 
 class SOKFileFormat:

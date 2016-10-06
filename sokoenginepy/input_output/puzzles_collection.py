@@ -1,7 +1,6 @@
 from unipath import Path
 
-from ..core import Variant
-
+from ..common import Variant
 from .output_settings import OutputSettings
 from .sok_file_format import SOKFileFormat
 

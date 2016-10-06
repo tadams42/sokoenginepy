@@ -1,15 +1,14 @@
-import pytest
 import factory
+import pytest
 
 from helpers import fake
-
-from sokoenginepy import (
-    AtomicMove, Direction, BoardCell, GameSnapshot, Variant, GameSolvingMode,
-    SokobanPlus, OutputSettings
-)
-from sokoenginepy.input_output import BoardEncodingCharacters
-from sokoenginepy.variant import SokobanBoard
-from sokoenginepy.core import Tessellation, BoardState, HashedBoardState
+from sokoenginepy.board import (BoardCell, BoardEncodingCharacters, BoardState,
+                                HashedBoardState, SokobanPlus)
+from sokoenginepy.common import Direction, Variant
+from sokoenginepy.game import GameSnapshot, GameSolvingMode
+from sokoenginepy.input_output import OutputSettings
+from sokoenginepy.snapshot import AtomicMove
+from sokoenginepy.tessellation import SokobanBoard, tessellation_factory
 
 
 class AtomicMoveFactory(factory.Factory):
@@ -142,12 +141,12 @@ def board_graph(variant_board):
 
 @pytest.fixture
 def sokoban_tessellation():
-    return Tessellation.factory('sokoban')
+    return tessellation_factory('sokoban')
 
 
 @pytest.fixture
 def trioban_tessellation():
-    return Tessellation.factory('trioban')
+    return tessellation_factory('trioban')
 
 
 @pytest.fixture

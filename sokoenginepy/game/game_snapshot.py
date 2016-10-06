@@ -1,28 +1,21 @@
-from collections.abc import MutableSequence, Iterable
+from collections.abc import Iterable, MutableSequence
 
-from ..core import (
-    SnapshotConversionError, IllegalDirectionError, SokoengineError,
-    PrettyPrintable, EqualityComparable, Tessellated, Variant
-)
-from ..input_output import (
-    OutputSettings, SpecialSnapshotCharacters, rle_encode, is_blank,
-    SnapshotStringParser
-)
-
+from ..common import (EqualityComparable, PrettyPrintable, SokoengineError,
+                      UnknownDirectionError, Variant, is_blank, rle_encode)
+from ..input_output import OutputSettings
+from ..snapshot import (SnapshotConversionError, SnapshotStringParser,
+                        SpecialSnapshotCharacters)
+from ..tessellation import Tessellated
 from .common import GameSolvingMode
 
 
-class GameSnapshot(
-    MutableSequence, PrettyPrintable, EqualityComparable, Tessellated
-):
+class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityComparable):
     """
     Sequence of AtomicMove representing snapshot of game.
     """
 
     def __init__(
-        self,
-        variant=Variant.SOKOBAN,
-        solving_mode=GameSolvingMode.FORWARD,
+        self, variant=Variant.SOKOBAN, solving_mode=GameSolvingMode.FORWARD,
         moves_data=""
     ):
         """
@@ -30,6 +23,7 @@ class GameSnapshot(
         will be parsed. Also, if not empty, solving mode will be parsed from
         it, and the value of solving_mode argument will be ignored
         """
+        super().__init__(variant)
         self._solving_mode = None
         self._moves_count = 0
         self._pushes_count = 0
@@ -37,7 +31,6 @@ class GameSnapshot(
         self._jumps_count_invalidated = False
         self._moves = []
 
-        super().__init__(variant)
         if not is_blank(moves_data):
             self._parse_string(moves_data)
         else:
@@ -243,7 +236,7 @@ class GameSnapshot(
             )
 
         if atomic_move.direction not in self.tessellation.legal_directions:
-            raise IllegalDirectionError(
+            raise UnknownDirectionError(
                 "Invalid direction for tessellation {0}".format(self.variant)
             )
 

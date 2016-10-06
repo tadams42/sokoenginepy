@@ -1,10 +1,8 @@
 from functools import reduce
 
-from ..core import Variant
-
-from .text_utils import (
-    is_pusher, is_box, is_goal, is_atomic_move_char, SpecialSnapshotCharacters
-)
+from ..board import is_box, is_goal, is_pusher
+from ..common import Variant
+from ..snapshot import SpecialSnapshotCharacters, is_atomic_move
 from .output_settings import OutputSettings
 
 
@@ -152,7 +150,7 @@ class PuzzleSnapshot:
     def pushes_count(self):
         reduce(
             lambda x, y: x + y, [
-                1 if is_atomic_move_char(chr) and chr.isupper() else 0
+                1 if is_atomic_move(chr) and chr.isupper() else 0
                 for chr in self.moves
             ], 0
         )
@@ -165,7 +163,7 @@ class PuzzleSnapshot:
         """
         reduce(
             lambda x, y: x + y, [
-                1 if is_atomic_move_char(chr) and chr.islower() else 0
+                1 if is_atomic_move(chr) and chr.islower() else 0
                 for chr in self.moves
             ], 0
         )
