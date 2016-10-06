@@ -10,7 +10,7 @@ sokoenginepy
   :target: https://travis-ci.org/tadamic/sokoenginepy
   :alt: TravisCI status
 
-.. image:: https://coveralls.io/repos/tadamic/sokoenginepy/badge.svg?branch=development
+.. image:: https://coveralls.io/repos/github/tadamic/sokoenginepy/badge.svg?branch=development
   :target: https://coveralls.io/github/tadamic/sokoenginepy?branch=development
   :alt: Coveralls status
 

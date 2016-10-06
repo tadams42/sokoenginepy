@@ -1,7 +1,6 @@
 import pytest
-from unittest.mock import Mock, call
+from unittest.mock import Mock, call, patch
 from sokoenginepy import SokobanPlus, Piece, SokobanPlusDataError
-from sokoenginepy.core.sokoban_plus import SokobanPlusValidator
 from factories import SokobanPlusFactory
 
 
@@ -117,86 +116,83 @@ class DescribeSokobanPlus:
                 SokobanPlus._LEGACY_DEFAULT_PLUS_ID
             )
 
+    class Describe_is_valid:
 
-class DescribeSokobanPlusValidator:
+        def it_is_valid_calls_all_validators(self, sokoban_plus):
+            sokoban_plus._validate_plus_ids = Mock()
+            sokoban_plus._validate_piece_count = Mock()
+            sokoban_plus._validate_ids_counts = Mock()
+            sokoban_plus._validate_id_sets_equality = Mock()
+            sokoban_plus.is_valid
 
-    def it_is_valid_calls_all_validators(self, sokoban_plus_validator):
-        sokoban_plus_validator._validate_plus_ids = Mock()
-        sokoban_plus_validator._validate_piece_count = Mock()
-        sokoban_plus_validator._validate_ids_counts = Mock()
-        sokoban_plus_validator._validate_id_sets_equality = Mock()
-        sokoban_plus_validator.is_valid()
+            assert sokoban_plus._validate_plus_ids.call_count == 2
+            assert sokoban_plus._validate_plus_ids.call_args_list == [
+                call(sokoban_plus._box_plus_ids),
+                call(sokoban_plus._goal_plus_ids)
+            ]
+            assert sokoban_plus._validate_piece_count.called
+            assert sokoban_plus._validate_ids_counts.called
+            assert sokoban_plus._validate_id_sets_equality.called
 
-        assert sokoban_plus_validator._validate_plus_ids.call_count == 2
-        assert sokoban_plus_validator._validate_plus_ids.call_args_list == [
-            call(sokoban_plus_validator.sokoban_plus._box_plus_ids),
-            call(sokoban_plus_validator.sokoban_plus._goal_plus_ids)
-        ]
-        assert sokoban_plus_validator._validate_piece_count.called
-        assert sokoban_plus_validator._validate_ids_counts.called
-        assert sokoban_plus_validator._validate_id_sets_equality.called
+        def it_validates_all_plus_ids(self, sokoban_plus):
+            with patch('sokoenginepy.core.sokoban_plus.Piece') as mock_class:
+                mock_class.is_valid_plus_id.return_value = True
+                sokoban_plus._validate_plus_ids(sokoban_plus._box_plus_ids)
 
-    def it_validates_all_plus_ids(self, sokoban_plus_validator):
-        sokoban_plus_validator._is_valid_plus_id = Mock(return_value=True)
-        sokoban_plus_validator._validate_plus_ids(
-            sokoban_plus_validator.sokoban_plus._box_plus_ids
-        )
-        assert sokoban_plus_validator._is_valid_plus_id.call_args_list == [
-            call(id) for id in sokoban_plus_validator.sokoban_plus._box_plus_ids
-        ]
-        assert len(sokoban_plus_validator.errors) == 0
+                assert mock_class.is_valid_plus_id.call_args_list == [
+                    call(id) for id in sokoban_plus._box_plus_ids
+                ]
+                assert len(sokoban_plus.errors) == 0
 
-        sokoban_plus_validator._is_valid_plus_id = Mock(return_value=False)
-        sokoban_plus_validator._validate_plus_ids(
-            sokoban_plus_validator.sokoban_plus._box_plus_ids
-        )
-        assert len(sokoban_plus_validator.errors) > 0
+                mock_class.is_valid_plus_id.return_value = False
+                sokoban_plus._validate_plus_ids(sokoban_plus._box_plus_ids)
+                assert len(sokoban_plus.errors) > 0
 
-    def it_validates_piece_count_is_greater_or_equal_than_zero(
-        self, sokoban_plus_validator
-    ):
-        sokoban_plus_validator._validate_piece_count()
-        assert len(sokoban_plus_validator.errors) == 0
-        sokoban_plus_validator.sokoban_plus._pieces_count = -42
-        sokoban_plus_validator._validate_piece_count()
-        assert len(sokoban_plus_validator.errors) > 0
+        def it_validates_piece_count_is_greater_or_equal_than_zero(
+            self, sokoban_plus
+        ):
+            sokoban_plus._validate_piece_count()
+            assert len(sokoban_plus.errors) == 0
+            sokoban_plus._pieces_count = -42
+            sokoban_plus._validate_piece_count()
+            assert len(sokoban_plus.errors) > 0
 
-    def it_validates_ids_lengths_are_equal_to_piece_count(
-        self, sokoban_plus_validator
-    ):
-        sokoban_plus_validator._validate_ids_counts()
-        assert len(sokoban_plus_validator.errors) == 0
-        sokoban_plus_validator.sokoban_plus._pieces_count = -42
-        sokoban_plus_validator._validate_ids_counts()
-        assert len(sokoban_plus_validator.errors) > 0
+        def it_validates_ids_lengths_are_equal_to_piece_count(
+            self, sokoban_plus
+        ):
+            sokoban_plus._validate_ids_counts()
+            assert len(sokoban_plus.errors) == 0
+            sokoban_plus._pieces_count = -42
+            sokoban_plus._validate_ids_counts()
+            assert len(sokoban_plus.errors) > 0
 
-    def it_validates_there_are_not_to_many_ids(self):
-        sokoban_plus = SokobanPlusFactory(
-            goalorder="1 2 3 4 5 6", boxorder="5 4 3 2 1", pieces_count=5
-        )
-        sokoban_plus._parse()
-        validator = SokobanPlusValidator(sokoban_plus)
+        def it_validates_there_are_not_to_many_ids(self):
+            sokoban_plus = SokobanPlusFactory(
+                goalorder="1 2 3 4 5 6", boxorder="5 4 3 2 1", pieces_count=5
+            )
+            sokoban_plus._parse()
+            assert not sokoban_plus.is_valid
 
-        assert not validator.is_valid()
+        def it_validates_same_id_set_is_defined_for_both_piece_types(
+            self, sokoban_plus
+        ):
+            sokoban_plus._validate_id_sets_equality()
+            assert len(sokoban_plus.errors) == 0
 
-    def it_validates_same_id_set_is_defined_for_both_piece_types(
-        self, sokoban_plus_validator
-    ):
-        sokoban_plus_validator._validate_id_sets_equality()
-        assert len(sokoban_plus_validator.errors) == 0
+            sokoban_plus._box_plus_ids = \
+                sokoban_plus._goal_plus_ids.copy()
+            sokoban_plus._box_plus_ids[42000] = 24000
 
-        sokoban_plus_validator.sokoban_plus._box_plus_ids = \
-            sokoban_plus_validator.sokoban_plus._goal_plus_ids.copy()
-        sokoban_plus_validator.sokoban_plus._box_plus_ids[42000] = 24000
+            sokoban_plus._validate_id_sets_equality()
+            assert len(sokoban_plus.errors) > 0
 
-        sokoban_plus_validator._validate_id_sets_equality()
-        assert len(sokoban_plus_validator.errors) > 0
-
-    def it_allows_that_there_are_duplicate_plus_ids_for_same_piece_type(self):
-        sokoban_plus = SokobanPlusFactory(
-            goalorder="1 1 2 2 3 3", boxorder="2 2 3 3 1 1", pieces_count=10
-        )
-        sokoban_plus._parse()
-        validator = SokobanPlusValidator(sokoban_plus)
-
-        assert validator.is_valid()
+        def it_allows_that_there_are_duplicate_plus_ids_for_same_piece_type(
+            self
+        ):
+            sokoban_plus = SokobanPlusFactory(
+                goalorder="1 1 2 2 3 3",
+                boxorder="2 2 3 3 1 1",
+                pieces_count=10
+            )
+            sokoban_plus._parse()
+            assert sokoban_plus.is_valid

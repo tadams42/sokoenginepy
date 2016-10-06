@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from cached_property import cached_property
 from .piece import Piece
+from .sokoban_plus import SokobanPlus
 
 
 class BoardState:
@@ -13,6 +14,7 @@ class BoardState:
         self._boxes = OrderedDict()
         self._goals = OrderedDict()
         self._pushers = OrderedDict()
+        self._sokoban_plus = None
 
         pusher_id = box_id = goal_id = Piece.DEFAULT_ID
 
@@ -31,13 +33,13 @@ class BoardState:
                 self._goals[goal_id] = Piece(position, goal_id)
                 goal_id += 1
 
-    @cached_property
-    def distinct_box_plus_ids(self):
-        return set(box.plus_id for box in self._boxes.values())
-
     @property
     def board_size(self):
         return self._variant_board.size
+
+    # --------------------------------------------------------------------------
+    # Pushers
+    # --------------------------------------------------------------------------
 
     @cached_property
     def pushers_count(self):
@@ -68,6 +70,10 @@ class BoardState:
         pusher = [p for p in self._pushers.values() if p.position == on_position]
         return pusher[0].id
 
+    # --------------------------------------------------------------------------
+    # Boxes
+    # --------------------------------------------------------------------------
+
     @cached_property
     def boxes_count(self):
         return len(self._boxes)
@@ -87,8 +93,9 @@ class BoardState:
         box = [b for b in self._boxes.values() if b.position == on_position]
         return box[0].id
 
-    def box_plus_id(self, id):
-        return self._boxes[id].plus_id
+    # --------------------------------------------------------------------------
+    # Goals
+    # --------------------------------------------------------------------------
 
     @cached_property
     def goals_count(self):
@@ -109,5 +116,56 @@ class BoardState:
         goal = [g for g in self._goals.values() if g.position == on_position]
         return goal[0].id
 
+    # --------------------------------------------------------------------------
+    # Sokoban+
+    # --------------------------------------------------------------------------
+
+    @cached_property
+    def _distinct_box_plus_ids(self):
+        return set(box.plus_id for box in self._boxes.values())
+
+    def box_plus_id(self, id):
+        return self._boxes[id].plus_id
+
     def goal_plus_id(self, id):
         return self._goals[id].plus_id
+
+    @property
+    def boxorder(self):
+        if self._sokoban_plus:
+            return self._sokoban_plus.boxorder
+        return ""
+
+    @property
+    def goalorder(self):
+        if self._sokoban_plus:
+            return self._sokoban_plus.goalorder
+        return ""
+
+    @property
+    def is_sokoban_plus_enabled(self):
+        if self._sokoban_plus:
+            return self._sokoban_plus.is_enabled
+        return False
+
+    @is_sokoban_plus_enabled.setter
+    def is_sokoban_plus_enabled(self, rv):
+        if self._sokoban_plus:
+            self._sokoban_plus.is_enabled = rv
+            for box in self._boxes:
+                box.plus_id = self._sokoban_plus.box_plus_id(box.id)
+            for goal in self._goals:
+                goal.plus_id = self._sokoban_plus.goal_plus_id(goal.id)
+
+    @property
+    def is_sokoban_plus_valid(self):
+        if self._sokoban_plus:
+            if not self._sokoban_plus.is_valid:
+                return self._sokoban_plus.errors
+        return True
+
+    def set_sokoban_plus(self, boxorder, goalorder):
+        self.is_sokoban_plus_enabled = False
+        self._sokoban_plus = SokobanPlus(
+            self.boxes_count, boxorder, goalorder
+        )

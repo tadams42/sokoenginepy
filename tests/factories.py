@@ -7,7 +7,6 @@ from sokoenginepy import (
     AtomicMove, Direction, BoardCell, GameSnapshot, Variant, GameSolvingMode,
     SokobanPlus, OutputSettings
 )
-from sokoenginepy.core.sokoban_plus import SokobanPlusValidator
 from sokoenginepy.input_output import BoardEncodingCharacters
 from sokoenginepy.variant import SokobanBoard
 from sokoenginepy.core import Tessellation, BoardState, HashedBoardState
@@ -97,12 +96,6 @@ class SokobanPlusFactory(factory.Factory):
 @pytest.fixture
 def sokoban_plus():
     return SokobanPlusFactory()
-
-
-@pytest.fixture
-def sokoban_plus_validator(sokoban_plus):
-    sokoban_plus._parse()
-    return SokobanPlusValidator(sokoban_plus)
 
 
 @pytest.fixture

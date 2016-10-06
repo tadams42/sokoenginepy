@@ -24,7 +24,7 @@ class HashedBoardState(BoardState):
         - generate one random 64b int for initial board hash
         """
         set_size = (
-            1 + self.board_size * len(self.distinct_box_plus_ids) *
+            1 + self.board_size * len(self._distinct_box_plus_ids) *
             self.pushers_count
         )
 
@@ -55,7 +55,7 @@ class HashedBoardState(BoardState):
             # yapf: enable
 
         # Assign position hashes to all distinct boxes
-        for box_plus_id in self.distinct_box_plus_ids:
+        for box_plus_id in self._distinct_box_plus_ids:
             self._box_hashes[box_plus_id] = random_pool[:self.board_size]
             random_pool = random_pool[self.board_size:]
 
