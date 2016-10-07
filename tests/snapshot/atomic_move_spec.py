@@ -1,6 +1,5 @@
 from factories import AtomicMoveFactory
-from sokoenginepy.board import Piece
-from sokoenginepy.common import Direction
+from sokoenginepy.common import DEFAULT_PIECE_ID, Direction
 
 
 class DescribeAtomicMove:
@@ -16,7 +15,7 @@ class DescribeAtomicMove:
             assert atomic_move._box_moved
             assert not atomic_move._pusher_selected
             assert not atomic_move._pusher_jumped
-            assert atomic_move._pusher_id == Piece.DEFAULT_ID
+            assert atomic_move._pusher_id == DEFAULT_PIECE_ID
             assert atomic_move._moved_box_id is None
             assert atomic_move.group_id == 0
 
@@ -25,7 +24,7 @@ class DescribeAtomicMove:
         def test_get_returns_none_if_move_is_not_push_or_pull(
             self, atomic_move
         ):
-            atomic_move.moved_box_id = Piece.DEFAULT_ID
+            atomic_move.moved_box_id = DEFAULT_PIECE_ID
             atomic_move.is_push_or_pull = False
             assert atomic_move.moved_box_id is None
 
@@ -33,8 +32,8 @@ class DescribeAtomicMove:
             self, atomic_move
         ):
             atomic_move.is_push_or_pull = True
-            atomic_move.moved_box_id = Piece.DEFAULT_ID + 42
-            assert atomic_move.moved_box_id == Piece.DEFAULT_ID + 42
+            atomic_move.moved_box_id = DEFAULT_PIECE_ID + 42
+            assert atomic_move.moved_box_id == DEFAULT_PIECE_ID + 42
 
         def test_when_setting_to_none_it_also_resets_push_or_pull_flag(
             self, atomic_move
@@ -50,17 +49,17 @@ class DescribeAtomicMove:
             self, atomic_move
         ):
             atomic_move.is_push_or_pull = False
-            atomic_move.moved_box_id = Piece.DEFAULT_ID + 42
+            atomic_move.moved_box_id = DEFAULT_PIECE_ID + 42
 
-            assert atomic_move.moved_box_id == Piece.DEFAULT_ID + 42
+            assert atomic_move.moved_box_id == DEFAULT_PIECE_ID + 42
             assert atomic_move.is_push_or_pull
             assert not atomic_move.is_move
 
     class Describe_pusher_id:
 
         def it_returns_id_of_pusher_that_performed_movement(self, atomic_move):
-            atomic_move.pusher_id = Piece.DEFAULT_ID + 42
-            assert atomic_move.pusher_id == Piece.DEFAULT_ID + 42
+            atomic_move.pusher_id = DEFAULT_PIECE_ID + 42
+            assert atomic_move.pusher_id == DEFAULT_PIECE_ID + 42
 
     class Describe_is_move:
 

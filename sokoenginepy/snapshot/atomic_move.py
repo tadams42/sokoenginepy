@@ -1,4 +1,5 @@
-from ..common import Direction, EqualityComparable, PrettyPrintable
+from ..common import (DEFAULT_PIECE_ID, Direction, EqualityComparable,
+                      PrettyPrintable, is_valid_piece_id)
 
 
 class AtomicMove(PrettyPrintable, EqualityComparable):
@@ -15,11 +16,10 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
     """
 
     def __init__(self, direction=Direction.LEFT, box_moved=False):
-        from ..board import Piece
         self._box_moved = False
         self._pusher_selected = False
         self._pusher_jumped = False
-        self._pusher_id = Piece.DEFAULT_ID
+        self._pusher_id = DEFAULT_PIECE_ID
         self._moved_box_id = None
         self.group_id = 0
 
@@ -64,8 +64,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
-        from ..board import Piece
-        if Piece.is_valid_id(value):
+        if is_valid_piece_id(value):
             self._moved_box_id = value
             self.is_push_or_pull = True
         else:
@@ -75,17 +74,16 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
     @property
     def pusher_id(self):
         """
-        Piece ID of pusher that performed movement.
+        ID of pusher that performed movement.
         """
         return self._pusher_id
 
     @pusher_id.setter
     def pusher_id(self, value):
-        from ..board import Piece
-        if Piece.is_valid_id(value):
+        if is_valid_piece_id(value):
             self._pusher_id = value
         else:
-            self._pusher_id = Piece.DEFAULT_ID
+            self._pusher_id = DEFAULT_PIECE_ID
 
     @property
     def is_move(self):

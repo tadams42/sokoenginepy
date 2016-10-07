@@ -1,39 +1,49 @@
-from collections import OrderedDict
-
 from cached_property import cached_property
+from midict import MIDict
 
-from ..piece import Piece
+from ...common import DEFAULT_PIECE_ID
 from ..sokoban_plus import SokobanPlus
 
 
 class BoardState:
     """
-    Stores positions, piece IDs and Sokoban+ IDs of all Piece-s on GameBoard
+    Memoizes all pieces on board and allows state modifications.
+
+    Note that it never modifies actual board cells - it just adjusts memoized
+    state for given board. Also, if given board is modified outside of
+    BoardState (ie. cells with boxes are edited, board is resized, etc..) this
+    is not automatically reflected on BoardState.
+
+    For reasons abowe, clients are responsible for syncing board and its
+    BoardState
     """
 
     def __init__(self, variant_board):
         self._variant_board = variant_board
-        self._boxes = OrderedDict()
-        self._goals = OrderedDict()
-        self._pushers = OrderedDict()
-        self._sokoban_plus = None
+        self._boxes = MIDict([], ['id', 'position'])
+        self._goals = MIDict([], ['id', 'position'])
+        self._pushers = MIDict([], ['id', 'position'])
 
-        pusher_id = box_id = goal_id = Piece.DEFAULT_ID
+        pusher_id = box_id = goal_id = DEFAULT_PIECE_ID
 
         for position in range(0, variant_board.size):
             cell = variant_board[position]
 
             if cell.has_pusher:
-                self._pushers[pusher_id] = Piece(position, pusher_id)
+                self._pushers['id':pusher_id] = position
                 pusher_id += 1
 
             if cell.has_box:
-                self._boxes[box_id] = Piece(position, box_id)
+                self._boxes['id':box_id] = position
                 box_id += 1
 
             if cell.has_goal:
-                self._goals[goal_id] = Piece(position, goal_id)
+                self._goals['id':goal_id] = position
                 goal_id += 1
+
+        self._sokoban_plus = SokobanPlus(
+            pieces_count=len(self._boxes), boxorder='', goalorder=''
+        )
 
     @property
     def board_size(self):
@@ -49,30 +59,32 @@ class BoardState:
 
     @property
     def pushers_ids(self):
-        return self._pushers.keys()
+        # For some reason following doesn't always work
+        # return self._pushers.keys('id')
+        return list(self._pushers.keys(0))
 
-    @cached_property
+    @property
     def pushers_positions(self):
-        return [p.position for p in self._pushers.values()]
+        # For some reason following doesn't always work
+        # return self._pushers.keys('position')
+        return list(self._pushers.keys(1))
 
     @cached_property
     def normalized_pusher_positions(self):
         retv = dict()
-        for pusher in self._pushers.values():
-            retv[pusher.id] = self._variant_board.normalized_pusher_position(
-                pusher.position,
-                excluded_positions=self.boxes_positions + list(retv.values())
+        excluded = list(self.boxes_positions)
+        for id, position in self._pushers.iteritems():
+            retv[id] = self._variant_board.normalized_pusher_position(
+                position, excluded_positions=excluded
             )
+            excluded = excluded + [retv[id]]
         return retv
 
     def pusher_position(self, id):
-        return self._pushers[id].position
+        return self._pushers['id':id]
 
     def pusher_id(self, on_position):
-        pusher = [
-            p for p in self._pushers.values() if p.position == on_position
-        ]
-        return pusher[0].id
+        return self._pushers['position':on_position]
 
     # --------------------------------------------------------------------------
     # Boxes
@@ -84,18 +96,21 @@ class BoardState:
 
     @property
     def boxes_ids(self):
-        return self._boxes.keys()
+        # For some reason following doesn't always work
+        # return self._boxes.keys('id')
+        return list(self._boxes.keys(0))
 
-    @cached_property
+    @property
     def boxes_positions(self):
-        return [b.position for b in self._boxes.values()]
+        # For some reason following doesn't always work
+        # return self._boxes.keys('position')
+        return list(self._boxes.keys(1))
 
     def box_position(self, id):
-        return self._boxes[id].position
+        return self._boxes['id':id]
 
     def box_id(self, on_position):
-        box = [b for b in self._boxes.values() if b.position == on_position]
-        return box[0].id
+        return self._boxes['position':on_position]
 
     # --------------------------------------------------------------------------
     # Goals
@@ -107,18 +122,21 @@ class BoardState:
 
     @property
     def goals_ids(self):
-        return self._goals.keys()
+        # For some reason following doesn't always work
+        # return self._goals.keys('id')
+        return list(self._goals.keys(0))
 
-    @cached_property
+    @property
     def goals_positions(self):
-        return [g.position for g in self._goals.values()]
+        # For some reason following doesn't always work
+        # return self._goals.keys('position')
+        return list(self._goals.keys(1))
 
     def goal_position(self, id):
-        return self._goals[id].position
+        return self._goals['id':id]
 
     def goal_id(self, on_position):
-        goal = [g for g in self._goals.values() if g.position == on_position]
-        return goal[0].id
+        return self._goals['position':on_position]
 
     # --------------------------------------------------------------------------
     # Sokoban+
@@ -126,48 +144,38 @@ class BoardState:
 
     @cached_property
     def _distinct_box_plus_ids(self):
-        return set(box.plus_id for box in self._boxes.values())
+        return set(self.box_plus_id(box_id) for box_id in self.boxes_ids)
 
     def box_plus_id(self, id):
-        return self._boxes[id].plus_id
+        return self._sokoban_plus.box_plus_id(id)
 
     def goal_plus_id(self, id):
-        return self._goals[id].plus_id
+        return self._sokoban_plus.goal_plus_id(id)
 
     @property
     def boxorder(self):
-        if self._sokoban_plus:
-            return self._sokoban_plus.boxorder
-        return ""
+        return self._sokoban_plus.boxorder
+
+    @boxorder.setter
+    def boxorder(self, rv):
+        self._sokoban_plus.boxorder = rv
 
     @property
     def goalorder(self):
-        if self._sokoban_plus:
-            return self._sokoban_plus.goalorder
-        return ""
+        return self._sokoban_plus.goalorder
+
+    @goalorder.setter
+    def goalorder(self, rv):
+        self._sokoban_plus.goalorder = rv
 
     @property
     def is_sokoban_plus_enabled(self):
-        if self._sokoban_plus:
-            return self._sokoban_plus.is_enabled
-        return False
+        return self._sokoban_plus.is_enabled
 
     @is_sokoban_plus_enabled.setter
     def is_sokoban_plus_enabled(self, rv):
-        if self._sokoban_plus:
-            self._sokoban_plus.is_enabled = rv
-            for box in self._boxes:
-                box.plus_id = self._sokoban_plus.box_plus_id(box.id)
-            for goal in self._goals:
-                goal.plus_id = self._sokoban_plus.goal_plus_id(goal.id)
+        self._sokoban_plus.is_enabled = rv
 
     @property
     def is_sokoban_plus_valid(self):
-        if self._sokoban_plus:
-            if not self._sokoban_plus.is_valid:
-                return self._sokoban_plus.errors
-        return True
-
-    def set_sokoban_plus(self, boxorder, goalorder):
-        self.is_sokoban_plus_enabled = False
-        self._sokoban_plus = SokobanPlus(self.boxes_count, boxorder, goalorder)
+        return self._sokoban_plus.is_valid

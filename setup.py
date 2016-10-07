@@ -4,12 +4,13 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
-# Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+import sys
 # To use a consistent encoding
 from codecs import open
 from os import path
-import sys
+
+# Always prefer setuptools over distutils
+from setuptools import find_packages, setup
 
 here = path.abspath(path.dirname(__file__))
 version = {}
@@ -34,7 +35,8 @@ install_requirements = [
     # Alternative that is A LOT faster but install through pip is not supported
     # 'graph-tool >=2.11'
     'networkx >=1.11',
-    'cached-property >=1.2.0'
+    'cached-property >=1.2.0',
+    'midict >= 0.1.4'
 ]
 
 dev_requirements = [

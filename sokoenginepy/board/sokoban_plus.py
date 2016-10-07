@@ -1,5 +1,4 @@
-from ..common import PrettyPrintable, SokoengineError
-from .piece import Piece
+from ..common import DEFAULT_PIECE_ID, PrettyPrintable, SokoengineError
 
 
 class SokobanPlusDataError(SokoengineError):
@@ -42,11 +41,12 @@ class SokobanPlus(PrettyPrintable):
 
     Original implementation used number 99 for default plus ID. As there can be
     more than 99 boxes on board, sokoenginepy changes this detail and uses
-    Piece.DEFAULT_PLUS_ID as default plus ID. When loading older puzzles
+    DEFAULT_PLUS_ID as default plus ID. When loading older puzzles
     with Sokoban+, legacy default value is converted transparently.
     """
 
     _LEGACY_DEFAULT_PLUS_ID = 99
+    DEFAULT_PLUS_ID = 0
 
     def __init__(self, pieces_count, boxorder, goalorder):
         self._is_enabled = False
@@ -59,8 +59,12 @@ class SokobanPlus(PrettyPrintable):
         self._boxorder = None
         self._goalorder = None
 
-        self.boxorder = boxorder
-        self.goalorder = goalorder
+        self.boxorder = boxorder or ''
+        self.goalorder = goalorder or ''
+
+    @classmethod
+    def is_valid_plus_id(cls, plus_id):
+        return isinstance(plus_id, int) and plus_id >= cls.DEFAULT_PLUS_ID
 
     @property
     def pieces_count(self):
@@ -131,15 +135,15 @@ class SokobanPlus(PrettyPrintable):
     def _rstrip_default_plus_ids(self, plus_ids_str):
         if self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID:
             return plus_ids_str.rstrip(
-                str(Piece.DEFAULT_PLUS_ID) + " " +
+                str(self.DEFAULT_PLUS_ID) + " " +
                 str(self._LEGACY_DEFAULT_PLUS_ID)
             )
         else:
-            return plus_ids_str.rstrip(str(Piece.DEFAULT_PLUS_ID) + " ")
+            return plus_ids_str.rstrip(str(self.DEFAULT_PLUS_ID) + " ")
 
     def _get_plus_id(self, for_id, from_where):
         if not self.is_enabled:
-            return Piece.DEFAULT_PLUS_ID
+            return self.DEFAULT_PLUS_ID
         else:
             return from_where[for_id]
 
@@ -156,19 +160,19 @@ class SokobanPlus(PrettyPrintable):
 
 
         replaced = [
-            Piece.DEFAULT_PLUS_ID if (
+            self.DEFAULT_PLUS_ID if (
                 i == self._LEGACY_DEFAULT_PLUS_ID and
                 self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID
             ) else i for i in trimmed
         ]
 
-        expanded = replaced + [Piece.DEFAULT_PLUS_ID] * (
+        expanded = replaced + [self.DEFAULT_PLUS_ID] * (
             self.pieces_count - len(replaced)
         )
 
         retv = dict()
         for index, plus_id in enumerate(expanded):
-            retv[Piece.DEFAULT_ID + index] = plus_id
+            retv[DEFAULT_PIECE_ID + index] = plus_id
 
         return retv
 
@@ -196,7 +200,7 @@ class SokobanPlus(PrettyPrintable):
     def _validate_plus_ids(self, ids):
         if ids:
             for i in ids:
-                if not Piece.is_valid_plus_id(i):
+                if not self.is_valid_plus_id(i):
                     self.errors.append("Invalid Sokoban+ ID: {0}".format(i))
 
     def _validate_piece_count(self):
@@ -222,7 +226,7 @@ class SokobanPlus(PrettyPrintable):
         if self._box_plus_ids:
             boxes = set(
                 id for id in self._box_plus_ids.values()
-                if id != Piece.DEFAULT_PLUS_ID
+                if id != self.DEFAULT_PLUS_ID
             )
         else:
             boxes = []
@@ -230,7 +234,7 @@ class SokobanPlus(PrettyPrintable):
         if self._goal_plus_ids:
             goals = set(
                 id for id in self._goal_plus_ids.values()
-                if id != Piece.DEFAULT_PLUS_ID
+                if id != self.DEFAULT_PLUS_ID
             )
         else:
             goals = []
