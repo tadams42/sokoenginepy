@@ -49,33 +49,22 @@ class SokobanPlus(PrettyPrintable):
     _LEGACY_DEFAULT_PLUS_ID = 99
 
     def __init__(self, pieces_count, boxorder, goalorder):
-        self._pieces_count = pieces_count
-        self._box_plus_ids = dict(
-            (Piece.DEFAULT_ID + i,
-             Piece.DEFAULT_PLUS_ID,) for i in range(pieces_count)
-        )
-        self._goal_plus_ids = dict(
-            (Piece.DEFAULT_ID + i,
-             Piece.DEFAULT_PLUS_ID,) for i in range(pieces_count)
-        )
-        self._boxorder = boxorder
-        self._goalorder = goalorder
         self._is_enabled = False
         self._is_validated = False
         self.errors = []
 
+        self._pieces_count = pieces_count
+        self._box_plus_ids = None
+        self._goal_plus_ids = None
+        self._boxorder = None
+        self._goalorder = None
+
+        self.boxorder = boxorder
+        self.goalorder = goalorder
+
     @property
     def pieces_count(self):
         return self._pieces_count
-
-    def _rstrip_default_plus_ids(self, plus_ids_str):
-        if self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID:
-            return plus_ids_str.rstrip(
-                str(Piece.DEFAULT_PLUS_ID) + " " +
-                str(self._LEGACY_DEFAULT_PLUS_ID)
-            )
-        else:
-            return plus_ids_str.rstrip(str(Piece.DEFAULT_PLUS_ID) + " ")
 
     @property
     def boxorder(self):
@@ -86,6 +75,12 @@ class SokobanPlus(PrettyPrintable):
         else:
             return self._boxorder
 
+    @boxorder.setter
+    def boxorder(self, rv):
+        self.is_enabled = False
+        self._is_validated = False
+        self._boxorder = rv
+
     @property
     def goalorder(self):
         if self.is_valid:
@@ -95,32 +90,15 @@ class SokobanPlus(PrettyPrintable):
         else:
             return self._goalorder
 
-    @property
-    def _representation_attributes(self):
-        return {
-            'pieces_count': self.pieces_count,
-            'boxorder': self.boxorder,
-            'goalorder': self.goalorder,
-        }
+    @goalorder.setter
+    def goalorder(self, rv):
+        self.is_enabled = False
+        self._is_validated = False
+        self._goalorder = rv
 
     @property
     def is_valid(self):
-        if self._is_validated:
-            return not self.errors
-
-        self.errors = []
-        try:
-            self._parse()
-        except SokobanPlusDataError as e:
-            self.errors.append(str(e))
-
-        self._validate_plus_ids(self._box_plus_ids)
-        self._validate_plus_ids(self._goal_plus_ids)
-        self._validate_piece_count()
-        self._validate_ids_counts()
-        self._validate_id_sets_equality()
-        self._is_validated = True
-
+        self._validate_and_parse()
         return not self.errors
 
     @property
@@ -150,11 +128,20 @@ class SokobanPlus(PrettyPrintable):
         """
         return self._get_plus_id(for_goal_id, from_where=self._goal_plus_ids)
 
+    def _rstrip_default_plus_ids(self, plus_ids_str):
+        if self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID:
+            return plus_ids_str.rstrip(
+                str(Piece.DEFAULT_PLUS_ID) + " " +
+                str(self._LEGACY_DEFAULT_PLUS_ID)
+            )
+        else:
+            return plus_ids_str.rstrip(str(Piece.DEFAULT_PLUS_ID) + " ")
+
     def _get_plus_id(self, for_id, from_where):
         if not self.is_enabled:
             return Piece.DEFAULT_PLUS_ID
         else:
-            return from_where[for_id - Piece.DEFAULT_ID]
+            return from_where[for_id]
 
     def _collect_ids_dict(self, ids_list):
         """
@@ -166,6 +153,7 @@ class SokobanPlus(PrettyPrintable):
             for id in self.
             _rstrip_default_plus_ids(" ".join(str(i) for i in ids_list)).split()
         ]
+
 
         replaced = [
             Piece.DEFAULT_PLUS_ID if (
@@ -206,9 +194,10 @@ class SokobanPlus(PrettyPrintable):
         )
 
     def _validate_plus_ids(self, ids):
-        for i in ids:
-            if not Piece.is_valid_plus_id(i):
-                self.errors.append("Invalid Sokoban+ ID: {0}".format(i))
+        if ids:
+            for i in ids:
+                if not Piece.is_valid_plus_id(i):
+                    self.errors.append("Invalid Sokoban+ ID: {0}".format(i))
 
     def _validate_piece_count(self):
         if self.pieces_count < 0:
@@ -224,22 +213,54 @@ class SokobanPlus(PrettyPrintable):
             )
         )
 
-        if len(self._box_plus_ids) != self.pieces_count:
+        if self._box_plus_ids and len(self._box_plus_ids) != self.pieces_count:
             self.errors.append(error_template.format("boxorder"))
-        if len(self._goal_plus_ids) != self.pieces_count:
+        if self._goal_plus_ids and len(self._goal_plus_ids) != self.pieces_count:
             self.errors.append(error_template.format("goalorder"))
 
     def _validate_id_sets_equality(self):
-        boxes = set(
-            id for id in self._box_plus_ids.values()
-            if id != Piece.DEFAULT_PLUS_ID
-        )
-        goals = set(
-            id for id in self._goal_plus_ids.values()
-            if id != Piece.DEFAULT_PLUS_ID
-        )
+        if self._box_plus_ids:
+            boxes = set(
+                id for id in self._box_plus_ids.values()
+                if id != Piece.DEFAULT_PLUS_ID
+            )
+        else:
+            boxes = []
+
+        if self._goal_plus_ids:
+            goals = set(
+                id for id in self._goal_plus_ids.values()
+                if id != Piece.DEFAULT_PLUS_ID
+            )
+        else:
+            goals = []
 
         if boxes != goals:
             self.errors.append(
                 "Sokoban+ data doesn't define equal sets of IDs for boxes and goals"
             )
+
+    @property
+    def _representation_attributes(self):
+        return {
+            'pieces_count': self.pieces_count,
+            'boxorder': self.boxorder,
+            'goalorder': self.goalorder,
+        }
+
+    def _validate_and_parse(self):
+        if self._is_validated:
+            return not self.errors
+
+        self.errors = []
+        try:
+            self._parse()
+        except SokobanPlusDataError as e:
+            self.errors.append(str(e))
+
+        self._validate_plus_ids(self._box_plus_ids)
+        self._validate_plus_ids(self._goal_plus_ids)
+        self._validate_piece_count()
+        self._validate_ids_counts()
+        self._validate_id_sets_equality()
+        self._is_validated = True

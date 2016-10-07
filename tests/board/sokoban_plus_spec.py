@@ -14,7 +14,7 @@ class DescribeSokobanPlus:
             sokoban_plus = SokobanPlus(42, "foo bar", [4, 2])
             assert not sokoban_plus._is_validated
 
-        def it_always_creates_not_enabled_instance(self):
+        def it_always_creates_disabled_instance(self):
             sokoban_plus = SokobanPlus(42, "foo bar", [4, 2])
             assert not sokoban_plus.is_enabled
 
@@ -35,6 +35,25 @@ class DescribeSokobanPlus:
             assert sokoban_plus.boxorder == "1 2 0 3"
             assert sokoban_plus.goalorder == "3 1 0 2"
 
+        def test_setters_disable_and_invalidate_instance(self):
+            sokoban_plus = SokobanPlus(5, "1 2 0 3 0 ", "3 1 0 2 0 0 0")
+            sokoban_plus.is_enabled = True
+            assert sokoban_plus.is_valid == True
+            assert sokoban_plus.is_enabled == True
+            sokoban_plus.boxorder = 'foo'
+            assert sokoban_plus.boxorder == 'foo'
+            assert sokoban_plus.is_enabled == False
+            assert sokoban_plus.is_valid == False
+
+            sokoban_plus = SokobanPlus(5, "1 2 0 3 0 ", "3 1 0 2 0 0 0")
+            sokoban_plus.is_enabled = True
+            assert sokoban_plus.is_valid == True
+            assert sokoban_plus.is_enabled == True
+            sokoban_plus.goalorder = 'foo'
+            assert sokoban_plus.goalorder == 'foo'
+            assert sokoban_plus.is_enabled == False
+            assert sokoban_plus.is_valid == False
+
     class Describe_getter_for_box_plus_id:
 
         def it_returns_default_plus_id_for_disabled_sokoban_plus(
@@ -44,9 +63,7 @@ class DescribeSokobanPlus:
 
         def it_returns_box_plus_id_for_enabled_sokoban_plus(self, sokoban_plus):
             sokoban_plus.is_enabled = True
-            assert sokoban_plus.box_plus_id(2) == sokoban_plus._box_plus_ids[
-                2 - Piece.DEFAULT_ID
-            ]
+            assert sokoban_plus.box_plus_id(2) == sokoban_plus._box_plus_ids[2]
 
     class Describe_getter_for_goal_plus_id:
 
@@ -59,9 +76,7 @@ class DescribeSokobanPlus:
             self, sokoban_plus
         ):
             sokoban_plus.is_enabled = True
-            assert sokoban_plus.goal_plus_id(2) == sokoban_plus._goal_plus_ids[
-                2 - Piece.DEFAULT_ID
-            ]
+            assert sokoban_plus.goal_plus_id(2) == sokoban_plus._goal_plus_ids[2]
 
     class When_it_is_set_to_enabled:
 
@@ -137,6 +152,7 @@ class DescribeSokobanPlus:
             assert sokoban_plus._validate_id_sets_equality.called
 
         def it_validates_all_plus_ids(self, sokoban_plus):
+            sokoban_plus.is_enabled = True
             with patch('sokoenginepy.board.sokoban_plus.Piece') as mock_class:
                 mock_class.is_valid_plus_id.return_value = True
                 sokoban_plus._validate_plus_ids(sokoban_plus._box_plus_ids)
@@ -162,6 +178,7 @@ class DescribeSokobanPlus:
         def it_validates_ids_lengths_are_equal_to_piece_count(
             self, sokoban_plus
         ):
+            sokoban_plus.is_enabled = True
             sokoban_plus._validate_ids_counts()
             assert len(sokoban_plus.errors) == 0
             sokoban_plus._pieces_count = -42
@@ -178,6 +195,7 @@ class DescribeSokobanPlus:
         def it_validates_same_id_set_is_defined_for_both_piece_types(
             self, sokoban_plus
         ):
+            sokoban_plus.is_enabled = True
             sokoban_plus._validate_id_sets_equality()
             assert len(sokoban_plus.errors) == 0
 
