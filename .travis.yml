@@ -16,10 +16,5 @@ script:
   - tox
 
 after_success:
-  - pyvenv .venv
-  - source .venv/bin/activate
-  - pip install wheel
-  - pip install -e .[test]
   - pip install codacy-coverage
-  - py.test --cov=./sokoenginepy --cov-report=xml
   - python-codacy-coverage -r coverage.xml
