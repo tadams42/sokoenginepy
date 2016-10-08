@@ -3,7 +3,7 @@ from sokoenginepy.common import DEFAULT_PIECE_ID
 from sokoenginepy.tessellation import index_1d
 
 
-class DescribeBoardStateSpec:
+class DescribeBoardState:
 
     def it_memoizes_pieces(self, board_state):
         width = board_state._variant_board.width
