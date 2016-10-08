@@ -29,7 +29,7 @@ class Puzzle:
         updated_at=""
     ):
         self._variant = None
-        self.id = 1
+        self.pid = 1
         self.board = board
         self.variant = variant
         self.title = title
@@ -112,7 +112,7 @@ class PuzzleSnapshot:
         variant=Variant.SOKOBAN
     ):
         self._variant = None
-        self.id = 1
+        self.pid = 1
         self.moves = moves
         self.title = title
         self.duration = duration

@@ -1,8 +1,8 @@
 from cached_property import cached_property
 from midict import MIDict
 
-from ...common import DEFAULT_PIECE_ID
-from ..sokoban_plus import SokobanPlus
+from ..common import DEFAULT_PIECE_ID
+from .sokoban_plus import SokobanPlus
 
 
 class BoardState:
@@ -45,7 +45,7 @@ class BoardState:
             pieces_count=len(self._boxes), boxorder='', goalorder=''
         )
 
-    @property
+    @cached_property
     def board_size(self):
         return self._variant_board.size
 
@@ -57,7 +57,7 @@ class BoardState:
     def pushers_count(self):
         return len(self._pushers)
 
-    @property
+    @cached_property
     def pushers_ids(self):
         # For some reason following doesn't always work
         # return self._pushers.keys('id')
@@ -73,15 +73,15 @@ class BoardState:
     def normalized_pusher_positions(self):
         retv = dict()
         excluded = list(self.boxes_positions)
-        for id, position in self._pushers.iteritems():
-            retv[id] = self._variant_board.normalized_pusher_position(
+        for pid, position in self._pushers.iteritems():
+            retv[pid] = self._variant_board.normalized_pusher_position(
                 position, excluded_positions=excluded
             )
-            excluded = excluded + [retv[id]]
+            excluded = excluded + [retv[pid]]
         return retv
 
-    def pusher_position(self, id):
-        return self._pushers['id':id]
+    def pusher_position(self, pid):
+        return self._pushers['id':pid]
 
     def pusher_id(self, on_position):
         return self._pushers['position':on_position]
@@ -94,7 +94,7 @@ class BoardState:
     def boxes_count(self):
         return len(self._boxes)
 
-    @property
+    @cached_property
     def boxes_ids(self):
         # For some reason following doesn't always work
         # return self._boxes.keys('id')
@@ -106,8 +106,8 @@ class BoardState:
         # return self._boxes.keys('position')
         return list(self._boxes.keys(1))
 
-    def box_position(self, id):
-        return self._boxes['id':id]
+    def box_position(self, pid):
+        return self._boxes['id':pid]
 
     def box_id(self, on_position):
         return self._boxes['position':on_position]
@@ -120,7 +120,7 @@ class BoardState:
     def goals_count(self):
         return len(self._goals)
 
-    @property
+    @cached_property
     def goals_ids(self):
         # For some reason following doesn't always work
         # return self._goals.keys('id')
@@ -132,8 +132,8 @@ class BoardState:
         # return self._goals.keys('position')
         return list(self._goals.keys(1))
 
-    def goal_position(self, id):
-        return self._goals['id':id]
+    def goal_position(self, pid):
+        return self._goals['id':pid]
 
     def goal_id(self, on_position):
         return self._goals['position':on_position]
@@ -142,15 +142,11 @@ class BoardState:
     # Sokoban+
     # --------------------------------------------------------------------------
 
-    @cached_property
-    def _distinct_box_plus_ids(self):
-        return set(self.box_plus_id(box_id) for box_id in self.boxes_ids)
+    def box_plus_id(self, pid):
+        return self._sokoban_plus.box_plus_id(pid)
 
-    def box_plus_id(self, id):
-        return self._sokoban_plus.box_plus_id(id)
-
-    def goal_plus_id(self, id):
-        return self._sokoban_plus.goal_plus_id(id)
+    def goal_plus_id(self, pid):
+        return self._sokoban_plus.goal_plus_id(pid)
 
     @property
     def boxorder(self):

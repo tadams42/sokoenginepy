@@ -10,5 +10,5 @@ class InvalidPieceIdError(SokoengineError):
     pass
 
 
-def is_valid_piece_id(id):
-    return isinstance(id, int) and id >= DEFAULT_PIECE_ID
+def is_valid_piece_id(pid):
+    return isinstance(pid, int) and pid >= DEFAULT_PIECE_ID

@@ -47,9 +47,9 @@ class PuzzlesCollection:
             )
 
         for i in range(0, len(self.puzzles)):
-            self.puzzles[i].id = i + 1
+            self.puzzles[i].pid = i + 1
             for j in range(0, len(self.puzzles[i].snapshots)):
-                self.puzzles[i].snapshots[j].id = j + 1
+                self.puzzles[i].snapshots[j].pid = j + 1
 
     def save(self, path):
         with open(path, 'w') as dest_file:

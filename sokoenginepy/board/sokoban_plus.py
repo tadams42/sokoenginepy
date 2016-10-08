@@ -84,7 +84,7 @@ class SokobanPlus(PrettyPrintable):
         if rv != self._boxorder:
             self.is_enabled = False
             self._is_validated = False
-            self._boxorder = rv
+            self._boxorder = rv or ''
 
     @property
     def goalorder(self):
@@ -100,7 +100,7 @@ class SokobanPlus(PrettyPrintable):
         if rv != self._goalorder:
             self.is_enabled = False
             self._is_validated = False
-            self._goalorder = rv
+            self._goalorder = rv or ''
 
     @property
     def is_valid(self):
