@@ -151,7 +151,7 @@ class SokobanPlus(PrettyPrintable):
         try:
             return self._get_plus_id(for_goal_id, from_where=self._goal_plus_ids)
         except KeyError:
-            raise KeyError("No goal with ID: {0}".format(pid))
+            raise KeyError("No goal with ID: {0}".format(for_goal_id))
 
     def _rstrip_default_plus_ids(self, plus_ids_str):
         if self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID:

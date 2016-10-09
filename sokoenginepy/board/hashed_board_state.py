@@ -1,9 +1,6 @@
 import random
 
-from midict import ValueExistsError
-
 from .board_state import BoardState
-from .exceptions import CellAlreadyOccupiedError
 
 
 class HashedBoardState(BoardState):
@@ -147,116 +144,16 @@ class HashedBoardState(BoardState):
         return position_hash
 
     def _move_box(self, box_id, box_plus_id, from_old_position, to_new_position):
-        if self.has_pusher_on(to_new_position):
-            raise CellAlreadyOccupiedError(
-                "Box can't be placed onto pusher in position: {0}".format(
-                    to_new_position
-                )
-            )
-
-        try:
-            self._boxes['id':box_id] = to_new_position
-        except ValueExistsError:
-            raise CellAlreadyOccupiedError(
-                "Box can't be placed onto box in position: {0}".format(
-                    to_new_position
-                )
-            )
-        # update hashes
+        super()._move_box(box_id, box_plus_id, from_old_position, to_new_position)
         self._position_hash ^= self._boxes_factors[box_plus_id][from_old_position]
         self._position_hash ^= self._boxes_factors[box_plus_id][to_new_position]
         self._position_with_pushers_hash ^= self._boxes_factors[box_plus_id][from_old_position]
         self._position_with_pushers_hash ^= self._boxes_factors[box_plus_id][to_new_position]
 
-    def move_box(self, from_old_position, to_new_position):
-        """
-        Updates board state with changed box position.
-
-        It doesn't verify if from_old_position and to_new_position are valid
-        board positions.
-
-        Raises KeyError in case there is no box on from_old_position.
-
-        Raises CellAlreadyOccupiedError if there is a box or a pusher already on
-        to_new_position
-        """
-        if from_old_position == to_new_position:
-            return
-        box_id = self.box_id(from_old_position)
-        box_plus_id = self.box_plus_id(box_id)
-        self._move_box(box_id, box_plus_id, from_old_position, to_new_position)
-
-    def move_box_id(self, box_id, to_new_position):
-        """
-        Updates board state with changed box position.
-
-        It doesn't verify if from_old_position and to_new_position are valid
-        board positions.
-
-        Raises KeyError in case there is no box with box_id
-
-        Raises CellAlreadyOccupiedError if there is a box or a pusher already on
-        to_new_position
-        """
-        from_old_position = self.box_position(box_id)
-        if from_old_position == to_new_position:
-            return
-        box_plus_id = self.box_plus_id(box_id)
-        self._move_box(box_id, box_plus_id, from_old_position, to_new_position)
-
     def _move_pusher(self, pusher_id, from_old_position, to_new_position):
-        if self.has_box_on(to_new_position):
-            raise CellAlreadyOccupiedError(
-                "Pusher can't be placed onto box in position: {0}".format(
-                    to_new_position
-                )
-            )
-
-        try:
-            self._pushers['id':pusher_id] = to_new_position
-        except ValueExistsError:
-            raise CellAlreadyOccupiedError(
-                "Pusher can't be placed onto pusher in position: {0}".format(
-                    to_new_position
-                )
-            )
-        # Update hashes
+        super()._move_pusher(pusher_id, from_old_position, to_new_position)
         self._position_with_pushers_hash ^= self._pushers_factors[from_old_position]
         self._position_with_pushers_hash ^= self._pushers_factors[to_new_position]
-
-    def move_pusher(self, from_old_position, to_new_position):
-        """
-        Updates board state with changed pusher position.
-
-        It doesn't verify if from_old_position and to_new_position are valid
-        board positions.
-
-        Raises KeyError in case there is no pusher on from_old_position.
-
-        Raises CellAlreadyOccupiedError if there is a box or a pusher already on
-        to_new_position
-        """
-        if from_old_position == to_new_position:
-            return
-        pusher_id = self.pusher_id(from_old_position)
-        self._move_pusher(pusher_id, from_old_position, to_new_position)
-
-    def move_pusher_id(self, pusher_id, to_new_position):
-        """
-        Updates board state with changed pusher position.
-
-        It doesn't verify if from_old_position and to_new_position are valid
-        board positions.
-
-        Raises KeyError in case there is no pusher with pusher_id
-
-        Raises CellAlreadyOccupiedError if there is a box or a pusher already on
-        to_new_position
-        """
-        from_old_position = self.pusher_position(pusher_id)
-        if from_old_position == to_new_position:
-            return
-        self._move_pusher(pusher_id, from_old_position, to_new_position)
 
     @BoardState.boxorder.setter
     def boxorder(self, rv):
@@ -294,5 +191,6 @@ class HashedBoardState(BoardState):
         return self._position_hash in self._solutions_hashes
 
     def switch_boxes_and_goals(self):
-        # TODO
-        pass
+        retv = super().switch_boxes_and_goals()
+        self._solutions_hashes = None
+        return retv
