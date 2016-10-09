@@ -138,14 +138,20 @@ class SokobanPlus(PrettyPrintable):
         plus ID from boxorder or Box.DEFAULT_PLUS_ID if there isn't one
         defined or self.is_enabled == False
         """
-        return self._get_plus_id(for_box_id, from_where=self._box_plus_ids)
+        try:
+            return self._get_plus_id(for_box_id, from_where=self._box_plus_ids)
+        except KeyError:
+            raise KeyError("No box with ID: {0}".format(for_box_id))
 
     def goal_plus_id(self, for_goal_id):
         """
         plus ID from goalorder or Goal.DEFAULT_PLUS_ID if there isn't one
         defined or self.is_enabled == False
         """
-        return self._get_plus_id(for_goal_id, from_where=self._goal_plus_ids)
+        try:
+            return self._get_plus_id(for_goal_id, from_where=self._goal_plus_ids)
+        except KeyError:
+            raise KeyError("No goal with ID: {0}".format(pid))
 
     def _rstrip_default_plus_ids(self, plus_ids_str):
         if self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID:

@@ -1,3 +1,5 @@
+from itertools import permutations
+
 from cached_property import cached_property
 from midict import MIDict
 
@@ -17,6 +19,11 @@ class BoardState:
     For reasons abowe, clients are responsible for syncing board and its
     BoardState
     """
+
+    # Following two are needed because accessing .keys('name') in MIDict
+    # doesn't seem to always work
+    _INDEX_ID = 0
+    _INDEX_POS = 1
 
     def __init__(self, variant_board):
         self._variant_board = variant_board
@@ -59,20 +66,19 @@ class BoardState:
 
     @cached_property
     def pushers_ids(self):
-        # For some reason following doesn't always work
-        # return self._pushers.keys('id')
-        return list(self._pushers.keys(0))
+        return list(self._pushers.keys(self._INDEX_ID))
 
     @property
     def pushers_positions(self):
-        # For some reason following doesn't always work
-        # return self._pushers.keys('position')
-        return list(self._pushers.keys(1))
+        return dict(
+            (pid, self._pushers[self._INDEX_ID:pid])
+            for pid in self._pushers.keys(self._INDEX_ID)
+        )
 
     @cached_property
     def normalized_pusher_positions(self):
         retv = dict()
-        excluded = list(self.boxes_positions)
+        excluded = list(self.boxes_positions.values())
         for pid, position in self._pushers.iteritems():
             retv[pid] = self._variant_board.normalized_pusher_position(
                 position, excluded_positions=excluded
@@ -81,10 +87,22 @@ class BoardState:
         return retv
 
     def pusher_position(self, pid):
-        return self._pushers['id':pid]
+        try:
+            return self._pushers['id':pid]
+        except KeyError:
+            raise KeyError("No pusher with ID: {0}".format(pid))
 
     def pusher_id(self, on_position):
-        return self._pushers['position':on_position]
+        try:
+            return self._pushers['position':on_position]
+        except KeyError:
+            raise KeyError("No pusher on position: {0}".format(on_position))
+
+    def has_pusher(self, pid):
+        return pid in self._pushers.keys(self._INDEX_ID)
+
+    def has_pusher_on(self, position):
+        return position in self._pushers.keys(self._INDEX_POS)
 
     # --------------------------------------------------------------------------
     # Boxes
@@ -96,21 +114,32 @@ class BoardState:
 
     @cached_property
     def boxes_ids(self):
-        # For some reason following doesn't always work
-        # return self._boxes.keys('id')
-        return list(self._boxes.keys(0))
+        return list(self._boxes.keys(self._INDEX_ID))
 
     @property
     def boxes_positions(self):
-        # For some reason following doesn't always work
-        # return self._boxes.keys('position')
-        return list(self._boxes.keys(1))
+        return dict(
+            (pid, self._boxes[self._INDEX_ID:pid])
+            for pid in self._boxes.keys(self._INDEX_ID)
+        )
 
     def box_position(self, pid):
-        return self._boxes['id':pid]
+        try:
+            return self._boxes['id':pid]
+        except KeyError:
+            raise KeyError("No box with ID: {0}".format(pid))
 
     def box_id(self, on_position):
-        return self._boxes['position':on_position]
+        try:
+            return self._boxes['position':on_position]
+        except KeyError:
+            raise KeyError("No box on position: {0}".format(on_position))
+
+    def has_box(self, pid):
+        return pid in self._boxes.keys(self._INDEX_ID)
+
+    def has_box_on(self, position):
+        return position in self._boxes.keys(self._INDEX_POS)
 
     # --------------------------------------------------------------------------
     # Goals
@@ -122,21 +151,32 @@ class BoardState:
 
     @cached_property
     def goals_ids(self):
-        # For some reason following doesn't always work
-        # return self._goals.keys('id')
-        return list(self._goals.keys(0))
+        return list(self._goals.keys(self._INDEX_ID))
 
-    @property
+    @cached_property
     def goals_positions(self):
-        # For some reason following doesn't always work
-        # return self._goals.keys('position')
-        return list(self._goals.keys(1))
+        return dict(
+            (pid, self._goals[self._INDEX_ID:pid])
+            for pid in self._goals.keys(self._INDEX_ID)
+        )
 
     def goal_position(self, pid):
-        return self._goals['id':pid]
+        try:
+            return self._goals['id':pid]
+        except KeyError:
+            raise KeyError("No goal with ID: {0}".format(pid))
 
     def goal_id(self, on_position):
-        return self._goals['position':on_position]
+        try:
+            return self._goals['position':on_position]
+        except KeyError:
+            raise KeyError("No goal on position: {0}".format(on_position))
+
+    def has_goal(self, pid):
+        return pid in self._goals.keys(self._INDEX_ID)
+
+    def has_goal_on(self, position):
+        return position in self._goals.keys(self._INDEX_POS)
 
     # --------------------------------------------------------------------------
     # Sokoban+
@@ -175,3 +215,35 @@ class BoardState:
     @property
     def is_sokoban_plus_valid(self):
         return self._sokoban_plus.is_valid
+
+    # --------------------------------------------------------------------------
+    # Other
+    # --------------------------------------------------------------------------
+
+    def solutions(self):
+        """
+        Generator for all configurations of boxes that result in solved board
+        """
+        
+        if self.boxes_count != self.goals_count:
+            return []
+
+        def is_valid_solution(boxes_positions):
+            retv = True
+            for index, box_position in enumerate(boxes_positions):
+                box_id = index + DEFAULT_PIECE_ID
+                box_plus_id = self.box_plus_id(box_id)
+                goal_id = self.goal_id(box_position)
+                goal_plus_id = self.goal_plus_id(goal_id)
+
+                retv = retv and (box_plus_id == goal_plus_id)
+                if not retv:
+                    break
+            return retv
+
+        for boxes_positions in permutations(self.goals_positions.values()):
+            if is_valid_solution(boxes_positions):
+                yield dict(
+                    (index + DEFAULT_PIECE_ID, box_position)
+                    for index, box_position in enumerate(boxes_positions)
+                )

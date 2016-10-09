@@ -1,5 +1,5 @@
 from .common import Direction, SokoengineError, Variant
-from .game import GameBoard, GameSnapshot, GameSolvingMode
+from .game import GameSnapshot, GameSolvingMode
 from .input_output import (OutputSettings, Puzzle, PuzzlesCollection,
                            PuzzleSnapshot)
 from .tessellation import (COLUMN, ROW, CellOrientation, X, Y, index_1d,
