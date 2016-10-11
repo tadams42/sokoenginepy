@@ -1,4 +1,4 @@
-from ..common import Direction, UnknownDirectionError, Variant
+from ..common import Direction, UnknownDirectionError
 from ..snapshot import AtomicMoveCharacters
 from .graph import GraphType
 from .tessellation import (COLUMN, ROW, CellOrientation, Tessellation,
@@ -6,9 +6,7 @@ from .tessellation import (COLUMN, ROW, CellOrientation, Tessellation,
 
 
 class TriobanTessellation(Tessellation):
-    """
-    Implements Tessellation for Trioban variant.
-    """
+    """Implements :class:`.Tessellation` for Trioban variant. """
 
     _LEGAL_DIRECTIONS = (
         Direction.LEFT, Direction.RIGHT, Direction.NORTH_EAST,

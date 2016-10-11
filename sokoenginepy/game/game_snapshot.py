@@ -10,19 +10,21 @@ from .common import GameSolvingMode
 
 
 class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityComparable):
-    """
-    Sequence of AtomicMove representing snapshot of game.
+    """Sequence of AtomicMove representing snapshot of game.
+
+    Args:
+        variant (Variant): game variant
+        solving_mode (GameSolvingMode): game solving mode
+        moves_data (string): Strings consisting of characters representing
+            atomic moves. If not empty it will be parsed. Also, if not empty,
+            solving mode will be parsed from it, and the value of
+            ``solving_mode`` argument will be ignored
     """
 
     def __init__(
         self, variant=Variant.SOKOBAN, solving_mode=GameSolvingMode.FORWARD,
         moves_data=""
     ):
-        """
-        moves_data: optional string that contains moves data. If not empty it
-        will be parsed. Also, if not empty, solving mode will be parsed from
-        it, and the value of solving_mode argument will be ignored
-        """
         super().__init__(variant)
         self._solving_mode = None
         self._moves_count = 0
@@ -116,9 +118,11 @@ class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityCompar
 
     @property
     def moves_count(self):
-        """
-        Number of atomic moves in self that are not pushes. Note This doesn't
-        account moves that are used for pusher selection in Multiban games.
+        """Count of atomic moves in self that are not pushes.
+
+        Note:
+            This doesn't account moves that are used for pusher selection in
+            Multiban games.
         """
         return self._moves_count
 
@@ -139,9 +143,6 @@ class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityCompar
         self._moves = []
 
     def to_s(self, output_settings=OutputSettings()):
-        """
-        Converts self to string (for printing snapshots in standard format)
-        """
         retv = ""
         conversion_ok = True
 

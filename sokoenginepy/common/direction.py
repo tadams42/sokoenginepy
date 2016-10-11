@@ -4,16 +4,11 @@ from .exceptions import SokoengineError
 
 
 class UnknownDirectionError(SokoengineError):
-    """
-    Exception
-    """
     pass
 
 
 class Direction(IntEnum):
-    """
-    Directions of movement
-    """
+    """Directions of movement."""
     UP = 0
     NORTH_EAST = 1
     RIGHT = 2

@@ -4,66 +4,75 @@ from .exceptions import SokoengineError
 
 
 class UnknownVariantError(SokoengineError):
-    """
-    Exception
-    """
     pass
 
 
 class Variant(IntEnum):
-    """
-    Enumerates implemented tessellation types. All classes that are tessellation
-    dependant have attribute variant whose value is one of these.
-    """
-    """
-    Board is laid out on squares.
-    Direction <-> character mapping:
+    """Implemented tessellation types.
 
-    |   LEFT  |  RIGHT  |    UP   |   DOWN  |
-    |:-------:|:-------:|:-------:|:-------:|
-    |   l, L  |   r, R  |   u, U  |  d, D   |
+    All classes that are tessellation dependant have attribute variant whose
+    value is one of these.
     """
+
     SOKOBAN = 0
     """
-    Board is laid out on alternating triangles with origin triangle poiting
-    down.
-    Direction <-> character mapping:
+    Board is laid out on squares. Direction <-> character mapping:
 
-    | LEFT | RIGHT | NORTH_EAST | NORTH_WEST | SOUTH_EAST | SOUTH_WEST |
-    |:----:|:-----:|:----------:|:----------:|:----------:|:----------:|
-    | l, L |  r, R |    n, N    |    u, U    |    d, D    |    s, S    |
+    ====  =====  ====  ====
+    LEFT  RIGHT  UP    DOWN
+    ====  =====  ====  ====
+    l, L  r, R   u, U  d, D
+    ====  =====  ====  ====
+    """
+
+    TRIOBAN = 1
+    """
+    Board is laid out on alternating triangles with origin triangle poiting
+    down. Direction <-> character mapping:
+
+    ====  =====  ==========  ==========  ==========  ==========
+    LEFT  RIGHT  NORTH_EAST  NORTH_WEST  SOUTH_EAST  SOUTH_WEST
+    ====  =====  ==========  ==========  ==========  ==========
+    l, L  r, R   n, N        u, U        d, D        s, S
+    ====  =====  ==========  ==========  ==========  ==========
 
     Depending on current pusher position, some moves are not allowed:
 
-    ![Trioban movement](docs/images/trioban_am.png)
+    .. image:: /images/trioban_am.png
+        :alt: Trioban movement
     """
-    TRIOBAN = 1
+
+    HEXOBAN = 2
     """
     Board space is laid out on vertical hexagons with following coordinate
     system:
 
-    ![Hexoban coordinates](docs/images/hexoban_coordinates.png)
+    .. image:: /images/hexoban_coordinates.png
+        :alt: Hexoban coordinates
 
     Textual representation uses two characters for each hexagon. This allows
     different encoding schemes.
 
-    |            Scheme 1          |            Scheme 2          |
-    | :--------------------------: |:----------------------------:|
-    | ![Scheme 1][hexoban_scheme1] | ![Scheme 2][hexoban_scheme2] |
-
-    [hexoban_scheme1]:docs/images/hexoban_scheme1.png
-    [hexoban_scheme2]:docs/images/hexoban_scheme2.png
+    +----------------------------------------+---------------------------------------------+
+    | Scheme 1                               | Scheme 2                                    |
+    +========================================+=============================================+
+    | .. image:: /images/hexoban_scheme1.png | .. image:: /images/hexoban_scheme2.png      |
+    |     :alt: Scheme 1                     |     :alt: Scheme 2                          |
+    +----------------------------------------+---------------------------------------------+
 
     As long as encoding of single board is consistent, all methods handle any
     scheme transparently - parsing of board strings 'Just Works (TM)'
 
     Direction <-> character mapping:
 
-    | LEFT | RIGHT | NORTH_WEST | SOUTH_WEST | NORTH_EAST | SOUTH_EAST |
-    |:----:|:-----:|:----------:|:----------:|:----------:|:----------:|
-    | l, L |  r, R |    u, U    |    d, D    |    n, N    |    s, S    |
+    ====  =====  ==========  ==========  ==========  ==========
+    LEFT  RIGHT  NORTH_WEST  SOUTH_WEST  NORTH_EAST  SOUTH_EAST
+    ====  =====  ==========  ==========  ==========  ==========
+    l, L  r, R   u, U        d, D        n, N        s, S
+    ====  =====  ==========  ==========  ==========  ==========
     """
-    HEXOBAN = 2
+
+    OCTOBAN = 3
     """
     Board space is laid out on alternating squares and octagons with
     origin of coordinate system being octagon. Tessellation allows all
@@ -73,11 +82,12 @@ class Variant(IntEnum):
 
     Direction <-> character mapping:
 
-    |  UP  | NORTH_EAST | RIGHT | SOUTH_EAST | DOWN | SOUTH_WEST | LEFT | NORTH_WEST |
-    |:----:|:----------:|:-----:|:----------:|:----:|:----------:|:----:|:----------:|
-    | u, U |    n, N    |  r, R |    e, E    | d, D |    s, S    | l, L |    w, W    |
+    ====  ==========  =====  ==========  ====  ==========  ====  ==========
+    UP    NORTH_EAST  RIGHT  SOUTH_EAST  DOWN  SOUTH_WEST  LEFT  NORTH_WEST
+    ====  ==========  =====  ==========  ====  ==========  ====  ==========
+    u, U  n, N        r, R   e, E        d, D  s, S        l, L  w, W
+    ====  ==========  =====  ==========  ====  ==========  ====  ==========
     """
-    OCTOBAN = 3
 
     def to_s(self):
         if self == self.SOKOBAN:

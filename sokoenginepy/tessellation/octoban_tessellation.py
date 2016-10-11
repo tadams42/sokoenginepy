@@ -6,9 +6,7 @@ from .tessellation import (COLUMN, ROW, CellOrientation, Tessellation,
 
 
 class OctobanTessellation(Tessellation):
-    """
-    Implements Tessellation for Octoban variant.
-    """
+    """Implements :class:`.Tessellation` for Octoban variant."""
 
     _LEGAL_DIRECTIONS = (
         Direction.LEFT,

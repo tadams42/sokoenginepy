@@ -68,8 +68,8 @@ class AtomicMoveCharacters(Enum):
     UPPER_SW = 'S'
 
 
-re_snapshot_string = re.compile(
-    "^([0-9\s" + re.escape("".join(c.value for c in AtomicMoveCharacters)) +
+_re_snapshot_string = re.compile(
+    r"^([0-9\s" + re.escape("".join(c.value for c in AtomicMoveCharacters)) +
     re.escape("".join(c.value for c in SpecialSnapshotCharacters)
              ) + re.escape("".join(c.value for c in RleCharacters)) + "])*$"
 )
@@ -99,22 +99,24 @@ def is_atomic_move(character):
 
 
 def is_snapshot_string(line):
-    """
-    Checks if @a tline is snapshot string: contains only digits,
-    spaces, atomic move characters and rle separators.
+    """Checks if ``line`` is snapshot string.
 
-    @note Doesn't check if snapshot string is properly formed (for example,
-    if all jump sequences are closed, etc.). This is by design, so this
-    method may be used to check strings read from stream line by line,
-    where each line alone doesn't represent legally formed snapshot, but
-    all of them together do. To completely validate this string, it needs
-    to be converted to GameSnapshot.
+    Snapshot strings contain only digits, spaces, atomic move characters and
+    rle separators.
+
+    Note:
+        Doesn't check if snapshot string is properly formed (for example, if
+        all jump sequences are closed, etc.). This is by design, so this method
+        may be used to check strings read from stream line by line, where each
+        line alone doesn't represent legally formed snapshot, but all of them
+        together do. To completely validate this string, it needs to be
+        converted to :class:`~sokoenginepy.game.game_snapshot.GameSnapshot`.
     """
     return (
         not is_blank(line) and not contains_only_digits_and_spaces(line) and
         reduce(
             lambda x, y: x and y, [
-                True if re_snapshot_string.match(l) else False
+                True if _re_snapshot_string.match(l) else False
                 for l in line.splitlines()
             ], True
         )
@@ -122,9 +124,8 @@ def is_snapshot_string(line):
 
 
 class SnapshotStringParser:
-    """
-    Parses and validates game snapshot string into sequence of AtomicMoves
-    """
+    """Parses and validates game snapshot string into sequence of AtomicMoves"""
+    
     atomic_moves = Regex(
         "([" + "".join(c.value for c in AtomicMoveCharacters) + "])+"
     )
@@ -140,7 +141,7 @@ class SnapshotStringParser:
     )
     grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
 
-    re_snapshot_string_cleanup = re.compile(
+    _re_snapshot_string_cleanup = re.compile(
         "([" + re.escape(SpecialSnapshotCharacters.CURENT_POSITION_CH.value) +
         r"\s])+"
     )
@@ -181,7 +182,7 @@ class SnapshotStringParser:
         self._resulting_solving_mode = None
         self._resulting_moves = None
 
-        moves_string = self.re_snapshot_string_cleanup.sub("", moves_string)
+        moves_string = self._re_snapshot_string_cleanup.sub("", moves_string)
         if is_blank(moves_string):
             self._resulting_solving_mode = 'forward'
             self._resulting_moves = []

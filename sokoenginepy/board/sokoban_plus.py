@@ -2,15 +2,11 @@ from ..common import DEFAULT_PIECE_ID, PrettyPrintable, SokoengineError
 
 
 class SokobanPlusDataError(SokoengineError):
-    """
-    Exception
-    """
     pass
 
 
 class SokobanPlus(PrettyPrintable):
-    """
-    Manages Sokoban+ data for game board
+    """Manages Sokoban+ data for game board.
 
     **Sokoban+ rules**
 
@@ -24,31 +20,37 @@ class SokobanPlus(PrettyPrintable):
     There is also default plus id that represents non tagged boxes and goals.
 
     Sokoban+ ids for given board are defined by two strings called goalorder
-    and boxorder.
-    For example, boxorder "13 24 3 122 1" would give plus_id = 13 to box id = 1,
-    plus_id = 24 to box ID = 2, etc...
+    and boxorder. For example, boxorder "13 24 3 122 1" would give plus_id = 13
+    to box id = 1, plus_id = 24 to box ID = 2, etc...
 
     **Valid Sokoban+ id sequences**
 
     Boxorder and goalorder must define ids for equal number of boxes and goals.
     This means that in case of boxorder asigning plus id "42" to two boxes,
     goalorder must also contain number 42 twice.
-    Sokoban+ data parser accepts any positive integer as plus id, but it is
-    encouraged to use small numbers because they are prettier once board is
-    rendered with displayed Sokoban+ IDs.
 
-    **Default plus_id in Sokoban+ strings**
+    Sokoban+ data parser accepts any positive integer as plus id.
 
-    Original implementation used number 99 for default plus ID. As there can be
-    more than 99 boxes on board, sokoenginepy changes this detail and uses
-    DEFAULT_PLUS_ID as default plus ID. When loading older puzzles
-    with Sokoban+, legacy default value is converted transparently.
+    Attributes:
+        DEFAULT_PLUS_ID: Sokoban+ ID for pieces that don't have one or when
+            Sokoban+ is disabled. Original Sokoban+ implementation used number 99
+            for default plus ID. As there can be more than 99 boxes on board,
+            sokoenginepy changes this detail and uses :const:`DEFAULT_PLUS_ID` as
+            default plus ID. When loading older puzzles with Sokoban+, legacy
+            default value is converted transparently.
+
+    Args:
+        boxorder (string): Space separated integers describing Sokoban+ IDs for
+            boxes
+        goalorder (string): Space separated integers describing Sokoban+ IDs for
+            goals
+        pieces_count (int): Total count of boxes/goals on board
     """
 
     _LEGACY_DEFAULT_PLUS_ID = 99
     DEFAULT_PLUS_ID = 0
 
-    def __init__(self, pieces_count, boxorder, goalorder):
+    def __init__(self, pieces_count, boxorder=None, goalorder=None):
         self._is_enabled = False
         self._is_validated = False
         self.errors = []
@@ -128,15 +130,27 @@ class SokobanPlus(PrettyPrintable):
 
     @is_enabled.setter
     def is_enabled(self, value):
+        """
+        Raises:
+            :exc:`SokobanPlusDataError`: Trying to enable invalid Sokoban+
+        """
         if value:
             if not self.is_valid:
                 raise SokobanPlusDataError(self.errors)
         self._is_enabled = value
 
     def box_plus_id(self, for_box_id):
-        """
-        plus ID from boxorder or Box.DEFAULT_PLUS_ID if there isn't one
-        defined or self.is_enabled == False
+        """Get Sokoban+ ID for box.
+
+        Args:
+            for_box_id (int): box ID
+
+        Returns:
+            int: If Sokoban+ is enabled returns Sokoban+ ID of a box. If not it returns :const:`DEFAULT_PLUS_ID`
+
+        Raises:
+            :exc:`KeyError`: No box with ID ``for_box_id``, but only if i
+                Sokoban+ is enabled
         """
         try:
             return self._get_plus_id(for_box_id, from_where=self._box_plus_ids)
@@ -144,9 +158,17 @@ class SokobanPlus(PrettyPrintable):
             raise KeyError("No box with ID: {0}".format(for_box_id))
 
     def goal_plus_id(self, for_goal_id):
-        """
-        plus ID from goalorder or Goal.DEFAULT_PLUS_ID if there isn't one
-        defined or self.is_enabled == False
+        """Get Sokoban+ ID for goal.
+
+        Args:
+            for_goal_id (int): goal ID
+
+        Returns:
+            int: If Sokoban+ is enabled returns Sokoban+ ID of a goal. If not it returns :const:`DEFAULT_PLUS_ID`
+
+        Raises:
+            :exc:`KeyError`: No goal with ID ``for_goal_id``, but only if
+                Sokoban+ is enabled
         """
         try:
             return self._get_plus_id(for_goal_id, from_where=self._goal_plus_ids)
@@ -178,7 +200,6 @@ class SokobanPlus(PrettyPrintable):
             for pid in self.
             _rstrip_default_plus_ids(" ".join(str(i) for i in ids_list)).split()
         ]
-
 
         replaced = [
             self.DEFAULT_PLUS_ID if (

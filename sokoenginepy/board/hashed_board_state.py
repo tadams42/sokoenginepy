@@ -4,9 +4,31 @@ from .board_state import BoardState
 
 
 class HashedBoardState(BoardState):
-    """
-    Adds Zobrist hashing on top of board piece data efectively hashing board
-    state whenever pieces data (like positions and/or Sokoban+ IDs) change.
+    """:class:`~sokoenginepy.board.board_state.BoardState` with Zobrist hashing
+
+    Adds Zobrist hashing on top of :class:`~sokoenginepy.board.board_state.BoardState`
+    and keeps it up to date when pieces are moved.
+
+    Zobrist hash is 64b integer hash derived from positions of all boxes on
+    board.
+
+    For most applications, it is only interesting to use hash of boxes'
+    positions. Sometimes might be usefull to have hash derived from both,
+    boxes' and pushers' positions.
+
+    Boxes with same Sokoban+ ID are treated as equal meaning that if two of
+    these boxes switch position, hash will not change. This alse means that
+    hash is different when Sokoban+ is enabled from the one when it is disabled
+
+    Pushers are all treated equal, meaning that if two pushers switch position,
+    hash will not change
+
+    Note:
+        - enabling/disabling Sokoban+ rehashes the board state
+        - changing position of pieces only updates existing hash, it doesn't
+          rehash whole board. This means that for example undoing box push
+          would "undo" the hash value to the one that was before move was
+          preformed
     """
 
     def __init__(self, variant_board):
@@ -21,32 +43,7 @@ class HashedBoardState(BoardState):
         self._zobrist_rehash()
 
     def _zobrist_rehash(self):
-        """
-        Recalculates Zobrist hash of board position from scratch.
-
-        Zobrist hash is 64b board hash number derived from position of all
-        pieces on it, different for each configuration of boxes and pushers.
-
-        For most applications, it is only interesting too use hash of boxes'
-        positions. Sometimes might be usefull to have hash derived from both,
-        boxes' and pushers' positions. This method calculates initial value for
-        both of these hashes.
-
-        Boxes with same Sokoban+ ID are treated as equal meaning that if two of
-        these boxes switch position, hash will not change. Note that this means
-        that hash is different when Sokoban+ is enabled from the one when it is
-        disabled
-
-        Pushers are all treated equal, meaning that if two pushers switch
-        position, hash will not change
-
-        Note the following:
-            - enabling/disabling Sokoban+ rehashes the board state
-            - changing position of pieces only updates existing hash, it doesn't
-              rehash whole board. This means that for example undoing box push
-              would "undo" the hash value to the one that was before move was
-              preformed
-        """
+        """Recalculates Zobrist hash of board position from scratch."""
 
         distinct_box_plus_ids = set(
             self.box_plus_id(box_id) for box_id in self.boxes_ids
@@ -100,31 +97,30 @@ class HashedBoardState(BoardState):
 
     @property
     def position_hash(self):
-        """
-        Board state hash constructed from current boxes layout and current
-        boxes' Sokoban+ IDs.
+        """Board hash.
 
-        Boxes with same Sokoban+ ID are treated as equal meaning that if two of
-        these boxes switch position, hash will not change. Note that this means
-        that position_hash is different when Sokoban+ is enabled from the one
-        when it is disabled
-
-        Note the following:
-            - enabling/disabling Sokoban+ rehashes the board
-            - changing position of pieces only updates existing hash, it doesn't
-              rehash whole board. This means that for example undoing box push
-              would "undo" the hash value to the one that was before move was
-              preformed
+        Constructed from current boxes layout and current boxes' Sokoban+ IDs.
         """
         return self._position_hash
 
-    def external_position_hash(self, position):
+    @property
+    def position_with_pushers_hash(self):
+        """Board hash.
+
+        Constructed from current boxes layout, current boxes' Sokoban+ IDs and
+        current pushers' layout
         """
-        Given dict of boxes positions, ie: {id1: position1, id2: position2,},
+        return self._position_with_pushers_hash
+
+    def external_position_hash(self, position):
+        """Same as :attr:`position_hash` but calculated for arbitrarily position.
+
+        Given dict of boxes positions, ie: {id1: position1, id2: position2},
         it calculates position_hash that position would have if it was applied
         to this board.
 
-        Returns None in case len(position) != self.boxes_count
+        Warning:
+            Returns None in case len(position) != self.boxes_count
         """
         if (
             len(position) != self.boxes_count or

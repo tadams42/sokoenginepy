@@ -18,54 +18,49 @@ class CellOrientation(IntEnum):
 
 
 class Tessellation(ABC):
-    """
-    Base class for all variant tessellation implementations.
-    """
+    """Base class for all variant tessellation implementations."""
 
     @property
     @abstractmethod
     def legal_directions(self):
-        """
-        Directions generally accepted by Tessellation.
+        """Directions generally accepted by Tessellation.
+
+        Returns:
+            list: of :class:`.Direction`
         """
         pass
 
     @abstractmethod
     def neighbor_position(self, position, direction, board_width, board_height):
-        """
-        Calculates neighbor position in given direction and verifies calculated
-        position.
+        """Calculates neighbor position in given direction and verifies calculated position.
 
-        If resulting position is off-board returns None
+        Returns:
+            int: If resulting position is off-board returns None, otherwise position
 
-        Raises IllegalDirection in case direction is not one of
-        self.legal_directions
+        Raises:
+            :exc:`.UnknownDirectionError`: in case direction is not one of self.legal_directions
 
         Position is always expressed as int index of board graph vertice. To
-        convert 2D coordinates into vertice index, use index_1d method
+        convert 2D coordinates into vertice index, use :func:`index_1d` method
         """
         pass
 
     @property
     @abstractmethod
     def _char_to_atomic_move_dict(self):
-        """
-        Dict mapping string to AtomicMove parameters
-        """
+        """Dict mapping string to AtomicMove parameters,"""
         pass
 
     @property
     @abstractmethod
     def graph_type(self):
-        """
-        Graph class usable in given tessellation.
-        """
+        """Type of graph used in given tessellation."""
         pass
 
     def char_to_atomic_move(self, input_chr):
         """
-        Converts string to AtomicMove instance or raises exception if conversion
-        not possible.
+        Converts string to :class:`.AtomicMove` instance or raises
+        :exc:`.UnknownDirectionError` if conversion not possible.
         """
         from ..snapshot import AtomicMove, AtomicMoveCharacters
 
@@ -84,15 +79,13 @@ class Tessellation(ABC):
     @property
     @abstractmethod
     def _atomic_move_to_char_dict(self):
-        """
-        Dict mapping AtomicMove parameters to string representation.
-        """
+        """Dict mapping AtomicMove parameters to string representation."""
         pass
 
     def atomic_move_to_char(self, atomic_move):
         """
-        Converts AtomicMove to string or raises exception if conversion
-        not possible.
+        Converts :class:`.AtomicMove` to string or raises
+        :exc:`.UnknownDirectionError` if conversion not possible.
         """
         retv = self._atomic_move_to_char_dict.get(
             (atomic_move.direction, atomic_move.is_push_or_pull), None
@@ -104,16 +97,16 @@ class Tessellation(ABC):
         return retv
 
     def cell_orientation(self, position, board_width, board_height):
-        """
-        Calculates board cell orientation for given position.
+        """Calculates board cell orientation for given position.
+
+        Returns:
+            CellOrientation: cell orientation for given `position`
         """
         return CellOrientation.DEFAULT
 
 
 def index_1d(x, y, board_width):
-    """
-    Converts 2D coordinate to board position index.
-    """
+    """Converts 2D coordinate to board position index."""
     return y * board_width + x
 
 

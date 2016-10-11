@@ -8,16 +8,14 @@ from .text_utils import ending_digits
 
 
 class RleCharacters(Enum):
-    """
-    Separators used in RLE encoded board and snapshot texts
-    """
+    """Separators used in RLE encoded board and snapshot texts."""
     GROUP_LEFT_DELIM = '('
     GROUP_RIGHT_DELIM = ')'
     RLE_ROW_SEPARATOR = '|'
 
 
-re_rle_replacer = re.compile(r"(\d+)(\D)")
-re_rle_splitter = re.compile(
+_re_rle_replacer = re.compile(r"(\d+)(\D)")
+_re_rle_splitter = re.compile(
     '|'.join(map(re.escape, [RleCharacters.RLE_ROW_SEPARATOR.value, '\n']))
 )
 
@@ -43,7 +41,7 @@ class Rle:
         decode('3(a2b)4b') == "abbabbabbbbbb"
         decode('3a4b44') == "aaabbb44"
         """
-        return re_rle_replacer.sub(
+        return _re_rle_replacer.sub(
             lambda m: m.group(2) * int(m.group(1)), rle_token
         )
 
@@ -96,4 +94,4 @@ def rle_encode(line):
 
 def rle_decode(line):
     retv = Rle.decode(line)
-    return re_rle_splitter.sub('\n', retv)
+    return _re_rle_splitter.sub('\n', retv)

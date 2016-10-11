@@ -5,22 +5,29 @@ from itertools import permutations
 from cached_property import cached_property
 from midict import MIDict, ValueExistsError
 
-from ..common import DEFAULT_PIECE_ID
-from .exceptions import CellAlreadyOccupiedError
+from ..common import DEFAULT_PIECE_ID, SokoengineError
 from .sokoban_plus import SokobanPlus
 
 
+class CellAlreadyOccupiedError(SokoengineError):
+    pass
+
+
 class BoardState:
-    """
-    Memoizes all pieces on board and allows state modifications.
+    """Memoizes all pieces on board and allows state modifications.
 
-    Note that it never modifies actual board cells - it just adjusts memoized
-    state for given board. Also, if given board is modified outside of
-    BoardState (ie. cells with boxes are edited, board is resized, etc..) this
-    is not automatically reflected on BoardState.
+    Note:
+        :class:`BoardState` never modifies actual board cells - it just adjusts
+        memoized state for given board. Also, if given board is modified outside
+        of :class:`BoardState` (ie. cells with boxes are edited, board is
+        resized, etc..) this is not automatically reflected on
+        :class:`BoardState`.
 
-    For reasons abowe, clients are responsible for syncing board and its
-    BoardState
+        For reasons above, clients are responsible for syncing board cells of a
+        given board and its :class:`BoardState`
+
+    Args:
+        variant_board (VariantBoard): Instance of :class:`.VariantBoard` subclasses
     """
 
     # Following two are needed because accessing .keys('name') in MIDict
@@ -69,48 +76,78 @@ class BoardState:
 
     @cached_property
     def pushers_ids(self):
+        """IDs of all pushers on board.
+
+        Returns:
+            list: integer IDs of all pushers on board
+        """
         return list(self._pushers.keys(self._INDEX_ID))
 
     @property
     def pushers_positions(self):
+        """Positions of all pushers on board.
+
+        Returns:
+            dict: mapping pushers' IDs to the corresponding board positions::
+
+                {1: 42, 2: 24}
+        """
         return dict(
             (pid, self._pushers[self._INDEX_ID:pid])
             for pid in self._pushers.keys(self._INDEX_ID)
         )
 
-    @cached_property
-    def normalized_pushers_positions(self):
-        retv = dict()
-        excluded = list(self.boxes_positions.values())
-        for pid, position in self._pushers.iteritems():
-            retv[pid] = self._variant_board.normalized_pusher_position(
-                position, excluded_positions=excluded
-            )
-            excluded = excluded + [retv[pid]]
-        return retv
-
     def pusher_position(self, pid):
+        """
+        Args:
+            pid (int): pusher ID
+
+        Returns:
+            int: pusher position
+
+        Raises:
+            :exc:`KeyError`: No pusher with ID ``pid``
+        """
         try:
             return self._pushers['id':pid]
         except KeyError:
             raise KeyError("No pusher with ID: {0}".format(pid))
 
-    def pusher_id_on(self, on_position):
+    def pusher_id_on(self, position):
+        """ID of pusher on position.
+
+        Args:
+            position (int): position to check
+
+        Returns:
+            int: pusher ID
+
+        Raises:
+            :exc:`KeyError`: No pusher on ``position``
+        """
         try:
-            return self._pushers['position':on_position]
+            return self._pushers['position':position]
         except KeyError:
-            raise KeyError("No pusher on position: {0}".format(on_position))
+            raise KeyError("No pusher on position: {0}".format(position))
 
     def has_pusher(self, pid):
+        """
+        Args:
+            pid (int): pusher ID
+        """
         # TODO Buggy MIDict forces us to convert to list here
         return pid in list(self._pushers.keys(self._INDEX_ID))
 
     def has_pusher_on(self, position):
+        """
+        Args:
+            position (int): position to check
+        """
         return position in self._pushers.keys(self._INDEX_POS)
 
-    def _move_pusher(self, pusher_id, from_old_position, to_new_position):
+    def _move_pusher(self, pid, old_position, to_new_position):
         try:
-            self._pushers['id':pusher_id] = to_new_position
+            self._pushers['id':pid] = to_new_position
         except ValueExistsError:
             raise CellAlreadyOccupiedError(
                 "Pusher can't be placed onto pusher in position: {0}".format(
@@ -118,51 +155,58 @@ class BoardState:
                 )
             )
 
-    def move_pusher(self, from_old_position, to_new_position):
+    def move_pusher_from(self, old_position, to_new_position):
+        """Updates board state with changed pusher position.
+
+        Args:
+            old_position (int): starting position
+            to_new_position (int): ending position
+
+        Raises:
+            :exc:`KeyError`: there is no pusher on ``old_position``
+            :exc:`.CellAlreadyOccupiedError`: there is a pusher already on ``to_new_position``
+
+        Note:
+            Allows placing a pusher onto position occupied by box. This is for
+            cases when we switch box/goals positions in reverse solving mode.
+            In this situation it is legal for pusher to end up standing on top
+            of the box. Game rules say that for these situations, first move(s)
+            must be jumps.
+
+        Warning:
+            It doesn't verify if ``old_position`` or ``to_new_position`` are
+            valid on-board positions.
         """
-        Updates board state with changed pusher position.
-
-        It doesn't verify if from_old_position and to_new_position are valid
-        board positions.
-
-        Raises KeyError in case there is no pusher on from_old_position.
-
-        Raises CellAlreadyOccupiedError if there is a pusher already on
-        to_new_position
-
-        Note: Allows placing of a pusher onto position occupied by box. This is
-        for cases when we switch box/goals positions in reverse solving mode.
-        In this situation it is legal for pusher to end up standing on top of
-        the box. Game rules say that for these situations, first move(s) must be
-        jumps
-        """
-        if from_old_position == to_new_position:
+        if old_position == to_new_position:
             return
-        pusher_id = self.pusher_id_on(from_old_position)
-        self._move_pusher(pusher_id, from_old_position, to_new_position)
+        pid = self.pusher_id_on(old_position)
+        self._move_pusher(pid, old_position, to_new_position)
 
-    def move_pusher_id(self, pusher_id, to_new_position):
+    def move_pusher(self, pid, to_new_position):
+        """Updates board state with changed pusher position.
+
+        Args:
+            pid (int): pusher ID
+            to_new_position (int): ending position
+
+        Raises:
+            :exc:`KeyError`: there is no pusher with ID ``pid``
+            :exc:`.CellAlreadyOccupiedError`: there is a pusher already on ``to_new_position``
+
+        Note:
+            Allows placing a pusher onto position occupied by box. This is for
+            cases when we switch box/goals positions in reverse solving mode.
+            In this situation it is legal for pusher to end up standing on top
+            of the box. Game rules say that for these situations, first move(s)
+            must be jumps.
+
+        Warning:
+            It doesn't verify if ``to_new_position`` is valid on-board position.
         """
-        Updates board state with changed pusher position.
-
-        It doesn't verify if from_old_position and to_new_position are valid
-        board positions.
-
-        Raises KeyError in case there is no pusher with pusher_id
-
-        Raises CellAlreadyOccupiedError if there is a pusher already on
-        to_new_position
-
-        Note: Allows placing of a pusher onto position occupied by box. This is
-        for cases when we switch box/goals positions in reverse solving mode.
-        In this situation it is legal for pusher to end up standing on top of
-        the box. Game rules say that for these situations, first move(s) must be
-        jumps
-        """
-        from_old_position = self.pusher_position(pusher_id)
-        if from_old_position == to_new_position:
+        old_position = self.pusher_position(pid)
+        if old_position == to_new_position:
             return
-        self._move_pusher(pusher_id, from_old_position, to_new_position)
+        self._move_pusher(pid, old_position, to_new_position)
 
     # --------------------------------------------------------------------------
     # Boxes
@@ -174,37 +218,78 @@ class BoardState:
 
     @cached_property
     def boxes_ids(self):
+        """IDs of all boxes on board.
+
+        Returns:
+            list: integer IDs of all boxes on board
+        """
         return list(self._boxes.keys(self._INDEX_ID))
 
     @property
     def boxes_positions(self):
+        """Positions of all boxes on board.
+
+        Returns:
+            dict: mapping boxes' IDs to the corresponding board positions::
+
+                {1: 42, 2: 24}
+        """
         return dict(
             (pid, self._boxes[self._INDEX_ID:pid])
             for pid in self._boxes.keys(self._INDEX_ID)
         )
 
     def box_position(self, pid):
+        """
+        Args:
+            pid (int): box ID
+
+        Returns:
+            int: box position
+
+        Raises:
+            KeyError: No box with ID ``pid``
+        """
         try:
             return self._boxes['id':pid]
         except KeyError:
             raise KeyError("No box with ID: {0}".format(pid))
 
-    def box_id_on(self, on_position):
+    def box_id_on(self, position):
+        """ID of box on position.
+
+        Args:
+            position (int): position to check
+
+        Returns:
+            int: box ID
+
+        Raises:
+            KeyError: No box on ``position``
+        """
         try:
-            return self._boxes['position':on_position]
+            return self._boxes['position':position]
         except KeyError:
-            raise KeyError("No box on position: {0}".format(on_position))
+            raise KeyError("No box on position: {0}".format(position))
 
     def has_box(self, pid):
+        """
+        Args:
+            pid (int): box ID
+        """
         # TODO Buggy MIDict forces us to convert to list here
         return pid in list(self._boxes.keys(self._INDEX_ID))
 
     def has_box_on(self, position):
+        """
+        Args:
+            position (int): position to check
+        """
         return position in self._boxes.keys(self._INDEX_POS)
 
-    def _move_box(self, box_id, box_plus_id, from_old_position, to_new_position):
+    def _move_box(self, pid, box_plus_id, old_position, to_new_position):
         try:
-            self._boxes['id':box_id] = to_new_position
+            self._boxes['id':pid] = to_new_position
         except ValueExistsError:
             raise CellAlreadyOccupiedError(
                 "Box can't be placed onto box in position: {0}".format(
@@ -212,53 +297,60 @@ class BoardState:
                 )
             )
 
-    def move_box(self, from_old_position, to_new_position):
+    def move_box_from(self, old_position, to_new_position):
+        """Updates board state with changed box position.
+
+        Args:
+            old_position (int): starting position
+            to_new_position (int): ending position
+
+        Raises:
+            :exc:`KeyError`: there is no box on ``old_position``
+            :exc:`.CellAlreadyOccupiedError`: there is a box already on ``to_new_position``
+
+        Note:
+            Allows placing of a box onto position occupied by pusher. This is for
+            cases when we switch box/goals positions in reverse solving mode. In
+            this situation it is legal for pusher to end up standing on top of the
+            box. Game rules say that for these situations, first move(s) must be
+            jumps
+
+        Warning:
+            It doesn't verify if ``old_position`` or ``to_new_position`` are
+            valid on-board positions.
         """
-        Updates board state with changed box position.
-
-        It doesn't verify if from_old_position and to_new_position are valid
-        board positions.
-
-        Raises KeyError in case there is no box on from_old_position.
-
-        Raises CellAlreadyOccupiedError if there is a box already on
-        to_new_position
-
-        Note: Allows placing of a box onto position occupied by pusher. This is
-        for cases when we switch box/goals positions in reverse solving mode.
-        In this situation it is legal for pusher to end up standing on top of
-        the box. Game rules say that for these situations, first move(s) must be
-        jumps
-        """
-        if from_old_position == to_new_position:
+        if old_position == to_new_position:
             return
-        box_id = self.box_id_on(from_old_position)
-        box_plus_id = self.box_plus_id(box_id)
-        self._move_box(box_id, box_plus_id, from_old_position, to_new_position)
+        pid = self.box_id_on(old_position)
+        box_plus_id = self.box_plus_id(pid)
+        self._move_box(pid, box_plus_id, old_position, to_new_position)
 
-    def move_box_id(self, box_id, to_new_position):
+    def move_box(self, pid, to_new_position):
+        """Updates board state with changed box position.
+
+        Args:
+            pid (int): box ID
+            to_new_position (int): ending position
+
+        Raises:
+            :exc:`KeyError`: there is no box with ID ``pid``
+            :exc:`.CellAlreadyOccupiedError`: there is a box already on ``to_new_position``
+
+        Note:
+            Allows placing of a box onto position occupied by pusher. This is for
+            cases when we switch box/goals positions in reverse solving mode. In
+            this situation it is legal for pusher to end up standing on top of the
+            box. Game rules say that for these situations, first move(s) must be
+            jumps
+
+        Warning:
+            It doesn't verify if ``to_new_position`` is valid on-board position.
         """
-        Updates board state with changed box position.
-
-        It doesn't verify if from_old_position and to_new_position are valid
-        board positions.
-
-        Raises KeyError in case there is no box with box_id.
-
-        Raises CellAlreadyOccupiedError if there is a box already on
-        to_new_position
-
-        Note: Allows placing of a box onto position occupied by pusher. This is
-        for cases when we switch box/goals positions in reverse solving mode.
-        In this situation it is legal for pusher to end up standing on top of
-        the box. Game rules say that for these situations, first move(s) must be
-        jumps
-        """
-        from_old_position = self.box_position(box_id)
-        if from_old_position == to_new_position:
+        old_position = self.box_position(pid)
+        if old_position == to_new_position:
             return
-        box_plus_id = self.box_plus_id(box_id)
-        self._move_box(box_id, box_plus_id, from_old_position, to_new_position)
+        box_plus_id = self.box_plus_id(pid)
+        self._move_box(pid, box_plus_id, old_position, to_new_position)
 
     # --------------------------------------------------------------------------
     # Goals
@@ -270,32 +362,73 @@ class BoardState:
 
     @cached_property
     def goals_ids(self):
+        """IDs of all goals on board.
+
+        Returns:
+            list: integer IDs of all goals on board
+        """
         return list(self._goals.keys(self._INDEX_ID))
 
     @property
     def goals_positions(self):
+        """Positions of all goals on board.
+
+        Returns:
+            dict: mapping goals' IDs to the corresponding board positions::
+
+                {1: 42, 2: 24}
+        """
         return dict(
             (pid, self._goals[self._INDEX_ID:pid])
             for pid in self._goals.keys(self._INDEX_ID)
         )
 
     def goal_position(self, pid):
+        """
+        Args:
+            pid (int): goal ID
+
+        Returns:
+            int: goal position
+
+        Raises:
+            :exc:`KeyError`: No goal with ID ``pid``
+        """
         try:
             return self._goals['id':pid]
         except KeyError:
             raise KeyError("No goal with ID: {0}".format(pid))
 
-    def goal_id_on(self, on_position):
+    def goal_id_on(self, position):
+        """ID of goal on position.
+
+        Args:
+            position (int): position to check
+
+        Returns:
+            int: goal ID
+
+        Raises:
+            :exc:`KeyError`: No goal on ``position``
+        """
         try:
-            return self._goals['position':on_position]
+            return self._goals['position':position]
         except KeyError:
-            raise KeyError("No goal on position: {0}".format(on_position))
+            raise KeyError("No goal on position: {0}".format(position))
 
     def has_goal(self, pid):
+        """
+        Args:
+            pid (int): goal ID
+        """
         # TODO Buggy MIDict forces us to convert to list here
         return pid in list(self._goals.keys(self._INDEX_ID))
 
     def has_goal_on(self, position):
+        """
+        Args:
+            position (int): position to check
+        """
         return position in self._goals.keys(self._INDEX_POS)
 
     # --------------------------------------------------------------------------
@@ -303,13 +436,25 @@ class BoardState:
     # --------------------------------------------------------------------------
 
     def box_plus_id(self, pid):
+        """
+        See Also:
+            :meth:`~sokoenginepy.board.sokoban_plus.SokobanPlus.box_plus_id`
+        """
         return self._sokoban_plus.box_plus_id(pid)
 
     def goal_plus_id(self, pid):
+        """
+        See Also:
+            :meth:`~sokoenginepy.board.sokoban_plus.SokobanPlus.goal_plus_id`
+        """
         return self._sokoban_plus.goal_plus_id(pid)
 
     @property
     def boxorder(self):
+        """
+        See Also:
+            :attr:`~sokoenginepy.board.sokoban_plus.SokobanPlus.boxorder`
+        """
         return self._sokoban_plus.boxorder
 
     @boxorder.setter
@@ -318,6 +463,10 @@ class BoardState:
 
     @property
     def goalorder(self):
+        """
+        See Also:
+            :attr:`~sokoenginepy.board.sokoban_plus.SokobanPlus.goalorder`
+        """
         return self._sokoban_plus.goalorder
 
     @goalorder.setter
@@ -341,10 +490,11 @@ class BoardState:
     # --------------------------------------------------------------------------
 
     def solutions(self):
-        """
-        Generator for all configurations of boxes that result in solved board
-        """
+        """Generator for all configurations of boxes that result in solved board.
 
+        Yields:
+            dict: {box_id1: box_position1, box_id2: box_position2, ...}
+        """
         if self.boxes_count != self.goals_count:
             return []
 
@@ -369,10 +519,13 @@ class BoardState:
                 )
 
     def _box_goal_pairs(self):
-        """
-        Finds a list of (box_id, goal_id,) tuples. If Sokoban+ is enabled,
-        boxes and goals are paired by Sokoban+ IDs, otherwise they are paired by
-        regular IDs
+        """Finds a list of paired (box_id, goal_id,) tuples.
+
+        If Sokoban+ is enabled, boxes and goals are paired by Sokoban+ IDs,
+        otherwise they are paired by regular IDs
+
+        Yields:
+            tuple: (box_id, goal_id)
         """
         if self.boxes_count != self.goals_count:
             return []
@@ -393,22 +546,17 @@ class BoardState:
             del(boxes_todo[index])
 
     def switch_boxes_and_goals(self):
-        """
-        Switches positions of boxes and goals pairs.
+        """Switches positions of boxes and goals pairs.
 
-        Returns dictionary describing operations that need to pe performed on
-        board cells for this switch.
+        Returns:
+            dict: operations that need to pe performed on board cells.
 
-        {
-            # Positions of pusher cells from which pusher has to be removed
-            # before switch
-            'pusher_to_remove': [pusher_position1, pusher_position2, '...'],
-            # Positions of pusher cells on which pusher has to be placed after
-            # switch
-            'pushers_to_place': [pusher_position1, pusher_position2, '...'],
-            # Positions of board cells on which switch has to be performed
-            'switches': [board_position1, board_position2, '...'],
-        }
+                - ``pushers_to_remove``: positions of pusher cells from which
+                  pusher has to be removed before switch
+                - ``pushers_to_place``: positions of pusher cells on which
+                  pusher has to be placed after
+                - ``switches``: positions of board cells on which switch has to
+                  be performed
         """
         if self.boxes_count != self.goals_count:
             raise SokoengineError(
@@ -429,11 +577,11 @@ class BoardState:
                 if self.has_pusher_on(goal_position):
                     retv['pusher_to_remove'].append(goal_position)
                     retv['pushers_to_place'].append(box_position)
-                    self.move_pusher_id(
+                    self.move_pusher(
                         self.pusher_id_on(goal_position), box_position
                     )
 
-                self.move_box_id(box_id, goal_position)
+                self.move_box(box_id, goal_position)
                 self._goals['id':goal_id] = box_position
 
                 retv['switches'].append(box_position)

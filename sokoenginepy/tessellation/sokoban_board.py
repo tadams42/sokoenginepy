@@ -4,9 +4,7 @@ from .variant_board import VariantBoard, VariantBoardResizer
 
 
 class SokobanBoard(VariantBoard):
-    """
-    Implements VariantBoard for Sokoban variant.
-    """
+    """Implements :class:`.VariantBoard` for Sokoban variant."""
 
     def __init__(self, board_width=0, board_height=0, board_str=""):
         super().__init__(

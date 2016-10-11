@@ -3,8 +3,8 @@ from ..common import (DEFAULT_PIECE_ID, Direction, EqualityComparable,
 
 
 class AtomicMove(PrettyPrintable, EqualityComparable):
-    """
-    Represents single step of pusher movement. It can be one of the following:
+    """Represents single step of pusher movement.
+
         - move - pusher moved without pushing box
         - push/pull - pusher moved and pushed a box in front of it (FORWARD
           solving mode) or pusher moved and pulled a box behind it (REVERSE
@@ -52,8 +52,8 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
 
     @property
     def moved_box_id(self):
-        """
-        If pusher performed push/pull, this is ID of box that was moved.
+        """If pusher performed push/pull, this is ID of box that was moved.
+
         Otherwise returns None
         """
         return self._moved_box_id if self.is_push_or_pull else None
@@ -73,9 +73,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
 
     @property
     def pusher_id(self):
-        """
-        ID of pusher that performed movement.
-        """
+        """ID of pusher that performed movement."""
         return self._pusher_id
 
     @pusher_id.setter
@@ -109,9 +107,7 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
 
     @property
     def is_push_or_pull(self):
-        """
-        True if pusher also moved a box.
-        """
+        """True if pusher also moved a box."""
         return (
             self._box_moved and not self._pusher_selected and
             not self._pusher_jumped

@@ -14,10 +14,8 @@ from .tessellated import Tessellated
 from .tessellation import index_1d
 
 
-def normalize_index_errors(method):
-    """
-    Normalizes NetworkX index out of range errors into IndexError
-    """
+def _normalize_index_errors(method):
+    """Normalizes NetworkX index out of range errors into IndexError."""
 
     @wraps(method)
     def method_wrapper(self, *args, **kwargs):
@@ -36,18 +34,25 @@ def normalize_index_errors(method):
 class VariantBoard(
     PrettyPrintable, EqualityComparable, Container, Tessellated, ABC
 ):
-    """
-    Base board class for variant specific implementations.
+    """Base board class for variant specific implementations.
+
     Internally it is stored as directed graph structure.
 
     Implements concerns of
+
         - board cell access/editing
         - string (de)serialization
         - resizing
         - board-space searching
 
     All positions are int indexes of graph vertices. To convert 2D coordinate
-    into vertice index, use index_1d method
+    into vertice index, use :func:`.index_1d`
+
+    Args:
+        board_width (int): number of columns
+        board_height (int): number of rows
+        variant (Variant): game variant
+        board_str (string): textual representation of board
     """
 
     def __init__(
@@ -116,18 +121,18 @@ class VariantBoard(
 
     @abstractmethod
     def _parse_string(self, board_str):
-        """
-        Override this in subclass to handle tessellation speciffic strings
+        """Override this in subclass to handle tessellation speciffic strings.
+
         Should return list of strings where each string represents all BoardCell
         in single line of game board.
         """
         return parse_board_string(board_str)
 
-    @normalize_index_errors
+    @_normalize_index_errors
     def __getitem__(self, position):
         return self._graph[position]
 
-    @normalize_index_errors
+    @_normalize_index_errors
     def __setitem__(self, position, board_cell):
         self._graph[position] = board_cell
 
@@ -136,9 +141,7 @@ class VariantBoard(
 
     @abstractmethod
     def to_s(self, output_settings=OutputSettings()):
-        """
-        Override this in subclass to handle tessellation speciffic strings
-        """
+        """Override this in subclass to handle tessellation speciffic strings."""
         rows = []
         for y in range(0, self.height):
             row = "".join(
@@ -171,26 +174,40 @@ class VariantBoard(
     def size(self):
         return self._width * self._height
 
-    @normalize_index_errors
+    @_normalize_index_errors
     def neighbor(self, from_position, direction):
+        """
+        Returns:
+            int: neighbor position in ``direction``
+        """
         return self._graph.neighbor(from_position, direction)
 
-    @normalize_index_errors
+    @_normalize_index_errors
     def wall_neighbors(self, from_position):
+        """
+        Returns:
+            list: of neighbor positions that are walls
+        """
         return self._graph.wall_neighbors(from_position)
 
-    @normalize_index_errors
+    @_normalize_index_errors
     def all_neighbors(self, from_position):
+        """
+        Returns:
+            list: of neighbor positions
+        """
         return self._graph.all_neighbors(from_position)
 
     def clear(self):
-        """
-        Empties all board cells.
-        """
+        """Empties all board cells."""
         for vertice in range(0, self.size):
             self[vertice].clear()
 
     def mark_play_area(self):
+        """
+        Returns:
+            list: of positions that are playable (reachable by any box or pusher)
+        """
         piece_positions = []
         for vertice in range(0, self.size):
             if self[vertice].has_box or self[vertice].has_pusher:
@@ -210,10 +227,14 @@ class VariantBoard(
             for reachable_vertice in reachables:
                 self[reachable_vertice].is_in_playable_area = True
 
-    @normalize_index_errors
+    @_normalize_index_errors
     def positions_reachable_by_pusher(
         self, pusher_position, excluded_positions=None
     ):
+        """
+        Returns:
+            list: of positions that are reachable by pusher standing on ``position``
+        """
 
         def is_obstacle(position):
             return not self[position].can_put_pusher_or_box
@@ -224,10 +245,14 @@ class VariantBoard(
             excluded_positions=excluded_positions
         )
 
-    @normalize_index_errors
+    @_normalize_index_errors
     def normalized_pusher_position(
         self, pusher_position, excluded_positions=None
     ):
+        """
+        Returns:
+            int: Top-left position reachable by pusher
+        """
         reachables = self.positions_reachable_by_pusher(
             pusher_position=pusher_position,
             excluded_positions=excluded_positions
@@ -237,7 +262,7 @@ class VariantBoard(
         else:
             return pusher_position
 
-    @normalize_index_errors
+    @_normalize_index_errors
     def path_destination(self, start_position, direction_path):
         if start_position not in self:
             raise IndexError('Board index out of range')
@@ -252,11 +277,19 @@ class VariantBoard(
         return retv
 
     def find_jump_path(self, start_position, end_position):
+        """
+        Returns:
+            list: of positions through which pusher must pass when jumping
+        """
         if start_position not in self:
             raise IndexError('Board index out of range')
         return self._graph.shortest_path(start_position, end_position)
 
     def find_move_path(self, start_position, end_position):
+        """
+        Returns:
+            list: of positions through which pusher must pass when moving without pushing boxes
+        """
         if start_position not in self:
             raise IndexError('Board index out of range')
 
@@ -273,12 +306,20 @@ class VariantBoard(
         return path
 
     def cell_orientation(self, position):
+        """
+        Returns:
+            CellOrientation: game variant specific parameter
+        """
         return self.tessellation.cell_orientation(
             position, self._width, self._height
         )
 
-    @normalize_index_errors
+    @_normalize_index_errors
     def position_path_to_direction_path(self, position_path):
+        """
+        Returns:
+            list: of :class:`.Direction`
+        """
         return self._graph.position_path_to_direction_path(position_path)
 
     def add_row_top(self):

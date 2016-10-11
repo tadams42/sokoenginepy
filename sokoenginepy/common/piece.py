@@ -4,9 +4,6 @@ DEFAULT_PIECE_ID = 1
 
 
 class InvalidPieceIdError(SokoengineError):
-    """
-    Exception
-    """
     pass
 
 

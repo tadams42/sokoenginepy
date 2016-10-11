@@ -6,6 +6,10 @@ from .sok_file_format import SOKFileFormat
 
 
 class PuzzlesCollection:
+    """Collection of :class:``.Puzzle``
+
+    TODO: Convert to iterable and sequence
+    """
 
     def __init__(
         self, title="", author="", created_at="", updated_at="", notes=""

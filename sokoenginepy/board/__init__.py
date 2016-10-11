@@ -1,7 +1,5 @@
-
 from .board_cell import BoardCell
-from .board_state import BoardState
-from .exceptions import CellAlreadyOccupiedError
+from .board_state import BoardState, CellAlreadyOccupiedError
 from .hashed_board_state import HashedBoardState
 from .input_output import (BoardConversionError, BoardEncodingCharacters,
                            is_board_string, is_box, is_empty_floor, is_goal,

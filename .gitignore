@@ -5,6 +5,7 @@
 .eggs/
 .ipynb_checkpoints/
 *.prof
+_build/
 build/
 .idea
 htmlcov

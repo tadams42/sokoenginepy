@@ -3,4 +3,4 @@ License
 
 sokoenginepy is licensed under terms of GPLv3
 
-.. literalinclude:: ../../LICENSE.md
+.. literalinclude:: ../LICENSE.md

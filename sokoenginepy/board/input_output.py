@@ -8,9 +8,7 @@ from ..common import (RleCharacters, SokoengineError,
 
 
 class BoardEncodingCharacters(Enum):
-    """
-    Characters used in textual representation of boards.
-    """
+    """Characters used in textual representation of boards."""
     WALL = '#'
     PUSHER = '@'
     PUSHER_ON_GOAL = '+'
@@ -30,9 +28,7 @@ class BoardEncodingCharacters(Enum):
 
 
 class BoardConversionError(SokoengineError):
-    """
-    Exception risen when converting board to or from board strings.
-    """
+    """Exception risen when converting board to or from board strings."""
     RLE_DECODING_ERROR = "Rle decoding board string failed"
     NON_BOARD_CHARS_FOUND = "Illegal characters found in board string"
     INVALID_LAYOUT = (
@@ -95,25 +91,24 @@ def is_wall(character):
     return character == BoardEncodingCharacters.WALL.value
 
 
-re_board_string = re.compile(
+_re_board_string = re.compile(
     r"^([0-9\s" + re.escape("".join(c.value for c in BoardEncodingCharacters)) +
     re.escape("".join(c.value for c in RleCharacters)) + "])*$"
 )
 
 
 def is_board_string(line):
-    """
-    Checks if line contains only characters legal in textual representation of
-    boards.
+    """Checks if line contains only characters legal in textual representation of boards.
 
-    @note Doesn't check if it actually contains legal board, it only checks that
-    there are no illegal characters. To find out if line is actual board
-    representation, it must be converted to actual GameBoard.
+    Note:
+        Doesn't check if it actually contains legal board, it only checks that
+        there are no illegal characters. To find out if line is actual board
+        representation, it must be converted to actual game board.
     """
     return (
         not contains_only_digits_and_spaces(line) and reduce(
             lambda x, y: x and y, [
-                True if re_board_string.match(l) else False
+                True if _re_board_string.match(l) else False
                 for l in line.splitlines()
             ], True
         )
@@ -125,11 +120,10 @@ def is_sokoban_plus_string(line):
 
 
 def parse_board_string(line):
-    """
-    Tries to parse string as board string (defined in SOK format specification)
-    Note that this only constructs list of valid board lines, but this list is
-    still not usable board. To use it as board, it needs to be fed into one of
-    board classes.
+    """Tries to parse board from string
+
+    Returns:
+        list: list of board strings, each representing single board line
     """
     if is_blank(line):
         return []

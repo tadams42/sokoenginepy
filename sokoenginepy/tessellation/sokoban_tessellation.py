@@ -1,13 +1,11 @@
-from ..common import Direction, UnknownDirectionError, Variant
+from ..common import Direction, UnknownDirectionError
 from ..snapshot import AtomicMoveCharacters
 from .graph import GraphType
 from .tessellation import COLUMN, ROW, Tessellation, index_1d, on_board_2d
 
 
 class SokobanTessellation(Tessellation):
-    """
-    Implements Tessellation for Sokoban variant.
-    """
+    """Implements :class:`.Tessellation` for Sokoban variant."""
 
     _LEGAL_DIRECTIONS = (
         Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN
