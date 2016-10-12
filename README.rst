@@ -72,21 +72,6 @@ Development environment
     pip install -e .[dev,test]
 
 
-Contents, indices and tables
-----------------------------
-
-.. toctree::
-    :maxdepth: 4
-
-    tutorial
-    api
-    license
-    development
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
 .. _SokobanYASC: http://sourceforge.net/projects/sokobanyasc/
 .. _JSoko: http://www.sokoban-online.de/
 .. _MazezaM: http://webpages.dcu.ie/~tyrrelma/MazezaM/
