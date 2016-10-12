@@ -1,10 +1,11 @@
 *.pyc
-**.egg-info/
+*.egg-info/
 .directory
 .tox/
 .eggs/
 .ipynb_checkpoints/
 *.prof
+_build/
 build/
 .idea
 htmlcov
@@ -13,3 +14,4 @@ htmlcov
 Untitled.ipynb
 main.py
 dist
+.cache/

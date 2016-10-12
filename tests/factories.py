@@ -1,65 +1,43 @@
-import pytest
 import factory
-
+import pytest
 from helpers import fake
-
-from sokoenginepy import (
-    AtomicMove, Direction, BoardCell, GameSnapshot, Variant,
-    GameSolvingMode, SokobanPlus, Piece, OutputSettings
-)
-from sokoenginepy.game import SokobanPlusValidator
-from sokoenginepy.io import BoardEncodingCharacters
-from sokoenginepy.variant import SokobanBoard
-from sokoenginepy.core import Tessellation
-
-
-class PieceFactory(factory.Factory):
-    class Meta:
-        model = Piece
-
-    position = factory.LazyAttribute(
-        lambda x: fake.random_int(min=-100, max=100)
-    )
-    id = factory.LazyAttribute(
-        lambda x: fake.random_int(
-            min=Piece.DEFAULT_ID, max=Piece.DEFAULT_ID + 100
-        )
-    )
-    plus_id = factory.LazyAttribute(
-        lambda x: fake.random_int(
-            min=Piece.DEFAULT_PLUS_ID, max=Piece.DEFAULT_PLUS_ID + 100
-        )
-    )
-
-@pytest.fixture
-def piece():
-    return PieceFactory()
+from sokoenginepy.board import (BoardCell, BoardEncodingCharacters, BoardState,
+                                HashedBoardState, SokobanPlus)
+from sokoenginepy.common import DEFAULT_PIECE_ID, Direction, Variant
+from sokoenginepy.game import GameSnapshot, GameSolvingMode
+from sokoenginepy.input_output import OutputSettings
+from sokoenginepy.snapshot import AtomicMove
+from sokoenginepy.tessellation import (SokobanBoard, index_1d,
+                                       tessellation_factory)
 
 
 class AtomicMoveFactory(factory.Factory):
+
     class Meta:
         model = AtomicMove
 
-    box_moved = factory.LazyAttribute(
-        lambda x: fake.boolean()
-    )
+    box_moved = factory.LazyAttribute(lambda x: fake.boolean())
     direction = factory.LazyAttribute(
         lambda x: fake.random_element(list(Direction))
     )
+
 
 @pytest.fixture
 def atomic_move():
     return AtomicMoveFactory(direction=Direction.LEFT, box_moved=False)
 
+
 @pytest.fixture
 def atomic_push():
     return AtomicMoveFactory(direction=Direction.LEFT, box_moved=True)
+
 
 @pytest.fixture
 def atomic_jump():
     retv = AtomicMoveFactory(direction=Direction.LEFT)
     retv.is_jump = True
     return retv
+
 
 @pytest.fixture
 def atomic_pusher_selection():
@@ -69,12 +47,14 @@ def atomic_pusher_selection():
 
 
 class BoardCellFactory(factory.Factory):
+
     class Meta:
         model = BoardCell
 
-    chr = factory.LazyAttribute(
+    character = factory.LazyAttribute(
         lambda x: BoardEncodingCharacters.FLOOR.value
     )
+
 
 @pytest.fixture
 def board_cell():
@@ -82,6 +62,7 @@ def board_cell():
 
 
 class GameSnapshotFactory(factory.Factory):
+
     class Meta:
         model = GameSnapshot
 
@@ -93,42 +74,36 @@ class GameSnapshotFactory(factory.Factory):
     )
     moves_data = ""
 
+
 @pytest.fixture
 def game_snapshot():
     return GameSnapshotFactory(moves_data="lurdLURD{lurd}LURD")
 
 
 class SokobanPlusFactory(factory.Factory):
+
     class Meta:
         model = SokobanPlus
 
-    pieces_count = factory.LazyAttribute(
-        lambda x: 5
-    )
+    pieces_count = factory.LazyAttribute(lambda x: 5)
 
-    boxorder = factory.LazyAttribute(
-        lambda x: "42 24 4 2"
-    )
+    boxorder = factory.LazyAttribute(lambda x: "42 24 4 2")
 
-    goalorder = factory.LazyAttribute(
-        lambda x: "2 24 42 4"
-    )
+    goalorder = factory.LazyAttribute(lambda x: "2 24 42 4")
+
 
 @pytest.fixture
 def sokoban_plus():
     return SokobanPlusFactory()
 
-@pytest.fixture
-def sokoban_plus_validator(sokoban_plus):
-    sokoban_plus._parse()
-    return SokobanPlusValidator(sokoban_plus)
 
 @pytest.fixture
 def board_str():
+    # yapf: disable
     return "\n".join([
         # 123456789012345678
         "    #####",            # 0
-        "    #   #",            # 1
+        "    #  @#",            # 1
         "    #$  #",            # 2
         "  ###  $##",           # 3
         "  #  $ $ #",           # 4
@@ -139,6 +114,8 @@ def board_str():
         "    #     #########",  # 9
         "    #######",          # 0
     ])
+    # yapf: enable
+
 
 @pytest.fixture
 def board_str_width():
@@ -160,12 +137,136 @@ def board_graph(variant_board):
 
 @pytest.fixture
 def sokoban_tessellation():
-    return Tessellation.factory('sokoban')
+    return tessellation_factory('sokoban')
 
 @pytest.fixture
 def trioban_tessellation():
-    return Tessellation.factory('trioban')
+    return tessellation_factory('trioban')
 
 @pytest.fixture
 def output_settings():
     return OutputSettings(use_visible_floors=True)
+
+@pytest.fixture
+def board_state(variant_board):
+    return BoardState(variant_board)
+
+@pytest.fixture
+def hashed_board_state(variant_board):
+    return HashedBoardState(variant_board)
+
+@pytest.fixture
+def pusher_ids():
+    return [DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1]
+
+@pytest.fixture
+def pushers_positions(board_str_width):
+    return {
+        DEFAULT_PIECE_ID: index_1d(7, 1, board_str_width),
+        DEFAULT_PIECE_ID + 1: index_1d(11, 8, board_str_width),
+    }
+
+@pytest.fixture
+def invalid_pusher_position():
+    return index_1d(11, 8, 42)
+
+@pytest.fixture
+def normalized_pushers_positions(board_str_width):
+    return {
+        DEFAULT_PIECE_ID: index_1d(5, 1, board_str_width),
+        DEFAULT_PIECE_ID + 1: index_1d(8, 4, board_str_width),
+    }
+
+@pytest.fixture
+def boxes_positions(board_str_width):
+    return {
+        DEFAULT_PIECE_ID: index_1d(5, 2, board_str_width),
+        DEFAULT_PIECE_ID + 1: index_1d(7, 3, board_str_width),
+        DEFAULT_PIECE_ID + 2: index_1d(5, 4, board_str_width),
+        DEFAULT_PIECE_ID + 3: index_1d(7, 4, board_str_width),
+        DEFAULT_PIECE_ID + 4: index_1d(2, 7, board_str_width),
+        DEFAULT_PIECE_ID + 5: index_1d(5, 7, board_str_width),
+    }
+
+@pytest.fixture
+def invalid_box_position():
+    return index_1d(5, 7, 42)
+
+@pytest.fixture
+def boxes_ids():
+    return [
+        DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1, DEFAULT_PIECE_ID + 2,
+        DEFAULT_PIECE_ID + 3, DEFAULT_PIECE_ID + 4, DEFAULT_PIECE_ID + 5
+    ]
+
+@pytest.fixture
+def goals_positions(board_str_width):
+    return {
+        DEFAULT_PIECE_ID: index_1d(16, 6, board_str_width),
+        DEFAULT_PIECE_ID + 1: index_1d(17, 6, board_str_width),
+        DEFAULT_PIECE_ID + 2: index_1d(16, 7, board_str_width),
+        DEFAULT_PIECE_ID + 3: index_1d(17, 7, board_str_width),
+        DEFAULT_PIECE_ID + 4: index_1d(16, 8, board_str_width),
+        DEFAULT_PIECE_ID + 5: index_1d(17, 8, board_str_width),
+    }
+
+@pytest.fixture
+def invalid_goal_position():
+    return index_1d(17, 8, 42)
+
+@pytest.fixture
+def goals_ids():
+    return [
+        DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1, DEFAULT_PIECE_ID + 2,
+        DEFAULT_PIECE_ID + 3, DEFAULT_PIECE_ID + 4, DEFAULT_PIECE_ID + 5
+    ]
+
+@pytest.fixture
+def switched_goals(boxes_positions):
+    return {
+        DEFAULT_PIECE_ID: boxes_positions[DEFAULT_PIECE_ID],
+        DEFAULT_PIECE_ID + 1: boxes_positions[DEFAULT_PIECE_ID + 1],
+        DEFAULT_PIECE_ID + 2: boxes_positions[DEFAULT_PIECE_ID + 2],
+        DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
+        DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
+        DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
+}
+
+@pytest.fixture
+def switched_boxes(goals_positions):
+    return {
+        DEFAULT_PIECE_ID: goals_positions[DEFAULT_PIECE_ID],
+        DEFAULT_PIECE_ID + 1: goals_positions[DEFAULT_PIECE_ID + 1],
+        DEFAULT_PIECE_ID + 2: goals_positions[DEFAULT_PIECE_ID + 2],
+        DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
+        DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
+        DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
+}
+
+@pytest.fixture
+def switched_goals_plus(boxes_positions):
+    # boxorder 1 3 2
+    # goalorder 3 2 1
+    # (box, goal) id pairs [(2, 1), (3, 2), (1, 3), (4, 4), (5, 5), (6, 6)]
+    return {
+        DEFAULT_PIECE_ID: boxes_positions[DEFAULT_PIECE_ID + 1],
+        DEFAULT_PIECE_ID + 1: boxes_positions[DEFAULT_PIECE_ID + 2],
+        DEFAULT_PIECE_ID + 2: boxes_positions[DEFAULT_PIECE_ID],
+        DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
+        DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
+        DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
+}
+
+@pytest.fixture
+def switched_boxes_plus(goals_positions):
+    # boxorder 1 3 2
+    # goalorder 3 2 1
+    # (box, goal) id pairs [(2, 1), (3, 2), (1, 3), (4, 4), (5, 5), (6, 6)]
+    return {
+        DEFAULT_PIECE_ID: goals_positions[DEFAULT_PIECE_ID + 2],
+        DEFAULT_PIECE_ID + 1: goals_positions[DEFAULT_PIECE_ID],
+        DEFAULT_PIECE_ID + 2: goals_positions[DEFAULT_PIECE_ID + 1],
+        DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
+        DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
+        DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
+}

@@ -1,19 +1,20 @@
 language: python
 
-# branches:
-#   except:
-#     - gh-pages
+env:
+  matrix:
+    - TOXENV=py35
+  global:
+    secure: Q6+be5pMqmPfqAi16t/R541rY3pFBROTXDFQVgSoNIwyRjhpiHsp8k7in/BdcCqyP0MmIx7BySAM3+Eo1UtO13xPEm9hs1o6ath4xNKj31fZ6kBVQOdRGPVARm8SBM3h+zYmrD5tOnJuElhLwKX9juXuXDWuVjTSv9UkM7Z9ZRHrr8NJTo9QkJM7D9HFjmQ/7hj7baBWzw6SO7ZOA/Ad/TL/rWj+FczyEN1CCueW4Hq9EJLJzrrWeoy2gVB0TzDZk4ePnXRu6asUOTfQHhTyJeO7hYn66xnsaeTpmbwirvhpHiCsAZrBcx6mLB6jjuq1JIadHeF/trLnlFYdFNZ6wQ4Aw9mTKhiF3YoiIzejcK29ah0AUSk2hlcpMSHPP+Zo8eX8CZjuY6Mp06Hf9l/+rlhpbNgUc/NtsqU6tJK5tBguzPDvBtrVK2AAfvdm8u+DpjyhhAiNM77Mud1+CxlyO/EU0fkcqfKcXU4C4mJGcAxZSDGXTz10ePMHgLXFvBQhIzuFrvv7Yy3DYKaTyrPSQwfQB/IdN/niO6izl81AkfDw0vySrjYkFYnqLx+VFMHO7hy5NcKBx8d7YwcbaM05tx1nakFZio04RivIXNlW9LlHukm5PRgvLDi9zR8ye67qnOFq7gkrdoUl0QhWQePO6xRblxpPjh3XRwszQzTIl10=
 
 python:
-  - "3.4"
+  - 3.5
 
 install:
-  - pip install -e .[test]
-  - pip install coveralls
+  - pip install tox
 
 script:
-  - py.test --cov=sokoenginepy tests/
   - tox
 
 after_success:
-  - coveralls
+  - pip install codacy-coverage
+  - python-codacy-coverage -r coverage.xml

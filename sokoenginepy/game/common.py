@@ -1,9 +1,6 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class GameSolvingMode(Enum):
-    """
-    Game solving mode
-    """
+class GameSolvingMode(IntEnum):
     FORWARD = 0
     REVERSE = 1

@@ -1,49 +1,7 @@
+from .common import Direction, SokoengineError, Variant
+from .game import GameSnapshot, GameSolvingMode
+from .input_output import (OutputSettings, Puzzle, PuzzlesCollection,
+                           PuzzleSnapshot)
+from .tessellation import (COLUMN, ROW, CellOrientation, X, Y, index_1d,
+                           on_board_1d, on_board_2d)
 from .version import __version__
-
-from .core import (
-    SokoengineError,
-    BoardConversionError,
-    SnapshotConversionError,
-    IllegalDirectionError,
-    UnknownTessellationError,
-    InvalidPieceIdError,
-    InvalidPiecePlusIdError,
-    SokobanPlusDataError,
-    Direction, Variant, CellOrientation, index_1d
-)
-
-from .game import (
-    GameSolvingMode, GameSnapshot, AtomicMove, BoardCell, Box, Pusher, Goal,
-    Piece, SokobanPlus,
-)
-
-from .io import OutputSettings, Puzzle, PuzzleSnapshot, PuzzlesCollection
-
-__all__ = [
-    '__version__',
-
-    'SokoengineError',
-    'BoardConversionError',
-    'SnapshotConversionError',
-    'IllegalDirectionError',
-    'UnknownTessellationError',
-    'InvalidPieceIdError',
-    'InvalidPiecePlusIdError',
-    'SokobanPlusDataError',
-    'Direction',
-    'Variant',
-    'CellOrientation',
-    'index_1d',
-
-    'GameSolvingMode',
-    'AtomicMove',
-    'BoardCell',
-    'Box', 'Pusher', 'Goal', 'Piece',
-    'SokobanPlus',
-    'GameSnapshot',
-
-    'OutputSettings',
-    'Puzzle',
-    'PuzzleSnapshot',
-    'PuzzlesCollection',
-]
