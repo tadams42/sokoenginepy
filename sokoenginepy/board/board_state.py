@@ -588,3 +588,12 @@ class BoardState:
                 retv['switches'].append(goal_position)
 
         return retv
+
+    @property
+    def is_playable(self):
+        return (
+            self.pushers_count > 0 and
+            self.boxes_count == self.goals_count and
+            self.boxes_count > 0 and
+            self.goals_count > 0
+        )
