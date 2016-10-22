@@ -86,17 +86,25 @@ class Variant(IntEnum):
     #: ====  ==========  =====  ==========  ====  ==========  ====  ==========
     OCTOBAN = 3
 
-    def to_s(self):
-        if self == self.SOKOBAN:
+    def __str__(self):
+        if self == Variant.SOKOBAN:
             return "Sokoban"
-        elif self == self.HEXOBAN:
+        elif self == Variant.HEXOBAN:
             return "Hexoban"
-        elif self == self.TRIOBAN:
+        elif self == Variant.TRIOBAN:
             return "Trioban"
-        elif self == self.OCTOBAN:
+        elif self == Variant.OCTOBAN:
             return "Octoban"
-        else:
-            raise UnknownVariantError(self)
+
+    def __repr__(self):
+        if self == Variant.SOKOBAN:
+            return "Variant.SOKOBAN"
+        elif self == Variant.HEXOBAN:
+            return "Variant.HEXOBAN"
+        elif self == Variant.TRIOBAN:
+            return "Variant.TRIOBAN"
+        elif self == Variant.OCTOBAN:
+            return "Variant.OCTOBAN"
 
     @classmethod
     def factory(cls, description):

@@ -39,7 +39,7 @@ class SOKReader:
         self.src_stream = src_stream
         self.dest_collection = dest_collection
         self.supplied_variant_hint = (
-            variant_hint.to_s().lower() if variant_hint else 'sokoban'
+            str(variant_hint).lower() if variant_hint else 'sokoban'
         )
 
     def read(self):
