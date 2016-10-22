@@ -6,6 +6,7 @@ from sokoenginepy.board import (BoardCell, BoardEncodingCharacters, BoardState,
                                 HashedBoardState, SokobanPlus)
 from sokoenginepy.common import (DEFAULT_PIECE_ID, Direction, GameSolvingMode,
                                  Variant)
+from sokoenginepy.game import Mover
 from sokoenginepy.input_output import OutputSettings
 from sokoenginepy.snapshot import AtomicMove, Snapshot
 from sokoenginepy.tessellation import (SokobanBoard, index_1d,
@@ -266,3 +267,41 @@ def switched_boxes_plus(goals_positions):
         DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
         DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
     }
+
+@pytest.fixture
+def non_playable_board():
+    return SokobanBoard(5, 5)
+
+@pytest.fixture
+def forward_board():
+    # yapf: disable
+    return SokobanBoard(board_str="\n".join([
+        # 12345678
+        "#########",  # 0
+        "#$  .  .#",  # 1
+        "#   @$# #",  # 2
+        "#.$    @#",  # 3
+        "#########",  # 4
+    ]))
+    # yapf: enable
+
+@pytest.fixture
+def reverse_board():
+    # yapf: disable
+    return SokobanBoard(board_str="\n".join([
+        # 12345678
+        "#########",  # 0
+        "#.  $  $#",  # 1
+        "#   @.# #",  # 2
+        "#$.    @#",  # 3
+        "#########",  # 4
+    ]))
+    # yapf: enable
+
+@pytest.fixture
+def forward_mover(forward_board):
+    return Mover(forward_board)
+
+@pytest.fixture
+def reverse_mover(forward_board):
+    return Mover(forward_board, GameSolvingMode.REVERSE)
