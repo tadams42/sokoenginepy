@@ -1,15 +1,15 @@
 from collections.abc import Iterable, MutableSequence
 
-from ..common import (EqualityComparable, PrettyPrintable, SokoengineError,
-                      UnknownDirectionError, Variant, is_blank, rle_encode)
+from ..common import (EqualityComparable, GameSolvingMode, PrettyPrintable,
+                      SokoengineError, UnknownDirectionError, Variant,
+                      is_blank, rle_encode)
 from ..input_output import OutputSettings
-from ..snapshot import (SnapshotConversionError, SnapshotStringParser,
-                        SpecialSnapshotCharacters)
 from ..tessellation import Tessellated
-from .common import GameSolvingMode
+from .input_output import (SnapshotConversionError, SnapshotStringParser,
+                           SpecialSnapshotCharacters)
 
 
-class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityComparable):
+class Snapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityComparable):
     """Sequence of AtomicMove representing snapshot of game.
 
     Args:
@@ -54,12 +54,12 @@ class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityCompar
     def __getitem__(self, index):
         retv = self._moves.__getitem__(index)
         if isinstance(retv, self._moves.__class__):
-            game_snapshot = GameSnapshot(
+            snapshot = Snapshot(
                 variant=self.variant, solving_mode=self.solving_mode
             )
             for atomic_move in retv:
-                game_snapshot.append(atomic_move)
-            return game_snapshot
+                snapshot.append(atomic_move)
+            return snapshot
         else:
             return retv
 

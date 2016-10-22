@@ -110,7 +110,7 @@ def is_snapshot_string(line):
         may be used to check strings read from stream line by line, where each
         line alone doesn't represent legally formed snapshot, but all of them
         together do. To completely validate this string, it needs to be
-        converted to :class:`~sokoenginepy.game.game_snapshot.GameSnapshot`.
+        converted to :class:`~sokoenginepy.snapshot.snapshot.Snapshot`.
     """
     return (
         not is_blank(line) and not contains_only_digits_and_spaces(line) and
@@ -125,7 +125,7 @@ def is_snapshot_string(line):
 
 class SnapshotStringParser:
     """Parses and validates game snapshot string into sequence of AtomicMoves"""
-    
+
     atomic_moves = Regex(
         "([" + "".join(c.value for c in AtomicMoveCharacters) + "])+"
     )

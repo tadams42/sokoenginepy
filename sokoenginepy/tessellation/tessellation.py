@@ -100,7 +100,7 @@ class Tessellation(ABC):
         """Calculates board cell orientation for given position.
 
         Returns:
-            CellOrientation: cell orientation for given `position`
+            CellOrientation: cell orientation for given ``position``
         """
         return CellOrientation.DEFAULT
 

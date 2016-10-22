@@ -1,12 +1,13 @@
 import factory
 import pytest
+
 from helpers import fake
 from sokoenginepy.board import (BoardCell, BoardEncodingCharacters, BoardState,
                                 HashedBoardState, SokobanPlus)
-from sokoenginepy.common import DEFAULT_PIECE_ID, Direction, Variant
-from sokoenginepy.game import GameSnapshot, GameSolvingMode
+from sokoenginepy.common import (DEFAULT_PIECE_ID, Direction, GameSolvingMode,
+                                 Variant)
 from sokoenginepy.input_output import OutputSettings
-from sokoenginepy.snapshot import AtomicMove
+from sokoenginepy.snapshot import AtomicMove, Snapshot
 from sokoenginepy.tessellation import (SokobanBoard, index_1d,
                                        tessellation_factory)
 
@@ -26,18 +27,15 @@ class AtomicMoveFactory(factory.Factory):
 def atomic_move():
     return AtomicMoveFactory(direction=Direction.LEFT, box_moved=False)
 
-
 @pytest.fixture
 def atomic_push():
     return AtomicMoveFactory(direction=Direction.LEFT, box_moved=True)
-
 
 @pytest.fixture
 def atomic_jump():
     retv = AtomicMoveFactory(direction=Direction.LEFT)
     retv.is_jump = True
     return retv
-
 
 @pytest.fixture
 def atomic_pusher_selection():
@@ -64,7 +62,7 @@ def board_cell():
 class GameSnapshotFactory(factory.Factory):
 
     class Meta:
-        model = GameSnapshot
+        model = Snapshot
 
     variant = factory.LazyAttribute(
         lambda x: fake.random_element(list(Variant))
@@ -96,7 +94,6 @@ class SokobanPlusFactory(factory.Factory):
 def sokoban_plus():
     return SokobanPlusFactory()
 
-
 @pytest.fixture
 def board_str():
     # yapf: disable
@@ -115,7 +112,6 @@ def board_str():
         "    #######",          # 0
     ])
     # yapf: enable
-
 
 @pytest.fixture
 def board_str_width():
@@ -230,7 +226,7 @@ def switched_goals(boxes_positions):
         DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
         DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
         DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
-}
+    }
 
 @pytest.fixture
 def switched_boxes(goals_positions):
@@ -241,7 +237,7 @@ def switched_boxes(goals_positions):
         DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
         DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
         DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
-}
+    }
 
 @pytest.fixture
 def switched_goals_plus(boxes_positions):
@@ -255,7 +251,7 @@ def switched_goals_plus(boxes_positions):
         DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
         DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
         DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
-}
+    }
 
 @pytest.fixture
 def switched_boxes_plus(goals_positions):
@@ -269,4 +265,4 @@ def switched_boxes_plus(goals_positions):
         DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
         DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
         DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
-}
+    }

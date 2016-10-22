@@ -7,4 +7,4 @@ from .rle import RleCharacters, rle_decode, rle_encode
 from .text_utils import (calculate_width, contains_only_digits_and_spaces,
                          drop_blank, drop_empty, ending_digits, is_blank,
                          normalize_width)
-from .variant import UnknownVariantError, Variant
+from .variant import UnknownVariantError, Variant, GameSolvingMode

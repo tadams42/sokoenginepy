@@ -116,7 +116,7 @@ class PuzzleSnapshot:
 
     No data validation is performed, to make parsing of Sokoban files as fast
     as possible. Proper validation is triggered when PuzzleSnapshot is
-    converted into GameSnapshot.
+    converted into Snapshot.
     """
 
     def __init__(
@@ -164,8 +164,8 @@ class PuzzleSnapshot:
             del self.__dict__['is_reverse']
 
     def to_game_snapshot(self):
-        from ..game import GameSnapshot
-        return GameSnapshot(variant=self.variant, moves_data=self.moves)
+        from ..game import Snapshot
+        return Snapshot(variant=self.variant, moves_data=self.moves)
 
     def reformat(self, output_settings=OutputSettings()):
         self.moves = self.to_game_snapshot().to_s(output_settings)

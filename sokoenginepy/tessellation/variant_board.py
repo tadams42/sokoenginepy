@@ -178,7 +178,11 @@ class VariantBoard(
     def neighbor(self, from_position, direction):
         """
         Returns:
-            int: neighbor position in ``direction``
+            int: neighbor position in ``direction`` or None if neighbor
+            position in ``direction`` would lead of board
+
+        Raises:
+            IndexError: if ``from_position`` is out of board position
         """
         return self._graph.neighbor(from_position, direction)
 

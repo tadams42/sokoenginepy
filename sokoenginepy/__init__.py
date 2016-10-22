@@ -1,7 +1,12 @@
-from .common import Direction, SokoengineError, Variant
-from .game import GameSnapshot, GameSolvingMode
+from .version import __version__
+
+from .board import (BoardCell, BoardConversionError, CellAlreadyOccupiedError,
+                    HashedBoardState, SokobanPlusDataError)
+from .common import Direction, SokoengineError, Variant, GameSolvingMode
 from .input_output import (OutputSettings, Puzzle, PuzzlesCollection,
                            PuzzleSnapshot)
-from .tessellation import (COLUMN, ROW, CellOrientation, X, Y, index_1d,
-                           on_board_1d, on_board_2d)
-from .version import __version__
+from .tessellation import (CellOrientation, HexobanBoard, HexobanTessellation,
+                           OctobanBoard, OctobanTessellation, SokobanBoard,
+                           SokobanTessellation, TriobanBoard,
+                           TriobanTessellation, index_1d)
+from .snapshot import Snapshot
