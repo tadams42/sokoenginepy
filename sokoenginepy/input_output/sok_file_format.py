@@ -94,7 +94,7 @@ class SOKReader:
             self.dest_collection.puzzles.append(puzzle)
 
     def _split_snapshot_chunks(self):
-        for puzzle_index, puzzle in enumerate(self.dest_collection.puzzles):
+        for puzzle in self.dest_collection.puzzles:
             remaining_lines = puzzle.notes
 
             first_moves_line = first_index_of(
@@ -403,7 +403,7 @@ class SOKWriter:
 
         if puzzle.variant != Variant.SOKOBAN:
             written = self._write_tagged(
-                SOKTags.VARIANT, puzzle.variant.to_s()
+                SOKTags.VARIANT, str(puzzle.variant)
             ) or written
 
         if not is_blank(puzzle.boxorder) and not is_blank(puzzle.goalorder):

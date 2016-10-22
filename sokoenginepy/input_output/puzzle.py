@@ -77,7 +77,7 @@ class Puzzle:
         self.updated_at = ""
 
     def reformat(self, output_settings=OutputSettings()):
-        self.board = self.to_game_board().to_s(output_settings)
+        self.board = str(self.to_game_board())
         for snapshot in self.snapshots:
             snapshot.reformat(output_settings)
 
@@ -168,7 +168,7 @@ class PuzzleSnapshot:
         return Snapshot(variant=self.variant, moves_data=self.moves)
 
     def reformat(self, output_settings=OutputSettings()):
-        self.moves = self.to_game_snapshot().to_s(output_settings)
+        self.moves = str(self.to_game_snapshot())
 
     def clear(self):
         self.moves = ""

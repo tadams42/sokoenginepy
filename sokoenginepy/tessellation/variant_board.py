@@ -5,9 +5,8 @@ from functools import wraps
 import networkx as nx
 
 from ..board import BoardCell, parse_board_string
-from ..common import (EqualityComparable, PrettyPrintable, RleCharacters,
-                      Variant, is_blank, rle_encode)
-from ..input_output import OutputSettings
+from ..common import RleCharacters, Variant, is_blank, rle_encode
+from ..input_output import output_settings
 from .factories import tessellation_factory
 from .graph import BoardGraph
 from .tessellated import Tessellated
@@ -31,9 +30,7 @@ def _normalize_index_errors(method):
     return method_wrapper
 
 
-class VariantBoard(
-    PrettyPrintable, EqualityComparable, Container, Tessellated, ABC
-):
+class VariantBoard(Container, Tessellated, ABC):
     """Base board class for variant specific implementations.
 
     Internally it is stored as directed graph structure.
@@ -101,15 +98,6 @@ class VariantBoard(
                     self._graph[index_1d(x, y, self._width)
                                ] = BoardCell(character)
 
-    @property
-    def _representation_attributes(self):
-        return {
-            'tessellation': self.variant,
-            'width': self.width,
-            'height': self.height,
-            'board': self.to_s,
-        }
-
     def __eq__(self, other):
         if (self.variant == other.variant and self.width == other.width and self.height == other.height):
             for vertice in range(0, self.size):
@@ -139,14 +127,12 @@ class VariantBoard(
     def __contains__(self, position):
         return position in self._graph
 
-    @abstractmethod
-    def to_s(self, output_settings=OutputSettings()):
+    def __str__(self):
         """Override this in subclass to handle tessellation speciffic strings."""
         rows = []
         for y in range(0, self.height):
             row = "".join(
-                cell.to_s(output_settings.use_visible_floors)
-                for cell in (
+                str(cell) for cell in (
                     self[index_1d(x, y, self.width)]
                     for x in range(0, self.width)
                 )
@@ -375,21 +361,21 @@ class VariantBoard(
         if new_height != old_height:
             if new_height > old_height:
                 amount = new_height - old_height
-                for i in range(0, amount):
+                for _ in range(0, amount):
                     self._resizer.add_row_bottom(reconfigure_edges=False)
             else:
                 amount = old_height - new_height
-                for i in range(0, amount):
+                for _ in range(0, amount):
                     self._resizer.remove_row_bottom(reconfigure_edges=False)
 
         if new_width != old_width:
             if new_width > old_width:
                 amount = new_width - old_width
-                for i in range(0, amount):
+                for _ in range(0, amount):
                     self._resizer.add_column_right(reconfigure_edges=False)
             else:
                 amount = old_width - new_width
-                for i in range(0, amount):
+                for _ in range(0, amount):
                     self._resizer.remove_column_right(reconfigure_edges=False)
 
         if old_width != self.width or old_height != self.height:
@@ -409,9 +395,9 @@ class VariantBoard(
             bottom = new_height - self.height - top
 
         if (left, right, top, bottom) != (0, 0, 0, 0):
-            for i in range(0, left):
+            for _ in range(0, left):
                 self._resizer.add_column_left(reconfigure_edges=False)
-            for i in range(0, top):
+            for _ in range(0, top):
                 self._resizer.add_row_top(reconfigure_edges=False)
 
             self.resize(self.width + right, self.height + bottom)
@@ -570,7 +556,7 @@ class VariantBoardResizer(ABC):
                         amount = x
                     break
 
-        for i in range(0, amount):
+        for _ in range(0, amount):
             self.remove_column_left(reconfigure_edges=False)
 
         if reconfigure_edges:
@@ -600,7 +586,7 @@ class VariantBoardResizer(ABC):
                         amount = y
                     break
 
-        for i in range(0, amount):
+        for _ in range(0, amount):
             self.remove_row_top(reconfigure_edges=False)
 
         if reconfigure_edges:

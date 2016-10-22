@@ -1,5 +1,4 @@
 from copy import deepcopy
-from enum import IntEnum
 from itertools import groupby
 
 from ..board import HashedBoardState

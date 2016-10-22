@@ -1,11 +1,14 @@
 from unittest.mock import patch
 
 import pytest
+
 from sokoenginepy.board import BoardConversionError
 from sokoenginepy.common import Direction, Variant
-from sokoenginepy.input_output import OutputSettings
+from sokoenginepy.input_output import output_settings
 from sokoenginepy.tessellation import (BoardGraph, SokobanBoard, TriobanBoard,
                                        index_1d)
+
+output_settings.use_visible_floors = True
 
 
 class DescribeVariantBoard:
@@ -24,7 +27,11 @@ class DescribeVariantBoard:
             b = SokobanBoard(4, 2, board_str=board_str)
             assert b.width == board_str_width
             assert b.height == board_str_height
-            assert b.to_s() == board_str
+
+            tmp = output_settings.use_visible_floors
+            output_settings.use_visible_floors = False
+            assert str(b) == board_str
+            output_settings.use_visible_floors = tmp
 
         def it_raises_on_illegal_board_string(self):
             with pytest.raises(BoardConversionError):
@@ -329,8 +336,7 @@ class DescribeVariantBoard:
             variant_board.resize(old_width + 2, old_height + 2)
             assert variant_board.width == old_width + 2
             assert variant_board.height == old_height + 2
-            assert variant_board.to_s(OutputSettings(use_visible_floors=True)
-                                     ) == output
+            assert str(variant_board) == output
 
         def test_removes_right_columns_and_bottom_rows_when_compacting(
             self, variant_board
@@ -351,8 +357,7 @@ class DescribeVariantBoard:
             variant_board.resize(old_width - 2, old_height - 2)
             assert variant_board.width == old_width - 2
             assert variant_board.height == old_height - 2
-            assert variant_board.to_s(OutputSettings(use_visible_floors=True)
-                                     ) == output
+            assert str(variant_board) == output
 
         def test_reconfigures_graph_edges_only_once(self, variant_board):
             with patch.object(
@@ -387,8 +392,7 @@ class DescribeVariantBoard:
             variant_board.resize_and_center(old_width + 5, old_height + 5)
             assert variant_board.width == old_width + 5
             assert variant_board.height == old_height + 5
-            assert variant_board.to_s(OutputSettings(use_visible_floors=True)
-                                     ) == output
+            assert str(variant_board) == output
 
         def test_removes_right_columns_and_bottom_rows_when_compacting(
             self, variant_board
@@ -409,8 +413,7 @@ class DescribeVariantBoard:
             variant_board.resize(old_width - 2, old_height - 2)
             assert variant_board.width == old_width - 2
             assert variant_board.height == old_height - 2
-            assert variant_board.to_s(OutputSettings(use_visible_floors=True)
-                                     ) == output
+            assert str(variant_board) == output
 
         def test_reconfigures_graph_edges_only_once(self, variant_board):
             with patch.object(
@@ -422,7 +425,7 @@ class DescribeVariantBoard:
     class describe_trim:
 
         def test_removes_empty_outer_rows_and_columns(self, variant_board):
-            output = variant_board.to_s(OutputSettings(use_visible_floors=True))
+            output = str(variant_board)
             old_width = variant_board.width
             old_height = variant_board.height
 
@@ -431,8 +434,7 @@ class DescribeVariantBoard:
 
             assert variant_board.width == old_width
             assert variant_board.height == old_height
-            assert variant_board.to_s(OutputSettings(use_visible_floors=True)
-                                     ) == output
+            assert str(variant_board) == output
 
         def test_reconfigures_graph_edges_only_once(self, variant_board):
             with patch.object(
@@ -458,8 +460,7 @@ class DescribeVariantBoard:
                 "----#####----------",
             ])
             variant_board.reverse_rows()
-            assert variant_board.to_s(OutputSettings(use_visible_floors=True)
-                                     ) == output
+            assert str(variant_board) == output
 
     class describe_reverse_columns:
 
@@ -478,5 +479,4 @@ class DescribeVariantBoard:
                 "--------#######----",
             ])
             variant_board.reverse_columns()
-            assert variant_board.to_s(OutputSettings(use_visible_floors=True)
-                                     ) == output
+            assert str(variant_board) == output

@@ -95,12 +95,12 @@ class DescribeGameSnapshot:
         ):
             slice_of_snapshot = forward_game_snapshot[0:4]
             assert isinstance(slice_of_snapshot, Snapshot)
-            assert slice_of_snapshot.to_s() == 'lurd'
+            assert str(slice_of_snapshot) == 'lurd'
             assert slice_of_snapshot.solving_mode == forward_game_snapshot.solving_mode
 
             slice_of_snapshot = reverse_game_snapshot[0:4]
             assert isinstance(slice_of_snapshot, Snapshot)
-            assert slice_of_snapshot.to_s() == '[]lurd'
+            assert str(slice_of_snapshot) == '[]lurd'
             assert slice_of_snapshot.solving_mode == reverse_game_snapshot.solving_mode
 
     class Describe_set_item:
@@ -319,18 +319,18 @@ class DescribeGameSnapshot:
             with pytest.raises(SnapshotConversionError):
                 sokoban_game_snapshot._parse_string(moves_data="42")
 
-    class Describe_to_s:
+    class Describe_str:
 
         def it_ensures_starting_jump_sequence_for_reverse_mode_snapshots(
             self, reverse_game_snapshot, atomic_jump, atomic_move
         ):
             reverse_game_snapshot.clear()
-            assert reverse_game_snapshot.to_s() == "[]"
+            assert str(reverse_game_snapshot) == "[]"
 
             reverse_game_snapshot.append(atomic_jump)
-            assert reverse_game_snapshot.to_s() == "[l]"
+            assert str(reverse_game_snapshot) == "[l]"
             reverse_game_snapshot.clear()
 
             reverse_game_snapshot.append(atomic_move)
             reverse_game_snapshot.append(atomic_jump)
-            assert reverse_game_snapshot.to_s() == "[]l[l]"
+            assert str(reverse_game_snapshot) == "[]l[l]"

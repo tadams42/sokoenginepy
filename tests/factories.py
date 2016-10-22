@@ -7,7 +7,6 @@ from sokoenginepy.board import (BoardCell, BoardEncodingCharacters, BoardState,
 from sokoenginepy.common import (DEFAULT_PIECE_ID, Direction, GameSolvingMode,
                                  Variant)
 from sokoenginepy.game import Mover
-from sokoenginepy.input_output import OutputSettings
 from sokoenginepy.snapshot import AtomicMove, Snapshot
 from sokoenginepy.tessellation import (SokobanBoard, index_1d,
                                        tessellation_factory)
@@ -139,10 +138,6 @@ def sokoban_tessellation():
 @pytest.fixture
 def trioban_tessellation():
     return tessellation_factory('trioban')
-
-@pytest.fixture
-def output_settings():
-    return OutputSettings(use_visible_floors=True)
 
 @pytest.fixture
 def board_state(variant_board):

@@ -1,11 +1,11 @@
-from ..common import DEFAULT_PIECE_ID, PrettyPrintable, SokoengineError
+from ..common import DEFAULT_PIECE_ID, SokoengineError
 
 
 class SokobanPlusDataError(SokoengineError):
     pass
 
 
-class SokobanPlus(PrettyPrintable):
+class SokobanPlus:
     """Manages Sokoban+ data for game board.
 
     **Sokoban+ rules**
@@ -286,10 +286,7 @@ class SokobanPlus(PrettyPrintable):
                 "Sokoban+ data doesn't define equal sets of IDs for boxes and goals"
             )
 
-    @property
-    def _representation_attributes(self):
-        return {
-            'pieces_count': self.pieces_count,
-            'boxorder': self.boxorder,
-            'goalorder': self.goalorder,
-        }
+    def __repr__(self):
+        return "SokobanPlus(pieces_count={0}, boxorder={1}, goalorder={2})".format(
+            self.pieces_count, self.boxorder, self.goalorder
+        )

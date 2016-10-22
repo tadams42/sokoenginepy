@@ -22,7 +22,7 @@ class DescribeMover:
         self, forward_board, reverse_board
     ):
         mover = Mover(forward_board, GameSolvingMode.REVERSE)
-        assert mover.board.to_s() == reverse_board.to_s()
+        assert str(mover.board) == str(reverse_board)
 
     class DescribeSelectingPusher:
 

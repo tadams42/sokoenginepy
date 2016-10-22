@@ -1,15 +1,14 @@
 from collections.abc import Iterable, MutableSequence
 
-from ..common import (EqualityComparable, GameSolvingMode, PrettyPrintable,
-                      SokoengineError, UnknownDirectionError, Variant,
-                      is_blank, rle_encode)
-from ..input_output import OutputSettings
+from ..common import (GameSolvingMode, SokoengineError, UnknownDirectionError,
+                      Variant, is_blank, rle_encode)
+from ..input_output import output_settings
 from ..tessellation import Tessellated
 from .input_output import (SnapshotConversionError, SnapshotStringParser,
                            SpecialSnapshotCharacters)
 
 
-class Snapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityComparable):
+class Snapshot(MutableSequence, Tessellated):
     """Sequence of AtomicMove representing snapshot of game.
 
     Args:
@@ -93,23 +92,20 @@ class Snapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityComparable
         self._before_inserting_move(atomic_move)
         self._moves.insert(index, atomic_move)
 
-    # PrettyPrintable
-    @property
-    def _representation_attributes(self):
-        return {
-            'solving_mode': self.solving_mode,
-            'tessellation': self.variant,
-            'moves_count': self.moves_count,
-            'pushes_count': self.pushes_count,
-            'jumps_count': self.jumps_count,
-        }
+    def __repr__(self):
+        return "Snapshot(variant={0}, solving_mode={1}, moves_data={2})".format(
+            self.variant, self.solving_mode, str(self)
+        )
 
-    # EqualityComparable
-    @property
-    def _equality_attributes(self):
+    def __eq__(self, rv):
         return (
-            self.variant, len(self._moves), self.solving_mode, self.moves_count,
-            self.pushes_count, self.jumps_count, self._moves
+            self.variant == rv.variant and
+            len(self._moves) == len(rv._moves) and
+            self.solving_mode == rv.solving_mode and
+            self.moves_count == rv.moves_count and
+            self.pushes_count == rv.pushes_count and
+            self.jumps_count == rv.jumps_count and
+            self._moves == rv._moves
         )
 
     @property
@@ -142,7 +138,7 @@ class Snapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityComparable
         self._jumps_count_invalidated = False
         self._moves = []
 
-    def to_s(self, output_settings=OutputSettings()):
+    def __str__(self):
         retv = ""
         conversion_ok = True
 

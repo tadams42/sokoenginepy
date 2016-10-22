@@ -10,10 +10,7 @@ class OutputSettings:
     """
 
     def __init__(
-        self,
-        break_long_lines=True,
-        rle_encode=False,
-        use_visible_floors=False,
+        self, break_long_lines=True, rle_encode=False, use_visible_floors=False,
         line_break_at=70
     ):
         self._rle_encode = False
@@ -52,3 +49,6 @@ class OutputSettings:
             self._use_visible_floors = True
         else:
             self._rle_encode = False
+
+
+output_settings = OutputSettings()

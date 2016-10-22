@@ -2,7 +2,7 @@ from ..board import (BoardConversionError, BoardEncodingCharacters,
                      is_empty_floor, parse_board_string)
 from ..common import (RleCharacters, Variant, calculate_width, normalize_width,
                       rle_encode)
-from ..input_output import OutputSettings
+from ..input_output import output_settings
 from .sokoban_board import SokobanBoard
 from .tessellation import X, Y, index_1d
 from .variant_board import VariantBoard, VariantBoardResizer
@@ -32,8 +32,8 @@ class HexobanBoard(VariantBoard):
         else:
             raise BoardConversionError(BoardConversionError.INVALID_LAYOUT)
 
-    def to_s(self, output_settings=OutputSettings()):
-        return HexobanTextConverter().convert_to_string(self, output_settings)
+    def __str__(self):
+        return HexobanTextConverter().convert_to_string(self)
 
 
 class HexobanBoardResizer(VariantBoardResizer):
@@ -53,31 +53,28 @@ class HexobanBoardResizer(VariantBoardResizer):
         tmp._resizer.reverse_columns(reconfigure_edges=False)
         tmp._resizer.remove_column_right(reconfigure_edges=False)
 
-        self.board._reinit_with_string(tmp.to_s(), reconfigure_edges)
+        self.board._reinit_with_string(str(tmp), reconfigure_edges)
 
     def add_row_top(self, reconfigure_edges):
         converter = HexobanTextConverter()
         tmp = SokobanBoard(board_str=converter.convert_to_string(self.board))
         tmp._resizer.add_row_top(reconfigure_edges=False)
-        self.board._reinit_with_string(tmp.to_s(), reconfigure_edges)
+        self.board._reinit_with_string(str(tmp), reconfigure_edges)
 
     def remove_row_top(self, reconfigure_edges):
         converter = HexobanTextConverter()
         tmp = SokobanBoard(board_str=converter.convert_to_string(self.board))
         tmp._resizer.remove_row_top(reconfigure_edges=False)
-        self.board._reinit_with_string(tmp.to_s(), reconfigure_edges)
+        self.board._reinit_with_string(str(tmp), reconfigure_edges)
 
     def remove_row_bottom(self, reconfigure_edges):
         converter = HexobanTextConverter()
         tmp = SokobanBoard(board_str=converter.convert_to_string(self.board))
         tmp._resizer.remove_row_bottom(reconfigure_edges=False)
-        self.board._reinit_with_string(tmp.to_s(), reconfigure_edges)
+        self.board._reinit_with_string(str(tmp), reconfigure_edges)
 
 
 class HexobanTextConverter:
-
-    def __init__(self, output_settings=OutputSettings()):
-        self.output_settings = output_settings
 
     def _debug_print(self, input, expected):
         print(
@@ -87,9 +84,14 @@ class HexobanTextConverter:
 
         input_lines = input.splitlines()
         expected_lines = expected.splitlines()
-        converted_lines = HexobanBoard(board_str=input).to_s(
-            output_settings=OutputSettings(use_visible_floors=True)
-        ).splitlines()
+
+        tmp_use_visible_floors = output_settings.use_visible_floors
+        output_settings.use_visible_floors = True
+
+        converted_lines = str(HexobanBoard(board_str=input)).splitlines()
+
+        output_settings.use_visible_floors = tmp_use_visible_floors
+
         internal_lines = self.convert_to_internal(input)[0]
 
         for i in range(0, len(internal_lines)):
@@ -146,11 +148,7 @@ class HexobanTextConverter:
 
         return internal, layout_ok
 
-    def convert_to_string(
-        self, hexoban_board, output_settings=OutputSettings()
-    ):
-        self.output_settings = output_settings
-
+    def convert_to_string(self, hexoban_board):
         retv = []
         for row in range(0, hexoban_board.height):
             line = []
@@ -161,8 +159,7 @@ class HexobanTextConverter:
             for col in range(0, hexoban_board.width):
                 line.append(self.floor_character)
                 line.append(
-                    hexoban_board[index_1d(col, row, hexoban_board.width)]
-                    .to_s(self.output_settings.use_visible_floors)
+                    str(hexoban_board[index_1d(col, row, hexoban_board.width)])
                 )
 
             retv.append("".join(line))
@@ -179,7 +176,7 @@ class HexobanTextConverter:
             return "\n".join(retv)
 
     def is_type1(self, hexoban_board):
-        return self._is_type1(parse_board_string(hexoban_board.to_s()))
+        return self._is_type1(parse_board_string(str(hexoban_board)))
 
     def _is_type1(self, string_list):
         rnfp = self._find_rightmost_non_floor(string_list)
@@ -280,7 +277,7 @@ class HexobanTextConverter:
     def floor_character(self):
         return (
             BoardEncodingCharacters.VISIBLE_FLOOR.value
-            if self.output_settings.use_visible_floors else
+            if output_settings.use_visible_floors else
             BoardEncodingCharacters.FLOOR.value
         )
 

@@ -1,4 +1,4 @@
-from ..common import Direction, UnknownDirectionError, Variant
+from ..common import Direction, UnknownDirectionError
 from ..snapshot import AtomicMoveCharacters
 from .graph import GraphType
 from .tessellation import (COLUMN, ROW, CellOrientation, Tessellation,
