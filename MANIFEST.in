@@ -8,4 +8,4 @@ recursive-exclude docs *.pyo
 recursive-exclude docs _build
 recursive-exclude docs _build/*
 recursive-exclude scripts *.ipynb
-prune docs/build
+prune docs/_build
