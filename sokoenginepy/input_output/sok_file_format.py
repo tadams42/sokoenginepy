@@ -36,6 +36,7 @@ class SOKTags:
 class SOKReader:
 
     def __init__(self, src_stream, dest_collection, variant_hint):
+        self.collection_header_variant_hint = None
         self.src_stream = src_stream
         self.dest_collection = dest_collection
         self.supplied_variant_hint = (
