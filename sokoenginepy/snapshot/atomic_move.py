@@ -1,8 +1,7 @@
-from ..common import (DEFAULT_PIECE_ID, Direction, EqualityComparable,
-                      PrettyPrintable, is_valid_piece_id)
+from ..common import DEFAULT_PIECE_ID, Direction, is_valid_piece_id
 
 
-class AtomicMove(PrettyPrintable, EqualityComparable):
+class AtomicMove:
     """Represents single step of pusher movement.
 
         - move - pusher moved without pushing box
@@ -29,25 +28,17 @@ class AtomicMove(PrettyPrintable, EqualityComparable):
         else:
             self.is_move = True
 
-    @property
-    def _representation_attributes(self):
-        return {
-            'direction': self.direction,
-            'is_push_or_pull': self.is_push_or_pull,
-            'is_pusher_selection': self.is_pusher_selection,
-            'is_jump': self.is_jump,
-            'pusher_id': self.pusher_id,
-            'moved_box_id': self.moved_box_id,
-            'group_id': self.group_id,
-        }
+    def __repr__(self):
+        return "AtomicMove(direction={0}, box_moved={1})".format(
+            str(self.direction), self.is_push_or_pull
+        )
 
-    @property
-    def _equality_attributes(self):
+    def __eq__(self, rv):
         return (
-            self.direction,
-            self.is_push_or_pull,
-            self.is_pusher_selection,
-            self.is_jump,
+            self.direction == rv.direction and
+            self.is_push_or_pull == rv.is_push_or_pull and
+            self.is_pusher_selection == rv.is_pusher_selection and
+            self.is_jump == rv.is_jump
         )
 
     @property

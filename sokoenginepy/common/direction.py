@@ -18,6 +18,9 @@ class Direction(IntEnum):
     LEFT = 6
     NORTH_WEST = 7
 
+    def __repr__(self):
+        return "Direction." + self.name
+
     @property
     def opposite(self):
         if self == Direction.UP:

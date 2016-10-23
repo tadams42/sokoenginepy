@@ -3,8 +3,9 @@ import copy
 import pytest
 
 from factories import BoardCellFactory
-from sokoenginepy.board import BoardCell, BoardEncodingCharacters
+from sokoenginepy.board import BoardCell, BoardCharacters
 from sokoenginepy.common import SokoengineError
+from sokoenginepy.input_output import OUTPUT_SETTINGS
 
 
 class DescribeBoardCell:
@@ -13,7 +14,7 @@ class DescribeBoardCell:
 
         def it_sets_all_attributes(self):
             board_cell = BoardCellFactory(
-                character=BoardEncodingCharacters.PUSHER
+                character=BoardCharacters.PUSHER
             )
 
             assert not board_cell._has_box
@@ -33,7 +34,7 @@ class DescribeBoardCell:
             assert not board_cell.is_deadlock
 
             board_cell = BoardCellFactory(
-                character=BoardEncodingCharacters.PUSHER
+                character=BoardCharacters.PUSHER
             )
             assert not board_cell.is_in_playable_area
             assert not board_cell.is_deadlock
@@ -266,34 +267,37 @@ class DescribeBoardCell:
             board_cell.has_pusher = True
             assert not board_cell.can_put_pusher_or_box
 
-    class Describe_to_s:
+    class Describe_str:
 
         def it_converts_board_cell_to_printable_character(self, board_cell):
             board_cell.clear()
             board_cell.has_pusher = True
-            assert board_cell.to_s() == BoardEncodingCharacters.PUSHER.value
+            assert str(board_cell) == BoardCharacters.PUSHER.value
             board_cell.clear()
             board_cell.has_pusher = True
             board_cell.has_goal = True
-            assert board_cell.to_s(
-            ) == BoardEncodingCharacters.PUSHER_ON_GOAL.value
+            assert str(board_cell) == BoardCharacters.PUSHER_ON_GOAL.value
             board_cell.clear()
             board_cell.has_box = True
-            assert board_cell.to_s() == BoardEncodingCharacters.BOX.value
+            assert str(board_cell) == BoardCharacters.BOX.value
             board_cell.clear()
             board_cell.has_box = True
             board_cell.has_goal = True
-            assert board_cell.to_s(
-            ) == BoardEncodingCharacters.BOX_ON_GOAL.value
+            assert str(board_cell) == BoardCharacters.BOX_ON_GOAL.value
             board_cell.clear()
             board_cell.has_goal = True
-            assert board_cell.to_s() == BoardEncodingCharacters.GOAL.value
+            assert str(board_cell) == BoardCharacters.GOAL.value
             board_cell.clear()
             board_cell.is_wall = True
-            assert board_cell.to_s() == BoardEncodingCharacters.WALL.value
+            assert str(board_cell) == BoardCharacters.WALL.value
 
+            tmp = OUTPUT_SETTINGS.use_visible_floors
             board_cell.clear()
-            assert board_cell.to_s() == BoardEncodingCharacters.FLOOR.value
-            assert board_cell.to_s(
-                use_visible_floor=True
-            ) == BoardEncodingCharacters.VISIBLE_FLOOR.value
+
+            OUTPUT_SETTINGS.use_visible_floors = False
+            assert str(board_cell) == BoardCharacters.FLOOR.value
+
+            OUTPUT_SETTINGS.use_visible_floors = True
+            assert str(board_cell) == BoardCharacters.VISIBLE_FLOOR.value
+
+            OUTPUT_SETTINGS.use_visible_floors = tmp

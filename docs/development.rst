@@ -5,8 +5,7 @@ Developing sokenginepy
 Prepare development environment
 -------------------------------
 
-sokoenginepy requires Python 3.3 or newer. It is encouraged to use vrtualenv.
-To set it up, lets first create new virtual environment
+Create new virtual environment
 
 .. code-block:: sh
 

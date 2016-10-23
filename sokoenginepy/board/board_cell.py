@@ -1,9 +1,8 @@
-from ..common import EqualityComparable, PrettyPrintable
-from .input_output import (BoardConversionError, BoardEncodingCharacters,
+from .input_output import (BoardConversionError, BoardCharacters,
                            is_box, is_empty_floor, is_goal, is_pusher, is_wall)
 
 
-class BoardCell(PrettyPrintable, EqualityComparable):
+class BoardCell:
     """Stores properties of one cell in board layout.
 
     Note:
@@ -13,7 +12,7 @@ class BoardCell(PrettyPrintable, EqualityComparable):
         class.
     """
 
-    def __init__(self, character=BoardEncodingCharacters.FLOOR):
+    def __init__(self, character=BoardCharacters.FLOOR):
         self._has_box = False
         self._has_pusher = False
         self._has_goal = False
@@ -43,46 +42,44 @@ class BoardCell(PrettyPrintable, EqualityComparable):
                     BoardConversionError.NON_BOARD_CHARS_FOUND
                 )
 
-    @property
-    def _representation_attributes(self):
-        return {
-            'has_pusher': self.has_pusher,
-            'has_box': self.has_box,
-            'has_goal': self.has_goal,
-            'is_wall': self.is_wall,
-            'is_in_playable_area': self.is_in_playable_area,
-            'is_deadlock': self.is_deadlock,
-        }
+    def __eq__(self, rv):
+        return (
+            self.is_wall == rv.is_wall and
+            self.has_pusher == rv.has_pusher and
+            self.has_box == rv.has_box and
+            self.has_goal == rv.has_goal
+        )
+
+    def __str__(self):
+        return self._str_helper.value
+
+    def __repr__(self):
+        return "BoardCell({0})".format(self._str_helper)
 
     @property
-    def _equality_attributes(self):
-        return (self.is_wall,
-                self.has_pusher,
-                self.has_box,
-                self.has_goal,)
-
-    def to_s(self, use_visible_floor=False):
-        """Converts self to string (for printing boards in textual format)."""
-        retv = BoardEncodingCharacters.FLOOR.value
+    def _str_helper(self):
+        from ..input_output import OUTPUT_SETTINGS
+        retv = BoardCharacters.FLOOR
 
         if not self.has_box and not self.has_goal and not self.has_pusher:
             if self.is_wall:
-                retv = BoardEncodingCharacters.WALL.value
+                retv = BoardCharacters.WALL
             else:
                 retv = (
-                    BoardEncodingCharacters.VISIBLE_FLOOR.value if
-                    use_visible_floor else BoardEncodingCharacters.FLOOR.value
+                    BoardCharacters.VISIBLE_FLOOR
+                    if OUTPUT_SETTINGS.use_visible_floors
+                    else BoardCharacters.FLOOR
                 )
         elif not self.has_box and not self.has_goal and self.has_pusher:
-            retv = BoardEncodingCharacters.PUSHER.value
+            retv = BoardCharacters.PUSHER
         elif not self.has_box and self.has_goal and not self.has_pusher:
-            retv = BoardEncodingCharacters.GOAL.value
+            retv = BoardCharacters.GOAL
         elif not self.has_box and self.has_goal and self.has_pusher:
-            retv = BoardEncodingCharacters.PUSHER_ON_GOAL.value
+            retv = BoardCharacters.PUSHER_ON_GOAL
         elif self.has_box and not self.has_goal and not self.has_pusher:
-            retv = BoardEncodingCharacters.BOX.value
+            retv = BoardCharacters.BOX
         else:
-            retv = BoardEncodingCharacters.BOX_ON_GOAL.value
+            retv = BoardCharacters.BOX_ON_GOAL
 
         return retv
 

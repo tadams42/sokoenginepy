@@ -1,12 +1,13 @@
 import factory
 import pytest
+
 from helpers import fake
-from sokoenginepy.board import (BoardCell, BoardEncodingCharacters, BoardState,
+from sokoenginepy.board import (BoardCell, BoardCharacters, BoardState,
                                 HashedBoardState, SokobanPlus)
-from sokoenginepy.common import DEFAULT_PIECE_ID, Direction, Variant
-from sokoenginepy.game import GameSnapshot, GameSolvingMode
-from sokoenginepy.input_output import OutputSettings
-from sokoenginepy.snapshot import AtomicMove
+from sokoenginepy.common import (DEFAULT_PIECE_ID, Direction, GameSolvingMode,
+                                 Variant)
+from sokoenginepy.game import Mover
+from sokoenginepy.snapshot import AtomicMove, Snapshot
 from sokoenginepy.tessellation import (SokobanBoard, index_1d,
                                        tessellation_factory)
 
@@ -26,18 +27,15 @@ class AtomicMoveFactory(factory.Factory):
 def atomic_move():
     return AtomicMoveFactory(direction=Direction.LEFT, box_moved=False)
 
-
 @pytest.fixture
 def atomic_push():
     return AtomicMoveFactory(direction=Direction.LEFT, box_moved=True)
-
 
 @pytest.fixture
 def atomic_jump():
     retv = AtomicMoveFactory(direction=Direction.LEFT)
     retv.is_jump = True
     return retv
-
 
 @pytest.fixture
 def atomic_pusher_selection():
@@ -52,7 +50,7 @@ class BoardCellFactory(factory.Factory):
         model = BoardCell
 
     character = factory.LazyAttribute(
-        lambda x: BoardEncodingCharacters.FLOOR.value
+        lambda x: BoardCharacters.FLOOR.value
     )
 
 
@@ -64,7 +62,7 @@ def board_cell():
 class GameSnapshotFactory(factory.Factory):
 
     class Meta:
-        model = GameSnapshot
+        model = Snapshot
 
     variant = factory.LazyAttribute(
         lambda x: fake.random_element(list(Variant))
@@ -96,7 +94,6 @@ class SokobanPlusFactory(factory.Factory):
 def sokoban_plus():
     return SokobanPlusFactory()
 
-
 @pytest.fixture
 def board_str():
     # yapf: disable
@@ -115,7 +112,6 @@ def board_str():
         "    #######",          # 0
     ])
     # yapf: enable
-
 
 @pytest.fixture
 def board_str_width():
@@ -142,10 +138,6 @@ def sokoban_tessellation():
 @pytest.fixture
 def trioban_tessellation():
     return tessellation_factory('trioban')
-
-@pytest.fixture
-def output_settings():
-    return OutputSettings(use_visible_floors=True)
 
 @pytest.fixture
 def board_state(variant_board):
@@ -230,7 +222,7 @@ def switched_goals(boxes_positions):
         DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
         DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
         DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
-}
+    }
 
 @pytest.fixture
 def switched_boxes(goals_positions):
@@ -241,7 +233,7 @@ def switched_boxes(goals_positions):
         DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
         DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
         DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
-}
+    }
 
 @pytest.fixture
 def switched_goals_plus(boxes_positions):
@@ -255,7 +247,7 @@ def switched_goals_plus(boxes_positions):
         DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
         DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
         DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
-}
+    }
 
 @pytest.fixture
 def switched_boxes_plus(goals_positions):
@@ -269,4 +261,42 @@ def switched_boxes_plus(goals_positions):
         DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
         DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
         DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
-}
+    }
+
+@pytest.fixture
+def non_playable_board():
+    return SokobanBoard(5, 5)
+
+@pytest.fixture
+def forward_board():
+    # yapf: disable
+    return SokobanBoard(board_str="\n".join([
+        # 12345678
+        "#########",  # 0
+        "#$  .  .#",  # 1
+        "#   @$# #",  # 2
+        "#.$    @#",  # 3
+        "#########",  # 4
+    ]))
+    # yapf: enable
+
+@pytest.fixture
+def reverse_board():
+    # yapf: disable
+    return SokobanBoard(board_str="\n".join([
+        # 12345678
+        "#########",  # 0
+        "#.  $  $#",  # 1
+        "#   @.# #",  # 2
+        "#$.    @#",  # 3
+        "#########",  # 4
+    ]))
+    # yapf: enable
+
+@pytest.fixture
+def forward_mover(forward_board):
+    return Mover(forward_board)
+
+@pytest.fixture
+def reverse_mover(forward_board):
+    return Mover(forward_board, GameSolvingMode.REVERSE)

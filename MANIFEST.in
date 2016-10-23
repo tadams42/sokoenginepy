@@ -5,5 +5,7 @@ recursive-exclude tests *.pyo
 recursive-include docs *
 recursive-exclude docs *.pyc
 recursive-exclude docs *.pyo
+recursive-exclude docs _build
+recursive-exclude docs _build/*
 recursive-exclude scripts *.ipynb
 prune docs/build

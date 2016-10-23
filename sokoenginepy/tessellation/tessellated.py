@@ -14,7 +14,7 @@ class Tessellated:
         variant - either case insensitive  string naming tessellation
         (ie. "hexoban") or one of Variant members
         """
-        self._variant_instance = Variant.factory(variant)
+        self._variant_instance = Variant.instance_from(variant)
         self._tessellation_instance = tessellation_factory(variant)
 
     @property

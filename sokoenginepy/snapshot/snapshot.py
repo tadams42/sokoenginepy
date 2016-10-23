@@ -1,15 +1,14 @@
 from collections.abc import Iterable, MutableSequence
 
-from ..common import (EqualityComparable, PrettyPrintable, SokoengineError,
-                      UnknownDirectionError, Variant, is_blank, rle_encode)
-from ..input_output import OutputSettings
-from ..snapshot import (SnapshotConversionError, SnapshotStringParser,
-                        SpecialSnapshotCharacters)
+from ..common import (GameSolvingMode, SokoengineError, UnknownDirectionError,
+                      Variant, is_blank, rle_encode)
+from ..input_output import OUTPUT_SETTINGS
 from ..tessellation import Tessellated
-from .common import GameSolvingMode
+from .input_output import (SnapshotConversionError, SnapshotStringParser,
+                           SpecialSnapshotCharacters)
 
 
-class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityComparable):
+class Snapshot(MutableSequence, Tessellated):
     """Sequence of AtomicMove representing snapshot of game.
 
     Args:
@@ -54,12 +53,12 @@ class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityCompar
     def __getitem__(self, index):
         retv = self._moves.__getitem__(index)
         if isinstance(retv, self._moves.__class__):
-            game_snapshot = GameSnapshot(
+            snapshot = Snapshot(
                 variant=self.variant, solving_mode=self.solving_mode
             )
             for atomic_move in retv:
-                game_snapshot.append(atomic_move)
-            return game_snapshot
+                snapshot.append(atomic_move)
+            return snapshot
         else:
             return retv
 
@@ -93,23 +92,20 @@ class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityCompar
         self._before_inserting_move(atomic_move)
         self._moves.insert(index, atomic_move)
 
-    # PrettyPrintable
-    @property
-    def _representation_attributes(self):
-        return {
-            'solving_mode': self.solving_mode,
-            'tessellation': self.variant,
-            'moves_count': self.moves_count,
-            'pushes_count': self.pushes_count,
-            'jumps_count': self.jumps_count,
-        }
+    def __repr__(self):
+        return "Snapshot(variant={0}, solving_mode={1}, moves_data={2})".format(
+            repr(self.variant), self.solving_mode, str(self)
+        )
 
-    # EqualityComparable
-    @property
-    def _equality_attributes(self):
+    def __eq__(self, rv):
         return (
-            self.variant, len(self._moves), self.solving_mode, self.moves_count,
-            self.pushes_count, self.jumps_count, self._moves
+            self.variant == rv.variant and
+            len(self._moves) == len(rv._moves) and
+            self.solving_mode == rv.solving_mode and
+            self.moves_count == rv.moves_count and
+            self.pushes_count == rv.pushes_count and
+            self.jumps_count == rv.jumps_count and
+            self._moves == rv._moves
         )
 
     @property
@@ -142,7 +138,7 @@ class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityCompar
         self._jumps_count_invalidated = False
         self._moves = []
 
-    def to_s(self, output_settings=OutputSettings()):
+    def __str__(self):
         retv = ""
         conversion_ok = True
 
@@ -204,14 +200,14 @@ class GameSnapshot(MutableSequence, PrettyPrintable, Tessellated, EqualityCompar
                     conversion_ok = False
                 i += 1
 
-        if conversion_ok and output_settings.rle_encode:
+        if conversion_ok and OUTPUT_SETTINGS.rle_encode:
             retv = rle_encode(retv)
 
-        if conversion_ok and output_settings.break_long_lines:
+        if conversion_ok and OUTPUT_SETTINGS.break_long_lines:
             tmp = ""
             for i, character in enumerate(retv):
                 tmp += character
-                if output_settings.should_insert_line_break_at(i + 1):
+                if OUTPUT_SETTINGS.should_insert_line_break_at(i + 1):
                     tmp += "\n"
             retv = tmp
 

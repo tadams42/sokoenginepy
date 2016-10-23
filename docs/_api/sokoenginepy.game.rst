@@ -5,10 +5,7 @@ game
     :members:
     :undoc-members:
 
-.. automodule:: sokoenginepy.game.common
+.. automodule:: sokoenginepy.game.mover
     :members:
     :undoc-members:
-
-.. automodule:: sokoenginepy.game.game_snapshot
-    :members:
-    :undoc-members:
+    :exclude-members: MoveWorkerOptions

@@ -85,6 +85,14 @@ class BoardGraphNetworkx(BoardGraphBase):
             edge[2]['weight'] = self.out_edge_weight(edge[1])
 
     def neighbor(self, from_position, direction):
+        """
+        Returns:
+            int: neighbor position in ``direction`` or None if neighbor
+            position in ``direction`` would lead of board
+
+        Raises:
+            IndexError: if ``from_position`` is out of board position
+        """
         for out_edge in self._graph.out_edges_iter(from_position, data=True):
             # edge: (source, target, data_dict)
             if out_edge[2]['direction'] == direction:

@@ -17,6 +17,8 @@ import os
 import shlex
 import sys
 
+import sokoenginepy
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -24,7 +26,6 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 # sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
 
-import sokoenginepy
 
 # from IPython import embed; embed()
 
@@ -49,6 +50,7 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
+    'sphinx.ext.autosummary',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -454,4 +456,3 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.5', None)}
 
 #autodoc_member_order = 'bysource'
 autodoc_member_order = 'groupwise'
-

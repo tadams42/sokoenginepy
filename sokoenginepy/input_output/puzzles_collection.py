@@ -1,7 +1,6 @@
 from unipath import Path
 
 from ..common import Variant
-from .output_settings import OutputSettings
 from .sok_file_format import SOKFileFormat
 
 
@@ -29,9 +28,9 @@ class PuzzlesCollection:
         self.notes = ""
         self.puzzles = []
 
-    def reformat(self, output_settings=OutputSettings()):
+    def reformat(self):
         for puzzle in self.puzzles:
-            puzzle.reformat(output_settings)
+            puzzle.reformat()
 
     def _extenstion_to_variant_hint(self, path):
         file_extension = Path(path).ext

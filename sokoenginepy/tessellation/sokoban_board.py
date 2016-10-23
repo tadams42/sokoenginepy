@@ -1,5 +1,4 @@
 from ..common import Variant
-from ..input_output import OutputSettings
 from .variant_board import VariantBoard, VariantBoardResizer
 
 
@@ -20,9 +19,6 @@ class SokobanBoard(VariantBoard):
 
     def _parse_string(self, board_str):
         return super()._parse_string(board_str)
-
-    def to_s(self, output_settings=OutputSettings()):
-        return super().to_s(output_settings)
 
 
 class SokobanBoardResizer(VariantBoardResizer):
