@@ -5,7 +5,6 @@ from cached_property import cached_property
 from ..board import is_box, is_goal, is_pusher
 from ..common import Variant
 from ..snapshot import SpecialSnapshotCharacters, is_atomic_move
-from .output_settings import OutputSettings
 
 
 class Puzzle:
@@ -17,16 +16,8 @@ class Puzzle:
     """
 
     def __init__(
-        self,
-        board="",
-        variant=Variant.SOKOBAN,
-        title="",
-        author="",
-        boxorder="",
-        goalorder="",
-        notes="",
-        snapshots=None,
-        created_at="",
+        self, board="", variant=Variant.SOKOBAN, title="", author="",
+        boxorder="", goalorder="", notes="", snapshots=None, created_at="",
         updated_at=""
     ):
         self._variant = None
@@ -48,7 +39,7 @@ class Puzzle:
 
     @variant.setter
     def variant(self, value):
-        self._variant = Variant.factory(value)
+        self._variant = Variant.instance_from(value)
 
     @property
     def board(self):
@@ -76,10 +67,10 @@ class Puzzle:
         self.created_at = ""
         self.updated_at = ""
 
-    def reformat(self, output_settings=OutputSettings()):
+    def reformat(self):
         self.board = str(self.to_game_board())
         for snapshot in self.snapshots:
-            snapshot.reformat(output_settings)
+            snapshot.reformat()
 
     def to_game_board(self):
         # TODO Convert to VariantBoard, but add boxorder and goalorder attrs to
@@ -147,7 +138,7 @@ class PuzzleSnapshot:
 
     @variant.setter
     def variant(self, value):
-        self._variant = Variant.factory(value)
+        self._variant = Variant.instance_from(value)
 
     @property
     def moves(self):
@@ -167,7 +158,7 @@ class PuzzleSnapshot:
         from ..game import Snapshot
         return Snapshot(variant=self.variant, moves_data=self.moves)
 
-    def reformat(self, output_settings=OutputSettings()):
+    def reformat(self):
         self.moves = str(self.to_game_snapshot())
 
     def clear(self):

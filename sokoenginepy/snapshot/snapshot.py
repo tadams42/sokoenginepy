@@ -2,7 +2,7 @@ from collections.abc import Iterable, MutableSequence
 
 from ..common import (GameSolvingMode, SokoengineError, UnknownDirectionError,
                       Variant, is_blank, rle_encode)
-from ..input_output import output_settings
+from ..input_output import OUTPUT_SETTINGS
 from ..tessellation import Tessellated
 from .input_output import (SnapshotConversionError, SnapshotStringParser,
                            SpecialSnapshotCharacters)
@@ -94,7 +94,7 @@ class Snapshot(MutableSequence, Tessellated):
 
     def __repr__(self):
         return "Snapshot(variant={0}, solving_mode={1}, moves_data={2})".format(
-            self.variant, self.solving_mode, str(self)
+            repr(self.variant), self.solving_mode, str(self)
         )
 
     def __eq__(self, rv):
@@ -200,14 +200,14 @@ class Snapshot(MutableSequence, Tessellated):
                     conversion_ok = False
                 i += 1
 
-        if conversion_ok and output_settings.rle_encode:
+        if conversion_ok and OUTPUT_SETTINGS.rle_encode:
             retv = rle_encode(retv)
 
-        if conversion_ok and output_settings.break_long_lines:
+        if conversion_ok and OUTPUT_SETTINGS.break_long_lines:
             tmp = ""
             for i, character in enumerate(retv):
                 tmp += character
-                if output_settings.should_insert_line_break_at(i + 1):
+                if OUTPUT_SETTINGS.should_insert_line_break_at(i + 1):
                     tmp += "\n"
             retv = tmp
 

@@ -48,8 +48,8 @@ loaded with features:
 
 sokoenginepy was inspired by `SokobanYASC`_, `JSoko`_, `MazezaM`_
 
-Install
--------
+Installing
+----------
 
 Installing sokoenginepy should be as simple as
 
@@ -57,19 +57,12 @@ Installing sokoenginepy should be as simple as
 
     pip install sokoenginepy
 
-Note that sokoenginepy requires Python 3.4 or newer.
 
+Using
+-----
 
-Development environment
------------------------
-
-.. code-block:: shell
-
-    pyvenv .venv
-    source .venv/bin/activate
-    pip install --upgrade pip
-    pip install --upgrade setuptools wheel twine
-    pip install -e .[dev,test]
+- For quick glance of features and usage check the :doc:`tutorial`.
+- For in-depth docs of whole package see :doc:`api`.
 
 
 .. _SokobanYASC: http://sourceforge.net/projects/sokobanyasc/

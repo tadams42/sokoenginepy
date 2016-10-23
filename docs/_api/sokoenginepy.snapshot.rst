@@ -16,4 +16,4 @@ snapshot
 .. automodule:: sokoenginepy.snapshot.input_output
     :members:
     :undoc-members:
-    :exclude-members: SnapshotStringParser
+    :exclude-members: SnapshotStringParser, is_atomic_move

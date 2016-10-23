@@ -50,5 +50,10 @@ class OutputSettings:
         else:
             self._rle_encode = False
 
-
-output_settings = OutputSettings()
+#: Settings that control string output of boards and snapshots.
+#:
+#: - break_long_lines (bool): insert line breaks
+#: - rle_encode (bool): RLE encode output
+#: - use_visible_floors (bool): print boards with visible floors
+#: - line_break_at (int): where to insert line breaks?
+OUTPUT_SETTINGS = OutputSettings()

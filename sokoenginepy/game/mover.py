@@ -59,6 +59,13 @@ class Mover:
     Args:
         board (VariantBoard): Instance of :class:`.VariantBoard` subclasses
         solving_mode (GameSolvingMode): start the game in this solving mode
+
+    Warning:
+        :class:`.Mover` operates directly on referenced game board. Because of
+        that, this board should not be edited outside of :class:`.Mover`
+        interface once :class:`.Mover` instance had been attached to it: editing
+        the board will corrupt :class:`.Mover` internal state. For the same
+        reason, it is not allowed to attach two movers to same game board.
     """
 
     def __init__(self, board, solving_mode=GameSolvingMode.FORWARD):

@@ -1,8 +1,8 @@
-from ..board import (BoardConversionError, BoardEncodingCharacters,
+from ..board import (BoardConversionError, BoardCharacters,
                      is_empty_floor, parse_board_string)
 from ..common import (RleCharacters, Variant, calculate_width, normalize_width,
                       rle_encode)
-from ..input_output import output_settings
+from ..input_output import OUTPUT_SETTINGS
 from .sokoban_board import SokobanBoard
 from .tessellation import X, Y, index_1d
 from .variant_board import VariantBoard, VariantBoardResizer
@@ -85,12 +85,12 @@ class HexobanTextConverter:
         input_lines = input.splitlines()
         expected_lines = expected.splitlines()
 
-        tmp_use_visible_floors = output_settings.use_visible_floors
-        output_settings.use_visible_floors = True
+        tmp_use_visible_floors = OUTPUT_SETTINGS.use_visible_floors
+        OUTPUT_SETTINGS.use_visible_floors = True
 
         converted_lines = str(HexobanBoard(board_str=input)).splitlines()
 
-        output_settings.use_visible_floors = tmp_use_visible_floors
+        OUTPUT_SETTINGS.use_visible_floors = tmp_use_visible_floors
 
         internal_lines = self.convert_to_internal(input)[0]
 
@@ -113,7 +113,7 @@ class HexobanTextConverter:
             return [], True
         elif even_row_x_parity < 0 or odd_row_x_parity < 0:
             internal = height * [
-                int(width / 2) * BoardEncodingCharacters.VISIBLE_FLOOR.value +
+                int(width / 2) * BoardCharacters.VISIBLE_FLOOR.value +
                 '\n'
             ]
             return internal, True
@@ -168,7 +168,7 @@ class HexobanTextConverter:
         if self._is_type1(retv):
             retv = self._remove_column_right(retv)
 
-        if output_settings.rle_encode:
+        if OUTPUT_SETTINGS.rle_encode:
             return RleCharacters.RLE_ROW_SEPARATOR.value.join(
                 rle_encode(line) for line in retv
             )
@@ -276,9 +276,9 @@ class HexobanTextConverter:
     @property
     def floor_character(self):
         return (
-            BoardEncodingCharacters.VISIBLE_FLOOR.value
-            if output_settings.use_visible_floors else
-            BoardEncodingCharacters.FLOOR.value
+            BoardCharacters.VISIBLE_FLOOR.value
+            if OUTPUT_SETTINGS.use_visible_floors else
+            BoardCharacters.FLOOR.value
         )
 
     def _add_column_left(self, string_list):

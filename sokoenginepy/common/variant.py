@@ -7,6 +7,9 @@ class GameSolvingMode(IntEnum):
     FORWARD = 0
     REVERSE = 1
 
+    def __repr__(self):
+        return "GameSolvingMode." + self.name
+
 
 class UnknownVariantError(SokoengineError):
     pass
@@ -87,27 +90,13 @@ class Variant(IntEnum):
     OCTOBAN = 3
 
     def __str__(self):
-        if self == Variant.SOKOBAN:
-            return "Sokoban"
-        elif self == Variant.HEXOBAN:
-            return "Hexoban"
-        elif self == Variant.TRIOBAN:
-            return "Trioban"
-        elif self == Variant.OCTOBAN:
-            return "Octoban"
+        return self.name.title()
 
     def __repr__(self):
-        if self == Variant.SOKOBAN:
-            return "Variant.SOKOBAN"
-        elif self == Variant.HEXOBAN:
-            return "Variant.HEXOBAN"
-        elif self == Variant.TRIOBAN:
-            return "Variant.TRIOBAN"
-        elif self == Variant.OCTOBAN:
-            return "Variant.OCTOBAN"
+        return "Variant." + self.name
 
     @classmethod
-    def factory(cls, description):
+    def instance_from(cls, description):
         if isinstance(description, str):
             description = description.strip().lower()
 

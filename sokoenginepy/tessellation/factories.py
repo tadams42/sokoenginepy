@@ -10,7 +10,7 @@ def board_factory(
     from .sokoban_board import SokobanBoard
     from .trioban_board import TriobanBoard
 
-    variant = Variant.factory(variant)
+    variant = Variant.instance_from(variant)
 
     for klass in VariantBoard.__subclasses__():
         if variant.name.lower() in klass.__name__.lower():
@@ -29,7 +29,7 @@ def tessellation_factory(variant=Variant.SOKOBAN):
     from .sokoban_tessellation import SokobanTessellation
     from .trioban_tessellation import TriobanTessellation
 
-    variant = Variant.factory(variant)
+    variant = Variant.instance_from(variant)
 
     for klass in Tessellation.__subclasses__():
         if variant.name.lower() in klass.__name__.lower():

@@ -4,9 +4,9 @@ from functools import wraps
 
 import networkx as nx
 
-from ..board import BoardCell, parse_board_string
+from ..board import BoardCell, BoardCharacters, parse_board_string
 from ..common import RleCharacters, Variant, is_blank, rle_encode
-from ..input_output import output_settings
+from ..input_output import OUTPUT_SETTINGS
 from .factories import tessellation_factory
 from .graph import BoardGraph
 from .tessellated import Tessellated
@@ -122,7 +122,10 @@ class VariantBoard(Container, Tessellated, ABC):
 
     @_normalize_index_errors
     def __setitem__(self, position, board_cell):
-        self._graph[position] = board_cell
+        if isinstance(board_cell, BoardCharacters):
+            self._graph[position] = BoardCell(board_cell)
+        else:
+            self._graph[position] = board_cell
 
     def __contains__(self, position):
         return position in self._graph
@@ -139,11 +142,11 @@ class VariantBoard(Container, Tessellated, ABC):
             )
             # Intentionally rstripping only if not using visible floors
             row = row.rstrip()
-            if output_settings.rle_encode:
+            if OUTPUT_SETTINGS.rle_encode:
                 row = rle_encode(row)
             rows.append(row)
 
-        if output_settings.rle_encode:
+        if OUTPUT_SETTINGS.rle_encode:
             return RleCharacters.RLE_ROW_SEPARATOR.value.join(rows)
         else:
             return "\n".join(rows)

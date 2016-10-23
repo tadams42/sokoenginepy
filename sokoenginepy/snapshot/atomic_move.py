@@ -29,7 +29,7 @@ class AtomicMove:
             self.is_move = True
 
     def __repr__(self):
-        return "AtomicMove({0}, {1})".format(
+        return "AtomicMove(direction={0}, box_moved={1})".format(
             str(self.direction), self.is_push_or_pull
         )
 

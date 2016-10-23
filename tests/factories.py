@@ -2,7 +2,7 @@ import factory
 import pytest
 
 from helpers import fake
-from sokoenginepy.board import (BoardCell, BoardEncodingCharacters, BoardState,
+from sokoenginepy.board import (BoardCell, BoardCharacters, BoardState,
                                 HashedBoardState, SokobanPlus)
 from sokoenginepy.common import (DEFAULT_PIECE_ID, Direction, GameSolvingMode,
                                  Variant)
@@ -50,7 +50,7 @@ class BoardCellFactory(factory.Factory):
         model = BoardCell
 
     character = factory.LazyAttribute(
-        lambda x: BoardEncodingCharacters.FLOOR.value
+        lambda x: BoardCharacters.FLOOR.value
     )
 
 

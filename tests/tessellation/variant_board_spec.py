@@ -4,11 +4,11 @@ import pytest
 
 from sokoenginepy.board import BoardConversionError
 from sokoenginepy.common import Direction, Variant
-from sokoenginepy.input_output import output_settings
+from sokoenginepy.input_output import OUTPUT_SETTINGS
 from sokoenginepy.tessellation import (BoardGraph, SokobanBoard, TriobanBoard,
                                        index_1d)
 
-output_settings.use_visible_floors = True
+OUTPUT_SETTINGS.use_visible_floors = True
 
 
 class DescribeVariantBoard:
@@ -28,10 +28,10 @@ class DescribeVariantBoard:
             assert b.width == board_str_width
             assert b.height == board_str_height
 
-            tmp = output_settings.use_visible_floors
-            output_settings.use_visible_floors = False
+            tmp = OUTPUT_SETTINGS.use_visible_floors
+            OUTPUT_SETTINGS.use_visible_floors = False
             assert str(b) == board_str
-            output_settings.use_visible_floors = tmp
+            OUTPUT_SETTINGS.use_visible_floors = tmp
 
         def it_raises_on_illegal_board_string(self):
             with pytest.raises(BoardConversionError):

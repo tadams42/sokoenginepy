@@ -320,13 +320,13 @@ class SOKReader:
             puzzle.notes = self._cleanup_whitespace(remaining_lines)
 
             if variant is not None:
-                puzzle.variant = Variant.factory(variant)
+                puzzle.variant = Variant.instance_from(variant)
             elif self.collection_header_variant_hint is not None:
-                puzzle.variant = Variant.factory(
+                puzzle.variant = Variant.instance_from(
                     self.collection_header_variant_hint
                 )
             elif self.supplied_variant_hint is not None:
-                puzzle.variant = Variant.factory(self.supplied_variant_hint)
+                puzzle.variant = Variant.instance_from(self.supplied_variant_hint)
 
             self._parse_snapshots(puzzle)
 

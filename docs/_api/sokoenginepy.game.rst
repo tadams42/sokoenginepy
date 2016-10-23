@@ -8,4 +8,4 @@ game
 .. automodule:: sokoenginepy.game.mover
     :members:
     :undoc-members:
-    :exclude-members: MoveWorkerOptions, LastMovementType
+    :exclude-members: MoveWorkerOptions

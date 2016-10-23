@@ -22,10 +22,6 @@ common
     :undoc-members:
     :exclude-members: Rle
 
-.. automodule:: sokoenginepy.common.text_utils
-    :members:
-    :undoc-members:
-
 .. automodule:: sokoenginepy.common.variant
     :members:
     :undoc-members:

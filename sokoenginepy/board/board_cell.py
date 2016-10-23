@@ -1,4 +1,4 @@
-from .input_output import (BoardConversionError, BoardEncodingCharacters,
+from .input_output import (BoardConversionError, BoardCharacters,
                            is_box, is_empty_floor, is_goal, is_pusher, is_wall)
 
 
@@ -12,7 +12,7 @@ class BoardCell:
         class.
     """
 
-    def __init__(self, character=BoardEncodingCharacters.FLOOR):
+    def __init__(self, character=BoardCharacters.FLOOR):
         self._has_box = False
         self._has_pusher = False
         self._has_goal = False
@@ -51,28 +51,35 @@ class BoardCell:
         )
 
     def __str__(self):
-        from ..input_output import output_settings
-        retv = BoardEncodingCharacters.FLOOR.value
+        return self._str_helper.value
+
+    def __repr__(self):
+        return "BoardCell({0})".format(self._str_helper)
+
+    @property
+    def _str_helper(self):
+        from ..input_output import OUTPUT_SETTINGS
+        retv = BoardCharacters.FLOOR
 
         if not self.has_box and not self.has_goal and not self.has_pusher:
             if self.is_wall:
-                retv = BoardEncodingCharacters.WALL.value
+                retv = BoardCharacters.WALL
             else:
                 retv = (
-                    BoardEncodingCharacters.VISIBLE_FLOOR.value
-                    if output_settings.use_visible_floors
-                    else BoardEncodingCharacters.FLOOR.value
+                    BoardCharacters.VISIBLE_FLOOR
+                    if OUTPUT_SETTINGS.use_visible_floors
+                    else BoardCharacters.FLOOR
                 )
         elif not self.has_box and not self.has_goal and self.has_pusher:
-            retv = BoardEncodingCharacters.PUSHER.value
+            retv = BoardCharacters.PUSHER
         elif not self.has_box and self.has_goal and not self.has_pusher:
-            retv = BoardEncodingCharacters.GOAL.value
+            retv = BoardCharacters.GOAL
         elif not self.has_box and self.has_goal and self.has_pusher:
-            retv = BoardEncodingCharacters.PUSHER_ON_GOAL.value
+            retv = BoardCharacters.PUSHER_ON_GOAL
         elif self.has_box and not self.has_goal and not self.has_pusher:
-            retv = BoardEncodingCharacters.BOX.value
+            retv = BoardCharacters.BOX
         else:
-            retv = BoardEncodingCharacters.BOX_ON_GOAL.value
+            retv = BoardCharacters.BOX_ON_GOAL
 
         return retv
 

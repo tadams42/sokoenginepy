@@ -287,6 +287,11 @@ class SokobanPlus:
             )
 
     def __repr__(self):
-        return "SokobanPlus(pieces_count={0}, boxorder={1}, goalorder={2})".format(
+        return "SokobanPlus(pieces_count={0}, boxorder='{1}', goalorder='{2}')".format(
+            self.pieces_count, self.boxorder, self.goalorder
+        )
+
+    def __str__(self):
+        return "<SokobanPlus boxorder='{1}', goalorder='{2}'>".format(
             self.pieces_count, self.boxorder, self.goalorder
         )

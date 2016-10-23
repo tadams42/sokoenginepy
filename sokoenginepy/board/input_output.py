@@ -7,7 +7,7 @@ from ..common import (RleCharacters, SokoengineError,
                       normalize_width, rle_decode)
 
 
-class BoardEncodingCharacters(Enum):
+class BoardCharacters(Enum):
     """Characters used in textual representation of boards."""
     WALL = '#'
     PUSHER = '@'
@@ -38,61 +38,61 @@ class BoardConversionError(SokoengineError):
 
 
 def is_pusher(character):
-    if isinstance(character, BoardEncodingCharacters):
+    if isinstance(character, BoardCharacters):
         character = character.value
     return (
-        character == BoardEncodingCharacters.PUSHER.value or
-        character == BoardEncodingCharacters.ALT_PUSHER1.value or
-        character == BoardEncodingCharacters.ALT_PUSHER2.value or
-        character == BoardEncodingCharacters.PUSHER_ON_GOAL.value or
-        character == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL1.value or
-        character == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL2.value
+        character == BoardCharacters.PUSHER.value or
+        character == BoardCharacters.ALT_PUSHER1.value or
+        character == BoardCharacters.ALT_PUSHER2.value or
+        character == BoardCharacters.PUSHER_ON_GOAL.value or
+        character == BoardCharacters.ALT_PUSHER_ON_GOAL1.value or
+        character == BoardCharacters.ALT_PUSHER_ON_GOAL2.value
     )
 
 
 def is_box(character):
-    if isinstance(character, BoardEncodingCharacters):
+    if isinstance(character, BoardCharacters):
         character = character.value
     return (
-        character == BoardEncodingCharacters.BOX.value or
-        character == BoardEncodingCharacters.ALT_BOX1.value or
-        character == BoardEncodingCharacters.BOX_ON_GOAL.value or
-        character == BoardEncodingCharacters.ALT_BOX_ON_GOAL1.value
+        character == BoardCharacters.BOX.value or
+        character == BoardCharacters.ALT_BOX1.value or
+        character == BoardCharacters.BOX_ON_GOAL.value or
+        character == BoardCharacters.ALT_BOX_ON_GOAL1.value
     )
 
 
 def is_goal(character):
-    if isinstance(character, BoardEncodingCharacters):
+    if isinstance(character, BoardCharacters):
         character = character.value
     return (
-        character == BoardEncodingCharacters.GOAL.value or
-        character == BoardEncodingCharacters.ALT_GOAL1.value or
-        character == BoardEncodingCharacters.BOX_ON_GOAL.value or
-        character == BoardEncodingCharacters.ALT_BOX_ON_GOAL1.value or
-        character == BoardEncodingCharacters.PUSHER_ON_GOAL.value or
-        character == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL1.value or
-        character == BoardEncodingCharacters.ALT_PUSHER_ON_GOAL2.value
+        character == BoardCharacters.GOAL.value or
+        character == BoardCharacters.ALT_GOAL1.value or
+        character == BoardCharacters.BOX_ON_GOAL.value or
+        character == BoardCharacters.ALT_BOX_ON_GOAL1.value or
+        character == BoardCharacters.PUSHER_ON_GOAL.value or
+        character == BoardCharacters.ALT_PUSHER_ON_GOAL1.value or
+        character == BoardCharacters.ALT_PUSHER_ON_GOAL2.value
     )
 
 
 def is_empty_floor(character):
-    if isinstance(character, BoardEncodingCharacters):
+    if isinstance(character, BoardCharacters):
         character = character.value
     return (
-        character == BoardEncodingCharacters.FLOOR.value or
-        character == BoardEncodingCharacters.VISIBLE_FLOOR.value or
-        character == BoardEncodingCharacters.ALT_VISIBLE_FLOOR1.value
+        character == BoardCharacters.FLOOR.value or
+        character == BoardCharacters.VISIBLE_FLOOR.value or
+        character == BoardCharacters.ALT_VISIBLE_FLOOR1.value
     )
 
 
 def is_wall(character):
-    if isinstance(character, BoardEncodingCharacters):
+    if isinstance(character, BoardCharacters):
         character = character.value
-    return character == BoardEncodingCharacters.WALL.value
+    return character == BoardCharacters.WALL.value
 
 
 _re_board_string = re.compile(
-    r"^([0-9\s" + re.escape("".join(c.value for c in BoardEncodingCharacters)) +
+    r"^([0-9\s" + re.escape("".join(c.value for c in BoardCharacters)) +
     re.escape("".join(c.value for c in RleCharacters)) + "])*$"
 )
 

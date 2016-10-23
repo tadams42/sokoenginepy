@@ -48,6 +48,7 @@ tessellation
     :members:
     :undoc-members:
     :inherited-members:
+    :exclude-members: on_board_1d, on_board_2d
 
 .. automodule:: sokoenginepy.tessellation.trioban_board
     :members:

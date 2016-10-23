@@ -1,6 +1,7 @@
 from copy import deepcopy
 from functools import partial
 from itertools import permutations
+from textwrap import dedent, indent
 
 from cached_property import cached_property
 from midict import MIDict, ValueExistsError
@@ -61,6 +62,35 @@ class BoardState:
         self._sokoban_plus = SokobanPlus(
             pieces_count=len(self._boxes), boxorder='', goalorder=''
         )
+
+    def __str__(self):
+        return "<{klass} pushers={pushers},".format(
+            klass=self.__class__.__name__,
+            pushers=self.pushers_positions,
+        ) + indent(dedent(
+            """
+            boxes={boxes},
+            goals={goals},
+            boxorder='{boxorder}',
+            goalorder='{goalorder}',
+            variant='{variant}',
+            variant_board=
+            """.format(
+                boxes=self.boxes_positions,
+                goals=self.goals_positions,
+                boxorder=str(self.boxorder),
+                goalorder=str(self.goalorder),
+                variant=str(self._variant_board.variant)
+            )), (len(self.__class__.__name__) + 2) * ' '
+        ) + str(self._variant_board) + '>'
+
+    def __repr__(self):
+        return "{klass}({board_klass}(board_str='\\n'.join([\n".format(
+            klass=self.__class__.__name__,
+            board_klass=self._variant_board.__class__.__name__
+        ) + indent(',\n'.join([
+            '"{0}"'.format(l) for l in str(self._variant_board).split('\n')
+        ]), '    ') + "\n])))"
 
     @cached_property
     def board_size(self):
