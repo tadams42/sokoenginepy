@@ -1,8 +1,3 @@
-.. sokoenginepy documentation master file, created by
-   sphinx-quickstart on Fri Jul 24 19:41:54 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 sokoenginepy - Sokoban and variants game engine
 ***********************************************
 
@@ -61,8 +56,8 @@ Installing sokoenginepy should be as simple as
 Using
 -----
 
-- For quick glance of features and usage check the :doc:`tutorial`.
-- For in-depth docs of whole package see :doc:`api`.
+- For quick glance of features and usage check the `Tutorial`_.
+- For in-depth docs of whole package see `API Reference`_.
 
 
 .. _SokobanYASC: http://sourceforge.net/projects/sokobanyasc/
@@ -70,3 +65,5 @@ Using
 .. _MazezaM: http://webpages.dcu.ie/~tyrrelma/MazezaM/
 .. _Sokobano: http://sokobano.de/en/index.php
 .. _Sokoban for Windows: http://www.sourcecode.se/sokoban/
+.. _Tutorial: https://sokoenginepy.readthedocs.io/en/development/tutorial.html
+.. _API reference: https://sokoenginepy.readthedocs.io/en/development/api.html
