@@ -76,7 +76,7 @@ class Mover:
         self._pulls_boxes = True
         self._selected_pusher = DEFAULT_PIECE_ID
         self._pull_count = 0
-        self._last_performed_moves = []
+        self.__last_performed_moves = []
 
         if not self._state.is_playable:
             raise NonPlayableBoardError
@@ -120,7 +120,7 @@ class Mover:
         if not self._state.has_pusher(pusher_id):
             raise KeyError('No such pusher: {0}', format(pusher_id))
 
-        self._last_performed_moves = []
+        self.__last_performed_moves = []
 
         if pusher_id != self.selected_pusher:
             old_pusher_position = self._state.pusher_position(self.selected_pusher)
@@ -133,7 +133,7 @@ class Mover:
             for direction in selection_path:
                 atomic_move = AtomicMove(direction, False)
                 atomic_move.is_pusher_selection = True
-                self._last_performed_moves.append(atomic_move)
+                self.__last_performed_moves.append(atomic_move)
 
             self._selected_pusher = pusher_id
 
@@ -159,7 +159,7 @@ class Mover:
         This is useful for generating movement animation in GUI after calling
         undo/redo
         """
-        return self._last_performed_moves
+        return self.__last_performed_moves
 
     def move(self, direction):
         """Moves currently selected pusher in ``direction``.
@@ -207,7 +207,7 @@ class Mover:
         if self.solving_mode != GameSolvingMode.REVERSE:
             raise IllegalMoveError('Jumps allowed only in reverse solving mode')
 
-        self._last_performed_moves = []
+        self.__last_performed_moves = []
 
         old_position = self._state.pusher_position(self.selected_pusher)
         if old_position == new_position:
@@ -225,7 +225,7 @@ class Mover:
                 am = AtomicMove(direction, False)
                 am.is_jump = True
                 am.pusher_id = self.selected_pusher
-                self._last_performed_moves.append(am)
+                self.__last_performed_moves.append(am)
             return True
 
         raise IllegalMoveError("Can't jump onto wall, box or pusher!")
@@ -233,27 +233,27 @@ class Mover:
     def undo(self):
         """Undoes most recent movement."""
 
-        if len(self._last_performed_moves) == 1:
+        if len(self.__last_performed_moves) == 1:
             options = MoveWorkerOptions()
             if self.solving_mode == GameSolvingMode.FORWARD:
                 options.force_pulls = True
                 options.increase_pull_count = False
                 return self._pull_or_move(
-                    self._last_performed_moves[0].direction.opposite, options
+                    self.__last_performed_moves[0].direction.opposite, options
                 )
             else:
                 options.decrease_pull_count = True
                 return self._push_or_move(
-                    self._last_performed_moves[0].direction.opposite, options
+                    self.__last_performed_moves[0].direction.opposite, options
                 )
-        elif len(self._last_performed_moves) > 1:
+        elif len(self.__last_performed_moves) > 1:
             path = [
                 am.direction.opposite
-                for am in reversed(self._last_performed_moves)
+                for am in reversed(self.__last_performed_moves)
             ]
             old_position = self._state.pusher_position(self.selected_pusher)
             new_position = self._board.path_destination(old_position, path)
-            if self._last_performed_moves[0].is_jump:
+            if self.__last_performed_moves[0].is_jump:
                 return self.jump(new_position)
             else:
                 self.selected_pusher = self._state.pusher_id_on(new_position)
@@ -277,7 +277,7 @@ class Mover:
             return 2
 
         for undo_move in [list(g) for k, g in groupby(moves, kf)]:
-            self._last_performed_moves = undo_move
+            self.__last_performed_moves = undo_move
             move_success = self.undo()
 
             if move_success:
@@ -310,7 +310,7 @@ class Mover:
         Note:
             Method guarantees strong exception safety.
         """
-        self._last_performed_moves = []
+        self.__last_performed_moves = []
 
         is_push = None
         box_moved_ok = None
@@ -357,7 +357,7 @@ class Mover:
                 atomic_move.moved_box_id = self._state.box_id_on(in_front_of_box)
                 if options.decrease_pull_count and self._pull_count > 0:
                     self._pull_count -= 1
-            self._last_performed_moves = [atomic_move]
+            self.__last_performed_moves = [atomic_move]
             return True
         else:
             return False
@@ -373,7 +373,7 @@ class Mover:
         Note:
             Method guarantees strong exception safety.
         """
-        self._last_performed_moves = []
+        self.__last_performed_moves = []
 
         pusher_moved_ok = None
         initial_pusher_position = self._state.pusher_position(self.selected_pusher)
@@ -412,7 +412,7 @@ class Mover:
             atomic_move.pusher_id = self.selected_pusher
             if is_pull:
                 atomic_move.moved_box_id = self._state.box_id_on(initial_pusher_position)
-            self._last_performed_moves = [atomic_move]
+            self.__last_performed_moves = [atomic_move]
             return True
         else:
             return False

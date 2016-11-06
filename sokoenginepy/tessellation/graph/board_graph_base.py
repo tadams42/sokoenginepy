@@ -12,6 +12,8 @@ class GraphType(IntEnum):
 
 class BoardGraphBase(ABC):
     MAX_EDGE_WEIGHT = len(Direction) + 1
+    KEY_CELL = 'cell'
+    KEY_DIRECTION = 'direction'
 
     @abstractmethod
     def __init__(self, number_of_vertices, graph_type):

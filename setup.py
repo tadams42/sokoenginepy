@@ -67,8 +67,9 @@ dev_requirements = [
     'restview >=2.6.0',
     'grip >=4.3.0',
 
-    # Profiler
+    # Profiling
     'snakeviz >=0.4.0',
+    'pyprof2calltree >= 1.4.0',
 
     'check-manifest >= 0.33.0',
     'pytest-colordots >=0.1.0',

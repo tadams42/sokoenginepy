@@ -78,6 +78,30 @@ and finally, tests can be run with tox
 
     tox
 
+
+Profiling
+---------
+
+Use IPython shell to generate profiling data
+
+.. code-block:: python
+
+    %prun -D program.prof [mover.move(d) for d in moves_cycle]
+
+After that, it is viewable by either Snakeviz
+
+.. code-block:: sh
+
+    snakeviz program.prof
+
+or as call graph through KCacheGrind
+
+.. code-block:: sh
+
+    pyprof2calltree -i program.prof
+    kcachegrind program.prof.log
+
+
 Uploading to PyPI
 -----------------
 
@@ -108,7 +132,7 @@ Create dist
 
 .. code-block:: sh
 
-    python setup.py sdist
+    python setup.py sdist bdist_wheel
 
 An upload it
 

@@ -23,12 +23,12 @@ class BoardGraphGraphtool(BoardGraphBase):
         # Graph tool creates directed multigraph by default.
         self._graph = Graph()
         self._graph.add_vertex(number_of_vertices)
-        self._graph.vertex_properties["cell"] = self._graph.new_vertex_property(
+        self._graph.vertex_properties[self.KEY_CELL] = self._graph.new_vertex_property(
             "object", number_of_vertices * [BoardCell()]
         )
-        self._graph.edge_properties["direction"
+        self._graph.edge_properties[self.KEY_DIRECTION
                                    ] = self._graph.new_edge_property("object")
-        self._graph.edge_properties["weight"
+        self._graph.edge_properties['weight'
                                    ] = self._graph.new_edge_property("int")
 
     def __getitem__(self, position):

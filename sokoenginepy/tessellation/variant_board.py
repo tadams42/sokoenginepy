@@ -13,23 +13,6 @@ from .tessellated import Tessellated
 from .tessellation import index_1d
 
 
-def _normalize_index_errors(method):
-    """Normalizes NetworkX index out of range errors into IndexError."""
-
-    @wraps(method)
-    def method_wrapper(self, *args, **kwargs):
-        try:
-            return method(self, *args, **kwargs)
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except nx.NetworkXError:
-            raise IndexError('Board index out of range')
-
-    return method_wrapper
-
-
 class VariantBoard(Container, Tessellated, ABC):
     """Base board class for variant specific implementations.
 
@@ -116,16 +99,28 @@ class VariantBoard(Container, Tessellated, ABC):
         """
         return parse_board_string(board_str)
 
-    @_normalize_index_errors
     def __getitem__(self, position):
-        return self._graph[position]
+        try:
+            return self._graph[position]
+        except IndexError:
+            raise IndexError('Board index out of range')
+        except KeyError:
+            raise IndexError('Board index out of range')
+        except nx.NetworkXError:
+            raise IndexError('Board index out of range')
 
-    @_normalize_index_errors
     def __setitem__(self, position, board_cell):
-        if isinstance(board_cell, BoardCharacters):
-            self._graph[position] = BoardCell(board_cell)
-        else:
-            self._graph[position] = board_cell
+        try:
+            if isinstance(board_cell, BoardCell):
+                self._graph[position] = board_cell
+            else:
+                self._graph[position] = BoardCell(board_cell)
+        except IndexError:
+            raise IndexError('Board index out of range')
+        except KeyError:
+            raise IndexError('Board index out of range')
+        except nx.NetworkXError:
+            raise IndexError('Board index out of range')
 
     def __contains__(self, position):
         return position in self._graph
@@ -163,7 +158,6 @@ class VariantBoard(Container, Tessellated, ABC):
     def size(self):
         return self._width * self._height
 
-    @_normalize_index_errors
     def neighbor(self, from_position, direction):
         """
         Returns:
@@ -173,23 +167,42 @@ class VariantBoard(Container, Tessellated, ABC):
         Raises:
             IndexError: if ``from_position`` is out of board position
         """
-        return self._graph.neighbor(from_position, direction)
+        try:
+            return self._graph.neighbor(from_position, direction)
+        except IndexError:
+            raise IndexError('Board index out of range')
+        except KeyError:
+            raise IndexError('Board index out of range')
+        except nx.NetworkXError:
+            raise IndexError('Board index out of range')
 
-    @_normalize_index_errors
     def wall_neighbors(self, from_position):
         """
         Returns:
             list: of neighbor positions that are walls
         """
-        return self._graph.wall_neighbors(from_position)
+        try:
+            return self._graph.wall_neighbors(from_position)
+        except IndexError:
+            raise IndexError('Board index out of range')
+        except KeyError:
+            raise IndexError('Board index out of range')
+        except nx.NetworkXError:
+            raise IndexError('Board index out of range')
 
-    @_normalize_index_errors
     def all_neighbors(self, from_position):
         """
         Returns:
             list: of neighbor positions
         """
-        return self._graph.all_neighbors(from_position)
+        try:
+            return self._graph.all_neighbors(from_position)
+        except IndexError:
+            raise IndexError('Board index out of range')
+        except KeyError:
+            raise IndexError('Board index out of range')
+        except nx.NetworkXError:
+            raise IndexError('Board index out of range')
 
     def clear(self):
         """Empties all board cells."""
@@ -220,7 +233,6 @@ class VariantBoard(Container, Tessellated, ABC):
             for reachable_vertice in reachables:
                 self[reachable_vertice].is_in_playable_area = True
 
-    @_normalize_index_errors
     def positions_reachable_by_pusher(
         self, pusher_position, excluded_positions=None
     ):
@@ -232,13 +244,19 @@ class VariantBoard(Container, Tessellated, ABC):
         def is_obstacle(position):
             return not self[position].can_put_pusher_or_box
 
-        return self._graph.reachables(
-            root=pusher_position,
-            is_obstacle_callable=is_obstacle,
-            excluded_positions=excluded_positions
-        )
+        try:
+            return self._graph.reachables(
+                root=pusher_position,
+                is_obstacle_callable=is_obstacle,
+                excluded_positions=excluded_positions
+            )
+        except IndexError:
+            raise IndexError('Board index out of range')
+        except KeyError:
+            raise IndexError('Board index out of range')
+        except nx.NetworkXError:
+            raise IndexError('Board index out of range')
 
-    @_normalize_index_errors
     def normalized_pusher_position(
         self, pusher_position, excluded_positions=None
     ):
@@ -246,28 +264,41 @@ class VariantBoard(Container, Tessellated, ABC):
         Returns:
             int: Top-left position reachable by pusher
         """
-        reachables = self.positions_reachable_by_pusher(
-            pusher_position=pusher_position,
-            excluded_positions=excluded_positions
-        )
-        if reachables:
-            return min(reachables)
-        else:
-            return pusher_position
+        try:
+            reachables = self.positions_reachable_by_pusher(
+                pusher_position=pusher_position,
+                excluded_positions=excluded_positions
+            )
+            if reachables:
+                return min(reachables)
+            else:
+                return pusher_position
+        except IndexError:
+            raise IndexError('Board index out of range')
+        except KeyError:
+            raise IndexError('Board index out of range')
+        except nx.NetworkXError:
+            raise IndexError('Board index out of range')
 
-    @_normalize_index_errors
     def path_destination(self, start_position, direction_path):
         if start_position not in self:
             raise IndexError('Board index out of range')
 
-        retv = start_position
-        for direction in direction_path:
-            next_target = self.neighbor(retv, direction)
-            if next_target:
-                retv = next_target
-            else:
-                break
-        return retv
+        try:
+            retv = start_position
+            for direction in direction_path:
+                next_target = self.neighbor(retv, direction)
+                if next_target:
+                    retv = next_target
+                else:
+                    break
+            return retv
+        except IndexError:
+            raise IndexError('Board index out of range')
+        except KeyError:
+            raise IndexError('Board index out of range')
+        except nx.NetworkXError:
+            raise IndexError('Board index out of range')
 
     def find_jump_path(self, start_position, end_position):
         """
@@ -307,13 +338,19 @@ class VariantBoard(Container, Tessellated, ABC):
             position, self._width, self._height
         )
 
-    @_normalize_index_errors
     def position_path_to_direction_path(self, position_path):
         """
         Returns:
             list: of :class:`.Direction`
         """
-        return self._graph.position_path_to_direction_path(position_path)
+        try:
+            return self._graph.position_path_to_direction_path(position_path)
+        except IndexError:
+            raise IndexError('Board index out of range')
+        except KeyError:
+            raise IndexError('Board index out of range')
+        except nx.NetworkXError:
+            raise IndexError('Board index out of range')
 
     def add_row_top(self):
         self._resizer.add_row_top(reconfigure_edges=True)

@@ -13,21 +13,22 @@ Contructing an instance of board is as easy as:
 
 .. code-block:: python
 
+    from textwrap import dedent
     from sokoenginepy import SokobanBoard
 
-    board = SokobanBoard(board_str="""
-        #####
-        #  @#
-        #$  #
-      ###  $##
-      #  $ $ #
-    ### # ## #   ######
-    #   # ## #####  ..#
-    # $  $          ..#
-    ##### ### #@##  ..#
-        #     #########
-        #######
-    """[1:-1])
+    board = SokobanBoard(board_str=dedent("""
+            #####
+            #  @#
+            #$  #
+          ###  $##
+          #  $ $ #
+        ### # ## #   ######
+        #   # ## #####  ..#
+        # $  $          ..#
+        ##### ### #@##  ..#
+            #     #########
+            #######
+    """[1:-1]))
 
 All boards implement rich API that allows editing individual board cells,
 resizing and exploring neigbouring positions. Positions are expressed as 1D

@@ -48,15 +48,15 @@ class BoardState:
             cell = variant_board[position]
 
             if cell.has_pusher:
-                self._pushers['id':pusher_id] = position
+                self._pushers[self._INDEX_ID:pusher_id] = position
                 pusher_id += 1
 
             if cell.has_box:
-                self._boxes['id':box_id] = position
+                self._boxes[self._INDEX_ID:box_id] = position
                 box_id += 1
 
             if cell.has_goal:
-                self._goals['id':goal_id] = position
+                self._goals[self._INDEX_ID:goal_id] = position
                 goal_id += 1
 
         self._sokoban_plus = SokobanPlus(
@@ -139,7 +139,7 @@ class BoardState:
             :exc:`KeyError`: No pusher with ID ``pid``
         """
         try:
-            return self._pushers['id':pid]
+            return self._pushers[self._INDEX_ID:pid]
         except KeyError:
             raise KeyError("No pusher with ID: {0}".format(pid))
 
@@ -156,7 +156,7 @@ class BoardState:
             :exc:`KeyError`: No pusher on ``position``
         """
         try:
-            return self._pushers['position':position]
+            return self._pushers[self._INDEX_POS:position]
         except KeyError:
             raise KeyError("No pusher on position: {0}".format(position))
 
@@ -175,9 +175,9 @@ class BoardState:
         """
         return position in self._pushers.keys(self._INDEX_POS)
 
-    def _move_pusher(self, pid, old_position, to_new_position):
+    def _move_pusher(self, pusher_id, old_position, to_new_position):
         try:
-            self._pushers['id':pid] = to_new_position
+            self._pushers[self._INDEX_ID:pusher_id] = to_new_position
         except ValueExistsError:
             raise CellAlreadyOccupiedError(
                 "Pusher can't be placed onto pusher in position: {0}".format(
@@ -281,7 +281,7 @@ class BoardState:
             KeyError: No box with ID ``pid``
         """
         try:
-            return self._boxes['id':pid]
+            return self._boxes[self._INDEX_ID:pid]
         except KeyError:
             raise KeyError("No box with ID: {0}".format(pid))
 
@@ -298,7 +298,7 @@ class BoardState:
             KeyError: No box on ``position``
         """
         try:
-            return self._boxes['position':position]
+            return self._boxes[self._INDEX_POS:position]
         except KeyError:
             raise KeyError("No box on position: {0}".format(position))
 
@@ -317,9 +317,9 @@ class BoardState:
         """
         return position in self._boxes.keys(self._INDEX_POS)
 
-    def _move_box(self, pid, box_plus_id, old_position, to_new_position):
+    def _move_box(self, box_id, box_plus_id, old_position, to_new_position):
         try:
-            self._boxes['id':pid] = to_new_position
+            self._boxes[self._INDEX_ID:box_id] = to_new_position
         except ValueExistsError:
             raise CellAlreadyOccupiedError(
                 "Box can't be placed onto box in position: {0}".format(
@@ -425,7 +425,7 @@ class BoardState:
             :exc:`KeyError`: No goal with ID ``pid``
         """
         try:
-            return self._goals['id':pid]
+            return self._goals[self._INDEX_ID:pid]
         except KeyError:
             raise KeyError("No goal with ID: {0}".format(pid))
 
@@ -442,7 +442,7 @@ class BoardState:
             :exc:`KeyError`: No goal on ``position``
         """
         try:
-            return self._goals['position':position]
+            return self._goals[self._INDEX_POS:position]
         except KeyError:
             raise KeyError("No goal on position: {0}".format(position))
 
@@ -612,7 +612,7 @@ class BoardState:
                     )
 
                 self.move_box(box_id, goal_position)
-                self._goals['id':goal_id] = box_position
+                self._goals[self._INDEX_ID:goal_id] = box_position
 
                 retv['switches'].append(box_position)
                 retv['switches'].append(goal_position)

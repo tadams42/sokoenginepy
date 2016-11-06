@@ -12,7 +12,6 @@ from .board_graph_base import BoardGraphBase, GraphType
 
 
 class BoardGraphNetworkx(BoardGraphBase):
-
     def __init__(self, number_of_vertices, graph_type):
         super().__init__(number_of_vertices, graph_type)
 
@@ -25,10 +24,10 @@ class BoardGraphNetworkx(BoardGraphBase):
             self._graph.add_node(vertice, cell=BoardCell())
 
     def __getitem__(self, position):
-        return self._graph.node[position]['cell']
+        return self._graph.node[position][self.KEY_CELL]
 
     def __setitem__(self, position, board_cell):
-        self._graph.node[position]['cell'] = board_cell
+        self._graph.node[position][self.KEY_CELL] = board_cell
 
     def __contains__(self, position):
         return position in self._graph
@@ -51,7 +50,7 @@ class BoardGraphNetworkx(BoardGraphBase):
             # edge: (source, target, data_dict)
             retv = retv or (
                 out_edge[1] == target_vertice and
-                out_edge[2]['direction'] == direction
+                out_edge[2][self.KEY_DIRECTION] == direction
             )
 
         return retv
@@ -95,7 +94,7 @@ class BoardGraphNetworkx(BoardGraphBase):
         """
         for out_edge in self._graph.out_edges_iter(from_position, data=True):
             # edge: (source, target, data_dict)
-            if out_edge[2]['direction'] == direction:
+            if out_edge[2][self.KEY_DIRECTION] == direction:
                 return out_edge[1]
         return None
 
@@ -132,7 +131,7 @@ class BoardGraphNetworkx(BoardGraphBase):
 
             for out_edge in self._graph.out_edges_iter(src_vertice, data=True):
                 if out_edge[1] == target_vertice:
-                    retv.append(out_edge[2]['direction'])
+                    retv.append(out_edge[2][self.KEY_DIRECTION])
 
         return {
             'source_position': position_path[0] if position_path else None,
