@@ -1,6 +1,7 @@
 from unittest.mock import Mock, call
 
 import pytest
+
 from factories import SokobanPlusFactory
 from sokoenginepy.board import SokobanPlus, SokobanPlusDataError
 
@@ -29,8 +30,11 @@ class DescribeSokobanPlus:
             assert sokoban_plus.boxorder == "foo"
             assert sokoban_plus.goalorder == "bar"
 
-        def test_they_return_parsed_order_string_if_sokoban_plus_is_valid(self):
-            sokoban_plus = SokobanPlus(5, "1 2 0 3 0 ", "3 1 0 2 0 0 0")
+        def test_they_return_parsed_order_string_if_sokoban_plus_is_valid_and_enabled(self):
+            sokoban_plus = SokobanPlus(5, "1 2 0 3 0", "3 1 0 2 0 0 0")
+            assert sokoban_plus.boxorder == "1 2 0 3 0"
+            assert sokoban_plus.goalorder == "3 1 0 2 0 0 0"
+            sokoban_plus.is_enabled = True
             assert sokoban_plus.boxorder == "1 2 0 3"
             assert sokoban_plus.goalorder == "3 1 0 2"
 
@@ -173,7 +177,7 @@ class DescribeSokobanPlus:
             sokoban_plus._validate_plus_ids(sokoban_plus._box_plus_ids)
 
             assert sokoban_plus.is_valid_plus_id.call_args_list == [
-                call(id) for id in sokoban_plus._box_plus_ids
+                call(id) for id in sokoban_plus._box_plus_ids.values()
             ]
             assert len(sokoban_plus.errors) == 0
 
@@ -204,7 +208,6 @@ class DescribeSokobanPlus:
             sokoban_plus = SokobanPlusFactory(
                 goalorder="1 2 3 4 5 6", boxorder="5 4 3 2 1", pieces_count=5
             )
-            sokoban_plus._parse()
             assert not sokoban_plus.is_valid
 
         def it_validates_same_id_set_is_defined_for_both_piece_types(
@@ -229,5 +232,4 @@ class DescribeSokobanPlus:
                 boxorder="2 2 3 3 1 1",
                 pieces_count=10
             )
-            sokoban_plus._parse()
             assert sokoban_plus.is_valid

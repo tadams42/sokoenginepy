@@ -84,9 +84,7 @@ class SokobanPlusFactory(factory.Factory):
         model = SokobanPlus
 
     pieces_count = factory.LazyAttribute(lambda x: 5)
-
     boxorder = factory.LazyAttribute(lambda x: "42 24 4 2")
-
     goalorder = factory.LazyAttribute(lambda x: "2 24 42 4")
 
 

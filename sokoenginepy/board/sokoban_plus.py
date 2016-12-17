@@ -72,9 +72,16 @@ class SokobanPlus:
     def pieces_count(self):
         return self._pieces_count
 
+    @pieces_count.setter
+    def pieces_count(self, rv):
+        if rv != self._pieces_count:
+            self.is_enabled = False
+            self._is_validated = False
+            self._pieces_count = int(rv)
+
     @property
     def boxorder(self):
-        if self.is_valid:
+        if self.is_enabled and self.is_valid:
             return self._rstrip_default_plus_ids(
                 " ".join(str(i) for i in self._box_plus_ids.values())
             )
@@ -90,7 +97,7 @@ class SokobanPlus:
 
     @property
     def goalorder(self):
-        if self.is_valid:
+        if self.is_enabled and self.is_valid:
             return self._rstrip_default_plus_ids(
                 " ".join(str(i) for i in self._goal_plus_ids.values())
             )
@@ -111,7 +118,8 @@ class SokobanPlus:
 
         self.errors = []
         try:
-            self._parse()
+            self._box_plus_ids = self._parse_and_clean_ids_string(self._boxorder)
+            self._goal_plus_ids = self._parse_and_clean_ids_string(self._goalorder)
         except SokobanPlusDataError as e:
             self.errors.append(str(e))
 
@@ -176,6 +184,7 @@ class SokobanPlus:
             raise KeyError("No goal with ID: {0}".format(for_goal_id))
 
     def _rstrip_default_plus_ids(self, plus_ids_str):
+        # TODO: Might not work correctly for "3 5 4 6 2 19" or "3 5 4 6 2 10"
         if self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID:
             return plus_ids_str.rstrip(
                 str(self.DEFAULT_PLUS_ID) + " " +
@@ -190,26 +199,36 @@ class SokobanPlus:
         else:
             return from_where[for_id]
 
-    def _collect_ids_dict(self, ids_list):
+    def _parse_and_clean_ids_string(self, plus_ids_str):
         """
-        Safely replaces legacy default plus ids with default ones and fills ids
-        list to pieces_count length with default plus ids.
+        Safely replaces legacy default plus ids with default ones.
+
+        Returns:
+            dict: dict that maps piece IDs to piece Sokoban+ IDs
         """
+        def convert_or_raise(id_str):
+            try:
+                return int(id_str)
+            except ValueError:
+                raise SokobanPlusDataError(
+                    "Can't parse Sokoban+ string! Illegal characters found. "
+                    "Only digits and spaces allowed."
+                )
+
         trimmed = [
-            int(pid)
-            for pid in self.
-            _rstrip_default_plus_ids(" ".join(str(i) for i in ids_list)).split()
+            convert_or_raise(id_str) for id_str in
+            self._rstrip_default_plus_ids(plus_ids_str).split()
         ]
 
-        replaced = [
+        cleaned = [
             self.DEFAULT_PLUS_ID if (
                 i == self._LEGACY_DEFAULT_PLUS_ID and
                 self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID
             ) else i for i in trimmed
         ]
 
-        expanded = replaced + [self.DEFAULT_PLUS_ID] * (
-            self.pieces_count - len(replaced)
+        expanded = cleaned + [self.DEFAULT_PLUS_ID] * (
+            self.pieces_count - len(cleaned)
         )
 
         retv = dict()
@@ -218,30 +237,9 @@ class SokobanPlus:
 
         return retv
 
-    def _parse(self):
-
-        def parse_sokoban_plus_data(line):
-            parsed_plus_ids = []
-            try:
-                parsed_plus_ids = [int(j) for j in line.split()]
-            except ValueError:
-                raise SokobanPlusDataError(
-                    "Can't parse Sokoban+ string! Illegal characters found. "
-                    "Only digits and spaces allowed."
-                )
-
-            return parsed_plus_ids
-
-        self._box_plus_ids = self._collect_ids_dict(
-            parse_sokoban_plus_data(self._boxorder)
-        )
-        self._goal_plus_ids = self._collect_ids_dict(
-            parse_sokoban_plus_data(self._goalorder)
-        )
-
     def _validate_plus_ids(self, ids):
         if ids:
-            for i in ids:
+            for i in ids.values():
                 if not self.is_valid_plus_id(i):
                     self.errors.append("Invalid Sokoban+ ID: {0}".format(i))
 
@@ -252,17 +250,21 @@ class SokobanPlus:
             )
 
     def _validate_ids_counts(self):
-        error_template = (
-            "Sokoban+ {0} data doesn't contain same amount of ids as there are "
-            "pieces on board! (pieces_count: {1})".format(
-                "{0}", self.pieces_count
-            )
-        )
-
         if self._box_plus_ids and len(self._box_plus_ids) != self.pieces_count:
-            self.errors.append(error_template.format("boxorder"))
+            self.errors.append(
+                "Sokoban+ boxorder data doesn't contain same amount of IDs " +
+                "as there are pieces on board! (pieces_count: {0})".format(
+                    self.pieces_count
+                )
+            )
+
         if self._goal_plus_ids and len(self._goal_plus_ids) != self.pieces_count:
-            self.errors.append(error_template.format("goalorder"))
+            self.errors.append(
+                "Sokoban+ goalorder data doesn't contain same amount of IDs " +
+                "as there are pieces on board! (pieces_count: {0})".format(
+                    self.pieces_count
+                )
+            )
 
     def _validate_id_sets_equality(self):
         if self._box_plus_ids:
