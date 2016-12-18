@@ -18,11 +18,40 @@ board
     :undoc-members:
     :inherited-members:
 
-.. automodule:: sokoenginepy.board.input_output
+.. automodule:: sokoenginepy.board.hexoban_board
     :members:
     :undoc-members:
-    :exclude-members: is_pusher, is_box, is_goal, is_empty_floor, is_wall, is_board_string, is_sokoban_plus_string, parse_board_string
+    :inherited-members:
+    :exclude-members: HexobanTextConverter, HexobanBoardResizer
+
+.. automodule:: sokoenginepy.board.octoban_board
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :exclude-members: OctobanBoardResizer
+
+.. automodule:: sokoenginepy.board.piece
+    :members:
+    :undoc-members:
+
+.. automodule:: sokoenginepy.board.sokoban_board
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :exclude-members: SokobanBoardResizer
 
 .. automodule:: sokoenginepy.board.sokoban_plus
     :members:
     :undoc-members:
+
+.. automodule:: sokoenginepy.board.trioban_board
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :exclude-members: TriobanBoardResizer
+
+.. automodule:: sokoenginepy.board.variant_board
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :exclude-members: VariantBoardResizer

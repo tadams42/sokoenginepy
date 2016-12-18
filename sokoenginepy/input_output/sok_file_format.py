@@ -1,16 +1,14 @@
 import re
 
-from ..board import is_board_string
-from ..common import (RESOURCES_ROOT, Variant, first_index_of, is_blank,
-                      last_index_of, utcnow)
-from ..snapshot import is_snapshot_string
+from .. import snapshot as snapshot_module
+from .. import board, game, utilities
 from .puzzle import Puzzle, PuzzleSnapshot
 
 
 class SOKFileFormat:
 
     @classmethod
-    def read(cls, src_stream, dest_collection, variant_hint=Variant.SOKOBAN):
+    def read(cls, src_stream, dest_collection, variant_hint=game.Variant.SOKOBAN):
         SOKReader(src_stream, dest_collection, variant_hint).read()
 
     @classmethod
@@ -52,7 +50,7 @@ class SOKReader:
         self._parse_puzzles()
 
     def _split_input(self, input_lines):
-        first_board_line = first_index_of(input_lines, is_board_string)
+        first_board_line = utilities.first_index_of(input_lines, board.VariantBoard.is_board_string)
         if first_board_line is not None:
             self.dest_collection.notes = input_lines[:first_board_line]
             remaining_lines = input_lines[first_board_line:]
@@ -68,8 +66,8 @@ class SOKReader:
         while len(remaining_lines) > 0:
             puzzle = Puzzle()
 
-            first_note_line = first_index_of(
-                remaining_lines, lambda x: not is_board_string(x)
+            first_note_line = utilities.first_index_of(
+                remaining_lines, lambda x: not board.VariantBoard.is_board_string(x)
             )
             if first_note_line is not None:
                 puzzle.board = "".join(remaining_lines[:first_note_line])
@@ -79,8 +77,8 @@ class SOKReader:
                 remaining_lines = []
 
             if len(remaining_lines) > 0:
-                first_board_line = first_index_of(
-                    remaining_lines, is_board_string
+                first_board_line = utilities.first_index_of(
+                    remaining_lines, board.VariantBoard.is_board_string
                 )
 
                 if first_board_line is not None:
@@ -98,8 +96,8 @@ class SOKReader:
         for puzzle in self.dest_collection.puzzles:
             remaining_lines = puzzle.notes
 
-            first_moves_line = first_index_of(
-                remaining_lines, is_snapshot_string
+            first_moves_line = utilities.first_index_of(
+                remaining_lines, snapshot_module.Snapshot.is_snapshot_string
             )
             if first_moves_line is not None:
                 puzzle.notes = remaining_lines[:first_moves_line]
@@ -113,8 +111,8 @@ class SOKReader:
             while len(remaining_lines) > 0:
                 snapshot = PuzzleSnapshot()
 
-                first_note_line = first_index_of(
-                    remaining_lines, lambda x: not is_snapshot_string(x)
+                first_note_line = utilities.first_index_of(
+                    remaining_lines, lambda x: not snapshot_module.Snapshot.is_snapshot_string(x)
                 )
                 if first_note_line is not None:
                     snapshot.moves = "".join(
@@ -129,8 +127,8 @@ class SOKReader:
                     remaining_lines = []
 
                 if len(remaining_lines) > 0:
-                    first_moves_line = first_index_of(
-                        remaining_lines, is_snapshot_string
+                    first_moves_line = utilities.first_index_of(
+                        remaining_lines, snapshot_module.Snapshot.is_snapshot_string
                     )
 
                     if first_moves_line is not None:
@@ -218,7 +216,7 @@ class SOKReader:
         ::   text line from a preceding puzzle, game, or file      ::
         ::   header can be mistaken for a title line.             ::
         """
-        candidate_index = last_index_of(notes, lambda x: not is_blank(x))
+        candidate_index = utilities.last_index_of(notes, lambda x: not utilities.is_blank(x))
         if candidate_index is None:
             return ""
 
@@ -231,11 +229,11 @@ class SOKReader:
             following_index = candidate_index + 1
 
         preceeding_ok = (
-            is_blank(notes[preceeding_index]) if preceeding_index else True
+            utilities.is_blank(notes[preceeding_index]) if preceeding_index else True
         )
 
         following_ok = (
-            is_blank(notes[following_index]) if following_index else True
+            utilities.is_blank(notes[following_index]) if following_index else True
         )
 
         if preceeding_ok and following_ok:
@@ -321,13 +319,13 @@ class SOKReader:
             puzzle.notes = self._cleanup_whitespace(remaining_lines)
 
             if variant is not None:
-                puzzle.variant = Variant.instance_from(variant)
+                puzzle.variant = game.Variant.instance_from(variant)
             elif self.collection_header_variant_hint is not None:
-                puzzle.variant = Variant.instance_from(
+                puzzle.variant = game.Variant.instance_from(
                     self.collection_header_variant_hint
                 )
             elif self.supplied_variant_hint is not None:
-                puzzle.variant = Variant.instance_from(self.supplied_variant_hint)
+                puzzle.variant = game.Variant.instance_from(self.supplied_variant_hint)
 
             self._parse_snapshots(puzzle)
 
@@ -363,12 +361,12 @@ class SOKReader:
             snapshot.variant = puzzle.variant
 
     def _cleanup_whitespace(self, lst):
-        i = first_index_of(lst, lambda x: not is_blank(x))
+        i = utilities.first_index_of(lst, lambda x: not utilities.is_blank(x))
         if i is None:
             return ""
         lst = lst[i:]
 
-        i = last_index_of(lst, lambda x: not is_blank(x))
+        i = utilities.last_index_of(lst, lambda x: not utilities.is_blank(x))
         if i is not None:
             lst = lst[:i + 1]
 
@@ -392,22 +390,22 @@ class SOKWriter:
             self._write_puzzle(puzzle)
 
     def _write_puzzle(self, puzzle):
-        if is_blank(puzzle.board):
+        if utilities.is_blank(puzzle.board):
             return
 
-        if not is_blank(puzzle.title):
+        if not utilities.is_blank(puzzle.title):
             self.dest_stream.write(puzzle.title.strip() + "\n\n")
 
         self.dest_stream.write(puzzle.board.rstrip() + "\n\n")
 
         written = False
 
-        if puzzle.variant != Variant.SOKOBAN:
+        if puzzle.variant != game.Variant.SOKOBAN:
             written = self._write_tagged(
                 SOKTags.VARIANT, str(puzzle.variant)
             ) or written
 
-        if not is_blank(puzzle.boxorder) and not is_blank(puzzle.goalorder):
+        if not utilities.is_blank(puzzle.boxorder) and not utilities.is_blank(puzzle.goalorder):
             written = self._write_tagged(
                 SOKTags.BOXORDER, puzzle.boxorder
             ) or written
@@ -415,7 +413,7 @@ class SOKWriter:
                 SOKTags.GOALORDER, puzzle.goalorder
             ) or written
 
-        if not is_blank(puzzle.notes):
+        if not utilities.is_blank(puzzle.notes):
             self.dest_stream.write(puzzle.notes.rstrip() + "\n")
             written = True
 
@@ -426,16 +424,16 @@ class SOKWriter:
             self._write_snapshot(snapshot)
 
     def _write_collection_header(self, puzzle_collection):
-        for line in open(RESOURCES_ROOT.child("SOK_format_specification.txt")):
+        for line in open(utilities.RESOURCES_ROOT.child("SOK_format_specification.txt")):
             self.dest_stream.write(line.rstrip() + "\n")
 
         self._write_tagged(
             SOKTags.CREATED_AT, puzzle_collection.created_at.strip() or
-            utcnow().isoformat()
+            utilities.utcnow().isoformat()
         )
         self._write_tagged(
             SOKTags.UPDATED_AT, puzzle_collection.updated_at.strip() or
-            utcnow().isoformat()
+            utilities.utcnow().isoformat()
         )
 
         self.dest_stream.write(
@@ -451,7 +449,7 @@ class SOKWriter:
             SOKTags.TITLE, puzzle_collection.title
         ) or written
 
-        if not is_blank(puzzle_collection.notes):
+        if not utilities.is_blank(puzzle_collection.notes):
             self.dest_stream.write(puzzle_collection.notes.rstrip() + "\n")
             written = True
 
@@ -459,10 +457,10 @@ class SOKWriter:
             self.dest_stream.write('\n')
 
     def _write_snapshot(self, snapshot):
-        if is_blank(snapshot.moves):
+        if utilities.is_blank(snapshot.moves):
             return
 
-        if not is_blank(snapshot.title):
+        if not utilities.is_blank(snapshot.title):
             self.dest_stream.write(snapshot.title.strip() + "\n\n")
 
         self.dest_stream.write(snapshot.moves.strip() + "\n\n")
@@ -476,7 +474,7 @@ class SOKWriter:
             SOKTags.DURATION, snapshot.duration
         ) or written
 
-        if not is_blank(snapshot.notes):
+        if not utilities.is_blank(snapshot.notes):
             self.dest_stream.write(snapshot.notes.rstrip() + "\n")
             written = True
 
@@ -484,7 +482,7 @@ class SOKWriter:
             self.dest_stream.write("\n")
 
     def _write_tagged(self, tag, content):
-        if is_blank(content) or is_blank(tag):
+        if utilities.is_blank(content) or utilities.is_blank(tag):
             return False
 
         self.dest_stream.write(tag.strip() + ": " + content.rstrip() + "\n")

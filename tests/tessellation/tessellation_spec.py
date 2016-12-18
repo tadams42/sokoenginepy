@@ -1,5 +1,4 @@
-from sokoenginepy.common import Direction
-from sokoenginepy.tessellation import X, Y, index_1d, on_board_1d, on_board_2d
+from sokoenginepy import Direction, X, Y, index_1d, on_board_1d, on_board_2d
 
 
 class Describe_INDEX:

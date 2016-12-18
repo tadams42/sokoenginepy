@@ -36,16 +36,16 @@ array indexes which can be retreived fro 2D coordinates using :func:`.index_1d`
 
 .. code-block:: python
 
-    from sokoenginepy import BoardCell, index_1d, BoardCharacters, Direction
+    from sokoenginepy import BoardCell, index_1d, BoardCell, Direction
 
     position = index_1d(11, 8, board.width)
 
     board[position]
-    # => BoardCell(BoardCharacters.PUSHER)
+    # => BoardCell(BoardCell.Characters.PUSHER)
     print(board[position])
     # => @
 
-    board[position] = BoardCharacters.BOX
+    board[position] = BoardCell.Characters.BOX
     print(board[position])
     # => $
 
@@ -135,7 +135,7 @@ game mechanics like this:
 
 .. code-block:: python
 
-    from sokoenginepy import Mover, GameSolvingMode
+    from sokoenginepy import Mover, SolvingMode
 
     # regular, forward solving mode
     forward_mover = Mover(board)
@@ -161,7 +161,7 @@ game mechanics like this:
         #     #########
         #######
     """[1:-1])
-    reverse_mover = Mover(board, GameSolvingMode.REVERSE)
+    reverse_mover = Mover(board, SolvingMode.REVERSE)
 
     print(reverse_mover.board)
     #     #####

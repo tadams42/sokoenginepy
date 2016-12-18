@@ -2,15 +2,15 @@ from unittest.mock import Mock
 
 import pytest
 
-from factories import GameSnapshotFactory
-from sokoenginepy.common import (Direction, GameSolvingMode, SokoengineError,
-                                 Variant)
-from sokoenginepy.snapshot import AtomicMove, Snapshot, SnapshotConversionError
+from factories import SnapshotFactory
+from sokoenginepy import (AtomicMove, Direction, Snapshot,
+                          SnapshotConversionError, SokoengineError,
+                          SolvingMode, Variant)
 
 
 @pytest.fixture
-def forward_game_snapshot():
-    return GameSnapshotFactory(
+def forward_sokoban_snapshot():
+    return SnapshotFactory(
         variant=Variant.SOKOBAN, moves_data="lurdLURD{lurd}LURD"
     )
 
@@ -31,8 +31,8 @@ def pusher_selections_count():
 
 
 @pytest.fixture
-def reverse_game_snapshot():
-    return GameSnapshotFactory(
+def reverse_sokoban_snapshot():
+    return SnapshotFactory(
         variant=Variant.SOKOBAN, moves_data="lurdLURD{lurd}[lurd]LURD"
     )
 
@@ -43,8 +43,8 @@ def jumps_count():
 
 
 @pytest.fixture
-def sokoban_game_snapshot():
-    return GameSnapshotFactory(
+def sokoban_snapshot():
+    return SnapshotFactory(
         variant=Variant.SOKOBAN, moves_data="lurdLURD{lurd}LURD"
     )
 
@@ -54,14 +54,14 @@ class DescribeGameSnapshot:
     class Describe_moves_count:
 
         def it_returns_total_count_of_atomic_non_pushes(
-            self, forward_game_snapshot, moves_count
+            self, forward_sokoban_snapshot, moves_count
         ):
-            assert forward_game_snapshot.moves_count == moves_count
+            assert forward_sokoban_snapshot.moves_count == moves_count
 
         def test_returned_count_doesnt_include_moves_in_jumps_and_selections(
-            self, forward_game_snapshot, moves_count
+            self, forward_sokoban_snapshot, moves_count
         ):
-            assert forward_game_snapshot.moves_count == moves_count
+            assert forward_sokoban_snapshot.moves_count == moves_count
 
     class Describe_init:
 
@@ -69,7 +69,7 @@ class DescribeGameSnapshot:
             assert Snapshot().variant == Variant.SOKOBAN
 
         def it_creates_forward_snaphost_by_default(self):
-            assert Snapshot().solving_mode == GameSolvingMode.FORWARD
+            assert Snapshot().solving_mode == SolvingMode.FORWARD
 
         def it_creates_empty_snapshot_by_default(self):
             assert len(Snapshot()) == 0
@@ -79,29 +79,29 @@ class DescribeGameSnapshot:
 
         def it_ignores_solving_mode_arg_if_moves_data_is_provided(self):
             assert Snapshot(
-                solving_mode=GameSolvingMode.FORWARD, moves_data="[lurd]"
-            ).solving_mode == GameSolvingMode.REVERSE
+                solving_mode=SolvingMode.FORWARD, moves_data="[lurd]"
+            ).solving_mode == SolvingMode.REVERSE
             assert Snapshot(
-                solving_mode=GameSolvingMode.REVERSE, moves_data="lurd"
-            ).solving_mode == GameSolvingMode.FORWARD
+                solving_mode=SolvingMode.REVERSE, moves_data="lurd"
+            ).solving_mode == SolvingMode.FORWARD
 
     class Describe_get_item:
 
-        def it_retrieves_single_atomic_move(self, forward_game_snapshot):
-            assert forward_game_snapshot[0] == AtomicMove(Direction.LEFT)
+        def it_retrieves_single_atomic_move(self, forward_sokoban_snapshot):
+            assert forward_sokoban_snapshot[0] == AtomicMove(Direction.LEFT)
 
         def it_retrieves_new_game_snapshot_from_slice(
-            self, forward_game_snapshot, reverse_game_snapshot
+            self, forward_sokoban_snapshot, reverse_sokoban_snapshot
         ):
-            slice_of_snapshot = forward_game_snapshot[0:4]
+            slice_of_snapshot = forward_sokoban_snapshot[0:4]
             assert isinstance(slice_of_snapshot, Snapshot)
             assert str(slice_of_snapshot) == 'lurd'
-            assert slice_of_snapshot.solving_mode == forward_game_snapshot.solving_mode
+            assert slice_of_snapshot.solving_mode == forward_sokoban_snapshot.solving_mode
 
-            slice_of_snapshot = reverse_game_snapshot[0:4]
+            slice_of_snapshot = reverse_sokoban_snapshot[0:4]
             assert isinstance(slice_of_snapshot, Snapshot)
             assert str(slice_of_snapshot) == '[]lurd'
-            assert slice_of_snapshot.solving_mode == reverse_game_snapshot.solving_mode
+            assert slice_of_snapshot.solving_mode == reverse_sokoban_snapshot.solving_mode
 
     class Describe_set_item:
 
@@ -201,9 +201,9 @@ class DescribeGameSnapshot:
     class Describe_jumps_count:
 
         def it_calls_recalc_jumps_before_returning_value(self, game_snapshot):
-            game_snapshot._recalc_jumps_count = Mock()
+            game_snapshot._recalculate_jumps_count = Mock()
             game_snapshot.jumps_count
-            assert game_snapshot._recalc_jumps_count.call_count == 1
+            assert game_snapshot._recalculate_jumps_count.call_count == 1
 
     class Describe_clear:
 
@@ -216,121 +216,97 @@ class DescribeGameSnapshot:
     class Describe_before_inserting_move:
 
         def it_increases_internal_counters_if_necessary(
-            self, reverse_game_snapshot, atomic_move, atomic_push, atomic_jump,
+            self, reverse_sokoban_snapshot, atomic_move, atomic_push, atomic_jump,
             atomic_pusher_selection
         ):
-            before = reverse_game_snapshot.moves_count
-            reverse_game_snapshot._before_inserting_move(atomic_move)
-            assert reverse_game_snapshot.moves_count == before + 1
+            before = reverse_sokoban_snapshot.moves_count
+            reverse_sokoban_snapshot._before_inserting_move(atomic_move)
+            assert reverse_sokoban_snapshot.moves_count == before + 1
 
-            before = reverse_game_snapshot.pushes_count
-            reverse_game_snapshot._before_inserting_move(atomic_push)
-            assert reverse_game_snapshot.pushes_count == before + 1
+            before = reverse_sokoban_snapshot.pushes_count
+            reverse_sokoban_snapshot._before_inserting_move(atomic_push)
+            assert reverse_sokoban_snapshot.pushes_count == before + 1
 
-            reverse_game_snapshot._before_inserting_move(atomic_jump)
-            assert reverse_game_snapshot._jumps_count_invalidated == True
+            reverse_sokoban_snapshot._before_inserting_move(atomic_jump)
+            assert reverse_sokoban_snapshot._jumps_count_invalidated == True
 
             before_moves, before_pushes, before_jumps_invalidate = (
-                reverse_game_snapshot.moves_count,
-                reverse_game_snapshot.pushes_count,
-                reverse_game_snapshot._jumps_count_invalidated
+                reverse_sokoban_snapshot.moves_count,
+                reverse_sokoban_snapshot.pushes_count,
+                reverse_sokoban_snapshot._jumps_count_invalidated
             )
-            reverse_game_snapshot._before_inserting_move(
+            reverse_sokoban_snapshot._before_inserting_move(
                 atomic_pusher_selection
             )
-            assert reverse_game_snapshot.moves_count == before_moves
-            assert reverse_game_snapshot.pushes_count == before_pushes
-            assert reverse_game_snapshot._jumps_count_invalidated == before_jumps_invalidate
+            assert reverse_sokoban_snapshot.moves_count == before_moves
+            assert reverse_sokoban_snapshot.pushes_count == before_pushes
+            assert reverse_sokoban_snapshot._jumps_count_invalidated == before_jumps_invalidate
 
         def it_rises_on_move_direction_not_supported_by_snapshot_tessellation(
-            self, sokoban_game_snapshot
+            self, sokoban_snapshot
         ):
             with pytest.raises(SokoengineError):
-                sokoban_game_snapshot._before_inserting_move(
+                sokoban_snapshot._before_inserting_move(
                     AtomicMove(Direction.NORTH_WEST)
                 )
 
     class Describe_before_removing_move:
 
         def it_decreases_internal_counters_if_necessary(
-            self, reverse_game_snapshot, atomic_move, atomic_push, atomic_jump,
+            self, reverse_sokoban_snapshot, atomic_move, atomic_push, atomic_jump,
             atomic_pusher_selection
         ):
-            before = reverse_game_snapshot.moves_count
-            reverse_game_snapshot._before_removing_move(atomic_move)
-            assert reverse_game_snapshot.moves_count == before - 1
+            before = reverse_sokoban_snapshot.moves_count
+            reverse_sokoban_snapshot._before_removing_move(atomic_move)
+            assert reverse_sokoban_snapshot.moves_count == before - 1
 
-            before = reverse_game_snapshot.pushes_count
-            reverse_game_snapshot._before_removing_move(atomic_push)
-            assert reverse_game_snapshot.pushes_count == before - 1
+            before = reverse_sokoban_snapshot.pushes_count
+            reverse_sokoban_snapshot._before_removing_move(atomic_push)
+            assert reverse_sokoban_snapshot.pushes_count == before - 1
 
-            reverse_game_snapshot._before_removing_move(atomic_jump)
-            assert reverse_game_snapshot._jumps_count_invalidated == True
+            reverse_sokoban_snapshot._before_removing_move(atomic_jump)
+            assert reverse_sokoban_snapshot._jumps_count_invalidated == True
 
             before_moves, before_pushes, before_jumps_invalidate = (
-                reverse_game_snapshot.moves_count,
-                reverse_game_snapshot.pushes_count,
-                reverse_game_snapshot._jumps_count_invalidated
+                reverse_sokoban_snapshot.moves_count,
+                reverse_sokoban_snapshot.pushes_count,
+                reverse_sokoban_snapshot._jumps_count_invalidated
             )
-            reverse_game_snapshot._before_removing_move(atomic_pusher_selection)
-            assert reverse_game_snapshot.moves_count == before_moves
-            assert reverse_game_snapshot.pushes_count == before_pushes
-            assert reverse_game_snapshot._jumps_count_invalidated == before_jumps_invalidate
+            reverse_sokoban_snapshot._before_removing_move(atomic_pusher_selection)
+            assert reverse_sokoban_snapshot.moves_count == before_moves
+            assert reverse_sokoban_snapshot.pushes_count == before_pushes
+            assert reverse_sokoban_snapshot._jumps_count_invalidated == before_jumps_invalidate
 
     class Describe_recalc_jumps_count:
 
-        def it_recalcs_jumps_count_if_necessary(self, reverse_game_snapshot):
-            reverse_game_snapshot._count_jumps = Mock()
+        def it_recalcs_jumps_count_if_necessary(self, reverse_sokoban_snapshot):
+            reverse_sokoban_snapshot._count_jumps = Mock()
 
-            reverse_game_snapshot._jumps_count_invalidated = False
-            reverse_game_snapshot._jumps_count = None
-            reverse_game_snapshot._recalc_jumps_count()
-            assert reverse_game_snapshot._count_jumps.call_count == 0
-            assert reverse_game_snapshot._jumps_count is None
+            reverse_sokoban_snapshot._jumps_count_invalidated = False
+            reverse_sokoban_snapshot._jumps_count = None
+            reverse_sokoban_snapshot._recalculate_jumps_count()
+            assert reverse_sokoban_snapshot._count_jumps.call_count == 0
+            assert reverse_sokoban_snapshot._jumps_count is None
 
-            reverse_game_snapshot._jumps_count_invalidated = True
-            reverse_game_snapshot._jumps_count = 0
-            reverse_game_snapshot._recalc_jumps_count()
-            assert reverse_game_snapshot._count_jumps.call_count == 1
-            assert reverse_game_snapshot._jumps_count is not None
-            assert not reverse_game_snapshot._jumps_count_invalidated
-
-    class Describe_parse_string:
-
-        def it_replaces_internal_data_with_atomic_moves_from_string(
-            self, sokoban_game_snapshot
-        ):
-            sokoban_game_snapshot._parse_string("LURD")
-            assert len(sokoban_game_snapshot) == 4
-            assert sokoban_game_snapshot[0] == AtomicMove(
-                Direction.LEFT, box_moved=True
-            )
-            assert sokoban_game_snapshot[1] == AtomicMove(
-                Direction.UP, box_moved=True
-            )
-            assert sokoban_game_snapshot[2] == AtomicMove(
-                Direction.RIGHT, box_moved=True
-            )
-            assert sokoban_game_snapshot[3] == AtomicMove(
-                Direction.DOWN, box_moved=True
-            )
-
-        def it_raises_on_parsing_errors(self, sokoban_game_snapshot):
-            with pytest.raises(SnapshotConversionError):
-                sokoban_game_snapshot._parse_string(moves_data="42")
+            reverse_sokoban_snapshot._jumps_count_invalidated = True
+            reverse_sokoban_snapshot._jumps_count = 0
+            reverse_sokoban_snapshot._recalculate_jumps_count()
+            assert reverse_sokoban_snapshot._count_jumps.call_count == 1
+            assert reverse_sokoban_snapshot._jumps_count is not None
+            assert not reverse_sokoban_snapshot._jumps_count_invalidated
 
     class Describe_str:
 
         def it_ensures_starting_jump_sequence_for_reverse_mode_snapshots(
-            self, reverse_game_snapshot, atomic_jump, atomic_move
+            self, reverse_sokoban_snapshot, atomic_jump, atomic_move
         ):
-            reverse_game_snapshot.clear()
-            assert str(reverse_game_snapshot) == "[]"
+            reverse_sokoban_snapshot.clear()
+            assert str(reverse_sokoban_snapshot) == "[]"
 
-            reverse_game_snapshot.append(atomic_jump)
-            assert str(reverse_game_snapshot) == "[l]"
-            reverse_game_snapshot.clear()
+            reverse_sokoban_snapshot.append(atomic_jump)
+            assert str(reverse_sokoban_snapshot) == "[l]"
+            reverse_sokoban_snapshot.clear()
 
-            reverse_game_snapshot.append(atomic_move)
-            reverse_game_snapshot.append(atomic_jump)
-            assert str(reverse_game_snapshot) == "[]l[l]"
+            reverse_sokoban_snapshot.append(atomic_move)
+            reverse_sokoban_snapshot.append(atomic_jump)
+            assert str(reverse_sokoban_snapshot) == "[]l[l]"

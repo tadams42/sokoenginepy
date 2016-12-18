@@ -1,4 +1,4 @@
-from sokoenginepy.common import DEFAULT_PIECE_ID
+from sokoenginepy import DEFAULT_PIECE_ID
 
 
 class DescribeHashedBoardState:

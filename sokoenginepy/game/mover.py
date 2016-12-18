@@ -1,17 +1,17 @@
 from copy import deepcopy
 from itertools import groupby
 
-from ..board import HashedBoardState
-from ..common import DEFAULT_PIECE_ID, GameSolvingMode, SokoengineError
-from ..snapshot import AtomicMove
+from .. import board as board_module
+from .. import utilities
+from .solving_mode import SolvingMode
 
 
-class NonPlayableBoardError(SokoengineError):
+class NonPlayableBoardError(utilities.SokoengineError):
     def __init__(self):
         super().__init__("Board is not playable!")
 
 
-class IllegalMoveError(SokoengineError):
+class IllegalMoveError(utilities.SokoengineError):
     pass
 
 
@@ -58,7 +58,7 @@ class Mover:
 
     Args:
         board (VariantBoard): Instance of :class:`.VariantBoard` subclasses
-        solving_mode (GameSolvingMode): start the game in this solving mode
+        solving_mode (SolvingMode): start the game in this solving mode
 
     Warning:
         :class:`.Mover` operates directly on referenced game board. Because of
@@ -68,20 +68,20 @@ class Mover:
         reason, it is not allowed to attach two movers to same game board.
     """
 
-    def __init__(self, board, solving_mode=GameSolvingMode.FORWARD):
+    def __init__(self, board, solving_mode=SolvingMode.FORWARD):
         self._board = board
         self._initial_board = deepcopy(board)
-        self._state = HashedBoardState(self._board)
+        self._state = board_module.HashedBoardState(self._board)
         self._solving_mode = solving_mode
         self._pulls_boxes = True
-        self._selected_pusher = DEFAULT_PIECE_ID
+        self._selected_pusher = board_module.DEFAULT_PIECE_ID
         self._pull_count = 0
         self.__last_performed_moves = []
 
         if not self._state.is_playable:
             raise NonPlayableBoardError
 
-        if self.solving_mode == GameSolvingMode.REVERSE:
+        if self.solving_mode == SolvingMode.REVERSE:
             self._switch_boxes_and_goals()
 
     @property
@@ -131,7 +131,8 @@ class Mover:
                 )
             )['path']
             for direction in selection_path:
-                atomic_move = AtomicMove(direction, False)
+                from .. import snapshot
+                atomic_move = snapshot.AtomicMove(direction, False)
                 atomic_move.is_pusher_selection = True
                 self.__last_performed_moves.append(atomic_move)
 
@@ -154,7 +155,7 @@ class Mover:
         """Sequence of :class:`.AtomicMove` that describes most recent movemt
 
         Sequence contains one :class:`.AtomicMove` or (in case of jumps and
-        pusher selections) a more than one :class:`.AtomicMove`-s
+        pusher selections) a more than one :class:`.AtomicMove` s
 
         This is useful for generating movement animation in GUI after calling
         undo/redo
@@ -177,7 +178,7 @@ class Mover:
         """
         move_success = None
         options = MoveWorkerOptions()
-        if self._solving_mode == GameSolvingMode.FORWARD:
+        if self._solving_mode == SolvingMode.FORWARD:
             options.decrease_pull_count = False
             move_success = self._push_or_move(direction, options)
         else:
@@ -204,7 +205,7 @@ class Mover:
         if self._pull_count != 0:
             raise IllegalMoveError('Jumps not allowed after first pull')
 
-        if self.solving_mode != GameSolvingMode.REVERSE:
+        if self.solving_mode != SolvingMode.REVERSE:
             raise IllegalMoveError('Jumps allowed only in reverse solving mode')
 
         self.__last_performed_moves = []
@@ -222,7 +223,8 @@ class Mover:
                     old_position, new_position
                 )
             )['path']:
-                am = AtomicMove(direction, False)
+                from .. import snapshot
+                am = snapshot.AtomicMove(direction, False)
                 am.is_jump = True
                 am.pusher_id = self.selected_pusher
                 self.__last_performed_moves.append(am)
@@ -235,7 +237,7 @@ class Mover:
 
         if len(self.__last_performed_moves) == 1:
             options = MoveWorkerOptions()
-            if self.solving_mode == GameSolvingMode.FORWARD:
+            if self.solving_mode == SolvingMode.FORWARD:
                 options.force_pulls = True
                 options.increase_pull_count = False
                 return self._pull_or_move(
@@ -351,7 +353,8 @@ class Mover:
             pusher_moved_ok = False
 
         if pusher_moved_ok and (not is_push or (is_push and box_moved_ok)):
-            atomic_move = AtomicMove(direction, is_push)
+            from .. import snapshot
+            atomic_move = snapshot.AtomicMove(direction, is_push)
             atomic_move.pusher_id = self.selected_pusher
             if is_push:
                 atomic_move.moved_box_id = self._state.box_id_on(in_front_of_box)
@@ -408,7 +411,8 @@ class Mover:
                 box_moved_ok = True
 
         if pusher_moved_ok and (not is_pull or (is_pull and box_moved_ok)):
-            atomic_move = AtomicMove(direction, is_pull)
+            from .. import snapshot
+            atomic_move = snapshot.AtomicMove(direction, is_pull)
             atomic_move.pusher_id = self.selected_pusher
             if is_pull:
                 atomic_move.moved_box_id = self._state.box_id_on(initial_pusher_position)

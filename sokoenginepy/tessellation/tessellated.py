@@ -1,21 +1,21 @@
-from ..common import Variant
-from .factories import tessellation_factory
+from .. import game
+from .tessellation import Tessellation
 
 
 class Tessellated:
     """
-    Mixin that marks class depending on Tessellation specifics. This means that
-    class will have to be initialized with Variant and it will use one of
-    Tessellation subclass instances.
+    Mixin that marks class depending on :class:`.Tessellation` specifics.
+    This means that class will have to be initialized with :class:`.Variant`
+    and it will use one of :class:`.Tessellation` subclass instances.
     """
 
     def __init__(self, variant):
         """
         variant - either case insensitive  string naming tessellation
-        (ie. "hexoban") or one of Variant members
+        (ie. "hexoban") or one of :class:`.Variant` members
         """
-        self._variant_instance = Variant.instance_from(variant)
-        self._tessellation_instance = tessellation_factory(variant)
+        self._variant_instance = game.Variant.instance_from(variant)
+        self._tessellation_instance = Tessellation.instance_for(variant)
 
     @property
     def variant(self):

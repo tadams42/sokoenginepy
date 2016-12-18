@@ -1,16 +1,16 @@
-from .board import (BoardCell, BoardConversionError, BoardCharacters,
-                    CellAlreadyOccupiedError, HashedBoardState,
-                    SokobanPlusDataError)
-from .common import (DEFAULT_PIECE_ID, Direction, GameSolvingMode,
-                     InvalidPieceIdError, RleCharacters, SokoengineError,
-                     UnknownDirectionError, Variant, is_valid_piece_id,
-                     rle_decode, rle_encode)
-from .game import IllegalMoveError, Mover, NonPlayableBoardError
+from .board import (DEFAULT_PIECE_ID, BoardCell, BoardConversionError,
+                    BoardGraph, BoardState, CellAlreadyOccupiedError,
+                    GraphType, HashedBoardState, HexobanBoard,
+                    InvalidPieceIdError, OctobanBoard, SokobanBoard,
+                    SokobanPlus, SokobanPlusDataError, TriobanBoard,
+                    VariantBoard, is_valid_piece_id)
+from .game import (IllegalMoveError, Mover, NonPlayableBoardError, SolvingMode,
+                   UnknownVariantError, Variant)
 from .input_output import (OUTPUT_SETTINGS, Puzzle, PuzzlesCollection,
-                           PuzzleSnapshot)
-from .snapshot import (AtomicMove, AtomicMoveCharacters, Snapshot,
-                       SnapshotConversionError, SpecialSnapshotCharacters)
-from .tessellation import (COLUMN, ROW, CellOrientation, HexobanBoard,
-                           OctobanBoard, SokobanBoard, TriobanBoard, X, Y,
-                           index_1d)
+                           PuzzleSnapshot, SOKFileFormat, SOKTags)
+from .snapshot import AtomicMove, Snapshot, SnapshotConversionError
+from .tessellation import (COLUMN, ROW, CellOrientation, Direction,
+                           Tessellated, Tessellation, UnknownDirectionError, X,
+                           Y, index_1d, on_board_1d, on_board_2d)
+from .utilities import RleCharacters, SokoengineError, rle_decode, rle_encode
 from .version import __version__

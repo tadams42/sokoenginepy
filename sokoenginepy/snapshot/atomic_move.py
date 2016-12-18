@@ -1,4 +1,6 @@
-from ..common import DEFAULT_PIECE_ID, Direction, is_valid_piece_id
+from enum import Enum
+
+from .. import board, tessellation
 
 
 class AtomicMove:
@@ -14,11 +16,36 @@ class AtomicMove:
           active pusher in Multiban games
     """
 
-    def __init__(self, direction=Direction.LEFT, box_moved=False):
+    class Characters(Enum):
+        """
+        Characters used in textual representation of snapshots.
+
+        Not all variants use all characters. Also, for different variants, same
+        character may have different meaning (ie. different represnet different
+        :class:`.Direction`).
+        """
+        LOWER_L = 'l'
+        LOWER_U = 'u'
+        LOWER_R = 'r'
+        LOWER_D = 'd'
+        UPPER_L = 'L'
+        UPPER_U = 'U'
+        UPPER_R = 'R'
+        UPPER_D = 'D'
+        LOWER_NW = 'w'
+        UPPER_NW = 'W'
+        LOWER_SE = 'e'
+        UPPER_SE = 'E'
+        LOWER_NE = 'n'
+        UPPER_NE = 'N'
+        LOWER_SW = 's'
+        UPPER_SW = 'S'
+
+    def __init__(self, direction=tessellation.Direction.LEFT, box_moved=False):
         self._box_moved = False
         self._pusher_selected = False
         self._pusher_jumped = False
-        self._pusher_id = DEFAULT_PIECE_ID
+        self._pusher_id = board.DEFAULT_PIECE_ID
         self._moved_box_id = None
         self.group_id = 0
 
@@ -27,6 +54,29 @@ class AtomicMove:
             self.is_push_or_pull = True
         else:
             self.is_move = True
+
+    @classmethod
+    def is_atomic_move_chr(cls, character):
+        if isinstance(character, cls.Characters):
+            character = character.value
+        return (
+            character == cls.Characters.LOWER_L.value or
+            character == cls.Characters.LOWER_U.value or
+            character == cls.Characters.LOWER_R.value or
+            character == cls.Characters.LOWER_D.value or
+            character == cls.Characters.LOWER_NW.value or
+            character == cls.Characters.LOWER_SE.value or
+            character == cls.Characters.LOWER_NE.value or
+            character == cls.Characters.LOWER_SW.value or
+            character == cls.Characters.UPPER_L.value or
+            character == cls.Characters.UPPER_U.value or
+            character == cls.Characters.UPPER_R.value or
+            character == cls.Characters.UPPER_D.value or
+            character == cls.Characters.UPPER_NW.value or
+            character == cls.Characters.UPPER_SE.value or
+            character == cls.Characters.UPPER_NE.value or
+            character == cls.Characters.UPPER_SW.value
+        )
 
     def __repr__(self):
         return "AtomicMove(direction={0}, box_moved={1})".format(
@@ -55,7 +105,7 @@ class AtomicMove:
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
-        if is_valid_piece_id(value):
+        if board.is_valid_piece_id(value):
             self._moved_box_id = value
             self.is_push_or_pull = True
         else:
@@ -69,10 +119,10 @@ class AtomicMove:
 
     @pusher_id.setter
     def pusher_id(self, value):
-        if is_valid_piece_id(value):
+        if board.is_valid_piece_id(value):
             self._pusher_id = value
         else:
-            self._pusher_id = DEFAULT_PIECE_ID
+            self._pusher_id = board.DEFAULT_PIECE_ID
 
     @property
     def is_move(self):

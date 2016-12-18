@@ -1,15 +1,13 @@
+import os
 from inspect import getsourcefile
-from os.path import abspath
 
 import pytest
+
 from faker import Faker
-from unipath import Path
+from sokoenginepy import AtomicMove, UnknownDirectionError
 
-from sokoenginepy.common import UnknownDirectionError
-from sokoenginepy.snapshot import AtomicMove
-
-TEST_RESOURCES_ROOT = (
-    Path(abspath(getsourcefile(lambda: 0))).ancestor(1).child('res')
+TEST_RESOURCES_ROOT = os.path.abspath(
+    os.path.join(getsourcefile(lambda: 0), '..', 'res')
 )
 
 fake = Faker()

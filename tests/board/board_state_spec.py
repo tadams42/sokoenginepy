@@ -2,8 +2,8 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy.board import CellAlreadyOccupiedError, SokobanPlus
-from sokoenginepy.common import DEFAULT_PIECE_ID
+from sokoenginepy import (DEFAULT_PIECE_ID, CellAlreadyOccupiedError,
+                          SokobanPlus)
 
 
 class DescribeBoardState:

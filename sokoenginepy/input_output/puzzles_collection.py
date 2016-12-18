@@ -1,6 +1,6 @@
-from unipath import Path
+import os
 
-from ..common import Variant
+from .. import game
 from .sok_file_format import SOKFileFormat
 
 
@@ -33,15 +33,15 @@ class PuzzlesCollection:
             puzzle.reformat()
 
     def _extenstion_to_variant_hint(self, path):
-        file_extension = Path(path).ext
+        file_name, file_extension = os.path.splitext(path)
         if (file_extension == '.sok' or file_extension == '.txt' or file_extension == '.xsb'):
-            return Variant.SOKOBAN
+            return game.Variant.SOKOBAN
         elif file_extension == '.tsb':
-            return Variant.TRIOBAN
+            return game.Variant.TRIOBAN
         elif file_extension == '.hsb':
-            return Variant.HEXOBAN
+            return game.Variant.HEXOBAN
 
-        return Variant.SOKOBAN
+        return game.Variant.SOKOBAN
 
     def load(self, path):
         with open(path, 'r') as src_file:

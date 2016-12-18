@@ -2,10 +2,9 @@ import pytest
 
 from factories import (forward_board, forward_mover, non_playable_board,
                        reverse_board)
-from sokoenginepy.common import DEFAULT_PIECE_ID, Direction, GameSolvingMode
-from sokoenginepy.game import IllegalMoveError, Mover, NonPlayableBoardError
-from sokoenginepy.snapshot import AtomicMove
-from sokoenginepy.tessellation import index_1d
+from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction,
+                          IllegalMoveError, Mover, NonPlayableBoardError,
+                          SolvingMode, index_1d)
 
 
 class DescribeMover:
@@ -16,12 +15,12 @@ class DescribeMover:
 
     def it_assumes_forward_solving_mode(self, forward_board):
         mover = Mover(forward_board)
-        assert mover.solving_mode == GameSolvingMode.FORWARD
+        assert mover.solving_mode == SolvingMode.FORWARD
 
     def it_switches_boxes_and_goals_if_reverse_solving_mode_requested(
         self, forward_board, reverse_board
     ):
-        mover = Mover(forward_board, GameSolvingMode.REVERSE)
+        mover = Mover(forward_board, SolvingMode.REVERSE)
         assert str(mover.board) == str(reverse_board)
 
     class DescribeSelectingPusher:

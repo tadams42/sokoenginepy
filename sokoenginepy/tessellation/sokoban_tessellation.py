@@ -1,7 +1,20 @@
-from ..common import Direction, UnknownDirectionError
-from ..snapshot import AtomicMoveCharacters
-from .graph import GraphType
-from .tessellation import COLUMN, ROW, Tessellation, index_1d, on_board_2d
+from .. import board, snapshot
+from .direction import Direction, UnknownDirectionError
+from .helpers import COLUMN, ROW, index_1d, on_board_2d
+from .tessellation import Tessellation
+
+_CHR_TO_ATOMIC_MOVE = {
+    snapshot.AtomicMove.Characters.LOWER_L.value: (Direction.LEFT, False),
+    snapshot.AtomicMove.Characters.UPPER_L.value: (Direction.LEFT, True),
+    snapshot.AtomicMove.Characters.LOWER_R.value: (Direction.RIGHT, False),
+    snapshot.AtomicMove.Characters.UPPER_R.value: (Direction.RIGHT, True),
+    snapshot.AtomicMove.Characters.LOWER_U.value: (Direction.UP, False),
+    snapshot.AtomicMove.Characters.UPPER_U.value: (Direction.UP, True),
+    snapshot.AtomicMove.Characters.LOWER_D.value: (Direction.DOWN, False),
+    snapshot.AtomicMove.Characters.UPPER_D.value: (Direction.DOWN, True),
+}
+
+_ATOMIC_MOVE_TO_CHR = dict((v, k) for k, v in _CHR_TO_ATOMIC_MOVE.items())
 
 
 class SokobanTessellation(Tessellation):
@@ -17,7 +30,7 @@ class SokobanTessellation(Tessellation):
 
     @property
     def graph_type(self):
-        return GraphType.DIRECTED
+        return board.GraphType.DIRECTED
 
     _NEIGHBOR_SHIFT = {
         Direction.LEFT: (0, -1),
@@ -47,23 +60,10 @@ class SokobanTessellation(Tessellation):
 
         return None
 
-    _CHR_TO_ATOMIC_MOVE = {
-        AtomicMoveCharacters.LOWER_L.value: (Direction.LEFT, False),
-        AtomicMoveCharacters.UPPER_L.value: (Direction.LEFT, True),
-        AtomicMoveCharacters.LOWER_R.value: (Direction.RIGHT, False),
-        AtomicMoveCharacters.UPPER_R.value: (Direction.RIGHT, True),
-        AtomicMoveCharacters.LOWER_U.value: (Direction.UP, False),
-        AtomicMoveCharacters.UPPER_U.value: (Direction.UP, True),
-        AtomicMoveCharacters.LOWER_D.value: (Direction.DOWN, False),
-        AtomicMoveCharacters.UPPER_D.value: (Direction.DOWN, True),
-    }
-
     @property
     def _char_to_atomic_move_dict(self):
-        return self._CHR_TO_ATOMIC_MOVE
-
-    _ATOMIC_MOVE_TO_CHR = dict((v, k) for k, v in _CHR_TO_ATOMIC_MOVE.items())
+        return _CHR_TO_ATOMIC_MOVE
 
     @property
     def _atomic_move_to_char_dict(self):
-        return self._ATOMIC_MOVE_TO_CHR
+        return _ATOMIC_MOVE_TO_CHR

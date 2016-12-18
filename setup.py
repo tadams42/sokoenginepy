@@ -29,12 +29,11 @@ setup_requirements = [
 ] + pytest_runner
 
 install_requirements = [
-    'Unipath >=1.1.0',
     'pytz >=2016.6.1',
     'pyparsing >=2.1.0',
+    'networkx >=1.11',
     # Alternative that is A LOT faster but install through pip is not supported
     # 'graph-tool >=2.11'
-    'networkx >=1.11',
     'cached-property >=1.2.0',
     'midict >= 0.1.4'
 ]
@@ -73,14 +72,16 @@ dev_requirements = [
 
     'check-manifest >= 0.33.0',
     'pytest-colordots >=0.1.0',
+
+    'sphinx_rtd_theme >=0.1.9'
 ]
 
 test_requirements = [
     'pytest>=3.0.0',
     'pytest-spec>=1.0.0',
     'pytest-cov>=2.3.0',
-    'factory-boy>=2.7.0',
-    'fake-factory>=0.6.0',
+    'factory-boy>=2.8.0',
+    'faker>=0.6.0',
     'pyexcel-ods3>=0.2.0',
     'lxml>=3.6.0',
     'tox>=2.3.0',

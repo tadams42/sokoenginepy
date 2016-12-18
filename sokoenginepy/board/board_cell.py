@@ -1,5 +1,11 @@
-from .input_output import (BoardConversionError, BoardCharacters,
-                           is_box, is_empty_floor, is_goal, is_pusher, is_wall)
+from enum import Enum
+
+from .. import input_output, utilities
+
+
+class BoardConversionError(utilities.SokoengineError):
+    """Exception risen when converting board to or from board strings."""
+    pass
 
 
 class BoardCell:
@@ -12,7 +18,80 @@ class BoardCell:
         class.
     """
 
-    def __init__(self, character=BoardCharacters.FLOOR):
+    class Characters(Enum):
+        """Characters used in textual representation of boards."""
+        WALL = '#'
+        PUSHER = '@'
+        PUSHER_ON_GOAL = '+'
+        BOX = '$'
+        BOX_ON_GOAL = '*'
+        GOAL = '.'
+        FLOOR = ' '
+        VISIBLE_FLOOR = '-'
+        ALT_PUSHER1 = 'p'
+        ALT_PUSHER2 = 'm'
+        ALT_PUSHER_ON_GOAL1 = 'P'
+        ALT_PUSHER_ON_GOAL2 = 'M'
+        ALT_BOX1 = 'b'
+        ALT_BOX_ON_GOAL1 = 'B'
+        ALT_GOAL1 = 'o'
+        ALT_VISIBLE_FLOOR1 = '_'
+
+    @classmethod
+    def is_pusher_chr(cls, character):
+        if isinstance(character, cls.Characters):
+            character = character.value
+        return (
+            character == cls.Characters.PUSHER.value or
+            character == cls.Characters.ALT_PUSHER1.value or
+            character == cls.Characters.ALT_PUSHER2.value or
+            character == cls.Characters.PUSHER_ON_GOAL.value or
+            character == cls.Characters.ALT_PUSHER_ON_GOAL1.value or
+            character == cls.Characters.ALT_PUSHER_ON_GOAL2.value
+        )
+
+    @classmethod
+    def is_box_chr(cls, character):
+        if isinstance(character, cls.Characters):
+            character = character.value
+        return (
+            character == cls.Characters.BOX.value or
+            character == cls.Characters.ALT_BOX1.value or
+            character == cls.Characters.BOX_ON_GOAL.value or
+            character == cls.Characters.ALT_BOX_ON_GOAL1.value
+        )
+
+    @classmethod
+    def is_goal_chr(cls, character):
+        if isinstance(character, cls.Characters):
+            character = character.value
+        return (
+            character == cls.Characters.GOAL.value or
+            character == cls.Characters.ALT_GOAL1.value or
+            character == cls.Characters.BOX_ON_GOAL.value or
+            character == cls.Characters.ALT_BOX_ON_GOAL1.value or
+            character == cls.Characters.PUSHER_ON_GOAL.value or
+            character == cls.Characters.ALT_PUSHER_ON_GOAL1.value or
+            character == cls.Characters.ALT_PUSHER_ON_GOAL2.value
+        )
+
+    @classmethod
+    def is_empty_floor_chr(cls, character):
+        if isinstance(character, cls.Characters):
+            character = character.value
+        return (
+            character == cls.Characters.FLOOR.value or
+            character == cls.Characters.VISIBLE_FLOOR.value or
+            character == cls.Characters.ALT_VISIBLE_FLOOR1.value
+        )
+
+    @classmethod
+    def is_wall_chr(cls, character):
+        if isinstance(character, cls.Characters):
+            character = character.value
+        return character == cls.Characters.WALL.value
+
+    def __init__(self, character=Characters.FLOOR):
         self._has_box = False
         self._has_pusher = False
         self._has_goal = False
@@ -24,22 +103,22 @@ class BoardCell:
         # first test succeeds is larger than for other cases. This means that
         # other branches will not be executed most of the time, which means
         # whole method runs faster.
-        if not is_empty_floor(character):
-            if is_wall(character):
+        if not self.is_empty_floor_chr(character):
+            if self.is_wall_chr(character):
                 self.is_wall = True
-            elif is_pusher(character):
+            elif self.is_pusher_chr(character):
                 self.has_pusher = True
-                if is_goal(character):
+                if self.is_goal_chr(character):
                     self.has_goal = True
-            elif is_box(character):
+            elif self.is_box_chr(character):
                 self.has_box = True
-                if is_goal(character):
+                if self.is_goal_chr(character):
                     self.has_goal = True
-            elif is_goal(character):
+            elif self.is_goal_chr(character):
                 self.has_goal = True
             else:
                 raise BoardConversionError(
-                    BoardConversionError.NON_BOARD_CHARS_FOUND
+                    "Illegal characters found in board string"
                 )
 
     def __eq__(self, rv):
@@ -58,28 +137,27 @@ class BoardCell:
 
     @property
     def _str_helper(self):
-        from ..input_output import OUTPUT_SETTINGS
-        retv = BoardCharacters.FLOOR
+        retv = self.Characters.FLOOR
 
         if not self.has_box and not self.has_goal and not self.has_pusher:
             if self.is_wall:
-                retv = BoardCharacters.WALL
+                retv = self.Characters.WALL
             else:
                 retv = (
-                    BoardCharacters.VISIBLE_FLOOR
-                    if OUTPUT_SETTINGS.use_visible_floors
-                    else BoardCharacters.FLOOR
+                    self.Characters.VISIBLE_FLOOR
+                    if input_output.OUTPUT_SETTINGS.use_visible_floors
+                    else self.Characters.FLOOR
                 )
         elif not self.has_box and not self.has_goal and self.has_pusher:
-            retv = BoardCharacters.PUSHER
+            retv = self.Characters.PUSHER
         elif not self.has_box and self.has_goal and not self.has_pusher:
-            retv = BoardCharacters.GOAL
+            retv = self.Characters.GOAL
         elif not self.has_box and self.has_goal and self.has_pusher:
-            retv = BoardCharacters.PUSHER_ON_GOAL
+            retv = self.Characters.PUSHER_ON_GOAL
         elif self.has_box and not self.has_goal and not self.has_pusher:
-            retv = BoardCharacters.BOX
+            retv = self.Characters.BOX
         else:
-            retv = BoardCharacters.BOX_ON_GOAL
+            retv = self.Characters.BOX_ON_GOAL
 
         return retv
 

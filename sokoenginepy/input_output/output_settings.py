@@ -22,10 +22,13 @@ class OutputSettings:
         self.line_break_at = line_break_at
 
     def should_insert_line_break_at(self, at_position):
-        retv = False
-        if (self.break_long_lines and self.line_break_at > 0 and at_position != 0):
-            retv = (at_position % self.line_break_at) == 0
-        return retv
+        if (
+            self.break_long_lines and
+            self.line_break_at > 0 and
+            at_position != 0
+        ):
+            return (at_position % self.line_break_at) == 0
+        return False
 
     @property
     def use_visible_floors(self):

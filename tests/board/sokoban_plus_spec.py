@@ -3,7 +3,7 @@ from unittest.mock import Mock, call
 import pytest
 
 from factories import SokobanPlusFactory
-from sokoenginepy.board import SokobanPlus, SokobanPlusDataError
+from sokoenginepy import SokobanPlus, SokobanPlusDataError
 
 
 class DescribeSokobanPlus:

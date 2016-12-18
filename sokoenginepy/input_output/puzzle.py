@@ -2,9 +2,7 @@ from functools import reduce
 
 from cached_property import cached_property
 
-from ..board import is_box, is_goal, is_pusher
-from ..common import Variant
-from ..snapshot import SpecialSnapshotCharacters, is_atomic_move
+from .. import board, game, snapshot
 
 
 class Puzzle:
@@ -16,7 +14,7 @@ class Puzzle:
     """
 
     def __init__(
-        self, board="", variant=Variant.SOKOBAN, title="", author="",
+        self, board="", variant=game.Variant.SOKOBAN, title="", author="",
         boxorder="", goalorder="", notes="", snapshots=None, created_at="",
         updated_at=""
     ):
@@ -39,7 +37,7 @@ class Puzzle:
 
     @variant.setter
     def variant(self, value):
-        self._variant = Variant.instance_from(value)
+        self._variant = game.Variant.instance_from(value)
 
     @property
     def board(self):
@@ -57,7 +55,7 @@ class Puzzle:
 
     def clear(self):
         self.board = ""
-        self.variant = Variant.SOKOBAN
+        self.variant = game.Variant.SOKOBAN
         self.title = ""
         self.author = ""
         self.boxorder = ""
@@ -73,53 +71,47 @@ class Puzzle:
             snapshot.reformat()
 
     def to_game_board(self):
-        # TODO Convert to VariantBoard, but add boxorder and goalorder attrs to
+        # TODO Convert to board.VariantBoard, but add boxorder and goalorder attrs to
         # to variant board boefore we can do it
-        from ..game import GameBoard
-        retv = GameBoard(board_str=self.board, variant=self.variant)
-        retv.sokoban_plus = (self.boxorder, self.goalorder)
-        return retv
+        # from ..game import GameBoard
+        # retv = GameBoard(board_str=self.board, variant=self.variant)
+        # retv.sokoban_plus = (self.boxorder, self.goalorder)
+        # return retv
+        pass
 
     @cached_property
     def pushers_count(self):
         return reduce(
             lambda x, y: x + y,
-            [1 if is_pusher(chr) else 0 for chr in self.board], 0
+            [1 if board.BoardCell.is_pusher_chr(chr) else 0 for chr in self.board], 0
         )
 
     @cached_property
     def boxes_count(self):
         return reduce(
-            lambda x, y: x + y, [1 if is_box(chr) else 0 for chr in self.board],
-            0
+            lambda x, y: x + y,
+            [1 if board.BoardCell.is_box_chr(chr) else 0 for chr in self.board], 0
         )
 
     @cached_property
     def goals_count(self):
         return reduce(
             lambda x, y: x + y,
-            [1 if is_goal(chr) else 0 for chr in self.board], 0
+            [1 if board.BoardCell.is_goal_chr(chr) else 0 for chr in self.board], 0
         )
 
 
 class PuzzleSnapshot:
-    """Snapshot with all its meta data.
+    """snapshot.Snapshot with all its meta data.
 
     No data validation is performed, to make parsing of Sokoban files as fast
     as possible. Proper validation is triggered when PuzzleSnapshot is
-    converted into Snapshot.
+    converted into snapshot.Snapshot.
     """
 
     def __init__(
-        self,
-        moves="",
-        title="",
-        duration=None,
-        solver="",
-        notes="",
-        created_at="",
-        updated_at="",
-        variant=Variant.SOKOBAN
+        self, moves="", title="", duration=None, solver="", notes="",
+        created_at="", updated_at="", variant=game.Variant.SOKOBAN
     ):
         self._variant = None
         self.pid = 1
@@ -138,7 +130,7 @@ class PuzzleSnapshot:
 
     @variant.setter
     def variant(self, value):
-        self._variant = Variant.instance_from(value)
+        self._variant = game.Variant.instance_from(value)
 
     @property
     def moves(self):
@@ -155,8 +147,7 @@ class PuzzleSnapshot:
             del self.__dict__['is_reverse']
 
     def to_game_snapshot(self):
-        from ..game import Snapshot
-        return Snapshot(variant=self.variant, moves_data=self.moves)
+        return snapshot.Snapshot(variant=self.variant, moves_data=self.moves)
 
     def reformat(self):
         self.moves = str(self.to_game_snapshot())
@@ -169,13 +160,13 @@ class PuzzleSnapshot:
         self.notes = ""
         self.created_at = ""
         self.updated_at = ""
-        self.variant = Variant.SOKOBAN
+        self.variant = game.Variant.SOKOBAN
 
     @cached_property
     def pushes_count(self):
         return reduce(
             lambda x, y: x + y, [
-                1 if is_atomic_move(chr) and chr.isupper() else 0
+                1 if snapshot.AtomicMove.is_atomic_move_chr(chr) and chr.isupper() else 0
                 for chr in self.moves
             ], 0
         )
@@ -189,7 +180,7 @@ class PuzzleSnapshot:
         """
         return reduce(
             lambda x, y: x + y, [
-                1 if is_atomic_move(chr) and chr.islower() else 0
+                1 if snapshot.AtomicMove.is_atomic_move_chr(chr) and chr.islower() else 0
                 for chr in self.moves
             ], 0
         )
@@ -198,7 +189,7 @@ class PuzzleSnapshot:
     def is_reverse(self):
         return reduce(
             lambda x, y: x or y, [
-                chr == SpecialSnapshotCharacters.JUMP_BEGIN or
-                chr == SpecialSnapshotCharacters.JUMP_END for chr in self.moves
+                chr == snapshot.Snapshot.NonMoveCharacters.JUMP_BEGIN or
+                chr == snapshot.Snapshot.NonMoveCharacters.JUMP_END for chr in self.moves
             ], False
         )

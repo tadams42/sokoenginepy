@@ -1,5 +1,5 @@
 from factories import AtomicMoveFactory
-from sokoenginepy.common import DEFAULT_PIECE_ID, Direction
+from sokoenginepy import DEFAULT_PIECE_ID, Direction
 
 
 class DescribeAtomicMove:

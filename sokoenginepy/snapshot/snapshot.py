@@ -1,28 +1,42 @@
 from collections.abc import Iterable, MutableSequence
+from enum import Enum
 
-from ..common import (GameSolvingMode, SokoengineError, UnknownDirectionError,
-                      Variant, is_blank, rle_encode)
-from ..input_output import OUTPUT_SETTINGS
-from ..tessellation import Tessellated
-from .input_output import (SnapshotConversionError, SnapshotStringParser,
-                           SpecialSnapshotCharacters)
+from .. import game, tessellation, utilities
 
 
-class Snapshot(MutableSequence, Tessellated):
+class SnapshotConversionError(utilities.SokoengineError):
+    """
+    Exception risen when converting game snapshot to or from snapshot strings.
+    """
+    pass
+
+
+class Snapshot(MutableSequence, tessellation.Tessellated):
     """Sequence of AtomicMove representing snapshot of game.
 
     Args:
         variant (Variant): game variant
-        solving_mode (GameSolvingMode): game solving mode
+        solving_mode (SolvingMode): game solving mode
         moves_data (string): Strings consisting of characters representing
-            atomic moves. If not empty it will be parsed. Also, if not empty,
-            solving mode will be parsed from it, and the value of
+            :class:`.AtomicMove`. If not empty it will be parsed. Also, if not
+            empty, solving mode will be parsed from it, and the value of
             ``solving_mode`` argument will be ignored
     """
 
+    class NonMoveCharacters(Enum):
+        """
+        Some characters that can be found in textual representation of snapshots
+        that do not represent :class:`.AtomicMove`.
+        """
+        JUMP_BEGIN = '['
+        JUMP_END = ']'
+        PUSHER_CHANGE_BEGIN = '{'
+        PUSHER_CHANGE_END = '}'
+        CURRENT_POSITION_CH = '*'
+
     def __init__(
-        self, variant=Variant.SOKOBAN, solving_mode=GameSolvingMode.FORWARD,
-        moves_data=""
+        self, variant=game.Variant.SOKOBAN,
+        solving_mode=game.SolvingMode.FORWARD, moves_data=""
     ):
         super().__init__(variant)
         self._solving_mode = None
@@ -32,10 +46,29 @@ class Snapshot(MutableSequence, Tessellated):
         self._jumps_count_invalidated = False
         self._moves = []
 
-        if not is_blank(moves_data):
-            self._parse_string(moves_data)
+        if not utilities.is_blank(moves_data):
+            from .snapshot_string_parser import SnapshotStringParser
+            SnapshotStringParser().convert_from_string(moves_data, self)
         else:
             self._solving_mode = solving_mode
+
+    @classmethod
+    def is_snapshot_string(cls, line):
+        """Checks if ``line`` is snapshot string.
+
+        Snapshot strings contain only digits, spaces, atomic move characters and
+        rle separators.
+
+        Note:
+            Doesn't check if snapshot string is properly formed (for example, if
+            all jump sequences are closed, etc.). This is by design, so this
+            method may be used to check strings read from stream line by line,
+            where each line alone doesn't represent legally formed snapshot, but
+            all of them together do. To completely validate this string, it
+            needs to be converted to :class:`Snapshot`.
+        """
+        from .snapshot_string_parser import SnapshotStringParser
+        return SnapshotStringParser.is_snapshot_string(line)
 
     # Iterable
     def __iter__(self):
@@ -128,7 +161,7 @@ class Snapshot(MutableSequence, Tessellated):
 
     @property
     def jumps_count(self):
-        self._recalc_jumps_count()
+        self._recalculate_jumps_count()
         return self._jumps_count
 
     def clear(self):
@@ -139,83 +172,8 @@ class Snapshot(MutableSequence, Tessellated):
         self._moves = []
 
     def __str__(self):
-        retv = ""
-        conversion_ok = True
-
-        # Handling beginning jump in reverse snapshots.
-        # It is required that in textual form reverse snapshots begin with
-        # jump even if empty one.
-        if self.solving_mode == GameSolvingMode.REVERSE:
-            # If is reverse, snapshot can be either
-            #  (1) Empty
-            #  (2) Non-empty, beginning with jump
-            #  (3) Non-empty, not beginning with jump
-            # Number (2) is handled gracefully later
-            if len(self._moves) == 0:
-                retv += SpecialSnapshotCharacters.JUMP_BEGIN.value
-                retv += SpecialSnapshotCharacters.JUMP_END.value
-            elif not self._moves[0].is_jump:
-                retv += SpecialSnapshotCharacters.JUMP_BEGIN.value
-                retv += SpecialSnapshotCharacters.JUMP_END.value
-
-        i = 0
-        iend = len(self._moves)
-        while i < iend and conversion_ok:
-            jump_flag = self._moves[i].is_jump
-            pusher_selected_flag = self._moves[i].is_pusher_selection
-
-            if jump_flag or pusher_selected_flag:
-                backup_flag = jump_flag
-                retv += (
-                    SpecialSnapshotCharacters.JUMP_BEGIN.value if jump_flag else
-                    SpecialSnapshotCharacters.PUSHER_CHANGE_BEGIN.value
-                )
-
-                while (
-                    i < iend and conversion_ok and
-                    (jump_flag or pusher_selected_flag)
-                ):
-                    try:
-                        retv += self.tessellation.atomic_move_to_char(
-                            self._moves[i]
-                        )
-                    except SokoengineError:
-                        conversion_ok = False
-                    i += 1
-                    if i < iend:
-                        jump_flag = self._moves[i].is_jump
-                        pusher_selected_flag = self._moves[i
-                                                          ].is_pusher_selection
-
-                retv += (
-                    SpecialSnapshotCharacters.JUMP_END.value if backup_flag else
-                    SpecialSnapshotCharacters.PUSHER_CHANGE_END.value
-                )
-            else:
-                try:
-                    retv += self.tessellation.atomic_move_to_char(
-                        self._moves[i]
-                    )
-                except SokoengineError:
-                    conversion_ok = False
-                i += 1
-
-        if conversion_ok and OUTPUT_SETTINGS.rle_encode:
-            retv = rle_encode(retv)
-
-        if conversion_ok and OUTPUT_SETTINGS.break_long_lines:
-            tmp = ""
-            for i, character in enumerate(retv):
-                tmp += character
-                if OUTPUT_SETTINGS.should_insert_line_break_at(i + 1):
-                    tmp += "\n"
-            retv = tmp
-
-        if not conversion_ok:
-            raise SnapshotConversionError(
-                SnapshotConversionError.NON_VARIANT_CHARACTERS_FOUND
-            )
-        return retv
+        from .snapshot_string_parser import SnapshotStringParser
+        return SnapshotStringParser.convert_to_string(self)
 
     def _before_removing_move(self, atomic_move):
         if not atomic_move.is_pusher_selection:
@@ -227,13 +185,16 @@ class Snapshot(MutableSequence, Tessellated):
                 self._pushes_count -= 1
 
     def _before_inserting_move(self, atomic_move):
-        if (self._solving_mode == GameSolvingMode.FORWARD and atomic_move.is_jump):
-            raise SokoengineError(
+        if (
+            self._solving_mode == game.SolvingMode.FORWARD and
+            atomic_move.is_jump
+        ):
+            raise utilities.SokoengineError(
                 "Forward mode snapshots are not allowed to contain jumps!"
             )
 
         if atomic_move.direction not in self.tessellation.legal_directions:
-            raise UnknownDirectionError(
+            raise tessellation.UnknownDirectionError(
                 "Invalid direction for tessellation {0}".format(self.variant)
             )
 
@@ -245,7 +206,7 @@ class Snapshot(MutableSequence, Tessellated):
             elif atomic_move.is_push_or_pull:
                 self._pushes_count += 1
 
-    def _recalc_jumps_count(self):
+    def _recalculate_jumps_count(self):
         if self._jumps_count_invalidated:
             self._jumps_count_invalidated = False
             self._jumps_count = self._count_jumps()
@@ -264,19 +225,3 @@ class Snapshot(MutableSequence, Tessellated):
                 i += 1
 
         return retv
-
-    def _parse_string(self, moves_data):
-        parser = SnapshotStringParser()
-        if not parser.convert(moves_data, self.tessellation):
-            raise SnapshotConversionError(parser.first_encountered_error)
-        self.clear()
-
-        if parser.resulting_solving_mode == 'forward':
-            self._solving_mode = GameSolvingMode.FORWARD
-        elif parser.resulting_solving_mode == 'reverse':
-            self._solving_mode = GameSolvingMode.REVERSE
-        else:
-            raise SokoengineError('Unknown parsed solving mode!')
-
-        for atomic_move in parser.resulting_moves:
-            self.append(atomic_move)

@@ -1,15 +1,17 @@
-from helpers import TEST_RESOURCES_ROOT
-from sokoenginepy.common import Variant, is_blank
-from sokoenginepy.input_output import PuzzlesCollection, SOKFileFormat
+import os
 
-INPUT_FILES_ROOT = TEST_RESOURCES_ROOT.child('test_data')
+from helpers import TEST_RESOURCES_ROOT
+from sokoenginepy import PuzzlesCollection, SOKFileFormat, Variant
+from sokoenginepy.utilities import is_blank
+
+INPUT_FILES_ROOT = os.path.join(TEST_RESOURCES_ROOT, 'test_data')
 
 
 class DescribeSOKReader:
 
     def it_loads_regular_collection_file(self):
         collection = PuzzlesCollection()
-        collection.load(INPUT_FILES_ROOT.child('Original_and_Extra.sok'))
+        collection.load(os.path.join(INPUT_FILES_ROOT, 'Original_and_Extra.sok'))
 
         assert len(collection.puzzles) == 91
         assert len(collection.puzzles[0].snapshots) == 6
@@ -23,7 +25,7 @@ class DescribeSOKReader:
     def it_loads_puzzle_without_title(self):
         collection = PuzzlesCollection()
         collection.load(
-            INPUT_FILES_ROOT.child('parser_test_puzzle_no_title.sok')
+            os.path.join(INPUT_FILES_ROOT, 'parser_test_puzzle_no_title.sok')
         )
 
         assert is_blank(collection.puzzles[0].title)
@@ -32,7 +34,7 @@ class DescribeSOKReader:
     def it_loads_puzzle_with_multiple_snapshots(self):
         collection = PuzzlesCollection()
         collection.load(
-            INPUT_FILES_ROOT.child('parser_test_multiple_snapshots.sok')
+            os.path.join(INPUT_FILES_ROOT, 'parser_test_multiple_snapshots.sok')
         )
 
         assert len(collection.puzzles[0].snapshots) == 3
@@ -44,7 +46,7 @@ class DescribeSOKReader:
     def it_loads_last_snapshot_notes(self):
         collection = PuzzlesCollection()
         collection.load(
-            INPUT_FILES_ROOT.child('parser_test_last_snapshot_notes.sok')
+            os.path.join(INPUT_FILES_ROOT, 'parser_test_last_snapshot_notes.sok')
         )
 
         title = "This is note for last snapshot, not heading line"
@@ -58,8 +60,7 @@ class DescribeSOKReader:
         def it_defaults_to_sokoban_if_not_specified(self):
             collection = PuzzlesCollection()
             with open(
-                INPUT_FILES_ROOT.
-                child('parser_test_variant_type_not_specified.sok')
+                os.path.join(INPUT_FILES_ROOT, 'parser_test_variant_type_not_specified.sok')
             ) as t:
                 SOKFileFormat.read(t, collection, None)
 
@@ -69,8 +70,7 @@ class DescribeSOKReader:
         def it_uses_value_from_colection_notes_even_if_hint_given(self):
             collection = PuzzlesCollection()
             with open(
-                INPUT_FILES_ROOT.
-                child('parser_test_variant_type_specified_global.sok')
+                os.path.join(INPUT_FILES_ROOT, 'parser_test_variant_type_specified_global.sok')
             ) as t:
                 SOKFileFormat.read(t, collection, Variant.OCTOBAN)
 
@@ -80,8 +80,7 @@ class DescribeSOKReader:
         def it_snapshots_get_the_same_value_as_their_puzzle(self):
             collection = PuzzlesCollection()
             with open(
-                INPUT_FILES_ROOT.
-                child('parser_test_variant_type_specified_global.sok')
+                os.path.join(INPUT_FILES_ROOT, 'parser_test_variant_type_specified_global.sok')
             ) as t:
                 SOKFileFormat.read(t, collection, Variant.OCTOBAN)
 
@@ -94,8 +93,7 @@ class DescribeSOKReader:
         ):
             collection = PuzzlesCollection()
             with open(
-                INPUT_FILES_ROOT.
-                child('parser_test_variant_type_specified_puzzle1.sok')
+                os.path.join(INPUT_FILES_ROOT, 'parser_test_variant_type_specified_puzzle1.sok')
             ) as t:
                 SOKFileFormat.read(t, collection, Variant.OCTOBAN)
 
@@ -105,8 +103,7 @@ class DescribeSOKReader:
         def it_uses_value_from_hint_when_nothing_is_specified_in_file(self):
             collection = PuzzlesCollection()
             with open(
-                INPUT_FILES_ROOT.
-                child('parser_test_variant_type_specified_puzzle2.sok')
+                os.path.join(INPUT_FILES_ROOT, 'parser_test_variant_type_specified_puzzle2.sok')
             ) as t:
                 SOKFileFormat.read(t, collection, Variant.TRIOBAN)
 

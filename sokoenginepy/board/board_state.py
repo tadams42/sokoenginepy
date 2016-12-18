@@ -6,11 +6,12 @@ from textwrap import dedent, indent
 from cached_property import cached_property
 from midict import MIDict, ValueExistsError
 
-from ..common import DEFAULT_PIECE_ID, SokoengineError
+from .. import utilities
+from .piece import DEFAULT_PIECE_ID
 from .sokoban_plus import SokobanPlus
 
 
-class CellAlreadyOccupiedError(SokoengineError):
+class CellAlreadyOccupiedError(utilities.SokoengineError):
     pass
 
 
@@ -589,7 +590,7 @@ class BoardState:
                   be performed
         """
         if self.boxes_count != self.goals_count:
-            raise SokoengineError(
+            raise utilities.SokoengineError(
                 "Unable to switch boxes and goals - counts are not the same"
             )
 

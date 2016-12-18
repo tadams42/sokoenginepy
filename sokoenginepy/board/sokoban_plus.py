@@ -1,7 +1,8 @@
-from ..common import DEFAULT_PIECE_ID, SokoengineError
+from .. import utilities
+from .piece import DEFAULT_PIECE_ID
 
 
-class SokobanPlusDataError(SokoengineError):
+class SokobanPlusDataError(utilities.SokoengineError):
     pass
 
 
@@ -26,17 +27,17 @@ class SokobanPlus:
     **Valid Sokoban+ id sequences**
 
     Boxorder and goalorder must define ids for equal number of boxes and goals.
-    This means that in case of boxorder asigning plus id "42" to two boxes,
+    This means that in case of boxorder assigning plus id "42" to two boxes,
     goalorder must also contain number 42 twice.
 
     Sokoban+ data parser accepts any positive integer as plus id.
 
     Attributes:
         DEFAULT_PLUS_ID: Sokoban+ ID for pieces that don't have one or when
-            Sokoban+ is disabled. Original Sokoban+ implementation used number 99
-            for default plus ID. As there can be more than 99 boxes on board,
-            sokoenginepy changes this detail and uses :const:`DEFAULT_PLUS_ID` as
-            default plus ID. When loading older puzzles with Sokoban+, legacy
+            Sokoban+ is disabled. Original Sokoban+ implementation used number
+            99 for default plus ID. As there can be more than 99 boxes on board,
+            sokoenginepy changes this detail and uses :const:`DEFAULT_PLUS_ID`
+            as default plus ID. When loading older puzzles with Sokoban+, legacy
             default value is converted transparently.
 
     Args:
@@ -63,6 +64,13 @@ class SokobanPlus:
 
         self.boxorder = boxorder or ''
         self.goalorder = goalorder or ''
+
+    @classmethod
+    def is_sokoban_plus_string(cls, line):
+        return (
+            utilities.contains_only_digits_and_spaces(line) and
+            not utilities.is_blank(line)
+        )
 
     @classmethod
     def is_valid_plus_id(cls, plus_id):

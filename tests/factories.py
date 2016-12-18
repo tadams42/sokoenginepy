@@ -2,14 +2,10 @@ import factory
 import pytest
 
 from helpers import fake
-from sokoenginepy.board import (BoardCell, BoardCharacters, BoardState,
-                                HashedBoardState, SokobanPlus)
-from sokoenginepy.common import (DEFAULT_PIECE_ID, Direction, GameSolvingMode,
-                                 Variant)
-from sokoenginepy.game import Mover
-from sokoenginepy.snapshot import AtomicMove, Snapshot
-from sokoenginepy.tessellation import (SokobanBoard, index_1d,
-                                       tessellation_factory)
+from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, BoardCell, BoardState,
+                          Direction, HashedBoardState, Mover, Snapshot,
+                          SokobanBoard, SokobanPlus, SolvingMode, Tessellation,
+                          Variant, index_1d)
 
 
 class AtomicMoveFactory(factory.Factory):
@@ -50,7 +46,7 @@ class BoardCellFactory(factory.Factory):
         model = BoardCell
 
     character = factory.LazyAttribute(
-        lambda x: BoardCharacters.FLOOR.value
+        lambda x: BoardCell.Characters.FLOOR.value
     )
 
 
@@ -59,7 +55,7 @@ def board_cell():
     return BoardCellFactory()
 
 
-class GameSnapshotFactory(factory.Factory):
+class SnapshotFactory(factory.Factory):
 
     class Meta:
         model = Snapshot
@@ -68,14 +64,14 @@ class GameSnapshotFactory(factory.Factory):
         lambda x: fake.random_element(list(Variant))
     )
     solving_mode = factory.LazyAttribute(
-        lambda x: fake.random_element(list(GameSolvingMode))
+        lambda x: fake.random_element(list(SolvingMode))
     )
     moves_data = ""
 
 
 @pytest.fixture
 def game_snapshot():
-    return GameSnapshotFactory(moves_data="lurdLURD{lurd}LURD")
+    return SnapshotFactory(moves_data="lurdLURD{lurd}LURD")
 
 
 class SokobanPlusFactory(factory.Factory):
@@ -131,11 +127,11 @@ def board_graph(variant_board):
 
 @pytest.fixture
 def sokoban_tessellation():
-    return tessellation_factory('sokoban')
+    return Tessellation.instance_for('sokoban')
 
 @pytest.fixture
 def trioban_tessellation():
-    return tessellation_factory('trioban')
+    return Tessellation.instance_for('trioban')
 
 @pytest.fixture
 def board_state(variant_board):
@@ -297,4 +293,4 @@ def forward_mover(forward_board):
 
 @pytest.fixture
 def reverse_mover(forward_board):
-    return Mover(forward_board, GameSolvingMode.REVERSE)
+    return Mover(forward_board, SolvingMode.REVERSE)

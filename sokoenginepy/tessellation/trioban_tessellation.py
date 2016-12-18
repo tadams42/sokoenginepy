@@ -1,8 +1,25 @@
-from ..common import Direction, UnknownDirectionError
-from ..snapshot import AtomicMoveCharacters
-from .graph import GraphType
-from .tessellation import (COLUMN, ROW, CellOrientation, Tessellation,
-                           index_1d, on_board_2d)
+from .. import board, snapshot
+from .cell_orientation import CellOrientation
+from .direction import Direction, UnknownDirectionError
+from .helpers import COLUMN, ROW, index_1d, on_board_2d
+from .tessellation import Tessellation
+
+_CHR_TO_ATOMIC_MOVE = {
+    snapshot.AtomicMove.Characters.LOWER_L.value: (Direction.LEFT, False),
+    snapshot.AtomicMove.Characters.UPPER_L.value: (Direction.LEFT, True),
+    snapshot.AtomicMove.Characters.LOWER_R.value: (Direction.RIGHT, False),
+    snapshot.AtomicMove.Characters.UPPER_R.value: (Direction.RIGHT, True),
+    snapshot.AtomicMove.Characters.LOWER_NE.value: (Direction.NORTH_EAST, False),
+    snapshot.AtomicMove.Characters.UPPER_NE.value: (Direction.NORTH_EAST, True),
+    snapshot.AtomicMove.Characters.LOWER_U.value: (Direction.NORTH_WEST, False),
+    snapshot.AtomicMove.Characters.UPPER_U.value: (Direction.NORTH_WEST, True),
+    snapshot.AtomicMove.Characters.LOWER_D.value: (Direction.SOUTH_EAST, False),
+    snapshot.AtomicMove.Characters.UPPER_D.value: (Direction.SOUTH_EAST, True),
+    snapshot.AtomicMove.Characters.LOWER_SW.value: (Direction.SOUTH_WEST, False),
+    snapshot.AtomicMove.Characters.UPPER_SW.value: (Direction.SOUTH_WEST, True),
+}
+
+_ATOMIC_MOVE_TO_CHR = dict((v, k) for k, v in _CHR_TO_ATOMIC_MOVE.items())
 
 
 class TriobanTessellation(Tessellation):
@@ -19,7 +36,7 @@ class TriobanTessellation(Tessellation):
 
     @property
     def graph_type(self):
-        return GraphType.DIRECTED_MULTI
+        return board.GraphType.DIRECTED_MULTI
 
     def neighbor_position(self, position, direction, board_width, board_height):
         # if not on_board_1d(position, board_width, board_height):
@@ -78,30 +95,13 @@ class TriobanTessellation(Tessellation):
 
         return None
 
-    _CHR_TO_ATOMIC_MOVE = {
-        AtomicMoveCharacters.LOWER_L.value: (Direction.LEFT, False),
-        AtomicMoveCharacters.UPPER_L.value: (Direction.LEFT, True),
-        AtomicMoveCharacters.LOWER_R.value: (Direction.RIGHT, False),
-        AtomicMoveCharacters.UPPER_R.value: (Direction.RIGHT, True),
-        AtomicMoveCharacters.LOWER_NE.value: (Direction.NORTH_EAST, False),
-        AtomicMoveCharacters.UPPER_NE.value: (Direction.NORTH_EAST, True),
-        AtomicMoveCharacters.LOWER_U.value: (Direction.NORTH_WEST, False),
-        AtomicMoveCharacters.UPPER_U.value: (Direction.NORTH_WEST, True),
-        AtomicMoveCharacters.LOWER_D.value: (Direction.SOUTH_EAST, False),
-        AtomicMoveCharacters.UPPER_D.value: (Direction.SOUTH_EAST, True),
-        AtomicMoveCharacters.LOWER_SW.value: (Direction.SOUTH_WEST, False),
-        AtomicMoveCharacters.UPPER_SW.value: (Direction.SOUTH_WEST, True),
-    }
-
     @property
     def _char_to_atomic_move_dict(self):
-        return self._CHR_TO_ATOMIC_MOVE
-
-    _ATOMIC_MOVE_TO_CHR = dict((v, k) for k, v in _CHR_TO_ATOMIC_MOVE.items())
+        return _CHR_TO_ATOMIC_MOVE
 
     @property
     def _atomic_move_to_char_dict(self):
-        return self._ATOMIC_MOVE_TO_CHR
+        return _ATOMIC_MOVE_TO_CHR
 
     def cell_orientation(self, position, board_width, board_height):
         row = ROW(position, board_width)
