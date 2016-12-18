@@ -8,4 +8,5 @@ recursive-exclude docs *.pyo
 recursive-exclude docs _build
 recursive-exclude docs _build/*
 recursive-exclude scripts *.ipynb
+recursive-exclude scripts animate_graph_reachables.py
 prune docs/_build
