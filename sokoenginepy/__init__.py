@@ -6,8 +6,9 @@ from .board import (DEFAULT_PIECE_ID, BoardCell, BoardConversionError,
                     VariantBoard, is_valid_piece_id)
 from .game import (IllegalMoveError, Mover, NonPlayableBoardError, SolvingMode,
                    UnknownVariantError, Variant)
-from .input_output import (OUTPUT_SETTINGS, Puzzle, PuzzlesCollection,
+from .input_output import (Puzzle, PuzzlesCollection,
                            PuzzleSnapshot, SOKFileFormat, SOKTags)
+from .settings import OUTPUT_SETTINGS
 from .snapshot import AtomicMove, Snapshot, SnapshotConversionError
 from .tessellation import (COLUMN, ROW, CellOrientation, Direction,
                            Tessellated, Tessellation, UnknownDirectionError, X,

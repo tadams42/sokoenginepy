@@ -1,6 +1,6 @@
 from enum import Enum
 
-from .. import input_output, utilities
+from .. import settings, utilities
 
 
 class BoardConversionError(utilities.SokoengineError):
@@ -145,7 +145,7 @@ class BoardCell:
             else:
                 retv = (
                     self.Characters.VISIBLE_FLOOR
-                    if input_output.OUTPUT_SETTINGS.use_visible_floors
+                    if settings.OUTPUT_SETTINGS.use_visible_floors
                     else self.Characters.FLOOR
                 )
         elif not self.has_box and not self.has_goal and self.has_pusher:

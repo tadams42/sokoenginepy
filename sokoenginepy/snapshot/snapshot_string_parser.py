@@ -3,14 +3,14 @@ from functools import reduce
 
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
-from .. import game, input_output, utilities
+from .. import game, settings, utilities
 from .atomic_move import AtomicMove
 from .snapshot import Snapshot, SnapshotConversionError
 
 _re_snapshot_string = re.compile(
     r"^([0-9\s" + re.escape("".join(c.value for c in AtomicMove.Characters)) +
-    re.escape("".join(c.value for c in Snapshot.NonMoveCharacters)
-             ) + re.escape("".join(c.value for c in utilities.RleCharacters)) + "])*$"
+    re.escape("".join(c.value for c in Snapshot.NonMoveCharacters)) +
+    re.escape("".join(c.value for c in utilities.RleCharacters)) + "])*$"
 )
 
 
@@ -29,9 +29,9 @@ class SnapshotStringParser:
         ) + oneOf(Snapshot.NonMoveCharacters.JUMP_END.value)
     )
     pusher_change = Group(
-        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN.value) + ZeroOrMore(
-            atomic_moves
-        ) + oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_END.value)
+        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN.value
+             ) + ZeroOrMore(atomic_moves) +
+        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_END.value)
     )
     grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
 
@@ -49,8 +49,7 @@ class SnapshotStringParser:
     def is_snapshot_string(cls, line):
         return (
             not utilities.is_blank(line) and
-            not utilities.contains_only_digits_and_spaces(line) and
-            reduce(
+            not utilities.contains_only_digits_and_spaces(line) and reduce(
                 lambda x, y: x and y, [
                     True if _re_snapshot_string.match(l) else False
                     for l in line.splitlines()
@@ -96,8 +95,8 @@ class SnapshotStringParser:
             if jump_flag or pusher_selected_flag:
                 backup_flag = jump_flag
                 retv += (
-                    snapshot.NonMoveCharacters.JUMP_BEGIN.value if jump_flag else
-                    snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN.value
+                    snapshot.NonMoveCharacters.JUMP_BEGIN.value if jump_flag
+                    else snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN.value
                 )
 
                 while (
@@ -116,8 +115,8 @@ class SnapshotStringParser:
                         pusher_selected_flag = snapshot[i].is_pusher_selection
 
                 retv += (
-                    snapshot.NonMoveCharacters.JUMP_END.value if backup_flag else
-                    snapshot.NonMoveCharacters.PUSHER_CHANGE_END.value
+                    snapshot.NonMoveCharacters.JUMP_END.value if backup_flag
+                    else snapshot.NonMoveCharacters.PUSHER_CHANGE_END.value
                 )
             else:
                 try:
@@ -128,14 +127,16 @@ class SnapshotStringParser:
                     conversion_ok = False
                 i += 1
 
-        if conversion_ok and input_output.OUTPUT_SETTINGS.rle_encode:
+        if conversion_ok and settings.OUTPUT_SETTINGS.rle_encode:
             retv = utilities.rle_encode(retv)
 
-        if conversion_ok and input_output.OUTPUT_SETTINGS.break_long_lines:
+        if conversion_ok and settings.OUTPUT_SETTINGS.break_long_lines:
             tmp = ""
             for i, character in enumerate(retv):
                 tmp += character
-                if input_output.OUTPUT_SETTINGS.should_insert_line_break_at(i + 1):
+                if settings.OUTPUT_SETTINGS.should_insert_line_break_at(
+                    i + 1
+                ):
                     tmp += "\n"
             retv = tmp
 
@@ -242,8 +243,8 @@ class SnapshotStringParser:
             if is_jump:
                 if atomic_move.is_push_or_pull:
                     self._first_encountered_error = (
-                        "Jump sequence in snapshot string contains atomic pushes. "
-                        "This is not allowed"
+                        "Jump sequence in snapshot string contains atomic "
+                        "pushes. This is not allowed"
                     )
                     return False
                 else:
@@ -251,8 +252,8 @@ class SnapshotStringParser:
             elif is_pusher_change:
                 if atomic_move.is_push_or_pull:
                     self._first_encountered_error = (
-                        "Pusher change sequence in snapshot string contains atomic "
-                        "pushes. This is not allowed"
+                        "Pusher change sequence in snapshot string contains "
+                        "atomic pushes. This is not allowed"
                     )
                     return False
                 else:

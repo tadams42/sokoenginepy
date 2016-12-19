@@ -1,4 +1,4 @@
-from .. import game, input_output, tessellation, utilities
+from .. import game, settings, tessellation, utilities
 from .board_cell import BoardCell, BoardConversionError
 from .sokoban_board import SokobanBoard
 from .variant_board import VariantBoard, VariantBoardResizer
@@ -84,12 +84,12 @@ class HexobanTextConverter:
         input_lines = input.splitlines()
         expected_lines = expected.splitlines()
 
-        tmp_use_visible_floors = input_output.OUTPUT_SETTINGS.use_visible_floors
-        input_output.OUTPUT_SETTINGS.use_visible_floors = True
+        tmp_use_visible_floors = settings.OUTPUT_SETTINGS.use_visible_floors
+        settings.OUTPUT_SETTINGS.use_visible_floors = True
 
         converted_lines = str(HexobanBoard(board_str=input)).splitlines()
 
-        input_output.OUTPUT_SETTINGS.use_visible_floors = tmp_use_visible_floors
+        settings.OUTPUT_SETTINGS.use_visible_floors = tmp_use_visible_floors
 
         internal_lines = self.convert_to_internal(input)[0]
 
@@ -167,7 +167,7 @@ class HexobanTextConverter:
         if self._is_type1(retv):
             retv = self._remove_column_right(retv)
 
-        if input_output.OUTPUT_SETTINGS.rle_encode:
+        if settings.OUTPUT_SETTINGS.rle_encode:
             return utilities.RleCharacters.RLE_ROW_SEPARATOR.value.join(
                 utilities.rle_encode(line) for line in retv
             )
@@ -280,7 +280,7 @@ class HexobanTextConverter:
     def floor_character(self):
         return (
             BoardCell.Characters.VISIBLE_FLOOR.value
-            if input_output.OUTPUT_SETTINGS.use_visible_floors else
+            if settings.OUTPUT_SETTINGS.use_visible_floors else
             BoardCell.Characters.FLOOR.value
         )
 

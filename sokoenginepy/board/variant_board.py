@@ -5,7 +5,7 @@ from functools import reduce
 
 import networkx as nx
 
-from .. import game, input_output, tessellation, utilities
+from .. import game, settings, tessellation, utilities
 from .board_cell import BoardCell, BoardConversionError
 from .graph import BoardGraph
 
@@ -195,11 +195,11 @@ class VariantBoard(Container, tessellation.Tessellated, ABC):
             )
             # Intentionally rstripping only if not using visible floors
             row = row.rstrip()
-            if input_output.OUTPUT_SETTINGS.rle_encode:
+            if settings.OUTPUT_SETTINGS.rle_encode:
                 row = utilities.rle_encode(row)
             rows.append(row)
 
-        if input_output.OUTPUT_SETTINGS.rle_encode:
+        if settings.OUTPUT_SETTINGS.rle_encode:
             return utilities.RleCharacters.RLE_ROW_SEPARATOR.value.join(rows)
         else:
             return "\n".join(rows)
