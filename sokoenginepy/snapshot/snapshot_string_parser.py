@@ -3,7 +3,7 @@ from functools import reduce
 
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
-from .. import game, settings, utilities
+from .. import settings, utilities
 from .atomic_move import AtomicMove
 from .snapshot import Snapshot, SnapshotConversionError
 
@@ -67,6 +67,8 @@ class SnapshotStringParser:
 
     @classmethod
     def convert_to_string(cls, snapshot):
+        from .. import game
+
         retv = ""
         conversion_ok = True
 
@@ -162,6 +164,8 @@ class SnapshotStringParser:
         - Sets parser state detailing the first error encountered in parsing
         - returns boolean value signaling parsing success or failure
         """
+        from .. import game
+
         self._first_encountered_error = None
         self._resulting_solving_mode = None
         self._resulting_moves = None

@@ -65,24 +65,23 @@ class DescribeGameSnapshot:
 
     class Describe_init:
 
-        def it_creates_sokoban_snapshot_by_default(self):
-            assert Snapshot().variant == Variant.SOKOBAN
-
-        def it_creates_forward_snaphost_by_default(self):
-            assert Snapshot().solving_mode == SolvingMode.FORWARD
-
         def it_creates_empty_snapshot_by_default(self):
-            assert len(Snapshot()) == 0
-            assert Snapshot().moves_count == 0
-            assert Snapshot().pushes_count == 0
-            assert Snapshot().jumps_count == 0
+            snapshot = Snapshot(
+                variant=Variant.SOKOBAN, solving_mode=SolvingMode.FORWARD
+            )
+            assert len(snapshot) == 0
+            assert snapshot.moves_count == 0
+            assert snapshot.pushes_count == 0
+            assert snapshot.jumps_count == 0
 
         def it_ignores_solving_mode_arg_if_moves_data_is_provided(self):
             assert Snapshot(
-                solving_mode=SolvingMode.FORWARD, moves_data="[lurd]"
+                variant=Variant.SOKOBAN, solving_mode=SolvingMode.FORWARD,
+                moves_data="[lurd]"
             ).solving_mode == SolvingMode.REVERSE
             assert Snapshot(
-                solving_mode=SolvingMode.REVERSE, moves_data="lurd"
+                variant=Variant.SOKOBAN, solving_mode=SolvingMode.REVERSE,
+                moves_data="lurd"
             ).solving_mode == SolvingMode.FORWARD
 
     class Describe_get_item:

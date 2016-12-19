@@ -1,6 +1,6 @@
 from enum import Enum
 
-from .. import board, tessellation
+from .. import tessellation
 
 
 class AtomicMove:
@@ -42,6 +42,7 @@ class AtomicMove:
         UPPER_SW = 'S'
 
     def __init__(self, direction=tessellation.Direction.LEFT, box_moved=False):
+        from .. import board
         self._box_moved = False
         self._pusher_selected = False
         self._pusher_jumped = False
@@ -105,6 +106,7 @@ class AtomicMove:
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
+        from .. import board
         if board.is_valid_piece_id(value):
             self._moved_box_id = value
             self.is_push_or_pull = True
@@ -119,6 +121,7 @@ class AtomicMove:
 
     @pusher_id.setter
     def pusher_id(self, value):
+        from .. import board
         if board.is_valid_piece_id(value):
             self._pusher_id = value
         else:

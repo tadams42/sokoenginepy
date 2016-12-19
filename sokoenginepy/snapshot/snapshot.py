@@ -1,7 +1,7 @@
 from collections.abc import Iterable, MutableSequence
 from enum import Enum
 
-from .. import game, tessellation, utilities
+from .. import tessellation, utilities
 
 
 class SnapshotConversionError(utilities.SokoengineError):
@@ -34,10 +34,7 @@ class Snapshot(MutableSequence, tessellation.Tessellated):
         PUSHER_CHANGE_END = '}'
         CURRENT_POSITION_CH = '*'
 
-    def __init__(
-        self, variant=game.Variant.SOKOBAN,
-        solving_mode=game.SolvingMode.FORWARD, moves_data=""
-    ):
+    def __init__(self, variant, solving_mode, moves_data=""):
         super().__init__(variant)
         self._solving_mode = None
         self._moves_count = 0
@@ -185,6 +182,7 @@ class Snapshot(MutableSequence, tessellation.Tessellated):
                 self._pushes_count -= 1
 
     def _before_inserting_move(self, atomic_move):
+        from .. import game
         if (
             self._solving_mode == game.SolvingMode.FORWARD and
             atomic_move.is_jump
