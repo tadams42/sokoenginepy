@@ -232,4 +232,4 @@ hand, :class:`.Puzzle` and :class:`.PuzzleSnapshot` can be easily converted to
     collection[0].board = str(some_edited_board)
 
 To controll output options (ie. line breaks, RLE encoding, etc...) use
-:data:`.OUTPUT_SETTINGS`.
+:mod:`.settings`.

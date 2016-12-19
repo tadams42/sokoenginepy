@@ -1,7 +1,6 @@
 settings
 ========
 
-.. automodule:: sokoenginepy.settings.output_settings
+.. automodule:: sokoenginepy.settings
     :members:
     :undoc-members:
-    :exclude-members: OutputSettings

@@ -3,7 +3,7 @@ import copy
 import pytest
 
 from factories import BoardCellFactory
-from sokoenginepy import OUTPUT_SETTINGS, BoardCell, SokoengineError
+from sokoenginepy import settings, BoardCell, SokoengineError
 
 
 class DescribeBoardCell:
@@ -329,13 +329,13 @@ class DescribeBoardCell:
             board_cell.is_wall = True
             assert str(board_cell) == BoardCell.Characters.WALL.value
 
-            tmp = OUTPUT_SETTINGS.use_visible_floors
+            tmp = settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
             board_cell.clear()
 
-            OUTPUT_SETTINGS.use_visible_floors = False
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = False
             assert str(board_cell) == BoardCell.Characters.FLOOR.value
 
-            OUTPUT_SETTINGS.use_visible_floors = True
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             assert str(board_cell) == BoardCell.Characters.VISIBLE_FLOOR.value
 
-            OUTPUT_SETTINGS.use_visible_floors = tmp
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = tmp

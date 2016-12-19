@@ -2,11 +2,11 @@ from unittest.mock import patch
 
 import pytest
 
-from sokoenginepy import (OUTPUT_SETTINGS, BoardConversionError, BoardGraph,
-                          Direction, SokobanBoard, Tessellation, TriobanBoard,
-                          VariantBoard, index_1d)
+from sokoenginepy import (BoardConversionError, BoardGraph, Direction,
+                          SokobanBoard, Tessellation, TriobanBoard,
+                          VariantBoard, index_1d, settings)
 
-OUTPUT_SETTINGS.use_visible_floors = True
+settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
 
 
 class DescribeVariantBoard:
@@ -118,10 +118,10 @@ class DescribeVariantBoard:
             assert b.width == board_str_width
             assert b.height == board_str_height
 
-            tmp = OUTPUT_SETTINGS.use_visible_floors
-            OUTPUT_SETTINGS.use_visible_floors = False
+            tmp = settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = False
             assert str(b) == board_str
-            OUTPUT_SETTINGS.use_visible_floors = tmp
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = tmp
 
         def it_raises_on_illegal_board_string(self):
             with pytest.raises(BoardConversionError):

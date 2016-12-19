@@ -82,12 +82,12 @@ class HexobanTextConverter:
         input_lines = input.splitlines()
         expected_lines = expected.splitlines()
 
-        tmp_use_visible_floors = settings.OUTPUT_SETTINGS.use_visible_floors
-        settings.OUTPUT_SETTINGS.use_visible_floors = True
+        tmp_use_visible_floors = settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
+        settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
 
         converted_lines = str(HexobanBoard(board_str=input)).splitlines()
 
-        settings.OUTPUT_SETTINGS.use_visible_floors = tmp_use_visible_floors
+        settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = tmp_use_visible_floors
 
         internal_lines = self.convert_to_internal(input)[0]
 
@@ -165,7 +165,7 @@ class HexobanTextConverter:
         if self._is_type1(retv):
             retv = self._remove_column_right(retv)
 
-        if settings.OUTPUT_SETTINGS.rle_encode:
+        if settings.RLE_ENCODE_BOARD_STRINGS:
             return utilities.RleCharacters.RLE_ROW_SEPARATOR.value.join(
                 utilities.rle_encode(line) for line in retv
             )
@@ -278,7 +278,7 @@ class HexobanTextConverter:
     def floor_character(self):
         return (
             BoardCell.Characters.VISIBLE_FLOOR.value
-            if settings.OUTPUT_SETTINGS.use_visible_floors else
+            if settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS else
             BoardCell.Characters.FLOOR.value
         )
 

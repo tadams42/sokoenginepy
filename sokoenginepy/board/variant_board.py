@@ -211,11 +211,11 @@ class VariantBoard(Container, ABC):
             )
             # Intentionally rstripping only if not using visible floors
             row = row.rstrip()
-            if settings.OUTPUT_SETTINGS.rle_encode:
+            if settings.RLE_ENCODE_BOARD_STRINGS:
                 row = utilities.rle_encode(row)
             rows.append(row)
 
-        if settings.OUTPUT_SETTINGS.rle_encode:
+        if settings.RLE_ENCODE_BOARD_STRINGS:
             return utilities.RleCharacters.RLE_ROW_SEPARATOR.value.join(rows)
         else:
             return "\n".join(rows)

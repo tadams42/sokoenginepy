@@ -148,7 +148,7 @@ class BoardCell:
             else:
                 retv = (
                     self.Characters.VISIBLE_FLOOR
-                    if settings.OUTPUT_SETTINGS.use_visible_floors
+                    if settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
                     else self.Characters.FLOOR
                 )
         elif not self.has_box and not self.has_goal and self.has_pusher:

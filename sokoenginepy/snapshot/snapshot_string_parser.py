@@ -129,14 +129,14 @@ class SnapshotStringParser:
                     conversion_ok = False
                 i += 1
 
-        if conversion_ok and settings.OUTPUT_SETTINGS.rle_encode:
+        if conversion_ok and settings.RLE_ENCODE_BOARD_STRINGS:
             retv = utilities.rle_encode(retv)
 
-        if conversion_ok and settings.OUTPUT_SETTINGS.break_long_lines:
+        if conversion_ok and settings.BREAK_LONG_SNAPSHOT_STRINGS:
             tmp = ""
             for i, character in enumerate(retv):
                 tmp += character
-                if settings.OUTPUT_SETTINGS.should_insert_line_break_at(
+                if settings.should_insert_line_break_at(
                     i + 1
                 ):
                     tmp += "\n"

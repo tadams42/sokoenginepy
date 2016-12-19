@@ -7,7 +7,7 @@ from .board import (DEFAULT_PIECE_ID, BoardCell, BoardConversionError,
 from .game import IllegalMoveError, Mover, NonPlayableBoardError, SolvingMode
 from .input_output import (Puzzle, PuzzlesCollection, PuzzleSnapshot,
                            SOKFileFormat, SOKTags)
-from .settings import OUTPUT_SETTINGS
+from . import settings
 from .snapshot import AtomicMove, Snapshot, SnapshotConversionError
 from .tessellation import (COLUMN, ROW, CellOrientation, Direction,
                            Tessellation,
