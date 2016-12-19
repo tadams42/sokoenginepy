@@ -1,4 +1,3 @@
-from .. import game
 from .variant_board import VariantBoard, VariantBoardResizer
 
 
@@ -6,10 +5,11 @@ class SokobanBoard(VariantBoard):
     """Implements :class:`.VariantBoard` for Sokoban variant."""
 
     def __init__(self, board_width=0, board_height=0, board_str=""):
+        from .. import game
         super().__init__(
+            variant=game.Variant.SOKOBAN,
             board_width=board_width,
             board_height=board_height,
-            variant=game.Variant.SOKOBAN,
             board_str=board_str
         )
 

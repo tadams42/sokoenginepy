@@ -5,7 +5,7 @@ from functools import reduce
 
 import networkx as nx
 
-from .. import game, settings, tessellation, utilities
+from .. import settings, tessellation, utilities
 from .board_cell import BoardCell, BoardConversionError
 from .graph import BoardGraph
 
@@ -38,10 +38,8 @@ class VariantBoard(Container, tessellation.Tessellated, ABC):
     """
 
     @classmethod
-    def instance_from(
-        cls, board_width=0, board_height=0, variant=game.Variant.SOKOBAN,
-        board_str=""
-    ):
+    def instance_from(cls, variant, board_width=0, board_height=0, board_str=""):
+        from .. import game
         from .hexoban_board import HexobanBoard
         from .octoban_board import OctobanBoard
         from .sokoban_board import SokobanBoard
@@ -55,10 +53,7 @@ class VariantBoard(Container, tessellation.Tessellated, ABC):
 
         raise game.UnknownVariantError(variant)
 
-    def __init__(
-        self, board_width=0, board_height=0, variant=game.Variant.SOKOBAN,
-        board_str=""
-    ):
+    def __init__(self, variant, board_width=0, board_height=0, board_str=""):
         super().__init__(variant)
         self._graph = None
         self._width = 0

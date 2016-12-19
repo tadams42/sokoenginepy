@@ -1,4 +1,4 @@
-from .. import game, settings, tessellation, utilities
+from .. import settings, tessellation, utilities
 from .board_cell import BoardCell, BoardConversionError
 from .sokoban_board import SokobanBoard
 from .variant_board import VariantBoard, VariantBoardResizer
@@ -8,10 +8,11 @@ class HexobanBoard(VariantBoard):
     """Implements :class:`.VariantBoard` for Hexoban variant."""
 
     def __init__(self, board_width=0, board_height=0, board_str=""):
+        from .. import game
         super().__init__(
+            variant=game.Variant.HEXOBAN,
             board_width=board_width,
             board_height=board_height,
-            variant=game.Variant.HEXOBAN,
             board_str=board_str
         )
 
