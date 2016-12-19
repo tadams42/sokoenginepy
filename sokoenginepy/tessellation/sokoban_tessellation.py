@@ -1,20 +1,31 @@
-from .. import board, snapshot
+from .. import utilities
 from .direction import Direction, UnknownDirectionError
 from .helpers import COLUMN, ROW, index_1d, on_board_2d
 from .tessellation import Tessellation
 
-_CHR_TO_ATOMIC_MOVE = {
-    snapshot.AtomicMove.Characters.LOWER_L.value: (Direction.LEFT, False),
-    snapshot.AtomicMove.Characters.UPPER_L.value: (Direction.LEFT, True),
-    snapshot.AtomicMove.Characters.LOWER_R.value: (Direction.RIGHT, False),
-    snapshot.AtomicMove.Characters.UPPER_R.value: (Direction.RIGHT, True),
-    snapshot.AtomicMove.Characters.LOWER_U.value: (Direction.UP, False),
-    snapshot.AtomicMove.Characters.UPPER_U.value: (Direction.UP, True),
-    snapshot.AtomicMove.Characters.LOWER_D.value: (Direction.DOWN, False),
-    snapshot.AtomicMove.Characters.UPPER_D.value: (Direction.DOWN, True),
-}
+_GLOBALS = {}
 
-_ATOMIC_MOVE_TO_CHR = dict((v, k) for k, v in _CHR_TO_ATOMIC_MOVE.items())
+
+def _init_module():
+    """
+    Avoiding circular dependnecies by not importing :mod:`.board` and
+    :mod:`.snapshot` untill they are needed
+    """
+    from .. import board, snapshot
+    _GLOBALS['graph_type'] = board.GraphType.DIRECTED
+    _GLOBALS['chr_to_atomic_move'] =  {
+        snapshot.AtomicMove.Characters.LOWER_L.value: (Direction.LEFT, False),
+        snapshot.AtomicMove.Characters.UPPER_L.value: (Direction.LEFT, True),
+        snapshot.AtomicMove.Characters.LOWER_R.value: (Direction.RIGHT, False),
+        snapshot.AtomicMove.Characters.UPPER_R.value: (Direction.RIGHT, True),
+        snapshot.AtomicMove.Characters.LOWER_U.value: (Direction.UP, False),
+        snapshot.AtomicMove.Characters.UPPER_U.value: (Direction.UP, True),
+        snapshot.AtomicMove.Characters.LOWER_D.value: (Direction.DOWN, False),
+        snapshot.AtomicMove.Characters.UPPER_D.value: (Direction.DOWN, True),
+    }
+    _GLOBALS['atomic_move_to_chr'] = utilities.inverted(
+        _GLOBALS['chr_to_atomic_move']
+    )
 
 
 class SokobanTessellation(Tessellation):
@@ -30,7 +41,9 @@ class SokobanTessellation(Tessellation):
 
     @property
     def graph_type(self):
-        return board.GraphType.DIRECTED
+        if not _GLOBALS:
+            _init_module()
+        return _GLOBALS['graph_type']
 
     _NEIGHBOR_SHIFT = {
         Direction.LEFT: (0, -1),
@@ -62,8 +75,12 @@ class SokobanTessellation(Tessellation):
 
     @property
     def _char_to_atomic_move_dict(self):
-        return _CHR_TO_ATOMIC_MOVE
+        if not _GLOBALS:
+            _init_module()
+        return _GLOBALS['chr_to_atomic_move']
 
     @property
     def _atomic_move_to_char_dict(self):
-        return _ATOMIC_MOVE_TO_CHR
+        if not _GLOBALS:
+            _init_module()
+        return _GLOBALS['atomic_move_to_chr']

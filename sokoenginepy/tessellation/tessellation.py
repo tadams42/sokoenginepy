@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-from .. import game, snapshot
 from .cell_orientation import CellOrientation
 from .direction import UnknownDirectionError
 
@@ -11,7 +10,8 @@ class Tessellation(ABC):
     """Base class for all variant tessellation implementations."""
 
     @classmethod
-    def instance_for(cls, variant=game.Variant.SOKOBAN):
+    def instance_for(cls, variant):
+        from .. import game
         from .hexoban_tessellation import HexobanTessellation
         from .octoban_tessellation import OctobanTessellation
         from .sokoban_tessellation import SokobanTessellation
@@ -69,6 +69,7 @@ class Tessellation(ABC):
         Converts string to :class:`.AtomicMove` instance or raises
         :exc:`.UnknownDirectionError` if conversion not possible.
         """
+        from .. import snapshot
         if isinstance(input_chr, snapshot.AtomicMove.Characters):
             input_chr = input_chr.value
 

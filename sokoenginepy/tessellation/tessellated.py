@@ -1,4 +1,3 @@
-from .. import game
 from .tessellation import Tessellation
 
 
@@ -14,6 +13,7 @@ class Tessellated:
         variant - either case insensitive  string naming tessellation
         (ie. "hexoban") or one of :class:`.Variant` members
         """
+        from .. import game
         self._variant_instance = game.Variant.instance_from(variant)
         self._tessellation_instance = Tessellation.instance_for(variant)
 
