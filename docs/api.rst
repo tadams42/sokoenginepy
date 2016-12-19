@@ -10,3 +10,4 @@ API reference
     _api/sokoenginepy.snapshot
     _api/sokoenginepy.tessellation
     _api/sokoenginepy.utilities
+    _api/sokoenginepy.settings

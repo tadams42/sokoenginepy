@@ -92,6 +92,9 @@ class AtomicMove:
             self.is_jump == rv.is_jump
         )
 
+    def __ne__(self, rv):
+        return not self == rv
+
     @property
     def moved_box_id(self):
         """If pusher performed push/pull, this is ID of box that was moved.

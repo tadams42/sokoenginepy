@@ -2,7 +2,7 @@ from .. import utilities
 from .cell_orientation import CellOrientation
 from .direction import Direction, UnknownDirectionError
 from .helpers import COLUMN, ROW, index_1d, on_board_2d
-from .tessellation import Tessellation
+from .tessellation_base import TessellationBase
 
 _GLOBALS = {}
 
@@ -37,9 +37,7 @@ def _init_module():
     )
 
 
-class OctobanTessellation(Tessellation):
-    """Implements :class:`.Tessellation` for Octoban variant."""
-
+class OctobanTessellation(TessellationBase):
     _LEGAL_DIRECTIONS = (
         Direction.LEFT,
         Direction.RIGHT,
@@ -121,3 +119,6 @@ class OctobanTessellation(Tessellation):
             CellOrientation.OCTAGON
             if (column + (row % 2)) % 2 == 0 else CellOrientation.DEFAULT
         )
+
+    def __str__(self):
+        return "octoban"

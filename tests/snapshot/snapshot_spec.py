@@ -5,13 +5,14 @@ import pytest
 from factories import SnapshotFactory
 from sokoenginepy import (AtomicMove, Direction, Snapshot,
                           SnapshotConversionError, SokoengineError,
-                          SolvingMode, Variant)
+                          SolvingMode, Tessellation)
 
 
 @pytest.fixture
 def forward_sokoban_snapshot():
     return SnapshotFactory(
-        variant=Variant.SOKOBAN, moves_data="lurdLURD{lurd}LURD"
+        tessellation_or_description=Tessellation.SOKOBAN,
+        moves_data="lurdLURD{lurd}LURD"
     )
 
 
@@ -33,7 +34,8 @@ def pusher_selections_count():
 @pytest.fixture
 def reverse_sokoban_snapshot():
     return SnapshotFactory(
-        variant=Variant.SOKOBAN, moves_data="lurdLURD{lurd}[lurd]LURD"
+        tessellation_or_description=Tessellation.SOKOBAN,
+        moves_data="lurdLURD{lurd}[lurd]LURD"
     )
 
 
@@ -45,7 +47,8 @@ def jumps_count():
 @pytest.fixture
 def sokoban_snapshot():
     return SnapshotFactory(
-        variant=Variant.SOKOBAN, moves_data="lurdLURD{lurd}LURD"
+        tessellation_or_description=Tessellation.SOKOBAN,
+        moves_data="lurdLURD{lurd}LURD"
     )
 
 
@@ -67,7 +70,8 @@ class DescribeGameSnapshot:
 
         def it_creates_empty_snapshot_by_default(self):
             snapshot = Snapshot(
-                variant=Variant.SOKOBAN, solving_mode=SolvingMode.FORWARD
+                tessellation_or_description=Tessellation.SOKOBAN,
+                solving_mode=SolvingMode.FORWARD
             )
             assert len(snapshot) == 0
             assert snapshot.moves_count == 0
@@ -76,11 +80,11 @@ class DescribeGameSnapshot:
 
         def it_ignores_solving_mode_arg_if_moves_data_is_provided(self):
             assert Snapshot(
-                variant=Variant.SOKOBAN, solving_mode=SolvingMode.FORWARD,
+                tessellation_or_description=Tessellation.SOKOBAN,
                 moves_data="[lurd]"
             ).solving_mode == SolvingMode.REVERSE
             assert Snapshot(
-                variant=Variant.SOKOBAN, solving_mode=SolvingMode.REVERSE,
+                tessellation_or_description=Tessellation.SOKOBAN,
                 moves_data="lurd"
             ).solving_mode == SolvingMode.FORWARD
 

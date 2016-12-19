@@ -1,7 +1,7 @@
 from .. import utilities
 from .direction import Direction, UnknownDirectionError
 from .helpers import COLUMN, ROW, index_1d, on_board_2d
-from .tessellation import Tessellation
+from .tessellation_base import TessellationBase
 
 _GLOBALS = {}
 
@@ -28,9 +28,7 @@ def _init_module():
     )
 
 
-class SokobanTessellation(Tessellation):
-    """Implements :class:`.Tessellation` for Sokoban variant."""
-
+class SokobanTessellation(TessellationBase):
     _LEGAL_DIRECTIONS = (
         Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN
     )
@@ -84,3 +82,6 @@ class SokobanTessellation(Tessellation):
         if not _GLOBALS:
             _init_module()
         return _GLOBALS['atomic_move_to_chr']
+
+    def __str__(self):
+        return "sokoban"

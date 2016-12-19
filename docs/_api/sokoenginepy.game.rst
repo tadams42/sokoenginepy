@@ -13,7 +13,3 @@ game
     :members:
     :undoc-members:
     :exclude-members: MoveWorkerOptions
-
-.. automodule:: sokoenginepy.game.variant
-    :members:
-    :undoc-members:

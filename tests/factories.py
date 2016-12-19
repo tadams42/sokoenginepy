@@ -5,11 +5,10 @@ from helpers import fake
 from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, BoardCell, BoardState,
                           Direction, HashedBoardState, Mover, Snapshot,
                           SokobanBoard, SokobanPlus, SolvingMode, Tessellation,
-                          Variant, index_1d)
+                          index_1d)
 
 
 class AtomicMoveFactory(factory.Factory):
-
     class Meta:
         model = AtomicMove
 
@@ -41,7 +40,6 @@ def atomic_pusher_selection():
 
 
 class BoardCellFactory(factory.Factory):
-
     class Meta:
         model = BoardCell
 
@@ -56,12 +54,11 @@ def board_cell():
 
 
 class SnapshotFactory(factory.Factory):
-
     class Meta:
         model = Snapshot
 
-    variant = factory.LazyAttribute(
-        lambda x: fake.random_element(list(Variant))
+    tessellation_or_description = factory.LazyAttribute(
+        lambda x: fake.random_element(list(Tessellation))
     )
     solving_mode = factory.LazyAttribute(
         lambda x: fake.random_element(list(SolvingMode))
@@ -75,7 +72,6 @@ def game_snapshot():
 
 
 class SokobanPlusFactory(factory.Factory):
-
     class Meta:
         model = SokobanPlus
 
@@ -127,11 +123,11 @@ def board_graph(variant_board):
 
 @pytest.fixture
 def sokoban_tessellation():
-    return Tessellation.instance_for('sokoban')
+    return Tessellation.SOKOBAN.value
 
 @pytest.fixture
 def trioban_tessellation():
-    return Tessellation.instance_for('trioban')
+    return Tessellation.TRIOBAN.value
 
 @pytest.fixture
 def board_state(variant_board):

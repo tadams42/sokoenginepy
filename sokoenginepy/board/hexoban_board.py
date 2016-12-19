@@ -5,12 +5,9 @@ from .variant_board import VariantBoard, VariantBoardResizer
 
 
 class HexobanBoard(VariantBoard):
-    """Implements :class:`.VariantBoard` for Hexoban variant."""
-
     def __init__(self, board_width=0, board_height=0, board_str=""):
-        from .. import game
         super().__init__(
-            variant=game.Variant.HEXOBAN,
+            tessellation_or_description=tessellation.Tessellation.HEXOBAN,
             board_width=board_width,
             board_height=board_height,
             board_str=board_str

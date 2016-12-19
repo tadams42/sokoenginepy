@@ -1,6 +1,6 @@
 import os
 
-from .. import game
+from .. import tessellation
 from .sok_file_format import SOKFileFormat
 
 
@@ -32,21 +32,21 @@ class PuzzlesCollection:
         for puzzle in self.puzzles:
             puzzle.reformat()
 
-    def _extenstion_to_variant_hint(self, path):
+    def _extenstion_to_tessellation_hint(self, path):
         file_name, file_extension = os.path.splitext(path)
         if (file_extension == '.sok' or file_extension == '.txt' or file_extension == '.xsb'):
-            return game.Variant.SOKOBAN
+            return tessellation.Tessellation.SOKOBAN
         elif file_extension == '.tsb':
-            return game.Variant.TRIOBAN
+            return tessellation.Tessellation.TRIOBAN
         elif file_extension == '.hsb':
-            return game.Variant.HEXOBAN
+            return tessellation.Tessellation.HEXOBAN
 
-        return game.Variant.SOKOBAN
+        return tessellation.Tessellation.SOKOBAN
 
     def load(self, path):
         with open(path, 'r') as src_file:
             SOKFileFormat.read(
-                src_file, self, self._extenstion_to_variant_hint(path)
+                src_file, self, self._extenstion_to_tessellation_hint(path)
             )
 
         for i in range(0, len(self.puzzles)):

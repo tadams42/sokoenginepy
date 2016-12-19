@@ -15,7 +15,7 @@ _re_board_string = re.compile(
 )
 
 
-class VariantBoard(Container, tessellation.Tessellated, ABC):
+class VariantBoard(Container, ABC):
     """Base board class for variant specific implementations.
 
     Internally it is stored as directed graph structure.
@@ -31,30 +31,44 @@ class VariantBoard(Container, tessellation.Tessellated, ABC):
     into vertex index, use :func:`.index_1d`
 
     Args:
+        tessellation_or_description (Tessellation): game tessellation or string describing it
         board_width (int): number of columns
         board_height (int): number of rows
-        variant (Variant): game variant
         board_str (string): textual representation of board
     """
 
     @classmethod
-    def instance_from(cls, variant, board_width=0, board_height=0, board_str=""):
-        from .. import game
+    def instance_from(
+        cls, tessellation_or_description, board_width=0, board_height=0,
+        board_str=""
+    ):
         from .hexoban_board import HexobanBoard
         from .octoban_board import OctobanBoard
         from .sokoban_board import SokobanBoard
         from .trioban_board import TriobanBoard
 
-        variant = game.Variant.instance_from(variant)
+        tessellation_instance = tessellation.Tessellation.instance_from(
+            tessellation_or_description
+        )
 
         for klass in VariantBoard.__subclasses__():
-            if variant.name.lower() in klass.__name__.lower():
-                return klass(board_width, board_height, board_str)
+            if tessellation_instance.name.lower() in klass.__name__.lower():
+                return klass(
+                    board_width=board_width,
+                    board_height=board_height,
+                    board_str=board_str
+                )
 
-        raise game.UnknownVariantError(variant)
+        raise tessellation.UnknownTessellationError(tessellation)
 
-    def __init__(self, variant, board_width=0, board_height=0, board_str=""):
-        super().__init__(variant)
+    def __init__(
+        self, tessellation_or_description, board_width=0, board_height=0,
+        board_str=""
+    ):
+        super().__init__()
+        self._tessellation_instance = tessellation.Tessellation.instance_from(
+            tessellation_or_description
+        ).value
         self._graph = None
         self._width = 0
         self._height = 0
@@ -64,6 +78,10 @@ class VariantBoard(Container, tessellation.Tessellated, ABC):
             self._reinit_with_string(board_str)
         else:
             self._reinit(board_width, board_height)
+
+    @property
+    def tessellation(self):
+        return self._tessellation_instance
 
     @classmethod
     def is_board_string(cls, line):
@@ -130,18 +148,21 @@ class VariantBoard(Container, tessellation.Tessellated, ABC):
                     self._graph[tessellation.index_1d(x, y, self._width)
                                ] = BoardCell(character)
 
-    def __eq__(self, other):
+    def __eq__(self, rv):
         if (
-            self.variant == other.variant and
-            self.width == other.width and
-            self.height == other.height
+            self.tessellation == rv.tessellation and
+            self.width == rv.width and
+            self.height == rv.height
         ):
             for vertex in range(0, self.size):
-                if self[vertex] != other[vertex]:
+                if self[vertex] != rv[vertex]:
                     return False
             return True
         else:
             return False
+
+    def __ne__(self, rv):
+        return not self == rv
 
     @abstractmethod
     def _parse_string(self, board_str):

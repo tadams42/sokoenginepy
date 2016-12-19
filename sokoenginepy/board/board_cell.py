@@ -129,6 +129,9 @@ class BoardCell:
             self.has_goal == rv.has_goal
         )
 
+    def __ne__(self, rv):
+        return not self == rv
+
     def __str__(self):
         return self._str_helper.value
 

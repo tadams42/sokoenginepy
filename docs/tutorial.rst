@@ -4,8 +4,9 @@ Tutorial
 Game board
 ^^^^^^^^^^
 
-For each implemented board tessellation, there is a game board class. Variants
-are enumarated by :class:`.Variant` and board classes are :class:`.SokobanBoard`,
+For each implemented game variant, there is a game board class. Game variants
+differ by board tessellation, and supported tessellations are enumerated in
+:class:`.Tessellation`. We provide following board classes: :class:`.SokobanBoard`,
 :class:`.TriobanBoard`, :class:`.OctobanBoard` and :class:`.HexobanBoard`. All
 implemented boards support having multiple pushers (``Multiban`` game variant).
 
@@ -36,7 +37,7 @@ array indexes which can be retreived fro 2D coordinates using :func:`.index_1d`
 
 .. code-block:: python
 
-    from sokoenginepy import BoardCell, index_1d, BoardCell, Direction
+    from sokoenginepy import BoardCell, index_1d, Direction
 
     position = index_1d(11, 8, board.width)
 
@@ -62,7 +63,7 @@ array indexes which can be retreived fro 2D coordinates using :func:`.index_1d`
     # => 164
 
 Except editing individual cells, all boards also support resizing, path
-searching, etc... For details see :class:`.VariantBoard` or any of subclasses.
+searching, etc...
 
 Board state
 ^^^^^^^^^^^
@@ -77,7 +78,7 @@ mechanics, we can attach instance of :class:`.HashedBoardState` to our board.
     state = HashedBoardState(board)
 
 Now we have efficient means to inspect positions of pushers, boxes and goals.
-To understand how this works, we need to have a way  if identifying individual
+To understand how this works, we need to have a way of identifying individual
 pushers, boxes and goals. :class:`.HashedBoardState` does that by assigning
 ID to individual pieces. This ID can then be used to refer to individual piece.
 
@@ -145,7 +146,7 @@ game mechanics like this:
     forward_mover.move(Direction.UP)
     # try to perform illegal move
     forward_mover.move(Direction.UP)
-    # rises IllegalMoveError
+    # raises IllegalMoveError
 
     # reverse solving mode
     board = SokobanBoard(board_str="""
@@ -189,8 +190,8 @@ game mechanics like this:
 mechanics. It still lacks full game features like recording unlimited undo/redo
 etc... This is by design: :class:`.Mover` is intended to be used by either full
 game implementation or by solvers. It provides minimal memory footprint and
-concentrates on being as fast as possible but sacrifficing reocrding of game
-history.
+concentrates on being as fast as possible but sacrifficing recording of game
+history and maybe few other full game features.
 
 Recording of game history and full game implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -207,7 +208,7 @@ representing boards, snapshots and meta data like author or title.
 These classes are intermediate results of parsing Sokoban files.
 
 This intermediary data is faster to manipulate and less memory hungry than full
-game board an game snapshot. That way it is possible to efficiently and quickly
+game board and game snapshot. That way it is possible to efficiently and quickly
 load, store and manipulate whole puzzle collections in memory. On the other
 hand, :class:`.Puzzle` and :class:`.PuzzleSnapshot` can be easily converted to
 :class:`.VariantBoard` and :class:`.Snapshot` when needed.

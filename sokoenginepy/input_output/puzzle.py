@@ -2,7 +2,8 @@ from functools import reduce
 
 from cached_property import cached_property
 
-from .. import board, game, snapshot
+from .. import tessellation as module_tessellation
+from .. import board, snapshot
 
 
 class Puzzle:
@@ -14,14 +15,14 @@ class Puzzle:
     """
 
     def __init__(
-        self, board="", variant=game.Variant.SOKOBAN, title="", author="",
-        boxorder="", goalorder="", notes="", snapshots=None, created_at="",
-        updated_at=""
+        self, board="", title="", author="", boxorder="", goalorder="",
+        notes="", snapshots=None, created_at="", updated_at="",
+        tessellation_or_description=module_tessellation.Tessellation.SOKOBAN
     ):
-        self._variant = None
+        self._tessellation = None
+        self.tessellation = tessellation_or_description
         self.pid = 1
         self._board = board
-        self.variant = variant
         self.title = title
         self.author = author
         self.boxorder = boxorder
@@ -32,12 +33,14 @@ class Puzzle:
         self.updated_at = updated_at
 
     @property
-    def variant(self):
-        return self._variant
+    def tessellation(self):
+        return self._tessellation
 
-    @variant.setter
-    def variant(self, value):
-        self._variant = game.Variant.instance_from(value)
+    @tessellation.setter
+    def tessellation(self, tessellation_or_description):
+        self._tessellation = module_tessellation.Tessellation.instance_from(
+            tessellation_or_description
+        ).value
 
     @property
     def board(self):
@@ -55,7 +58,7 @@ class Puzzle:
 
     def clear(self):
         self.board = ""
-        self.variant = game.Variant.SOKOBAN
+        self.variant = tessellation.Tessellation.SOKOBAN.value
         self.title = ""
         self.author = ""
         self.boxorder = ""
@@ -71,10 +74,10 @@ class Puzzle:
             snapshot.reformat()
 
     def to_game_board(self):
-        # TODO Convert to board.VariantBoard, but add boxorder and goalorder attrs to
+        # TODO Convert to board.VariantBoard, but add boxorder and goalorder attrs
         # to variant board boefore we can do it
         # from ..game import GameBoard
-        # retv = GameBoard(board_str=self.board, variant=self.variant)
+        # retv = GameBoard(board_str=self.board, tessellation=self.tessellation)
         # retv.sokoban_plus = (self.boxorder, self.goalorder)
         # return retv
         pass
@@ -111,9 +114,11 @@ class PuzzleSnapshot:
 
     def __init__(
         self, moves="", title="", duration=None, solver="", notes="",
-        created_at="", updated_at="", variant=game.Variant.SOKOBAN
+        created_at="", updated_at="",
+        tessellation_or_description=module_tessellation.Tessellation.SOKOBAN
     ):
-        self._variant = None
+        self._tessellation = None
+        self.tessellation = tessellation_or_description
         self.pid = 1
         self._moves = moves
         self.title = title
@@ -122,15 +127,16 @@ class PuzzleSnapshot:
         self.notes = notes
         self.created_at = created_at
         self.updated_at = updated_at
-        self.variant = variant
 
     @property
-    def variant(self):
-        return self._variant
+    def tessellation(self):
+        return self._tessellation
 
-    @variant.setter
-    def variant(self, value):
-        self._variant = game.Variant.instance_from(value)
+    @tessellation.setter
+    def tessellation(self, tessellation_or_description):
+        self._tessellation = module_tessellation.Tessellation.instance_from(
+            tessellation_or_description
+        ).value
 
     @property
     def moves(self):
@@ -147,20 +153,12 @@ class PuzzleSnapshot:
             del self.__dict__['is_reverse']
 
     def to_game_snapshot(self):
-        return snapshot.Snapshot(variant=self.variant, moves_data=self.moves)
+        return snapshot.Snapshot(
+            tessellation_or_description=self.tessellation, moves_data=self.moves
+        )
 
     def reformat(self):
         self.moves = str(self.to_game_snapshot())
-
-    def clear(self):
-        self.moves = ""
-        self.title = ""
-        self.duration = None
-        self.solver = ""
-        self.notes = ""
-        self.created_at = ""
-        self.updated_at = ""
-        self.variant = game.Variant.SOKOBAN
 
     @cached_property
     def pushes_count(self):

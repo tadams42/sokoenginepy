@@ -11,11 +11,12 @@ class SnapshotConversionError(utilities.SokoengineError):
     pass
 
 
-class Snapshot(MutableSequence, tessellation.Tessellated):
+class Snapshot(MutableSequence):
     """Sequence of AtomicMove representing snapshot of game.
 
     Args:
-        variant (Variant): game variant
+        tessellation (Tessellation): game tessellation as string or
+            :class:`.Tessellation` instance
         solving_mode (SolvingMode): game solving mode
         moves_data (string): Strings consisting of characters representing
             :class:`.AtomicMove`. If not empty it will be parsed. Also, if not
@@ -34,8 +35,13 @@ class Snapshot(MutableSequence, tessellation.Tessellated):
         PUSHER_CHANGE_END = '}'
         CURRENT_POSITION_CH = '*'
 
-    def __init__(self, variant, solving_mode, moves_data=""):
-        super().__init__(variant)
+    def __init__(
+        self, tessellation_or_description, solving_mode=None, moves_data=""
+    ):
+        super().__init__()
+        self._tessellation_instance = tessellation.Tessellation.instance_from(
+            tessellation_or_description
+        ).value
         self._solving_mode = None
         self._moves_count = 0
         self._pushes_count = 0
@@ -48,6 +54,15 @@ class Snapshot(MutableSequence, tessellation.Tessellated):
             SnapshotStringParser().convert_from_string(moves_data, self)
         else:
             self._solving_mode = solving_mode
+
+        if self._solving_mode is None:
+            raise utilities.SokoengineError(
+                "Snapshot not correctly initialized! Missing solving_mode. " +
+                "Either provide it explcitly or provide moves_data." +
+                "tessellation_or_description: {0}, solving_mode: {1}, ".format(
+                    tessellation_or_description, solving_mode
+                ) + "moves_data: {0}".format(moves_data)
+            )
 
     @classmethod
     def is_snapshot_string(cls, line):
@@ -67,6 +82,10 @@ class Snapshot(MutableSequence, tessellation.Tessellated):
         from .snapshot_string_parser import SnapshotStringParser
         return SnapshotStringParser.is_snapshot_string(line)
 
+    @property
+    def tessellation(self):
+        return self._tessellation_instance
+
     # Iterable
     def __iter__(self):
         return self._moves.__iter__()
@@ -84,7 +103,8 @@ class Snapshot(MutableSequence, tessellation.Tessellated):
         retv = self._moves.__getitem__(index)
         if isinstance(retv, self._moves.__class__):
             snapshot = Snapshot(
-                variant=self.variant, solving_mode=self.solving_mode
+                tessellation_or_description=self.tessellation,
+                solving_mode=self.solving_mode
             )
             for atomic_move in retv:
                 snapshot.append(atomic_move)
@@ -123,13 +143,13 @@ class Snapshot(MutableSequence, tessellation.Tessellated):
         self._moves.insert(index, atomic_move)
 
     def __repr__(self):
-        return "Snapshot(variant={0}, solving_mode={1}, moves_data={2})".format(
-            repr(self.variant), self.solving_mode, str(self)
+        return "Snapshot(tessellation={0}, solving_mode={1}, moves_data={2})".format(
+            repr(self.tessellation), self.solving_mode, str(self)
         )
 
     def __eq__(self, rv):
         return (
-            self.variant == rv.variant and
+            self.tessellation == rv.tessellation and
             len(self._moves) == len(rv._moves) and
             self.solving_mode == rv.solving_mode and
             self.moves_count == rv.moves_count and
@@ -137,6 +157,9 @@ class Snapshot(MutableSequence, tessellation.Tessellated):
             self.jumps_count == rv.jumps_count and
             self._moves == rv._moves
         )
+
+    def __ne__(self, rv):
+        return not self == rv
 
     @property
     def solving_mode(self):
@@ -193,7 +216,7 @@ class Snapshot(MutableSequence, tessellation.Tessellated):
 
         if atomic_move.direction not in self.tessellation.legal_directions:
             raise tessellation.UnknownDirectionError(
-                "Invalid direction for tessellation {0}".format(self.variant)
+                "Invalid direction for tessellation {0}".format(self.tessellation)
             )
 
         if not atomic_move.is_pusher_selection:

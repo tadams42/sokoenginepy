@@ -36,4 +36,4 @@ class DescribeHexobanTessellation(
         'l', 'r', 'u', 'n', 's', 'd', 'L', 'R', 'U', 'N', 'S', 'D'
     ]
 
-    tessellation = Tessellation.instance_for('Hexoban')
+    tessellation = Tessellation.instance_from('Hexoban').value

@@ -36,4 +36,4 @@ class DescribeTriobanTessellation(
         'l', 'r', 'u', 'n', 's', 'd', 'L', 'R', 'U', 'N', 'S', 'D'
     ]
 
-    tessellation = Tessellation.instance_for('Trioban')
+    tessellation = Tessellation.instance_from('Trioban').value

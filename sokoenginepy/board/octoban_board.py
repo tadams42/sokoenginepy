@@ -1,13 +1,11 @@
+from .. import tessellation
 from .variant_board import VariantBoard, VariantBoardResizer
 
 
 class OctobanBoard(VariantBoard):
-    """Implements :class:`.VariantBoard` for Octoban variant."""
-
     def __init__(self, board_width=0, board_height=0, board_str=""):
-        from .. import game
         super().__init__(
-            variant=game.Variant.OCTOBAN,
+            tessellation_or_description=tessellation.Tessellation.OCTOBAN,
             board_width=board_width,
             board_height=board_height,
             board_str=board_str

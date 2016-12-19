@@ -2,7 +2,7 @@ from .. import utilities
 from .cell_orientation import CellOrientation
 from .direction import Direction, UnknownDirectionError
 from .helpers import COLUMN, ROW, index_1d, on_board_2d
-from .tessellation import Tessellation
+from .tessellation_base import TessellationBase
 
 _GLOBALS = {}
 
@@ -33,9 +33,7 @@ def _init_module():
     )
 
 
-class TriobanTessellation(Tessellation):
-    """Implements :class:`.Tessellation` for Trioban variant. """
-
+class TriobanTessellation(TessellationBase):
     _LEGAL_DIRECTIONS = (
         Direction.LEFT, Direction.RIGHT, Direction.NORTH_EAST,
         Direction.NORTH_WEST, Direction.SOUTH_EAST, Direction.SOUTH_WEST
@@ -127,3 +125,6 @@ class TriobanTessellation(Tessellation):
             CellOrientation.TRIANGLE_DOWN
             if (column + (row % 2)) % 2 == 0 else CellOrientation.DEFAULT
         )
+
+    def __str__(self):
+        return "trioban"

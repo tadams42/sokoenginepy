@@ -1,7 +1,7 @@
 import os
 
 from helpers import TEST_RESOURCES_ROOT
-from sokoenginepy import PuzzlesCollection, SOKFileFormat, Variant
+from sokoenginepy import PuzzlesCollection, SOKFileFormat, Tessellation
 from sokoenginepy.utilities import is_blank
 
 INPUT_FILES_ROOT = os.path.join(TEST_RESOURCES_ROOT, 'test_data')
@@ -65,28 +65,28 @@ class DescribeSOKReader:
                 SOKFileFormat.read(t, collection, None)
 
             for puzzle in collection.puzzles:
-                assert puzzle.variant == Variant.SOKOBAN
+                assert puzzle.tessellation == Tessellation.SOKOBAN.value
 
         def it_uses_value_from_colection_notes_even_if_hint_given(self):
             collection = PuzzlesCollection()
             with open(
                 os.path.join(INPUT_FILES_ROOT, 'parser_test_variant_type_specified_global.sok')
             ) as t:
-                SOKFileFormat.read(t, collection, Variant.OCTOBAN)
+                SOKFileFormat.read(t, collection, Tessellation.OCTOBAN)
 
             for puzzle in collection.puzzles:
-                assert puzzle.variant == Variant.TRIOBAN
+                assert puzzle.tessellation == Tessellation.TRIOBAN.value
 
         def it_snapshots_get_the_same_value_as_their_puzzle(self):
             collection = PuzzlesCollection()
             with open(
                 os.path.join(INPUT_FILES_ROOT, 'parser_test_variant_type_specified_global.sok')
             ) as t:
-                SOKFileFormat.read(t, collection, Variant.OCTOBAN)
+                SOKFileFormat.read(t, collection, Tessellation.OCTOBAN)
 
             for puzzle in collection.puzzles:
                 for snapshot in puzzle.snapshots:
-                    assert snapshot.variant == puzzle.variant
+                    assert snapshot.tessellation == puzzle.tessellation
 
         def it_uses_value_from_puzzle_notes_and_ignores_hint_and_collection_notes(
             self
@@ -95,17 +95,17 @@ class DescribeSOKReader:
             with open(
                 os.path.join(INPUT_FILES_ROOT, 'parser_test_variant_type_specified_puzzle1.sok')
             ) as t:
-                SOKFileFormat.read(t, collection, Variant.OCTOBAN)
+                SOKFileFormat.read(t, collection, Tessellation.OCTOBAN)
 
-            assert collection.puzzles[0].variant == Variant.SOKOBAN
-            assert collection.puzzles[1].variant == Variant.HEXOBAN
+            assert collection.puzzles[0].tessellation == Tessellation.SOKOBAN.value
+            assert collection.puzzles[1].tessellation == Tessellation.HEXOBAN.value
 
         def it_uses_value_from_hint_when_nothing_is_specified_in_file(self):
             collection = PuzzlesCollection()
             with open(
                 os.path.join(INPUT_FILES_ROOT, 'parser_test_variant_type_specified_puzzle2.sok')
             ) as t:
-                SOKFileFormat.read(t, collection, Variant.TRIOBAN)
+                SOKFileFormat.read(t, collection, Tessellation.TRIOBAN)
 
-            assert collection.puzzles[0].variant == Variant.TRIOBAN
-            assert collection.puzzles[1].variant == Variant.HEXOBAN
+            assert collection.puzzles[0].tessellation == Tessellation.TRIOBAN.value
+            assert collection.puzzles[1].tessellation == Tessellation.HEXOBAN.value

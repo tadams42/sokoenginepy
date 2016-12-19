@@ -30,4 +30,4 @@ class DescribeSokobanTessellation(
 
     legal_characters = ['l', 'r', 'u', 'd', 'L', 'R', 'U', 'D']
 
-    tessellation = Tessellation.instance_for('Sokoban')
+    tessellation = Tessellation.instance_from('Sokoban').value

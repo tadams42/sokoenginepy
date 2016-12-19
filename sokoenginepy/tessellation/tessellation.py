@@ -1,111 +1,116 @@
-from abc import ABC, abstractmethod
+from enum import Enum
 
-from .cell_orientation import CellOrientation
-from .direction import UnknownDirectionError
+from .. import utilities
+from .hexoban_tessellation import HexobanTessellation
+from .octoban_tessellation import OctobanTessellation
+from .sokoban_tessellation import SokobanTessellation
+from .tessellation_base import TessellationBase
+from .trioban_tessellation import TriobanTessellation
 
-_TESSELLATIONS = dict()
+
+class UnknownTessellationError(utilities.SokoengineError):
+    pass
 
 
-class Tessellation(ABC):
-    """Base class for all variant tessellation implementations."""
+class Tessellation(Enum):
+    """Implemented tessellation types."""
+
+    #: Board is laid out on squares. Direction <-> character mapping
+    #:
+    #: ====  =====  ====  ====
+    #: LEFT  RIGHT  UP    DOWN
+    #: ====  =====  ====  ====
+    #: l, L  r, R   u, U  d, D
+    #: ====  =====  ====  ====
+    SOKOBAN = SokobanTessellation()
+
+    #: Board is laid out on alternating triangles with origin triangle poiting
+    #: down. Direction <-> character mapping
+    #:
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #: LEFT  RIGHT  NORTH_EAST  NORTH_WEST  SOUTH_EAST  SOUTH_WEST
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #: l, L  r, R   n, N        u, U        d, D        s, S
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #:
+    #: Depending on current pusher position, some moves are not allowed:
+    #:
+    #: .. image:: /images/trioban_am.png
+    #:     :alt: Trioban movement
+    TRIOBAN = TriobanTessellation()
+
+    #: Board space is laid out on vertical hexagons with following coordinate
+    #: system:
+    #:
+    #: .. image:: /images/hexoban_coordinates.png
+    #:     :alt: Hexoban coordinates
+    #:
+    #: Textual representation uses two characters for each hexagon. This allows
+    #: different encoding schemes.
+    #:
+    #: +----------------------------------------+---------------------------------------------+
+    #: | Scheme 1                               | Scheme 2                                    |
+    #: +========================================+=============================================+
+    #: | .. image:: /images/hexoban_scheme1.png | .. image:: /images/hexoban_scheme2.png      |
+    #: |     :alt: Scheme 1                     |     :alt: Scheme 2                          |
+    #: +----------------------------------------+---------------------------------------------+
+    #:
+    #: As long as encoding of single board is consistent, all methods handle any
+    #: scheme transparently - parsing of board strings 'Just Works (TM)'
+    #:
+    #: Direction <-> character mapping:
+    #:
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #: LEFT  RIGHT  NORTH_WEST  SOUTH_WEST  NORTH_EAST  SOUTH_EAST
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #: l, L  r, R   u, U        d, D        n, N        s, S
+    #: ====  =====  ==========  ==========  ==========  ==========
+    HEXOBAN = HexobanTessellation()
+
+    #: Board space is laid out on alternating squares and octagons with
+    #: origin of coordinate system being octagon. Tessellation allows all
+    #: 8 directions of movement from Direction and depending on current
+    #: pusher position some of these directions do not result in successful
+    #: move.
+    #:
+    #: Direction <-> character mapping:
+    #:
+    #: ====  ==========  =====  ==========  ====  ==========  ====  ==========
+    #: UP    NORTH_EAST  RIGHT  SOUTH_EAST  DOWN  SOUTH_WEST  LEFT  NORTH_WEST
+    #: ====  ==========  =====  ==========  ====  ==========  ====  ==========
+    #: u, U  n, N        r, R   e, E        d, D  s, S        l, L  w, W
+    #: ====  ==========  =====  ==========  ====  ==========  ====  ==========
+    OCTOBAN = OctobanTessellation()
+
+    def __str__(self):
+        return self.name.title()
+
+    def __repr__(self):
+        return "Tessellation." + self.name
 
     @classmethod
-    def instance_for(cls, variant):
-        from .. import game
-        from .hexoban_tessellation import HexobanTessellation
-        from .octoban_tessellation import OctobanTessellation
-        from .sokoban_tessellation import SokobanTessellation
-        from .trioban_tessellation import TriobanTessellation
-
-        variant = game.Variant.instance_from(variant)
-
-        for klass in cls.__subclasses__():
-            if variant.name.lower() in klass.__name__.lower():
-                if variant not in _TESSELLATIONS.keys():
-                    _TESSELLATIONS[variant] = klass()
-                return _TESSELLATIONS[variant]
-
-        raise game.UnknownVariantError(variant)
-
-    @property
-    @abstractmethod
-    def legal_directions(self):
-        """Directions generally accepted by Tessellation.
-
-        Returns:
-            list: of :class:`.Direction`
-        """
-        pass
-
-    @abstractmethod
-    def neighbor_position(self, position, direction, board_width, board_height):
-        """Calculates neighbor position in given direction and verifies calculated position.
-
-        Returns:
-            int: If resulting position is off-board returns None, otherwise position
-
-        Raises:
-            :exc:`.UnknownDirectionError`: in case direction is not one of self.legal_directions
-
-        Position is always expressed as int index of board graph vertex. To
-        convert 2D coordinates into vertex index, use :func:`.index_1d` method
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def _char_to_atomic_move_dict(self):
-        """Dict mapping string to :class:`.AtomicMove` parameters,"""
-        pass
-
-    @property
-    @abstractmethod
-    def graph_type(self):
-        """Type of graph used in given tessellation."""
-        pass
-
-    def char_to_atomic_move(self, input_chr):
-        """
-        Converts string to :class:`.AtomicMove` instance or raises
-        :exc:`.UnknownDirectionError` if conversion not possible.
-        """
-        from .. import snapshot
-        if isinstance(input_chr, snapshot.AtomicMove.Characters):
-            input_chr = input_chr.value
-
-        direction, box_moved = self._char_to_atomic_move_dict.get(
-            input_chr, (None, None)
-        )
-
-        if direction is None:
-            raise UnknownDirectionError(input_chr)
-
-        return snapshot.AtomicMove(direction=direction, box_moved=box_moved)
-
-    @property
-    @abstractmethod
-    def _atomic_move_to_char_dict(self):
-        """Dict mapping :class:`.AtomicMove` parameters to string representation."""
-        pass
-
-    def atomic_move_to_char(self, atomic_move):
-        """
-        Converts :class:`.AtomicMove` to string or raises
-        :exc:`.UnknownDirectionError` if conversion not possible.
-        """
-        retv = self._atomic_move_to_char_dict.get(
-            (atomic_move.direction, atomic_move.is_push_or_pull), None
-        )
-
-        if retv is None:
-            raise UnknownDirectionError(atomic_move)
-
-        return retv
-
-    def cell_orientation(self, position, board_width, board_height):
-        """Calculates board cell orientation for given position.
-
-        Returns:
-            CellOrientation: cell orientation for given ``position``
-        """
-        return CellOrientation.DEFAULT
+    def instance_from(cls, tessellation_or_description):
+        if (
+            not tessellation_or_description or
+            tessellation_or_description == cls.SOKOBAN or
+            'sokoban' in str(tessellation_or_description).lower() or
+            utilities.is_blank(str(tessellation_or_description))
+        ):
+            return cls.SOKOBAN
+        elif (
+            tessellation_or_description == cls.TRIOBAN or
+            'trioban' in str(tessellation_or_description).lower()
+        ):
+            return cls.TRIOBAN
+        elif (
+            tessellation_or_description == cls.HEXOBAN or
+            'hexoban' in str(tessellation_or_description).lower()
+        ):
+            return cls.HEXOBAN
+        elif (
+            tessellation_or_description == cls.OCTOBAN or
+            'octoban' in str(tessellation_or_description).lower()
+        ):
+            return cls.OCTOBAN
+        else:
+            raise UnknownTessellationError(tessellation_or_description)

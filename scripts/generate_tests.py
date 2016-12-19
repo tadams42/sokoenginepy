@@ -74,13 +74,13 @@ class SpecGenerator:
 
 
             def triangle_points_down(position, board_width, board_height):
-                return Tessellation.instance_for('trioban').cell_orientation(
+                return Tessellation.TRIOBAN.value.cell_orientation(
                     position, board_width, board_height
                 ) == CellOrientation.TRIANGLE_DOWN
 
 
             def is_octagon(position, board_width, board_height):
-                return Tessellation.instance_for('octoban').cell_orientation(
+                return Tessellation.OCTOBAN.value.cell_orientation(
                     position, board_width, board_height
                 ) == CellOrientation.OCTAGON
         """
@@ -141,7 +141,7 @@ class SpecGenerator:
 
         if test_case['test_type'] == 'tessellation':
             self.output.append(
-                '            t = Tessellation.instance_for("{0}")'.
+                '            t = Tessellation.instance_from("{0}").value'.
                 format(test_case['variant'])
             )
         else:

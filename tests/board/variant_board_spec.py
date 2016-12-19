@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 
 from sokoenginepy import (OUTPUT_SETTINGS, BoardConversionError, BoardGraph,
-                          Direction, SokobanBoard, TriobanBoard, Variant,
+                          Direction, SokobanBoard, Tessellation, TriobanBoard,
                           VariantBoard, index_1d)
 
 OUTPUT_SETTINGS.use_visible_floors = True
@@ -109,7 +109,7 @@ class DescribeVariantBoard:
             b = TriobanBoard(4, 2)
             assert b.width == 4
             assert b.height == 2
-            assert b.variant == Variant.TRIOBAN
+            assert b.tessellation == Tessellation.TRIOBAN.value
 
         def it_ignores_specified_size_if_string_given_and_parses_string_instead(
             self, board_str, board_str_width, board_str_height
