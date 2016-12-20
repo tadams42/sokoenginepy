@@ -166,7 +166,8 @@ class BoardCell:
 
     def clear(self):
         """Clears cell, converting it to empty floor."""
-        self._is_wall = self._has_box = self._has_goal = self._has_pusher = False
+        self._is_wall = self._has_box = self._has_goal = self._has_pusher = \
+            False
         return self
 
     def switch_box_and_goal(self):

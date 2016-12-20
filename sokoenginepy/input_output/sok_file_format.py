@@ -1,3 +1,4 @@
+import os
 import re
 
 from .. import board, snapshot, tessellation, utilities
@@ -306,11 +307,11 @@ class SOKReader:
     def _parse_puzzles(self):
         for puzzle in self.dest_collection.puzzles:
             remaining_lines = []
-            tessellation = None
+            tess = None
             for line in puzzle.notes:
                 if self._is_puzzle_tag_line(line):
-                    tessellation = (
-                        tessellation or self._get_tag_data(SOKTags.VARIANT, line)
+                    tess = (
+                        tess or self._get_tag_data(SOKTags.VARIANT, line)
                     )
                     puzzle.title = (
                         puzzle.title or self._get_tag_data(SOKTags.TITLE, line)
@@ -332,8 +333,8 @@ class SOKReader:
 
             puzzle.notes = self._cleanup_whitespace(remaining_lines)
 
-            if tessellation is not None:
-                puzzle.tessellation = tessellation
+            if tess is not None:
+                puzzle.tessellation = tess
             elif self.collection_header_tessellation_hint is not None:
                 puzzle.tessellation = self.collection_header_tessellation_hint
             elif self.supplied_tessellation_hint is not None:
@@ -438,7 +439,9 @@ class SOKWriter:
 
     def _write_collection_header(self, puzzle_collection):
         for line in open(
-            utilities.RESOURCES_ROOT.child("SOK_format_specification.txt")
+            os.path.join(
+                utilities.RESOURCES_ROOT, "SOK_format_specification.txt"
+            )
         ):
             self.dest_stream.write(line.rstrip() + "\n")
 

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 from enum import IntEnum
 
-from ... import tessellation
+from ... import tessellation as module_tessellation
 
 
 class GraphType(IntEnum):
@@ -11,7 +11,7 @@ class GraphType(IntEnum):
 
 
 class BoardGraphBase(ABC):
-    MAX_EDGE_WEIGHT = len(tessellation.Direction) + 1
+    MAX_EDGE_WEIGHT = len(module_tessellation.Direction) + 1
     KEY_CELL = 'cell'
     KEY_DIRECTION = 'direction'
 
@@ -68,10 +68,7 @@ class BoardGraphBase(ABC):
         pass
 
     def reachables(
-        self,
-        root,
-        excluded_positions=None,
-        is_obstacle_callable=None,
+        self, root, excluded_positions=None, is_obstacle_callable=None,
         add_animation_frame_hook=None
     ):
         """

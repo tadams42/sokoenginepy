@@ -9,7 +9,7 @@ from .. import settings, tessellation, utilities
 from .board_cell import BoardCell, BoardConversionError
 from .graph import BoardGraph
 
-_re_board_string = re.compile(
+_RE_BOARD_STRING = re.compile(
     r"^([0-9\s" + re.escape("".join(c.value for c in BoardCell.Characters)) +
     re.escape("".join(c.value for c in utilities.RleCharacters)) + "])*$"
 )
@@ -31,7 +31,8 @@ class VariantBoard(Container, ABC):
     into vertex index, use :func:`.index_1d`
 
     Args:
-        tessellation_or_description (Tessellation): game tessellation or string describing it
+        tessellation_or_description (Tessellation): game tessellation or string
+            describing it
         board_width (int): number of columns
         board_height (int): number of rows
         board_str (string): textual representation of board
@@ -85,17 +86,19 @@ class VariantBoard(Container, ABC):
 
     @classmethod
     def is_board_string(cls, line):
-        """Checks if line contains only characters legal in textual representation of boards.
+        """
+        Checks if line contains only characters legal in textual representation
+        of boards.
 
         Note:
-            Doesn't check if it actually contains legal board, it only checks that
-            there are no illegal characters. To find out if line is actual board
-            representation, it must be converted to actual game board.
+            Doesn't check if it actually contains legal board, it only checks
+            that there are no illegal characters. To find out if line is actual
+            board representation, it must be converted to actual game board.
         """
         return (
             not utilities.contains_only_digits_and_spaces(line) and reduce(
                 lambda x, y: x and y, [
-                    True if _re_board_string.match(l) else False
+                    True if _RE_BOARD_STRING.match(l) else False
                     for l in line.splitlines()
                 ], True
             )
@@ -200,7 +203,9 @@ class VariantBoard(Container, ABC):
         return position in self._graph
 
     def __str__(self):
-        """Override this in subclass to handle tessellation speciffic strings."""
+        """
+        Override this in subclass to handle tessellation speciffic strings.
+        """
         rows = []
         for y in range(0, self.height):
             row = "".join(
@@ -286,7 +291,8 @@ class VariantBoard(Container, ABC):
     def mark_play_area(self):
         """
         Returns:
-            list: of positions that are playable (reachable by any box or pusher)
+            list: of positions that are playable (reachable by any box or
+            pusher)
         """
         piece_positions = []
         for vertex in range(0, self.size):
@@ -312,7 +318,8 @@ class VariantBoard(Container, ABC):
     ):
         """
         Returns:
-            list: of positions that are reachable by pusher standing on ``position``
+            list: of positions that are reachable by pusher standing on
+            ``position``
         """
 
         def is_obstacle(position):
@@ -386,7 +393,8 @@ class VariantBoard(Container, ABC):
     def find_move_path(self, start_position, end_position):
         """
         Returns:
-            list: of positions through which pusher must pass when moving without pushing boxes
+            list: of positions through which pusher must pass when moving
+            without pushing boxes
         """
         if start_position not in self:
             raise IndexError('Board index out of range')
@@ -663,8 +671,9 @@ class VariantBoardResizer(ABC):
         for y in range(0, self.board.height):
             border_found = False
             for x in range(0, self.board.width):
-                border_found = self.board[tessellation.index_1d(x, y, self.board.width)
-                                         ].is_border_element
+                border_found = self.board[tessellation.index_1d(
+                    x, y, self.board.width
+                )].is_border_element
                 if border_found:
                     if x < amount:
                         amount = x
@@ -693,8 +702,9 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             border_found = False
             for y in range(0, self.board.height):
-                border_found = self.board[tessellation.index_1d(x, y, self.board.width)
-                                         ].is_border_element
+                border_found = self.board[tessellation.index_1d(
+                    x, y, self.board.width
+                )].is_border_element
                 if border_found:
                     if y < amount:
                         amount = y
@@ -728,7 +738,9 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
                 self.board[tessellation.index_1d(x, y, self.board.width)] = \
-                    old_body[tessellation.index_1d(x, self.board.height - y - 1, self.board.width)]
+                    old_body[tessellation.index_1d(
+                        x, self.board.height - y - 1, self.board.width
+                    )]
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(
@@ -745,7 +757,9 @@ class VariantBoardResizer(ABC):
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
                 self.board[tessellation.index_1d(x, y, self.board.width)] = \
-                    old_body[tessellation.index_1d(self.board.width - x - 1, y, self.board.width)]
+                    old_body[tessellation.index_1d(
+                        self.board.width - x - 1, y, self.board.width
+                    )]
 
         if reconfigure_edges:
             self.board._graph.reconfigure_edges(

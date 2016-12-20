@@ -18,8 +18,6 @@ def should_insert_line_break_at(position):
     """
     For given ``position`` in string, should we insert line break?
     """
-    if (
-        BREAK_LONG_SNAPSHOT_STRINGS and SNAPSHOT_LINE_BREAKS_AT > 0 and position
-    ):
+    if BREAK_LONG_SNAPSHOT_STRINGS and SNAPSHOT_LINE_BREAKS_AT > 0 and position:
         return (position % SNAPSHOT_LINE_BREAKS_AT) == 0
     return False

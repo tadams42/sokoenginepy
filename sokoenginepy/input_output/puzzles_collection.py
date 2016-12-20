@@ -34,7 +34,11 @@ class PuzzlesCollection:
 
     def _extenstion_to_tessellation_hint(self, path):
         file_name, file_extension = os.path.splitext(path)
-        if (file_extension == '.sok' or file_extension == '.txt' or file_extension == '.xsb'):
+        if (
+            file_extension == '.sok' or
+            file_extension == '.txt' or
+            file_extension == '.xsb'
+        ):
             return tessellation.Tessellation.SOKOBAN
         elif file_extension == '.tsb':
             return tessellation.Tessellation.TRIOBAN

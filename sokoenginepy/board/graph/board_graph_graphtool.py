@@ -12,7 +12,7 @@ from graph_tool import Graph
 from graph_tool.topology import shortest_path
 
 from ..board_cell import BoardCell
-from .board_graph_base import BoardGraphBase, GraphType
+from .board_graph_base import BoardGraphBase
 
 
 class BoardGraphGraphtool(BoardGraphBase):
@@ -22,9 +22,10 @@ class BoardGraphGraphtool(BoardGraphBase):
         # Graph tool creates directed multigraph by default.
         self._graph = Graph()
         self._graph.add_vertex(number_of_vertices)
-        self._graph.vertex_properties[self.KEY_CELL] = self._graph.new_vertex_property(
-            "object", number_of_vertices * [BoardCell()]
-        )
+        self._graph.vertex_properties[self.KEY_CELL] = \
+            self._graph.new_vertex_property(
+                "object", number_of_vertices * [BoardCell()]
+            )
         self._graph.edge_properties[self.KEY_DIRECTION
                                    ] = self._graph.new_edge_property("object")
         self._graph.edge_properties['weight'
@@ -46,10 +47,10 @@ class BoardGraphGraphtool(BoardGraphBase):
         return self._graph.num_edges()
 
     def has_edge(self, source_vertex, target_vertex, direction):
-        for e in self._graph.vertex(source_vertex).out_edges():
+        for edge in self._graph.vertex(source_vertex).out_edges():
             if (
-                int(e.target()) == target_vertex and
-                self._graph.ep.direction[e] == direction
+                int(edge.target()) == target_vertex and
+                self._graph.ep.direction[edge] == direction
             ):
                 return True
         return False
@@ -74,10 +75,10 @@ class BoardGraphGraphtool(BoardGraphBase):
                     board_height=height
                 )
                 if neighbor_vertex is not None:
-                    e = self._graph.add_edge(
+                    edge = self._graph.add_edge(
                         source_vertex, neighbor_vertex, add_missing=False
                     )
-                    self._graph.ep.direction[e] = direction
+                    self._graph.ep.direction[edge] = direction
 
     # TODO: Faster version?
     # def reconfigure_edges(self, width, height, tessellation):
@@ -118,14 +119,16 @@ class BoardGraphGraphtool(BoardGraphBase):
     #                 directions_to_add[e].popleft()
 
     def calculate_edge_weights(self):
-        for e in self._graph.edges():
-            self._graph.ep.weight[e] = self.out_edge_weight(int(e.target()))
+        for edge in self._graph.edges():
+            self._graph.ep.weight[edge] = self.out_edge_weight(
+                int(edge.target())
+            )
 
     def neighbor(self, from_position, direction):
         try:
-            for e in self._graph.vertex(from_position).out_edges():
-                if self._graph.ep.direction[e] == direction:
-                    return int(e.target())
+            for edge in self._graph.vertex(from_position).out_edges():
+                if self._graph.ep.direction[edge] == direction:
+                    return int(edge.target())
         except ValueError as e:
             raise IndexError(e.args)
 

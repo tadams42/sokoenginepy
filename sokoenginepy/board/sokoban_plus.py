@@ -126,8 +126,12 @@ class SokobanPlus:
 
         self.errors = []
         try:
-            self._box_plus_ids = self._parse_and_clean_ids_string(self._boxorder)
-            self._goal_plus_ids = self._parse_and_clean_ids_string(self._goalorder)
+            self._box_plus_ids = self._parse_and_clean_ids_string(
+                self._boxorder
+            )
+            self._goal_plus_ids = self._parse_and_clean_ids_string(
+                self._goalorder
+            )
         except SokobanPlusDataError as e:
             self.errors.append(str(e))
 
@@ -162,7 +166,8 @@ class SokobanPlus:
             for_box_id (int): box ID
 
         Returns:
-            int: If Sokoban+ is enabled returns Sokoban+ ID of a box. If not it returns :const:`DEFAULT_PLUS_ID`
+            int: If Sokoban+ is enabled returns Sokoban+ ID of a box.
+            If not, returns :const:`DEFAULT_PLUS_ID`
 
         Raises:
             :exc:`KeyError`: No box with ID ``for_box_id``, but only if i
@@ -180,14 +185,17 @@ class SokobanPlus:
             for_goal_id (int): goal ID
 
         Returns:
-            int: If Sokoban+ is enabled returns Sokoban+ ID of a goal. If not it returns :const:`DEFAULT_PLUS_ID`
+            int: If Sokoban+ is enabled returns Sokoban+ ID of a goal.
+            If not, returns :const:`DEFAULT_PLUS_ID`
 
         Raises:
             :exc:`KeyError`: No goal with ID ``for_goal_id``, but only if
                 Sokoban+ is enabled
         """
         try:
-            return self._get_plus_id(for_goal_id, from_where=self._goal_plus_ids)
+            return self._get_plus_id(
+                for_goal_id, from_where=self._goal_plus_ids
+            )
         except KeyError:
             raise KeyError("No goal with ID: {0}".format(for_goal_id))
 
@@ -214,6 +222,7 @@ class SokobanPlus:
         Returns:
             dict: dict that maps piece IDs to piece Sokoban+ IDs
         """
+
         def convert_or_raise(id_str):
             try:
                 return int(id_str)
@@ -224,8 +233,8 @@ class SokobanPlus:
                 )
 
         trimmed = [
-            convert_or_raise(id_str) for id_str in
-            self._rstrip_default_plus_ids(plus_ids_str).split()
+            convert_or_raise(id_str)
+            for id_str in self._rstrip_default_plus_ids(plus_ids_str).split()
         ]
 
         cleaned = [
@@ -261,17 +270,18 @@ class SokobanPlus:
         if self._box_plus_ids and len(self._box_plus_ids) != self.pieces_count:
             self.errors.append(
                 "Sokoban+ boxorder data doesn't contain same amount of IDs " +
-                "as there are pieces on board! (pieces_count: {0})".format(
-                    self.pieces_count
-                )
+                "as there are pieces on board! (pieces_count: {0})".
+                format(self.pieces_count)
             )
 
-        if self._goal_plus_ids and len(self._goal_plus_ids) != self.pieces_count:
+        if (
+            self._goal_plus_ids and
+            len(self._goal_plus_ids) != self.pieces_count
+        ):
             self.errors.append(
                 "Sokoban+ goalorder data doesn't contain same amount of IDs " +
-                "as there are pieces on board! (pieces_count: {0})".format(
-                    self.pieces_count
-                )
+                "as there are pieces on board! (pieces_count: {0})".
+                format(self.pieces_count)
             )
 
     def _validate_id_sets_equality(self):
@@ -281,7 +291,7 @@ class SokobanPlus:
                 if pid != self.DEFAULT_PLUS_ID
             )
         else:
-            boxes = []
+            boxes = set()
 
         if self._goal_plus_ids:
             goals = set(
@@ -289,19 +299,26 @@ class SokobanPlus:
                 if pid != self.DEFAULT_PLUS_ID
             )
         else:
-            goals = []
+            goals = set()
 
         if boxes != goals:
             self.errors.append(
-                "Sokoban+ data doesn't define equal sets of IDs for boxes and goals"
+                "Sokoban+ data doesn't define equal sets of IDs for " +
+                "boxes and goals"
             )
 
     def __repr__(self):
-        return "SokobanPlus(pieces_count={0}, boxorder='{1}', goalorder='{2}')".format(
-            self.pieces_count, self.boxorder, self.goalorder
+        return (
+            "SokobanPlus(" +
+            "pieces_count={0}, boxorder='{1}', goalorder='{2}')".format(
+                self.pieces_count, self.boxorder, self.goalorder
+            )
         )
 
     def __str__(self):
-        return "<SokobanPlus boxorder='{1}', goalorder='{2}'>".format(
-            self.pieces_count, self.boxorder, self.goalorder
+        return (
+            "SokobanPlus(" +
+            "pieces_count={0}, boxorder='{1}', goalorder='{2}')".format(
+                self.pieces_count, self.boxorder, self.goalorder
+            )
         )

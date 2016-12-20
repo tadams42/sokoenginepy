@@ -101,7 +101,9 @@ class Mover:
 
     @property
     def state(self):
-        """Board state tracking through instance of :class:`.HashedBoardState`"""
+        """
+        Board state tracking through instance of :class:`.HashedBoardState`
+        """
         return self._state
 
     @property
@@ -123,7 +125,9 @@ class Mover:
         self.__last_performed_moves = []
 
         if pusher_id != self.selected_pusher:
-            old_pusher_position = self._state.pusher_position(self.selected_pusher)
+            old_pusher_position = self._state.pusher_position(
+                self.selected_pusher
+            )
             new_pusher_position = self._state.pusher_position(pusher_id)
             selection_path = self._board.position_path_to_direction_path(
                 self._board.find_jump_path(
@@ -224,10 +228,10 @@ class Mover:
                 )
             )['path']:
                 from .. import snapshot
-                am = snapshot.AtomicMove(direction, False)
-                am.is_jump = True
-                am.pusher_id = self.selected_pusher
-                self.__last_performed_moves.append(am)
+                atomic_move = snapshot.AtomicMove(direction, False)
+                atomic_move.is_jump = True
+                atomic_move.pusher_id = self.selected_pusher
+                self.__last_performed_moves.append(atomic_move)
             return True
 
         raise IllegalMoveError("Can't jump onto wall, box or pusher!")
@@ -271,14 +275,14 @@ class Mover:
         """
         retv = []
 
-        def kf(elem):
+        def key_functor(elem):
             if elem.is_jump:
                 return 0
             if elem.is_pusher_selection:
                 return 1
             return 2
 
-        for undo_move in [list(g) for k, g in groupby(moves, kf)]:
+        for undo_move in [list(g) for k, g in groupby(moves, key_functor)]:
             self.__last_performed_moves = undo_move
             move_success = self.undo()
 
@@ -319,16 +323,24 @@ class Mover:
         pusher_moved_ok = None
         in_front_of_box = None
 
-        initial_pusher_position = self._state.pusher_position(self.selected_pusher)
-        in_front_of_pusher = self._board.neighbor(initial_pusher_position, direction)
+        initial_pusher_position = self._state.pusher_position(
+            self.selected_pusher
+        )
+        in_front_of_pusher = self._board.neighbor(
+            initial_pusher_position, direction
+        )
 
         if in_front_of_pusher:
             if self._state.has_box_on(in_front_of_pusher):
                 is_push = True
-                in_front_of_box = self._board.neighbor(in_front_of_pusher, direction)
+                in_front_of_box = self._board.neighbor(
+                    in_front_of_pusher, direction
+                )
                 if in_front_of_box:
                     if self._board[in_front_of_box].can_put_pusher_or_box:
-                        self._state.move_box_from(in_front_of_pusher, in_front_of_box)
+                        self._state.move_box_from(
+                            in_front_of_pusher, in_front_of_box
+                        )
                         self._board[in_front_of_pusher].remove_box()
                         self._board[in_front_of_box].put_box()
                         box_moved_ok = True
@@ -341,7 +353,9 @@ class Mover:
 
             if not is_push or (is_push and box_moved_ok):
                 if self._board[in_front_of_pusher].can_put_pusher_or_box:
-                    self._state.move_pusher_from(initial_pusher_position, in_front_of_pusher)
+                    self._state.move_pusher_from(
+                        initial_pusher_position, in_front_of_pusher
+                    )
                     self._board[initial_pusher_position].remove_pusher()
                     self._board[in_front_of_pusher].put_pusher()
                     pusher_moved_ok = True
@@ -357,7 +371,9 @@ class Mover:
             atomic_move = snapshot.AtomicMove(direction, is_push)
             atomic_move.pusher_id = self.selected_pusher
             if is_push:
-                atomic_move.moved_box_id = self._state.box_id_on(in_front_of_box)
+                atomic_move.moved_box_id = self._state.box_id_on(
+                    in_front_of_box
+                )
                 if options.decrease_pull_count and self._pull_count > 0:
                     self._pull_count -= 1
             self.__last_performed_moves = [atomic_move]
@@ -379,12 +395,18 @@ class Mover:
         self.__last_performed_moves = []
 
         pusher_moved_ok = None
-        initial_pusher_position = self._state.pusher_position(self.selected_pusher)
-        in_front_of_pusher = self._board.neighbor(initial_pusher_position, direction)
+        initial_pusher_position = self._state.pusher_position(
+            self.selected_pusher
+        )
+        in_front_of_pusher = self._board.neighbor(
+            initial_pusher_position, direction
+        )
 
         if in_front_of_pusher:
             if self._board[in_front_of_pusher].can_put_pusher_or_box:
-                self._state.move_pusher_from(initial_pusher_position, in_front_of_pusher)
+                self._state.move_pusher_from(
+                    initial_pusher_position, in_front_of_pusher
+                )
                 self._board[initial_pusher_position].remove_pusher()
                 self._board[in_front_of_pusher].put_pusher()
                 pusher_moved_ok = True
@@ -400,10 +422,14 @@ class Mover:
         box_moved_ok = None
 
         if options.force_pulls:
-            behind_pusher = self._board.neighbor(initial_pusher_position, direction.opposite)
+            behind_pusher = self._board.neighbor(
+                initial_pusher_position, direction.opposite
+            )
             if behind_pusher and self._board[behind_pusher].has_box:
                 is_pull = True
-                self._state.move_box_from(behind_pusher, initial_pusher_position)
+                self._state.move_box_from(
+                    behind_pusher, initial_pusher_position
+                )
                 self._board[behind_pusher].remove_box()
                 self._board[initial_pusher_position].put_box()
                 if options.increase_pull_count:
@@ -415,7 +441,9 @@ class Mover:
             atomic_move = snapshot.AtomicMove(direction, is_pull)
             atomic_move.pusher_id = self.selected_pusher
             if is_pull:
-                atomic_move.moved_box_id = self._state.box_id_on(initial_pusher_position)
+                atomic_move.moved_box_id = self._state.box_id_on(
+                    initial_pusher_position
+                )
             self.__last_performed_moves = [atomic_move]
             return True
         else:

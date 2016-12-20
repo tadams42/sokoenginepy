@@ -4,7 +4,6 @@ from .. import utilities
 from .hexoban_tessellation import HexobanTessellation
 from .octoban_tessellation import OctobanTessellation
 from .sokoban_tessellation import SokobanTessellation
-from .tessellation_base import TessellationBase
 from .trioban_tessellation import TriobanTessellation
 
 

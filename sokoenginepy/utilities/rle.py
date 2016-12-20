@@ -14,8 +14,8 @@ class RleCharacters(Enum):
     RLE_ROW_SEPARATOR = '|'
 
 
-_re_rle_replacer = re.compile(r"(\d+)(\D)")
-_re_rle_splitter = re.compile(
+_RE_RLE_REPLACER = re.compile(r"(\d+)(\D)")
+_RE_RLE_SPLITTER = re.compile(
     '|'.join(map(re.escape, [RleCharacters.RLE_ROW_SEPARATOR.value, '\n']))
 )
 
@@ -41,7 +41,7 @@ class Rle:
         decode('3(a2b)4b') == "abbabbabbbbbb"
         decode('3a4b44') == "aaabbb44"
         """
-        return _re_rle_replacer.sub(
+        return _RE_RLE_REPLACER.sub(
             lambda m: m.group(2) * int(m.group(1)), rle_token
         )
 
@@ -93,4 +93,4 @@ def rle_encode(line):
 
 
 def rle_decode(line):
-    return _re_rle_splitter.sub('\n', Rle.decode(line))
+    return _RE_RLE_SPLITTER.sub('\n', Rle.decode(line))

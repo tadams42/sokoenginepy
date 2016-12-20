@@ -39,6 +39,11 @@ tessellation
     :undoc-members:
     :inherited-members:
 
+.. automodule:: sokoenginepy.tessellation.tessellation_base
+    :members:
+    :undoc-members:
+    :inherited-members:
+
 .. automodule:: sokoenginepy.tessellation.trioban_tessellation
     :members:
     :undoc-members:

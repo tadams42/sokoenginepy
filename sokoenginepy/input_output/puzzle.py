@@ -2,12 +2,14 @@ from functools import reduce
 
 from cached_property import cached_property
 
+from .. import board as module_board
 from .. import tessellation as module_tessellation
-from .. import board, snapshot
+from .. import snapshot
 
 
 class Puzzle:
-    """Textual representation of game board with all its meta data and snapshots.
+    """
+    Textual representation of game board with all its meta data and snapshots.
 
     No data validation is performed, to make parsing of Sokoban files as fast
     as possible. Proper validation is triggered when Puzzle is converted into
@@ -58,7 +60,7 @@ class Puzzle:
 
     def clear(self):
         self.board = ""
-        self.variant = tessellation.Tessellation.SOKOBAN.value
+        self.tessellation = module_tessellation.Tessellation.SOKOBAN.value
         self.title = ""
         self.author = ""
         self.boxorder = ""
@@ -70,11 +72,12 @@ class Puzzle:
 
     def reformat(self):
         self.board = str(self.to_game_board())
-        for snapshot in self.snapshots:
-            snapshot.reformat()
+        for snap in self.snapshots:
+            snap.reformat()
 
     def to_game_board(self):
-        # TODO Convert to board.VariantBoard, but add boxorder and goalorder attrs
+        # TODO Convert to board.VariantBoard, but add boxorder and goalorder
+        # attrs
         # to variant board boefore we can do it
         # from ..game import GameBoard
         # retv = GameBoard(board_str=self.board, tessellation=self.tessellation)
@@ -86,21 +89,33 @@ class Puzzle:
     def pushers_count(self):
         return reduce(
             lambda x, y: x + y,
-            [1 if board.BoardCell.is_pusher_chr(chr) else 0 for chr in self.board], 0
+            [
+                1 if module_board.BoardCell.is_pusher_chr(chr)
+                else 0
+                for chr in self.board
+            ], 0
         )
 
     @cached_property
     def boxes_count(self):
         return reduce(
             lambda x, y: x + y,
-            [1 if board.BoardCell.is_box_chr(chr) else 0 for chr in self.board], 0
+            [
+                1 if module_board.BoardCell.is_box_chr(chr)
+                else 0
+                for chr in self.board
+            ], 0
         )
 
     @cached_property
     def goals_count(self):
         return reduce(
             lambda x, y: x + y,
-            [1 if board.BoardCell.is_goal_chr(chr) else 0 for chr in self.board], 0
+            [
+                1 if module_board.BoardCell.is_goal_chr(chr)
+                else 0
+                for chr in self.board
+            ], 0
         )
 
 
@@ -164,7 +179,10 @@ class PuzzleSnapshot:
     def pushes_count(self):
         return reduce(
             lambda x, y: x + y, [
-                1 if snapshot.AtomicMove.is_atomic_move_chr(chr) and chr.isupper() else 0
+                1 if (
+                    snapshot.AtomicMove.is_atomic_move_chr(chr) and
+                    chr.isupper()
+                ) else 0
                 for chr in self.moves
             ], 0
         )
@@ -178,7 +196,10 @@ class PuzzleSnapshot:
         """
         return reduce(
             lambda x, y: x + y, [
-                1 if snapshot.AtomicMove.is_atomic_move_chr(chr) and chr.islower() else 0
+                1 if (
+                    snapshot.AtomicMove.is_atomic_move_chr(chr) and
+                    chr.islower()
+                ) else 0
                 for chr in self.moves
             ], 0
         )
@@ -188,6 +209,7 @@ class PuzzleSnapshot:
         return reduce(
             lambda x, y: x or y, [
                 chr == snapshot.Snapshot.NonMoveCharacters.JUMP_BEGIN or
-                chr == snapshot.Snapshot.NonMoveCharacters.JUMP_END for chr in self.moves
+                chr == snapshot.Snapshot.NonMoveCharacters.JUMP_END
+                for chr in self.moves
             ], False
         )

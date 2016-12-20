@@ -5,9 +5,9 @@ Helpers for working with strings and lists of strings.
 import re
 from functools import reduce
 
-_re_only_digits_and_spaces = re.compile(r"^([0-9\s])*$")
-_re_ending_digits = re.compile(r"(\d+)$")
-_re_contains_any_digit = re.compile(r"([0-9])+")
+_RE_ONLY_DIGITS_AND_SPACES = re.compile(r"^([0-9\s])*$")
+_RE_ENDING_DIGITS = re.compile(r"(\d+)$")
+_RE_CONTAINS_ANY_DIGIT = re.compile(r"([0-9])+")
 
 
 def is_blank(line):
@@ -18,7 +18,7 @@ def is_blank(line):
 def contains_only_digits_and_spaces(line):
     return reduce(
         lambda x, y: x and y, [
-            True if _re_only_digits_and_spaces.match(l) else False
+            True if _RE_ONLY_DIGITS_AND_SPACES.match(l) else False
             for l in line.splitlines()
         ], True
     )
@@ -45,9 +45,9 @@ def calculate_width(string_list):
 
 def ending_digits(line):
     """Extracts ending digits of string."""
-    retv = _re_ending_digits.findall(line)
+    retv = _RE_ENDING_DIGITS.findall(line)
     if retv:
-        return _re_ending_digits.sub("", line), retv[-1]
+        return _RE_ENDING_DIGITS.sub("", line), retv[-1]
     return line, None
 
 

@@ -7,7 +7,7 @@ from .. import settings, utilities
 from .atomic_move import AtomicMove
 from .snapshot import Snapshot, SnapshotConversionError
 
-_re_snapshot_string = re.compile(
+_RE_SNAPSHOT_STRING = re.compile(
     r"^([0-9\s" + re.escape("".join(c.value for c in AtomicMove.Characters)) +
     re.escape("".join(c.value for c in Snapshot.NonMoveCharacters)) +
     re.escape("".join(c.value for c in utilities.RleCharacters)) + "])*$"
@@ -51,7 +51,7 @@ class SnapshotStringParser:
             not utilities.is_blank(line) and
             not utilities.contains_only_digits_and_spaces(line) and reduce(
                 lambda x, y: x and y, [
-                    True if _re_snapshot_string.match(l) else False
+                    True if _RE_SNAPSHOT_STRING.match(l) else False
                     for l in line.splitlines()
                 ], True
             )
@@ -182,8 +182,10 @@ class SnapshotStringParser:
             )
             return False
 
-        if (Snapshot.NonMoveCharacters.JUMP_BEGIN.value in moves_string or
-                Snapshot.NonMoveCharacters.JUMP_END.value in moves_string):
+        if (
+            Snapshot.NonMoveCharacters.JUMP_BEGIN.value in moves_string or
+            Snapshot.NonMoveCharacters.JUMP_END.value in moves_string
+        ):
             self._resulting_solving_mode = game.SolvingMode.REVERSE
         else:
             self._resulting_solving_mode = game.SolvingMode.FORWARD

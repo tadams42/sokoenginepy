@@ -19,13 +19,17 @@ class TessellationBase(ABC):
 
     @abstractmethod
     def neighbor_position(self, position, direction, board_width, board_height):
-        """Calculates neighbor position in given direction and verifies calculated position.
+        """
+        Calculates neighbor position in given direction and verifies calculated
+        position.
 
         Returns:
-            int: If resulting position is off-board returns None, otherwise position
+            int: If resulting position is off-board returns None, otherwise
+            position
 
         Raises:
-            :exc:`.UnknownDirectionError`: in case direction is not one of self.legal_directions
+            :exc:`.UnknownDirectionError`: in case direction is not one
+                of self.legal_directions
 
         Position is always expressed as int index of board graph vertex. To
         convert 2D coordinates into vertex index, use :func:`.index_1d` method
@@ -65,7 +69,9 @@ class TessellationBase(ABC):
     @property
     @abstractmethod
     def _atomic_move_to_char_dict(self):
-        """Dict mapping :class:`.AtomicMove` parameters to string representation."""
+        """
+        Dict mapping :class:`.AtomicMove` parameters to string representation.
+        """
         pass
 
     def atomic_move_to_char(self, atomic_move):

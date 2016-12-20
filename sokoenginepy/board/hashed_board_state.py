@@ -6,8 +6,8 @@ from .board_state import BoardState
 class HashedBoardState(BoardState):
     """:class:`~sokoenginepy.board.board_state.BoardState` with Zobrist hashing
 
-    Adds Zobrist hashing on top of :class:`~sokoenginepy.board.board_state.BoardState`
-    and keeps it up to date when pieces are moved.
+    Adds Zobrist hashing on top of :class:`.BoardState` and keeps it up to date
+    when pieces are moved.
 
     Zobrist hash is 64b integer hash derived from positions of all boxes on
     board.
@@ -67,7 +67,8 @@ class HashedBoardState(BoardState):
         self._initial_layout_hash = self._layout_hash = random_pool[0]
         random_pool = random_pool[1:]
 
-        # Store position factors for all distinct positions of all distinct boxes
+        # Store position factors for all distinct positions of all distinct
+        # boxes
         self._boxes_factors = dict()
         for box_plus_id in distinct_box_plus_ids:
             self._boxes_factors[box_plus_id] = random_pool[:self.board_size]
@@ -80,7 +81,7 @@ class HashedBoardState(BoardState):
         for box_id in self.boxes_ids:
             self._layout_hash ^= (
                 self._boxes_factors[self.box_plus_id(box_id)]
-                    [self.box_position(box_id)]
+                [self.box_position(box_id)]
             )
 
         # Hash from pushers' and boxes' positions
@@ -142,7 +143,9 @@ class HashedBoardState(BoardState):
 
         return retv
 
-    def _move_box(self, box_id, box_plus_id, from_old_position, to_new_position):
+    def _move_box(
+        self, box_id, box_plus_id, from_old_position, to_new_position
+    ):
         super()._move_box(box_id, box_plus_id, from_old_position, to_new_position)
         self._layout_hash ^= self._boxes_factors[box_plus_id][from_old_position]
         self._layout_hash ^= self._boxes_factors[box_plus_id][to_new_position]

@@ -143,8 +143,11 @@ class Snapshot(MutableSequence):
         self._moves.insert(index, atomic_move)
 
     def __repr__(self):
-        return "Snapshot(tessellation={0}, solving_mode={1}, moves_data={2})".format(
-            repr(self.tessellation), self.solving_mode, str(self)
+        return (
+            "Snapshot(tessellation=" +
+            "{0}, solving_mode={1}, moves_data={2})".format(
+                repr(self.tessellation), self.solving_mode, str(self)
+            )
         )
 
     def __eq__(self, rv):
@@ -216,7 +219,9 @@ class Snapshot(MutableSequence):
 
         if atomic_move.direction not in self.tessellation.legal_directions:
             raise tessellation.UnknownDirectionError(
-                "Invalid direction for tessellation {0}".format(self.tessellation)
+                "Invalid direction for tessellation {0}".format(
+                    self.tessellation
+                )
             )
 
         if not atomic_move.is_pusher_selection:

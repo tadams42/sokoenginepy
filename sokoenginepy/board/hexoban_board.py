@@ -5,6 +5,7 @@ from .variant_board import VariantBoard, VariantBoardResizer
 
 
 class HexobanBoard(VariantBoard):
+
     def __init__(self, board_width=0, board_height=0, board_str=""):
         super().__init__(
             tessellation_or_description=tessellation.Tessellation.HEXOBAN,
@@ -110,8 +111,7 @@ class HexobanTextConverter:
             return [], True
         elif even_row_x_parity < 0 or odd_row_x_parity < 0:
             internal = height * [
-                int(width / 2) * BoardCell.Characters.VISIBLE_FLOOR.value +
-                '\n'
+                int(width / 2) * BoardCell.Characters.VISIBLE_FLOOR.value + '\n'
             ]
             return internal, True
 
@@ -126,13 +126,13 @@ class HexobanTextConverter:
                 if not layout_ok:
                     break
 
-                layout_ok, should_copy_cell = self._analyze_text_cell_position(
-                    (parsed[y][x],
-                     x,
-                     y,
-                     odd_row_x_parity,
-                     even_row_x_parity,)
-                )
+                layout_ok, should_copy_cell = self._analyze_text_cell_position((
+                    parsed[y][x],
+                    x,
+                    y,
+                    odd_row_x_parity,
+                    even_row_x_parity,
+                ))
 
                 if layout_ok and should_copy_cell:
                     internal_line.append(parsed[y][x])
@@ -156,7 +156,10 @@ class HexobanTextConverter:
             for col in range(0, hexoban_board.width):
                 line.append(self.floor_character)
                 line.append(
-                    str(hexoban_board[tessellation.index_1d(col, row, hexoban_board.width)])
+                    str(
+                        hexoban_board[tessellation.
+                                      index_1d(col, row, hexoban_board.width)]
+                    )
                 )
 
             retv.append("".join(line))
@@ -179,10 +182,10 @@ class HexobanTextConverter:
 
     def _is_type1(self, string_list):
         rnfp = self._find_rightmost_non_floor(string_list)
-        if (rnfp > 0):
+        if rnfp > 0:
             y = tessellation.Y(rnfp, utilities.calculate_width(string_list))
             return y % 2 == 0
-        elif (rnfp == 0):
+        elif rnfp == 0:
             return True
         return False
 
@@ -225,8 +228,10 @@ class HexobanTextConverter:
 
         should_copy_cell = layout_ok and not is_cell_for_layout
 
-        return (layout_ok,
-                should_copy_cell,)
+        return (
+            layout_ok,
+            should_copy_cell,
+        )
 
     def _preparse_board(self, board_string):
         parsed = []
@@ -247,8 +252,10 @@ class HexobanTextConverter:
                 if has_non_floor_left_in_odd_row:
                     break
                 has_non_floor_left_in_odd_row = (
-                    has_non_floor_left_in_odd_row or
-                    (i % 2 == 1 and not BoardCell.is_empty_floor_chr(parsed[i][0]))
+                    has_non_floor_left_in_odd_row or (
+                        i % 2 == 1 and
+                        not BoardCell.is_empty_floor_chr(parsed[i][0])
+                    )
                 )
 
             if has_non_floor_left_in_odd_row:
@@ -268,11 +275,13 @@ class HexobanTextConverter:
 
                 odd_row_x_parity = (even_row_x_parity + 1) % 2
 
-        return (parsed,
-                width,
-                height,
-                even_row_x_parity,
-                odd_row_x_parity,)
+        return (
+            parsed,
+            width,
+            height,
+            even_row_x_parity,
+            odd_row_x_parity,
+        )
 
     @property
     def floor_character(self):
@@ -309,7 +318,8 @@ class HexobanTextConverter:
                 if non_floor_found:
                     break
 
-                if (not BoardCell.is_empty_floor_chr(normalized[row][column]) and
+                if (
+                    not BoardCell.is_empty_floor_chr(normalized[row][column]) and
                     (column > x or row > y)
                 ):
                     x = column
@@ -366,4 +376,7 @@ class HexobanTextConverter:
         elif even_x > odd_x:
             return rightmost_in_even_rows
 
-        return rightmost_in_odd_rows if odd_y > even_y else rightmost_in_even_rows
+        return (
+            rightmost_in_odd_rows
+            if odd_y > even_y else rightmost_in_even_rows
+        )

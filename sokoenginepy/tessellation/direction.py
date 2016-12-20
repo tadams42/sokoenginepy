@@ -23,22 +23,15 @@ class Direction(IntEnum):
 
     @property
     def opposite(self):
-        if self == Direction.UP:
-            retv = Direction.DOWN
-        elif self == Direction.DOWN:
-            retv = Direction.UP
-        elif self == Direction.LEFT:
-            retv = Direction.RIGHT
-        elif self == Direction.RIGHT:
-            retv = Direction.LEFT
-        elif self == Direction.NORTH_WEST:
-            retv = Direction.SOUTH_EAST
-        elif self == Direction.NORTH_EAST:
-            retv = Direction.SOUTH_WEST
-        elif self == Direction.SOUTH_WEST:
-            retv = Direction.NORTH_EAST
-        elif self == Direction.SOUTH_EAST:
-            retv = Direction.NORTH_WEST
-        else:
-            retv = None
-        return retv
+        return _OPPOSITE.get(self, None)
+
+_OPPOSITE = {
+    Direction.UP: Direction.DOWN,
+    Direction.DOWN: Direction.UP,
+    Direction.LEFT: Direction.RIGHT,
+    Direction.RIGHT: Direction.LEFT,
+    Direction.NORTH_WEST: Direction.SOUTH_EAST,
+    Direction.SOUTH_EAST: Direction.NORTH_WEST,
+    Direction.NORTH_EAST: Direction.SOUTH_WEST,
+    Direction.SOUTH_WEST: Direction.NORTH_EAST
+}

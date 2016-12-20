@@ -13,7 +13,7 @@ def _init_module():
     """
     from .. import board, snapshot
     _GLOBALS['graph_type'] = board.GraphType.DIRECTED
-    _GLOBALS['chr_to_atomic_move'] =  {
+    _GLOBALS['chr_to_atomic_move'] = {
         snapshot.AtomicMove.Characters.LOWER_L.value: (Direction.LEFT, False),
         snapshot.AtomicMove.Characters.UPPER_L.value: (Direction.LEFT, True),
         snapshot.AtomicMove.Characters.LOWER_R.value: (Direction.RIGHT, False),

@@ -24,8 +24,8 @@ class BoardState:
       assigning numerical ID to each individual piece. This ID can then be used
       to refer that piece in various contexts.
 
-      IDs are assigned by simply counting from top left corner of board, starting
-      with :data:`.DEFAULT_PIECE_ID`
+      IDs are assigned by simply counting from top left corner of board,
+      starting with :data:`.DEFAULT_PIECE_ID`
 
       .. image:: /images/assigning_ids.png
           :alt: Assigning board elements' IDs
@@ -39,9 +39,9 @@ class BoardState:
 
       Let's assume we create :class:`.BoardState`, then edit the board, placing
       pusher somwhere else, and then create :class:`.BoardState` again. This
-      pusher on new position may in general case get completely new ID. Instead,
-      there are movement methods that allow updating pusher and box positions
-      when movement occurs:
+      pusher on new position may in general case get completely new ID.
+      Instead, there are movement methods that allow updating pusher and box
+      positions when movement occurs:
 
       +----------------------------------------------+----------------------------------------------+----------------------------------------------+
       | 1) Initial board                             | 2) Edited board                              | 3) Box moved                                 |
@@ -50,13 +50,13 @@ class BoardState:
       +----------------------------------------------+----------------------------------------------+----------------------------------------------+
 
     Warning:
-        All changes made to :class:`.BoardState` are not automatically reflected
-        onto :class:`.BoardCell` of tracked :class:`.VariantBoard`. Ie. if we use
-        :meth:`move_pusher` it will only update :class:`BoardState`, not the
-        :class:`.VariantBoard` itself. Also, edits preformed on
-        :class:`.VariantBoard` outside of :class:`BoardState` are not
-        automatically reflected onto :class:`BoardState` that is used to track
-        that :class:`.VariantBoard`. Clients of :class:`BoardState` and
+        All changes made to :class:`.BoardState` are not automatically
+        reflected onto :class:`.BoardCell` of tracked :class:`.VariantBoard`.
+        Ie. if we use :meth:`move_pusher` it will only update
+        :class:`BoardState`, not the :class:`.VariantBoard` itself. Also, edits
+        preformed on :class:`.VariantBoard` outside of :class:`BoardState` are
+        not automatically reflected onto :class:`BoardState` that is used to
+        track that :class:`.VariantBoard`. Clients of :class:`BoardState` and
         :class:`.VariantBoard` are responsible for keeping board and its state
         in sync.
 
@@ -227,7 +227,8 @@ class BoardState:
 
         Raises:
             :exc:`KeyError`: there is no pusher on ``old_position``
-            :exc:`.CellAlreadyOccupiedError`: there is a pusher already on ``to_new_position``
+            :exc:`.CellAlreadyOccupiedError`: there is a pusher already on
+                ``to_new_position``
 
         Note:
             Allows placing a pusher onto position occupied by box. This is for
@@ -254,7 +255,8 @@ class BoardState:
 
         Raises:
             :exc:`KeyError`: there is no pusher with ID ``pid``
-            :exc:`.CellAlreadyOccupiedError`: there is a pusher already on ``to_new_position``
+            :exc:`.CellAlreadyOccupiedError`: there is a pusher already on
+                ``to_new_position``
 
         Note:
             Allows placing a pusher onto position occupied by box. This is for
@@ -369,14 +371,15 @@ class BoardState:
 
         Raises:
             :exc:`KeyError`: there is no box on ``old_position``
-            :exc:`.CellAlreadyOccupiedError`: there is a box already on ``to_new_position``
+            :exc:`.CellAlreadyOccupiedError`: there is a box already on
+                ``to_new_position``
 
         Note:
-            Allows placing of a box onto position occupied by pusher. This is for
-            cases when we switch box/goals positions in reverse solving mode. In
-            this situation it is legal for pusher to end up standing on top of the
-            box. Game rules say that for these situations, first move(s) must be
-            jumps
+            Allows placing of a box onto position occupied by pusher. This is
+            for cases when we switch box/goals positions in reverse solving
+            mode. In this situation it is legal for pusher to end up standing
+            on top of the box. Game rules say that for these situations, first
+            move(s) must be jumps
 
         Warning:
             It doesn't verify if ``old_position`` or ``to_new_position`` are
@@ -397,14 +400,15 @@ class BoardState:
 
         Raises:
             :exc:`KeyError`: there is no box with ID ``pid``
-            :exc:`.CellAlreadyOccupiedError`: there is a box already on ``to_new_position``
+            :exc:`.CellAlreadyOccupiedError`: there is a box already on
+                ``to_new_position``
 
         Note:
-            Allows placing of a box onto position occupied by pusher. This is for
-            cases when we switch box/goals positions in reverse solving mode. In
-            this situation it is legal for pusher to end up standing on top of the
-            box. Game rules say that for these situations, first move(s) must be
-            jumps
+            Allows placing of a box onto position occupied by pusher. This is
+            for cases when we switch box/goals positions in reverse solving
+            mode. In this situation it is legal for pusher to end up standing
+            on top of the box. Game rules say that for these situations, first
+            move(s) must be jumps
 
         Warning:
             It doesn't verify if ``to_new_position`` is valid on-board position.
@@ -553,7 +557,8 @@ class BoardState:
     # --------------------------------------------------------------------------
 
     def solutions(self):
-        """Generator for all configurations of boxes that result in solved board.
+        """
+        Generator for all configurations of boxes that result in solved board.
 
         Yields:
             dict: {box_id1: box_position1, box_id2: box_position2, ...}
