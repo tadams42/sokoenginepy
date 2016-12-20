@@ -39,56 +39,45 @@ install_requirements = [
 ]
 
 dev_requirements = [
-    'pycodestyle >=2.0.0',  # (formerly called pep8)
-    'mccabe >=0.5.0',
-    'pylint >=1.6.0',
-    'yapf >=0.11.0',
-    # 'flake8 >=3.0.0',
-    # 'pep257 >=0.7.0',
-    # 'pylama >=7.1.0',
-    # 'pylama-pylint >=2.2.1',
+    'pycodestyle >= 2.0.0',  # (formerly called pep8)
+    'mccabe >= 0.5.0',
+    'pylint >= 1.6.0',
+    'yapf >= 0.11.0',
+    # 'flake8 >= 3.0.0',
+    # 'pep257 >= 0.7.0',
+    # 'pylama >= 7.1.0',
+    # 'pylama-pylint >= 2.2.1',
 
     # IPython stuff
-    'ipython >=5.0.0',
-    'jupyter >=1.0.0',
-    'ipdb >=0.10.0',
-
-    # Petty stacktrace
-    'colored-traceback >=0.2.0',
-
-    # Animation and graph debugging
-    'scipy >=0.18.0',
-    'moviepy >=0.2.0',
-    'matplotlib >=1.5.0',
+    'ipython >= 5.0.0',
+    'jupyter >= 1.0.0',
+    'ipdb >= 0.10.0',
 
     # Docs and viewers
-    'Sphinx >=1.4.0',
-    'restview >=2.6.0',
-    'grip >=4.3.0',
+    'Sphinx >= 1.4.0',
+    'sphinx_rtd_theme >= 0.1.9',
+    'restview >= 2.6.0',
+    'grip >= 4.3.0',
 
     # Profiling
-    'snakeviz >=0.4.0',
+    'snakeviz >= 0.4.0',
     'pyprof2calltree >= 1.4.0',
-
-    'check-manifest >= 0.33.0',
-    'pytest-colordots >=0.1.0',
-
-    'sphinx_rtd_theme >=0.1.9'
 ]
 
 test_requirements = [
-    'pytest>=3.0.0',
-    'pytest-spec>=1.0.0',
-    'pytest-cov>=2.3.0',
-    'factory-boy>=2.8.0',
-    'faker>=0.6.0',
-    'pyexcel-ods3>=0.2.0',
-    'lxml>=3.6.0',
-    'tox>=2.3.0',
-    'coverage>=4.2.0',
-    'check-manifest>=0.33.0',
-    'docutils >=0.12.0',
-    'Pygments >=2.1.0'
+    'pytest >= 3.0.0',
+    'pytest-spec >= 1.0.0',
+    'pytest-cov >= 2.3.0',
+    'pytest-benchmark >= 3.0.0',
+    'pytest-colordots >= 0.1.0',
+
+    'colored-traceback >= 0.2.0',
+    'check-manifest >= 0.33.0',
+
+    'factory-boy >= 2.8.0',
+    'faker >= 0.6.0',
+
+    'coverage >= 4.2.0',
 ]
 
 setup(
