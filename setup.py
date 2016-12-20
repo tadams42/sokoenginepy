@@ -62,6 +62,10 @@ dev_requirements = [
     # Profiling
     'snakeviz >= 0.4.0',
     'pyprof2calltree >= 1.4.0',
+
+    # py.test things usefull only when manually running tests
+    'pytest-colordots >= 0.1.0',
+    'colored-traceback >= 0.2.0',
 ]
 
 test_requirements = [
@@ -69,9 +73,7 @@ test_requirements = [
     'pytest-spec >= 1.0.0',
     'pytest-cov >= 2.3.0',
     'pytest-benchmark >= 3.0.0',
-    'pytest-colordots >= 0.1.0',
 
-    'colored-traceback >= 0.2.0',
     'check-manifest >= 0.33.0',
 
     'factory-boy >= 2.8.0',

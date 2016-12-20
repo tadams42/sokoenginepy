@@ -16,20 +16,52 @@ class CellAlreadyOccupiedError(utilities.SokoengineError):
 
 
 class BoardState:
-    """Memoizes all pieces on board and allows state modifications.
+    """Memoizes and tracks positions and position changes of all pieces.
 
-    Note:
-        :class:`BoardState` never modifies actual board cells - it just adjusts
-        memoized state for given board. Also, if given board is modified outside
-        of :class:`BoardState` (ie. cells with boxes are edited, board is
-        resized, etc..) this is not automatically reflected on
-        :class:`BoardState`.
+    - Provides efficient means to inspect positions of pushers, boxes and goals.
+      To understand how this works, we need to have a way of identifying
+      individual pushers, boxes and goals. :class:`.BoardState` does that by
+      assigning numerical ID to each individual piece. This ID can then be used
+      to refer that piece in various contexts.
 
-        For reasons above, clients are responsible for syncing board cells of a
-        given board and its :class:`BoardState`
+      IDs are assigned by simply counting from top left corner of board, starting
+      with :data:`.DEFAULT_PIECE_ID`
+
+      .. image:: /images/assigning_ids.png
+          :alt: Assigning board elements' IDs
+
+    - Provides efficient means of state updates. Ie. we can move pushers and
+      boxes and state will update.
+
+      Note that this movement doesn't implement game logic - it is perfectly
+      legal to move pusher onto ie. wall position. What movement implementation
+      does here is preservation of piece IDs in contex of board state changes.
+
+      Let's assume we create :class:`.BoardState`, then edit the board, placing
+      pusher somwhere else, and then create :class:`.BoardState` again. This
+      pusher on new position may in general case get completely new ID. Instead,
+      there are movement methods that allow updating pusher and box positions
+      when movement occurs:
+
+      +----------------------------------------------+----------------------------------------------+----------------------------------------------+
+      | 1) Initial board                             | 2) Edited board                              | 3) Box moved                                 |
+      +----------------------------------------------+----------------------------------------------+----------------------------------------------+
+      | .. image:: /images/movement_vs_transfer1.png | .. image:: /images/movement_vs_transfer2.png | .. image:: /images/movement_vs_transfer3.png |
+      +----------------------------------------------+----------------------------------------------+----------------------------------------------+
+
+    Warning:
+        All changes made to :class:`.BoardState` are not automatically reflected
+        onto :class:`.BoardCell` of tracked :class:`.VariantBoard`. Ie. if we use
+        :meth:`move_pusher` it will only update :class:`BoardState`, not the
+        :class:`.VariantBoard` itself. Also, edits preformed on
+        :class:`.VariantBoard` outside of :class:`BoardState` are not
+        automatically reflected onto :class:`BoardState` that is used to track
+        that :class:`.VariantBoard`. Clients of :class:`BoardState` and
+        :class:`.VariantBoard` are responsible for keeping board and its state
+        in sync.
 
     Args:
-        variant_board (VariantBoard): Instance of :class:`.VariantBoard` subclasses
+        variant_board (VariantBoard): board for which we want to manage state
     """
 
     # Following two are needed because accessing .keys('name') in MIDict

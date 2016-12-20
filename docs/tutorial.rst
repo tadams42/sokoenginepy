@@ -14,22 +14,21 @@ Contructing an instance of board is as easy as:
 
 .. code-block:: python
 
-    from textwrap import dedent
-    from sokoenginepy import SokobanBoard
-
-    board = SokobanBoard(board_str=dedent("""
-            #####
-            #  @#
-            #$  #
-          ###  $##
-          #  $ $ #
-        ### # ## #   ######
-        #   # ## #####  ..#
-        # $  $          ..#
-        ##### ### #@##  ..#
-            #     #########
-            #######
-    """[1:-1]))
+    >>> from textwrap import dedent
+    >>> from sokoenginepy import SokobanBoard
+    >>> board = SokobanBoard(board_str=dedent("""
+    ...             #####
+    ...             #  @#
+    ...             #$  #
+    ...           ###  $##
+    ...           #  $ $ #
+    ...         ### # ## #   ######
+    ...         #   # ## #####  ..#
+    ...         # $  $          ..#
+    ...         ##### ### #@##  ..#
+    ...             #     #########
+    ...             #######
+    ...     """[1:-1]))
 
 All boards implement rich API that allows editing individual board cells,
 resizing and exploring neigbouring positions. Positions are expressed as 1D
@@ -37,30 +36,26 @@ array indexes which can be retreived fro 2D coordinates using :func:`.index_1d`
 
 .. code-block:: python
 
-    from sokoenginepy import BoardCell, index_1d, Direction
-
-    position = index_1d(11, 8, board.width)
-
-    board[position]
-    # => BoardCell(BoardCell.Characters.PUSHER)
-    print(board[position])
-    # => @
-
-    board[position] = BoardCell.Characters.BOX
-    print(board[position])
-    # => $
-
-    board[position].has_pusher
-    # => False
-    board[position].has_box
-    # => True
-
-    board[position].put_pusher()
-    print(board[position])
-    # => @
-
-    board.neighbor(position, Direction.RIGHT)
-    # => 164
+    >>> from sokoenginepy import BoardCell, index_1d, Direction
+    >>> position = index_1d(11, 8, board.width)
+    >>>
+    >>> board[position]
+    BoardCell(Characters.PUSHER)
+    >>> print(board[position])
+    @
+    >>> board[position] = BoardCell.Characters.BOX
+    >>> board[position]
+    BoardCell(Characters.BOX)
+    >>> print(board[position])
+    $
+    >>> board[position].has_pusher
+    False
+    >>> board[position].has_box
+    True
+    >>> board[position].put_pusher()
+    BoardCell(Characters.PUSHER)
+    >>> board.neighbor(position, Direction.RIGHT)
+    164
 
 Except editing individual cells, all boards also support resizing, path
 searching, etc...
@@ -73,54 +68,69 @@ mechanics, we can attach instance of :class:`.HashedBoardState` to our board.
 
 .. code-block:: python
 
-    from sokoenginepy import HashedBoardState
+    >>> from sokoenginepy import HashedBoardState
+    >>> state = HashedBoardState(board)
+    >>> state
+    HashedBoardState(SokobanBoard(board_str='\n'.join([
+        "----#####----------",
+        "----#--@#----------",
+        "----#$--#----------",
+        "--###--$##---------",
+        "--#--$-$-#---------",
+        "###-#-##-#---######",
+        "#---#-##-#####--..#",
+        "#-$--$----------..#",
+        "#####-###-#@##--..#",
+        "----#-----#########",
+        "----#######--------",
+        "-------------------"
+    ])))
 
-    state = HashedBoardState(board)
-
-Now we have efficient means to inspect positions of pushers, boxes and goals.
-To understand how this works, we need to have a way of identifying individual
-pushers, boxes and goals. :class:`.HashedBoardState` does that by assigning
-ID to individual pieces. This ID can then be used to refer to individual piece.
-
-IDs are assigned by simply counting from top left corner of board, starting with
-:data:`.DEFAULT_PIECE_ID`
-
-.. image:: /images/assigning_ids.png
-    :alt: Assigning board elements' IDs
-
-Having IDs of elements, we can refer them through :class:`.HashedBoardState`
-
-.. code-block:: python
-
-    from sokoenginepy import DEFAULT_PIECE_ID
-
-    state.pusher_position(DEFAULT_PIECE_ID)
-    # => 26
-
-    state.box_position(DEFAULT_PIECE_ID + 2)
-    # => 81
-
-Once we have tracking of piece positions, it is also possible to move them:
+This class memoizes positions of pushers and boxes and assigns numerical IDs to
+them so they can be referred to in different contextes.
 
 .. code-block:: python
 
-    state.move_pusher(DEFAULT_PIECE_ID, Direction.RIGHT)
+    >>> from sokoenginepy import DEFAULT_PIECE_ID
+    >>> state.pushers_ids
+    [1, 2]
+    >>> state.pushers_positions
+    {1: 26, 2: 163}
+    >>> state.has_pusher(42)
+    False
+    >>> state.has_pusher_on(163)
+    True
+    >>> state.pusher_position(DEFAULT_PIECE_ID)
+    26
+    >>> state.box_position(DEFAULT_PIECE_ID + 2)
+    81
 
-Movement preserves IDs of pieces. This is best ilustrated by following:
-
-+----------------------------------------------+----------------------------------------------+----------------------------------------------+
-| 1) Initial board                             | 2) Edited board                              | 3) Box moved                                 |
-+----------------------------------------------+----------------------------------------------+----------------------------------------------+
-| .. image:: /images/movement_vs_transfer1.png | .. image:: /images/movement_vs_transfer2.png | .. image:: /images/movement_vs_transfer3.png |
-+----------------------------------------------+----------------------------------------------+----------------------------------------------+
-
-Using :class:`.HashedBoardState`, we can also manage Sokoban+.
+Now that we have a way to refer to individual pushers, boxes and goals, we can
+also use Sokoban+ strings which changes end game conditions:
 
 .. code-block:: python
 
-    state.boxorder = '1 3 2'
-    state.goalorder = '3 2 1'
-    state.is_sokoban_plus_enabled = True
+    >>> state.boxorder = '1 3 2'
+    >>> state.goalorder = '3 2 1'
+    >>> state.is_sokoban_plus_enabled = True
+    >>> state.is_sokoban_plus_enabled
+    True
+    >>> state.is_sokoban_plus_valid
+    True
+
+Above code block means that pieces get following Sokoban+ IDs:
+
++----------------------+-----------------+------------------+
+| box/goal ID          | box Sokoban+ ID | goal Sokoban+ ID |
++----------------------+-----------------+------------------+
+| DEFAULT_PIECE_ID     |        1        |         3        |
++----------------------+-----------------+------------------+
+| DEFAULT_PIECE_ID + 1 |        3        |         2        |
++----------------------+-----------------+------------------+
+| DEFAULT_PIECE_ID + 2 |        2        |         1        |
++----------------------+-----------------+------------------+
+
+And board is solved only when matching Sokoban+ ids are paired.
 
 The last thing that :class:`.HashedBoardState` does is Zobrist hashing of board.
 This is mainly usefull for implementing game solvers.
@@ -136,55 +146,60 @@ game mechanics like this:
 
 .. code-block:: python
 
-    from sokoenginepy import Mover, SolvingMode
+    >>> from sokoenginepy import Mover, SolvingMode, IllegalMoveError
+    >>>
+    >>> # regular, forward solving mode
+    >>> forward_mover = Mover(board)
+    >>> # select pusher that will perform movement
+    >>> forward_mover.selected_pusher = DEFAULT_PIECE_ID + 1
+    >>> # perform movement
+    >>> forward_mover.move(Direction.UP)
+    True
+    >>> # try to perform illegal move raises IllegalMoveError
+    >>> try:
+    ...     forward_mover.move(Direction.UP)
+    ... except IllegalMoveError:
+    ...     print("IllegalMoveError risen!")
+    ...
+    IllegalMoveError risen!
 
-    # regular, forward solving mode
-    forward_mover = Mover(board)
-    # select pusher that will perform movement
-    forward_mover.selected_pusher = DEFAULT_PIECE_ID + 1
-    # perform movement
-    forward_mover.move(Direction.UP)
-    # try to perform illegal move
-    forward_mover.move(Direction.UP)
-    # raises IllegalMoveError
+    >>> # reverse solving mode
+    >>> board = SokobanBoard(board_str="""
+    ...     #####
+    ...     #  @#
+    ...     #$  #
+    ...   ###  $##
+    ...   #  $ $ #
+    ... ### # ## #   ######
+    ... #   # ## #####  ..#
+    ... # $  $          ..#
+    ... ##### ### #@##  ..#
+    ...     #     #########
+    ...     #######
+    ... """[1:-1])
+    >>> reverse_mover = Mover(board, SolvingMode.REVERSE)
+    >>> print(reverse_mover.board)
+    ----#####----------
+    ----#--@#----------
+    ----#.--#----------
+    --###--.##---------
+    --#--.-.-#---------
+    ###-#-##-#---######
+    #---#-##-#####--$$#
+    #-.--.----------$$#
+    #####-###-#@##--$$#
+    ----#-----#########
+    ----#######--------
 
-    # reverse solving mode
-    board = SokobanBoard(board_str="""
-        #####
-        #  @#
-        #$  #
-      ###  $##
-      #  $ $ #
-    ### # ## #   ######
-    #   # ## #####  ..#
-    # $  $          ..#
-    ##### ### #@##  ..#
-        #     #########
-        #######
-    """[1:-1])
-    reverse_mover = Mover(board, SolvingMode.REVERSE)
 
-    print(reverse_mover.board)
-    #     #####
-    #     #  @#
-    #     #.  #
-    #   ###  .##
-    #   #  . . #
-    # ### # ## #   ######
-    # #   # ## #####  $$#
-    # # .  .          $$#
-    # ##### ### #@##  $$#
-    #     #     #########
-    #     #######
-
-    # Sokoban+
-    reverse_mover.state.boxorder = '1 3 2'
-    reverse_mover.state.goalorder = '3 2 1'
-    reverse_mover.state.is_sokoban_plus_enabled = True
-
-    # This check also considers if Sokoban+ is enabled...
-    reverse_mover.state.is_solved
-    # => False
+    >>> # Sokoban+
+    >>> reverse_mover.state.boxorder = '1 3 2'
+    >>> reverse_mover.state.goalorder = '3 2 1'
+    >>> reverse_mover.state.is_sokoban_plus_enabled = True
+    >>>
+    >>> # This check also considers if Sokoban+ is enabled...
+    >>> reverse_mover.state.is_solved()
+    False
 
 :class:`.Mover` implements all ``Sokoban``, ``Sokoban+`` and other variants game
 mechanics. It still lacks full game features like recording unlimited undo/redo

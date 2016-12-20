@@ -3,7 +3,7 @@ Global sokoenginepy settings.
 """
 
 #: Use more visibe characer for Boards when printing them?
-OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
+OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = False
 
 #: When printing Boards, should they be RLE encoded?
 RLE_ENCODE_BOARD_STRINGS = False
@@ -12,7 +12,7 @@ RLE_ENCODE_BOARD_STRINGS = False
 BREAK_LONG_SNAPSHOT_STRINGS = True
 
 #: How many characerts for each line of snapshot string?
-SNAPSHOT_LINE_BREAKS_AT = 70
+SNAPSHOT_LINE_BREAKS_AT = 80
 
 def should_insert_line_break_at(position):
     """
