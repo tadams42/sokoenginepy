@@ -1,12 +1,8 @@
-include LICENSE.md tox.ini .pylintrc .travis.yml scripts/cloc.sh scripts/generate_tests.py
+include LICENSE.md tox.ini .pylintrc .travis.yml
 recursive-include tests *
-recursive-exclude tests *.pyc
-recursive-exclude tests *.pyo
 recursive-include docs *
-recursive-exclude docs *.pyc
-recursive-exclude docs *.pyo
-recursive-exclude docs _build
-recursive-exclude docs _build/*
-recursive-exclude scripts *.ipynb
-recursive-exclude scripts animate_graph_reachables.py
+recursive-include scripts *
+global-exclude .ipynb_checkpoints/*
+global-exclude *.pyc
+global-exclude *.pyo
 prune docs/_build

@@ -358,3 +358,25 @@ class DescribeMover:
             assert reverse_mover.last_performed_moves[0].is_push_or_pull
             reverse_mover.undo()
             assert reverse_mover.jump(index_1d(1, 1, reverse_mover.board.width))
+
+    class DescribeMoverBenchmark:
+        def it_benchmarks_forward_mover(
+            self, benchmark, forward_mover, forward_mover_moves_cycle
+        ):
+            result = benchmark(
+                lambda: [
+                    forward_mover.move(d)
+                    for d in 100*forward_mover_moves_cycle
+                ]
+            )
+
+        def it_benchmarks_reverse_mover(
+            self, benchmark, reverse_mover, reverse_mover_moves_cycle
+        ):
+            reverse_mover.pulls_boxes = True
+            result = benchmark(
+                lambda: [
+                    reverse_mover.move(d)
+                    for d in 100*reverse_mover_moves_cycle
+                ]
+            )

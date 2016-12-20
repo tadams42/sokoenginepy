@@ -290,3 +290,19 @@ def forward_mover(forward_board):
 @pytest.fixture
 def reverse_mover(forward_board):
     return Mover(forward_board, SolvingMode.REVERSE)
+
+@pytest.fixture
+def forward_mover_moves_cycle():
+    return [
+        Direction.LEFT, Direction.LEFT, Direction.LEFT, Direction.DOWN,
+        Direction.RIGHT, Direction.UP, Direction.RIGHT, Direction.RIGHT,
+        Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT
+    ]
+
+@pytest.fixture
+def reverse_mover_moves_cycle():
+    return [
+        Direction.LEFT, Direction.UP, Direction.LEFT, Direction.DOWN,
+        Direction.RIGHT, Direction.RIGHT, Direction.UP, Direction.RIGHT,
+        Direction.DOWN, Direction.LEFT
+    ]

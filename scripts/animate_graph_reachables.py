@@ -1,3 +1,8 @@
+# Animation and graph debugging requirements
+# 'scipy >= 0.18.0',
+# 'moviepy >= 0.2.0',
+# 'matplotlib >= 1.5.0',
+
 from functools import partial
 
 import numpy as np

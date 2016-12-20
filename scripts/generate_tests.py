@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Requires: 'pyexcel-ods3 >= 0.2.0',
+
 import os
 import textwrap
 from collections import OrderedDict
