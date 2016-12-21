@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from .. import utilities
 from .cell_orientation import CellOrientation
 from .direction import UnknownDirectionError
 
@@ -13,15 +14,16 @@ class TessellationBase(ABC):
         """Directions generally accepted by Tessellation.
 
         Returns:
-            list: of :class:`.Direction`
+            list: sequence of :class:`.Direction`
         """
         pass
 
     @abstractmethod
     def neighbor_position(self, position, direction, board_width, board_height):
-        """
-        Calculates neighbor position in given direction and verifies calculated
-        position.
+        """Calculates neighbor position in given direction.
+
+        Position is always expressed as 1D index of board graph vertex. To
+        convert 2D coordinates into vertex index, use :func:`.index_1d` method
 
         Returns:
             int: If resulting position is off-board returns None, otherwise
@@ -30,9 +32,6 @@ class TessellationBase(ABC):
         Raises:
             :exc:`.UnknownDirectionError`: in case direction is not one
                 of self.legal_directions
-
-        Position is always expressed as int index of board graph vertex. To
-        convert 2D coordinates into vertex index, use :func:`.index_1d` method
         """
         pass
 
@@ -45,13 +44,21 @@ class TessellationBase(ABC):
     @property
     @abstractmethod
     def graph_type(self):
-        """Type of graph used in given tessellation."""
+        """Type of graph used in given tessellation.
+
+        Returns:
+            GraphType: type of graph
+        """
         pass
 
     def char_to_atomic_move(self, input_chr):
-        """
-        Converts string to :class:`.AtomicMove` instance or raises
-        :exc:`.UnknownDirectionError` if conversion not possible.
+        """Converts character to :class:`.AtomicMove`.
+
+        Returns:
+           AtomicMove: resulting :class:`.AtomicMove`
+
+        Raises:
+            :exc:`.UnknownDirectionError` if conversion not possible.
         """
         from .. import snapshot
         if isinstance(input_chr, snapshot.AtomicMove.Characters):
@@ -75,9 +82,13 @@ class TessellationBase(ABC):
         pass
 
     def atomic_move_to_char(self, atomic_move):
-        """
-        Converts :class:`.AtomicMove` to string or raises
-        :exc:`.UnknownDirectionError` if conversion not possible.
+        """Converts :class:`.AtomicMove` to string
+
+        Returns:
+           string: resulting string representation of :class:`.AtomicMove`
+
+        Raises:
+            :exc:`.UnknownDirectionError` if conversion not possible.
         """
         retv = self._atomic_move_to_char_dict.get(
             (atomic_move.direction, atomic_move.is_push_or_pull), None
@@ -101,3 +112,9 @@ class TessellationBase(ABC):
 
     def __ne__(self, other):
         return not self == other
+
+
+class TessellationBaseInheritableDocstrings(
+    type(TessellationBase), utilities.InheritableDocstrings
+):
+    pass

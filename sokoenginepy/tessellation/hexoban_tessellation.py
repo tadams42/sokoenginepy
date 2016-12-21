@@ -1,7 +1,9 @@
 from .. import utilities
 from .direction import Direction, UnknownDirectionError
-from .helpers import COLUMN, ROW, index_1d, on_board_2d
-from .tessellation_base import TessellationBase
+from .helpers import COLUMN, ROW, index_1d, is_on_board_2d
+from .tessellation_base import (
+    TessellationBase, TessellationBaseInheritableDocstrings
+)
 
 _GLOBALS = {}
 
@@ -32,7 +34,9 @@ def _init_module():
     )
 
 
-class HexobanTessellation(TessellationBase):
+class HexobanTessellation(
+    TessellationBase, metaclass=TessellationBaseInheritableDocstrings
+):
     _LEGAL_DIRECTIONS = (
         Direction.LEFT,
         Direction.RIGHT,
@@ -43,17 +47,20 @@ class HexobanTessellation(TessellationBase):
     )
 
     @property
+    @copy_ancestor_docstring
     def legal_directions(self):
         return self._LEGAL_DIRECTIONS
 
     @property
+    @copy_ancestor_docstring
     def graph_type(self):
         if not _GLOBALS:
             _init_module()
         return _GLOBALS['graph_type']
 
+    @copy_ancestor_docstring
     def neighbor_position(self, position, direction, board_width, board_height):
-        # if not on_board_1d(position, board_width, board_height):
+        # if not is_on_board_1d(position, board_width, board_height):
         #     return None
 
         row = ROW(position, board_width)
@@ -78,7 +85,7 @@ class HexobanTessellation(TessellationBase):
         else:
             raise UnknownDirectionError(direction)
 
-        if on_board_2d(column, row, board_width, board_height):
+        if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
         return None
 

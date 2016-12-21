@@ -1,13 +1,8 @@
 from abc import ABC, abstractmethod
 from collections import deque
-from enum import IntEnum
 
 from ... import tessellation as module_tessellation
-
-
-class GraphType(IntEnum):
-    DIRECTED = 0
-    DIRECTED_MULTI = 1
+from .graph_type import GraphType
 
 
 class BoardGraphBase(ABC):

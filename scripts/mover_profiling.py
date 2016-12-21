@@ -27,7 +27,8 @@ def main():
 # if __name__ == "__main__":
 #     main()
 
-cProfile.run('main()', 'mover_profiling.prof')
+cProfile.run('main()', 'moves_profile.prof')
+cProfile.run('mover.move(Direction.LEFT)', 'single_move_profile.prof')
 
 # python scripts/mover_profiling.py
 # pyprof2calltree -i mover_profiling.prof

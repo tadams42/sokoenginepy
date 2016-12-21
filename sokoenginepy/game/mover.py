@@ -37,15 +37,15 @@ class Mover:
 
     - pusher is allowed to pull single box at the time
 
-      - if position allows pull that pull is optional (pusher is allowed to
-        move without pull even if pull is possible). Default behavior is to
-        always pulls boxes but can be changed through Mover flag
+        - if position allows pull that pull is optional (pusher is allowed to
+          move without pull even if pull is possible). Default behavior is to
+          always pull boxes but that can be changed any time through
+          :meth:`Mover.pulls_boxes`
 
     - pusher can't push boxes
-
     - pusher is allowed to jump over boxes and walls
 
-      - jumps are allowed only before first pull is done
+        - jumps are allowed only before first pull is done
 
     - board starts in solved state: positions of boxes and goals are switched
 
@@ -86,32 +86,30 @@ class Mover:
 
     @property
     def board(self):
-        """Instance of :class:`.VariantBoard` subclasses."""
+        """Board on which :class:`Mover` is operating on"""
         return self._board
 
     @property
     def initial_board(self):
-        """Saved ``board`` layout before any movement."""
+        """Saved ``board`` layout before any movement movement was performed."""
         return self._initial_board
 
     @property
     def solving_mode(self):
-        """In which solving mode is board being solved?"""
+        """:class:`Mover` operation mode (:class:`.SolvingMode`)."""
         return self._solving_mode
 
     @property
     def state(self):
-        """
-        Board state tracking through instance of :class:`.HashedBoardState`
-        """
+        """Current board state (:class:`.HashedBoardState`)."""
         return self._state
 
     @property
     def selected_pusher(self):
         """ID of pusher that will perform next move.
 
-        For single-pusher boards the only pusher is always selected so this
-        doesn't need to be called.
+        For single-pusher boards, pusher is always automatically selected so
+        this doesn't need to be called.
 
         Default is :data:`.DEFAULT_PIECE_ID`
         """
@@ -144,9 +142,12 @@ class Mover:
 
     @property
     def pulls_boxes(self):
-        """In reverse solving mode it is optional to pull boxes.
+        """
+        Select behavior in :attr:`.SolvingMode.REVERSE` mode when pusher is
+        moving away from box.
 
-        This flag selects pull behavior.
+        See Also:
+            :meth:`.Mover.move`
         """
         return self._pulls_boxes
 
@@ -156,10 +157,10 @@ class Mover:
 
     @property
     def last_performed_moves(self):
-        """Sequence of :class:`.AtomicMove` that describes most recent movemt
+        """Sequence of :class:`.AtomicMove` that describes most recent movemt.
 
         Sequence contains one :class:`.AtomicMove` or (in case of jumps and
-        pusher selections) a more than one :class:`.AtomicMove` s
+        pusher selections) more than one :class:`.AtomicMove`
 
         This is useful for generating movement animation in GUI after calling
         undo/redo
@@ -169,10 +170,11 @@ class Mover:
     def move(self, direction):
         """Moves currently selected pusher in ``direction``.
 
-        In forward solving mode, pushes the box if it is there.
+        In :attr:`.SolvingMode.FORWARD` mode, pushes the box in front of pusher
+        (if there is one).
 
-        In reverse solving mode pulls box together with pusher depending on
-        self.pulls_boxes.
+        In :attr:`.SolvingMode.REVERSE` mode pulls box together with pusher (if
+        there is one and if ``self.pulls_boxes == True``).
 
         Args:
             direction (Direction): direction of movement
@@ -199,7 +201,8 @@ class Mover:
         """Currently selected pusher jumps to ``new_position``.
 
         Fails if
-            - :class:`Mover` is in forward solving mode
+
+            - :class:`Mover` is in :attr:`.SolvingMode.FORWARD` mode
             - pusher can't be dropped on ``new_position``
             - first pull had been made
 
@@ -237,7 +240,11 @@ class Mover:
         raise IllegalMoveError("Can't jump onto wall, box or pusher!")
 
     def undo(self):
-        """Undoes most recent movement."""
+        """ Undoes most recent movement.
+
+        See Also:
+            :attr:`.Mover.last_performed_moves`
+        """
 
         if len(self.__last_performed_moves) == 1:
             options = MoveWorkerOptions()
@@ -270,7 +277,7 @@ class Mover:
 
         Returns undo sequence of moves.
 
-        Stops after  all moves from ``moves`` are undone of illegal move is
+        Stops after  all moves from ``moves`` are undone or illegal move is
         encountered.
         """
         retv = []

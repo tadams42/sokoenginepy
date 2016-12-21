@@ -12,6 +12,6 @@ from .snapshot import AtomicMove, Snapshot, SnapshotConversionError
 from .tessellation import (COLUMN, ROW, CellOrientation, Direction,
                            Tessellation,
                            UnknownDirectionError, X, Y,
-                           index_1d, on_board_1d, on_board_2d)
+                           index_1d, is_on_board_1d, is_on_board_2d)
 from .utilities import RleCharacters, SokoengineError, rle_decode, rle_encode
 from .version import __version__

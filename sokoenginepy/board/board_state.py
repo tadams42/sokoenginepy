@@ -208,16 +208,6 @@ class BoardState:
         """
         return position in self._pushers.keys(self._INDEX_POS)
 
-    def _move_pusher(self, pusher_id, old_position, to_new_position):
-        try:
-            self._pushers[self._INDEX_ID:pusher_id] = to_new_position
-        except ValueExistsError:
-            raise CellAlreadyOccupiedError(
-                "Pusher can't be placed onto pusher in position: {0}".format(
-                    to_new_position
-                )
-            )
-
     def move_pusher_from(self, old_position, to_new_position):
         """Updates board state with changed pusher position.
 
@@ -243,10 +233,19 @@ class BoardState:
         """
         if old_position == to_new_position:
             return
-        pid = self.pusher_id_on(old_position)
-        self._move_pusher(pid, old_position, to_new_position)
 
-    def move_pusher(self, pid, to_new_position):
+        try:
+            self._pushers[
+                self._INDEX_ID:self.pusher_id_on(old_position)
+            ] = to_new_position
+        except ValueExistsError:
+            raise CellAlreadyOccupiedError(
+                "Pusher can't be placed onto pusher in position: {0}".format(
+                    to_new_position
+                )
+            )
+
+    def move_pusher(self, pusher_id, to_new_position):
         """Updates board state with changed pusher position.
 
         Args:
@@ -268,10 +267,7 @@ class BoardState:
         Warning:
             It doesn't verify if ``to_new_position`` is valid on-board position.
         """
-        old_position = self.pusher_position(pid)
-        if old_position == to_new_position:
-            return
-        self._move_pusher(pid, old_position, to_new_position)
+        self.move_pusher_from(self.pusher_position(pusher_id), to_new_position)
 
     # --------------------------------------------------------------------------
     # Boxes
@@ -352,16 +348,6 @@ class BoardState:
         """
         return position in self._boxes.keys(self._INDEX_POS)
 
-    def _move_box(self, box_id, box_plus_id, old_position, to_new_position):
-        try:
-            self._boxes[self._INDEX_ID:box_id] = to_new_position
-        except ValueExistsError:
-            raise CellAlreadyOccupiedError(
-                "Box can't be placed onto box in position: {0}".format(
-                    to_new_position
-                )
-            )
-
     def move_box_from(self, old_position, to_new_position):
         """Updates board state with changed box position.
 
@@ -387,11 +373,19 @@ class BoardState:
         """
         if old_position == to_new_position:
             return
-        pid = self.box_id_on(old_position)
-        box_plus_id = self.box_plus_id(pid)
-        self._move_box(pid, box_plus_id, old_position, to_new_position)
 
-    def move_box(self, pid, to_new_position):
+        try:
+            self._boxes[
+                self._INDEX_ID:self.box_id_on(old_position)
+            ] = to_new_position
+        except ValueExistsError:
+            raise CellAlreadyOccupiedError(
+                "Box can't be placed onto box in position: {0}".format(
+                    to_new_position
+                )
+            )
+
+    def move_box(self, box_id, to_new_position):
         """Updates board state with changed box position.
 
         Args:
@@ -413,11 +407,7 @@ class BoardState:
         Warning:
             It doesn't verify if ``to_new_position`` is valid on-board position.
         """
-        old_position = self.box_position(pid)
-        if old_position == to_new_position:
-            return
-        box_plus_id = self.box_plus_id(pid)
-        self._move_box(pid, box_plus_id, old_position, to_new_position)
+        self.move_box_from(self.box_position(box_id), to_new_position)
 
     # --------------------------------------------------------------------------
     # Goals
@@ -505,14 +495,14 @@ class BoardState:
     def box_plus_id(self, pid):
         """
         See Also:
-            :meth:`~sokoenginepy.board.sokoban_plus.SokobanPlus.box_plus_id`
+            :meth:`.SokobanPlus.box_plus_id`
         """
         return self._sokoban_plus.box_plus_id(pid)
 
     def goal_plus_id(self, pid):
         """
         See Also:
-            :meth:`~sokoenginepy.board.sokoban_plus.SokobanPlus.goal_plus_id`
+            :meth:`.SokobanPlus.goal_plus_id`
         """
         return self._sokoban_plus.goal_plus_id(pid)
 
@@ -520,7 +510,7 @@ class BoardState:
     def boxorder(self):
         """
         See Also:
-            :attr:`~sokoenginepy.board.sokoban_plus.SokobanPlus.boxorder`
+            :attr:`.SokobanPlus.boxorder`
         """
         return self._sokoban_plus.boxorder
 
@@ -532,7 +522,7 @@ class BoardState:
     def goalorder(self):
         """
         See Also:
-            :attr:`~sokoenginepy.board.sokoban_plus.SokobanPlus.goalorder`
+            :attr:`.SokobanPlus.goalorder`
         """
         return self._sokoban_plus.goalorder
 
@@ -562,6 +552,9 @@ class BoardState:
 
         Yields:
             dict: {box_id1: box_position1, box_id2: box_position2, ...}
+
+        Note:
+            Resultset depends on :attr:`.BoardState.is_sokoban_plus_enabled`.
         """
         if self.boxes_count != self.goals_count:
             return []
@@ -617,12 +610,22 @@ class BoardState:
         """Switches positions of boxes and goals pairs.
 
         Returns:
-            dict: operations that need to pe performed on board cells.
+            dict: operations that need to pe performed on board cells, ie
+
+            .. code-block:: python
+
+                {
+                    pushers_to_remove: [42, 24],
+                    pushers_to_place: [43, 34],
+                    switches: [4, 2]
+                }
+
+            where:
 
                 - ``pushers_to_remove``: positions of pusher cells from which
                   pusher has to be removed before switch
                 - ``pushers_to_place``: positions of pusher cells on which
-                  pusher has to be placed after
+                  pusher has to be placed after switch
                 - ``switches``: positions of board cells on which switch has to
                   be performed
         """

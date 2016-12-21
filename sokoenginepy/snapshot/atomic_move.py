@@ -7,21 +7,21 @@ class AtomicMove:
     """Represents single step of pusher movement.
 
         - move - pusher moved without pushing box
-        - push/pull - pusher moved and pushed a box in front of it (FORWARD
-          solving mode) or pusher moved and pulled a box behind it (REVERSE
-          solving mode)
+        - push/pull - pusher moved and pushed a box in front of it (
+          :attr:`.SolvingMode.FORWARD`) or pusher moved and pulled a box behind
+          it (:attr:`.SolvingMode.REVERSE`)
         - jump - single step in pusher jump sequence (jumps are allowed only in
-          REVERSE solving mode)
+          :attr:`.SolvingMode.REVERSE`)
         - pusher selection - single step in sequence describing focus change of
           active pusher in Multiban games
     """
 
     class Characters(Enum):
         """
-        Characters used in textual representation of snapshots.
+        Characters used in textual representation of :class:`AtomicMove`.
 
         Not all variants use all characters. Also, for different variants, same
-        character may have different meaning (ie. different represnet different
+        character may have different meaning (represent different
         :class:`.Direction`).
         """
         LOWER_L = 'l'
@@ -97,9 +97,9 @@ class AtomicMove:
 
     @property
     def moved_box_id(self):
-        """If pusher performed push/pull, this is ID of box that was moved.
-
-        Otherwise returns None
+        """
+        ID of box that was moved or None, depending on type of
+        :class:`.AtomicMove`
         """
         return self._moved_box_id if self.is_push_or_pull else None
 
@@ -194,7 +194,8 @@ class AtomicMove:
     @property
     def is_jump(self):
         """
-        True if this move is part of pusher jump sequence in REVERSE games.
+        True if this move is part of pusher jump sequence in
+        :attr:`.SolvingMode.REVERSE` games.
         """
         return (
             self._pusher_jumped and not self._box_moved and

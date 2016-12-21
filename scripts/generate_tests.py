@@ -72,7 +72,7 @@ class SpecGenerator:
             from sokoenginepy import (CellOrientation, Direction, HexobanBoard,
                                       OctobanBoard, SokobanBoard, Tessellation,
                                       TriobanBoard, UnknownDirectionError, index_1d,
-                                      on_board_1d)
+                                      is_on_board_1d)
 
 
             def triangle_points_down(position, board_width, board_height):
@@ -169,7 +169,7 @@ class SpecGenerator:
             if test_case['test_type'] == 'tessellation':
                 if self.is_result_illegal_position(test_case, direction):
                     s = """
-                        assert not on_board_1d(t.neighbor_position(index, {0}, width, height), width, height)
+                        assert not is_on_board_1d(t.neighbor_position(index, {0}, width, height), width, height)
                     """.format(self.DIRECTIONS_HASH[direction])
 
                 elif self.is_result_illegal_direction(test_case, direction):
@@ -190,7 +190,7 @@ class SpecGenerator:
                     self.is_result_illegal_direction(test_case, direction)
                 ):
                     s = """
-                        assert not on_board_1d(b.neighbor(index, {0}), width, height)
+                        assert not is_on_board_1d(b.neighbor(index, {0}), width, height)
                     """.format(self.DIRECTIONS_HASH[direction])
                 else:
                     s = """

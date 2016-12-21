@@ -1,4 +1,4 @@
-include LICENSE.md tox.ini .pylintrc .travis.yml
+include LICENSE tox.ini .pylintrc .travis.yml
 recursive-include tests *
 recursive-include docs *
 recursive-include scripts *

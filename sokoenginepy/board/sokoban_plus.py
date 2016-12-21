@@ -34,7 +34,9 @@ class SokobanPlus:
 
     Attributes:
         DEFAULT_PLUS_ID: Sokoban+ ID for pieces that don't have one or when
-            Sokoban+ is disabled. Original Sokoban+ implementation used number
+            Sokoban+ is disabled.
+
+            Original Sokoban+ implementation used number
             99 for default plus ID. As there can be more than 99 boxes on board,
             sokoenginepy changes this detail and uses :const:`DEFAULT_PLUS_ID`
             as default plus ID. When loading older puzzles with Sokoban+, legacy

@@ -8,6 +8,9 @@ class CellOrientation(IntEnum):
     upwards. This means that orientation of all other triangles depends on
     their position. Methods that calculate orientation return one of these
     values.
+
+    See Also:
+        :meth:`.TessellationBase.cell_orientation`
     """
     DEFAULT = 0
     TRIANGLE_DOWN = 1

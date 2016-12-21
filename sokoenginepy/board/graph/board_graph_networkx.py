@@ -8,7 +8,8 @@ This is default and fall back implementation used in sokoenginepy.
 import networkx as nx
 
 from ..board_cell import BoardCell
-from .board_graph_base import BoardGraphBase, GraphType
+from .board_graph_base import BoardGraphBase
+from .graph_type import GraphType
 
 
 class BoardGraphNetworkx(BoardGraphBase):

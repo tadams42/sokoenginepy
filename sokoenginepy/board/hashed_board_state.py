@@ -1,9 +1,10 @@
 import random
 
 from .board_state import BoardState
+from .. import utilities
 
 
-class HashedBoardState(BoardState):
+class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
     """:class:`~sokoenginepy.board.board_state.BoardState` with Zobrist hashing
 
     Adds Zobrist hashing on top of :class:`.BoardState` and keeps it up to date
@@ -143,21 +144,36 @@ class HashedBoardState(BoardState):
 
         return retv
 
-    def _move_box(
-        self, box_id, box_plus_id, from_old_position, to_new_position
-    ):
-        super()._move_box(box_id, box_plus_id, from_old_position, to_new_position)
-        self._layout_hash ^= self._boxes_factors[box_plus_id][from_old_position]
-        self._layout_hash ^= self._boxes_factors[box_plus_id][to_new_position]
-        self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][from_old_position]
-        self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][to_new_position]
+    @copy_ancestor_docstring
+    def move_box_from(self, old_position, to_new_position):
+        super().move_box_from(old_position, to_new_position)
+        if old_position != to_new_position:
+            box_plus_id = self.box_plus_id(self.box_id_on(to_new_position))
 
-    def _move_pusher(self, pusher_id, from_old_position, to_new_position):
-        super()._move_pusher(pusher_id, from_old_position, to_new_position)
-        self._layout_with_pushers_hash ^= self._pushers_factors[from_old_position]
-        self._layout_with_pushers_hash ^= self._pushers_factors[to_new_position]
+            self._layout_hash ^= self._boxes_factors[box_plus_id][old_position]
+            self._layout_hash ^= self._boxes_factors[box_plus_id][
+                to_new_position
+            ]
+            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
+                old_position
+            ]
+            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
+                to_new_position
+            ]
+
+    @copy_ancestor_docstring
+    def move_pusher_from(self, old_position, to_new_position):
+        super().move_pusher_from(old_position, to_new_position)
+        if old_position != to_new_position:
+            self._layout_with_pushers_hash ^= self._pushers_factors[
+                old_position
+            ]
+            self._layout_with_pushers_hash ^= self._pushers_factors[
+                to_new_position
+            ]
 
     @BoardState.boxorder.setter
+    @copy_ancestor_docstring
     def boxorder(self, rv):
         old_plus_enabled = self.is_sokoban_plus_enabled
         BoardState.boxorder.fset(self, rv)
@@ -165,6 +181,7 @@ class HashedBoardState(BoardState):
             self._zobrist_rehash()
 
     @BoardState.goalorder.setter
+    @copy_ancestor_docstring
     def goalorder(self, rv):
         old_plus_enabled = self.is_sokoban_plus_enabled
         BoardState.goalorder.fset(self, rv)
@@ -172,6 +189,7 @@ class HashedBoardState(BoardState):
             self._zobrist_rehash()
 
     @BoardState.is_sokoban_plus_enabled.setter
+    @copy_ancestor_docstring
     def is_sokoban_plus_enabled(self, rv):
         old_plus_enabled = self.is_sokoban_plus_enabled
         BoardState.is_sokoban_plus_enabled.fset(self, rv)
@@ -192,6 +210,7 @@ class HashedBoardState(BoardState):
 
         return self._layout_hash in self._solutions_hashes
 
+    @copy_ancestor_docstring
     def switch_boxes_and_goals(self):
         retv = super().switch_boxes_and_goals()
         self._solutions_hashes = None

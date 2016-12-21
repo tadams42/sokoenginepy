@@ -17,3 +17,5 @@ main.py
 dist
 .cache/
 coverage.xml
+*.log
+

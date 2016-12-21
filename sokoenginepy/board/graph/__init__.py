@@ -4,4 +4,4 @@ try:
 except ImportError:
     from .board_graph_networkx import BoardGraphNetworkx as BoardGraph
 
-from .board_graph_base import GraphType
+from .graph_type import GraphType

@@ -15,8 +15,8 @@ class Snapshot(MutableSequence):
     """Sequence of AtomicMove representing snapshot of game.
 
     Args:
-        tessellation (Tessellation): game tessellation as string or
-            :class:`.Tessellation` instance
+        tessellation_or_description (Tessellation): game tessellation as string
+            or :class:`.Tessellation` instance
         solving_mode (SolvingMode): game solving mode
         moves_data (string): Strings consisting of characters representing
             :class:`.AtomicMove`. If not empty it will be parsed. Also, if not
@@ -170,11 +170,9 @@ class Snapshot(MutableSequence):
 
     @property
     def moves_count(self):
-        """Count of atomic moves in self that are not pushes.
-
-        Note:
-            This doesn't account moves that are used for pusher selection in
-            Multiban games.
+        """
+        Count of atomic moves in self that are not pushes, not jumps and are
+        not pusher selections.
         """
         return self._moves_count
 
