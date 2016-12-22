@@ -2,11 +2,21 @@ import factory
 import pytest
 
 from helpers import fake
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, BoardCell, BoardState,
-                          Direction, HashedBoardState, Mover, Snapshot,
-                          SokobanBoard, SokobanPlus, SolvingMode, Tessellation,
-                          index_1d)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID, AtomicMove, BoardCell, BoardState, Direction,
+    HashedBoardState, Mover, Snapshot, SokobanBoard, SokobanPlus, SolvingMode,
+    Tessellation, index_1d, settings
+)
 
+
+@pytest.fixture(scope='function', autouse=True)
+def preserved_settings(request):
+    backup_flag1 = settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
+
+    def teardown():
+        settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = backup_flag1
+
+    request.addfinalizer(teardown)
 
 class AtomicMoveFactory(factory.Factory):
     class Meta:

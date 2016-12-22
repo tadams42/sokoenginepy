@@ -18,4 +18,4 @@ dist
 .cache/
 coverage.xml
 *.log
-
+.benchmarks

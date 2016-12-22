@@ -128,7 +128,7 @@ def _copy_ancestor_docstring(mro, fn):
 
 class InheritableDocstrings(type):
     @classmethod
-    def __prepare__(cls, name, bases, **kwds):
+    def __prepare__(mcs, name, bases, **kwds):
         classdict = super().__prepare__(name, bases, *kwds)
 
         # Inject decorators into class namespace

@@ -1,7 +1,7 @@
 from .. import utilities
 
 #: All pieces on board (pushers, boxes) and goals are assigned ID to be used for
-#: referring them . 
+#: referring them.
 #:
 #: Piece ids are assigned by numbering each type of piece or goal starting with
 #: ``DEFAULT_PIECE_ID``

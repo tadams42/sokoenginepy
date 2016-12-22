@@ -319,8 +319,9 @@ class HexobanTextConverter:
                     break
 
                 if (
-                    not BoardCell.is_empty_floor_chr(normalized[row][column]) and
-                    (column > x or row > y)
+                    not BoardCell.is_empty_floor_chr(
+                        normalized[row][column]
+                    ) and (column > x or row > y)
                 ):
                     x = column
                     y = row

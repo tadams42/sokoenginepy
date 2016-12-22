@@ -2,11 +2,10 @@ from unittest.mock import patch
 
 import pytest
 
-from sokoenginepy import (BoardConversionError, BoardGraph, Direction,
-                          SokobanBoard, Tessellation, TriobanBoard,
-                          VariantBoard, index_1d, settings)
-
-settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
+from sokoenginepy import (
+    BoardConversionError, BoardGraph, Direction, SokobanBoard, Tessellation,
+    TriobanBoard, VariantBoard, index_1d, settings
+)
 
 
 class DescribeVariantBoard:
@@ -406,6 +405,7 @@ class DescribeVariantBoard:
         def test_adds_right_columns_and_bottom_rows_when_enlarging(
             self, variant_board
         ):
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             output = "\n".join([
                 "----#####------------",
                 "----#--@#------------",
@@ -431,6 +431,7 @@ class DescribeVariantBoard:
         def test_removes_right_columns_and_bottom_rows_when_compacting(
             self, variant_board
         ):
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             output = "\n".join([
                 "----#####--------",
                 "----#--@#--------",
@@ -458,7 +459,10 @@ class DescribeVariantBoard:
 
     class describe_resize_and_center:
 
-        def test_adds_columns_and_rows_when_enlarging(self, variant_board):
+        def test_adds_columns_and_rows_when_enlarging(
+            self, variant_board
+        ):
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             output = "\n".join([
                 "------------------------",
                 "------------------------",
@@ -487,6 +491,7 @@ class DescribeVariantBoard:
         def test_removes_right_columns_and_bottom_rows_when_compacting(
             self, variant_board
         ):
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             output = "\n".join([
                 "----#####--------",
                 "----#--@#--------",
@@ -536,6 +541,7 @@ class DescribeVariantBoard:
     class describe_reverse_rows:
 
         def test_mirrors_board_up_down(self, variant_board):
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             output = "\n".join([
                 "----#######--------",
                 "----#-----#########",
@@ -555,6 +561,7 @@ class DescribeVariantBoard:
     class describe_reverse_columns:
 
         def test_mirrors_board_left_rightt(self, variant_board):
+            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             output = "\n".join([
                 "----------#####----",
                 "----------#@--#----",

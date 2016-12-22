@@ -476,26 +476,26 @@ class SOKWriter:
         if written:
             self.dest_stream.write('\n')
 
-    def _write_snapshot(self, snapshot):
-        if utilities.is_blank(snapshot.moves):
+    def _write_snapshot(self, snap):
+        if utilities.is_blank(snap.moves):
             return
 
-        if not utilities.is_blank(snapshot.title):
-            self.dest_stream.write(snapshot.title.strip() + "\n\n")
+        if not utilities.is_blank(snap.title):
+            self.dest_stream.write(snap.title.strip() + "\n\n")
 
-        self.dest_stream.write(snapshot.moves.strip() + "\n\n")
+        self.dest_stream.write(snap.moves.strip() + "\n\n")
 
         written = True
-        written = self._write_tagged(SOKTags.SOLVER, snapshot.solver) or written
+        written = self._write_tagged(SOKTags.SOLVER, snap.solver) or written
         written = self._write_tagged(
-            SOKTags.SNAPSHOT_CREATED_AT, snapshot.created_at
+            SOKTags.SNAPSHOT_CREATED_AT, snap.created_at
         ) or written
         written = self._write_tagged(
-            SOKTags.DURATION, snapshot.duration
+            SOKTags.DURATION, snap.duration
         ) or written
 
-        if not utilities.is_blank(snapshot.notes):
-            self.dest_stream.write(snapshot.notes.rstrip() + "\n")
+        if not utilities.is_blank(snap.notes):
+            self.dest_stream.write(snap.notes.rstrip() + "\n")
             written = True
 
         if written:
