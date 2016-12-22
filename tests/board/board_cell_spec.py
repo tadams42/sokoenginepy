@@ -245,45 +245,6 @@ class DescribeBoardCell:
             assert board_cell.is_deadlock
             assert board_cell.is_in_playable_area
 
-    class Describe_switch_box_and_goal:
-
-        def it_switches_box_for_goal(self, board_cell):
-            board_cell.has_box = True
-            board_cell.has_goal = False
-            board_cell.switch_box_and_goal()
-            assert not board_cell.has_box
-            assert board_cell.has_goal
-
-        def it_switches_goal_for_box(self, board_cell):
-            board_cell.has_box = False
-            board_cell.has_goal = True
-            board_cell.switch_box_and_goal()
-            assert board_cell.has_box
-            assert not board_cell.has_goal
-
-        def it_doesnt_switch_goal_if_pusher_is_standing_on_it(self, board_cell):
-            board_cell.has_goal = True
-            board_cell.has_pusher = True
-            board_cell.switch_box_and_goal()
-            assert board_cell.has_goal
-            assert board_cell.has_pusher
-            assert not board_cell.has_box
-
-        def it_doesnt_change_secondary_flags(self, board_cell):
-            board_cell.has_box = True
-            board_cell.is_deadlock = True
-            board_cell.is_in_playable_area = True
-            board_cell.switch_box_and_goal()
-            assert board_cell.is_in_playable_area
-            assert board_cell.is_deadlock
-
-        def it_fails_silently_if_no_switch_can_be_performed(self, board_cell):
-            board_cell.is_wall = True
-            board_cell.switch_box_and_goal()
-            assert board_cell.is_wall
-            assert not board_cell.has_goal
-            assert not board_cell.has_box
-
     class Describe_can_put_pusher_or_box:
 
         def it_returns_true_for_empty_floor(self, board_cell):

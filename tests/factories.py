@@ -114,6 +114,24 @@ def board_str():
     # yapf: enable
 
 @pytest.fixture
+def switched_board_str():
+    # yapf: disable
+    return "\n".join([
+        "    #####",
+        "    #  @#",
+        "    #.  #",
+        "  ###  .##",
+        "  #  . . #",
+        "### # ## #   ######",
+        "#   # ## #####  $$#",
+        "# .  .          $$#",
+        "##### ### #@##  $$#",
+        "    #     #########",
+        "    #######",
+    ])
+    # yapf: enable
+
+@pytest.fixture
 def board_str_width():
     return 19
 

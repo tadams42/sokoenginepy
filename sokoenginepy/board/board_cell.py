@@ -170,19 +170,6 @@ class BoardCell:
             False
         return self
 
-    def switch_box_and_goal(self):
-        """Changes box into goal and vice versa.
-
-        In case there is pusher on goal, does nothing.
-        """
-        if self.has_box and not self.has_goal:
-            self._has_box = False
-            self._has_goal = True
-        elif not self.has_box and self.has_goal and not self.has_pusher:
-            self._has_box = True
-            self._has_goal = False
-        return self
-
     @property
     def has_piece(self):
         """True if there is pusher, box or goal on this cell."""

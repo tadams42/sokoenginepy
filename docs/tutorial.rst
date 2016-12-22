@@ -154,8 +154,7 @@ game mechanics like this:
     >>> forward_mover.selected_pusher = DEFAULT_PIECE_ID + 1
     >>> # perform movement
     >>> forward_mover.move(Direction.UP)
-    True
-    >>> # try to perform illegal move raises IllegalMoveError
+    >>> # try to perform illegal move raises CellAlreadyOccupiedError
     >>> try:
     ...     forward_mover.move(Direction.UP)
     ... except IllegalMoveError:

@@ -16,13 +16,13 @@ class CellAlreadyOccupiedError(utilities.SokoengineError):
 
 
 class BoardState:
-    """Memoizes and tracks positions and position changes of all pieces.
+    """Memoizes, tracks and updates positions of all pieces.
 
     - Provides efficient means to inspect positions of pushers, boxes and goals.
       To understand how this works, we need to have a way of identifying
       individual pushers, boxes and goals. :class:`.BoardState` does that by
       assigning numerical ID to each individual piece. This ID can then be used
-      to refer that piece in various contexts.
+      to refer to that piece in various contexts.
 
       IDs are assigned by simply counting from top left corner of board,
       starting with :data:`.DEFAULT_PIECE_ID`
@@ -30,18 +30,16 @@ class BoardState:
       .. image:: /images/assigning_ids.png
           :alt: Assigning board elements' IDs
 
-    - Provides efficient means of state updates. Ie. we can move pushers and
-      boxes and state will update.
+    - Provides efficient means of pieces movemet. Ie. we can move pushers and
+      boxes and :class:`BoardState` will update internal state and board cells.
 
-      Note that this movement doesn't implement game logic - it is perfectly
-      legal to move pusher onto ie. wall position. What movement implementation
-      does here is preservation of piece IDs in contex of board state changes.
-
-      Let's assume we create :class:`.BoardState`, then edit the board, placing
-      pusher somwhere else, and then create :class:`.BoardState` again. This
-      pusher on new position may in general case get completely new ID.
-      Instead, there are movement methods that allow updating pusher and box
-      positions when movement occurs:
+      This movement preserves piece IDs in contex of board state changes. To
+      ilustrate, let's assume we create :class:`.BoardState` from board with two
+      pushers one abowe the other. After then we edit the board, placing pusher
+      ID 2 in row abowe pusher ID 1. Finally, we create another instance of
+      :class:`.BoardState`. If we now inspect pusher IDs in first and second
+      :class:`.BoardState` instance, they will be different. Have we used
+      movement methods instead of board editing, these IDs would be preserved:
 
       +----------------------------------------------+----------------------------------------------+----------------------------------------------+
       | 1) Initial board                             | 2) Edited board                              | 3) Box moved                                 |
@@ -49,16 +47,17 @@ class BoardState:
       | .. image:: /images/movement_vs_transfer1.png | .. image:: /images/movement_vs_transfer2.png | .. image:: /images/movement_vs_transfer3.png |
       +----------------------------------------------+----------------------------------------------+----------------------------------------------+
 
+    Note:
+        Movement methods here are just for state and board cell updates, they
+        don't implement full game logic. For game logic see :class:`.Mover`
+
     Warning:
-        All changes made to :class:`.BoardState` are not automatically
-        reflected onto :class:`.BoardCell` of tracked :class:`.VariantBoard`.
-        Ie. if we use :meth:`move_pusher` it will only update
-        :class:`BoardState`, not the :class:`.VariantBoard` itself. Also, edits
-        preformed on :class:`.VariantBoard` outside of :class:`BoardState` are
-        not automatically reflected onto :class:`BoardState` that is used to
-        track that :class:`.VariantBoard`. Clients of :class:`BoardState` and
-        :class:`.VariantBoard` are responsible for keeping board and its state
-        in sync.
+        Once we create instance of :class:`BoardState` from some
+        :class:`VariantBoard` instance, that board should not be edited.
+        :class:`BoardState` will updated cells on board when pieces are moved,
+        and editing board cells directly (ie. adding/removing pushers or boxes,
+        changing board size, changing walls layout, etc...) will not sync these
+        edits back to our :class:`BoardState` instance.
 
     Args:
         variant_board (VariantBoard): board for which we want to manage state
@@ -128,6 +127,10 @@ class BoardState:
     @cached_property
     def board_size(self):
         return self._variant_board.size
+
+    @cached_property
+    def board(self):
+        return self._variant_board
 
     # --------------------------------------------------------------------------
     # Pushers
@@ -209,7 +212,7 @@ class BoardState:
         return position in self._pushers.keys(self._INDEX_POS)
 
     def move_pusher_from(self, old_position, to_new_position):
-        """Updates board state with changed pusher position.
+        """Updates board state and board cells with changed pusher position.
 
         Args:
             old_position (int): starting position
@@ -217,22 +220,18 @@ class BoardState:
 
         Raises:
             :exc:`KeyError`: there is no pusher on ``old_position``
-            :exc:`.CellAlreadyOccupiedError`: there is a pusher already on
-                ``to_new_position``
-
-        Note:
-            Allows placing a pusher onto position occupied by box. This is for
-            cases when we switch box/goals positions in reverse solving mode.
-            In this situation it is legal for pusher to end up standing on top
-            of the box. Game rules say that for these situations, first move(s)
-            must be jumps.
-
-        Warning:
-            It doesn't verify if ``old_position`` or ``to_new_position`` are
-            valid on-board positions.
+            :exc:`.CellAlreadyOccupiedError`: there is an obstacle (
+                wall/box/antoher pusher) on ``to_new_position``
         """
         if old_position == to_new_position:
             return
+
+        dest_cell = self._variant_board[to_new_position]
+        if not dest_cell.can_put_pusher_or_box:
+            raise CellAlreadyOccupiedError(
+                "Pusher can't be placed in position " +
+                "{0} occupied by '{1}'".format(to_new_position, dest_cell)
+            )
 
         try:
             self._pushers[
@@ -245,8 +244,11 @@ class BoardState:
                 )
             )
 
+        self._variant_board[old_position].remove_pusher()
+        dest_cell.put_pusher()
+
     def move_pusher(self, pusher_id, to_new_position):
-        """Updates board state with changed pusher position.
+        """Updates board state and board cells with changed pusher position.
 
         Args:
             pid (int): pusher ID
@@ -374,6 +376,13 @@ class BoardState:
         if old_position == to_new_position:
             return
 
+        dest_cell = self._variant_board[to_new_position]
+        if not dest_cell.can_put_pusher_or_box:
+            raise CellAlreadyOccupiedError(
+                "Box can't be placed on position " +
+                "{0} occupied by '{1}'".format(to_new_position, dest_cell)
+            )
+
         try:
             self._boxes[
                 self._INDEX_ID:self.box_id_on(old_position)
@@ -384,6 +393,9 @@ class BoardState:
                     to_new_position
                 )
             )
+
+        self._variant_board[old_position].remove_box()
+        dest_cell.put_box()
 
     def move_box(self, box_id, to_new_position):
         """Updates board state with changed box position.
@@ -607,58 +619,43 @@ class BoardState:
             del(boxes_todo[index])
 
     def switch_boxes_and_goals(self):
-        """Switches positions of boxes and goals pairs.
-
-        Returns:
-            dict: operations that need to pe performed on board cells, ie
-
-            .. code-block:: python
-
-                {
-                    pushers_to_remove: [42, 24],
-                    pushers_to_place: [43, 34],
-                    switches: [4, 2]
-                }
-
-            where:
-
-                - ``pushers_to_remove``: positions of pusher cells from which
-                  pusher has to be removed before switch
-                - ``pushers_to_place``: positions of pusher cells on which
-                  pusher has to be placed after switch
-                - ``switches``: positions of board cells on which switch has to
-                  be performed
-        """
+        """Switches positions of boxes and goals pairs."""
         if self.boxes_count != self.goals_count:
             raise utilities.SokoengineError(
                 "Unable to switch boxes and goals - counts are not the same"
             )
 
-        retv = {
-            'pusher_to_remove': [],
-            'pushers_to_place': [],
-            'switches': [],
-        }
-
         for box_id, goal_id in self._box_goal_pairs():
-            box_position = self.box_position(box_id)
-            goal_position = self.goal_position(goal_id)
+            old_box_position = self.box_position(box_id)
+            old_goal_position = self.goal_position(goal_id)
 
-            if box_position != goal_position:
-                if self.has_pusher_on(goal_position):
-                    retv['pusher_to_remove'].append(goal_position)
-                    retv['pushers_to_place'].append(box_position)
-                    self.move_pusher(
-                        self.pusher_id_on(goal_position), box_position
-                    )
+            if old_box_position != old_goal_position:
+                self._goals[self._INDEX_ID:goal_id] = old_box_position
+                self._variant_board[old_goal_position].remove_goal()
 
-                self.move_box(box_id, goal_position)
-                self._goals[self._INDEX_ID:goal_id] = box_position
+                old_pusher_position = None
+                if self.has_pusher_on(old_goal_position):
+                    # If there is a pusher on goal, we have to remove it before
+                    # we put a box there
+                    old_pusher_position = old_goal_position
+                    self._variant_board[old_goal_position].remove_pusher()
 
-                retv['switches'].append(box_position)
-                retv['switches'].append(goal_position)
+                self.move_box_from(old_box_position, old_goal_position)
+                self._variant_board[old_box_position].put_goal()
 
-        return retv
+                if old_pusher_position:
+                    # There was pusher on former goal cell - we now put it on
+                    # new goal cell avoiding situation where pusher would end up
+                    # standing on top of the box - net result is that box and
+                    # goal switched places and pusher moved to new goal
+                    # position.
+                    # Note that move_pusher_from doesn't mind if there is no
+                    # pusher on src board cell, but would mind if there was no
+                    # pusher in self._pushers. Also, we couldn't just edit
+                    # self._pushers - we need to actually perform movement
+                    # because subclasses might count on it.
+                    self.move_pusher_from(old_pusher_position, old_box_position)
+
 
     @property
     def is_playable(self):

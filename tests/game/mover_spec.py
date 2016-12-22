@@ -1,10 +1,12 @@
 import pytest
 
-from factories import (forward_board, forward_mover, non_playable_board,
-                       reverse_board)
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction,
-                          IllegalMoveError, Mover, NonPlayableBoardError,
-                          SolvingMode, index_1d)
+from factories import (
+    forward_board, forward_mover, non_playable_board, reverse_board
+)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID, AtomicMove, Direction, IllegalMoveError, Mover,
+    NonPlayableBoardError, SolvingMode, index_1d
+)
 
 
 class DescribeMover:
@@ -73,20 +75,20 @@ class DescribeMover:
             src = index_1d(4, 2, forward_mover.board.width)
             dest = index_1d(3, 2, forward_mover.board.width)
 
-            assert forward_mover.move(Direction.LEFT)
+            forward_mover.move(Direction.LEFT)
             assert forward_mover.state.pusher_position(DEFAULT_PIECE_ID) == dest
             assert not forward_mover.board[src].has_pusher
             assert forward_mover.board[dest].has_pusher
 
         def it_pushes_box_in_front_of_pusher(self, forward_mover):
-            assert forward_mover.move(Direction.DOWN)
-            assert forward_mover.move(Direction.RIGHT)
+            forward_mover.move(Direction.DOWN)
+            forward_mover.move(Direction.RIGHT)
 
             box_src = index_1d(5, 2, forward_mover.board.width)
             box_dest = index_1d(5, 1, forward_mover.board.width)
             pusher_src = index_1d(5, 3, forward_mover.board.width)
             pusher_dest = box_src
-            assert forward_mover.move(Direction.UP)
+            forward_mover.move(Direction.UP)
 
             assert forward_mover.state.box_position(
                 DEFAULT_PIECE_ID + 1
@@ -101,18 +103,18 @@ class DescribeMover:
             assert forward_mover.board[pusher_dest].has_pusher
 
         def it_refuses_to_move_pusher_into_obstacles(self, forward_mover):
-            assert forward_mover.move(Direction.UP)
+            forward_mover.move(Direction.UP)
             with pytest.raises(IllegalMoveError):
                 forward_mover.move(Direction.UP)
 
         def it_refuses_to_push_two_boxes(self, forward_mover):
-            assert forward_mover.move(Direction.UP)
-            assert forward_mover.move(Direction.RIGHT)
-            assert forward_mover.move(Direction.DOWN)
+            forward_mover.move(Direction.UP)
+            forward_mover.move(Direction.RIGHT)
+            forward_mover.move(Direction.DOWN)
             forward_mover.selected_pusher = DEFAULT_PIECE_ID + 1
-            assert forward_mover.move(Direction.LEFT)
-            assert forward_mover.move(Direction.LEFT)
-            assert forward_mover.move(Direction.LEFT)
+            forward_mover.move(Direction.LEFT)
+            forward_mover.move(Direction.LEFT)
+            forward_mover.move(Direction.LEFT)
             with pytest.raises(IllegalMoveError):
                 forward_mover.move(Direction.LEFT)
 
@@ -125,7 +127,7 @@ class DescribeMover:
             src = index_1d(4, 2, reverse_mover.board.width)
             dest = index_1d(3, 2, reverse_mover.board.width)
 
-            assert reverse_mover.move(Direction.LEFT)
+            reverse_mover.move(Direction.LEFT)
             assert reverse_mover.state.pusher_position(DEFAULT_PIECE_ID) == dest
             assert not reverse_mover.board[src].has_pusher
             assert reverse_mover.board[dest].has_pusher
@@ -137,7 +139,7 @@ class DescribeMover:
             box_dest = index_1d(4, 2, reverse_mover.board.width)
             pusher_src = box_dest
             pusher_dest = index_1d(4, 3, reverse_mover.board.width)
-            assert reverse_mover.move(Direction.DOWN)
+            reverse_mover.move(Direction.DOWN)
 
             assert reverse_mover.state.box_position(
                 DEFAULT_PIECE_ID
@@ -158,7 +160,7 @@ class DescribeMover:
             pusher_src = index_1d(4, 2, reverse_mover.board.width)
             pusher_dest = index_1d(4, 3, reverse_mover.board.width)
 
-            assert reverse_mover.move(Direction.DOWN)
+            reverse_mover.move(Direction.DOWN)
 
             assert reverse_mover.state.box_position(
                 DEFAULT_PIECE_ID
@@ -174,13 +176,13 @@ class DescribeMover:
 
         def it_refuses_to_push_boxes(self, reverse_mover):
             reverse_mover.pulls_boxes = False
-            assert reverse_mover.move(Direction.LEFT)
-            assert reverse_mover.move(Direction.UP)
+            reverse_mover.move(Direction.LEFT)
+            reverse_mover.move(Direction.UP)
             with pytest.raises(IllegalMoveError):
                 not reverse_mover.move(Direction.RIGHT)
 
         def it_refuses_to_move_pusher_into_obstacles(self, reverse_mover):
-            assert reverse_mover.move(Direction.RIGHT)
+            reverse_mover.move(Direction.RIGHT)
             with pytest.raises(IllegalMoveError):
                 reverse_mover.move(Direction.RIGHT)
 
@@ -316,7 +318,7 @@ class DescribeMover:
             src = index_1d(4, 2, reverse_mover.board.width)
             dest = index_1d(3, 2, reverse_mover.board.width)
 
-            assert reverse_mover.move(Direction.LEFT)
+            reverse_mover.move(Direction.LEFT)
             reverse_mover.undo()
             assert reverse_mover.state.pusher_position(DEFAULT_PIECE_ID) == src
             assert reverse_mover.board[src].has_pusher
@@ -357,7 +359,9 @@ class DescribeMover:
             reverse_mover.move(Direction.DOWN)
             assert reverse_mover.last_performed_moves[0].is_push_or_pull
             reverse_mover.undo()
-            assert reverse_mover.jump(index_1d(1, 1, reverse_mover.board.width))
+            jump_dest = index_1d(1, 1, reverse_mover.board.width)
+            reverse_mover.jump(jump_dest)
+            assert reverse_mover.board[jump_dest].has_pusher
 
     class DescribeMoverBenchmark:
         def it_benchmarks_forward_mover(

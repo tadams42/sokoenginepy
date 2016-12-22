@@ -36,7 +36,7 @@ class DescribeHashedBoardState:
         initial_pus_hash = hashed_board_state.boxes_and_pushers_layout_hash
 
         initial_pusher_position = hashed_board_state.pusher_position(DEFAULT_PIECE_ID)
-        new_pusher_position = initial_pusher_position + 1
+        new_pusher_position = initial_pusher_position - 1
 
         hashed_board_state.move_pusher_from(initial_pusher_position, new_pusher_position)
         assert hashed_board_state.boxes_layout_hash == initial_box_hash

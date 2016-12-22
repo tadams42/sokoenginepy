@@ -2,13 +2,15 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, CellAlreadyOccupiedError,
-                          SokobanPlus)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID, BoardState, CellAlreadyOccupiedError, SokobanBoard,
+    SokobanPlus
+)
 
 
 class DescribeBoardState:
     def it_memoizes_board_size(self, board_state):
-        assert board_state.board_size == board_state._variant_board.size
+        assert board_state.board_size == board_state.board.size
 
     def it_memoizes_pushers(
         self, board_state, pushers_positions, invalid_pusher_position
@@ -137,71 +139,65 @@ class DescribeBoardState:
             {1: 149, 2: 130, 3: 131, 4: 169, 5: 168, 6: 150}
         ]
 
-    def test_moving_box_onto_another_box_raises_exception(self, board_state):
-        first_box_id = DEFAULT_PIECE_ID
-        second_box_id = DEFAULT_PIECE_ID + 1
-        first_box_position = board_state.box_position(first_box_id)
-        second_box_position = board_state.box_position(second_box_id)
-
-        with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_box_from(second_box_position, first_box_position)
-
-        with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_box(second_box_id, first_box_position)
-
-    def test_moving_pusher_onto_another_pusher_raises_exception(self, board_state):
-        first_pusher_id = DEFAULT_PIECE_ID
-        second_pusher_id = DEFAULT_PIECE_ID + 1
-        first_pusher_position = board_state.pusher_position(first_pusher_id)
-        second_pusher_position = board_state.pusher_position(second_pusher_id)
-
-        with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_pusher_from(second_pusher_position, first_pusher_position)
-
-        with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_pusher(second_pusher_id, first_pusher_position)
-
-    def it_allows_moving_box_onto_pusher(self, board_state):
+    def test_moving_box_onto_obstacle_raises_exception(self, board_state):
         box_id = DEFAULT_PIECE_ID
         box_position = board_state.box_position(box_id)
+
+        board_state.board[0].put_box()
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_box(box_id, 0)
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_box_from(box_position, 0)
+
+        board_state.board[0].put_pusher()
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_box(box_id, 0)
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_box_from(box_position, 0)
+
+        board_state.board[0].is_wall = True
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_box(box_id, 0)
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_box_from(box_position, 0)
+
+    def test_moving_pusher_onto_obstacle_raises_exception(self, board_state):
         pusher_id = DEFAULT_PIECE_ID
         pusher_position = board_state.pusher_position(pusher_id)
 
-        board_state.move_box_from(box_position, pusher_position)
-        assert board_state.box_position(box_id) == pusher_position
-        board_state.move_box_from(pusher_position, box_position)
-        assert board_state.box_position(box_id) == box_position
+        board_state.board[0].put_box()
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_pusher(pusher_id, 0)
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_pusher_from(pusher_position, 0)
 
-        board_state.move_box(box_id, pusher_position)
-        assert board_state.box_position(box_id) == pusher_position
+        board_state.board[0].put_pusher()
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_pusher(pusher_id, 0)
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_pusher_from(pusher_position, 0)
 
-    def it_allows_moving_pusher_onto_box(self, board_state):
-        box_id = DEFAULT_PIECE_ID
-        box_position = board_state.box_position(box_id)
-        pusher_id = DEFAULT_PIECE_ID
-        pusher_position = board_state.pusher_position(pusher_id)
-
-        board_state.move_pusher_from(pusher_position, box_position)
-        assert board_state.pusher_position(pusher_id) == box_position
-        board_state.move_pusher_from(box_position, pusher_position)
-        assert board_state.pusher_position(pusher_id) == pusher_position
-
-        board_state.move_pusher(pusher_id, box_position)
-        assert board_state.pusher_position(pusher_id) == box_position
+        board_state.board[0].is_wall = True
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_pusher(pusher_id, 0)
+        with pytest.raises(CellAlreadyOccupiedError):
+            board_state.move_pusher_from(pusher_position, 0)
 
     def it_implements_switching_box_and_goal_positions(
         self, board_state, boxes_positions, switched_boxes,
-        goals_positions, switched_goals
+        goals_positions, switched_goals, board_str, switched_board_str
     ):
         board_state.switch_boxes_and_goals()
         assert board_state.boxes_positions == switched_boxes
         assert board_state.goals_positions == switched_goals
+        assert str(board_state.board) == switched_board_str
 
-        result = board_state.switch_boxes_and_goals()
+        board_state.switch_boxes_and_goals()
         assert board_state.boxes_positions == boxes_positions
         assert board_state.goals_positions == goals_positions
+        assert str(board_state.board) == board_str
 
-    def test_switching_respects_sokonban_plus_if_enabled(
+    def test_switching_respects_sokoban_plus_if_enabled(
         self, board_state, switched_boxes_plus, switched_goals_plus,
         boxes_positions, goals_positions
     ):
@@ -216,3 +212,26 @@ class DescribeBoardState:
         result = board_state.switch_boxes_and_goals()
         assert board_state.boxes_positions == boxes_positions
         assert board_state.goals_positions == goals_positions
+
+    def test_switching_moves_pusher_out_of_the_way(self):
+        board_str = "\n".join([
+            "########",
+            "#      #",
+            "#  +   #",
+            "#    $ #",
+            "########",
+        ])
+        switched_board_str = "\n".join([
+            "########",
+            "#      #",
+            "#  $   #",
+            "#    + #",
+            "########",
+        ])
+
+        board_state = BoardState(SokobanBoard(board_str=board_str))
+
+        board_state.switch_boxes_and_goals()
+        assert str(board_state.board) == switched_board_str
+        board_state.switch_boxes_and_goals()
+        assert str(board_state.board) == board_str
