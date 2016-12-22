@@ -251,7 +251,7 @@ class BoardState:
         """Updates board state and board cells with changed pusher position.
 
         Args:
-            pid (int): pusher ID
+            pusher_id (int): pusher ID
             to_new_position (int): ending position
 
         Raises:
@@ -401,11 +401,11 @@ class BoardState:
         """Updates board state with changed box position.
 
         Args:
-            pid (int): box ID
+            box_id (int): box ID
             to_new_position (int): ending position
 
         Raises:
-            :exc:`KeyError`: there is no box with ID ``pid``
+            :exc:`KeyError`: there is no box with ID ``box_id``
             :exc:`.CellAlreadyOccupiedError`: there is a box already on
                 ``to_new_position``
 
@@ -655,7 +655,6 @@ class BoardState:
                     # self._pushers - we need to actually perform movement
                     # because subclasses might count on it.
                     self.move_pusher_from(old_pusher_position, old_box_position)
-
 
     @property
     def is_playable(self):
