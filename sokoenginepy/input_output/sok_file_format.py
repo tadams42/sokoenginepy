@@ -344,10 +344,10 @@ class SOKReader:
             self._parse_snapshots(puzzle)
 
     def _parse_snapshots(self, puzzle):
-        for snap in puzzle.snaps:
+        for snap in puzzle.snapshots:
             remaining_lines = []
             for line in snap.notes:
-                if self._is_snap_tag_line(line):
+                if self._is_snapshot_tag_line(line):
                     snap.solver = (
                         snap.solver or
                         self._get_tag_data(SOKTags.AUTHOR, line)
