@@ -1,10 +1,8 @@
-from copy import deepcopy
 from functools import partial
 from itertools import permutations
 from textwrap import dedent, indent
 
 from cached_property import cached_property
-from midict import MIDict, ValueExistsError
 
 from .. import utilities
 from .piece import DEFAULT_PIECE_ID
@@ -63,16 +61,11 @@ class BoardState:
         board (VariantBoard): board for which we want to manage state
     """
 
-    # Following two are needed because accessing .keys('name') in MIDict
-    # doesn't seem to always work
-    _INDEX_ID = 0
-    _INDEX_POS = 1
-
     def __init__(self, board):
         self._board = board
-        self._boxes = MIDict([], ['id', 'position'])
-        self._goals = MIDict([], ['id', 'position'])
-        self._pushers = MIDict([], ['id', 'position'])
+        self._boxes = utilities.Flipdict()
+        self._goals = utilities.Flipdict()
+        self._pushers = utilities.Flipdict()
 
         pusher_id = box_id = goal_id = DEFAULT_PIECE_ID
 
@@ -80,15 +73,15 @@ class BoardState:
             cell = board[position]
 
             if cell.has_pusher:
-                self._pushers[self._INDEX_ID:pusher_id] = position
+                self._pushers[pusher_id] = position
                 pusher_id += 1
 
             if cell.has_box:
-                self._boxes[self._INDEX_ID:box_id] = position
+                self._boxes[box_id] = position
                 box_id += 1
 
             if cell.has_goal:
-                self._goals[self._INDEX_ID:goal_id] = position
+                self._goals[goal_id] = position
                 goal_id += 1
 
         self._sokoban_plus = SokobanPlus(
@@ -98,7 +91,7 @@ class BoardState:
     def __str__(self):
         return "<{klass} pushers={pushers},".format(
             klass=self.__class__.__name__,
-            pushers=self.pushers_positions,
+            pushers=list(self.pushers_positions),
         ) + indent(dedent(
             """
             boxes={boxes},
@@ -108,8 +101,8 @@ class BoardState:
             tessellation='{tessellation}',
             board=
             """.format(
-                boxes=self.boxes_positions,
-                goals=self.goals_positions,
+                boxes=list(self.boxes_positions),
+                goals=list(self.goals_positions),
                 boxorder=str(self.boxorder),
                 goalorder=str(self.goalorder),
                 tessellation=str(self._board.tessellation)
@@ -143,7 +136,7 @@ class BoardState:
         Returns:
             list: integer IDs of all pushers on board
         """
-        return list(self._pushers.keys(self._INDEX_ID))
+        return list(self._pushers.keys())
 
     @property
     def pushers_positions(self):
@@ -154,26 +147,23 @@ class BoardState:
 
                 {1: 42, 2: 24}
         """
-        return dict(
-            (pid, self._pushers[self._INDEX_ID:pid])
-            for pid in self._pushers.keys(self._INDEX_ID)
-        )
+        return dict(self._pushers)
 
-    def pusher_position(self, pid):
+    def pusher_position(self, pusher_id):
         """
         Args:
-            pid (int): pusher ID
+            pusher_id (int): pusher ID
 
         Returns:
             int: pusher position
 
         Raises:
-            :exc:`KeyError`: No pusher with ID ``pid``
+            :exc:`KeyError`: No pusher with ID ``pusher_id``
         """
         try:
-            return self._pushers[self._INDEX_ID:pid]
+            return self._pushers[pusher_id]
         except KeyError:
-            raise KeyError("No pusher with ID: {0}".format(pid))
+            raise KeyError("No pusher with ID: {0}".format(pusher_id))
 
     def pusher_id_on(self, position):
         """ID of pusher on position.
@@ -188,24 +178,23 @@ class BoardState:
             :exc:`KeyError`: No pusher on ``position``
         """
         try:
-            return self._pushers[self._INDEX_POS:position]
+            return self._pushers.flip[position]
         except KeyError:
             raise KeyError("No pusher on position: {0}".format(position))
 
-    def has_pusher(self, pid):
+    def has_pusher(self, pusher_id):
         """
         Args:
-            pid (int): pusher ID
+            pusher_id (int): pusher ID
         """
-        # TODO Buggy MIDict forces us to convert to list here
-        return pid in list(self._pushers.keys(self._INDEX_ID))
+        return pusher_id in self._pushers
 
     def has_pusher_on(self, position):
         """
         Args:
             position (int): position to check
         """
-        return position in self._pushers.keys(self._INDEX_POS)
+        return position in self._pushers.flip
 
     def move_pusher_from(self, old_position, to_new_position):
         """Updates board state and board cells with changed pusher position.
@@ -232,10 +221,8 @@ class BoardState:
             )
 
         try:
-            self._pushers[
-                self._INDEX_ID:self.pusher_id_on(old_position)
-            ] = to_new_position
-        except ValueExistsError:
+            self._pushers[self._pushers.flip[old_position]] = to_new_position
+        except KeyError:
             raise CellAlreadyOccupiedError(
                 "Pusher ID: {0} ".format(self.pusher_id_on(old_position)) +
                 "can't be placed in position {0} occupied by '{1}'".format(
@@ -254,7 +241,7 @@ class BoardState:
             to_new_position (int): ending position
 
         Raises:
-            :exc:`KeyError`: there is no pusher with ID ``pid``
+            :exc:`KeyError`: there is no pusher with ID ``pusher_id``
             :exc:`.CellAlreadyOccupiedError`: there is a pusher already on
                 ``to_new_position``
 
@@ -268,7 +255,7 @@ class BoardState:
         Warning:
             It doesn't verify if ``to_new_position`` is valid on-board position.
         """
-        self.move_pusher_from(self.pusher_position(pusher_id), to_new_position)
+        self.move_pusher_from(self._pushers[pusher_id], to_new_position)
 
     # --------------------------------------------------------------------------
     # Boxes
@@ -285,7 +272,7 @@ class BoardState:
         Returns:
             list: integer IDs of all boxes on board
         """
-        return list(self._boxes.keys(self._INDEX_ID))
+        return list(self._boxes.keys())
 
     @property
     def boxes_positions(self):
@@ -296,26 +283,23 @@ class BoardState:
 
                 {1: 42, 2: 24}
         """
-        return dict(
-            (pid, self._boxes[self._INDEX_ID:pid])
-            for pid in self._boxes.keys(self._INDEX_ID)
-        )
+        return dict(self._boxes)
 
-    def box_position(self, pid):
+    def box_position(self, box_id):
         """
         Args:
-            pid (int): box ID
+            box_id (int): box ID
 
         Returns:
             int: box position
 
         Raises:
-            KeyError: No box with ID ``pid``
+            :exc:`KeyError`: No box with ID ``box_id``
         """
         try:
-            return self._boxes[self._INDEX_ID:pid]
+            return self._boxes[box_id]
         except KeyError:
-            raise KeyError("No box with ID: {0}".format(pid))
+            raise KeyError("No box with ID: {0}".format(box_id))
 
     def box_id_on(self, position):
         """ID of box on position.
@@ -327,30 +311,29 @@ class BoardState:
             int: box ID
 
         Raises:
-            KeyError: No box on ``position``
+            :exc:`KeyError`: No box on ``position``
         """
         try:
-            return self._boxes[self._INDEX_POS:position]
+            return self._boxes.flip[position]
         except KeyError:
             raise KeyError("No box on position: {0}".format(position))
 
-    def has_box(self, pid):
+    def has_box(self, box_id):
         """
         Args:
-            pid (int): box ID
+            box_id (int): box ID
         """
-        # TODO Buggy MIDict forces us to convert to list here
-        return pid in list(self._boxes.keys(self._INDEX_ID))
+        return box_id in self._boxes
 
     def has_box_on(self, position):
         """
         Args:
             position (int): position to check
         """
-        return position in self._boxes.keys(self._INDEX_POS)
+        return position in self._boxes.flip
 
     def move_box_from(self, old_position, to_new_position):
-        """Updates board state with changed box position.
+        """Updates board state and board cells with changed box position.
 
         Args:
             old_position (int): starting position
@@ -358,19 +341,8 @@ class BoardState:
 
         Raises:
             :exc:`KeyError`: there is no box on ``old_position``
-            :exc:`.CellAlreadyOccupiedError`: there is a box already on
-                ``to_new_position``
-
-        Note:
-            Allows placing of a box onto position occupied by pusher. This is
-            for cases when we switch box/goals positions in reverse solving
-            mode. In this situation it is legal for pusher to end up standing
-            on top of the box. Game rules say that for these situations, first
-            move(s) must be jumps
-
-        Warning:
-            It doesn't verify if ``old_position`` or ``to_new_position`` are
-            valid on-board positions.
+            :exc:`.CellAlreadyOccupiedError`: there is an obstacle (
+                wall/box/antoher pusher) on ``to_new_position``
         """
         if old_position == to_new_position:
             return
@@ -385,9 +357,7 @@ class BoardState:
             )
 
         try:
-            self._boxes[
-                self._INDEX_ID:self.box_id_on(old_position)
-            ] = to_new_position
+            self._boxes[self._boxes.flip[old_position]] = to_new_position
         except ValueExistsError:
             raise CellAlreadyOccupiedError(
                 "Box ID: {0} ".format(self.box_id_on(old_position)) +
@@ -400,28 +370,18 @@ class BoardState:
         dest_cell.put_box()
 
     def move_box(self, box_id, to_new_position):
-        """Updates board state with changed box position.
+        """Updates board state and board cells with changed box position.
 
         Args:
-            box_id (int): box ID
+            old_position (int): starting position
             to_new_position (int): ending position
 
         Raises:
-            :exc:`KeyError`: there is no box with ID ``box_id``
-            :exc:`.CellAlreadyOccupiedError`: there is a box already on
-                ``to_new_position``
-
-        Note:
-            Allows placing of a box onto position occupied by pusher. This is
-            for cases when we switch box/goals positions in reverse solving
-            mode. In this situation it is legal for pusher to end up standing
-            on top of the box. Game rules say that for these situations, first
-            move(s) must be jumps
-
-        Warning:
-            It doesn't verify if ``to_new_position`` is valid on-board position.
+            :exc:`KeyError`: there is no box on ``old_position``
+            :exc:`.CellAlreadyOccupiedError`: there is an obstacle (
+                wall/box/antoher pusher) on ``to_new_position``
         """
-        self.move_box_from(self.box_position(box_id), to_new_position)
+        self.move_box_from(self._boxes[box_id], to_new_position)
 
     # --------------------------------------------------------------------------
     # Goals
@@ -438,7 +398,7 @@ class BoardState:
         Returns:
             list: integer IDs of all goals on board
         """
-        return list(self._goals.keys(self._INDEX_ID))
+        return list(self._goals.keys())
 
     @property
     def goals_positions(self):
@@ -449,26 +409,23 @@ class BoardState:
 
                 {1: 42, 2: 24}
         """
-        return dict(
-            (pid, self._goals[self._INDEX_ID:pid])
-            for pid in self._goals.keys(self._INDEX_ID)
-        )
+        return dict(self._goals)
 
-    def goal_position(self, pid):
+    def goal_position(self, goal_id):
         """
         Args:
-            pid (int): goal ID
+            goal_id (int): goal ID
 
         Returns:
             int: goal position
 
         Raises:
-            :exc:`KeyError`: No goal with ID ``pid``
+            :exc:`KeyError`: No goal with ID ``goal_id``
         """
         try:
-            return self._goals[self._INDEX_ID:pid]
+            return self._goals[goal_id]
         except KeyError:
-            raise KeyError("No goal with ID: {0}".format(pid))
+            raise KeyError("No goal with ID: {0}".format(goal_id))
 
     def goal_id_on(self, position):
         """ID of goal on position.
@@ -483,42 +440,41 @@ class BoardState:
             :exc:`KeyError`: No goal on ``position``
         """
         try:
-            return self._goals[self._INDEX_POS:position]
+            return self._goals.flip[position]
         except KeyError:
             raise KeyError("No goal on position: {0}".format(position))
 
-    def has_goal(self, pid):
+    def has_goal(self, goal_id):
         """
         Args:
-            pid (int): goal ID
+            goal_id (int): goal ID
         """
-        # TODO Buggy MIDict forces us to convert to list here
-        return pid in list(self._goals.keys(self._INDEX_ID))
+        return goal_id in self._goals
 
     def has_goal_on(self, position):
         """
         Args:
             position (int): position to check
         """
-        return position in self._goals.keys(self._INDEX_POS)
+        return position in self._goals.flip
 
     # --------------------------------------------------------------------------
     # Sokoban+
     # --------------------------------------------------------------------------
 
-    def box_plus_id(self, pid):
+    def box_plus_id(self, box_id):
         """
         See Also:
             :meth:`.SokobanPlus.box_plus_id`
         """
-        return self._sokoban_plus.box_plus_id(pid)
+        return self._sokoban_plus.box_plus_id(box_id)
 
-    def goal_plus_id(self, pid):
+    def goal_plus_id(self, goal_id):
         """
         See Also:
             :meth:`.SokobanPlus.goal_plus_id`
         """
-        return self._sokoban_plus.goal_plus_id(pid)
+        return self._sokoban_plus.goal_plus_id(goal_id)
 
     @property
     def boxorder(self):
@@ -586,7 +542,7 @@ class BoardState:
                     break
             return retv
 
-        for boxes_positions in permutations(self.goals_positions.values()):
+        for boxes_positions in permutations(self._goals.values()):
             if is_valid_solution(boxes_positions):
                 yield dict(
                     (index + DEFAULT_PIECE_ID, box_position)
@@ -612,8 +568,8 @@ class BoardState:
                 )
             return box[1] == goal_id
 
-        boxes_todo = deepcopy(self.boxes_ids)
-        goals_ids = deepcopy(self.goals_ids)
+        boxes_todo = list(self.boxes_ids)
+        goals_ids = list(self.goals_ids)
         for goal_id in goals_ids:
             predicate = partial(is_box_goal_pair, goal_id=goal_id)
             index, box_id = next(filter(predicate, enumerate(boxes_todo)), None)
@@ -628,11 +584,11 @@ class BoardState:
             )
 
         for box_id, goal_id in self._box_goal_pairs():
-            old_box_position = self.box_position(box_id)
-            old_goal_position = self.goal_position(goal_id)
+            old_box_position = self._boxes[box_id]
+            old_goal_position = self._goals[goal_id]
 
             if old_box_position != old_goal_position:
-                self._goals[self._INDEX_ID:goal_id] = old_box_position
+                self._goals[goal_id] = old_box_position
                 self._board[old_goal_position].remove_goal()
 
                 old_pusher_position = None

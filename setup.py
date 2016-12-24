@@ -34,8 +34,7 @@ install_requirements = [
     'networkx >=1.11',
     # Alternative that is A LOT faster but install through pip is not supported
     # 'graph-tool >=2.11'
-    'cached-property >=1.2.0',
-    'midict >= 0.1.4'
+    'cached-property >=1.2.0'
 ]
 
 dev_requirements = [

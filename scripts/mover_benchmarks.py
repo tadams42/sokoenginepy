@@ -7,8 +7,9 @@ from textwrap import dedent
 
 from cached_property import cached_property
 
-from sokoenginepy import (Direction, HashedBoardState, Mover, SokobanBoard,
-                          SolvingMode, settings)
+from sokoenginepy import (
+    Direction, HashedBoardState, Mover, SokobanBoard, SolvingMode, settings
+)
 
 settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = False
 
@@ -59,12 +60,12 @@ class BoardType(IntEnum):
 
 
 class BenchmarkType(IntEnum):
-    FORWARD_MOVE = 0
-    REVERSE_MOVE = 1
+    FORWARD_MOVER = 0
+    REVERSE_MOVER = 1
 
     @property
     def is_reverse(self):
-        return self == self.REVERSE_MOVE
+        return self == self.REVERSE_MOVER
 
     @property
     def title(self):
@@ -72,7 +73,7 @@ class BenchmarkType(IntEnum):
 
     @property
     def direction(self):
-        if self == self.FORWARD_MOVE:
+        if self == self.FORWARD_MOVER:
             return Direction.LEFT
         else:
             return Direction.RIGHT
@@ -93,25 +94,29 @@ class MovementBenchmark:
             )
         )
         self.mover.pulls_boxes = True
-        self.start_time = None
-        self.end_time = None
 
     @property
     def speed(self):
-        return self.moves_count / (self.milliseconds_used * 1000)
+        return self.moves_count / (self.milliseconds_used / 1000)
 
     def run(self):
-        self.start_time = time.perf_counter()
+        total_time = 0
         undo_move = False
         for i in range(0, int(self.moves_count)):
             if undo_move:
+                start_time = time.perf_counter()
                 self.mover.undo()
+                end_time = time.perf_counter()
+                total_time += end_time - start_time
                 undo_move = False
             else:
+                start_time = time.perf_counter()
                 self.mover.move(self.benchmark_type.direction)
+                end_time = time.perf_counter()
+                total_time += end_time - start_time
                 undo_move = True
-        self.end_time = time.perf_counter()
-        self.milliseconds_used = (self.end_time - self.start_time) * 1000
+
+        self.milliseconds_used = total_time * 1000
 
 
 class MovementBenchmarkPrinter:
@@ -122,7 +127,7 @@ class MovementBenchmarkPrinter:
 
     def board_header(self, board_type):
         benchmarker = MovementBenchmark(
-            board_type, BenchmarkType.FORWARD_MOVE, 1
+            board_type, BenchmarkType.FORWARD_MOVER, 1
         )
 
         return '{:<10} W:{:<5} H:{:<5} P:{:<5} B:{:<5}'.format(
@@ -139,7 +144,7 @@ class MovementBenchmarkPrinter:
         self, board_type, benchmark_type, pivot_speed=None
     ):
         speeds = []
-        moves = []
+        times = []
 
         print("{:<20}: ".format(benchmark_type.title), end='', flush=True)
 
@@ -149,11 +154,15 @@ class MovementBenchmarkPrinter:
             )
             self.benchmarker.run()
             speeds.append(self.benchmarker.speed)
-            moves.append(self.benchmarker.moves_count)
+            times.append(self.benchmarker.milliseconds_used)
             print('.', end='', flush=True)
 
         mean_speed = reduce(operator.add, speeds, 0.0) / len(speeds)
-        print(" {:.2E} [moves/s]".format(mean_speed), end='', flush=True)
+        mean_time = reduce(operator.add, times, 0.0) / len(times)
+        print(
+            " {:.2f} [ms] {:.2f} [moves/s]".format(mean_time, mean_speed ),
+            end='', flush=True
+        )
 
         if pivot_speed:
             print("  {0:.2f}%".format(mean_speed / pivot_speed * 100))
@@ -169,16 +178,19 @@ class MovementBenchmarkPrinter:
         print("--------------------------------------------------")
 
         runs = 10
-        moves_per_run = 3e3
+        moves_per_run = 3e4
 
         printer = MovementBenchmarkPrinter(runs, moves_per_run)
         print(printer.board_header(BoardType.SMALL))
 
-        pivot_speed = printer.run_and_print_experiment(
-            BoardType.SMALL, BenchmarkType.FORWARD_MOVE
+        # C++ speed
+        pivot_speed = 5e6
+
+        printer.run_and_print_experiment(
+            BoardType.SMALL, BenchmarkType.FORWARD_MOVER, pivot_speed
         )
         printer.run_and_print_experiment(
-            BoardType.SMALL, BenchmarkType.REVERSE_MOVE, pivot_speed
+            BoardType.SMALL, BenchmarkType.REVERSE_MOVER, pivot_speed
         )
 
 
