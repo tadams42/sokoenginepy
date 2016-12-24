@@ -60,8 +60,8 @@ class BoardGraphGraphtool(BoardGraphBase):
 
     def out_edges_count(self, source_vertex, target_vertex):
         return len([
-            1 for e in self._graph.vertex(source_vertex).out_edges()
-            if int(e.target()) == target_vertex
+            1 for edge in self._graph.vertex(source_vertex).out_edges()
+            if int(edge.target()) == target_vertex
         ])
 
     def reconfigure_edges(self, width, height, tessellation):
@@ -83,44 +83,6 @@ class BoardGraphGraphtool(BoardGraphBase):
                     )
                     self._graph.ep.direction[edge] = direction
 
-    # TODO: Faster version?
-    # def reconfigure_edges(self, width, height, tessellation):
-    #     """
-    #     Uses tessellation object to create all edges in graph.
-    #     """
-    #     self._graph.clear_edges()
-    #     edges_to_add = []
-    #     directions_to_add = dict()
-    #     for source_vertex in self._graph.vertices():
-    #         for direction in tessellation.legal_directions:
-    #             neighbor_vertex = tessellation.neighbor_position(
-    #                 int(source_vertex), direction,
-    #                 board_width=width, board_height=height
-    #             )
-    #             if neighbor_vertex is not None:
-    #                 edge = (int(source_vertex), neighbor_vertex,)
-
-    #                 edges_to_add.append(edge)
-
-    #                 if edge not in directions_to_add:
-    #                     directions_to_add[edge] = deque()
-
-    #                 directions_to_add[edge].append(direction)
-
-    #     self._graph.add_edge_list(edges_to_add) if edges_to_add else None
-
-    #     for e in edges_to_add:
-    #         e_descriptors = self._graph.edge(
-    #             s = self._graph.vertex(e[0]),
-    #             t = self._graph.vertex(e[1]),
-    #             all_edges = True
-    #         )
-
-    #         for e_descriptor in e_descriptors:
-    #             if len(directions_to_add[e]) > 0:
-    #                 self._graph.ep.direction[e_descriptor] = directions_to_add[e][0]
-    #                 directions_to_add[e].popleft()
-
     def calculate_edge_weights(self):
         for edge in self._graph.edges():
             self._graph.ep.weight[edge] = self.out_edge_weight(
@@ -132,8 +94,8 @@ class BoardGraphGraphtool(BoardGraphBase):
             for edge in self._graph.vertex(from_position).out_edges():
                 if self._graph.ep.direction[edge] == direction:
                     return int(edge.target())
-        except ValueError as e:
-            raise IndexError(e.args)
+        except ValueError as exc:
+            raise IndexError(exc.args)
 
         return None
 

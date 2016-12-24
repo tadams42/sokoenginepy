@@ -59,9 +59,9 @@ class Snapshot(MutableSequence):
             raise utilities.SokoengineError(
                 "Snapshot not correctly initialized! Missing solving_mode. " +
                 "Either provide it explcitly or provide moves_data." +
-                "tessellation_or_description: '{0}', solving_mode: {1}, ".format(
+                "tessellation_or_description: '{0}', solving_mode: {1},".format(
                     tessellation_or_description, solving_mode
-                ) + "moves_data: {0}".format(moves_data)
+                ) + " moves_data: {0}".format(moves_data)
             )
 
     @classmethod

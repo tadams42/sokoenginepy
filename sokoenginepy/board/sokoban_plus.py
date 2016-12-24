@@ -134,8 +134,8 @@ class SokobanPlus:
             self._goal_plus_ids = self._parse_and_clean_ids_string(
                 self._goalorder
             )
-        except SokobanPlusDataError as e:
-            self.errors.append(str(e))
+        except SokobanPlusDataError as exc:
+            self.errors.append(str(exc))
 
         self._validate_plus_ids(self._box_plus_ids)
         self._validate_plus_ids(self._goal_plus_ids)

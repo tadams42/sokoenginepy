@@ -31,8 +31,8 @@ class PuzzlesCollection:
     def reformat(self):
         for puzzle in self.puzzles:
             puzzle.reformat()
-
-    def _extenstion_to_tessellation_hint(self, path):
+                
+    def _extension_to_tessellation_hint(self, path):
         file_name, file_extension = os.path.splitext(path)
         if (
             file_extension == '.sok' or
@@ -50,7 +50,7 @@ class PuzzlesCollection:
     def load(self, path):
         with open(path, 'r') as src_file:
             SOKFileFormat.read(
-                src_file, self, self._extenstion_to_tessellation_hint(path)
+                src_file, self, self._extension_to_tessellation_hint(path)
             )
 
         for i in range(0, len(self.puzzles)):

@@ -9,7 +9,7 @@
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS,.venv,.tox,.eggs,.git,docs,build
+ignore=CVS,.venv,.tox,.eggs,.git,docs,build,.venvgt
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -144,7 +144,7 @@ ignored-classes=optparse.Values,thread._local,_thread._local
 # List of members which are set dynamically and missed by pylint inference
 # system, and so shouldn't trigger E1101 when accessed. Python regular
 # expressions are accepted.
-generated-members=
+generated-members=copy_ancestor_docstring
 
 # List of decorators that produce context managers, such as
 # contextlib.contextmanager. Add to this list to register other decorators that
@@ -155,7 +155,7 @@ contextmanager-decorators=contextlib.contextmanager
 [BASIC]
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=i,j,k,ex,Run,_,ROW,COLUMN,X,Y,UP,x,y,dx,dy,rv
+good-names=i,j,k,v,exc,Run,_,ROW,COLUMN,X,Y,UP,x,y,dx,dy,rv
 
 # Bad variable names which should always be refused, separated by a comma
 bad-names=foo,bar,baz,toto,tutu,tata
@@ -342,13 +342,13 @@ max-statements=50
 max-parents=7
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=7
+max-attributes=15
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods=2
 
 # Maximum number of public methods for a class (see R0904).
-max-public-methods=20
+max-public-methods=40
 
 # Maximum number of boolean expressions in a if statement
 max-bool-expr=5

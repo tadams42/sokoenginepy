@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Container
 from functools import reduce
 
-import networkx as nx
+import networkx
 
 from .. import settings, tessellation, utilities
 from .board_cell import BoardCell, BoardConversionError
@@ -183,7 +183,7 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except KeyError:
             raise IndexError('Board index out of range')
-        except nx.NetworkXError:
+        except networkx.NetworkXError:
             raise IndexError('Board index out of range')
         except ValueError:
             raise IndexError('Board index out of range')
@@ -198,7 +198,7 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except KeyError:
             raise IndexError('Board index out of range')
-        except nx.NetworkXError:
+        except networkx.NetworkXError:
             raise IndexError('Board index out of range')
         except ValueError:
             raise IndexError('Board index out of range')
@@ -256,7 +256,7 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except KeyError:
             raise IndexError('Board index out of range')
-        except nx.NetworkXError:
+        except networkx.NetworkXError:
             raise IndexError('Board index out of range')
         except ValueError:
             raise IndexError('Board index out of range')
@@ -272,7 +272,7 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except KeyError:
             raise IndexError('Board index out of range')
-        except nx.NetworkXError:
+        except networkx.NetworkXError:
             raise IndexError('Board index out of range')
         except ValueError:
             raise IndexError('Board index out of range')
@@ -288,7 +288,7 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except KeyError:
             raise IndexError('Board index out of range')
-        except nx.NetworkXError:
+        except networkx.NetworkXError:
             raise IndexError('Board index out of range')
         except ValueError:
             raise IndexError('Board index out of range')
@@ -345,7 +345,7 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except KeyError:
             raise IndexError('Board index out of range')
-        except nx.NetworkXError:
+        except networkx.NetworkXError:
             raise IndexError('Board index out of range')
         except ValueError:
             raise IndexError('Board index out of range')
@@ -370,7 +370,7 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except KeyError:
             raise IndexError('Board index out of range')
-        except nx.NetworkXError:
+        except networkx.NetworkXError:
             raise IndexError('Board index out of range')
         except ValueError:
             raise IndexError('Board index out of range')
@@ -392,7 +392,7 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except KeyError:
             raise IndexError('Board index out of range')
-        except nx.NetworkXError:
+        except networkx.NetworkXError:
             raise IndexError('Board index out of range')
         except ValueError:
             raise IndexError('Board index out of range')
@@ -447,7 +447,7 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except KeyError:
             raise IndexError('Board index out of range')
-        except nx.NetworkXError:
+        except networkx.NetworkXError:
             raise IndexError('Board index out of range')
         except ValueError:
             raise IndexError('Board index out of range')

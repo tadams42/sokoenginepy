@@ -358,7 +358,7 @@ class BoardState:
 
         try:
             self._boxes[self._boxes.flip[old_position]] = to_new_position
-        except ValueExistsError:
+        except KeyError:
             raise CellAlreadyOccupiedError(
                 "Box ID: {0} ".format(self.box_id_on(old_position)) +
                 "can't be placed in position {0} occupied by '{1}'".format(
@@ -574,7 +574,7 @@ class BoardState:
             predicate = partial(is_box_goal_pair, goal_id=goal_id)
             index, box_id = next(filter(predicate, enumerate(boxes_todo)), None)
             yield (box_id, goal_id,)
-            del(boxes_todo[index])
+            del boxes_todo[index]
 
     def switch_boxes_and_goals(self):
         """Switches positions of boxes and goals pairs."""

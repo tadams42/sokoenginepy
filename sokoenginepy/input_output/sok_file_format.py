@@ -122,7 +122,8 @@ class SOKReader:
                 snap = PuzzleSnapshot()
 
                 first_note_line = utilities.first_index_of(
-                    remaining_lines, lambda x: not snapshot.Snapshot.is_snapshot_string(x)
+                    remaining_lines,
+                    lambda x: not snapshot.Snapshot.is_snapshot_string(x)
                 )
                 if first_note_line is not None:
                     snap.moves = "".join(
@@ -253,7 +254,7 @@ class SOKReader:
 
         if preceeding_ok and following_ok:
             title_line = notes[candidate_index].strip()
-            del (notes[candidate_index])
+            del notes[candidate_index]
             return title_line
 
         return ""
@@ -343,35 +344,35 @@ class SOKReader:
             self._parse_snapshots(puzzle)
 
     def _parse_snapshots(self, puzzle):
-        for snapshot in puzzle.snapshots:
+        for snap in puzzle.snaps:
             remaining_lines = []
-            for line in snapshot.notes:
-                if self._is_snapshot_tag_line(line):
-                    snapshot.solver = (
-                        snapshot.solver or
+            for line in snap.notes:
+                if self._is_snap_tag_line(line):
+                    snap.solver = (
+                        snap.solver or
                         self._get_tag_data(SOKTags.AUTHOR, line)
                     )
-                    snapshot.solver = (
-                        snapshot.solver or
+                    snap.solver = (
+                        snap.solver or
                         self._get_tag_data(SOKTags.SOLVER, line)
                     )
-                    snapshot.created_at = (
-                        snapshot.created_at or
+                    snap.created_at = (
+                        snap.created_at or
                         self._get_tag_data(SOKTags.CREATED_AT, line)
                     )
-                    snapshot.duration = (
-                        snapshot.duration or
+                    snap.duration = (
+                        snap.duration or
                         self._get_tag_data(SOKTags.DURATION, line)
                     )
-                    snapshot.created_at = (
-                        snapshot.created_at or
+                    snap.created_at = (
+                        snap.created_at or
                         self._get_tag_data(SOKTags.SNAPSHOT_CREATED_AT, line)
                     )
                 else:
                     remaining_lines.append(line)
 
-            snapshot.notes = self._cleanup_whitespace(remaining_lines)
-            snapshot.tessellation = puzzle.tessellation
+            snap.notes = self._cleanup_whitespace(remaining_lines)
+            snap.tessellation = puzzle.tessellation
 
     def _cleanup_whitespace(self, lst):
         i = utilities.first_index_of(lst, lambda x: not utilities.is_blank(x))
@@ -434,8 +435,8 @@ class SOKWriter:
         if written:
             self.dest_stream.write("\n")
 
-        for snapshot in puzzle.snapshots:
-            self._write_snapshot(snapshot)
+        for snap in puzzle.snapshots:
+            self._write_snapshot(snap)
 
     def _write_collection_header(self, puzzle_collection):
         for line in open(
