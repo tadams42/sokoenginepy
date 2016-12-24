@@ -19,17 +19,20 @@ class BoardGraphGraphtool(BoardGraphBase):
 
     def __init__(self, number_of_vertices, graph_type):
         super().__init__(number_of_vertices, graph_type)
-        # Graph tool creates directed multigraph by default.
-        self._graph = Graph()
+        self._graph = Graph(directed=True)
         self._graph.add_vertex(number_of_vertices)
+
         self._graph.vertex_properties[self.KEY_CELL] = \
             self._graph.new_vertex_property(
-                "object", number_of_vertices * [BoardCell()]
+                value_type="python::object",
+                vals=number_of_vertices * [BoardCell()]
             )
-        self._graph.edge_properties[self.KEY_DIRECTION
-                                   ] = self._graph.new_edge_property("object")
-        self._graph.edge_properties['weight'
-                                   ] = self._graph.new_edge_property("int")
+
+        self._graph.edge_properties[self.KEY_DIRECTION] = \
+            self._graph.new_edge_property(value_type="python::object")
+
+        self._graph.edge_properties['weight'] = \
+            self._graph.new_edge_property(value_type="int")
 
     def __getitem__(self, position):
         return self._graph.vp.cell[self._graph.vertex(position)]

@@ -69,7 +69,9 @@ class Mover:
     """
 
     def __init__(self, board, solving_mode=SolvingMode.FORWARD):
-        self._initial_board = deepcopy(board)
+        self._initial_board = module_board.VariantBoard.instance_from(
+            board.tessellation, board_str=str(board)
+        )
         self._state = module_board.HashedBoardState(board)
         self._solving_mode = solving_mode
         self._pulls_boxes = True
@@ -297,7 +299,12 @@ class Mover:
         )
 
         if not in_front_of_pusher:
-            raise IllegalMoveError("Can't move pusher off board!")
+            raise IllegalMoveError(
+                "Can't move pusher off board! (pusher_id: " +
+                "{0}, direction: {1})".format(
+                    self.selected_pusher, str(direction)
+                )
+            )
 
         is_push = False
         in_front_of_box = None
@@ -307,7 +314,13 @@ class Mover:
                 in_front_of_pusher, direction
             )
             if not in_front_of_box:
-                raise IllegalMoveError("Can't push box off board!")
+                raise IllegalMoveError(
+                    "Can't push box off board! (box_id: " +
+                    "{0}, direction: {1})".format(
+                        self._state.box_id_on(in_front_of_pusher),
+                        str(direction)
+                    )
+                )
 
             try:
                 self._state.move_box_from(in_front_of_pusher, in_front_of_box)
@@ -344,7 +357,13 @@ class Mover:
         )
 
         if not in_front_of_pusher:
-            raise IllegalMoveError("Can't move pusher off board!")
+            raise IllegalMoveError(
+                "Can't move pusher off board! (pusher_id: " +
+                "{0}, direction: {1})".format(
+                    self.selected_pusher, str(direction)
+                )
+            )
+
 
         try:
             self._state.move_pusher_from(

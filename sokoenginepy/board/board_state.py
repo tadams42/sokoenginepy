@@ -60,7 +60,7 @@ class BoardState:
         edits back to our :class:`BoardState` instance.
 
     Args:
-        variant_board (VariantBoard): board for which we want to manage state
+        board (VariantBoard): board for which we want to manage state
     """
 
     # Following two are needed because accessing .keys('name') in MIDict
@@ -68,16 +68,16 @@ class BoardState:
     _INDEX_ID = 0
     _INDEX_POS = 1
 
-    def __init__(self, variant_board):
-        self._variant_board = variant_board
+    def __init__(self, board):
+        self._board = board
         self._boxes = MIDict([], ['id', 'position'])
         self._goals = MIDict([], ['id', 'position'])
         self._pushers = MIDict([], ['id', 'position'])
 
         pusher_id = box_id = goal_id = DEFAULT_PIECE_ID
 
-        for position in range(0, variant_board.size):
-            cell = variant_board[position]
+        for position in range(0, board.size):
+            cell = board[position]
 
             if cell.has_pusher:
                 self._pushers[self._INDEX_ID:pusher_id] = position
@@ -105,32 +105,28 @@ class BoardState:
             goals={goals},
             boxorder='{boxorder}',
             goalorder='{goalorder}',
-            variant='{variant}',
-            variant_board=
+            tessellation='{tessellation}',
+            board=
             """.format(
                 boxes=self.boxes_positions,
                 goals=self.goals_positions,
                 boxorder=str(self.boxorder),
                 goalorder=str(self.goalorder),
-                variant=str(self._variant_board.variant)
+                tessellation=str(self._board.tessellation)
             )), (len(self.__class__.__name__) + 2) * ' '
-        ) + str(self._variant_board) + '>'
+        ) + str(self._board) + '>'
 
     def __repr__(self):
         return "{klass}({board_klass}(board_str='\\n'.join([\n".format(
             klass=self.__class__.__name__,
-            board_klass=self._variant_board.__class__.__name__
+            board_klass=self._board.__class__.__name__
         ) + indent(',\n'.join([
-            '"{0}"'.format(l) for l in str(self._variant_board).split('\n')
+            '"{0}"'.format(l) for l in str(self._board).split('\n')
         ]), '    ') + "\n])))"
 
-    @cached_property
-    def board_size(self):
-        return self._variant_board.size
-
-    @cached_property
+    @property
     def board(self):
-        return self._variant_board
+        return self._board
 
     # --------------------------------------------------------------------------
     # Pushers
@@ -226,11 +222,13 @@ class BoardState:
         if old_position == to_new_position:
             return
 
-        dest_cell = self._variant_board[to_new_position]
+        dest_cell = self._board[to_new_position]
         if not dest_cell.can_put_pusher_or_box:
             raise CellAlreadyOccupiedError(
-                "Pusher can't be placed in position " +
-                "{0} occupied by '{1}'".format(to_new_position, dest_cell)
+                "Pusher ID: {0} ".format(self.pusher_id_on(old_position)) +
+                "can't be placed in position {0} occupied by '{1}'".format(
+                    to_new_position, dest_cell
+                )
             )
 
         try:
@@ -239,12 +237,13 @@ class BoardState:
             ] = to_new_position
         except ValueExistsError:
             raise CellAlreadyOccupiedError(
-                "Pusher can't be placed onto pusher in position: {0}".format(
-                    to_new_position
+                "Pusher ID: {0} ".format(self.pusher_id_on(old_position)) +
+                "can't be placed in position {0} occupied by '{1}'".format(
+                    to_new_position, dest_cell
                 )
             )
 
-        self._variant_board[old_position].remove_pusher()
+        self._board[old_position].remove_pusher()
         dest_cell.put_pusher()
 
     def move_pusher(self, pusher_id, to_new_position):
@@ -376,11 +375,13 @@ class BoardState:
         if old_position == to_new_position:
             return
 
-        dest_cell = self._variant_board[to_new_position]
+        dest_cell = self._board[to_new_position]
         if not dest_cell.can_put_pusher_or_box:
             raise CellAlreadyOccupiedError(
-                "Box can't be placed on position " +
-                "{0} occupied by '{1}'".format(to_new_position, dest_cell)
+                "Box ID: {0} ".format(self.box_id_on(old_position)) +
+                "can't be placed in position {0} occupied by '{1}'".format(
+                    to_new_position, dest_cell
+                )
             )
 
         try:
@@ -389,12 +390,13 @@ class BoardState:
             ] = to_new_position
         except ValueExistsError:
             raise CellAlreadyOccupiedError(
-                "Box can't be placed onto box in position: {0}".format(
-                    to_new_position
+                "Box ID: {0} ".format(self.box_id_on(old_position)) +
+                "can't be placed in position {0} occupied by '{1}'".format(
+                    to_new_position, dest_cell
                 )
             )
 
-        self._variant_board[old_position].remove_box()
+        self._board[old_position].remove_box()
         dest_cell.put_box()
 
     def move_box(self, box_id, to_new_position):
@@ -631,17 +633,17 @@ class BoardState:
 
             if old_box_position != old_goal_position:
                 self._goals[self._INDEX_ID:goal_id] = old_box_position
-                self._variant_board[old_goal_position].remove_goal()
+                self._board[old_goal_position].remove_goal()
 
                 old_pusher_position = None
                 if self.has_pusher_on(old_goal_position):
                     # If there is a pusher on goal, we have to remove it before
                     # we put a box there
                     old_pusher_position = old_goal_position
-                    self._variant_board[old_goal_position].remove_pusher()
+                    self._board[old_goal_position].remove_pusher()
 
                 self.move_box_from(old_box_position, old_goal_position)
-                self._variant_board[old_box_position].put_goal()
+                self._board[old_box_position].put_goal()
 
                 if old_pusher_position:
                     # There was pusher on former goal cell - we now put it on

@@ -1,4 +1,5 @@
 from functools import reduce
+from operator import add, or_
 
 from cached_property import cached_property
 
@@ -76,20 +77,16 @@ class Puzzle:
             snap.reformat()
 
     def to_game_board(self):
-        # TODO Convert to board.VariantBoard, but add boxorder and goalorder
-        # attrs
-        # to variant board boefore we can do it
-        # from ..game import GameBoard
-        # retv = GameBoard(board_str=self.board, tessellation=self.tessellation)
-        # retv.sokoban_plus = (self.boxorder, self.goalorder)
-        # return retv
-        pass
+        retv = module_board.VariantBoard.instance_from(
+            tessellation_or_description=self.tessellation,
+            board_str=self.board
+        )
+        return retv
 
     @cached_property
     def pushers_count(self):
         return reduce(
-            lambda x, y: x + y,
-            [
+            add, [
                 1 if module_board.BoardCell.is_pusher_chr(chr)
                 else 0
                 for chr in self.board
@@ -99,8 +96,7 @@ class Puzzle:
     @cached_property
     def boxes_count(self):
         return reduce(
-            lambda x, y: x + y,
-            [
+            add, [
                 1 if module_board.BoardCell.is_box_chr(chr)
                 else 0
                 for chr in self.board
@@ -110,8 +106,7 @@ class Puzzle:
     @cached_property
     def goals_count(self):
         return reduce(
-            lambda x, y: x + y,
-            [
+            add, [
                 1 if module_board.BoardCell.is_goal_chr(chr)
                 else 0
                 for chr in self.board
@@ -178,7 +173,7 @@ class PuzzleSnapshot:
     @cached_property
     def pushes_count(self):
         return reduce(
-            lambda x, y: x + y, [
+            add, [
                 1 if (
                     snapshot.AtomicMove.is_atomic_move_chr(chr) and
                     chr.isupper()
@@ -195,7 +190,7 @@ class PuzzleSnapshot:
         selections.
         """
         return reduce(
-            lambda x, y: x + y, [
+            add, [
                 1 if (
                     snapshot.AtomicMove.is_atomic_move_chr(chr) and
                     chr.islower()
@@ -207,7 +202,7 @@ class PuzzleSnapshot:
     @cached_property
     def is_reverse(self):
         return reduce(
-            lambda x, y: x or y, [
+            or_, [
                 chr == snapshot.Snapshot.NonMoveCharacters.JUMP_BEGIN or
                 chr == snapshot.Snapshot.NonMoveCharacters.JUMP_END
                 for chr in self.moves

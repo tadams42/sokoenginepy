@@ -9,9 +9,6 @@ from sokoenginepy import (
 
 
 class DescribeBoardState:
-    def it_memoizes_board_size(self, board_state):
-        assert board_state.board_size == board_state.board.size
-
     def it_memoizes_pushers(
         self, board_state, pushers_positions, invalid_pusher_position
     ):

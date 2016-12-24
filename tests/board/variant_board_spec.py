@@ -332,14 +332,17 @@ class DescribeVariantBoard:
             expected = variant_board.position_path_to_direction_path(
                 variant_board.find_jump_path(start_position, end_position)
             )
-            assert expected['path'] == [
-                Direction.UP,
-                Direction.UP,
-                Direction.UP,
-                Direction.LEFT,
-                Direction.LEFT,
-                Direction.LEFT,
-            ]
+            assert (
+                expected['path'] == [
+                    Direction.UP, Direction.UP, Direction.UP,
+                    Direction.LEFT, Direction.LEFT, Direction.LEFT,
+                ]
+                or
+                expected['path'] == [
+                    Direction.LEFT, Direction.LEFT, Direction.LEFT,
+                    Direction.UP, Direction.UP, Direction.UP,
+                ]
+            )
 
         def test_raises_if_start_position_is_of_board(self, variant_board):
             with pytest.raises(IndexError):

@@ -185,6 +185,8 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
             raise IndexError('Board index out of range')
+        except ValueError:
+            raise IndexError('Board index out of range')
 
     def __setitem__(self, position, board_cell):
         try:
@@ -197,6 +199,8 @@ class VariantBoard(Container, ABC):
         except KeyError:
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
+            raise IndexError('Board index out of range')
+        except ValueError:
             raise IndexError('Board index out of range')
 
     def __contains__(self, position):
@@ -254,6 +258,8 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
             raise IndexError('Board index out of range')
+        except ValueError:
+            raise IndexError('Board index out of range')
 
     def wall_neighbors(self, from_position):
         """
@@ -268,6 +274,8 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
             raise IndexError('Board index out of range')
+        except ValueError:
+            raise IndexError('Board index out of range')
 
     def all_neighbors(self, from_position):
         """
@@ -281,6 +289,8 @@ class VariantBoard(Container, ABC):
         except KeyError:
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
+            raise IndexError('Board index out of range')
+        except ValueError:
             raise IndexError('Board index out of range')
 
     def clear(self):
@@ -337,6 +347,8 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
             raise IndexError('Board index out of range')
+        except ValueError:
+            raise IndexError('Board index out of range')
 
     def normalized_pusher_position(
         self, pusher_position, excluded_positions=None
@@ -360,6 +372,8 @@ class VariantBoard(Container, ABC):
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
             raise IndexError('Board index out of range')
+        except ValueError:
+            raise IndexError('Board index out of range')
 
     def path_destination(self, start_position, direction_path):
         if start_position not in self:
@@ -379,6 +393,8 @@ class VariantBoard(Container, ABC):
         except KeyError:
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
+            raise IndexError('Board index out of range')
+        except ValueError:
             raise IndexError('Board index out of range')
 
     def find_jump_path(self, start_position, end_position):
@@ -432,6 +448,8 @@ class VariantBoard(Container, ABC):
         except KeyError:
             raise IndexError('Board index out of range')
         except nx.NetworkXError:
+            raise IndexError('Board index out of range')
+        except ValueError:
             raise IndexError('Board index out of range')
 
     def add_row_top(self):

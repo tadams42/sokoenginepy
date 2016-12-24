@@ -59,7 +59,7 @@ class Snapshot(MutableSequence):
             raise utilities.SokoengineError(
                 "Snapshot not correctly initialized! Missing solving_mode. " +
                 "Either provide it explcitly or provide moves_data." +
-                "tessellation_or_description: {0}, solving_mode: {1}, ".format(
+                "tessellation_or_description: '{0}', solving_mode: {1}, ".format(
                     tessellation_or_description, solving_mode
                 ) + "moves_data: {0}".format(moves_data)
             )
@@ -217,7 +217,7 @@ class Snapshot(MutableSequence):
 
         if atomic_move.direction not in self.tessellation.legal_directions:
             raise tessellation.UnknownDirectionError(
-                "Invalid direction for tessellation {0}".format(
+                "Invalid direction for tessellation '{0}'".format(
                     self.tessellation
                 )
             )

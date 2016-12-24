@@ -190,17 +190,30 @@ class DescribeMover:
         def it_memoizes_last_pusher_selection_into_movement_history(
             self, forward_mover
         ):
-            expected = [
+            expected1 = [
                 AtomicMove(Direction.DOWN),
                 AtomicMove(Direction.RIGHT),
                 AtomicMove(Direction.RIGHT),
                 AtomicMove(Direction.RIGHT),
             ]
-            for am in expected:
+            for am in expected1:
+                am.is_pusher_selection = True
+            expected2 = [
+                AtomicMove(Direction.RIGHT),
+                AtomicMove(Direction.RIGHT),
+                AtomicMove(Direction.RIGHT),
+                AtomicMove(Direction.DOWN),
+            ]
+            for am in expected2:
                 am.is_pusher_selection = True
 
             forward_mover.selected_pusher = DEFAULT_PIECE_ID + 1
-            assert forward_mover.last_performed_moves == expected
+
+            assert (
+                forward_mover.last_performed_moves == expected1
+                or
+                forward_mover.last_performed_moves == expected2
+            )
 
         def it_can_undo_last_pusher_selection(self, forward_mover):
             assert forward_mover.selected_pusher == DEFAULT_PIECE_ID
@@ -225,16 +238,27 @@ class DescribeMover:
 
     class DescribeJumpingHistory:
         def it_memoizes_last_jump_into_movement_history(self, reverse_mover):
-            expected = [
+            expected1 = [
                 AtomicMove(Direction.UP, False),
                 AtomicMove(Direction.LEFT, False),
                 AtomicMove(Direction.LEFT, False),
                 AtomicMove(Direction.LEFT, False),
             ]
-            for am in expected:
+            for am in expected1:
+                am.is_jump = True
+            expected2 = [
+                AtomicMove(Direction.LEFT, False),
+                AtomicMove(Direction.LEFT, False),
+                AtomicMove(Direction.LEFT, False),
+                AtomicMove(Direction.UP, False),
+            ]
+            for am in expected2:
                 am.is_jump = True
             reverse_mover.jump(index_1d(1, 1, reverse_mover.board.width))
-            assert reverse_mover.last_performed_moves == expected
+            assert (
+                reverse_mover.last_performed_moves == expected1 or
+                reverse_mover.last_performed_moves == expected2
+            )
 
         def it_can_undo_last_jump(self, reverse_mover):
             src = index_1d(4, 2, reverse_mover.board.width)

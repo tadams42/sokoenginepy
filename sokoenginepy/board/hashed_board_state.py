@@ -1,7 +1,7 @@
 import random
 
-from .board_state import BoardState
 from .. import utilities
+from .board_state import BoardState
 
 
 class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
@@ -52,9 +52,9 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
 
         random_pool_size = (
             # one random number for each position pusher can occupy
-            self.board_size +
+            self.board.size +
             # one random number for position each distinct box can occupy
-            len(distinct_box_plus_ids) * self.board_size +
+            len(distinct_box_plus_ids) * self.board.size +
             # one random number for initial hash
             1
         )
@@ -72,11 +72,11 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
         # boxes
         self._boxes_factors = dict()
         for box_plus_id in distinct_box_plus_ids:
-            self._boxes_factors[box_plus_id] = random_pool[:self.board_size]
-            random_pool = random_pool[self.board_size:]
+            self._boxes_factors[box_plus_id] = random_pool[:self.board.size]
+            random_pool = random_pool[self.board.size:]
 
         # Store position factors for all distinct pusher positions
-        self._pushers_factors = random_pool[:self.board_size]
+        self._pushers_factors = random_pool[:self.board.size]
 
         # Hash from boxes positions
         for box_id in self.boxes_ids:
