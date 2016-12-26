@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from collections import deque
 
 from ... import tessellation as module_tessellation
@@ -6,7 +6,7 @@ from ... import utilities
 from .graph_type import GraphType
 
 
-class BoardGraphBase(ABC):
+class BoardGraphBase(metaclass=ABCMeta):
     MAX_EDGE_WEIGHT = len(module_tessellation.Direction) + 1
     KEY_CELL = 'cell'
     KEY_DIRECTION = 'direction'

@@ -1,11 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 
 from .. import utilities
 from .cell_orientation import CellOrientation
 from .direction import UnknownDirectionError
 
 
-class TessellationBase(ABC):
+class TessellationBase(metaclass=ABCMeta):
     """Base class for all tessellation implementations."""
     #pylint: disable=unused-argument
 

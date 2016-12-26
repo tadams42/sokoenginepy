@@ -1,6 +1,6 @@
 import re
 import textwrap
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from collections.abc import Container
 from functools import reduce
 
@@ -16,7 +16,7 @@ _RE_BOARD_STRING = re.compile(
 )
 
 
-class VariantBoard(Container, ABC):
+class VariantBoard(Container, metaclass=ABCMeta):
     """Base board class for variant specific implementations.
 
     Internally it is stored as directed graph structure.
@@ -565,7 +565,7 @@ class VariantBoard(Container, ABC):
             )
 
 
-class VariantBoardResizer(ABC):
+class VariantBoardResizer(metaclass=ABCMeta):
     """
     Implements board graph transformations related to adding/removing board
     rows and columnns.

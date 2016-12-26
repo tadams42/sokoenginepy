@@ -37,6 +37,9 @@ INSTALL_REQUIREMENTS = [
     'cached-property >=1.2.0'
 ]
 
+if (sys.version_info.major, sys.version_info.minor) < (3, 4):
+    INSTALL_REQUIREMENTS.append('enum34 >= 1.1.6')
+
 DEV_REQUIREMENTS = [
     'pycodestyle >= 2.0.0',  # (formerly called pep8)
     'mccabe >= 0.5.0',
@@ -95,6 +98,7 @@ setup(
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3 :: Only',
