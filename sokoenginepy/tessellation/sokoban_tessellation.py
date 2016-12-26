@@ -16,18 +16,17 @@ def _init_module():
     from .. import board, snapshot
     _GLOBALS['graph_type'] = board.GraphType.DIRECTED
     _GLOBALS['chr_to_atomic_move'] = {
-        snapshot.AtomicMove.Characters.LOWER_L.value: (Direction.LEFT, False),
-        snapshot.AtomicMove.Characters.UPPER_L.value: (Direction.LEFT, True),
-        snapshot.AtomicMove.Characters.LOWER_R.value: (Direction.RIGHT, False),
-        snapshot.AtomicMove.Characters.UPPER_R.value: (Direction.RIGHT, True),
-        snapshot.AtomicMove.Characters.LOWER_U.value: (Direction.UP, False),
-        snapshot.AtomicMove.Characters.UPPER_U.value: (Direction.UP, True),
-        snapshot.AtomicMove.Characters.LOWER_D.value: (Direction.DOWN, False),
-        snapshot.AtomicMove.Characters.UPPER_D.value: (Direction.DOWN, True),
+        snapshot.AtomicMove.Characters.LOWER_L: (Direction.LEFT, False),
+        snapshot.AtomicMove.Characters.UPPER_L: (Direction.LEFT, True),
+        snapshot.AtomicMove.Characters.LOWER_R: (Direction.RIGHT, False),
+        snapshot.AtomicMove.Characters.UPPER_R: (Direction.RIGHT, True),
+        snapshot.AtomicMove.Characters.LOWER_U: (Direction.UP, False),
+        snapshot.AtomicMove.Characters.UPPER_U: (Direction.UP, True),
+        snapshot.AtomicMove.Characters.LOWER_D: (Direction.DOWN, False),
+        snapshot.AtomicMove.Characters.UPPER_D: (Direction.DOWN, True),
     }
-    _GLOBALS['atomic_move_to_chr'] = utilities.inverted(
-        _GLOBALS['chr_to_atomic_move']
-    )
+    _GLOBALS['atomic_move_to_chr'
+            ] = utilities.inverted(_GLOBALS['chr_to_atomic_move'])
 
 
 class SokobanTessellation(

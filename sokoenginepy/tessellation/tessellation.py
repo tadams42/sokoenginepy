@@ -47,12 +47,14 @@ class Tessellation(Enum):
     #: Textual representation uses two characters for each hexagon. This allows
     #: different encoding schemes.
     #:
-    #: +----------------------------------------+---------------------------------------------+
-    #: | Scheme 1                               | Scheme 2                                    |
-    #: +========================================+=============================================+
-    #: | .. image:: /images/hexoban_scheme1.png | .. image:: /images/hexoban_scheme2.png      |
-    #: |     :alt: Scheme 1                     |     :alt: Scheme 2                          |
-    #: +----------------------------------------+---------------------------------------------+
+    #: .. |img1| image:: /images/hexoban_scheme1.png
+    #: .. |img2| image:: /images/hexoban_scheme2.png
+    #:
+    #: +----------+----------+
+    #: | Scheme 1 | Scheme 2 |
+    #: +==========+==========+
+    #: |  |img1|  |  |img1|  |
+    #: +----------+----------+
     #:
     #: As long as encoding of single board is consistent, all methods handle any
     #: scheme transparently - parsing of board strings 'Just Works (TM)'

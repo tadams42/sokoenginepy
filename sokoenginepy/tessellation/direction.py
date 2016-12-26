@@ -25,6 +25,7 @@ class Direction(IntEnum):
     def opposite(self):
         return _OPPOSITE.get(self, None)
 
+
 _OPPOSITE = {
     Direction.UP: Direction.DOWN,
     Direction.DOWN: Direction.UP,

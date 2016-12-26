@@ -2,8 +2,8 @@ import os
 from inspect import getsourcefile
 
 import pytest
-
 from faker import Faker
+
 from sokoenginepy import AtomicMove, UnknownDirectionError
 
 TEST_RESOURCES_ROOT = os.path.abspath(
@@ -14,7 +14,6 @@ fake = Faker()
 
 
 class TessellationSpecMixin:
-
     def test_converts_legal_atomic_moves_to_characters(self):
         for index, atomic_move in enumerate(self.legal_moves):
             assert (

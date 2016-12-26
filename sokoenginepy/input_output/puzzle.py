@@ -17,6 +17,7 @@ class Puzzle:
     game board.
     """
 
+    #pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
         self, board="", title="", author="", boxorder="", goalorder="",
         notes="", snapshots=None, created_at="", updated_at="",
@@ -34,6 +35,8 @@ class Puzzle:
         self.snapshots = snapshots or []
         self.created_at = created_at
         self.updated_at = updated_at
+
+    #pylint: enable=too-many-arguments
 
     @property
     def tessellation(self):
@@ -78,8 +81,7 @@ class Puzzle:
 
     def to_game_board(self):
         retv = module_board.VariantBoard.instance_from(
-            tessellation_or_description=self.tessellation,
-            board_str=self.board
+            tessellation_or_description=self.tessellation, board_str=self.board
         )
         return retv
 
@@ -87,8 +89,7 @@ class Puzzle:
     def pushers_count(self):
         return reduce(
             add, [
-                1 if module_board.BoardCell.is_pusher_chr(chr)
-                else 0
+                1 if module_board.BoardCell.is_pusher_chr(chr) else 0
                 for chr in self.board
             ], 0
         )
@@ -97,8 +98,7 @@ class Puzzle:
     def boxes_count(self):
         return reduce(
             add, [
-                1 if module_board.BoardCell.is_box_chr(chr)
-                else 0
+                1 if module_board.BoardCell.is_box_chr(chr) else 0
                 for chr in self.board
             ], 0
         )
@@ -107,8 +107,7 @@ class Puzzle:
     def goals_count(self):
         return reduce(
             add, [
-                1 if module_board.BoardCell.is_goal_chr(chr)
-                else 0
+                1 if module_board.BoardCell.is_goal_chr(chr) else 0
                 for chr in self.board
             ], 0
         )
@@ -122,6 +121,7 @@ class PuzzleSnapshot:
     converted into snapshot.Snapshot.
     """
 
+    #pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
         self, moves="", title="", duration=None, solver="", notes="",
         created_at="", updated_at="",
@@ -137,6 +137,8 @@ class PuzzleSnapshot:
         self.notes = notes
         self.created_at = created_at
         self.updated_at = updated_at
+
+    #pylint: enable=too-many-arguments
 
     @property
     def tessellation(self):
@@ -174,11 +176,9 @@ class PuzzleSnapshot:
     def pushes_count(self):
         return reduce(
             add, [
-                1 if (
-                    snapshot.AtomicMove.is_atomic_move_chr(chr) and
-                    chr.isupper()
-                ) else 0
-                for chr in self.moves
+                1 if
+                (snapshot.AtomicMove.is_atomic_move_chr(chr) and
+                 chr.isupper()) else 0 for chr in self.moves
             ], 0
         )
 
@@ -191,11 +191,9 @@ class PuzzleSnapshot:
         """
         return reduce(
             add, [
-                1 if (
-                    snapshot.AtomicMove.is_atomic_move_chr(chr) and
-                    chr.islower()
-                ) else 0
-                for chr in self.moves
+                1 if
+                (snapshot.AtomicMove.is_atomic_move_chr(chr) and
+                 chr.islower()) else 0 for chr in self.moves
             ], 0
         )
 

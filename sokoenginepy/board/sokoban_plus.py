@@ -276,10 +276,8 @@ class SokobanPlus:
                 format(self.pieces_count)
             )
 
-        if (
-            self._goal_plus_ids and
-            len(self._goal_plus_ids) != self.pieces_count
-        ):
+        if (self._goal_plus_ids and
+                len(self._goal_plus_ids) != self.pieces_count):
             self.errors.append(
                 "Sokoban+ goalorder data doesn't contain same amount of IDs " +
                 "as there are pieces on board! (pieces_count: {0})".

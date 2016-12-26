@@ -24,7 +24,7 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
     Pushers are all treated equal, meaning that if two pushers switch position,
     hash will not change
 
-    Note:
+    Notes:
         - enabling/disabling Sokoban+ rehashes the board state
         - changing position of pieces only updates existing hash, it doesn't
           rehash whole board. This means that for example undoing box push
@@ -129,10 +129,8 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
         Note:
             Returns None in case len(boxes_positions) != self.boxes_count
         """
-        if (
-            len(boxes_positions) != self.boxes_count or
-            len(boxes_positions) != self.goals_count
-        ):
+        if (len(boxes_positions) != self.boxes_count or
+                len(boxes_positions) != self.goals_count):
             return None
 
         if self._initial_layout_hash is None:
@@ -151,12 +149,10 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
             box_plus_id = self.box_plus_id(self.box_id_on(to_new_position))
 
             self._layout_hash ^= self._boxes_factors[box_plus_id][old_position]
-            self._layout_hash ^= self._boxes_factors[box_plus_id][
-                to_new_position
-            ]
-            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
-                old_position
-            ]
+            self._layout_hash ^= self._boxes_factors[box_plus_id
+                                                    ][to_new_position]
+            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id
+                                                                 ][old_position]
             self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
                 to_new_position
             ]
@@ -165,9 +161,8 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
     def move_pusher_from(self, old_position, to_new_position):
         super().move_pusher_from(old_position, to_new_position)
         if old_position != to_new_position:
-            self._layout_with_pushers_hash ^= self._pushers_factors[
-                old_position
-            ]
+            self._layout_with_pushers_hash ^= self._pushers_factors[old_position
+                                                                   ]
             self._layout_with_pushers_hash ^= self._pushers_factors[
                 to_new_position
             ]
@@ -202,7 +197,8 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
 
         if not self._solutions_hashes:
             self._solutions_hashes = set(
-                h for h in [
+                h
+                for h in [
                     self.external_position_hash(solution)
                     for solution in self.solutions()
                 ] if h

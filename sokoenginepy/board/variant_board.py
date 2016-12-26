@@ -1,4 +1,5 @@
 import re
+import textwrap
 from abc import ABC, abstractmethod
 from collections.abc import Container
 from functools import reduce
@@ -10,8 +11,8 @@ from .board_cell import BoardCell, BoardConversionError
 from .graph import BoardGraph
 
 _RE_BOARD_STRING = re.compile(
-    r"^([0-9\s" + re.escape("".join(c.value for c in BoardCell.Characters)) +
-    re.escape("".join(c.value for c in utilities.RleCharacters)) + "])*$"
+    r"^([0-9\s" + re.escape("".join(c for c in BoardCell.Characters)) +
+    re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
 )
 
 
@@ -43,6 +44,8 @@ class VariantBoard(Container, ABC):
         cls, tessellation_or_description, board_width=0, board_height=0,
         board_str=""
     ):
+
+        #pylint: disable=unused-variable
         from .hexoban_board import HexobanBoard
         from .octoban_board import OctobanBoard
         from .sokoban_board import SokobanBoard
@@ -55,8 +58,7 @@ class VariantBoard(Container, ABC):
         for klass in VariantBoard.__subclasses__():
             if tessellation_instance.name.lower() in klass.__name__.lower():
                 return klass(
-                    board_width=board_width,
-                    board_height=board_height,
+                    board_width=board_width, board_height=board_height,
                     board_str=board_str
                 )
 
@@ -152,11 +154,8 @@ class VariantBoard(Container, ABC):
                                ] = BoardCell(character)
 
     def __eq__(self, rv):
-        if (
-            self.tessellation == rv.tessellation and
-            self.width == rv.width and
-            self.height == rv.height
-        ):
+        if (self.tessellation == rv.tessellation and self.width == rv.width and
+                self.height == rv.height):
             for vertex in range(0, self.size):
                 if self[vertex] != rv[vertex]:
                     return False
@@ -213,7 +212,8 @@ class VariantBoard(Container, ABC):
         rows = []
         for y in range(0, self.height):
             row = "".join(
-                str(cell) for cell in (
+                str(cell)
+                for cell in (
                     self[tessellation.index_1d(x, y, self.width)]
                     for x in range(0, self.width)
                 )
@@ -225,9 +225,18 @@ class VariantBoard(Container, ABC):
             rows.append(row)
 
         if settings.RLE_ENCODE_BOARD_STRINGS:
-            return utilities.RleCharacters.RLE_ROW_SEPARATOR.value.join(rows)
+            return utilities.RleCharacters.RLE_ROW_SEPARATOR.join(rows)
         else:
             return "\n".join(rows)
+
+    def __repr__(self):
+        board_str = textwrap.indent(
+            ',\n'.join(["'{0}'".format(l) for l in str(self).split('\n')]),
+            '    '
+        )
+        return "{klass}(board_str='\\n'.join([\n{board_str}\n]))".format(
+            klass=self.__class__.__name__, board_str=board_str
+        )
 
     @property
     def width(self):
@@ -337,8 +346,7 @@ class VariantBoard(Container, ABC):
 
         try:
             return self._graph.reachables(
-                root=pusher_position,
-                is_obstacle_callable=is_obstacle,
+                root=pusher_position, is_obstacle_callable=is_obstacle,
                 excluded_positions=excluded_positions
             )
         except IndexError:
@@ -563,6 +571,7 @@ class VariantBoardResizer(ABC):
     rows and columnns.
     """
 
+    #pylint: disable=protected-access
     def __init__(self, variant_board):
         self.board = variant_board
 
@@ -571,8 +580,7 @@ class VariantBoardResizer(ABC):
         old_height = self.board.height
 
         self.board._reinit(
-            self.board.width,
-            self.board.height + 1,
+            self.board.width, self.board.height + 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -586,8 +594,7 @@ class VariantBoardResizer(ABC):
         old_height = self.board.height
 
         self.board._reinit(
-            self.board.width,
-            self.board.height + 1,
+            self.board.width, self.board.height + 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -601,8 +608,7 @@ class VariantBoardResizer(ABC):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width + 1,
-            self.board.height,
+            self.board.width + 1, self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -616,8 +622,7 @@ class VariantBoardResizer(ABC):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width + 1,
-            self.board.height,
+            self.board.width + 1, self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -630,8 +635,7 @@ class VariantBoardResizer(ABC):
         old_body = self.board._graph
 
         self.board._reinit(
-            self.board.width,
-            self.board.height - 1,
+            self.board.width, self.board.height - 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -644,8 +648,7 @@ class VariantBoardResizer(ABC):
         old_body = self.board._graph
 
         self.board._reinit(
-            self.board.width,
-            self.board.height - 1,
+            self.board.width, self.board.height - 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -659,8 +662,7 @@ class VariantBoardResizer(ABC):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width - 1,
-            self.board.height,
+            self.board.width - 1, self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -674,8 +676,7 @@ class VariantBoardResizer(ABC):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width - 1,
-            self.board.height,
+            self.board.width - 1, self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 

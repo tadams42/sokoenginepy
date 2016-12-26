@@ -70,7 +70,6 @@ class Flipdict(dict):
         """
         return self._flip
 
-
     #{ Non-mutating methods that are NOT delegated to the dict superclass.
 
     def __repr__(self):
@@ -90,7 +89,6 @@ class Flipdict(dict):
         return cls(dict.fromkeys(keys, value))
 
     #}
-
 
     #{ Mutating methods.  These must keep the inverse mapping in sync!
 
@@ -121,17 +119,17 @@ class Flipdict(dict):
             [('one', 1), ('twenty-two', 22)]
         """
         k = self._flip.get(val, _NOTFOUND)
-        if not (k is _NOTFOUND or k==key):
+        if not (k is _NOTFOUND or k == key):
             raise KeyError('(key,val) would erase mapping for value %r' % val)
 
         v = self.get(key, _NOTFOUND)
         if v is not _NOTFOUND:
             dict.__delitem__(self._flip, v)
 
-        dict.__setitem__(self,       key, val)
+        dict.__setitem__(self, key, val)
         dict.__setitem__(self._flip, val, key)
 
-    def setdefault(self, key, default = None):
+    def setdefault(self, key, default=None):
         # Copied from python's UserDict.DictMixin code.
         try:
             return self[key]
@@ -139,7 +137,7 @@ class Flipdict(dict):
             self[key] = default
             return default
 
-    def update(self, other = None, **kwargs):
+    def update(self, other=None, **kwargs):
         # Copied from python's UserDict.DictMixin code.
         # Make progressively weaker assumptions about "other"
         if other is None:
@@ -188,6 +186,6 @@ def makepair(*args, **kw):
     return fd, fd.flip
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.ELLIPSIS)

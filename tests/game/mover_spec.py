@@ -10,7 +10,6 @@ from sokoenginepy import (
 
 
 class DescribeMover:
-
     def it_raises_if_board_is_not_playable(self, non_playable_board):
         with pytest.raises(NonPlayableBoardError):
             mover = Mover(non_playable_board)
@@ -26,7 +25,6 @@ class DescribeMover:
         assert str(mover.board) == str(reverse_board)
 
     class DescribeSelectingPusher:
-
         def it_pre_selects_first_pusher(self, forward_board):
             mover = Mover(forward_board)
             assert mover.selected_pusher == DEFAULT_PIECE_ID
@@ -162,9 +160,7 @@ class DescribeMover:
 
             reverse_mover.move(Direction.DOWN)
 
-            assert reverse_mover.state.box_position(
-                DEFAULT_PIECE_ID
-            ) == box_src
+            assert reverse_mover.state.box_position(DEFAULT_PIECE_ID) == box_src
             assert reverse_mover.state.pusher_position(
                 DEFAULT_PIECE_ID
             ) == pusher_dest
@@ -210,8 +206,7 @@ class DescribeMover:
             forward_mover.selected_pusher = DEFAULT_PIECE_ID + 1
 
             assert (
-                forward_mover.last_performed_moves == expected1
-                or
+                forward_mover.last_performed_moves == expected1 or
                 forward_mover.last_performed_moves == expected2
             )
 
@@ -357,7 +352,9 @@ class DescribeMover:
             reverse_mover.undo()
 
             assert reverse_mover.state.box_position(DEFAULT_PIECE_ID) == box_src
-            assert reverse_mover.state.pusher_position(DEFAULT_PIECE_ID) == pusher_src
+            assert reverse_mover.state.pusher_position(
+                DEFAULT_PIECE_ID
+            ) == pusher_src
 
             assert reverse_mover.board[box_src].has_box
             assert reverse_mover.board[pusher_src].has_pusher

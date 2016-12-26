@@ -3,9 +3,7 @@ from sokoenginepy.utilities.rle import Rle
 
 
 class DescribeRle:
-
     class Describe_decode_rle_token:
-
         def it_decodes_rle_token(self):
             assert Rle.decode_rle_token("4a4b2cd3e") == "aaaabbbbccdeee"
             assert Rle.decode_rle_token(
@@ -24,7 +22,6 @@ class DescribeRle:
 
 
 class Describe_rle_encode:
-
     def it_rle_encodes_string(self):
         assert rle_encode("aaaabbbbccdeee") == "4a4b2cd3e"
         assert rle_encode("aaaabbbbccdeeefghij") == "4a4b2cd3efghij"
@@ -37,7 +34,6 @@ class Describe_rle_encode:
 
 
 class Describe_rle_decode:
-
     def it_decodes_rle_string(self):
         assert rle_decode("4a4b2cd3e") == "aaaabbbbccdeee"
         assert rle_decode("4a4b2cd3efghij") == "aaaabbbbccdeeefghij"

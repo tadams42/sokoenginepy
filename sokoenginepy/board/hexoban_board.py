@@ -5,12 +5,10 @@ from .variant_board import VariantBoard, VariantBoardResizer
 
 
 class HexobanBoard(VariantBoard):
-
     def __init__(self, board_width=0, board_height=0, board_str=""):
         super().__init__(
             tessellation_or_description=tessellation.Tessellation.HEXOBAN,
-            board_width=board_width,
-            board_height=board_height,
+            board_width=board_width, board_height=board_height,
             board_str=board_str
         )
 
@@ -35,7 +33,7 @@ class HexobanBoard(VariantBoard):
 
 
 class HexobanBoardResizer(VariantBoardResizer):
-
+    #pylint: disable=protected-access
     def __init__(self, hexoban_board):
         super().__init__(hexoban_board)
 
@@ -73,32 +71,31 @@ class HexobanBoardResizer(VariantBoardResizer):
 
 
 class HexobanTextConverter:
-
-    def _debug_print(self, input, expected):
-        print(
-            "{0:<30}{1:<30}{2:<30}{3:<30}".
-            format("input", "expected", "converted", "internal")
-        )
-
-        input_lines = input.splitlines()
-        expected_lines = expected.splitlines()
-
-        tmp_use_visible_floors = settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
-        settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
-
-        converted_lines = str(HexobanBoard(board_str=input)).splitlines()
-
-        settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = tmp_use_visible_floors
-
-        internal_lines = self.convert_to_internal(input)[0]
-
-        for i in range(0, len(internal_lines)):
-            print(
-                "{0:<30}{1:<30}{2:<30}{3:<30}".format(
-                    input_lines[i], expected_lines[i], converted_lines[i],
-                    internal_lines[i]
-                )
-            )
+    # def _debug_print(self, input, expected):
+    #     print(
+    #         "{0:<30}{1:<30}{2:<30}{3:<30}".
+    #         format("input", "expected", "converted", "internal")
+    #     )
+    #
+    #     input_lines = input.splitlines()
+    #     expected_lines = expected.splitlines()
+    #
+    #     tmp_use_visible_floors = settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
+    #     settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
+    #
+    #     converted_lines = str(HexobanBoard(board_str=input)).splitlines()
+    #
+    #     settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = tmp_use_visible_floors
+    #
+    #     internal_lines = self.convert_to_internal(input)[0]
+    #
+    #     for i in range(0, len(internal_lines)):
+    #         print(
+    #             "{0:<30}{1:<30}{2:<30}{3:<30}".format(
+    #                 input_lines[i], expected_lines[i], converted_lines[i],
+    #                 internal_lines[i]
+    #             )
+    #         )
 
     def convert_to_internal(self, src_str):
         # Converts textual Hexoban into 2D array and validates textual layout
@@ -111,7 +108,7 @@ class HexobanTextConverter:
             return [], True
         elif even_row_x_parity < 0 or odd_row_x_parity < 0:
             internal = height * [
-                int(width / 2) * BoardCell.Characters.VISIBLE_FLOOR.value + '\n'
+                int(width / 2) * BoardCell.Characters.VISIBLE_FLOOR + '\n'
             ]
             return internal, True
 
@@ -126,13 +123,9 @@ class HexobanTextConverter:
                 if not layout_ok:
                     break
 
-                layout_ok, should_copy_cell = self._analyze_text_cell_position((
-                    parsed[y][x],
-                    x,
-                    y,
-                    odd_row_x_parity,
-                    even_row_x_parity,
-                ))
+                layout_ok, should_copy_cell = self._analyze_text_cell_position(
+                    parsed[y][x], x, y, odd_row_x_parity, even_row_x_parity
+                )
 
                 if layout_ok and should_copy_cell:
                     internal_line.append(parsed[y][x])
@@ -169,7 +162,7 @@ class HexobanTextConverter:
             retv = self._remove_column_right(retv)
 
         if settings.RLE_ENCODE_BOARD_STRINGS:
-            return utilities.RleCharacters.RLE_ROW_SEPARATOR.value.join(
+            return utilities.RleCharacters.RLE_ROW_SEPARATOR.join(
                 utilities.rle_encode(line) for line in retv
             )
         else:
@@ -192,8 +185,10 @@ class HexobanTextConverter:
     def _is_type2(self, string_list):
         return not self._is_type1(string_list)
 
-    def _analyze_text_cell_position(self, position_data):
-        cell, x, y, odd_row_x_parity, even_row_x_parity = position_data
+    @staticmethod
+    def _analyze_text_cell_position(
+        cell, x, y, odd_row_x_parity, even_row_x_parity
+    ):
 
         y_parity = y % 2
         x_parity = x % 2
@@ -228,10 +223,7 @@ class HexobanTextConverter:
 
         should_copy_cell = layout_ok and not is_cell_for_layout
 
-        return (
-            layout_ok,
-            should_copy_cell,
-        )
+        return layout_ok, should_copy_cell
 
     def _preparse_board(self, board_string):
         parsed = []
@@ -275,20 +267,14 @@ class HexobanTextConverter:
 
                 odd_row_x_parity = (even_row_x_parity + 1) % 2
 
-        return (
-            parsed,
-            width,
-            height,
-            even_row_x_parity,
-            odd_row_x_parity,
-        )
+        return parsed, width, height, even_row_x_parity, odd_row_x_parity
 
     @property
     def floor_character(self):
         return (
-            BoardCell.Characters.VISIBLE_FLOOR.value
+            BoardCell.Characters.VISIBLE_FLOOR
             if settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS else
-            BoardCell.Characters.FLOOR.value
+            BoardCell.Characters.FLOOR
         )
 
     def _add_column_left(self, string_list):
@@ -297,10 +283,12 @@ class HexobanTextConverter:
     def _add_column_right(self, string_list):
         return [line + self.floor_character for line in string_list]
 
-    def _remove_column_right(self, string_list):
+    @staticmethod
+    def _remove_column_right(string_list):
         return [line[:-1] for line in string_list]
 
-    def _find_first_non_floor(self, string_list):
+    @staticmethod
+    def _find_first_non_floor(string_list):
         normalized = utilities.normalize_width(string_list)
         width = len(normalized[0]) if len(normalized) > 0 else 0
         height = len(normalized)
@@ -318,11 +306,8 @@ class HexobanTextConverter:
                 if non_floor_found:
                     break
 
-                if (
-                    not BoardCell.is_empty_floor_chr(
-                        normalized[row][column]
-                    ) and (column > x or row > y)
-                ):
+                if (not BoardCell.is_empty_floor_chr(normalized[row][column])
+                        and (column > x or row > y)):
                     x = column
                     y = row
                     non_floor_found = True
@@ -333,8 +318,8 @@ class HexobanTextConverter:
         # Empty board, assuming scheme1
         return tessellation.index_1d(1, 0, width)
 
-    def _find_rightmost_non_floor(self, string_list):
-
+    @staticmethod
+    def _find_rightmost_non_floor(string_list):
         def rightmost_finder(string_list, row_parity):
             cell_found = False
             height = len(string_list)
@@ -378,6 +363,5 @@ class HexobanTextConverter:
             return rightmost_in_even_rows
 
         return (
-            rightmost_in_odd_rows
-            if odd_y > even_y else rightmost_in_even_rows
+            rightmost_in_odd_rows if odd_y > even_y else rightmost_in_even_rows
         )

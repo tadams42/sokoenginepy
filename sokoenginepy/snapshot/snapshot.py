@@ -24,7 +24,7 @@ class Snapshot(MutableSequence):
             ``solving_mode`` argument will be ignored
     """
 
-    class NonMoveCharacters(Enum):
+    class NonMoveCharacters(str, Enum):
         """
         Some characters that can be found in textual representation of snapshots
         that do not represent :class:`.AtomicMove`.
@@ -144,21 +144,19 @@ class Snapshot(MutableSequence):
 
     def __repr__(self):
         return (
-            "Snapshot(tessellation=" +
-            "{0}, solving_mode={1}, moves_data={2})".format(
-                repr(self.tessellation), self.solving_mode, str(self)
-            )
+            "Snapshot(tessellation=" + "{0}, solving_mode={1}, moves_data={2})".
+            format(repr(self.tessellation), self.solving_mode, str(self))
         )
 
     def __eq__(self, rv):
+        #pylint: disable=protected-access
         return (
             self.tessellation == rv.tessellation and
             len(self._moves) == len(rv._moves) and
             self.solving_mode == rv.solving_mode and
             self.moves_count == rv.moves_count and
             self.pushes_count == rv.pushes_count and
-            self.jumps_count == rv.jumps_count and
-            self._moves == rv._moves
+            self.jumps_count == rv.jumps_count and self._moves == rv._moves
         )
 
     def __ne__(self, rv):
@@ -217,9 +215,8 @@ class Snapshot(MutableSequence):
 
         if atomic_move.direction not in self.tessellation.legal_directions:
             raise tessellation.UnknownDirectionError(
-                "Invalid direction for tessellation '{0}'".format(
-                    self.tessellation
-                )
+                "Invalid direction for tessellation '{0}'".
+                format(self.tessellation)
             )
 
         if not atomic_move.is_pusher_selection:

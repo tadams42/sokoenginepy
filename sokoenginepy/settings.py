@@ -14,6 +14,7 @@ BREAK_LONG_SNAPSHOT_STRINGS = True
 #: How many characerts for each line of snapshot string?
 SNAPSHOT_LINE_BREAKS_AT = 80
 
+
 def should_insert_line_break_at(position):
     """
     For given ``position`` in string, should we insert line break?

@@ -2,7 +2,6 @@ from sokoenginepy import DEFAULT_PIECE_ID
 
 
 class DescribeHashedBoardState:
-
     def it_hashes_board_layout(self, hashed_board_state):
         assert hashed_board_state.boxes_layout_hash is not None
         assert hashed_board_state.boxes_and_pushers_layout_hash is not None
@@ -31,18 +30,26 @@ class DescribeHashedBoardState:
         assert hashed_board_state.boxes_layout_hash == initial_box_hash
         assert hashed_board_state.boxes_and_pushers_layout_hash == initial_pus_hash
 
-    def test_moving_pusher_modifies_hashes_consistently(self, hashed_board_state):
+    def test_moving_pusher_modifies_hashes_consistently(
+        self, hashed_board_state
+    ):
         initial_box_hash = hashed_board_state.boxes_layout_hash
         initial_pus_hash = hashed_board_state.boxes_and_pushers_layout_hash
 
-        initial_pusher_position = hashed_board_state.pusher_position(DEFAULT_PIECE_ID)
+        initial_pusher_position = hashed_board_state.pusher_position(
+            DEFAULT_PIECE_ID
+        )
         new_pusher_position = initial_pusher_position - 1
 
-        hashed_board_state.move_pusher_from(initial_pusher_position, new_pusher_position)
+        hashed_board_state.move_pusher_from(
+            initial_pusher_position, new_pusher_position
+        )
         assert hashed_board_state.boxes_layout_hash == initial_box_hash
         assert hashed_board_state.boxes_and_pushers_layout_hash != initial_pus_hash
 
-        hashed_board_state.move_pusher_from(new_pusher_position, initial_pusher_position)
+        hashed_board_state.move_pusher_from(
+            new_pusher_position, initial_pusher_position
+        )
         assert hashed_board_state.boxes_layout_hash == initial_box_hash
         assert hashed_board_state.boxes_and_pushers_layout_hash == initial_pus_hash
 
@@ -50,7 +57,9 @@ class DescribeHashedBoardState:
         assert hashed_board_state.boxes_layout_hash == initial_box_hash
         assert hashed_board_state.boxes_and_pushers_layout_hash != initial_pus_hash
 
-        hashed_board_state.move_pusher(DEFAULT_PIECE_ID, initial_pusher_position)
+        hashed_board_state.move_pusher(
+            DEFAULT_PIECE_ID, initial_pusher_position
+        )
         assert hashed_board_state.boxes_layout_hash == initial_box_hash
         assert hashed_board_state.boxes_and_pushers_layout_hash == initial_pus_hash
 

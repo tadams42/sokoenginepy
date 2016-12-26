@@ -1,6 +1,5 @@
 from functools import partial
 from itertools import permutations
-from textwrap import dedent, indent
 
 from cached_property import cached_property
 
@@ -39,11 +38,15 @@ class BoardState:
       :class:`.BoardState` instance, they will be different. Have we used
       movement methods instead of board editing, these IDs would be preserved:
 
-      +----------------------------------------------+----------------------------------------------+----------------------------------------------+
-      | 1) Initial board                             | 2) Edited board                              | 3) Box moved                                 |
-      +----------------------------------------------+----------------------------------------------+----------------------------------------------+
-      | .. image:: /images/movement_vs_transfer1.png | .. image:: /images/movement_vs_transfer2.png | .. image:: /images/movement_vs_transfer3.png |
-      +----------------------------------------------+----------------------------------------------+----------------------------------------------+
+      .. |img1| image:: /images/movement_vs_transfer1.png
+      .. |img2| image:: /images/movement_vs_transfer2.png
+      .. |img3| image:: /images/movement_vs_transfer3.png
+
+      +------------------+------------------+------------------+
+      | 1) Initial board | 2) Edited board  | 3) Box moved     |
+      +------------------+------------------+------------------+
+      |      |img1|      |      |img2|      |      |img3|      |
+      +------------------+------------------+------------------+
 
     Note:
         Movement methods here are just for state and board cell updates, they
@@ -51,7 +54,7 @@ class BoardState:
 
     Warning:
         Once we create instance of :class:`BoardState` from some
-        :class:`VariantBoard` instance, that board should not be edited.
+        :class:`.VariantBoard` instance, that board should not be edited.
         :class:`BoardState` will updated cells on board when pieces are moved,
         and editing board cells directly (ie. adding/removing pushers or boxes,
         changing board size, changing walls layout, etc...) will not sync these
@@ -89,33 +92,21 @@ class BoardState:
         )
 
     def __str__(self):
-        return "<{klass} pushers={pushers},".format(
-            klass=self.__class__.__name__,
-            pushers=list(self.pushers_positions),
-        ) + indent(dedent(
-            """
-            boxes={boxes},
-            goals={goals},
-            boxorder='{boxorder}',
-            goalorder='{goalorder}',
-            tessellation='{tessellation}',
-            board=
-            """.format(
-                boxes=list(self.boxes_positions),
-                goals=list(self.goals_positions),
-                boxorder=str(self.boxorder),
-                goalorder=str(self.goalorder),
-                tessellation=str(self._board.tessellation)
-            )), (len(self.__class__.__name__) + 2) * ' '
-        ) + str(self._board) + '>'
+        prefix = (len(self.__class__.__name__) + 2) * ' '
+        return '\n'.join([
+            "<{0} pushers: {1},".format(
+                self.__class__.__name__, self.pushers_positions
+            ),
+            prefix + "boxes: " + str(self.boxes_positions) + ",",
+            prefix + "goals: " + str(self.goals_positions) + ",",
+            prefix + "boxorder: " + str(self.boxorder) + ",",
+            prefix + "goalorder: " + str(self.goalorder) + ",",
+            prefix + "tessellation: " + str(self.board.tessellation) + ",",
+            prefix + "board:\n" + str(self.board) + ">",
+        ])
 
     def __repr__(self):
-        return "{klass}({board_klass}(board_str='\\n'.join([\n".format(
-            klass=self.__class__.__name__,
-            board_klass=self._board.__class__.__name__
-        ) + indent(',\n'.join([
-            '"{0}"'.format(l) for l in str(self._board).split('\n')
-        ]), '    ') + "\n])))"
+        return "{0}({1})".format(self.__class__.__name__, repr(self.board))
 
     @property
     def board(self):
@@ -215,9 +206,8 @@ class BoardState:
         if not dest_cell.can_put_pusher_or_box:
             raise CellAlreadyOccupiedError(
                 "Pusher ID: {0} ".format(self.pusher_id_on(old_position)) +
-                "can't be placed in position {0} occupied by '{1}'".format(
-                    to_new_position, dest_cell
-                )
+                "can't be placed in position {0} occupied by '{1}'".
+                format(to_new_position, dest_cell)
             )
 
         try:
@@ -225,9 +215,8 @@ class BoardState:
         except KeyError:
             raise CellAlreadyOccupiedError(
                 "Pusher ID: {0} ".format(self.pusher_id_on(old_position)) +
-                "can't be placed in position {0} occupied by '{1}'".format(
-                    to_new_position, dest_cell
-                )
+                "can't be placed in position {0} occupied by '{1}'".
+                format(to_new_position, dest_cell)
             )
 
         self._board[old_position].remove_pusher()
@@ -351,9 +340,8 @@ class BoardState:
         if not dest_cell.can_put_pusher_or_box:
             raise CellAlreadyOccupiedError(
                 "Box ID: {0} ".format(self.box_id_on(old_position)) +
-                "can't be placed in position {0} occupied by '{1}'".format(
-                    to_new_position, dest_cell
-                )
+                "can't be placed in position {0} occupied by '{1}'".
+                format(to_new_position, dest_cell)
             )
 
         try:
@@ -361,9 +349,8 @@ class BoardState:
         except KeyError:
             raise CellAlreadyOccupiedError(
                 "Box ID: {0} ".format(self.box_id_on(old_position)) +
-                "can't be placed in position {0} occupied by '{1}'".format(
-                    to_new_position, dest_cell
-                )
+                "can't be placed in position {0} occupied by '{1}'".
+                format(to_new_position, dest_cell)
             )
 
         self._board[old_position].remove_box()
@@ -520,11 +507,13 @@ class BoardState:
         """
         Generator for all configurations of boxes that result in solved board.
 
-        Yields:
-            dict: {box_id1: box_position1, box_id2: box_position2, ...}
-
         Note:
             Resultset depends on :attr:`.BoardState.is_sokoban_plus_enabled`.
+
+        Yields:
+            dict: mapping of box IDs and positions of one board solution::
+
+                {1: 42, 2: 24, 3: 54}
         """
         if self.boxes_count != self.goals_count:
             return []
@@ -563,9 +552,7 @@ class BoardState:
 
         def is_box_goal_pair(box, goal_id):
             if self.is_sokoban_plus_enabled:
-                return (
-                    self.box_plus_id(box[1]) == self.goal_plus_id(goal_id)
-                )
+                return self.box_plus_id(box[1]) == self.goal_plus_id(goal_id)
             return box[1] == goal_id
 
         boxes_todo = list(self.boxes_ids)
@@ -573,7 +560,7 @@ class BoardState:
         for goal_id in goals_ids:
             predicate = partial(is_box_goal_pair, goal_id=goal_id)
             index, box_id = next(filter(predicate, enumerate(boxes_todo)), None)
-            yield (box_id, goal_id,)
+            yield box_id, goal_id
             del boxes_todo[index]
 
     def switch_boxes_and_goals(self):
@@ -617,8 +604,6 @@ class BoardState:
     @property
     def is_playable(self):
         return (
-            self.pushers_count > 0 and
-            self.boxes_count == self.goals_count and
-            self.boxes_count > 0 and
-            self.goals_count > 0
+            self.pushers_count > 0 and self.boxes_count == self.goals_count and
+            self.boxes_count > 0 and self.goals_count > 0
         )

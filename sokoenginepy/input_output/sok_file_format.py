@@ -1,17 +1,18 @@
 import os
 import re
+from enum import Enum
 
 from .. import board, snapshot, tessellation, utilities
 from .puzzle import Puzzle, PuzzleSnapshot
 
 
 class SOKFileFormat:
-
     @classmethod
     def read(
         cls, src_stream, dest_collection,
         tessellation_hint=tessellation.Tessellation.SOKOBAN
     ):
+
         SOKReader(src_stream, dest_collection, tessellation_hint).read()
 
     @classmethod
@@ -19,7 +20,7 @@ class SOKFileFormat:
         SOKWriter(dest_stream).write(puzzle_or_collection)
 
 
-class SOKTags:
+class SOKTags(str, Enum):
     AUTHOR = 'Author'
     TITLE = 'Title'
     GOALORDER = 'goalorder'
@@ -35,17 +36,15 @@ class SOKTags:
 
 
 class SOKReader:
-
     def __init__(self, src_stream, dest_collection, tessellation_hint):
-        self.collection_header_tessellation_hint = None
+        self.coll_header_tessellation_hint = None
         self.src_stream = src_stream
         self.dest_collection = dest_collection
         self.supplied_tessellation_hint = (
             str(
                 tessellation.Tessellation.instance_from(tessellation_hint).value
-            ).lower()
-            if tessellation_hint
-            else str(tessellation.Tessellation.SOKOBAN.value)
+            ).lower() if tessellation_hint else
+            str(tessellation.Tessellation.SOKOBAN.value)
         )
 
     def read(self):
@@ -139,8 +138,7 @@ class SOKReader:
 
                 if len(remaining_lines) > 0:
                     first_moves_line = utilities.first_index_of(
-                        remaining_lines,
-                        snapshot.Snapshot.is_snapshot_string
+                        remaining_lines, snapshot.Snapshot.is_snapshot_string
                     )
 
                     if first_moves_line is not None:
@@ -166,7 +164,8 @@ class SOKReader:
             return components[1].strip()
         return None
 
-    def _is_tagged_as(self, tag, line):
+    @staticmethod
+    def _is_tagged_as(tag, line):
         return (
             any(chr in list(SOKTags.TAG_DELIMITERS) for chr in line) and
             line.lstrip().lower().startswith(tag.strip().lower())
@@ -199,7 +198,8 @@ class SOKReader:
             )
         )
 
-    def _is_raw_file_notes_line(self, line):
+    @staticmethod
+    def _is_raw_file_notes_line(line):
         return line.lstrip().startswith(SOKTags.RAW_FILE_NOTES)
 
     def _notes_before_puzzle(self, puzzle_index):
@@ -216,7 +216,8 @@ class SOKReader:
             return puzzle.notes
         return puzzle.snapshots[snapshot_index - 1].notes
 
-    def _get_and_remove_title_line(self, notes):
+    @staticmethod
+    def _get_and_remove_title_line(notes):
         """
         ::   Titles                                               ::
         ::   A title line is the last non-blank text line before  ::
@@ -264,19 +265,19 @@ class SOKReader:
             puzzle.title = self._get_and_remove_title_line(
                 self._notes_before_puzzle(puzzle_index)
             )
-            for snapshot_index, snapshot in enumerate(puzzle.snapshots):
-                snapshot.title = self._get_and_remove_title_line(
+            for snapshot_index, snap in enumerate(puzzle.snapshots):
+                snap.title = self._get_and_remove_title_line(
                     self._notes_before_snapshot(puzzle_index, snapshot_index)
                 )
 
     def _parse_collection_notes(self):
-        self.collection_header_tessellation_hint = None
+        self.coll_header_tessellation_hint = None
 
         remaining_lines = []
         for line in self.dest_collection.notes:
             if self._is_collection_tag_line(line):
-                self.collection_header_tessellation_hint = (
-                    self.collection_header_tessellation_hint or
+                self.coll_header_tessellation_hint = (
+                    self.coll_header_tessellation_hint or
                     self._get_tag_data(SOKTags.VARIANT, line)
                 )
                 self.dest_collection.title = (
@@ -298,9 +299,9 @@ class SOKReader:
             elif not self._is_raw_file_notes_line(line):
                 remaining_lines.append(line)
 
-        if self.collection_header_tessellation_hint:
-            self.collection_header_tessellation_hint = (
-                self.collection_header_tessellation_hint.strip().lower()
+        if self.coll_header_tessellation_hint:
+            self.coll_header_tessellation_hint = (
+                self.coll_header_tessellation_hint.strip().lower()
             )
 
         self.dest_collection.notes = self._cleanup_whitespace(remaining_lines)
@@ -311,9 +312,7 @@ class SOKReader:
             tess = None
             for line in puzzle.notes:
                 if self._is_puzzle_tag_line(line):
-                    tess = (
-                        tess or self._get_tag_data(SOKTags.VARIANT, line)
-                    )
+                    tess = (tess or self._get_tag_data(SOKTags.VARIANT, line))
                     puzzle.title = (
                         puzzle.title or self._get_tag_data(SOKTags.TITLE, line)
                     )
@@ -336,8 +335,8 @@ class SOKReader:
 
             if tess is not None:
                 puzzle.tessellation = tess
-            elif self.collection_header_tessellation_hint is not None:
-                puzzle.tessellation = self.collection_header_tessellation_hint
+            elif self.coll_header_tessellation_hint is not None:
+                puzzle.tessellation = self.coll_header_tessellation_hint
             elif self.supplied_tessellation_hint is not None:
                 puzzle.tessellation = self.supplied_tessellation_hint
 
@@ -349,12 +348,10 @@ class SOKReader:
             for line in snap.notes:
                 if self._is_snapshot_tag_line(line):
                     snap.solver = (
-                        snap.solver or
-                        self._get_tag_data(SOKTags.AUTHOR, line)
+                        snap.solver or self._get_tag_data(SOKTags.AUTHOR, line)
                     )
                     snap.solver = (
-                        snap.solver or
-                        self._get_tag_data(SOKTags.SOLVER, line)
+                        snap.solver or self._get_tag_data(SOKTags.SOLVER, line)
                     )
                     snap.created_at = (
                         snap.created_at or
@@ -374,7 +371,8 @@ class SOKReader:
             snap.notes = self._cleanup_whitespace(remaining_lines)
             snap.tessellation = puzzle.tessellation
 
-    def _cleanup_whitespace(self, lst):
+    @staticmethod
+    def _cleanup_whitespace(lst):
         i = utilities.first_index_of(lst, lambda x: not utilities.is_blank(x))
         if i is None:
             return ""
@@ -388,7 +386,6 @@ class SOKReader:
 
 
 class SOKWriter:
-
     def __init__(self, dest_stream):
         self.dest_stream = dest_stream
 
@@ -415,12 +412,14 @@ class SOKWriter:
         written = False
 
         if puzzle.tessellation != tessellation.Tessellation.SOKOBAN.value:
-            written = self._write_tagged(SOKTags.VARIANT,
-                                         str(puzzle.tessellation)) or written
+            written = self._write_tagged(
+                SOKTags.VARIANT, str(puzzle.tessellation)
+            ) or written
 
         if not utilities.is_blank(puzzle.boxorder) and not utilities.is_blank(
             puzzle.goalorder
         ):
+
             written = self._write_tagged(
                 SOKTags.BOXORDER, puzzle.boxorder
             ) or written
@@ -439,10 +438,10 @@ class SOKWriter:
             self._write_snapshot(snap)
 
     def _write_collection_header(self, puzzle_collection):
+
         for line in open(
-            os.path.join(
-                utilities.RESOURCES_ROOT, "SOK_format_specification.txt"
-            )
+            os.path.
+            join(utilities.RESOURCES_ROOT, "SOK_format_specification.txt")
         ):
             self.dest_stream.write(line.rstrip() + "\n")
 
@@ -491,9 +490,7 @@ class SOKWriter:
         written = self._write_tagged(
             SOKTags.SNAPSHOT_CREATED_AT, snap.created_at
         ) or written
-        written = self._write_tagged(
-            SOKTags.DURATION, snap.duration
-        ) or written
+        written = self._write_tagged(SOKTags.DURATION, snap.duration) or written
 
         if not utilities.is_blank(snap.notes):
             self.dest_stream.write(snap.notes.rstrip() + "\n")

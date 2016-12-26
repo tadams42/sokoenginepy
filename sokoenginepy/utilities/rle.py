@@ -7,7 +7,7 @@ from pyparsing import CharsNotIn, ParseBaseException, ZeroOrMore, nestedExpr
 from .text_utils import ending_digits
 
 
-class RleCharacters(Enum):
+class RleCharacters(str, Enum):
     """Separators used in RLE encoded board and snapshot texts."""
     GROUP_LEFT_DELIM = '('
     GROUP_RIGHT_DELIM = ')'
@@ -16,12 +16,11 @@ class RleCharacters(Enum):
 
 _RE_RLE_REPLACER = re.compile(r"(\d+)(\D)")
 _RE_RLE_SPLITTER = re.compile(
-    '|'.join(map(re.escape, [RleCharacters.RLE_ROW_SEPARATOR.value, '\n']))
+    '|'.join(map(re.escape, [RleCharacters.RLE_ROW_SEPARATOR, '\n']))
 )
 
 
 class Rle:
-
     @classmethod
     def encode(cls, line):
         if len(line) == 0:
@@ -29,8 +28,10 @@ class Rle:
 
         encoded = [(len(list(g)), k) for k, g in groupby(line)]
         return "".join(
-            "".join((str(c) if c > 1 else "",
-                     v,)) for c, v in encoded
+            "".join((
+                str(c) if c > 1 else "",
+                v,
+            )) for c, v in encoded
         )
 
     @classmethod
@@ -46,12 +47,10 @@ class Rle:
         )
 
     rle_token = CharsNotIn(
-        RleCharacters.GROUP_LEFT_DELIM.value +
-        RleCharacters.GROUP_RIGHT_DELIM.value
+        RleCharacters.GROUP_LEFT_DELIM + RleCharacters.GROUP_RIGHT_DELIM
     )
     grouped_rle = nestedExpr(
-        RleCharacters.GROUP_LEFT_DELIM.value,
-        RleCharacters.GROUP_RIGHT_DELIM.value
+        RleCharacters.GROUP_LEFT_DELIM, RleCharacters.GROUP_RIGHT_DELIM
     )
     token_or_group = rle_token | grouped_rle
     grammar = ZeroOrMore(token_or_group)

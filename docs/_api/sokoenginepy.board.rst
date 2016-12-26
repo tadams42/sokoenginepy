@@ -70,3 +70,7 @@ board
 .. automodule:: sokoenginepy.board.graph.graph_type
     :members:
     :undoc-members:
+
+.. automodule:: sokoenginepy.board.graph.board_graph_networkx
+    :members:
+    :undoc-members:

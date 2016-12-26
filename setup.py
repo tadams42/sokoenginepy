@@ -12,23 +12,23 @@ from os import path
 # Always prefer setuptools over distutils
 from setuptools import find_packages, setup
 
-here = path.abspath(path.dirname(__file__))
-version = {}
-needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
-pytest_runner = ['pytest-runner'] if needs_pytest else []
+HERE = path.abspath(path.dirname(__file__))
+VERSION = {}
+NEEDS_PYTEST = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
+PYTEST_RUNNER = ['pytest-runner'] if NEEDS_PYTEST else []
 
 # Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+with open(path.join(HERE, 'README.rst'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = f.read()
 
-with open(path.join(here, 'sokoenginepy/version.py'), encoding='utf-8') as f:
-    exec(f.read(), version)
+with open(path.join(HERE, 'sokoenginepy/version.py'), encoding='utf-8') as f:
+    exec(f.read(), VERSION)
 
-setup_requirements = [
+SETUP_REQUIREMENTS = [
     # ... (other setup requirements)
-] + pytest_runner
+] + PYTEST_RUNNER
 
-install_requirements = [
+INSTALL_REQUIREMENTS = [
     'pytz >=2016.6.1',
     'pyparsing >=2.1.0',
     'networkx >=1.11',
@@ -37,7 +37,7 @@ install_requirements = [
     'cached-property >=1.2.0'
 ]
 
-dev_requirements = [
+DEV_REQUIREMENTS = [
     'pycodestyle >= 2.0.0',  # (formerly called pep8)
     'mccabe >= 0.5.0',
     'pylint >= 1.6.0',
@@ -67,17 +67,14 @@ dev_requirements = [
     'colored-traceback >= 0.2.0',
 ]
 
-test_requirements = [
+TEST_REQUIREMENTS = [
     'pytest >= 3.0.0',
     'pytest-spec >= 1.0.0',
     'pytest-cov >= 2.3.0',
     'pytest-benchmark >= 3.0.0',
-
     'check-manifest >= 0.33.0',
-
     'factory-boy >= 2.8.0',
     'faker >= 0.6.0',
-
     'coverage >= 4.2.0',
 ]
 
@@ -90,58 +87,48 @@ setup(
     keywords="game sokoban hexoban octoban trioban",
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
-    # the version across setup.py and the project code, see
+    # the VERSION across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version=version['__version__'],
-
+    version=VERSION['__version__'],
     description="Sokoban and variants game engine",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3 :: Only',
-
         "Development Status :: 4 - Beta",
-
         "Intended Audience :: Developers",
-
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-
         "Operating System :: OS Independent",
-
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Games/Entertainment :: Puzzle Games",
     ],
 
-    # You can just specify the packages manually here if your project is
+    # You can just specify the packages manually HERE if your project is
     # simple. Or you can use find_packages().
     packages=find_packages(exclude=['docs', 'tests', 'scripts']),
+    setup_requires=SETUP_REQUIREMENTS,
 
-    setup_requires=setup_requirements,
-
-    # List run-time dependencies here.  These will be installed by pip when
+    # List run-time dependencies HERE.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=install_requirements,
+    install_requires=INSTALL_REQUIREMENTS,
+    tests_require=TEST_REQUIREMENTS,
 
-    tests_require=test_requirements,
-
-    # List additional groups of dependencies here (e.g. development
+    # List additional groups of dependencies HERE (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'dev': list(set(dev_requirements).union(set(test_requirements))),
-        'test': test_requirements
+        'dev': list(set(DEV_REQUIREMENTS).union(set(TEST_REQUIREMENTS))),
+        'test': TEST_REQUIREMENTS
     },
 
     # If there are data files included in your packages that need to be
-    # installed, specify them here.  If using Python 2.6 or less, then these
+    # installed, specify them HERE.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    package_data={
-        'sokoenginepy': ['res/*'],
-    },
+    package_data={'sokoenginepy': ['res/*'],},
 )

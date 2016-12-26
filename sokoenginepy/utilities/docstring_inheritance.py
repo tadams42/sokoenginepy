@@ -104,8 +104,11 @@ def copy_ancestor_docstring(fn):
     For this decorator to work, the class has to use the `InheritableDocstrings`
     metaclass.
     '''
-    raise RuntimeError('Decorator can only be used in classes '
-                       'using the `InheritableDocstrings` metaclass')
+    raise RuntimeError(
+        'Decorator can only be used in classes '
+        'using the `InheritableDocstrings` metaclass'
+    )
+
 
 def _copy_ancestor_docstring(mro, fn):
     '''Decorator to set docstring for *fn* from *mro*'''
@@ -121,10 +124,13 @@ def _copy_ancestor_docstring(mro, fn):
         fn.__doc__ = super_fn.__doc__
         break
     else:
-        raise RuntimeError("Can't inherit docstring for %s: method does not "
-                           "exist in superclass" % fn.__name__)
+        raise RuntimeError(
+            "Can't inherit docstring for %s: method does not "
+            "exist in superclass" % fn.__name__
+        )
 
     return fn
+
 
 class InheritableDocstrings(type):
     @classmethod
@@ -132,7 +138,9 @@ class InheritableDocstrings(type):
         classdict = super().__prepare__(name, bases, *kwds)
 
         # Inject decorators into class namespace
-        classdict['copy_ancestor_docstring'] = partial(_copy_ancestor_docstring, mro(*bases))
+        classdict['copy_ancestor_docstring'] = partial(
+            _copy_ancestor_docstring, mro(*bases)
+        )
 
         return classdict
 
@@ -144,10 +152,14 @@ class InheritableDocstrings(type):
         if 'copy_ancestor_docstring' in classdict:
 
             # Make sure that class definition hasn't messed with decorators
-            copy_impl = getattr(classdict['copy_ancestor_docstring'], 'func', None)
+            copy_impl = getattr(
+                classdict['copy_ancestor_docstring'], 'func', None
+            )
             if copy_impl is not _copy_ancestor_docstring:
-                raise RuntimeError('No copy_ancestor_docstring attribute may be created '
-                                   'in classes using the InheritableDocstrings metaclass')
+                raise RuntimeError(
+                    'No copy_ancestor_docstring attribute may be created '
+                    'in classes using the InheritableDocstrings metaclass'
+                )
 
             # Delete decorators from class namespace
             del classdict['copy_ancestor_docstring']

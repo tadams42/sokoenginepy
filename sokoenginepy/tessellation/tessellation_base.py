@@ -7,6 +7,7 @@ from .direction import UnknownDirectionError
 
 class TessellationBase(ABC):
     """Base class for all tessellation implementations."""
+    #pylint: disable=unused-argument
 
     @property
     @abstractmethod
@@ -61,8 +62,6 @@ class TessellationBase(ABC):
             :exc:`.UnknownDirectionError` if conversion not possible.
         """
         from .. import snapshot
-        if isinstance(input_chr, snapshot.AtomicMove.Characters):
-            input_chr = input_chr.value
 
         direction, box_moved = self._char_to_atomic_move_dict.get(
             input_chr, (None, None)
@@ -105,6 +104,7 @@ class TessellationBase(ABC):
         Returns:
             CellOrientation: cell orientation for given ``position``
         """
+        #pylint: disable=no-self-use
         return CellOrientation.DEFAULT
 
     def __eq__(self, rv):

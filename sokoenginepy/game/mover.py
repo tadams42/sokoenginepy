@@ -129,7 +129,8 @@ class Mover:
         old_pusher_position = self._state.pusher_position(self.selected_pusher)
         new_pusher_position = self._state.pusher_position(pusher_id)
         selection_path = self._state.board.position_path_to_direction_path(
-            self._state.board.find_jump_path(old_pusher_position, new_pusher_position)
+            self._state.board.
+            find_jump_path(old_pusher_position, new_pusher_position)
         )['path']
 
         for direction in selection_path:
@@ -222,6 +223,7 @@ class Mover:
         for direction in self._state.board.position_path_to_direction_path(
             self._state.board.find_jump_path(old_position, new_position)
         )['path']:
+
             atomic_move = snapshot.AtomicMove(direction, False)
             atomic_move.is_jump = True
             atomic_move.pusher_id = self.selected_pusher
@@ -301,9 +303,8 @@ class Mover:
         if not in_front_of_pusher:
             raise IllegalMoveError(
                 "Can't move pusher off board! (pusher_id: " +
-                "{0}, direction: {1})".format(
-                    self.selected_pusher, str(direction)
-                )
+                "{0}, direction: {1})".
+                format(self.selected_pusher, str(direction))
             )
 
         is_push = False
@@ -359,11 +360,9 @@ class Mover:
         if not in_front_of_pusher:
             raise IllegalMoveError(
                 "Can't move pusher off board! (pusher_id: " +
-                "{0}, direction: {1})".format(
-                    self.selected_pusher, str(direction)
-                )
+                "{0}, direction: {1})".
+                format(self.selected_pusher, str(direction))
             )
-
 
         try:
             self._state.move_pusher_from(

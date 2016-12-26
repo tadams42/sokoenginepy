@@ -12,7 +12,9 @@
 .tox/
 .venv/
 .venv34/
+.venv33/
 .venvgt/
+.venvpypy/
 Untitled.ipynb
 _build/
 build/

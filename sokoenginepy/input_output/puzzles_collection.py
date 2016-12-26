@@ -10,6 +10,7 @@ class PuzzlesCollection:
     TODO: Convert to iterable and sequence
     """
 
+    #pylint: disable=too-many-arguments
     def __init__(
         self, title="", author="", created_at="", updated_at="", notes=""
     ):
@@ -19,6 +20,8 @@ class PuzzlesCollection:
         self.updated_at = updated_at
         self.notes = notes
         self.puzzles = []
+
+    #pylint: enable=too-many-arguments
 
     def clear(self):
         self.title = ""
@@ -31,8 +34,10 @@ class PuzzlesCollection:
     def reformat(self):
         for puzzle in self.puzzles:
             puzzle.reformat()
-                
-    def _extension_to_tessellation_hint(self, path):
+
+    @staticmethod
+    def _extension_to_tessellation_hint(path):
+        #pylint: disable=unused-variable
         file_name, file_extension = os.path.splitext(path)
         if (
             file_extension == '.sok' or

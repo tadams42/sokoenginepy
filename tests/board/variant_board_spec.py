@@ -27,7 +27,6 @@ class DescribeVariantBoard:
             assert not VariantBoard.is_board_string("   \r\n ")
 
     class Describe_parse_board_string:
-
         def it_parses_regular_board(self):
             src = " ##########\n    \n" +\
                   " ## @ *   #\n" +\
@@ -103,7 +102,6 @@ class DescribeVariantBoard:
         assert parsed == []
 
     class describe_init:
-
         def it_creates_board_of_specified_size_and_tessellation(self):
             b = TriobanBoard(4, 2)
             assert b.width == 4
@@ -127,7 +125,6 @@ class DescribeVariantBoard:
                 SokobanBoard(board_str="ZOOMG!")
 
     class describe__reinit:
-
         def it_reinitializes_graph_vertices(self, variant_board):
             variant_board._reinit(width=2, height=3)
             assert variant_board._graph.vertices_count() == 2 * 3
@@ -147,7 +144,6 @@ class DescribeVariantBoard:
             assert variant_board._graph.edges_count() > 0
 
     class describe_clear:
-
         def it_clears_board_cells_in_all_nodes(self, variant_board):
             variant_board.clear()
             for pos in range(0, variant_board.size):
@@ -290,7 +286,6 @@ class DescribeVariantBoard:
                 self.variant_board.normalized_pusher_position(42000)
 
     class describe_path_destination:
-
         def test_calculates_destination_position_from_source_and_direction_path(
             self, variant_board
         ):
@@ -323,7 +318,6 @@ class DescribeVariantBoard:
                 variant_board.path_destination(42000, []),
 
     class describe_find_jump_path:
-
         def test_returns_sequence_of_positions_defining_shortest_path_for_pusher_jump(
             self, variant_board
         ):
@@ -334,13 +328,19 @@ class DescribeVariantBoard:
             )
             assert (
                 expected['path'] == [
-                    Direction.UP, Direction.UP, Direction.UP,
-                    Direction.LEFT, Direction.LEFT, Direction.LEFT,
-                ]
-                or
-                expected['path'] == [
-                    Direction.LEFT, Direction.LEFT, Direction.LEFT,
-                    Direction.UP, Direction.UP, Direction.UP,
+                    Direction.UP,
+                    Direction.UP,
+                    Direction.UP,
+                    Direction.LEFT,
+                    Direction.LEFT,
+                    Direction.LEFT,
+                ] or expected['path'] == [
+                    Direction.LEFT,
+                    Direction.LEFT,
+                    Direction.LEFT,
+                    Direction.UP,
+                    Direction.UP,
+                    Direction.UP,
                 ]
             )
 
@@ -354,7 +354,6 @@ class DescribeVariantBoard:
             assert variant_board.find_jump_path(42, 42000) == []
 
     class describe_find_move_path:
-
         def test_returns_sequence_of_positions_defining_shortest_path_for_pusher_movement_without_pushing_boxes(
             self, variant_board
         ):
@@ -387,7 +386,6 @@ class DescribeVariantBoard:
             ) == []
 
     class describe_neighbor:
-
         def test_returns_neighbor_position_in_given_direction(
             self, variant_board
         ):
@@ -404,7 +402,6 @@ class DescribeVariantBoard:
             assert variant_board.neighbor(0, Direction.NORTH_WEST) is None
 
     class describe_resize:
-
         def test_adds_right_columns_and_bottom_rows_when_enlarging(
             self, variant_board
         ):
@@ -461,10 +458,7 @@ class DescribeVariantBoard:
             assert mock_method.call_count == 1
 
     class describe_resize_and_center:
-
-        def test_adds_columns_and_rows_when_enlarging(
-            self, variant_board
-        ):
+        def test_adds_columns_and_rows_when_enlarging(self, variant_board):
             settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             output = "\n".join([
                 "------------------------",
@@ -521,7 +515,6 @@ class DescribeVariantBoard:
             assert mock_method.call_count == 1
 
     class describe_trim:
-
         def test_removes_empty_outer_rows_and_columns(self, variant_board):
             output = str(variant_board)
             old_width = variant_board.width
@@ -542,7 +535,6 @@ class DescribeVariantBoard:
             assert mock_method.call_count == 1
 
     class describe_reverse_rows:
-
         def test_mirrors_board_up_down(self, variant_board):
             settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             output = "\n".join([
@@ -562,7 +554,6 @@ class DescribeVariantBoard:
             assert str(variant_board) == output
 
     class describe_reverse_columns:
-
         def test_mirrors_board_left_rightt(self, variant_board):
             settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
             output = "\n".join([

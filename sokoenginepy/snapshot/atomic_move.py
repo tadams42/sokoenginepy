@@ -16,7 +16,7 @@ class AtomicMove:
           active pusher in Multiban games
     """
 
-    class Characters(Enum):
+    class Characters(str, Enum):
         """
         Characters used in textual representation of :class:`AtomicMove`.
 
@@ -51,6 +51,7 @@ class AtomicMove:
         self.group_id = 0
 
         self.direction = direction
+        #pylint: disable=simplifiable-if-statement
         if box_moved:
             self.is_push_or_pull = True
         else:
@@ -59,24 +60,24 @@ class AtomicMove:
     @classmethod
     def is_atomic_move_chr(cls, character):
         if isinstance(character, cls.Characters):
-            character = character.value
+            character = character
         return (
-            character == cls.Characters.LOWER_L.value or
-            character == cls.Characters.LOWER_U.value or
-            character == cls.Characters.LOWER_R.value or
-            character == cls.Characters.LOWER_D.value or
-            character == cls.Characters.LOWER_NW.value or
-            character == cls.Characters.LOWER_SE.value or
-            character == cls.Characters.LOWER_NE.value or
-            character == cls.Characters.LOWER_SW.value or
-            character == cls.Characters.UPPER_L.value or
-            character == cls.Characters.UPPER_U.value or
-            character == cls.Characters.UPPER_R.value or
-            character == cls.Characters.UPPER_D.value or
-            character == cls.Characters.UPPER_NW.value or
-            character == cls.Characters.UPPER_SE.value or
-            character == cls.Characters.UPPER_NE.value or
-            character == cls.Characters.UPPER_SW.value
+            character == cls.Characters.LOWER_L or
+            character == cls.Characters.LOWER_U or
+            character == cls.Characters.LOWER_R or
+            character == cls.Characters.LOWER_D or
+            character == cls.Characters.LOWER_NW or
+            character == cls.Characters.LOWER_SE or
+            character == cls.Characters.LOWER_NE or
+            character == cls.Characters.LOWER_SW or
+            character == cls.Characters.UPPER_L or
+            character == cls.Characters.UPPER_U or
+            character == cls.Characters.UPPER_R or
+            character == cls.Characters.UPPER_D or
+            character == cls.Characters.UPPER_NW or
+            character == cls.Characters.UPPER_SE or
+            character == cls.Characters.UPPER_NE or
+            character == cls.Characters.UPPER_SW
         )
 
     def __repr__(self):

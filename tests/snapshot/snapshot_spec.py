@@ -3,9 +3,10 @@ from unittest.mock import Mock
 import pytest
 
 from factories import SnapshotFactory
-from sokoenginepy import (AtomicMove, Direction, Snapshot,
-                          SnapshotConversionError, SokoengineError,
-                          SolvingMode, Tessellation)
+from sokoenginepy import (
+    AtomicMove, Direction, Snapshot, SokoengineError, SolvingMode,
+    Tessellation
+)
 
 
 @pytest.fixture
@@ -53,9 +54,7 @@ def sokoban_snapshot():
 
 
 class DescribeGameSnapshot:
-
     class Describe_moves_count:
-
         def it_returns_total_count_of_atomic_non_pushes(
             self, forward_sokoban_snapshot, moves_count
         ):
@@ -67,7 +66,6 @@ class DescribeGameSnapshot:
             assert forward_sokoban_snapshot.moves_count == moves_count
 
     class Describe_init:
-
         def it_creates_empty_snapshot_by_default(self):
             snapshot = Snapshot(
                 tessellation_or_description=Tessellation.SOKOBAN,
@@ -89,7 +87,6 @@ class DescribeGameSnapshot:
             ).solving_mode == SolvingMode.FORWARD
 
     class Describe_get_item:
-
         def it_retrieves_single_atomic_move(self, forward_sokoban_snapshot):
             assert forward_sokoban_snapshot[0] == AtomicMove(Direction.LEFT)
 
@@ -107,7 +104,6 @@ class DescribeGameSnapshot:
             assert slice_of_snapshot.solving_mode == reverse_sokoban_snapshot.solving_mode
 
     class Describe_set_item:
-
         def it_calls_recalc_methods_before_replacing_atomic_move(
             self, game_snapshot
         ):
@@ -134,12 +130,8 @@ class DescribeGameSnapshot:
 
             old_moves = game_snapshot._moves[1:5]
             new_moves = [
-                AtomicMove(
-                    Direction.UP, box_moved=True
-                ),
-                AtomicMove(
-                    Direction.DOWN, box_moved=True
-                ),
+                AtomicMove(Direction.UP, box_moved=True),
+                AtomicMove(Direction.DOWN, box_moved=True),
             ]
             game_snapshot[1:5] = new_moves
 
@@ -159,7 +151,6 @@ class DescribeGameSnapshot:
             ] == new_moves
 
     class Describe_del_item:
-
         def it_calls_recalc_methods_before_deleting_atomic_move(
             self, game_snapshot
         ):
@@ -188,7 +179,6 @@ class DescribeGameSnapshot:
             ] == old_moves
 
     class Describe_insert:
-
         def it_calls_recalc_methods_before_inserting_atomic_move(
             self, game_snapshot
         ):
@@ -202,14 +192,12 @@ class DescribeGameSnapshot:
             )
 
     class Describe_jumps_count:
-
         def it_calls_recalc_jumps_before_returning_value(self, game_snapshot):
             game_snapshot._recalculate_jumps_count = Mock()
             game_snapshot.jumps_count
             assert game_snapshot._recalculate_jumps_count.call_count == 1
 
     class Describe_clear:
-
         def it_resets_internal_counters(self, game_snapshot):
             game_snapshot.clear()
             assert game_snapshot.moves_count == 0
@@ -217,10 +205,9 @@ class DescribeGameSnapshot:
             assert game_snapshot.jumps_count == 0
 
     class Describe_before_inserting_move:
-
         def it_increases_internal_counters_if_necessary(
-            self, reverse_sokoban_snapshot, atomic_move, atomic_push, atomic_jump,
-            atomic_pusher_selection
+            self, reverse_sokoban_snapshot, atomic_move, atomic_push,
+            atomic_jump, atomic_pusher_selection
         ):
             before = reverse_sokoban_snapshot.moves_count
             reverse_sokoban_snapshot._before_inserting_move(atomic_move)
@@ -254,10 +241,9 @@ class DescribeGameSnapshot:
                 )
 
     class Describe_before_removing_move:
-
         def it_decreases_internal_counters_if_necessary(
-            self, reverse_sokoban_snapshot, atomic_move, atomic_push, atomic_jump,
-            atomic_pusher_selection
+            self, reverse_sokoban_snapshot, atomic_move, atomic_push,
+            atomic_jump, atomic_pusher_selection
         ):
             before = reverse_sokoban_snapshot.moves_count
             reverse_sokoban_snapshot._before_removing_move(atomic_move)
@@ -275,13 +261,14 @@ class DescribeGameSnapshot:
                 reverse_sokoban_snapshot.pushes_count,
                 reverse_sokoban_snapshot._jumps_count_invalidated
             )
-            reverse_sokoban_snapshot._before_removing_move(atomic_pusher_selection)
+            reverse_sokoban_snapshot._before_removing_move(
+                atomic_pusher_selection
+            )
             assert reverse_sokoban_snapshot.moves_count == before_moves
             assert reverse_sokoban_snapshot.pushes_count == before_pushes
             assert reverse_sokoban_snapshot._jumps_count_invalidated == before_jumps_invalidate
 
     class Describe_recalc_jumps_count:
-
         def it_recalcs_jumps_count_if_necessary(self, reverse_sokoban_snapshot):
             reverse_sokoban_snapshot._count_jumps = Mock()
 
@@ -299,7 +286,6 @@ class DescribeGameSnapshot:
             assert not reverse_sokoban_snapshot._jumps_count_invalidated
 
     class Describe_str:
-
         def it_ensures_starting_jump_sequence_for_reverse_mode_snapshots(
             self, reverse_sokoban_snapshot, atomic_jump, atomic_move
         ):

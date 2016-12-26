@@ -8,9 +8,9 @@ from .atomic_move import AtomicMove
 from .snapshot import Snapshot, SnapshotConversionError
 
 _RE_SNAPSHOT_STRING = re.compile(
-    r"^([0-9\s" + re.escape("".join(c.value for c in AtomicMove.Characters)) +
-    re.escape("".join(c.value for c in Snapshot.NonMoveCharacters)) +
-    re.escape("".join(c.value for c in utilities.RleCharacters)) + "])*$"
+    r"^([0-9\s" + re.escape("".join(c for c in AtomicMove.Characters)) +
+    re.escape("".join(c for c in Snapshot.NonMoveCharacters)
+             ) + re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
 )
 
 
@@ -21,22 +21,21 @@ class SnapshotStringParser:
     """
 
     atomic_moves = Regex(
-        "([" + "".join(c.value for c in AtomicMove.Characters) + "])+"
+        "([" + "".join(c for c in AtomicMove.Characters) + "])+"
     )
     jump = Group(
-        oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN.value) + ZeroOrMore(
-            atomic_moves
-        ) + oneOf(Snapshot.NonMoveCharacters.JUMP_END.value)
+        oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN) + ZeroOrMore(atomic_moves)
+        + oneOf(Snapshot.NonMoveCharacters.JUMP_END)
     )
     pusher_change = Group(
-        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN.value
-             ) + ZeroOrMore(atomic_moves) +
-        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_END.value)
+        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN) + ZeroOrMore(
+            atomic_moves
+        ) + oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_END)
     )
     grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
 
     _re_snapshot_string_cleanup = re.compile(
-        "([" + re.escape(Snapshot.NonMoveCharacters.CURRENT_POSITION_CH.value) +
+        "([" + re.escape(Snapshot.NonMoveCharacters.CURRENT_POSITION_CH) +
         r"\s])+"
     )
 
@@ -58,6 +57,7 @@ class SnapshotStringParser:
         )
 
     def convert_from_string(self, from_string, to_snapshot):
+        #pylint: disable=protected-access
         if not self._parse(from_string, to_snapshot.tessellation):
             raise SnapshotConversionError(self._first_encountered_error)
         to_snapshot.clear()
@@ -82,11 +82,11 @@ class SnapshotStringParser:
             #  (3) Non-empty, not beginning with jump
             # Number (2) is handled gracefully later
             if len(snapshot) == 0:
-                retv += snapshot.NonMoveCharacters.JUMP_BEGIN.value
-                retv += snapshot.NonMoveCharacters.JUMP_END.value
+                retv += snapshot.NonMoveCharacters.JUMP_BEGIN
+                retv += snapshot.NonMoveCharacters.JUMP_END
             elif not snapshot[0].is_jump:
-                retv += snapshot.NonMoveCharacters.JUMP_BEGIN.value
-                retv += snapshot.NonMoveCharacters.JUMP_END.value
+                retv += snapshot.NonMoveCharacters.JUMP_BEGIN
+                retv += snapshot.NonMoveCharacters.JUMP_END
 
         i = 0
         iend = len(snapshot)
@@ -97,8 +97,8 @@ class SnapshotStringParser:
             if jump_flag or pusher_selected_flag:
                 backup_flag = jump_flag
                 retv += (
-                    snapshot.NonMoveCharacters.JUMP_BEGIN.value if jump_flag
-                    else snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN.value
+                    snapshot.NonMoveCharacters.JUMP_BEGIN if jump_flag else
+                    snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
                 )
 
                 while (
@@ -117,8 +117,8 @@ class SnapshotStringParser:
                         pusher_selected_flag = snapshot[i].is_pusher_selection
 
                 retv += (
-                    snapshot.NonMoveCharacters.JUMP_END.value if backup_flag
-                    else snapshot.NonMoveCharacters.PUSHER_CHANGE_END.value
+                    snapshot.NonMoveCharacters.JUMP_END if backup_flag else
+                    snapshot.NonMoveCharacters.PUSHER_CHANGE_END
                 )
             else:
                 try:
@@ -136,9 +136,7 @@ class SnapshotStringParser:
             tmp = ""
             for i, character in enumerate(retv):
                 tmp += character
-                if settings.should_insert_line_break_at(
-                    i + 1
-                ):
+                if settings.should_insert_line_break_at(i + 1):
                     tmp += "\n"
             retv = tmp
 
@@ -182,10 +180,12 @@ class SnapshotStringParser:
             )
             return False
 
+
         if (
-            Snapshot.NonMoveCharacters.JUMP_BEGIN.value in moves_string or
-            Snapshot.NonMoveCharacters.JUMP_END.value in moves_string
+            Snapshot.NonMoveCharacters.JUMP_BEGIN in moves_string or
+            Snapshot.NonMoveCharacters.JUMP_END in moves_string
         ):
+
             self._resulting_solving_mode = game.SolvingMode.REVERSE
         else:
             self._resulting_solving_mode = game.SolvingMode.FORWARD
@@ -212,12 +212,10 @@ class SnapshotStringParser:
                 convert_success = self._convert_token(
                     token=token[1],
                     tessellation=tessellation,
-                    is_jump=(
-                        token[0] == Snapshot.NonMoveCharacters.JUMP_BEGIN.value
-                    ),
+                    is_jump=(token[0] == Snapshot.NonMoveCharacters.JUMP_BEGIN),
                     is_pusher_change=(
                         token[0] ==
-                        Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN.value
+                        Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
                     ),
                 )
             else:
@@ -232,6 +230,7 @@ class SnapshotStringParser:
     def _convert_token(
         self, token, tessellation, is_jump=False, is_pusher_change=False
     ):
+
         for character in token:
             atomic_move = None
             try:

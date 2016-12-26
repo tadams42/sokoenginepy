@@ -3,9 +3,7 @@ from sokoenginepy import DEFAULT_PIECE_ID, Direction
 
 
 class DescribeAtomicMove:
-
     class Describe_init:
-
         def it_sets_all_attributes(self):
             atomic_move = AtomicMoveFactory(
                 direction=Direction.RIGHT, box_moved=True
@@ -20,7 +18,6 @@ class DescribeAtomicMove:
             assert atomic_move.group_id == 0
 
     class Describe_moved_box_id:
-
         def test_get_returns_none_if_move_is_not_push_or_pull(
             self, atomic_move
         ):
@@ -56,13 +53,11 @@ class DescribeAtomicMove:
             assert not atomic_move.is_move
 
     class Describe_pusher_id:
-
         def it_returns_id_of_pusher_that_performed_movement(self, atomic_move):
             atomic_move.pusher_id = DEFAULT_PIECE_ID + 42
             assert atomic_move.pusher_id == DEFAULT_PIECE_ID + 42
 
     class Describe_is_move:
-
         def it_returns_true_if_box_was_not_moved(self, atomic_move):
             atomic_move.is_move = True
             assert atomic_move.is_move
@@ -114,7 +109,6 @@ class DescribeAtomicMove:
             assert not atomic_move.is_jump
 
     class Describe_is_push_or_pull:
-
         def it_returns_true_if_box_was_moved(self, atomic_move):
             atomic_move.is_push_or_pull = True
             assert atomic_move.is_push_or_pull
@@ -175,7 +169,6 @@ class DescribeAtomicMove:
             assert atomic_move.is_jump
 
     class Describe_is_pusher_selection:
-
         def it_returns_true_if_pusher_was_selected(self, atomic_move):
             atomic_move.is_pusher_selection = True
             assert atomic_move.is_pusher_selection
@@ -236,7 +229,6 @@ class DescribeAtomicMove:
             assert atomic_move.is_jump
 
     class Describe_is_jump:
-
         def it_returns_true_if_pusher_jumped(self, atomic_move):
             atomic_move.is_jump = True
             assert atomic_move.is_jump

@@ -1,8 +1,9 @@
 import pytest
 
 from factories import SnapshotFactory
-from sokoenginepy import (AtomicMove, Direction, SnapshotConversionError,
-                          SolvingMode, Tessellation)
+from sokoenginepy import (
+    AtomicMove, Direction, SnapshotConversionError, SolvingMode, Tessellation
+)
 from sokoenginepy.snapshot.snapshot_string_parser import SnapshotStringParser
 
 
@@ -20,9 +21,7 @@ def sokoban_snapshot():
 
 
 class DescribeSnapshotStringParser:
-
     class Describe_convert:
-
         def it_ignores_spaces_and_current_position_character(self, parser):
             success = parser._parse(
                 "  \n **  \t l ", Tessellation.SOKOBAN.value
@@ -32,9 +31,7 @@ class DescribeSnapshotStringParser:
             assert parser._resulting_moves == [AtomicMove(Direction.LEFT)]
 
         def it_accepts_blank_input_as_empty_forward_snapshot(self, parser):
-            success = parser._parse(
-                "  \n   \t  ", Tessellation.SOKOBAN.value
-            )
+            success = parser._parse("  \n   \t  ", Tessellation.SOKOBAN.value)
             assert success
             assert parser._resulting_solving_mode == SolvingMode.FORWARD
             assert parser._resulting_moves == []
@@ -92,7 +89,6 @@ class DescribeSnapshotStringParser:
                 assert atomic_move.is_pusher_selection
 
     class Describe_convert_token:
-
         def it_fails_on_moves_illegal_in_context_of_requested_tessellation(
             self, parser
         ):
@@ -119,14 +115,12 @@ class DescribeSnapshotStringParser:
             assert (
                 parser._resulting_moves == [
                     AtomicMove(Direction.LEFT), AtomicMove(Direction.UP),
-                    AtomicMove(Direction.RIGHT), AtomicMove(
-                        Direction.DOWN, box_moved=True
-                    )
+                    AtomicMove(Direction.RIGHT),
+                    AtomicMove(Direction.DOWN, box_moved=True)
                 ]
             )
 
     class Describe_convert_from_string:
-
         def it_replaces_internal_data_with_atomic_moves_from_string(
             self, parser, sokoban_snapshot
         ):

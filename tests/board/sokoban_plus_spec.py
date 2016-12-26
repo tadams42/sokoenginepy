@@ -7,9 +7,7 @@ from sokoenginepy import SokobanPlus, SokobanPlusDataError
 
 
 class DescribeSokobanPlus:
-
     class Describe_init:
-
         def it_doesnt_validate_on_init(self):
             sokoban_plus = SokobanPlus(42, "foo bar", [4, 2])
             assert not sokoban_plus._is_validated
@@ -19,7 +17,6 @@ class DescribeSokobanPlus:
             assert not sokoban_plus.is_enabled
 
     class Describe_boxorder_and_goalorder:
-
         def test_they_return_order_object_from_init_if_sokoban_plus_is_not_valid(
             self, sokoban_plus
         ):
@@ -30,7 +27,9 @@ class DescribeSokobanPlus:
             assert sokoban_plus.boxorder == "foo"
             assert sokoban_plus.goalorder == "bar"
 
-        def test_they_return_parsed_order_string_if_sokoban_plus_is_valid_and_enabled(self):
+        def test_they_return_parsed_order_string_if_sokoban_plus_is_valid_and_enabled(
+            self
+        ):
             sokoban_plus = SokobanPlus(5, "1 2 0 3 0", "3 1 0 2 0 0 0")
             assert sokoban_plus.boxorder == "1 2 0 3 0"
             assert sokoban_plus.goalorder == "3 1 0 2 0 0 0"
@@ -57,7 +56,9 @@ class DescribeSokobanPlus:
             assert sokoban_plus.is_enabled == False
             assert sokoban_plus.is_valid == False
 
-        def test_setters_dont_disable_and_invalidate_if_setting_to_equal_value(self):
+        def test_setters_dont_disable_and_invalidate_if_setting_to_equal_value(
+            self
+        ):
             sokoban_plus = SokobanPlus(5, "1 2 0 3 0", "3 1 0 2 0 0 0")
             sokoban_plus.is_enabled = True
             assert sokoban_plus.is_valid == True
@@ -74,7 +75,6 @@ class DescribeSokobanPlus:
             assert sokoban_plus.is_enabled == True
 
     class Describe_getter_for_box_plus_id:
-
         def it_returns_default_plus_id_for_disabled_sokoban_plus(
             self, sokoban_plus
         ):
@@ -85,7 +85,6 @@ class DescribeSokobanPlus:
             assert sokoban_plus.box_plus_id(2) == sokoban_plus._box_plus_ids[2]
 
     class Describe_getter_for_goal_plus_id:
-
         def it_returns_default_plus_id_for_disabled_sokoban_plus(
             self, sokoban_plus
         ):
@@ -95,10 +94,10 @@ class DescribeSokobanPlus:
             self, sokoban_plus
         ):
             sokoban_plus.is_enabled = True
-            assert sokoban_plus.goal_plus_id(2) == sokoban_plus._goal_plus_ids[2]
+            assert sokoban_plus.goal_plus_id(2) == sokoban_plus._goal_plus_ids[2
+                                                                              ]
 
     class When_it_is_set_to_enabled:
-
         def it_parses_init_data(self, sokoban_plus):
             assert not sokoban_plus._is_validated
             sokoban_plus.is_enabled = True
@@ -115,13 +114,11 @@ class DescribeSokobanPlus:
             assert sokoban_plus._is_enabled
 
     class Describe_legacy_plus_id_handling:
-
         def it_converts_legacy_plus_ids_silently_if_piece_count_is_smaller_than_legacy_plus_id(
             self
         ):
             sokoban_plus = SokobanPlusFactory(
-                pieces_count=10,
-                boxorder="1 5 42 {0} 23".
+                pieces_count=10, boxorder="1 5 42 {0} 23".
                 format(SokobanPlus._LEGACY_DEFAULT_PLUS_ID),
                 goalorder="1 5 42 {0} 23".
                 format(SokobanPlus._LEGACY_DEFAULT_PLUS_ID)
@@ -153,7 +150,6 @@ class DescribeSokobanPlus:
             )
 
     class Describe_is_valid:
-
         def it_is_valid_calls_all_validators(self, sokoban_plus):
             sokoban_plus._validate_plus_ids = Mock()
             sokoban_plus._validate_piece_count = Mock()
@@ -228,8 +224,6 @@ class DescribeSokobanPlus:
             self
         ):
             sokoban_plus = SokobanPlusFactory(
-                goalorder="1 1 2 2 3 3",
-                boxorder="2 2 3 3 1 1",
-                pieces_count=10
+                goalorder="1 1 2 2 3 3", boxorder="2 2 3 3 1 1", pieces_count=10
             )
             assert sokoban_plus.is_valid

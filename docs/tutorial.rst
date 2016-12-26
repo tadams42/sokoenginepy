@@ -14,21 +14,32 @@ Contructing an instance of board is as easy as:
 
 .. code-block:: python
 
-    >>> from textwrap import dedent
     >>> from sokoenginepy import SokobanBoard
-    >>> board = SokobanBoard(board_str=dedent("""
-    ...             #####
-    ...             #  @#
-    ...             #$  #
-    ...           ###  $##
-    ...           #  $ $ #
-    ...         ### # ## #   ######
-    ...         #   # ## #####  ..#
-    ...         # $  $          ..#
-    ...         ##### ### #@##  ..#
-    ...             #     #########
-    ...             #######
-    ...     """[1:-1]))
+    >>> board = SokobanBoard(board_str='\n'.join([
+    ...     '    #####',
+    ...     '    #  @#',
+    ...     '    #$  #',
+    ...     '  ###  $##',
+    ...     '  #  $ $ #',
+    ...     '### # ## #   ######',
+    ...     '#   # ## #####  ..#',
+    ...     '# $  $          ..#',
+    ...     '##### ### #@##  ..#',
+    ...     '    #     #########',
+    ...     '    #######'
+    ... ]))
+    >>> print(board)
+        #####
+        #  @#
+        #$  #
+      ###  $##
+      #  $ $ #
+    ### # ## #   ######
+    #   # ## #####  ..#
+    # $  $          ..#
+    ##### ### #@##  ..#
+        #     #########
+        #######
 
 All boards implement rich API that allows editing individual board cells,
 resizing and exploring neigbouring positions. Positions are expressed as 1D
@@ -40,20 +51,18 @@ array indexes which can be retreived fro 2D coordinates using :func:`.index_1d`
     >>> position = index_1d(11, 8, board.width)
     >>>
     >>> board[position]
-    BoardCell(Characters.PUSHER)
+    BoardCell('@')
     >>> print(board[position])
     @
     >>> board[position] = BoardCell.Characters.BOX
     >>> board[position]
-    BoardCell(Characters.BOX)
-    >>> print(board[position])
-    $
+    BoardCell('$')
     >>> board[position].has_pusher
     False
     >>> board[position].has_box
     True
     >>> board[position].put_pusher()
-    BoardCell(Characters.PUSHER)
+    BoardCell('@')
     >>> board.neighbor(position, Direction.RIGHT)
     164
 
@@ -72,18 +81,17 @@ mechanics, we can attach instance of :class:`.HashedBoardState` to our board.
     >>> state = HashedBoardState(board)
     >>> state
     HashedBoardState(SokobanBoard(board_str='\n'.join([
-        "    #####",
-        "    #  @#",
-        "    #$  #",
-        "  ###  $##",
-        "  #  $ $ #",
-        "### # ## #   ######",
-        "#   # ## #####  ..#",
-        "# $  $          ..#",
-        "##### ### #@##  ..#",
-        "    #     #########",
-        "    #######",
-        ""
+        '    #####',
+        '    #  @#',
+        '    #$  #',
+        '  ###  $##',
+        '  #  $ $ #',
+        '### # ## #   ######',
+        '#   # ## #####  ..#',
+        '# $  $          ..#',
+        '##### ### #@##  ..#',
+        '    #     #########',
+        '    #######'
     ])))
 
 This class memoizes positions of pushers and boxes and assigns numerical IDs to
