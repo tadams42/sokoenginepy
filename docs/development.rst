@@ -111,6 +111,15 @@ following:
     make
     sudo make install
 
+Runing under PyPy3
+------------------
+
+.. code-block:: sh
+
+    wget https://bitbucket.org/pypy/pypy/downloads/pypy3.3-v5.5.0-alpha-linux64.tar.bz2
+    tar xvfj pypy3.3-v5.5.0-alpha-linux64.tar.bz2
+    virtualenv -p /foo/bar/baz/pypy3-v5.5.0-linux64/bin/pypy3pypy3 .venvpypy
+    source .venvpypy/bin/python
 
 Profiling
 ---------
