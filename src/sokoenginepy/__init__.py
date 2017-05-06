@@ -14,4 +14,4 @@ from .tessellation import (COLUMN, ROW, CellOrientation, Direction,
                            is_on_board_1d, is_on_board_2d)
 from .utilities import RleCharacters, SokoengineError, rle_decode, rle_encode
 
-__version__ = "0.5.0"
+__version__ = "0.4.1"
