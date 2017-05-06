@@ -120,7 +120,7 @@ also use Sokoban+ strings which changes end game conditions:
 
     >>> state.boxorder = '1 3 2'
     >>> state.goalorder = '3 2 1'
-    >>> state.is_sokoban_plus_enabled = True
+    >>> state.enable_sokoban_plus()
     >>> state.is_sokoban_plus_enabled
     True
     >>> state.is_sokoban_plus_valid
@@ -201,7 +201,7 @@ game mechanics like this:
     >>> # Sokoban+
     >>> reverse_mover.state.boxorder = '1 3 2'
     >>> reverse_mover.state.goalorder = '3 2 1'
-    >>> reverse_mover.state.is_sokoban_plus_enabled = True
+    >>> reverse_mover.state.enable_sokoban_plus()
     >>>
     >>> # This check also considers if Sokoban+ is enabled...
     >>> reverse_mover.state.is_solved()

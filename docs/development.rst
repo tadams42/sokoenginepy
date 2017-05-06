@@ -1,8 +1,8 @@
-Developing sokenginepy
-======================
+Development
+===========
 
-Prepare development environment
--------------------------------
+Preparing development environment
+---------------------------------
 
 Create new virtual environment
 
@@ -11,28 +11,9 @@ Create new virtual environment
     cd path/to/cloned/repo/sokoenginepy
     pyvenv .venv
     source .venv/bin/activate
+    pip install -u pip wheel
 
-Then ensure we have newest pip and setuptools
-
-.. code-block:: sh
-
-    pip install -U pip
-    wget https://bootstrap.pypa.io/ez_setup.py -O - | python
-
-To be able to package project into wheels, we need
-
-.. code-block:: sh
-
-    pip install wheel
-
-And to distribute it on PyPI_
-
-.. code-block:: sh
-
-    pip install twine
-
-
-Install it in develop mode
+Installing in develop mode
 --------------------------
 
 .. code-block:: sh
@@ -49,8 +30,7 @@ To install extra packages usefull in development
 
 .. code-block:: sh
 
-    pip install -e .[dev, test]
-
+    pip install -e .[dev]
 
 Running tests
 -------------
@@ -77,6 +57,22 @@ and finally, tests can be run with tox_
 
     tox
 
+Note, to combine the coverage data from all the tox environments run:
+
+.. list-table::
+    :widths: 10 90
+    :stub-columns: 1
+
+    - - Windows
+      - ::
+
+            set PYTEST_ADDOPTS=--cov-append
+            tox
+
+    - - Other
+      - ::
+
+            PYTEST_ADDOPTS=--cov-append tox
 
 Installing graph-tool_ to virtual environment on Ubuntu
 -------------------------------------------------------
@@ -142,7 +138,6 @@ or as call graph through KCacheGrind
 
     pyprof2calltree -i program.prof
     kcachegrind program.prof.log
-
 
 Uploading to PyPI
 -----------------

@@ -1,8 +1,19 @@
-include LICENSE tox.ini .pylintrc .travis.yml
-recursive-include tests *
-recursive-include docs *
-recursive-include scripts *
+graft docs
+graft src
+graft tests
+graft scripts
+
+include .bumpversion.cfg
+include .coveragerc
+include .editorconfig
+
+include LICENSE
+include README.rst
+include .pylintrc
+
+include tox.ini .travis.yml
+
+global-exclude *.py[cod] __pycache__ *.so *.dylib
+
 global-exclude .ipynb_checkpoints/*
-global-exclude *.pyc
-global-exclude *.pyo
 prune docs/_build

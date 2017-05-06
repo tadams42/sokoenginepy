@@ -1,15 +1,10 @@
 import operator
 import time
-from copy import deepcopy
 from enum import IntEnum
 from functools import reduce
 from textwrap import dedent
 
-from cached_property import cached_property
-
-from sokoenginepy import (
-    Direction, HashedBoardState, Mover, SokobanBoard, SolvingMode, settings
-)
+from sokoenginepy import Direction, Mover, SokobanBoard, SolvingMode, settings
 
 settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = False
 
@@ -96,7 +91,7 @@ class MovementBenchmark:
         self.mover.pulls_boxes = True
 
     @property
-    def speed(self):
+    def moves_per_second(self):
         return self.moves_count / (self.milliseconds_used / 1000)
 
     def run(self):
@@ -123,7 +118,6 @@ class MovementBenchmarkPrinter:
     def __init__(self, runs_count, moves_per_run_count):
         self.runs_count = runs_count
         self.moves_per_run_count = moves_per_run_count
-        self.benchmarker = None
 
     def board_header(self, board_type):
         benchmarker = MovementBenchmark(
@@ -149,18 +143,18 @@ class MovementBenchmarkPrinter:
         print("{:<20}: ".format(benchmark_type.title), end='', flush=True)
 
         for i in range(0, self.runs_count):
-            self.benchmarker = MovementBenchmark(
+            benchmarker = MovementBenchmark(
                 board_type, benchmark_type, self.moves_per_run_count
             )
-            self.benchmarker.run()
-            speeds.append(self.benchmarker.speed)
-            times.append(self.benchmarker.milliseconds_used)
+            benchmarker.run()
+            speeds.append(benchmarker.moves_per_second)
+            times.append(benchmarker.milliseconds_used)
             print('.', end='', flush=True)
 
         mean_speed = reduce(operator.add, speeds, 0.0) / len(speeds)
         mean_time = reduce(operator.add, times, 0.0) / len(times)
         print(
-            " {:.2f} [ms] {:.2f} [moves/s]".format(mean_time, mean_speed ),
+            " {:.2f} [ms] {:.2f} [moves/s]".format(mean_time, mean_speed),
             end='', flush=True
         )
 

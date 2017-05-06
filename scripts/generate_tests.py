@@ -16,8 +16,8 @@ SOURCE_ROOT = os.path.abspath(os.path.join(basedir, '..'))
 TESTS_DIR = os.path.abspath(os.path.join(SOURCE_ROOT, 'tests'))
 RES_DIR = os.path.abspath(os.path.join(TESTS_DIR, 'res'))
 TEST_CASES_DIR = os.path.abspath(os.path.join(RES_DIR, 'test_cases'))
-BOARD_TESTS_DIR = os.path.abspath(os.path.join(TESTS_DIR, 'board'))
-TESSELLATION_TESTS_DIR = os.path.abspath(os.path.join(TESTS_DIR, 'tessellation'))
+BOARD_TESTS_DIR = os.path.abspath(os.path.join(TESTS_DIR, 'sokoenginepy', 'board'))
+TESSELLATION_TESTS_DIR = os.path.abspath(os.path.join(TESTS_DIR, 'sokoenginepy', 'tessellation'))
 
 
 class SpecGenerator:

@@ -1,12 +1,11 @@
 import factory
 import pytest
-
 from helpers import fake
-from sokoenginepy import (
-    DEFAULT_PIECE_ID, AtomicMove, BoardCell, BoardState, Direction,
-    HashedBoardState, Mover, Snapshot, SokobanBoard, SokobanPlus, SolvingMode,
-    Tessellation, index_1d, settings
-)
+
+from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, BoardCell, BoardState,
+                          Direction, HashedBoardState, Mover, Snapshot,
+                          SokobanBoard, SokobanPlus, SolvingMode, Tessellation,
+                          index_1d, settings)
 
 
 @pytest.fixture(scope='function', autouse=True)
@@ -137,12 +136,12 @@ def switched_board_str():
 
 
 @pytest.fixture
-def board_str_width():
+def board_width():
     return 19
 
 
 @pytest.fixture
-def board_str_height():
+def board_height():
     return 11
 
 
@@ -179,15 +178,20 @@ def hashed_board_state(variant_board):
 
 
 @pytest.fixture
+def wall_position(board_width):
+    return index_1d(4, 0, board_width)
+
+
+@pytest.fixture
 def pusher_ids():
     return [DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1]
 
 
 @pytest.fixture
-def pushers_positions(board_str_width):
+def pushers_positions(board_width):
     return {
-        DEFAULT_PIECE_ID: index_1d(7, 1, board_str_width),
-        DEFAULT_PIECE_ID + 1: index_1d(11, 8, board_str_width),
+        DEFAULT_PIECE_ID: index_1d(7, 1, board_width),
+        DEFAULT_PIECE_ID + 1: index_1d(11, 8, board_width),
     }
 
 
@@ -197,22 +201,22 @@ def invalid_pusher_position():
 
 
 @pytest.fixture
-def normalized_pushers_positions(board_str_width):
+def normalized_pushers_positions(board_width):
     return {
-        DEFAULT_PIECE_ID: index_1d(5, 1, board_str_width),
-        DEFAULT_PIECE_ID + 1: index_1d(8, 4, board_str_width),
+        DEFAULT_PIECE_ID: index_1d(5, 1, board_width),
+        DEFAULT_PIECE_ID + 1: index_1d(8, 4, board_width),
     }
 
 
 @pytest.fixture
-def boxes_positions(board_str_width):
+def boxes_positions(board_width):
     return {
-        DEFAULT_PIECE_ID: index_1d(5, 2, board_str_width),
-        DEFAULT_PIECE_ID + 1: index_1d(7, 3, board_str_width),
-        DEFAULT_PIECE_ID + 2: index_1d(5, 4, board_str_width),
-        DEFAULT_PIECE_ID + 3: index_1d(7, 4, board_str_width),
-        DEFAULT_PIECE_ID + 4: index_1d(2, 7, board_str_width),
-        DEFAULT_PIECE_ID + 5: index_1d(5, 7, board_str_width),
+        DEFAULT_PIECE_ID: index_1d(5, 2, board_width),
+        DEFAULT_PIECE_ID + 1: index_1d(7, 3, board_width),
+        DEFAULT_PIECE_ID + 2: index_1d(5, 4, board_width),
+        DEFAULT_PIECE_ID + 3: index_1d(7, 4, board_width),
+        DEFAULT_PIECE_ID + 4: index_1d(2, 7, board_width),
+        DEFAULT_PIECE_ID + 5: index_1d(5, 7, board_width),
     }
 
 
@@ -230,14 +234,14 @@ def boxes_ids():
 
 
 @pytest.fixture
-def goals_positions(board_str_width):
+def goals_positions(board_width):
     return {
-        DEFAULT_PIECE_ID: index_1d(16, 6, board_str_width),
-        DEFAULT_PIECE_ID + 1: index_1d(17, 6, board_str_width),
-        DEFAULT_PIECE_ID + 2: index_1d(16, 7, board_str_width),
-        DEFAULT_PIECE_ID + 3: index_1d(17, 7, board_str_width),
-        DEFAULT_PIECE_ID + 4: index_1d(16, 8, board_str_width),
-        DEFAULT_PIECE_ID + 5: index_1d(17, 8, board_str_width),
+        DEFAULT_PIECE_ID: index_1d(16, 6, board_width),
+        DEFAULT_PIECE_ID + 1: index_1d(17, 6, board_width),
+        DEFAULT_PIECE_ID + 2: index_1d(16, 7, board_width),
+        DEFAULT_PIECE_ID + 3: index_1d(17, 7, board_width),
+        DEFAULT_PIECE_ID + 4: index_1d(16, 8, board_width),
+        DEFAULT_PIECE_ID + 5: index_1d(17, 8, board_width),
     }
 
 
