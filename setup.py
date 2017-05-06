@@ -75,34 +75,36 @@ setup(
     # $ pip install -e .[dev]
     extras_require={
         'dev': [
-            'pycodestyle >= 2.0.0',  # (formerly called pep8)
-            'mccabe >= 0.5.0',
-            'pylint >= 1.6.0',
-            'yapf >= 0.11.0',
-            'bumpversion >= 0.5.3',
+            'pycodestyle',
+            'mccabe',
+            'pylint',
+            'yapf',
+            'bumpversion',
             'isort',
+            'check-manifest',
 
             # IPython stuff
-            'ipython >= 5.0.0',
-            'jupyter >= 1.0.0',
-            'ipdb >= 0.10.0',
+            'ipython',
+            'jupyter',
+            'ipdb',
 
             # Docs and viewers
-            'sphinx >= 1.4.0',
-            'sphinx_rtd_theme >= 0.1.9',
+            'sphinx',
+            'sphinx_rtd_theme',
 
             # py.test stuff
-            'pytest-colordots >= 0.1.0',
-            'colored-traceback >= 0.2.0',
             'pytest >= 3.0.0',
-            'pytest-spec >= 1.0.0',
-            'pytest-cov >= 2.3.0',
+            'pytest-spec',
+            'pytest-cov',
             'pytest-runner',  # Needed for `python setup.py test` to work
-            'check-manifest >= 0.33.0',
-            'coverage >= 4.2.0',
-            'pytest-benchmark >= 3.0.0',
-            'factory-boy >= 2.8.0',
-            'faker >= 0.6.0',
+            'pytest-colordots',
+            'pytest-benchmark',
+            'pytest-mock',
+
+            'colored-traceback',
+            'coverage',
+            'factory-boy',
+            'faker',
         ]
     },
     # If there are data files included in your packages that need to be

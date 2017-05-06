@@ -1,5 +1,3 @@
-# from unittest.mock import Mock, call
-
 import pytest
 from factories import SokobanPlusFactory
 
@@ -150,36 +148,36 @@ class DescribeSokobanPlus:
             )
 
     class Describe_is_valid:
-        # def it_is_valid_calls_all_validators(self, sokoban_plus):
-        #     sokoban_plus._validate_plus_ids = Mock()
-        #     sokoban_plus._validate_piece_count = Mock()
-        #     sokoban_plus._validate_ids_counts = Mock()
-        #     sokoban_plus._validate_id_sets_equality = Mock()
-        #     sokoban_plus.is_valid
-        #
-        #     assert sokoban_plus._validate_plus_ids.call_count == 2
-        #     assert sokoban_plus._validate_plus_ids.call_args_list == [
-        #         call(sokoban_plus._box_plus_ids),
-        #         call(sokoban_plus._goal_plus_ids)
-        #     ]
-        #     assert sokoban_plus._validate_piece_count.called
-        #     assert sokoban_plus._validate_ids_counts.called
-        #     assert sokoban_plus._validate_id_sets_equality.called
-        #
-        # def it_validates_all_plus_ids(self, sokoban_plus):
-        #     sokoban_plus.is_enabled = True
-        #     sokoban_plus.is_valid_plus_id = Mock()
-        #     sokoban_plus.is_valid_plus_id.return_value = True
-        #     sokoban_plus._validate_plus_ids(sokoban_plus._box_plus_ids)
-        #
-        #     assert sokoban_plus.is_valid_plus_id.call_args_list == [
-        #         call(id) for id in sokoban_plus._box_plus_ids.values()
-        #     ]
-        #     assert len(sokoban_plus.errors) == 0
-        #
-        #     sokoban_plus.is_valid_plus_id.return_value = False
-        #     sokoban_plus._validate_plus_ids(sokoban_plus._box_plus_ids)
-        #     assert len(sokoban_plus.errors) > 0
+        def it_is_valid_calls_all_validators(self, mocker, sokoban_plus):
+            sokoban_plus._validate_plus_ids = mocker.Mock()
+            sokoban_plus._validate_piece_count = mocker.Mock()
+            sokoban_plus._validate_ids_counts = mocker.Mock()
+            sokoban_plus._validate_id_sets_equality = mocker.Mock()
+            sokoban_plus.is_valid
+
+            assert sokoban_plus._validate_plus_ids.call_count == 2
+            assert sokoban_plus._validate_plus_ids.call_args_list == [
+                mocker.call(sokoban_plus._box_plus_ids),
+                mocker.call(sokoban_plus._goal_plus_ids)
+            ]
+            assert sokoban_plus._validate_piece_count.called
+            assert sokoban_plus._validate_ids_counts.called
+            assert sokoban_plus._validate_id_sets_equality.called
+
+        def it_validates_all_plus_ids(self, mocker, sokoban_plus):
+            sokoban_plus.is_enabled = True
+            sokoban_plus.is_valid_plus_id = mocker.Mock()
+            sokoban_plus.is_valid_plus_id.return_value = True
+            sokoban_plus._validate_plus_ids(sokoban_plus._box_plus_ids)
+
+            assert sokoban_plus.is_valid_plus_id.call_args_list == [
+                mocker.call(id) for id in sokoban_plus._box_plus_ids.values()
+            ]
+            assert len(sokoban_plus.errors) == 0
+
+            sokoban_plus.is_valid_plus_id.return_value = False
+            sokoban_plus._validate_plus_ids(sokoban_plus._box_plus_ids)
+            assert len(sokoban_plus.errors) > 0
 
         def it_validates_piece_count_is_greater_or_equal_than_zero(
             self, sokoban_plus
