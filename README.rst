@@ -1,33 +1,51 @@
 sokoenginepy - Sokoban and variants game engine
 ***********************************************
 
-.. image:: https://img.shields.io/pypi/l/sokoenginepy.svg
-    :target: http://opensource.org/licenses/GPL-3.0
+.. start-badges
+
+|version| |license| |travis| |docs| |requirements| |codacy_grade| |codacy_coverage| |wheel| |python_versions|
+
+.. |version| image:: https://img.shields.io/pypi/v/sokoenginepy.svg
+    :alt: PyPI Package latest release
+    :target: https://pypi.python.org/pypi/sokoenginepy
+
+.. |license| image:: https://img.shields.io/pypi/l/sokoenginepy.svg
     :alt: License
+    :target: https://opensource.org/licenses/GPL-3.0
 
-.. image:: https://img.shields.io/pypi/v/sokoenginepy.svg
+.. |wheel| image:: https://img.shields.io/pypi/wheel/sokoenginepy.svg
+    :alt: PyPI Wheel
     :target: https://pypi.python.org/pypi/sokoenginepy
-    :alt: PyPI Release
 
-.. image:: https://img.shields.io/pypi/pyversions/sokoenginepy.svg
+.. |python_versions| image:: https://img.shields.io/pypi/pyversions/sokoenginepy.svg
+    :alt: Supported versions
     :target: https://pypi.python.org/pypi/sokoenginepy
-    :alt: Supported Python versions
 
-.. image:: https://readthedocs.org/projects/sokoenginepy/badge/?version=latest
-    :target: https://sokoenginepy.readthedocs.org/
-    :alt: Documentation
+.. |python_implementations| image:: https://img.shields.io/pypi/implementation/sokoenginepy.svg
+    :alt: Supported implementations
+    :target: https://pypi.python.org/pypi/sokoenginepy
 
-.. image:: https://travis-ci.org/tadamic/sokoenginepy.svg?branch=development
+.. |travis| image:: https://api.travis-ci.org/tadamic/sokoenginepy.svg
+    :alt: Travis-CI Build Status
     :target: https://travis-ci.org/tadamic/sokoenginepy
-    :alt: TravisCI status
 
-.. image:: https://api.codacy.com/project/badge/Coverage/492a7c08b97e4dbe991b0190dd3abf02
-    :target: https://www.codacy.com/app/tomislav-adamic/sokoenginepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tadamic/sokoenginepy&amp;utm_campaign=Badge_Coverage
-    :alt: Tests coverage
+.. |docs| image:: https://readthedocs.org/projects/sokoenginepy/badge/?style=flat
+    :target: http://sokoenginepy.readthedocs.io/en/latest/
+    :alt: Documentation Status
 
-.. image:: https://api.codacy.com/project/badge/Grade/492a7c08b97e4dbe991b0190dd3abf02
+.. |requirements| image:: https://requires.io/github/tadamic/sokoenginepy/requirements.svg?branch=master
+     :target: https://requires.io/github/tadamic/sokoenginepy/requirements/?branch=master
+     :alt: Requirements Status
+
+.. |codacy_grade| image:: https://api.codacy.com/project/badge/Grade/492a7c08b97e4dbe991b0190dd3abf02
+    :alt: Codacy grade
     :target: https://www.codacy.com/app/tomislav-adamic/sokoenginepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tadamic/sokoenginepy&amp;utm_campaign=Badge_Grade
-    :alt: Code quality
+
+.. |codacy_coverage| image:: https://api.codacy.com/project/badge/Coverage/492a7c08b97e4dbe991b0190dd3abf02
+    :alt: Codacy coverage
+    :target: https://www.codacy.com/app/tomislav-adamic/sokoenginepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tadamic/sokoenginepy&amp;utm_campaign=Badge_Coverage
+
+.. end-badges
 
 sokoenginepy is game engine for Sokoban and variants written in Python and
 loaded with features:
@@ -41,7 +59,7 @@ loaded with features:
 - reading and writing level collections
     - fully compatible with `SokobanYASC`_ .sok file format and variants (.xsb, .tsb, .hsb, .txt)
 
-sokoenginepy was inspired by `SokobanYASC`_, `JSoko`_, `MazezaM`_
+sokoenginepy was inspired by `SokobanYASC`_, `JSoko`_, MazezaM
 
 Installing
 ----------
@@ -52,7 +70,6 @@ Installing sokoenginepy should be as simple as
 
     pip install sokoenginepy
 
-
 Using
 -----
 
@@ -60,9 +77,8 @@ Using
 - For in-depth docs of whole package see `API Reference`_.
 
 
-.. _SokobanYASC: http://sourceforge.net/projects/sokobanyasc/
-.. _JSoko: http://www.sokoban-online.de/
-.. _MazezaM: http://webpages.dcu.ie/~tyrrelma/MazezaM/
+.. _SokobanYASC: https://sourceforge.net/projects/sokobanyasc/
+.. _JSoko: http://www.sokoban-online.de/jsoko.html
 .. _Sokobano: http://sokobano.de/en/index.php
 .. _Sokoban for Windows: http://www.sourcecode.se/sokoban/
 .. _Tutorial: https://sokoenginepy.readthedocs.io/en/development/tutorial.html

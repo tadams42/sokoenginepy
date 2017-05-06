@@ -4,16 +4,14 @@ input_output
 .. automodule:: sokoenginepy.input_output
     :members:
     :undoc-members:
-
-.. automodule:: sokoenginepy.input_output.output_settings
-    :members:
-    :undoc-members:
-    :exclude-members: OutputSettings
+    :show-inheritance:
 
 .. automodule:: sokoenginepy.input_output.puzzle
     :members:
     :undoc-members:
+    :show-inheritance:
 
 .. automodule:: sokoenginepy.input_output.puzzles_collection
     :members:
     :undoc-members:
+    :show-inheritance:

@@ -4,65 +4,58 @@ tessellation
 .. automodule:: sokoenginepy.tessellation
     :members:
     :undoc-members:
+    :show-inheritance:
     :inherited-members:
 
-.. automodule:: sokoenginepy.tessellation.factories
+.. automodule:: sokoenginepy.tessellation.cell_orientation
     :members:
     :undoc-members:
+    :show-inheritance:
     :inherited-members:
 
-.. automodule:: sokoenginepy.tessellation.hexoban_board
+.. automodule:: sokoenginepy.tessellation.direction
     :members:
     :undoc-members:
-    :inherited-members:
-    :exclude-members: HexobanTextConverter, HexobanBoardResizer
+    :show-inheritance:
+
+.. automodule:: sokoenginepy.tessellation.helpers
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 .. automodule:: sokoenginepy.tessellation.hexoban_tessellation
     :members:
     :undoc-members:
+    :show-inheritance:
     :inherited-members:
-
-.. automodule:: sokoenginepy.tessellation.octoban_board
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :exclude-members: OctobanBoardResizer
 
 .. automodule:: sokoenginepy.tessellation.octoban_tessellation
     :members:
     :undoc-members:
+    :show-inheritance:
     :inherited-members:
-
-.. automodule:: sokoenginepy.tessellation.sokoban_board
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :exclude-members: SokobanBoardResizer
 
 .. automodule:: sokoenginepy.tessellation.sokoban_tessellation
     :members:
     :undoc-members:
+    :show-inheritance:
     :inherited-members:
 
 .. automodule:: sokoenginepy.tessellation.tessellation
     :members:
     :undoc-members:
+    :show-inheritance:
     :inherited-members:
-    :exclude-members: on_board_1d, on_board_2d
 
-.. automodule:: sokoenginepy.tessellation.trioban_board
+.. automodule:: sokoenginepy.tessellation.tessellation_base
     :members:
     :undoc-members:
+    :show-inheritance:
     :inherited-members:
-    :exclude-members: TriobanBoardResizer
+    :exclude-members: TessellationBaseInheritableDocstrings
 
 .. automodule:: sokoenginepy.tessellation.trioban_tessellation
     :members:
     :undoc-members:
+    :show-inheritance:
     :inherited-members:
-
-.. automodule:: sokoenginepy.tessellation.variant_board
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :exclude-members: VariantBoardResizer
