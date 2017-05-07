@@ -3,7 +3,8 @@ import copy
 import pytest
 from factories import BoardCellFactory
 
-from sokoenginepy import BoardCell, SokoengineError, settings
+from sokoenginepy import BoardCell, settings
+from sokoenginepy.exceptions import SokoengineError
 
 
 class DescribeBoardCell:

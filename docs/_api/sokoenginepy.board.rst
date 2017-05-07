@@ -1,76 +1,104 @@
-board
-=====
-
-.. automodule:: sokoenginepy.board
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: sokoenginepy.board.board_cell
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: sokoenginepy.board.board_state
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: sokoenginepy.board.hashed_board_state
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-.. automodule:: sokoenginepy.board.hexoban_board
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-    :exclude-members: HexobanTextConverter, HexobanBoardResizer
-
-.. automodule:: sokoenginepy.board.octoban_board
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-    :exclude-members: OctobanBoardResizer
+Boards
+======
 
 .. automodule:: sokoenginepy.board.piece
     :members:
     :undoc-members:
     :show-inheritance:
+    :exclude-members: InvalidPieceIdError
 
-.. automodule:: sokoenginepy.board.sokoban_board
+BoardCell
+---------
+
+.. autoclass:: sokoenginepy.BoardCell
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-    :exclude-members: SokobanBoardResizer
 
-.. automodule:: sokoenginepy.board.sokoban_plus
-    :members:
-    :show-inheritance:
-    :undoc-members:
+BoardState
+----------
 
-.. automodule:: sokoenginepy.board.trioban_board
+.. autoclass:: sokoenginepy.board.board_state.BoardState
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-    :exclude-members: TriobanBoardResizer
 
-.. automodule:: sokoenginepy.board.variant_board
+HashedBoardState
+----------------
+
+.. autoclass:: sokoenginepy.board.hashed_board_state.HashedBoardState
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+BoardGraph
+----------
+
+.. autoclass:: sokoenginepy.GraphType
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-    :exclude-members: VariantBoardResizer
 
-.. automodule:: sokoenginepy.board.graph.graph_type
+.. autoclass:: sokoenginepy.BoardGraph
     :members:
     :undoc-members:
+    :inherited-members:
+    :show-inheritance:
 
-.. automodule:: sokoenginepy.board.graph.board_graph_networkx
+.. autoclass:: sokoenginepy.board.graph.board_graph_networkx.BoardGraphNetworkx
     :members:
     :undoc-members:
+    :inherited-members:
+
+VariantBoard
+------------
+
+.. autoclass:: sokoenginepy.board.variant_board.VariantBoard
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
+SokobanBoard
+------------
+
+.. autoclass:: sokoenginepy.SokobanBoard
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+HexobanBoard
+------------
+
+.. autoclass:: sokoenginepy.HexobanBoard
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+TriobanBoard
+------------
+
+.. autoclass:: sokoenginepy.TriobanBoard
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+OctobanBoard
+------------
+
+.. autoclass:: sokoenginepy.OctobanBoard
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+SokobanPlus
+-----------
+
+.. autoclass:: sokoenginepy.SokobanPlus
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:

@@ -5,7 +5,8 @@ from helpers import fake
 from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, BoardCell, BoardState,
                           Direction, HashedBoardState, Mover, Snapshot,
                           SokobanBoard, SokobanPlus, SolvingMode, Tessellation,
-                          index_1d, settings)
+                          settings)
+from sokoenginepy.utilities import index_1d
 
 
 @pytest.fixture(scope='function', autouse=True)

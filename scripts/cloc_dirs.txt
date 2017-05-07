@@ -1,4 +1,4 @@
-sokoenginepy
+src/sokoenginepy
 tests
 setup.py
 scripts

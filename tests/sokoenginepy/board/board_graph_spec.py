@@ -1,5 +1,5 @@
-from sokoenginepy import (BoardGraph, Direction, GraphType, SokobanBoard,
-                          index_1d)
+from sokoenginepy import BoardGraph, Direction, GraphType, SokobanBoard
+from sokoenginepy.utilities import index_1d
 
 
 class DescribeBoardGraph:

@@ -4,7 +4,8 @@ from inspect import getsourcefile
 import pytest
 from faker import Faker
 
-from sokoenginepy import AtomicMove, UnknownDirectionError
+from sokoenginepy import AtomicMove
+from sokoenginepy.exceptions import UnknownDirectionError
 
 TEST_RESOURCES_ROOT = os.path.abspath(
     os.path.join(getsourcefile(lambda: 0), '..', 'res')

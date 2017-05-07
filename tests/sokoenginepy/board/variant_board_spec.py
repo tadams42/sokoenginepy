@@ -2,9 +2,10 @@ from unittest.mock import patch
 
 import pytest
 
-from sokoenginepy import (BoardConversionError, BoardGraph, Direction,
-                          SokobanBoard, Tessellation, TriobanBoard,
-                          VariantBoard, index_1d, settings)
+from sokoenginepy import (BoardGraph, Direction, SokobanBoard, Tessellation,
+                          TriobanBoard, VariantBoard, settings)
+from sokoenginepy.exceptions import BoardConversionError
+from sokoenginepy.utilities import index_1d
 
 
 class DescribeVariantBoard:

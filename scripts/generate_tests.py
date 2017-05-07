@@ -71,8 +71,9 @@ class SpecGenerator:
 
             from sokoenginepy import (CellOrientation, Direction, HexobanBoard,
                                       OctobanBoard, SokobanBoard, Tessellation,
-                                      TriobanBoard, UnknownDirectionError, index_1d,
-                                      is_on_board_1d)
+                                      TriobanBoard)
+            from sokoenginepy.exceptions import UnknownDirectionError
+            from sokoenginepy.utilities import is_on_board_1d, index_1d
 
 
             def triangle_points_down(position, board_width, board_height):

@@ -28,7 +28,7 @@ class BoardState:
           :alt: Assigning board elements' IDs
 
     - Provides efficient means of pieces movemet. Ie. we can move pushers and
-      boxes and :class:`BoardState` will update internal state and board cells.
+      boxes and :class:`.BoardState` will update internal state and board cells.
 
       This movement preserves piece IDs in contex of board state changes. To
       ilustrate, let's assume we create :class:`.BoardState` from board with two
@@ -53,12 +53,12 @@ class BoardState:
         don't implement full game logic. For game logic see :class:`.Mover`
 
     Warning:
-        Once we create instance of :class:`BoardState` from some
+        Once we create instance of :class:`.BoardState` from some
         :class:`.VariantBoard` instance, that board should not be edited.
-        :class:`BoardState` will updated cells on board when pieces are moved,
+        :class:`.BoardState` will update cells on board when pieces are moved,
         and editing board cells directly (ie. adding/removing pushers or boxes,
         changing board size, changing walls layout, etc...) will not sync these
-        edits back to our :class:`BoardState` instance.
+        edits back to our :class:`.BoardState` instance.
 
     Args:
         board (VariantBoard): board for which we want to manage state

@@ -1,7 +1,8 @@
 import pytest
 from factories import SokobanPlusFactory
 
-from sokoenginepy import SokobanPlus, SokobanPlusDataError
+from sokoenginepy import SokobanPlus
+from sokoenginepy.exceptions import SokobanPlusDataError
 
 
 class DescribeSokobanPlus:

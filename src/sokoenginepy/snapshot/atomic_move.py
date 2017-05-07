@@ -18,7 +18,7 @@ class AtomicMove:
 
     class Characters(str, Enum):
         """
-        Characters used in textual representation of :class:`AtomicMove`.
+        Characters used in textual representation of :class:`.AtomicMove`.
 
         Not all variants use all characters. Also, for different variants, same
         character may have different meaning (represent different

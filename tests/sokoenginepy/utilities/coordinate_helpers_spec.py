@@ -1,5 +1,5 @@
-from sokoenginepy import (Direction, X, Y, index_1d, is_on_board_1d,
-                          is_on_board_2d)
+from sokoenginepy.utilities import (X, Y, index_1d, is_on_board_1d,
+                                    is_on_board_2d)
 
 
 class Describe_INDEX:
@@ -37,15 +37,3 @@ class Describe_on_board_1d:
         assert is_on_board_1d(4, 3, 3)
         assert is_on_board_1d(8, 3, 3)
         assert not is_on_board_1d(9, 3, 3)
-
-
-class DesctibeDirection_opposite:
-    def it_returns_opposite_direction(self):
-        assert Direction.UP.opposite == Direction.DOWN
-        assert Direction.DOWN.opposite == Direction.UP
-        assert Direction.LEFT.opposite == Direction.RIGHT
-        assert Direction.RIGHT.opposite == Direction.LEFT
-        assert Direction.NORTH_WEST.opposite == Direction.SOUTH_EAST
-        assert Direction.NORTH_EAST.opposite == Direction.SOUTH_WEST
-        assert Direction.SOUTH_WEST.opposite == Direction.NORTH_EAST
-        assert Direction.SOUTH_EAST.opposite == Direction.NORTH_WEST

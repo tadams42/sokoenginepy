@@ -1,18 +1,7 @@
-utilities
-=========
+sokoenginepy.utilities
+======================
 
 .. automodule:: sokoenginepy.utilities
-    :members:
+    :members: COLUMN, ROW, X, Y, index_1d, is_on_board_1d, is_on_board_2d, RleCharacters, rle_decode, rle_encode
     :undoc-members:
     :show-inheritance:
-
-.. automodule:: sokoenginepy.utilities.exceptions
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: sokoenginepy.utilities.rle
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :exclude-members: Rle

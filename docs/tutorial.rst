@@ -47,7 +47,8 @@ array indexes which can be retreived fro 2D coordinates using :func:`.index_1d`
 
 .. code-block:: python
 
-    >>> from sokoenginepy import BoardCell, index_1d, Direction
+    >>> from sokoenginepy import BoardCell, Direction
+    >>> from sokoenginepy.utilities import index_1d
     >>> position = index_1d(11, 8, board.width)
     >>>
     >>> board[position]
@@ -154,7 +155,8 @@ game mechanics like this:
 
 .. code-block:: python
 
-    >>> from sokoenginepy import Mover, SolvingMode, IllegalMoveError
+    >>> from sokoenginepy import Mover, SolvingMode
+    >>> from sokoenginepy.exceptions import IllegalMoveError
     >>>
     >>> # regular, forward solving mode
     >>> forward_mover = Mover(board)

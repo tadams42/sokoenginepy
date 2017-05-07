@@ -3,8 +3,9 @@ from unittest.mock import Mock
 import pytest
 from factories import SnapshotFactory
 
-from sokoenginepy import (AtomicMove, Direction, Snapshot, SokoengineError,
-                          SolvingMode, Tessellation)
+from sokoenginepy import (AtomicMove, Direction, Snapshot, SolvingMode,
+                          Tessellation)
+from sokoenginepy.exceptions import SokoengineError
 
 
 @pytest.fixture

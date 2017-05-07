@@ -1,4 +1,4 @@
-from sokoenginepy import rle_decode, rle_encode
+from sokoenginepy.utilities import rle_decode, rle_encode
 from sokoenginepy.utilities.rle import Rle
 
 

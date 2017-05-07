@@ -2,9 +2,10 @@ from copy import deepcopy
 
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction,
-                          IllegalMoveError, Mover, NonPlayableBoardError,
-                          SolvingMode, index_1d)
+from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction, Mover,
+                          SolvingMode)
+from sokoenginepy.exceptions import IllegalMoveError, NonPlayableBoardError
+from sokoenginepy.utilities import index_1d
 
 
 class DescribeMover:
@@ -225,6 +226,7 @@ class DescribeMover:
             assert forward_mover.selected_pusher == DEFAULT_PIECE_ID
             forward_mover.selected_pusher = DEFAULT_PIECE_ID + 1
             assert forward_mover.selected_pusher == DEFAULT_PIECE_ID + 1
+
             forward_mover.undo()
 
             expected_directions = [
@@ -525,10 +527,10 @@ class DescribeMover:
         def it_benchmarks_forward_mover(
             self, benchmark, forward_mover, forward_mover_moves_cycle
         ):
-            result = benchmark(
+            benchmark(
                 lambda: [
                     forward_mover.move(d)
-                    for d in 100*forward_mover_moves_cycle
+                    for d in range(100*forward_mover_moves_cycle)
                 ]
             )
 
@@ -536,9 +538,9 @@ class DescribeMover:
             self, benchmark, reverse_mover, reverse_mover_moves_cycle
         ):
             reverse_mover.pulls_boxes = True
-            result = benchmark(
+            benchmark(
                 lambda: [
                     reverse_mover.move(d)
-                    for d in 100*reverse_mover_moves_cycle
+                    for d in range(100*reverse_mover_moves_cycle)
                 ]
             )
