@@ -26,7 +26,7 @@ Later, to uninstall it
 
     python setup.py develop --uninstall
 
-To install extra packages usefull in development
+To install extra packages useful in development
 
 .. code-block:: sh
 
@@ -78,7 +78,7 @@ Installing graph-tool_ to virtual environment on Ubuntu
 -------------------------------------------------------
 
 graph-tool_ is `Boost Graph Library`_ based graph package. Since it is not
-instalable via pip, it is left as optional dependency: if sokoenginepy detects
+installable via pip, it is left as optional dependency: if sokoenginepy detects
 it, it will use it instead of default NetworkX_. To install graph-tool_ do the
 following:
 
@@ -107,8 +107,8 @@ following:
     make
     sudo make install
 
-Runing under PyPy3
-------------------
+Running under PyPy3
+-------------------
 
 .. code-block:: sh
 

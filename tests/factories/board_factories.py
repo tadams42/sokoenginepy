@@ -2,99 +2,9 @@ import factory
 import pytest
 from helpers import fake
 
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, BoardCell, BoardState,
-                          Direction, HashedBoardState, Mover, Snapshot,
-                          SokobanBoard, SokobanPlus, SolvingMode, Tessellation,
-                          settings)
+from sokoenginepy import (DEFAULT_PIECE_ID, BoardState, HashedBoardState,
+                          SokobanBoard, SokobanPlus, Tessellation)
 from sokoenginepy.utilities import index_1d
-
-
-@pytest.fixture(scope='function', autouse=True)
-def preserved_settings(request):
-    backup_flag1 = settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
-
-    def teardown():
-        settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = backup_flag1
-
-    request.addfinalizer(teardown)
-
-
-class AtomicMoveFactory(factory.Factory):
-    class Meta:
-        model = AtomicMove
-
-    box_moved = factory.LazyAttribute(lambda x: fake.boolean())
-    direction = factory.LazyAttribute(
-        lambda x: fake.random_element(list(Direction))
-    )
-
-
-@pytest.fixture
-def atomic_move():
-    return AtomicMoveFactory(direction=Direction.LEFT, box_moved=False)
-
-
-@pytest.fixture
-def atomic_push():
-    return AtomicMoveFactory(direction=Direction.LEFT, box_moved=True)
-
-
-@pytest.fixture
-def atomic_jump():
-    retv = AtomicMoveFactory(direction=Direction.LEFT)
-    retv.is_jump = True
-    return retv
-
-
-@pytest.fixture
-def atomic_pusher_selection():
-    retv = AtomicMoveFactory(direction=Direction.LEFT)
-    retv.is_pusher_selection = True
-    return retv
-
-
-class BoardCellFactory(factory.Factory):
-    class Meta:
-        model = BoardCell
-
-    character = factory.LazyAttribute(lambda x: BoardCell.Characters.FLOOR)
-
-
-@pytest.fixture
-def board_cell():
-    return BoardCellFactory()
-
-
-class SnapshotFactory(factory.Factory):
-    class Meta:
-        model = Snapshot
-
-    tessellation_or_description = factory.LazyAttribute(
-        lambda x: fake.random_element(list(Tessellation))
-    )
-    solving_mode = factory.LazyAttribute(
-        lambda x: fake.random_element(list(SolvingMode))
-    )
-    moves_data = ""
-
-
-@pytest.fixture
-def game_snapshot():
-    return SnapshotFactory(moves_data="lurdLURD{lurd}LURD")
-
-
-class SokobanPlusFactory(factory.Factory):
-    class Meta:
-        model = SokobanPlus
-
-    pieces_count = factory.LazyAttribute(lambda x: 5)
-    boxorder = factory.LazyAttribute(lambda x: "42 24 4 2")
-    goalorder = factory.LazyAttribute(lambda x: "2 24 42 4")
-
-
-@pytest.fixture
-def sokoban_plus():
-    return SokobanPlusFactory()
 
 
 @pytest.fixture
@@ -318,57 +228,15 @@ def non_playable_board():
     return SokobanBoard(5, 5)
 
 
-@pytest.fixture
-def forward_board():
-    # yapf: disable
-    return SokobanBoard(board_str="\n".join([
-        # 12345678
-        "#########",  # 0
-        "#$  .  .#",  # 1
-        "#   @$# #",  # 2
-        "#.$    @#",  # 3
-        "#########",  # 4
-    ]))
-    # yapf: enable
+class SokobanPlusFactory(factory.Factory):
+    class Meta:
+        model = SokobanPlus
+
+    pieces_count = factory.LazyAttribute(lambda x: 5)
+    boxorder = factory.LazyAttribute(lambda x: "42 24 4 2")
+    goalorder = factory.LazyAttribute(lambda x: "2 24 42 4")
 
 
 @pytest.fixture
-def reverse_board():
-    # yapf: disable
-    return SokobanBoard(board_str="\n".join([
-        # 12345678
-        "#########",  # 0
-        "#.  $  $#",  # 1
-        "#   @.# #",  # 2
-        "#$.    @#",  # 3
-        "#########",  # 4
-    ]))
-    # yapf: enable
-
-
-@pytest.fixture
-def forward_mover(forward_board):
-    return Mover(forward_board)
-
-
-@pytest.fixture
-def reverse_mover(forward_board):
-    return Mover(forward_board, SolvingMode.REVERSE)
-
-
-@pytest.fixture
-def forward_mover_moves_cycle():
-    return [
-        Direction.LEFT, Direction.LEFT, Direction.LEFT, Direction.DOWN,
-        Direction.RIGHT, Direction.UP, Direction.RIGHT, Direction.RIGHT,
-        Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT
-    ]
-
-
-@pytest.fixture
-def reverse_mover_moves_cycle():
-    return [
-        Direction.LEFT, Direction.UP, Direction.LEFT, Direction.DOWN,
-        Direction.RIGHT, Direction.RIGHT, Direction.UP, Direction.RIGHT,
-        Direction.DOWN, Direction.LEFT
-    ]
+def sokoban_plus():
+    return SokobanPlusFactory()

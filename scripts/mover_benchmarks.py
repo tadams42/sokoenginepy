@@ -100,7 +100,7 @@ class MovementBenchmark:
         for i in range(0, int(self.moves_count)):
             if undo_move:
                 start_time = time.perf_counter()
-                self.mover.undo()
+                self.mover.undo_last_move()
                 end_time = time.perf_counter()
                 total_time += end_time - start_time
                 undo_move = False
