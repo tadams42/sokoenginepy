@@ -101,10 +101,8 @@ class Mover:
     def selected_pusher(self):
         """ID of pusher that will perform next move.
 
-        For single-pusher boards, pusher is always automatically selected so
-        this doesn't need to be called.
-
-        Default is :data:`.DEFAULT_PIECE_ID`
+        See Also:
+            :meth:`.select_pusher`
         """
         return self._selected_pusher
 
@@ -136,13 +134,13 @@ class Mover:
         choose which animations to render for that.
 
         It is also possible to set this to some external sequence of moves. In
-        that case, calling undo() will cuase Mover to try to undo that external
-        sequence of atomic moves.
+        that case, calling :meth:`.undo_last_move` will cause Mover to try to
+        undo that external sequence of atomic moves.
 
         Example:
 
             >>> from sokoenginepy import Mover, SokobanBoard, AtomicMove, Direction
-            >>> board = SokobanBoard(board_str='\n'.join([
+            >>> board = SokobanBoard(board_str='\\n'.join([
             ...     '    #####',
             ...     '    #  @#',
             ...     '    #$  #',
@@ -159,7 +157,7 @@ class Mover:
             >>> mover.last_move = [AtomicMove(Direction.UP), AtomicMove(Direction.RIGHT)]
             >>> mover.undo_last_move()
             >>> mover.board
-            SokobanBoard(board_str='\n'.join([
+            SokobanBoard(board_str='\\n'.join([
                 '    #####',
                 '    #   #',
                 '    #$@ #',
@@ -187,6 +185,21 @@ class Mover:
         self._last_move = rv
 
     def select_pusher(self, pusher_id):
+        """
+        Selects pusher that will perform next move.
+
+        Mover always selects :data:`.DEFAULT_PIECE_ID` before any movements is
+        performed. This means that for single-pusher boards, that single pusher
+        is always automatically selected and this method doesn't need to be
+        called.
+
+        Args:
+            pusher_id (int): ID of pusher
+
+        See Also:
+            :attr:`.BoardState.pushers_ids`
+        """
+
         if pusher_id == self._selected_pusher:
             return
 

@@ -32,8 +32,8 @@ class BoardState:
 
       This movement preserves piece IDs in contex of board state changes. To
       ilustrate, let's assume we create :class:`.BoardState` from board with two
-      pushers one abowe the other. After then we edit the board, placing pusher
-      ID 2 in row abowe pusher ID 1. Finally, we create another instance of
+      pushers one above the other. After then we edit the board, placing pusher
+      ID 2 in row above pusher ID 1. Finally, we create another instance of
       :class:`.BoardState`. If we now inspect pusher IDs in first and second
       :class:`.BoardState` instance, they will be different. Have we used
       movement methods instead of board editing, these IDs would be preserved:
@@ -43,7 +43,7 @@ class BoardState:
       .. |img3| image:: /images/movement_vs_transfer3.png
 
       +------------------+------------------+------------------+
-      | 1) Initial board | 2) Edited board  | 3) Box moved     |
+      | 1) Initial board | 2) Edited board  | 3) Box ID:1 moved|
       +------------------+------------------+------------------+
       |      |img1|      |      |img2|      |      |img3|      |
       +------------------+------------------+------------------+
@@ -201,7 +201,7 @@ class BoardState:
         Raises:
             :exc:`KeyError`: there is no pusher on ``old_position``
             :exc:`.CellAlreadyOccupiedError`: there is an obstacle (
-                wall/box/antoher pusher) on ``to_new_position``
+                wall/box/another pusher) on ``to_new_position``
         """
         if old_position == to_new_position:
             return
@@ -333,7 +333,7 @@ class BoardState:
         Raises:
             :exc:`KeyError`: there is no box on ``old_position``
             :exc:`.CellAlreadyOccupiedError`: there is an obstacle (
-                wall/box/antoher pusher) on ``to_new_position``
+                wall/box/pusher) on ``to_new_position``
         """
         if old_position == to_new_position:
             return
@@ -362,7 +362,7 @@ class BoardState:
         Raises:
             :exc:`KeyError`: there is no box on ``old_position``
             :exc:`.CellAlreadyOccupiedError`: there is an obstacle (
-                wall/box/antoher pusher) on ``to_new_position``
+                wall/box/another pusher) on ``to_new_position``
         """
         self.move_box_from(self._boxes[box_id], to_new_position)
 
@@ -488,13 +488,33 @@ class BoardState:
         return self._sokoban_plus.is_enabled
 
     def enable_sokoban_plus(self):
+        """
+        Enables using Sokoban+ rules for this board.
+
+        Enabling these, changes victory condition for given board.
+
+        See Also:
+            :class:`.SokobanPlus`
+        """
         self._sokoban_plus.is_enabled = True
 
     def disable_sokoban_plus(self):
+        """
+        Disables using Sokoban+ rules for this board.
+
+        See Also:
+            :class:`.SokobanPlus`
+        """
         self._sokoban_plus.is_enabled = False
 
     @property
     def is_sokoban_plus_valid(self):
+        """
+        Validates current set of Sokoban+ rules.
+
+        See Also:
+            :class:`.SokobanPlus`
+        """
         return self._sokoban_plus.is_valid
 
     # --------------------------------------------------------------------------
