@@ -25,25 +25,25 @@ sokoenginepy - Sokoban and variants game engine
     :alt: Supported implementations
     :target: https://pypi.python.org/pypi/sokoenginepy
 
-.. |travis| image:: https://api.travis-ci.org/tadamic/sokoenginepy.svg
+.. |travis| image:: https://api.travis-ci.org/tadams42/sokoenginepy.svg
     :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/tadamic/sokoenginepy
+    :target: https://travis-ci.org/tadams42/sokoenginepy
 
 .. |docs| image:: https://readthedocs.org/projects/sokoenginepy/badge/?style=flat
     :target: http://sokoenginepy.readthedocs.io/en/latest/
     :alt: Documentation Status
 
-.. |requirements| image:: https://requires.io/github/tadamic/sokoenginepy/requirements.svg?branch=master
-     :target: https://requires.io/github/tadamic/sokoenginepy/requirements/?branch=master
+.. |requirements| image:: https://requires.io/github/tadams42/sokoenginepy/requirements.svg?branch=master
+     :target: https://requires.io/github/tadams42/sokoenginepy/requirements/?branch=master
      :alt: Requirements Status
 
 .. |codacy_grade| image:: https://api.codacy.com/project/badge/Grade/492a7c08b97e4dbe991b0190dd3abf02
     :alt: Codacy grade
-    :target: https://www.codacy.com/app/tomislav-adamic/sokoenginepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tadamic/sokoenginepy&amp;utm_campaign=Badge_Grade
+    :target: https://www.codacy.com/app/tomislav-adamic/sokoenginepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tadams42/sokoenginepy&amp;utm_campaign=Badge_Grade
 
 .. |codacy_coverage| image:: https://api.codacy.com/project/badge/Coverage/492a7c08b97e4dbe991b0190dd3abf02
     :alt: Codacy coverage
-    :target: https://www.codacy.com/app/tomislav-adamic/sokoenginepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tadamic/sokoenginepy&amp;utm_campaign=Badge_Coverage
+    :target: https://www.codacy.com/app/tomislav-adamic/sokoenginepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tadams42/sokoenginepy&amp;utm_campaign=Badge_Coverage
 
 .. end-badges
 
