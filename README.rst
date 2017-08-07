@@ -27,7 +27,7 @@ sokoenginepy - Sokoban and variants game engine
 
 .. |travis| image:: https://api.travis-ci.org/tadams42/sokoenginepy.svg
     :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/tadams42/sokoenginepy
+    :target: https://travis-ci.org/tadams42/sokoenginepy.svg?branch=master
 
 .. |docs| image:: https://readthedocs.org/projects/sokoenginepy/badge/?style=flat
     :target: http://sokoenginepy.readthedocs.io/en/latest/
