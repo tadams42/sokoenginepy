@@ -157,12 +157,11 @@ Prepare ``~/.pypirc``
         pypitest
 
     [pypitest]
-    repository = https://testpypi.python.org/pypi
+    repository = https://test.pypi.org/legacy/
     username = <username>
     password = <password>
 
     [pypi]
-    repository = https://pypi.python.org/pypi
     username = <username>
     password = <password>
 
