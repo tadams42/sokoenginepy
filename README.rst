@@ -7,7 +7,7 @@ sokoenginepy - Sokoban and variants game engine
 
 .. |version| image:: https://img.shields.io/pypi/v/sokoenginepy.svg
     :alt: PyPI Package latest release
-    :target: https://pypi.python.org/pypi/sokoenginepy
+    :target: https://pypi.org/project/sokoenginepy/
 
 .. |license| image:: https://img.shields.io/pypi/l/sokoenginepy.svg
     :alt: License
@@ -15,15 +15,15 @@ sokoenginepy - Sokoban and variants game engine
 
 .. |wheel| image:: https://img.shields.io/pypi/wheel/sokoenginepy.svg
     :alt: PyPI Wheel
-    :target: https://pypi.python.org/pypi/sokoenginepy
+    :target: https://pypi.org/project/sokoenginepy/
 
 .. |python_versions| image:: https://img.shields.io/pypi/pyversions/sokoenginepy.svg
     :alt: Supported versions
-    :target: https://pypi.python.org/pypi/sokoenginepy
+    :target: https://pypi.org/project/sokoenginepy/
 
 .. |python_implementations| image:: https://img.shields.io/pypi/implementation/sokoenginepy.svg
     :alt: Supported implementations
-    :target: https://pypi.python.org/pypi/sokoenginepy
+    :target: https://pypi.org/project/sokoenginepy/
 
 .. |travis| image:: https://api.travis-ci.org/tadams42/sokoenginepy.svg
     :alt: Travis-CI Build Status
