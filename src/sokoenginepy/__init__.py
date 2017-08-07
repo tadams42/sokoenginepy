@@ -9,4 +9,4 @@ from .input_output import (Puzzle, PuzzlesCollection, PuzzleSnapshot,
 from .snapshot import AtomicMove, Snapshot
 from .tessellation import CellOrientation, Direction, Tessellation
 
-__version__ = "0.4.2"
+__version__ = "0.4.3"

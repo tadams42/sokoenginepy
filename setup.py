@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name="sokoenginepy",
-    version='0.4.2',
+    version='0.4.3',
     license="GPLv3",
     description="Sokoban and variants game engine",
     long_description='%s' % (
