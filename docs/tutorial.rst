@@ -10,7 +10,7 @@ differ by board tessellation, and supported tessellations are enumerated in
 :class:`.TriobanBoard`, :class:`.OctobanBoard` and :class:`.HexobanBoard`. All
 implemented boards support having multiple pushers (``Multiban`` game variant).
 
-Contructing an instance of board is as easy as:
+Constructing an instance of board is as easy as:
 
 .. code-block:: python
 
@@ -42,12 +42,13 @@ Contructing an instance of board is as easy as:
         #######
 
 All boards implement rich API that allows editing individual board cells,
-resizing and exploring neigbouring positions. Positions are expressed as 1D
-array indexes which can be retreived fro 2D coordinates using :func:`.index_1d`
+resizing and exploring neighboring positions. Positions are expressed as 1D
+array indexes which can be retrieved fro 2D coordinates using :func:`.index_1d`
 
 .. code-block:: python
 
-    >>> from sokoenginepy import BoardCell, index_1d, Direction
+    >>> from sokoenginepy import BoardCell, Direction
+    >>> from sokoenginepy.utilities import index_1d
     >>> position = index_1d(11, 8, board.width)
     >>>
     >>> board[position]
@@ -66,7 +67,7 @@ array indexes which can be retreived fro 2D coordinates using :func:`.index_1d`
     >>> board.neighbor(position, Direction.RIGHT)
     164
 
-Except editing individual cells, all boards also support resizing, path
+Besides editing individual cells, all boards also support resizing, path
 searching, etc...
 
 Board state
@@ -95,7 +96,7 @@ mechanics, we can attach instance of :class:`.HashedBoardState` to our board.
     ])))
 
 This class memoizes positions of pushers and boxes and assigns numerical IDs to
-them so they can be referred to in different contextes.
+them so they can be referred to in different contexts.
 
 .. code-block:: python
 
@@ -141,7 +142,7 @@ Above code block means that pieces get following Sokoban+ IDs:
 And board is solved only when matching Sokoban+ ids are paired.
 
 The last thing that :class:`.HashedBoardState` does is Zobrist hashing of board.
-This is mainly usefull for implementing game solvers.
+This is mainly useful for implementing game solvers.
 
 Movement
 ^^^^^^^^
@@ -154,12 +155,13 @@ game mechanics like this:
 
 .. code-block:: python
 
-    >>> from sokoenginepy import Mover, SolvingMode, IllegalMoveError
+    >>> from sokoenginepy import Mover, SolvingMode
+    >>> from sokoenginepy.exceptions import IllegalMoveError
     >>>
     >>> # regular, forward solving mode
     >>> forward_mover = Mover(board)
     >>> # select pusher that will perform movement
-    >>> forward_mover.selected_pusher = DEFAULT_PIECE_ID + 1
+    >>> forward_mover.select_pusher(DEFAULT_PIECE_ID + 1)
     >>> # perform movement
     >>> forward_mover.move(Direction.UP)
     >>> # try to perform illegal move raises CellAlreadyOccupiedError
@@ -211,7 +213,7 @@ game mechanics like this:
 mechanics. It still lacks full game features like recording unlimited undo/redo
 etc... This is by design: :class:`.Mover` is intended to be used by either full
 game implementation or by solvers. It provides minimal memory footprint and
-concentrates on being as fast as possible but sacrifficing recording of game
+concentrates on being as fast as possible but sacrificing recording of game
 history and maybe few other full game features.
 
 Recording of game history and full game implementation
@@ -252,5 +254,5 @@ hand, :class:`.Puzzle` and :class:`.PuzzleSnapshot` can be easily converted to
     collection[0].snapshots[0].moves = str(some_recorded_snapshot)
     collection[0].board = str(some_edited_board)
 
-To controll output options (ie. line breaks, RLE encoding, etc...) use
+To control output options (ie. line breaks, RLE encoding, etc...) use
 :mod:`.settings`.

@@ -119,10 +119,10 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
         return self._layout_with_pushers_hash
 
     def external_position_hash(self, boxes_positions):
-        """Same as :attr:`boxes_layout_hash` but calculated for arbitrarily
+        """Same as :attr:`.boxes_layout_hash` but calculated for arbitrarily
         board layout.
 
-        Given dict of boxes positions, it calculates :meth:`boxes_layout_hash`
+        Given dict of boxes positions, it calculates :attr:`.boxes_layout_hash`
         that position would have if it was applied to this board.
 
         Args:

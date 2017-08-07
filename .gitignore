@@ -1,26 +1,68 @@
-*.egg-info/
-*.log
-*.prof
-*.pyc
-.benchmarks
-.cache/
-.coverage
-.directory
-.eggs/
-.idea
+# Python
+*.py[cod]
+__pycache__
 .ipynb_checkpoints/
-.tox/
+*.ipynb
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+.eggs
+parts
+sdist
+
+# virtual environments
 .venv/
 .venv34/
 .venv33/
 .venvgt/
 .venvpypy/
-Untitled.ipynb
-_build/
-build/
-coverage.xml
-dist/
-htmlcov
-main.py
 
-.coverage*
+# Unit test / coverage reports
+.coverage
+.tox
+.coverage.*
+nosetests.xml
+coverage.xml
+htmlcov
+
+# Sphinx
+docs/_build
+
+# web apps
+log/*
+tmp/*
+public/*
+uploads/*
+config/production.conf
+.cache/
+
+# Logs
+log/
+*.log
+pip-log.txt
+npm-debug.log*
+
+# Translations
+*.mo
+*.pot
+
+# Pycharm
+# We ignore whole project dir and then 'git add -f`
+# pieces that are meant to be shared (run configurations etc...)
+.idea/
+
+# VS Code
+.vscode
+
+# Benchmarks and profiling
+*.prof
+.benchmarks
+
+.directory

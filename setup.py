@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name="sokoenginepy",
-    version='0.4.2',
+    version='0.4.3',
     license="GPLv3",
     description="Sokoban and variants game engine",
     long_description='%s' % (
@@ -33,7 +33,7 @@ setup(
     ),
     author="Tomislav Adamic",
     author_email="tomislav.adamic@gmail.com",
-    url="https://github.com/tadamic/sokoenginepy",
+    url="https://github.com/tadams42/sokoenginepy",
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
@@ -76,8 +76,8 @@ setup(
     extras_require={
         'dev': [
             'pycodestyle',
-            'mccabe',
-            'pylint',
+            # 'mccabe',
+            # 'pylint',
             'yapf',
             'bumpversion',
             'isort',
@@ -94,14 +94,15 @@ setup(
 
             # py.test stuff
             'pytest >= 3.0.0',
+            'pytest-pythonpath',
+            'colored-traceback',
+            # 'pytest-colordots',
             'pytest-spec',
+            'pytest-sugar',
             'pytest-cov',
-            'pytest-runner',  # Needed for `python setup.py test` to work
-            'pytest-colordots',
             'pytest-benchmark',
             'pytest-mock',
 
-            'colored-traceback',
             'coverage',
             'factory-boy',
             'faker',

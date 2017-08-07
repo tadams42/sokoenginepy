@@ -1,17 +1,47 @@
-input_output
-============
+I/O
+===
 
-.. automodule:: sokoenginepy.input_output
+Puzzle
+------
+
+.. autoclass:: sokoenginepy.Puzzle
     :members:
     :undoc-members:
+    :inherited-members:
     :show-inheritance:
 
-.. automodule:: sokoenginepy.input_output.puzzle
+PuzzleSnapshot
+--------------
+
+.. autoclass:: sokoenginepy.PuzzleSnapshot
     :members:
     :undoc-members:
+    :inherited-members:
     :show-inheritance:
 
-.. automodule:: sokoenginepy.input_output.puzzles_collection
+PuzzlesCollection
+-----------------
+
+.. autoclass:: sokoenginepy.PuzzlesCollection
     :members:
     :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
+SOKFileFormat
+-------------
+
+.. autoclass:: sokoenginepy.SOKFileFormat
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
+SOKTags
+-------
+
+.. autoclass:: sokoenginepy.SOKTags
+    :members:
+    :undoc-members:
+    :inherited-members:
     :show-inheritance:

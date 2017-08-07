@@ -150,7 +150,7 @@ class HexobanTextConverter:
                 line.append(self.floor_character)
                 line.append(
                     str(
-                        hexoban_board[tessellation.
+                        hexoban_board[utilities.
                                       index_1d(col, row, hexoban_board.width)]
                     )
                 )
@@ -176,7 +176,7 @@ class HexobanTextConverter:
     def _is_type1(self, string_list):
         rnfp = self._find_rightmost_non_floor(string_list)
         if rnfp > 0:
-            y = tessellation.Y(rnfp, utilities.calculate_width(string_list))
+            y = utilities.Y(rnfp, utilities.calculate_width(string_list))
             return y % 2 == 0
         elif rnfp == 0:
             return True
@@ -257,8 +257,8 @@ class HexobanTextConverter:
             # Calculate parities
             first_cell = self._find_first_non_floor(parsed)
             if first_cell is not None:
-                first_cell_x_parity = tessellation.X(first_cell, width) % 2
-                first_cell_y_parity = tessellation.Y(first_cell, width) % 2
+                first_cell_x_parity = utilities.X(first_cell, width) % 2
+                first_cell_y_parity = utilities.Y(first_cell, width) % 2
 
                 if first_cell_y_parity == 0:
                     even_row_x_parity = first_cell_x_parity
@@ -313,10 +313,10 @@ class HexobanTextConverter:
                     non_floor_found = True
 
         if non_floor_found:
-            return tessellation.index_1d(x, y, width)
+            return utilities.index_1d(x, y, width)
 
         # Empty board, assuming scheme1
-        return tessellation.index_1d(1, 0, width)
+        return utilities.index_1d(1, 0, width)
 
     @staticmethod
     def _find_rightmost_non_floor(string_list):
@@ -335,7 +335,7 @@ class HexobanTextConverter:
                             y = row
 
             if cell_found:
-                return tessellation.index_1d(x, y, width)
+                return utilities.index_1d(x, y, width)
 
             return None
 
@@ -350,12 +350,12 @@ class HexobanTextConverter:
         rightmost_in_odd_rows = rightmost_finder(normalized, 1)
 
         if rightmost_in_even_rows is None or rightmost_in_odd_rows is None:
-            return tessellation.index_1d(0, 0, width)
+            return utilities.index_1d(0, 0, width)
 
-        odd_x = tessellation.X(rightmost_in_odd_rows, width)
-        odd_y = tessellation.Y(rightmost_in_odd_rows, width)
-        even_x = tessellation.X(rightmost_in_even_rows, width)
-        even_y = tessellation.Y(rightmost_in_even_rows, width)
+        odd_x = utilities.X(rightmost_in_odd_rows, width)
+        odd_y = utilities.Y(rightmost_in_odd_rows, width)
+        even_x = utilities.X(rightmost_in_even_rows, width)
+        even_y = utilities.Y(rightmost_in_even_rows, width)
 
         if odd_x > even_x:
             return rightmost_in_odd_rows

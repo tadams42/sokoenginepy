@@ -14,7 +14,7 @@ class BoardCell:
     Note:
         There is no game logic encoded in this class. It is perfectly fine to
         put pusher on wall cell (in which case wall will be replaced by pusher).
-        This is by design: :class:`BoardCell` is value class, not game logic
+        This is by design: :class:`.BoardCell` is value class, not game logic
         class.
     """
 

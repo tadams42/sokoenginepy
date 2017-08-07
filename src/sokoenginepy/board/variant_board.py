@@ -150,7 +150,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             self._reinit(width, height, reconfigure_edges)
             for y, row in enumerate(board_rows):
                 for x, character in enumerate(row):
-                    self._graph[tessellation.index_1d(x, y, self._width)
+                    self._graph[utilities.index_1d(x, y, self._width)
                                ] = BoardCell(character)
 
     def __eq__(self, rv):
@@ -214,7 +214,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             row = "".join(
                 str(cell)
                 for cell in (
-                    self[tessellation.index_1d(x, y, self.width)]
+                    self[utilities.index_1d(x, y, self.width)]
                     for x in range(0, self.width)
                 )
             )
@@ -586,8 +586,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, self.board.width):
             for y in range(0, old_height):
-                self.board[tessellation.index_1d(x, y + 1, self.board.width)] =\
-                    old_body[tessellation.index_1d(x, y, self.board.width)]
+                self.board[utilities.index_1d(x, y + 1, self.board.width)] =\
+                    old_body[utilities.index_1d(x, y, self.board.width)]
 
     def add_row_bottom(self, reconfigure_edges):
         old_body = self.board._graph
@@ -600,8 +600,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, self.board.width):
             for y in range(0, old_height):
-                self.board[tessellation.index_1d(x, y, self.board.width)] =\
-                    old_body[tessellation.index_1d(x, y, self.board.width)]
+                self.board[utilities.index_1d(x, y, self.board.width)] =\
+                    old_body[utilities.index_1d(x, y, self.board.width)]
 
     def add_column_left(self, reconfigure_edges):
         old_body = self.board._graph
@@ -614,8 +614,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, old_width):
             for y in range(0, self.board.height):
-                self.board[tessellation.index_1d(x + 1, y, self.board.width)] =\
-                    old_body[tessellation.index_1d(x, y, old_width)]
+                self.board[utilities.index_1d(x + 1, y, self.board.width)] =\
+                    old_body[utilities.index_1d(x, y, old_width)]
 
     def add_column_right(self, reconfigure_edges):
         old_body = self.board._graph
@@ -628,8 +628,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, old_width):
             for y in range(0, self.board.height):
-                self.board[tessellation.index_1d(x, y, self.board.width)] =\
-                    old_body[tessellation.index_1d(x, y, old_width)]
+                self.board[utilities.index_1d(x, y, self.board.width)] =\
+                    old_body[utilities.index_1d(x, y, old_width)]
 
     def remove_row_top(self, reconfigure_edges):
         old_body = self.board._graph
@@ -641,8 +641,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[tessellation.index_1d(x, y, self.board.width)] =\
-                    old_body[tessellation.index_1d(x, y + 1, self.board.width)]
+                self.board[utilities.index_1d(x, y, self.board.width)] =\
+                    old_body[utilities.index_1d(x, y + 1, self.board.width)]
 
     def remove_row_bottom(self, reconfigure_edges):
         old_body = self.board._graph
@@ -654,8 +654,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[tessellation.index_1d(x, y, self.board.width)] =\
-                    old_body[tessellation.index_1d(x, y, self.board.width)]
+                self.board[utilities.index_1d(x, y, self.board.width)] =\
+                    old_body[utilities.index_1d(x, y, self.board.width)]
 
     def remove_column_left(self, reconfigure_edges):
         old_body = self.board._graph
@@ -668,8 +668,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[tessellation.index_1d(x, y, self.board.width)] =\
-                    old_body[tessellation.index_1d(x + 1, y, old_width)]
+                self.board[utilities.index_1d(x, y, self.board.width)] =\
+                    old_body[utilities.index_1d(x + 1, y, old_width)]
 
     def remove_column_right(self, reconfigure_edges):
         old_body = self.board._graph
@@ -682,15 +682,15 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[tessellation.index_1d(x, y, self.board.width)] =\
-                    old_body[tessellation.index_1d(x, y, old_width)]
+                self.board[utilities.index_1d(x, y, self.board.width)] =\
+                    old_body[utilities.index_1d(x, y, old_width)]
 
     def trim_left(self, reconfigure_edges):
         amount = self.board.width
         for y in range(0, self.board.height):
             border_found = False
             for x in range(0, self.board.width):
-                border_found = self.board[tessellation.index_1d(
+                border_found = self.board[utilities.index_1d(
                     x, y, self.board.width
                 )].is_border_element
                 if border_found:
@@ -721,7 +721,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
         for x in range(0, self.board.width):
             border_found = False
             for y in range(0, self.board.height):
-                border_found = self.board[tessellation.index_1d(
+                border_found = self.board[utilities.index_1d(
                     x, y, self.board.width
                 )].is_border_element
                 if border_found:
@@ -756,8 +756,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[tessellation.index_1d(x, y, self.board.width)] = \
-                    old_body[tessellation.index_1d(
+                self.board[utilities.index_1d(x, y, self.board.width)] = \
+                    old_body[utilities.index_1d(
                         x, self.board.height - y - 1, self.board.width
                     )]
 
@@ -775,8 +775,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
 
         for x in range(0, self.board.width):
             for y in range(0, self.board.height):
-                self.board[tessellation.index_1d(x, y, self.board.width)] = \
-                    old_body[tessellation.index_1d(
+                self.board[utilities.index_1d(x, y, self.board.width)] = \
+                    old_body[utilities.index_1d(
                         self.board.width - x - 1, y, self.board.width
                     )]
 

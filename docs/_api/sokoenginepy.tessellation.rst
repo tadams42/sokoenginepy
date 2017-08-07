@@ -1,60 +1,36 @@
-tessellation
-============
+Tessellations
+=============
 
-.. automodule:: sokoenginepy.tessellation
+Direction
+---------
+
+.. autoclass:: sokoenginepy.Direction
     :members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
 
-.. automodule:: sokoenginepy.tessellation.cell_orientation
+
+CellOrientation
+---------------
+
+.. autoclass:: sokoenginepy.CellOrientation
     :members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
 
-.. automodule:: sokoenginepy.tessellation.direction
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
-.. automodule:: sokoenginepy.tessellation.helpers
-    :members:
-    :undoc-members:
-    :show-inheritance:
+Tessellation
+------------
 
-.. automodule:: sokoenginepy.tessellation.hexoban_tessellation
+.. autoclass:: sokoenginepy.Tessellation
     :members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
 
-.. automodule:: sokoenginepy.tessellation.octoban_tessellation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :inherited-members:
-
-.. automodule:: sokoenginepy.tessellation.sokoban_tessellation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :inherited-members:
-
-.. automodule:: sokoenginepy.tessellation.tessellation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :inherited-members:
-
-.. automodule:: sokoenginepy.tessellation.tessellation_base
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :inherited-members:
-    :exclude-members: TessellationBaseInheritableDocstrings
-
-.. automodule:: sokoenginepy.tessellation.trioban_tessellation
+.. autoclass:: sokoenginepy.tessellation.tessellation_base.TessellationBase
     :members:
     :undoc-members:
     :show-inheritance:

@@ -274,7 +274,7 @@ class BoardGraphBase(metaclass=ABCMeta):
 
         Args:
             position_path (list): list of indexes obrained from either
-                :meth:`shortest_path` or :meth:`dijkstra_path`.
+                :meth:`.shortest_path` or :meth:`.dijkstra_path`.
 
         Returns:
             dict: describing start vertex index and path consisting of

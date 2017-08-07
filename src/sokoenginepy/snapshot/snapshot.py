@@ -77,7 +77,7 @@ class Snapshot(MutableSequence):
             method may be used to check strings read from stream line by line,
             where each line alone doesn't represent legally formed snapshot, but
             all of them together do. To completely validate this string, it
-            needs to be converted to :class:`Snapshot`.
+            needs to be converted to :class:`.Snapshot`.
         """
         from .snapshot_string_parser import SnapshotStringParser
         return SnapshotStringParser.is_snapshot_string(line)

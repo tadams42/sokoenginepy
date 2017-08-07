@@ -1,0 +1,4 @@
+src/sokoenginepy
+tests
+setup.py
+bin

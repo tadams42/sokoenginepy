@@ -1,18 +1,38 @@
-game
+Game
 ====
 
-.. automodule:: sokoenginepy.game
+SolvingMode
+-----------
+
+.. autoclass:: sokoenginepy.SolvingMode
     :members:
     :undoc-members:
+    :inherited-members:
     :show-inheritance:
 
-.. automodule:: sokoenginepy.game.solving_mode
+Mover
+-----
+
+.. autoclass:: sokoenginepy.Mover
     :members:
     :undoc-members:
+    :inherited-members:
     :show-inheritance:
 
-.. automodule:: sokoenginepy.game.mover
+Mover commands
+--------------
+
+.. autoclass:: sokoenginepy.game.SelectPusherCommand
     :members:
     :undoc-members:
-    :show-inheritance:
-    :exclude-members: MoveWorkerOptions
+    :inherited-members:
+
+.. autoclass:: sokoenginepy.game.JumpCommand
+    :members:
+    :undoc-members:
+    :inherited-members:
+
+.. autoclass:: sokoenginepy.game.MoveCommand
+    :members:
+    :undoc-members:
+    :inherited-members:

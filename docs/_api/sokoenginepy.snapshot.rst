@@ -1,17 +1,20 @@
-snapshot
-========
+Snapshots
+=========
 
-.. automodule:: sokoenginepy.snapshot
+AtomicMove
+----------
+
+.. autoclass:: sokoenginepy.AtomicMove
     :members:
     :undoc-members:
+    :inherited-members:
     :show-inheritance:
 
-.. automodule:: sokoenginepy.snapshot.atomic_move
-    :members:
-    :undoc-members:
-    :show-inheritance:
+Snapshot
+--------
 
-.. automodule:: sokoenginepy.snapshot.snapshot
+.. autoclass:: sokoenginepy.Snapshot
     :members:
     :undoc-members:
+    :inherited-members:
     :show-inheritance:

@@ -1,7 +1,7 @@
 graft docs
 graft src
 graft tests
-graft scripts
+graft bin
 
 include .bumpversion.cfg
 include .coveragerc
@@ -9,7 +9,6 @@ include .editorconfig
 
 include LICENSE
 include README.rst
-include .pylintrc
 
 include tox.ini .travis.yml
 

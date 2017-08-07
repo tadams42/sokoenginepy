@@ -1,6 +1,5 @@
-from .. import utilities
+from ..utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from .direction import Direction, UnknownDirectionError
-from .helpers import COLUMN, ROW, index_1d, is_on_board_2d
 from .tessellation_base import (TessellationBase,
                                 TessellationBaseInheritableDocstrings)
 
@@ -25,7 +24,7 @@ def _init_module():
         snapshot.AtomicMove.Characters.UPPER_D: (Direction.DOWN, True),
     }
     _GLOBALS['atomic_move_to_chr'
-            ] = utilities.inverted(_GLOBALS['chr_to_atomic_move'])
+            ] = inverted(_GLOBALS['chr_to_atomic_move'])
 
 
 class SokobanTessellation(
