@@ -67,7 +67,7 @@ array indexes which can be retrieved fro 2D coordinates using :func:`.index_1d`
     >>> board.neighbor(position, Direction.RIGHT)
     164
 
-Except editing individual cells, all boards also support resizing, path
+Besides editing individual cells, all boards also support resizing, path
 searching, etc...
 
 Board state

@@ -1,4 +1,4 @@
-from . import exceptions, settings, utilities, game
+from . import exceptions, game, settings, utilities
 from .board import (DEFAULT_PIECE_ID, BoardCell, BoardGraph, BoardState,
                     GraphType, HashedBoardState, HexobanBoard, OctobanBoard,
                     SokobanBoard, SokobanPlus, TriobanBoard, VariantBoard,

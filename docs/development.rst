@@ -9,7 +9,7 @@ Create new virtual environment
 .. code-block:: sh
 
     cd path/to/cloned/repo/sokoenginepy
-    pyvenv .venv
+    python3 -m venv .venv
     source .venv/bin/activate
     pip install -u pip wheel
 
@@ -37,19 +37,19 @@ Running tests
 
 .. code-block:: sh
 
-    python setup.py test -a "tests"
+    py.test
 
 or to get more verbose output
 
 .. code-block:: sh
 
-    python setup.py test -a "--spec tests"
+    py.test -p no:sugar --spec
 
 or to generate tests coverage
 
 .. code-block:: sh
 
-    py.test --cov=sokoenginepy --cov-report=html tests/
+    py.test --cov=sokoenginepy --cov-report=html
 
 and finally, tests can be run with tox_
 
@@ -84,7 +84,7 @@ following:
 
 .. code-block:: sh
 
-    pyvenv .venvgt
+    python3 -m venv .venvgt
     source .venvgt/bin/activate
 
     sudo apt-get install libcairomm-1.0-dev libgtk-3-dev libcairo2-dev \
@@ -112,10 +112,11 @@ Running under PyPy3
 
 .. code-block:: sh
 
-    wget https://bitbucket.org/pypy/pypy/downloads/pypy3.3-v5.5.0-alpha-linux64.tar.bz2
-    tar xvfj pypy3.3-v5.5.0-alpha-linux64.tar.bz2
-    virtualenv -p /foo/bar/baz/pypy3-v5.5.0-linux64/bin/pypy3pypy3 .venvpypy
-    source .venvpypy/bin/python
+    wget https://bitbucket.org/pypy/pypy/downloads/pypy3-v5.8.0-linux64.tar.bz2
+    tar -xvjf pypy3-v5.8.0-linux64.tar.bz2
+    virtualenv -p pypy3-v5.8.0-linux64/bin/pypy3 .venvpypy
+    source .venvpypy/bin/activate
+    pip install -U pip wheel
 
 Profiling
 ---------

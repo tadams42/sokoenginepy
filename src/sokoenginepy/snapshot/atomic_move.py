@@ -48,7 +48,6 @@ class AtomicMove:
         self._pusher_jumped = False
         self._pusher_id = board.DEFAULT_PIECE_ID
         self._moved_box_id = None
-        self.group_id = 0
 
         self.direction = direction
         #pylint: disable=simplifiable-if-statement
@@ -88,11 +87,10 @@ class AtomicMove:
     def __str__(self):
         return (
             "AtomicMove({0}, box_moved={1}, is_jump={2}, "
-            "is_pusher_selection={3} pusher_id={4} box_id={5} group_id={6})"
+            "is_pusher_selection={3} pusher_id={4} box_id={5})"
         ).format(
             str(self.direction), self.is_push_or_pull, self.is_jump,
             self.is_pusher_selection, self.pusher_id, self.moved_box_id,
-            self.group_id
         )
 
     def __eq__(self, rv):

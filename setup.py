@@ -76,8 +76,8 @@ setup(
     extras_require={
         'dev': [
             'pycodestyle',
-            'mccabe',
-            'pylint',
+            # 'mccabe',
+            # 'pylint',
             'yapf',
             'bumpversion',
             'isort',
@@ -94,14 +94,15 @@ setup(
 
             # py.test stuff
             'pytest >= 3.0.0',
+            'pytest-pythonpath',
+            'colored-traceback',
+            # 'pytest-colordots',
             'pytest-spec',
+            'pytest-sugar',
             'pytest-cov',
-            'pytest-runner',  # Needed for `python setup.py test` to work
-            'pytest-colordots',
             'pytest-benchmark',
             'pytest-mock',
 
-            'colored-traceback',
             'coverage',
             'factory-boy',
             'faker',
