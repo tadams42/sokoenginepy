@@ -21,7 +21,7 @@ matrix:
     - python: '3.6'
       env:
         - TOXENV=3.6-nocov
-    - python: pypy-5.8
+    - python: pypy-5.7.1
       env:
         - TOXENV=pypy3-nocov
 install:
