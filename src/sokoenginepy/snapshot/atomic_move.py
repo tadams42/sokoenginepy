@@ -1,6 +1,7 @@
 from enum import Enum
 
 from .. import tessellation
+from .. import board
 
 
 class AtomicMove:
@@ -41,8 +42,11 @@ class AtomicMove:
         LOWER_SW = 's'
         UPPER_SW = 'S'
 
+        @classmethod
+        def values(cls):
+            return (o for o in cls)
+
     def __init__(self, direction=tessellation.Direction.LEFT, box_moved=False):
-        from .. import board
         self._box_moved = False
         self._pusher_selected = False
         self._pusher_jumped = False
@@ -58,26 +62,7 @@ class AtomicMove:
 
     @classmethod
     def is_atomic_move_chr(cls, character):
-        if isinstance(character, cls.Characters):
-            character = character
-        return (
-            character == cls.Characters.LOWER_L or
-            character == cls.Characters.LOWER_U or
-            character == cls.Characters.LOWER_R or
-            character == cls.Characters.LOWER_D or
-            character == cls.Characters.LOWER_NW or
-            character == cls.Characters.LOWER_SE or
-            character == cls.Characters.LOWER_NE or
-            character == cls.Characters.LOWER_SW or
-            character == cls.Characters.UPPER_L or
-            character == cls.Characters.UPPER_U or
-            character == cls.Characters.UPPER_R or
-            character == cls.Characters.UPPER_D or
-            character == cls.Characters.UPPER_NW or
-            character == cls.Characters.UPPER_SE or
-            character == cls.Characters.UPPER_NE or
-            character == cls.Characters.UPPER_SW
-        )
+        return character in cls.Characters.values()
 
     def __repr__(self):
         return "AtomicMove({0}, box_moved={1})".format(
@@ -118,7 +103,6 @@ class AtomicMove:
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
-        from .. import board
         if board.is_valid_piece_id(value):
             self._moved_box_id = value
             self.is_push_or_pull = True
@@ -133,7 +117,6 @@ class AtomicMove:
 
     @pusher_id.setter
     def pusher_id(self, value):
-        from .. import board
         if board.is_valid_piece_id(value):
             self._pusher_id = value
         else:
