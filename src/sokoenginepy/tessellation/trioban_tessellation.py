@@ -1,20 +1,20 @@
+from .. import snapshot
 from ..utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from .cell_orientation import CellOrientation
 from .direction import Direction, UnknownDirectionError
 from .tessellation_base import (TessellationBase,
                                 TessellationBaseInheritableDocstrings)
 
-_GLOBALS = {}
 
+class TriobanTessellation(
+    TessellationBase, metaclass=TessellationBaseInheritableDocstrings
+):
+    _LEGAL_DIRECTIONS = (
+        Direction.LEFT, Direction.RIGHT, Direction.NORTH_EAST,
+        Direction.NORTH_WEST, Direction.SOUTH_EAST, Direction.SOUTH_WEST
+    )
 
-def _init_module():
-    """
-    Avoiding circular dependnecies by not importing :mod:`.board` and
-    :mod:`.snapshot` untill they are needed
-    """
-    from .. import board, snapshot
-    _GLOBALS['graph_type'] = board.GraphType.DIRECTED_MULTI
-    _GLOBALS['chr_to_atomic_move'] = {
+    _CHR_TO_ATOMIC_MOVE = {
         snapshot.AtomicMove.Characters.LOWER_L: (Direction.LEFT, False),
         snapshot.AtomicMove.Characters.UPPER_L: (Direction.LEFT, True),
         snapshot.AtomicMove.Characters.LOWER_R: (Direction.RIGHT, False),
@@ -28,17 +28,8 @@ def _init_module():
         snapshot.AtomicMove.Characters.LOWER_SW: (Direction.SOUTH_WEST, False),
         snapshot.AtomicMove.Characters.UPPER_SW: (Direction.SOUTH_WEST, True),
     }
-    _GLOBALS['atomic_move_to_chr'
-            ] = inverted(_GLOBALS['chr_to_atomic_move'])
 
-
-class TriobanTessellation(
-    TessellationBase, metaclass=TessellationBaseInheritableDocstrings
-):
-    _LEGAL_DIRECTIONS = (
-        Direction.LEFT, Direction.RIGHT, Direction.NORTH_EAST,
-        Direction.NORTH_WEST, Direction.SOUTH_EAST, Direction.SOUTH_WEST
-    )
+    _ATOMIC_MOVE_TO_CHR = inverted(_CHR_TO_ATOMIC_MOVE)
 
     @property
     @copy_ancestor_docstring
@@ -48,9 +39,8 @@ class TriobanTessellation(
     @property
     @copy_ancestor_docstring
     def graph_type(self):
-        if not _GLOBALS:
-            _init_module()
-        return _GLOBALS['graph_type']
+        from .. import board
+        return board.GraphType.DIRECTED_MULTI
 
     @copy_ancestor_docstring
     def neighbor_position(self, position, direction, board_width, board_height):
@@ -112,15 +102,11 @@ class TriobanTessellation(
 
     @property
     def _char_to_atomic_move_dict(self):
-        if not _GLOBALS:
-            _init_module()
-        return _GLOBALS['chr_to_atomic_move']
+        return self._CHR_TO_ATOMIC_MOVE
 
     @property
     def _atomic_move_to_char_dict(self):
-        if not _GLOBALS:
-            _init_module()
-        return _GLOBALS['atomic_move_to_chr']
+        return self._ATOMIC_MOVE_TO_CHR
 
     @copy_ancestor_docstring
     def cell_orientation(self, position, board_width, board_height):
