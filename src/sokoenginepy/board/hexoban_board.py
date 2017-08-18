@@ -1,5 +1,5 @@
 from .. import settings, tessellation, utilities
-from .board_cell import BoardCell, BoardConversionError
+from .board_cell import BoardCell, BoardCellCharacters, BoardConversionError
 from .sokoban_board import SokobanBoard
 from .variant_board import VariantBoard, VariantBoardResizer
 
@@ -108,7 +108,7 @@ class HexobanTextConverter:
             return [], True
         elif even_row_x_parity < 0 or odd_row_x_parity < 0:
             internal = height * [
-                int(width / 2) * BoardCell.Characters.VISIBLE_FLOOR + '\n'
+                int(width / 2) * BoardCellCharacters.VISIBLE_FLOOR + '\n'
             ]
             return internal, True
 
@@ -149,9 +149,10 @@ class HexobanTextConverter:
             for col in range(0, hexoban_board.width):
                 line.append(self.floor_character)
                 line.append(
-                    str(
-                        hexoban_board[utilities.
-                                      index_1d(col, row, hexoban_board.width)]
+                    hexoban_board[
+                        utilities. index_1d(col, row, hexoban_board.width)
+                    ].to_str(
+                        settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
                     )
                 )
 
@@ -272,9 +273,9 @@ class HexobanTextConverter:
     @property
     def floor_character(self):
         return (
-            BoardCell.Characters.VISIBLE_FLOOR
+            BoardCellCharacters.VISIBLE_FLOOR
             if settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS else
-            BoardCell.Characters.FLOOR
+            BoardCellCharacters.FLOOR
         )
 
     def _add_column_left(self, string_list):

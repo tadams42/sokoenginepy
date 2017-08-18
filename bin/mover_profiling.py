@@ -30,6 +30,9 @@ def main():
 cProfile.run('main()', 'moves_profile.prof')
 cProfile.run('mover.move(Direction.LEFT)', 'single_move_profile.prof')
 
+# pip install pyprof2calltree
 # python bin/mover_profiling.py
-# pyprof2calltree -i mover_profiling.prof
-# kcachegrind mover_profiling.prof.log
+# pyprof2calltree -i moves_profile.prof
+# pyprof2calltree -i single_move_profile.prof
+# kcachegrind moves_profile.prof.log
+# kcachegrind single_move_profile.prof.log

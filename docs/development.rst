@@ -73,40 +73,7 @@ Note, to combine the coverage data from all the tox environments run:
       - ::
 
             PYTEST_ADDOPTS=--cov-append tox
-
-Installing graph-tool_ to virtual environment on Ubuntu
--------------------------------------------------------
-
-graph-tool_ is `Boost Graph Library`_ based graph package. Since it is not
-installable via pip, it is left as optional dependency: if sokoenginepy detects
-it, it will use it instead of default NetworkX_. To install graph-tool_ do the
-following:
-
-.. code-block:: sh
-
-    python3 -m venv .venvgt
-    source .venvgt/bin/activate
-
-    sudo apt-get install libcairomm-1.0-dev libgtk-3-dev libcairo2-dev \
-        libjpeg-dev libgif-dev
-
-    git clone git://git.cairographics.org/git/pycairo
-    cd pycairo
-    python setup.py install
-
-    sudo apt-get install libsparsehash-dev libcgal-dev libboost-python-dev  \
-        libboost-iostreams-dev libboost-coroutine-dev libboost-graph-dev \
-        libexpat1-dev
-    pip install scipy numpy matplotlib
-
-    cd graph-tool-2.19
-    export CXXFLAGS="-I${VIRTUAL_ENV}/include"
-    export LIBDIR="-I${VIRTUAL_ENV}/lib"
-    export CAIROMM_CFLAGS="-std=c++14 -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12 -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include"
-    ./configure
-    make
-    sudo make install
-
+            
 Running under PyPy3
 -------------------
 

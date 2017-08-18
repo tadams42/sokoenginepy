@@ -65,8 +65,6 @@ setup(
         'pytz >=2016.6.1',
         'pyparsing >=2.1.0',
         'networkx >=1.11',
-        # Alternative that is A LOT faster but install through pip is not supported
-        # 'graph-tool >=2.11'
         'cached-property >=1.2.0'
     ],
     # List additional groups of dependencies HERE (e.g. development

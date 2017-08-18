@@ -42,13 +42,7 @@ BoardGraph
     :inherited-members:
     :show-inheritance:
 
-.. autoclass:: sokoenginepy.BoardGraph
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-.. autoclass:: sokoenginepy.board.graph.board_graph_networkx.BoardGraphNetworkx
+.. autoclass:: sokoenginepy.board.graph.board_graph.BoardGraph
     :members:
     :undoc-members:
     :inherited-members:

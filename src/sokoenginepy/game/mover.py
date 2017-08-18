@@ -205,10 +205,10 @@ class Mover:
 
         old_pusher_position = self._state.pusher_position(self._selected_pusher)
         new_pusher_position = self._state.pusher_position(pusher_id)
-        selection_path = self._state.board.position_path_to_direction_path(
+        selection_path = self._state.board.positions_path_to_directions_path(
             self._state.board.
             find_jump_path(old_pusher_position, new_pusher_position)
-        )['path']
+        )
 
         self._last_move = []
         for direction in selection_path:
@@ -269,9 +269,9 @@ class Mover:
         except module_board.CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
-        path = self._state.board.position_path_to_direction_path(
+        path = self._state.board.positions_path_to_directions_path(
             self._state.board.find_jump_path(old_position, new_position)
-        )['path']
+        )
 
         def jump_am(direction):
             atomic_move = snapshot.AtomicMove(direction, False)

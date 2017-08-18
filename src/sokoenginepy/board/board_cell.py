@@ -1,13 +1,33 @@
 from enum import Enum
 
-from .. import settings, utilities
+from .. import utilities
+
+
+class BoardCellCharacters(str, Enum):
+    """Characters used in textual representation of boards."""
+    WALL = '#'
+    PUSHER = '@'
+    PUSHER_ON_GOAL = '+'
+    BOX = '$'
+    BOX_ON_GOAL = '*'
+    GOAL = '.'
+    FLOOR = ' '
+    VISIBLE_FLOOR = '-'
+    ALT_PUSHER1 = 'p'
+    ALT_PUSHER2 = 'm'
+    ALT_PUSHER_ON_GOAL1 = 'P'
+    ALT_PUSHER_ON_GOAL2 = 'M'
+    ALT_BOX1 = 'b'
+    ALT_BOX_ON_GOAL1 = 'B'
+    ALT_GOAL1 = 'o'
+    ALT_VISIBLE_FLOOR1 = '_'
 
 
 class BoardConversionError(utilities.SokoengineError):
     """Exception risen when converting board to or from board strings."""
     pass
 
-
+#
 class BoardCell:
     """Stores properties of one cell in board layout.
 
@@ -18,76 +38,60 @@ class BoardCell:
         class.
     """
 
-    class Characters(str, Enum):
-        """Characters used in textual representation of boards."""
-        WALL = '#'
-        PUSHER = '@'
-        PUSHER_ON_GOAL = '+'
-        BOX = '$'
-        BOX_ON_GOAL = '*'
-        GOAL = '.'
-        FLOOR = ' '
-        VISIBLE_FLOOR = '-'
-        ALT_PUSHER1 = 'p'
-        ALT_PUSHER2 = 'm'
-        ALT_PUSHER_ON_GOAL1 = 'P'
-        ALT_PUSHER_ON_GOAL2 = 'M'
-        ALT_BOX1 = 'b'
-        ALT_BOX_ON_GOAL1 = 'B'
-        ALT_GOAL1 = 'o'
-        ALT_VISIBLE_FLOOR1 = '_'
-
     @classmethod
     def is_pusher_chr(cls, character):
         return (
-            character == cls.Characters.PUSHER or
-            character == cls.Characters.ALT_PUSHER1 or
-            character == cls.Characters.ALT_PUSHER2 or
-            character == cls.Characters.PUSHER_ON_GOAL or
-            character == cls.Characters.ALT_PUSHER_ON_GOAL1 or
-            character == cls.Characters.ALT_PUSHER_ON_GOAL2
+            character == BoardCellCharacters.PUSHER or
+            character == BoardCellCharacters.ALT_PUSHER1 or
+            character == BoardCellCharacters.ALT_PUSHER2 or
+            character == BoardCellCharacters.PUSHER_ON_GOAL or
+            character == BoardCellCharacters.ALT_PUSHER_ON_GOAL1 or
+            character == BoardCellCharacters.ALT_PUSHER_ON_GOAL2
         )
 
     @classmethod
     def is_box_chr(cls, character):
         return (
-            character == cls.Characters.BOX or
-            character == cls.Characters.ALT_BOX1 or
-            character == cls.Characters.BOX_ON_GOAL or
-            character == cls.Characters.ALT_BOX_ON_GOAL1
+            character == BoardCellCharacters.BOX or
+            character == BoardCellCharacters.ALT_BOX1 or
+            character == BoardCellCharacters.BOX_ON_GOAL or
+            character == BoardCellCharacters.ALT_BOX_ON_GOAL1
         )
 
     @classmethod
     def is_goal_chr(cls, character):
         return (
-            character == cls.Characters.GOAL or
-            character == cls.Characters.ALT_GOAL1 or
-            character == cls.Characters.BOX_ON_GOAL or
-            character == cls.Characters.ALT_BOX_ON_GOAL1 or
-            character == cls.Characters.PUSHER_ON_GOAL or
-            character == cls.Characters.ALT_PUSHER_ON_GOAL1 or
-            character == cls.Characters.ALT_PUSHER_ON_GOAL2
+            character == BoardCellCharacters.GOAL or
+            character == BoardCellCharacters.ALT_GOAL1 or
+            character == BoardCellCharacters.BOX_ON_GOAL or
+            character == BoardCellCharacters.ALT_BOX_ON_GOAL1 or
+            character == BoardCellCharacters.PUSHER_ON_GOAL or
+            character == BoardCellCharacters.ALT_PUSHER_ON_GOAL1 or
+            character == BoardCellCharacters.ALT_PUSHER_ON_GOAL2
         )
 
     @classmethod
     def is_empty_floor_chr(cls, character):
         return (
-            character == cls.Characters.FLOOR or
-            character == cls.Characters.VISIBLE_FLOOR or
-            character == cls.Characters.ALT_VISIBLE_FLOOR1
+            character == BoardCellCharacters.FLOOR or
+            character == BoardCellCharacters.VISIBLE_FLOOR or
+            character == BoardCellCharacters.ALT_VISIBLE_FLOOR1
         )
 
     @classmethod
     def is_wall_chr(cls, character):
-        return character == cls.Characters.WALL
+        return character == BoardCellCharacters.WALL
 
-    def __init__(self, character=Characters.FLOOR):
+    def __init__(
+        self, character=BoardCellCharacters.FLOOR,
+        is_in_playable_area=False, is_deadlock=False
+    ):
         self._has_box = False
         self._has_pusher = False
         self._has_goal = False
         self._is_wall = False
-        self.is_in_playable_area = False
-        self.is_deadlock = False
+        self.is_in_playable_area = is_in_playable_area
+        self.is_deadlock = is_deadlock
 
         # Most of the board space consists of empty floors, thus a chance this
         # first test succeeds is larger than for other cases. This means that
@@ -107,7 +111,7 @@ class BoardCell:
             elif self.is_goal_chr(character):
                 self.has_goal = True
             else:
-                raise BoardConversionError(
+                raise ValueError(
                     "Illegal characters found in board string"
                 )
 
@@ -121,42 +125,39 @@ class BoardCell:
         return not self == rv
 
     def __str__(self):
-        return self._str_helper.value
+        return self.to_str(use_visible_floor=False)
 
     def __repr__(self):
-        return "BoardCell('{0}')".format(self._str_helper)
+        return "BoardCell('{0}')".format(str(self))
 
-    @property
-    def _str_helper(self):
-        retv = self.Characters.FLOOR
+    def to_str(self, use_visible_floor=False):
+        retv = BoardCellCharacters.FLOOR
 
-        if not self.has_box and not self.has_goal and not self.has_pusher:
+        if not self.has_piece:
             if self.is_wall:
-                retv = self.Characters.WALL
+                retv = BoardCellCharacters.WALL
             else:
                 retv = (
-                    self.Characters.VISIBLE_FLOOR
-                    if settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS else
-                    self.Characters.FLOOR
+                    BoardCellCharacters.VISIBLE_FLOOR
+                    if use_visible_floor else BoardCellCharacters.FLOOR
                 )
         elif not self.has_box and not self.has_goal and self.has_pusher:
-            retv = self.Characters.PUSHER
+            retv = BoardCellCharacters.PUSHER
         elif not self.has_box and self.has_goal and not self.has_pusher:
-            retv = self.Characters.GOAL
+            retv = BoardCellCharacters.GOAL
         elif not self.has_box and self.has_goal and self.has_pusher:
-            retv = self.Characters.PUSHER_ON_GOAL
+            retv = BoardCellCharacters.PUSHER_ON_GOAL
         elif self.has_box and not self.has_goal and not self.has_pusher:
-            retv = self.Characters.BOX
+            retv = BoardCellCharacters.BOX
         else:
-            retv = self.Characters.BOX_ON_GOAL
+            retv = BoardCellCharacters.BOX_ON_GOAL
 
-        return retv
+        return retv.value
 
     def clear(self):
         """Clears cell, converting it to empty floor."""
         self._is_wall = self._has_box = self._has_goal = self._has_pusher = \
             False
-        return self
 
     @property
     def has_piece(self):
@@ -166,9 +167,8 @@ class BoardCell:
     @property
     def is_empty_floor(self):
         """True if there is no pieces and no wall on this cell."""
-        return (
-            not self.has_pusher and not self.has_box and not self.has_goal and
-            not self.is_wall
+        return not (
+            self.has_pusher or self.has_box or self.has_goal or self.is_wall
         )
 
     @property
@@ -186,7 +186,7 @@ class BoardCell:
             can be used by higher game logic classes to implement actual game
             logic.
         """
-        return not self.has_box and not self.has_pusher and not self.is_wall
+        return not (self.has_box or self.has_pusher or self.is_wall)
 
     @property
     def has_box(self):
@@ -203,11 +203,9 @@ class BoardCell:
 
     def put_box(self):
         self.has_box = True
-        return self
 
     def remove_box(self):
         self.has_box = False
-        return self
 
     @property
     def has_goal(self):
@@ -223,11 +221,9 @@ class BoardCell:
 
     def put_goal(self):
         self.has_goal = True
-        return self
 
     def remove_goal(self):
         self.has_goal = False
-        return self
 
     @property
     def has_pusher(self):
@@ -244,11 +240,9 @@ class BoardCell:
 
     def put_pusher(self):
         self.has_pusher = True
-        return self
 
     def remove_pusher(self):
         self.has_pusher = False
-        return self
 
     @property
     def is_wall(self):

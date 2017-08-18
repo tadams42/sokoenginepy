@@ -47,7 +47,7 @@ array indexes which can be retrieved fro 2D coordinates using :func:`.index_1d`
 
 .. code-block:: python
 
-    >>> from sokoenginepy import BoardCell, Direction
+    >>> from sokoenginepy import BoardCell, BoardCellCharacters, Direction
     >>> from sokoenginepy.utilities import index_1d
     >>> position = index_1d(11, 8, board.width)
     >>>
@@ -55,7 +55,7 @@ array indexes which can be retrieved fro 2D coordinates using :func:`.index_1d`
     BoardCell('@')
     >>> print(board[position])
     @
-    >>> board[position] = BoardCell.Characters.BOX
+    >>> board[position] = BoardCellCharacters.BOX
     >>> board[position]
     BoardCell('$')
     >>> board[position].has_pusher
@@ -63,7 +63,6 @@ array indexes which can be retrieved fro 2D coordinates using :func:`.index_1d`
     >>> board[position].has_box
     True
     >>> board[position].put_pusher()
-    BoardCell('@')
     >>> board.neighbor(position, Direction.RIGHT)
     164
 

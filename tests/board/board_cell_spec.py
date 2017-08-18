@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from sokoenginepy import BoardCell, settings
+from sokoenginepy import BoardCell, BoardCellCharacters, settings
 from sokoenginepy.exceptions import SokoengineError
 
 from ..fixtures import BoardCellFactory
@@ -11,63 +11,53 @@ from ..fixtures import BoardCellFactory
 class DescribeBoardCell:
     class Describe_is_pusher_chr:
         def it_correctly_categorizes(self):
-            assert BoardCell.is_pusher_chr(BoardCell.Characters.PUSHER)
-            assert BoardCell.is_pusher_chr(BoardCell.Characters.ALT_PUSHER1)
-            assert BoardCell.is_pusher_chr(BoardCell.Characters.ALT_PUSHER2)
-            assert BoardCell.is_pusher_chr(BoardCell.Characters.PUSHER_ON_GOAL)
+            assert BoardCell.is_pusher_chr(BoardCellCharacters.PUSHER)
+            assert BoardCell.is_pusher_chr(BoardCellCharacters.ALT_PUSHER1)
+            assert BoardCell.is_pusher_chr(BoardCellCharacters.ALT_PUSHER2)
+            assert BoardCell.is_pusher_chr(BoardCellCharacters.PUSHER_ON_GOAL)
             assert BoardCell.is_pusher_chr(
-                BoardCell.Characters.ALT_PUSHER_ON_GOAL1
+                BoardCellCharacters.ALT_PUSHER_ON_GOAL1
             )
             assert BoardCell.is_pusher_chr(
-                BoardCell.Characters.ALT_PUSHER_ON_GOAL2
+                BoardCellCharacters.ALT_PUSHER_ON_GOAL2
             )
 
     class Describe_is_box_chr:
         def it_correctly_categorizes(self):
-            assert BoardCell.is_box_chr(BoardCell.Characters.BOX)
-            assert BoardCell.is_box_chr(BoardCell.Characters.ALT_BOX1)
-            assert BoardCell.is_box_chr(BoardCell.Characters.BOX_ON_GOAL)
-            assert BoardCell.is_box_chr(BoardCell.Characters.ALT_BOX_ON_GOAL1)
+            assert BoardCell.is_box_chr(BoardCellCharacters.BOX)
+            assert BoardCell.is_box_chr(BoardCellCharacters.ALT_BOX1)
+            assert BoardCell.is_box_chr(BoardCellCharacters.BOX_ON_GOAL)
+            assert BoardCell.is_box_chr(BoardCellCharacters.ALT_BOX_ON_GOAL1)
 
     class Describe_is_goal_chr:
         def it_correctly_categorizes(self):
-            assert BoardCell.is_goal_chr(BoardCell.Characters.GOAL)
-            assert BoardCell.is_goal_chr(BoardCell.Characters.ALT_GOAL1)
-            assert BoardCell.is_goal_chr(BoardCell.Characters.PUSHER_ON_GOAL)
+            assert BoardCell.is_goal_chr(BoardCellCharacters.GOAL)
+            assert BoardCell.is_goal_chr(BoardCellCharacters.ALT_GOAL1)
+            assert BoardCell.is_goal_chr(BoardCellCharacters.PUSHER_ON_GOAL)
             assert BoardCell.is_goal_chr(
-                BoardCell.Characters.ALT_PUSHER_ON_GOAL1
+                BoardCellCharacters.ALT_PUSHER_ON_GOAL1
             )
             assert BoardCell.is_goal_chr(
-                BoardCell.Characters.ALT_PUSHER_ON_GOAL2
+                BoardCellCharacters.ALT_PUSHER_ON_GOAL2
             )
-            assert BoardCell.is_goal_chr(BoardCell.Characters.BOX_ON_GOAL)
-            assert BoardCell.is_goal_chr(BoardCell.Characters.ALT_BOX_ON_GOAL1)
+            assert BoardCell.is_goal_chr(BoardCellCharacters.BOX_ON_GOAL)
+            assert BoardCell.is_goal_chr(BoardCellCharacters.ALT_BOX_ON_GOAL1)
 
     class Describe_is_empty_floor_chr:
         def it_correctly_categorizes(self):
-            assert BoardCell.is_empty_floor_chr(BoardCell.Characters.FLOOR)
+            assert BoardCell.is_empty_floor_chr(BoardCellCharacters.FLOOR)
             assert BoardCell.is_empty_floor_chr(
-                BoardCell.Characters.VISIBLE_FLOOR
+                BoardCellCharacters.VISIBLE_FLOOR
             )
             assert BoardCell.is_empty_floor_chr(
-                BoardCell.Characters.ALT_VISIBLE_FLOOR1
+                BoardCellCharacters.ALT_VISIBLE_FLOOR1
             )
 
     class Describe_is_wall_chr:
         def it_correctly_categorizes(self):
-            assert BoardCell.is_wall_chr(BoardCell.Characters.WALL)
+            assert BoardCell.is_wall_chr(BoardCellCharacters.WALL)
 
     class Describe_init:
-        def it_sets_all_attributes(self):
-            board_cell = BoardCellFactory(character=BoardCell.Characters.PUSHER)
-
-            assert not board_cell._has_box
-            assert board_cell._has_pusher
-            assert not board_cell._has_goal
-            assert not board_cell._is_wall
-            assert not board_cell.is_in_playable_area
-            assert not board_cell.is_deadlock
-
         def it_createst_empty_floor_by_default(self):
             board_cell = BoardCell()
             assert board_cell.is_empty_floor
@@ -77,12 +67,12 @@ class DescribeBoardCell:
             assert not board_cell.is_in_playable_area
             assert not board_cell.is_deadlock
 
-            board_cell = BoardCellFactory(character=BoardCell.Characters.PUSHER)
+            board_cell = BoardCellFactory(character=BoardCellCharacters.PUSHER)
             assert not board_cell.is_in_playable_area
             assert not board_cell.is_deadlock
 
         def it_raises_on_illegal_character(self):
-            with pytest.raises(SokoengineError):
+            with pytest.raises(ValueError):
                 BoardCell(character="4")
 
     class Describe_equality_comparisson:
@@ -268,29 +258,27 @@ class DescribeBoardCell:
         def it_converts_board_cell_to_printable_character(self, board_cell):
             board_cell.clear()
             board_cell.has_pusher = True
-            assert str(board_cell) == BoardCell.Characters.PUSHER
+            assert str(board_cell) == BoardCellCharacters.PUSHER
             board_cell.clear()
             board_cell.has_pusher = True
             board_cell.has_goal = True
-            assert str(board_cell) == BoardCell.Characters.PUSHER_ON_GOAL
+            assert str(board_cell) == BoardCellCharacters.PUSHER_ON_GOAL
             board_cell.clear()
             board_cell.has_box = True
-            assert str(board_cell) == BoardCell.Characters.BOX
+            assert str(board_cell) == BoardCellCharacters.BOX
             board_cell.clear()
             board_cell.has_box = True
             board_cell.has_goal = True
-            assert str(board_cell) == BoardCell.Characters.BOX_ON_GOAL
+            assert str(board_cell) == BoardCellCharacters.BOX_ON_GOAL
             board_cell.clear()
             board_cell.has_goal = True
-            assert str(board_cell) == BoardCell.Characters.GOAL
+            assert str(board_cell) == BoardCellCharacters.GOAL
             board_cell.clear()
             board_cell.is_wall = True
-            assert str(board_cell) == BoardCell.Characters.WALL
+            assert str(board_cell) == BoardCellCharacters.WALL
 
             board_cell.clear()
 
-            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = False
-            assert str(board_cell) == BoardCell.Characters.FLOOR
+            assert str(board_cell) == BoardCellCharacters.FLOOR
 
-            settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
-            assert str(board_cell) == BoardCell.Characters.VISIBLE_FLOOR
+            assert board_cell.to_str(use_visible_floor=True) == BoardCellCharacters.VISIBLE_FLOOR

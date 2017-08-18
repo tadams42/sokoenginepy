@@ -1,4 +1,4 @@
-from .board_cell import BoardCell, BoardConversionError
+from .board_cell import BoardCell, BoardCellCharacters, BoardConversionError
 from .board_state import BoardState, CellAlreadyOccupiedError
 from .graph import BoardGraph, GraphType
 from .hashed_board_state import HashedBoardState

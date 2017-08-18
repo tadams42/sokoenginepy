@@ -4,14 +4,12 @@ from abc import ABCMeta, abstractmethod
 from collections.abc import Container
 from functools import reduce
 
-import networkx
-
 from .. import settings, tessellation, utilities
-from .board_cell import BoardCell, BoardConversionError
+from .board_cell import BoardCell, BoardCellCharacters, BoardConversionError
 from .graph import BoardGraph
 
 _RE_BOARD_STRING = re.compile(
-    r"^([0-9\s" + re.escape("".join(c for c in BoardCell.Characters)) +
+    r"^([0-9\s" + re.escape("".join(c for c in BoardCellCharacters)) +
     re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
 )
 
@@ -131,6 +129,19 @@ class VariantBoard(Container, metaclass=ABCMeta):
         """
         pass
 
+    def _reconfigure_edges(self):
+        """Recreate all edges using :attr:`.tessellation`."""
+        self._graph.remove_all_edges()
+        for source_vertex in range(self.size):
+            for direction in self.tessellation.legal_directions:
+                neighbor_vertex = self.tessellation.neighbor_position(
+                    source_vertex, direction, self.width, self.height
+                )
+                if neighbor_vertex is not None:
+                    self._graph.add_edge(
+                        source_vertex, neighbor_vertex, direction
+                    )
+
     def _reinit(self, width, height, reconfigure_edges=True):
         self._graph = BoardGraph(width * height, self.tessellation.graph_type)
 
@@ -138,9 +149,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
         self._height = height
 
         if reconfigure_edges:
-            self._graph.reconfigure_edges(
-                self.width, self.height, self.tessellation
-            )
+            self._reconfigure_edges()
 
     def _reinit_with_string(self, board_str, reconfigure_edges=True):
         if not utilities.is_blank(board_str):
@@ -176,31 +185,13 @@ class VariantBoard(Container, metaclass=ABCMeta):
         return self.parse_board_string(board_str)
 
     def __getitem__(self, position):
-        try:
-            return self._graph[position]
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except networkx.NetworkXError:
-            raise IndexError('Board index out of range')
-        except ValueError:
-            raise IndexError('Board index out of range')
+        return self._graph[position]
 
     def __setitem__(self, position, board_cell):
-        try:
-            if isinstance(board_cell, BoardCell):
-                self._graph[position] = board_cell
-            else:
-                self._graph[position] = BoardCell(board_cell)
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except networkx.NetworkXError:
-            raise IndexError('Board index out of range')
-        except ValueError:
-            raise IndexError('Board index out of range')
+        if isinstance(board_cell, BoardCell):
+            self._graph[position] = board_cell
+        else:
+            self._graph[position] = BoardCell(board_cell)
 
     def __contains__(self, position):
         return position in self._graph
@@ -212,7 +203,9 @@ class VariantBoard(Container, metaclass=ABCMeta):
         rows = []
         for y in range(0, self.height):
             row = "".join(
-                str(cell)
+                cell.to_str(
+                    use_visible_floor=settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
+                )
                 for cell in (
                     self[utilities.index_1d(x, y, self.width)]
                     for x in range(0, self.width)
@@ -252,6 +245,8 @@ class VariantBoard(Container, metaclass=ABCMeta):
 
     def neighbor(self, from_position, direction):
         """
+        Calculates neighbor vertex index in ``direction``
+
         Returns:
             int: neighbor position in ``direction`` or None if neighbor
             position in ``direction`` would lead of board
@@ -259,48 +254,21 @@ class VariantBoard(Container, metaclass=ABCMeta):
         Raises:
             IndexError: if ``from_position`` is out of board position
         """
-        try:
-            return self._graph.neighbor(from_position, direction)
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except networkx.NetworkXError:
-            raise IndexError('Board index out of range')
-        except ValueError:
-            raise IndexError('Board index out of range')
+        return self._graph.neighbor(from_position, direction)
 
     def wall_neighbors(self, from_position):
         """
         Returns:
             list: of neighbor positions that are walls
         """
-        try:
-            return self._graph.wall_neighbors(from_position)
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except networkx.NetworkXError:
-            raise IndexError('Board index out of range')
-        except ValueError:
-            raise IndexError('Board index out of range')
+        return self._graph.wall_neighbors(from_position)
 
     def all_neighbors(self, from_position):
         """
         Returns:
             list: of neighbor positions
         """
-        try:
-            return self._graph.all_neighbors(from_position)
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except networkx.NetworkXError:
-            raise IndexError('Board index out of range')
-        except ValueError:
-            raise IndexError('Board index out of range')
+        return self._graph.all_neighbors(from_position)
 
     def clear(self):
         """Empties all board cells."""
@@ -309,28 +277,9 @@ class VariantBoard(Container, metaclass=ABCMeta):
 
     def mark_play_area(self):
         """
-        Returns:
-            list: of positions that are playable (reachable by any box or
-            pusher)
+        Marks all BoardCell that are playable (reachable by any box or pusher).
         """
-        piece_positions = []
-        for vertex in range(0, self.size):
-            if self[vertex].has_box or self[vertex].has_pusher:
-                self[vertex].is_in_playable_area = True
-                piece_positions.append(vertex)
-            else:
-                self[vertex].is_in_playable_area = False
-
-        def is_obstacle(vertex):
-            return self[vertex].is_wall
-
-        for piece_position in piece_positions:
-            reachables = self._graph.reachables(
-                root=piece_position, is_obstacle_callable=is_obstacle
-            )
-
-            for reachable_vertex in reachables:
-                self[reachable_vertex].is_in_playable_area = True
+        self._graph.mark_play_area()
 
     def positions_reachable_by_pusher(
         self, pusher_position, excluded_positions=None
@@ -340,23 +289,9 @@ class VariantBoard(Container, metaclass=ABCMeta):
             list: of positions that are reachable by pusher standing on
             ``position``
         """
-
-        def is_obstacle(position):
-            return not self[position].can_put_pusher_or_box
-
-        try:
-            return self._graph.reachables(
-                root=pusher_position, is_obstacle_callable=is_obstacle,
-                excluded_positions=excluded_positions
-            )
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except networkx.NetworkXError:
-            raise IndexError('Board index out of range')
-        except ValueError:
-            raise IndexError('Board index out of range')
+        return self._graph.positions_reachable_by_pusher(
+            pusher_position, excluded_positions
+        )
 
     def normalized_pusher_position(
         self, pusher_position, excluded_positions=None
@@ -365,54 +300,19 @@ class VariantBoard(Container, metaclass=ABCMeta):
         Returns:
             int: Top-left position reachable by pusher
         """
-        try:
-            reachables = self.positions_reachable_by_pusher(
-                pusher_position=pusher_position,
-                excluded_positions=excluded_positions
-            )
-            if reachables:
-                return min(reachables)
-            else:
-                return pusher_position
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except networkx.NetworkXError:
-            raise IndexError('Board index out of range')
-        except ValueError:
-            raise IndexError('Board index out of range')
+        return self._graph.normalized_pusher_position(
+            pusher_position, excluded_positions
+        )
 
     def path_destination(self, start_position, direction_path):
-        if start_position not in self:
-            raise IndexError('Board index out of range')
-
-        try:
-            retv = start_position
-            for direction in direction_path:
-                next_target = self.neighbor(retv, direction)
-                if next_target:
-                    retv = next_target
-                else:
-                    break
-            return retv
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except networkx.NetworkXError:
-            raise IndexError('Board index out of range')
-        except ValueError:
-            raise IndexError('Board index out of range')
+        return self._graph.path_destination(start_position, direction_path)
 
     def find_jump_path(self, start_position, end_position):
         """
         Returns:
             list: of positions through which pusher must pass when jumping
         """
-        if start_position not in self:
-            raise IndexError('Board index out of range')
-        return self._graph.shortest_path(start_position, end_position)
+        return self._graph.find_jump_path(start_position, end_position)
 
     def find_move_path(self, start_position, end_position):
         """
@@ -420,20 +320,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             list: of positions through which pusher must pass when moving
             without pushing boxes
         """
-        if start_position not in self:
-            raise IndexError('Board index out of range')
-
-        path = self._graph.dijkstra_path(start_position, end_position)
-
-        retv = path[:1]
-        for position in path[1:]:
-            if self[position].can_put_pusher_or_box:
-                retv.append(position)
-            else:
-                break
-        if retv != path:
-            return []
-        return path
+        return self._graph.find_move_path(start_position, end_position)
 
     def cell_orientation(self, position):
         """
@@ -444,21 +331,18 @@ class VariantBoard(Container, metaclass=ABCMeta):
             position, self._width, self._height
         )
 
-    def position_path_to_direction_path(self, position_path):
+    def positions_path_to_directions_path(self, position_path):
         """
+        Converts path expressed as vertices' indexes to one expressed as
+        :class:`.Direction`
+
+        Args:
+            position_path (list): list of integer positions
+
         Returns:
-            list: of :class:`.Direction`
+            list: of :class:`.Direction` instances
         """
-        try:
-            return self._graph.position_path_to_direction_path(position_path)
-        except IndexError:
-            raise IndexError('Board index out of range')
-        except KeyError:
-            raise IndexError('Board index out of range')
-        except networkx.NetworkXError:
-            raise IndexError('Board index out of range')
-        except ValueError:
-            raise IndexError('Board index out of range')
+        return self._graph.positions_path_to_directions_path(position_path)
 
     def add_row_top(self):
         self._resizer.add_row_top(reconfigure_edges=True)
@@ -527,9 +411,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
                     self._resizer.remove_column_right(reconfigure_edges=False)
 
         if old_width != self.width or old_height != self.height:
-            self._graph.reconfigure_edges(
-                self.width, self.height, self.tessellation
-            )
+            self._reconfigure_edges()
 
     def resize_and_center(self, new_width, new_height):
         left = right = top = bottom = 0
@@ -560,9 +442,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
         self._resizer.trim_right(reconfigure_edges=False)
 
         if old_width != self.width or old_height != old_height:
-            self._graph.reconfigure_edges(
-                self.width, self.height, self.tessellation
-            )
+            self._reconfigure_edges()
 
 
 class VariantBoardResizer(metaclass=ABCMeta):
@@ -702,9 +582,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
             self.remove_column_left(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._graph.reconfigure_edges(
-                self.board.width, self.board.height, self.board.tessellation
-            )
+            self.board._reconfigure_edges()
 
     def trim_right(self, reconfigure_edges):
         self.reverse_columns(reconfigure_edges=False)
@@ -712,9 +590,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
         self.reverse_columns(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._graph.reconfigure_edges(
-                self.board.width, self.board.height, self.board.tessellation
-            )
+            self.board._reconfigure_edges()
 
     def trim_top(self, reconfigure_edges):
         amount = self.board.height
@@ -733,9 +609,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
             self.remove_row_top(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._graph.reconfigure_edges(
-                self.board.width, self.board.height, self.board.tessellation
-            )
+            self.board._reconfigure_edges()
 
     def trim_bottom(self, reconfigure_edges):
         self.reverse_rows(reconfigure_edges=False)
@@ -743,9 +617,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
         self.reverse_rows(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._graph.reconfigure_edges(
-                self.board.width, self.board.height, self.board.tessellation
-            )
+            self.board._reconfigure_edges()
 
     def reverse_rows(self, reconfigure_edges):
         old_body = self.board._graph
@@ -762,9 +634,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     )]
 
         if reconfigure_edges:
-            self.board._graph.reconfigure_edges(
-                self.board.width, self.board.height, self.board.tessellation
-            )
+            self.board._reconfigure_edges()
 
     def reverse_columns(self, reconfigure_edges):
         old_body = self.board._graph
@@ -781,6 +651,4 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     )]
 
         if reconfigure_edges:
-            self.board._graph.reconfigure_edges(
-                self.board.width, self.board.height, self.board.tessellation
-            )
+            self.board._reconfigure_edges()

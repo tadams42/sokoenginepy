@@ -1,7 +1,6 @@
 from enum import Enum
 
-from .. import tessellation
-from .. import board
+from .. import board, tessellation
 
 
 class AtomicMove:
