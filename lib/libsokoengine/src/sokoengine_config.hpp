@@ -1,5 +1,5 @@
-#ifndef LIBSOKOENGINE_CONFIG_0FEA723A_C86F_6753_04ABD475F6FCA5FB
-#define LIBSOKOENGINE_CONFIG_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#ifndef SOKOENGINE_CONFIG_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#define SOKOENGINE_CONFIG_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 // ###############################################################################
 // https://gcc.gnu.org/wiki/Visibility
@@ -42,13 +42,5 @@
   #define LIBSOKOENGINE_LOCAL
 #endif // LIBSOKOENGINE_DLL
 // ###############################################################################
-
-#define LIBSOKOENGINE_VERSION "0.7.0"
-#define LIBSOKOENGINE_VERSION_MAJOR 0
-#define LIBSOKOENGINE_VERSION_MINOR 7
-#define LIBSOKOENGINE_VERSION_PATCH 0
-
-#define LIBSOKONGINE_SYSTEM_IS_LINUX
-/* #undef LIBSOKOENGINE_COMPILER_IS_MSVC */
 
 #endif // HEADER_GUARD

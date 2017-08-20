@@ -1,6 +1,6 @@
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <libsokoengine.hpp>
+#include <sokoengine.hpp>
 
 using namespace boost::python;
 using namespace sokoengine;

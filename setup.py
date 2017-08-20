@@ -35,37 +35,41 @@ def configure_native_extension():
         else None
     )
 
-    if LIBBOOST_PYTHON:
+    LIBBOOST_GRAPH = (
+        'boost_graph'
+        if os.path.exists('/usr/lib/x86_64-linux-gnu/libboost_graph.so')
+        else None
+    )
+
+    if LIBBOOST_PYTHON and LIBBOOST_GRAPH:
         libsokoengine = Extension(
             name='libsokoengine',
             sources=[
-                os.path.join('src', 'libsokoengine', file_name) for file_name in [
-                    'direction.cpp',
-                    'board_cell.cpp',
-                    'atomic_move.cpp',
-                    'board_graph.cpp',
-                    'tessellation_base.cpp',
-                    'sokoban_tessellation.cpp',
-                    'hexoban_tessellation.cpp',
-                    'octoban_tessellation.cpp',
-                    'trioban_tessellation.cpp',
-                ]
+                'lib/libsokoengine/src/board/board_cell.cpp',
+                'lib/libsokoengine/src/board/board_graph.cpp',
+                'lib/libsokoengine/src/snapshot/atomic_move.cpp',
+                'lib/libsokoengine/src/tessellation/direction.cpp',
+                'lib/libsokoengine/src/tessellation/tessellation_base.cpp',
+                'lib/libsokoengine/src/tessellation/sokoban_tessellation.cpp',
+                'lib/libsokoengine/src/tessellation/hexoban_tessellation.cpp',
+                'lib/libsokoengine/src/tessellation/octoban_tessellation.cpp',
+                'lib/libsokoengine/src/tessellation/trioban_tessellation.cpp',
             ] + [
-                os.path.join('src', 'ext', file_name) for file_name in [
-                    'export_common.cpp',
-                    'export_direction.cpp',
-                    'export_board_cell.cpp',
-                    'export_atomic_move.cpp',
-                    'export_board_graph.cpp',
-                    'export_tessellations.cpp',
-                    'export_libsokoengine.cpp',
-                ]
+                'src/ext/export_common.cpp',
+                'src/ext/export_direction.cpp',
+                'src/ext/export_board_cell.cpp',
+                'src/ext/export_atomic_move.cpp',
+                'src/ext/export_board_graph.cpp',
+                'src/ext/export_tessellations.cpp',
+                'src/ext/export_libsokoengine.cpp',
             ],
-            libraries=[LIBBOOST_PYTHON, 'boost_graph'],
+            libraries=[LIBBOOST_PYTHON, LIBBOOST_GRAPH],
             include_dirs=[
-                'src',
-                os.path.join('src', 'libsokoengine'),
-                os.path.join('src', 'ext')
+                'lib/libsokoengine/src',
+                'lib/libsokoengine/src/board',
+                'lib/libsokoengine/src/snapshot',
+                'lib/libsokoengine/src/tessellation',
+                'src/ext'
             ],
             language='c++',
             extra_compile_args=[

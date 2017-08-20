@@ -1,5 +1,5 @@
 #include <boost/python.hpp>
-#include <libsokoengine.hpp>
+#include <sokoengine.hpp>
 
 using namespace boost::python;
 using namespace sokoengine;

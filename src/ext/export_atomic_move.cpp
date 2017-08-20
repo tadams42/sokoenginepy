@@ -1,6 +1,6 @@
 #include <boost/python.hpp>
 #include <boost/python/raw_function.hpp>
-#include <libsokoengine.hpp>
+#include <sokoengine.hpp>
 
 using namespace boost::python;
 using namespace sokoengine;

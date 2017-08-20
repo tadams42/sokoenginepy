@@ -7,8 +7,8 @@
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API Direction;
-class LIBSOKOENGINE_API AtomicMove;
+class Direction;
+class AtomicMove;
 
 class LIBSOKOENGINE_API UnknownDirectionError: public std::invalid_argument {
 public:
