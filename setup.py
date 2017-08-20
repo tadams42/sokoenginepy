@@ -24,47 +24,62 @@ def read(*names, **kwargs):
     ).read()
 
 
-libsokoengine = Extension(
-    name='libsokoengine',
-    sources=[
-        os.path.join('src', 'libsokoengine', file_name) for file_name in [
-            'direction.cpp',
-            'board_cell.cpp',
-            'atomic_move.cpp',
-            'board_graph.cpp',
-            'tessellation_base.cpp',
-            'sokoban_tessellation.cpp',
-            'hexoban_tessellation.cpp',
-            'octoban_tessellation.cpp',
-            'trioban_tessellation.cpp',
-        ]
-    ] + [
-        os.path.join('src', 'ext', file_name) for file_name in [
-            'export_common.cpp',
-            'export_direction.cpp',
-            'export_board_cell.cpp',
-            'export_atomic_move.cpp',
-            'export_board_graph.cpp',
-            'export_tessellations.cpp',
-            'export_libsokoengine.cpp',
-        ]
-    ],
-    libraries=['boost_python-py35'],
-    include_dirs=[
-        'src',
-        os.path.join('src', 'libsokoengine'),
-        os.path.join('src', 'ext')
-    ],
-    language='c++',
-    extra_compile_args=[
-        '-std=c++14',
-        '-Wno-overloaded-virtual',
-        '-Wno-sign-compare',
-        '-Wno-unused-parameter',
-        '-Wno-attributes'
-    ],
-    optional=True
-)
+def configure_native_extension():
+    # TODO: configure script for native extension should:
+    #     - figure out Python version under which we are installing
+    #     - find Boost.Python for that version
+    #     - be portable
+    LIBBOOST_PYTHON = (
+        'boost_python-py35'
+        if os.path.exists('/usr/lib/x86_64-linux-gnu/libboost_python-py35.so')
+        else None
+    )
+
+    if LIBBOOST_PYTHON:
+        libsokoengine = Extension(
+            name='libsokoengine',
+            sources=[
+                os.path.join('src', 'libsokoengine', file_name) for file_name in [
+                    'direction.cpp',
+                    'board_cell.cpp',
+                    'atomic_move.cpp',
+                    'board_graph.cpp',
+                    'tessellation_base.cpp',
+                    'sokoban_tessellation.cpp',
+                    'hexoban_tessellation.cpp',
+                    'octoban_tessellation.cpp',
+                    'trioban_tessellation.cpp',
+                ]
+            ] + [
+                os.path.join('src', 'ext', file_name) for file_name in [
+                    'export_common.cpp',
+                    'export_direction.cpp',
+                    'export_board_cell.cpp',
+                    'export_atomic_move.cpp',
+                    'export_board_graph.cpp',
+                    'export_tessellations.cpp',
+                    'export_libsokoengine.cpp',
+                ]
+            ],
+            libraries=[LIBBOOST_PYTHON, 'boost_graph'],
+            include_dirs=[
+                'src',
+                os.path.join('src', 'libsokoengine'),
+                os.path.join('src', 'ext')
+            ],
+            language='c++',
+            extra_compile_args=[
+                '-std=c++14',
+                '-Wno-overloaded-virtual',
+                '-Wno-sign-compare',
+                '-Wno-unused-parameter',
+                '-Wno-attributes'
+            ],
+            optional=True
+        )
+        return [libsokoengine]
+
+    return []
 
 setup(
     name="sokoenginepy",
@@ -152,5 +167,5 @@ setup(
     # installed, specify them HERE.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={'sokoenginepy': ['res/*'],},
-    ext_modules=[libsokoengine]
+    ext_modules=configure_native_extension()
 )

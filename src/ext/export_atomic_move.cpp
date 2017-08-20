@@ -1,4 +1,5 @@
 #include <boost/python.hpp>
+#include <boost/python/raw_function.hpp>
 #include <libsokoengine.hpp>
 
 using namespace boost::python;
