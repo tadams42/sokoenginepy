@@ -1,6 +1,6 @@
 from enum import Enum
 
-from .. import utilities
+from ... import utilities
 
 
 class BoardCellCharacters(str, Enum):
