@@ -1,6 +1,6 @@
 from enum import Enum
 
-from .. import board, tessellation
+from ... import board, tessellation
 
 
 class InvalidAtomicMoveError(ValueError):

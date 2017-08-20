@@ -30,12 +30,14 @@ libsokoengine = Extension(
         os.path.join('src', 'libsokoengine', file_name) for file_name in [
             'direction.cpp',
             'board_cell.cpp',
+            'atomic_move.cpp',
         ]
     ] + [
         os.path.join('src', 'ext', file_name) for file_name in [
             'export_common.cpp',
             'export_direction.cpp',
             'export_board_cell.cpp',
+            'export_atomic_move.cpp',
             'export_libsokoengine.cpp',
         ]
     ],

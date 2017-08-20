@@ -4,5 +4,6 @@
 #include "common_types.hpp"
 #include "direction.hpp"
 #include "board_cell.hpp"
+#include "atomic_move.hpp"
 
 #endif // HEADER_GUARD
