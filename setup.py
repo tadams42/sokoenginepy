@@ -9,11 +9,12 @@ https://github.com/pypa/sampleproject
 from __future__ import absolute_import, print_function
 
 import io
+import os
 import re
 from glob import glob
 from os.path import basename, dirname, join, splitext
 
-from setuptools import find_packages, setup
+from setuptools import Extension, find_packages, setup
 
 
 def read(*names, **kwargs):
@@ -22,6 +23,36 @@ def read(*names, **kwargs):
         encoding=kwargs.get('encoding', 'utf8')
     ).read()
 
+
+libsokoengine = Extension(
+    name='libsokoengine',
+    sources=[
+        os.path.join('src', 'libsokoengine', file_name) for file_name in [
+            'direction.cpp',
+        ]
+    ] + [
+        os.path.join('src', 'ext', file_name) for file_name in [
+            'export_common.cpp',
+            'export_direction.cpp',
+            'export_libsokoengine.cpp',
+        ]
+    ],
+    libraries=['boost_python-py35'],
+    include_dirs=[
+        'src',
+        os.path.join('src', 'libsokoengine'),
+        os.path.join('src', 'ext')
+    ],
+    language='c++',
+    extra_compile_args=[
+        '-std=c++14',
+        '-Wno-overloaded-virtual',
+        '-Wno-sign-compare',
+        '-Wno-unused-parameter',
+        '-Wno-attributes'
+    ],
+    optional=True
+)
 
 setup(
     name="sokoenginepy",
@@ -109,4 +140,5 @@ setup(
     # installed, specify them HERE.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={'sokoenginepy': ['res/*'],},
+    ext_modules=[libsokoengine]
 )

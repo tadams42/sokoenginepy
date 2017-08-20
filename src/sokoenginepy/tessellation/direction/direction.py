@@ -1,6 +1,6 @@
 from enum import IntEnum
 
-from .. import utilities
+from ... import utilities
 
 
 class UnknownDirectionError(ValueError):
