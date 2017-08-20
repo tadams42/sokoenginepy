@@ -13,11 +13,11 @@ class DescribeAtomicMove:
             )
 
             assert atomic_move.direction == Direction.RIGHT
-            assert atomic_move._box_moved
-            assert not atomic_move._pusher_selected
-            assert not atomic_move._pusher_jumped
-            assert atomic_move._pusher_id == DEFAULT_PIECE_ID
-            assert atomic_move._moved_box_id is None
+            assert not atomic_move.is_move
+            assert not atomic_move.is_pusher_selection
+            assert not atomic_move.is_jump
+            assert atomic_move.pusher_id == DEFAULT_PIECE_ID
+            assert atomic_move.moved_box_id is None
 
         def it_validates_parameters(self):
             with pytest.raises(ValueError):

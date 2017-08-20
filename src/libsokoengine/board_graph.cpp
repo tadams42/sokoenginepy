@@ -228,9 +228,18 @@ void BoardGraph::add_edge(
   if (!contains(source_vertex) || !contains(neighbor_vertex)) {
     throw out_of_range("Board index out of range!");
   }
-  GraphEdgePropertyT e;
-  e.direction = direction;
-  boost::add_edge(source_vertex, neighbor_vertex, e, m_impl->m_graph);
+
+  bool should_add;
+  if (m_impl->m_graph_type == GraphType::DIRECTED_MULTI)
+    should_add = true;
+  else
+    should_add = !has_edge(source_vertex, neighbor_vertex, direction);
+
+  if (should_add) {
+    GraphEdgePropertyT e;
+    e.direction = direction;
+    boost::add_edge(source_vertex, neighbor_vertex, e, m_impl->m_graph);
+  }
 }
 
 size_t BoardGraph::out_edge_weight(position_t target_position) const {

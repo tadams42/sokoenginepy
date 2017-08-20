@@ -5,7 +5,6 @@
 #include "board_cell.hpp"
 #include "direction.hpp"
 #include "atomic_move.hpp"
-#include "exceptions.hpp"
 
 using namespace std;
 

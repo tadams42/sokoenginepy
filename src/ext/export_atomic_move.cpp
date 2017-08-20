@@ -6,7 +6,10 @@ using namespace sokoengine;
 
 struct AtomicMovePickle : boost::python::pickle_suite {
   static boost::python::tuple getinitargs(AtomicMove const& am) {
-    return boost::python::make_tuple(am.direction(), am.is_push_or_pull());
+    return boost::python::make_tuple(
+      am.direction(), am.is_push_or_pull(), am.is_jump(),
+      am.is_pusher_selection(), am.pusher_id(), am.moved_box_id()
+    );
   }
 };
 
@@ -36,13 +39,80 @@ void pusher_id_setter_wraper(AtomicMove &atomic_move, const object& val) {
   atomic_move.set_pusher_id(rv);
 }
 
+object AtomicMove_init(tuple args, dict kwargs) {
+  Direction direction = Direction::LEFT;
+  bool box_moved = false, is_jump = false, is_pusher_selection = false;
+  piece_id_t pusher_id = DEFAULT_PIECE_ID, moved_box_id = NULL_ID;
+
+  auto moved_box_id_extractor = [&] (const object& obj) -> piece_id_t {
+    if (!obj.is_none()) return extract<piece_id_t>(obj);
+    else return NULL_ID;
+  };
+
+  switch (len(args)) {
+    case 7:
+      direction = extract<Direction>(args[1]);
+      box_moved = extract<bool>(args[2]);
+      is_jump = extract<bool>(args[3]);
+      is_pusher_selection = extract<bool>(args[4]);
+      pusher_id = extract<piece_id_t>(args[5]);
+      moved_box_id = moved_box_id_extractor(args[6]);
+      break;
+    case 6:
+      direction = extract<Direction>(args[1]);
+      box_moved = extract<bool>(args[2]);
+      is_jump = extract<bool>(args[3]);
+      is_pusher_selection = extract<bool>(args[4]);
+      pusher_id = extract<piece_id_t>(args[5]);
+      break;
+    case 5:
+      direction = extract<Direction>(args[1]);
+      box_moved = extract<bool>(args[2]);
+      is_jump = extract<bool>(args[3]);
+      is_pusher_selection = extract<bool>(args[4]);
+      break;
+    case 4:
+      direction = extract<Direction>(args[1]);
+      box_moved = extract<bool>(args[2]);
+      is_jump = extract<bool>(args[3]);
+      break;
+    case 3:
+      direction = extract<Direction>(args[1]);
+      box_moved = extract<bool>(args[2]);
+      break;
+    case 2:
+      direction = extract<Direction>(args[1]);
+  }
+
+  if (kwargs.contains("direction"))
+    direction = extract<Direction>(kwargs["direction"]);
+  if (kwargs.contains("box_moved"))
+    box_moved = extract<bool>(kwargs["box_moved"]);
+  if (kwargs.contains("is_jump"))
+    is_jump = extract<bool>(kwargs["is_jump"]);
+  if (kwargs.contains("is_pusher_selection"))
+    is_pusher_selection = extract<bool>(kwargs["is_pusher_selection"]);
+  if (kwargs.contains("pusher_id"))
+    pusher_id = extract<piece_id_t>(kwargs["pusher_id"]);
+  if (kwargs.contains("moved_box_id"))
+    moved_box_id = moved_box_id_extractor(kwargs["moved_box_id"]);
+
+  return args[0].attr("__init__")(
+    direction, box_moved, is_jump, is_pusher_selection, pusher_id, moved_box_id
+  );
+}
+
 void export_atomic_move() {
-  scope in_AtomicMove = class_<AtomicMove>(
-      // class Python name
-      "AtomicMove",
-      // __init__
-      init<optional<Direction, bool> >(args("direction", "box_moved"))
-    )
+  scope in_AtomicMove = class_<AtomicMove>("AtomicMove", no_init)
+    .def("__init__", raw_function(AtomicMove_init)) // raw constructor
+    .def(
+      init<Direction, bool, bool, bool, piece_id_t, piece_id_t>(
+        args(
+          "direction", "box_moved", "is_jump", "is_pusher_selection",
+          "pusher_id", "moved_box_id"
+        )
+      )
+    ) // C++ constructor, shadowed by raw ctor
 
     // pickle support
     .def_pickle(AtomicMovePickle())

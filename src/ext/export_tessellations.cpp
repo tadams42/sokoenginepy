@@ -67,7 +67,10 @@ void export_tessellations() {
 
     .add_property(
       "legal_directions",
-      make_function(&SokobanTessellation::legal_directions, return_internal_reference<>())
+      make_function(
+        &SokobanTessellation::legal_directions,
+        return_internal_reference<>()
+      )
     )
     .def(
       "neighbor_position", &sokoban_neighbor_position_wraper,
@@ -100,7 +103,9 @@ void export_tessellations() {
 
     .add_property(
       "legal_directions",
-      make_function(&HexobanTessellation::legal_directions, return_internal_reference<>())
+      make_function(
+        &HexobanTessellation::legal_directions, return_internal_reference<>()
+      )
     )
     .def(
       "neighbor_position", &hexoban_neighbor_position_wraper,
@@ -133,7 +138,9 @@ void export_tessellations() {
 
     .add_property(
       "legal_directions",
-      make_function(&OctobanTessellation::legal_directions, return_internal_reference<>())
+      make_function(
+        &OctobanTessellation::legal_directions, return_internal_reference<>()
+      )
     )
     .def(
       "neighbor_position", &octoban_neighbor_position_wraper,
@@ -166,7 +173,9 @@ void export_tessellations() {
 
     .add_property(
       "legal_directions",
-      make_function(&TriobanTessellation::legal_directions, return_internal_reference<>())
+      make_function(
+        &TriobanTessellation::legal_directions, return_internal_reference<>()
+      )
     )
     .def(
       "neighbor_position", &trioban_neighbor_position_wraper,

@@ -32,7 +32,6 @@ libsokoengine = Extension(
             'board_cell.cpp',
             'atomic_move.cpp',
             'board_graph.cpp',
-            'exceptions.cpp',
             'tessellation_base.cpp',
             'sokoban_tessellation.cpp',
             'hexoban_tessellation.cpp',

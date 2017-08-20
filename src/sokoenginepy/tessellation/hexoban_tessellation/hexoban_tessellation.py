@@ -1,7 +1,7 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from ..direction import Direction, UnknownDirectionError
 from ..tessellation_base import (TessellationBase,
-                                TessellationBaseInheritableDocstrings)
+                                 TessellationBaseInheritableDocstrings)
 
 
 class HexobanTessellation(

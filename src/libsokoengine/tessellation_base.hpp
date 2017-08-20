@@ -1,12 +1,20 @@
 #ifndef TESSELLATION_BASE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TESSELLATION_BASE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
+#include <stdexcept>
+
 #include "common_types.hpp"
 
 namespace sokoengine {
 
 class LIBSOKOENGINE_API Direction;
 class LIBSOKOENGINE_API AtomicMove;
+
+class LIBSOKOENGINE_API UnknownDirectionError: public std::invalid_argument {
+public:
+  UnknownDirectionError(const std::string& mess);
+  virtual ~UnknownDirectionError();
+};
 
 class LIBSOKOENGINE_API TessellationBase {
 public:

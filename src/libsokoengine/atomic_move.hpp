@@ -2,11 +2,19 @@
 #define ATOMIC_MOVE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include <string>
+#include <stdexcept>
 
 #include "common_types.hpp"
 #include "direction.hpp"
 
 namespace sokoengine {
+
+
+class LIBSOKOENGINE_API InvalidAtomicMoveError: public std::invalid_argument {
+public:
+  InvalidAtomicMoveError(const std::string& mess);
+  virtual ~InvalidAtomicMoveError();
+};
 
 
 class LIBSOKOENGINE_API AtomicMove {
@@ -25,7 +33,11 @@ public:
            ch == W || ch == E || ch == N || ch == S;
   }
 
-  AtomicMove(const Direction& direction = Direction::LEFT, bool box_moved = false);
+  AtomicMove(
+    const Direction& direction = Direction::LEFT, bool box_moved = false,
+    bool is_jump = false, bool is_pusher_selection = false,
+    piece_id_t pusher_id = DEFAULT_PIECE_ID, piece_id_t moved_box_id = NULL_ID
+  );
 
   bool operator== (const AtomicMove& rv) const {
     return direction() == rv.direction() &&
