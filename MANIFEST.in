@@ -16,3 +16,6 @@ global-exclude *.py[cod] __pycache__ *.so *.dylib
 
 global-exclude .ipynb_checkpoints/*
 prune docs/_build
+
+recursive-include res *.ipynb
+recursive-include res *.py
