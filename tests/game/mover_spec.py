@@ -6,7 +6,7 @@ from pytest_mock import mocker
 
 from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction, Mover,
                           SokobanBoard, SolvingMode)
-from sokoenginepy.exceptions import IllegalMoveError, NonPlayableBoardError
+from sokoenginepy import IllegalMoveError, NonPlayableBoardError
 from sokoenginepy.utilities import index_1d
 
 from .. import fixtures

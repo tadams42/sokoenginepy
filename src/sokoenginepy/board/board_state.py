@@ -8,7 +8,11 @@ from .piece import DEFAULT_PIECE_ID
 from .sokoban_plus import SokobanPlus
 
 
-class CellAlreadyOccupiedError(utilities.SokoengineError):
+class CellAlreadyOccupiedError(RuntimeError):
+    pass
+
+
+class BoxGoalSwitchError(RuntimeError):
     pass
 
 
@@ -584,7 +588,7 @@ class BoardState:
     def switch_boxes_and_goals(self):
         """Switches positions of boxes and goals pairs."""
         if self.boxes_count != self.goals_count:
-            raise utilities.SokoengineError(
+            raise BoxGoalSwitchError(
                 "Unable to switch boxes and goals - counts are not the same"
             )
 

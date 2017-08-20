@@ -3,7 +3,6 @@ import copy
 import pytest
 
 from sokoenginepy import BoardCell, BoardCellCharacters, settings
-from sokoenginepy.exceptions import SokoengineError
 
 from ..fixtures import BoardCellFactory
 

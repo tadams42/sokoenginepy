@@ -1,5 +1,7 @@
-from .board_cell import BoardCell, BoardCellCharacters, BoardConversionError
-from .board_state import BoardState, CellAlreadyOccupiedError
+from .board_cell import (BoardCell, BoardCellCharacters, BoardConversionError,
+                         IllegalBoardCharacterError)
+from .board_state import (BoardState, BoxGoalSwitchError,
+                          CellAlreadyOccupiedError)
 from .graph import BoardGraph, GraphType
 from .hashed_board_state import HashedBoardState
 from .hexoban_board import HexobanBoard

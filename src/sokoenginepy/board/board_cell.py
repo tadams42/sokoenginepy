@@ -23,11 +23,15 @@ class BoardCellCharacters(str, Enum):
     ALT_VISIBLE_FLOOR1 = '_'
 
 
-class BoardConversionError(utilities.SokoengineError):
+class BoardConversionError(RuntimeError):
     """Exception risen when converting board to or from board strings."""
     pass
 
-#
+
+class IllegalBoardCharacterError(ValueError):
+    pass
+
+
 class BoardCell:
     """Stores properties of one cell in board layout.
 
@@ -111,7 +115,7 @@ class BoardCell:
             elif self.is_goal_chr(character):
                 self.has_goal = True
             else:
-                raise ValueError(
+                raise IllegalBoardCharacterError(
                     "Illegal characters found in board string"
                 )
 

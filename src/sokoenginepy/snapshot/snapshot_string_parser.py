@@ -109,7 +109,7 @@ class SnapshotStringParser:
                         retv += snapshot.tessellation.atomic_move_to_char(
                             snapshot[i]
                         )
-                    except utilities.SokoengineError:
+                    except RuntimeError:
                         conversion_ok = False
                     i += 1
                     if i < iend:
@@ -125,7 +125,7 @@ class SnapshotStringParser:
                     retv += snapshot.tessellation.atomic_move_to_char(
                         snapshot[i]
                     )
-                except utilities.SokoengineError:
+                except RuntimeError:
                     conversion_ok = False
                 i += 1
 
@@ -235,7 +235,7 @@ class SnapshotStringParser:
             atomic_move = None
             try:
                 atomic_move = tessellation.char_to_atomic_move(character)
-            except utilities.SokoengineError:
+            except ValueError:
                 atomic_move = None
 
             if atomic_move is None:

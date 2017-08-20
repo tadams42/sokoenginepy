@@ -1,11 +1,16 @@
 from collections import deque
+from enum import IntEnum
 
 import networkx as nx
 
 from ... import tessellation as module_tessellation
 from ... import utilities
-from ..board_cell import BoardCell
-from .graph_type import GraphType
+from .. board_cell import BoardCell
+
+
+class GraphType(IntEnum):
+    DIRECTED = 0
+    DIRECTED_MULTI = 1
 
 
 class BoardGraph:
@@ -20,7 +25,7 @@ class BoardGraph:
 
     _KEY_CELL = 'cell'
     _KEY_DIRECTION = 'direction'
-    _MAX_EDGE_WEIGHT = len(module_tessellation.Direction) + 1
+    _MAX_EDGE_WEIGHT = module_tessellation.Direction.__len__() + 1
 
     def __init__(self, number_of_vertices, graph_type):
         # assert graph_type in GraphType

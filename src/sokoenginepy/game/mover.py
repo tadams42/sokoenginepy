@@ -6,12 +6,12 @@ from .. import snapshot, utilities
 from .solving_mode import SolvingMode
 
 
-class NonPlayableBoardError(utilities.SokoengineError):
+class NonPlayableBoardError(RuntimeError):
     def __init__(self):
         super().__init__("Board is not playable!")
 
 
-class IllegalMoveError(utilities.SokoengineError):
+class IllegalMoveError(RuntimeError):
     pass
 
 
@@ -266,7 +266,7 @@ class Mover:
 
         try:
             self._state.move_pusher_from(old_position, new_position)
-        except module_board.CellAlreadyOccupiedError as exc:
+        except RuntimeError as exc:
             raise IllegalMoveError(str(exc))
 
         path = self._state.board.positions_path_to_directions_path(
@@ -386,14 +386,14 @@ class Mover:
 
             try:
                 self._state.move_box_from(in_front_of_pusher, in_front_of_box)
-            except module_board.CellAlreadyOccupiedError as exc:
+            except RuntimeError as exc:
                 raise IllegalMoveError(str(exc))
 
         try:
             self._state.move_pusher_from(
                 initial_pusher_position, in_front_of_pusher
             )
-        except module_board.CellAlreadyOccupiedError as exc:
+        except RuntimeError as exc:
             raise IllegalMoveError(str(exc))
 
         atomic_move = snapshot.AtomicMove(direction, is_push)
@@ -427,7 +427,7 @@ class Mover:
             self._state.move_pusher_from(
                 initial_pusher_position, in_front_of_pusher
             )
-        except module_board.CellAlreadyOccupiedError as exc:
+        except RuntimeError as exc:
             raise IllegalMoveError(str(exc))
 
         is_pull = False
@@ -441,7 +441,7 @@ class Mover:
                     self._state.move_box_from(
                         behind_pusher, initial_pusher_position
                     )
-                except module_board.CellAlreadyOccupiedError as exc:
+                except RuntimeError as exc:
                     raise IllegalMoveError(str(exc))
                 if options.increase_pull_count:
                     self._pull_count += 1

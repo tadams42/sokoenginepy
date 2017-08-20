@@ -4,7 +4,7 @@ from enum import Enum
 from .. import tessellation, utilities
 
 
-class SnapshotConversionError(utilities.SokoengineError):
+class SnapshotConversionError(ValueError):
     """
     Exception risen when converting game snapshot to or from snapshot strings.
     """
@@ -56,9 +56,9 @@ class Snapshot(MutableSequence):
             self._solving_mode = solving_mode
 
         if self._solving_mode is None:
-            raise utilities.SokoengineError(
+            raise RuntimeError(
                 "Snapshot not correctly initialized! Missing solving_mode. " +
-                "Either provide it explcitly or provide moves_data." +
+                "Either provide it explicitly or provide moves_data." +
                 "tessellation_or_description: '{0}', solving_mode: {1},".format(
                     tessellation_or_description, solving_mode
                 ) + " moves_data: {0}".format(moves_data)
@@ -209,7 +209,7 @@ class Snapshot(MutableSequence):
             self._solving_mode == game.SolvingMode.FORWARD and
             atomic_move.is_jump
         ):
-            raise utilities.SokoengineError(
+            raise ValueError(
                 "Forward mode snapshots are not allowed to contain jumps!"
             )
 

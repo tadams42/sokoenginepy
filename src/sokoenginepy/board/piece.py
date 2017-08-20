@@ -14,7 +14,7 @@ from .. import utilities
 DEFAULT_PIECE_ID = 1
 
 
-class InvalidPieceIdError(utilities.SokoengineError):
+class InvalidPieceIdError(ValueError):
     pass
 
 

@@ -154,8 +154,7 @@ game mechanics like this:
 
 .. code-block:: python
 
-    >>> from sokoenginepy import Mover, SolvingMode
-    >>> from sokoenginepy.exceptions import IllegalMoveError
+    >>> from sokoenginepy import Mover, SolvingMode, IllegalMoveError
     >>>
     >>> # regular, forward solving mode
     >>> forward_mover = Mover(board)

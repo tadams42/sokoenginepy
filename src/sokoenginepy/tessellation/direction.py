@@ -3,7 +3,7 @@ from enum import IntEnum
 from .. import utilities
 
 
-class UnknownDirectionError(utilities.SokoengineError):
+class UnknownDirectionError(ValueError):
     pass
 
 

@@ -8,10 +8,3 @@ from .rle import RleCharacters, rle_decode, rle_encode
 from .text_utils import (calculate_width, contains_only_digits_and_spaces,
                          drop_blank, drop_empty, ending_digits, is_blank,
                          normalize_width)
-
-
-class SokoengineError(RuntimeError):
-    """
-    Base class for all sokoenginepy exceptions.
-    """
-    pass

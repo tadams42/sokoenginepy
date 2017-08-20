@@ -4,7 +4,7 @@ import pytest
 
 from sokoenginepy import (BoardGraph, Direction, GraphType, SokobanBoard,
                           Tessellation, TriobanBoard, VariantBoard, settings)
-from sokoenginepy.exceptions import BoardConversionError
+from sokoenginepy import BoardConversionError
 from sokoenginepy.utilities import index_1d
 
 
