@@ -13,14 +13,14 @@ class SokobanTessellation(
     )
 
     _CHR_TO_ATOMIC_MOVE = {
-        snapshot.AtomicMove.Characters.LOWER_L: (Direction.LEFT, False),
-        snapshot.AtomicMove.Characters.UPPER_L: (Direction.LEFT, True),
-        snapshot.AtomicMove.Characters.LOWER_R: (Direction.RIGHT, False),
-        snapshot.AtomicMove.Characters.UPPER_R: (Direction.RIGHT, True),
-        snapshot.AtomicMove.Characters.LOWER_U: (Direction.UP, False),
-        snapshot.AtomicMove.Characters.UPPER_U: (Direction.UP, True),
-        snapshot.AtomicMove.Characters.LOWER_D: (Direction.DOWN, False),
-        snapshot.AtomicMove.Characters.UPPER_D: (Direction.DOWN, True),
+        snapshot.AtomicMoveCharacters.l: (Direction.LEFT, False),
+        snapshot.AtomicMoveCharacters.L: (Direction.LEFT, True),
+        snapshot.AtomicMoveCharacters.r: (Direction.RIGHT, False),
+        snapshot.AtomicMoveCharacters.R: (Direction.RIGHT, True),
+        snapshot.AtomicMoveCharacters.u: (Direction.UP, False),
+        snapshot.AtomicMoveCharacters.U: (Direction.UP, True),
+        snapshot.AtomicMoveCharacters.d: (Direction.DOWN, False),
+        snapshot.AtomicMoveCharacters.D: (Direction.DOWN, True),
     }
 
     _ATOMIC_MOVE_TO_CHR = inverted(_CHR_TO_ATOMIC_MOVE)

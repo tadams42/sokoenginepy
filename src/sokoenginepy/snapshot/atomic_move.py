@@ -3,6 +3,36 @@ from enum import Enum
 from .. import board, tessellation
 
 
+class AtomicMoveCharacters(str, Enum):
+    """
+    Characters used in textual representation of :class:`.Snapshot`.
+
+    Not all variants use all characters. Also, for different variants, same
+    character may have different meaning (represent different
+    :class:`.Direction`).
+    """
+    l = 'l'
+    u = 'u'
+    r = 'r'
+    d = 'd'
+    L = 'L'
+    U = 'U'
+    R = 'R'
+    D = 'D'
+    w = 'w'
+    W = 'W'
+    e = 'e'
+    E = 'E'
+    n = 'n'
+    N = 'N'
+    s = 's'
+    S = 'S'
+
+    @classmethod
+    def values(cls):
+        return (o for o in cls)
+
+
 class AtomicMove:
     """Represents single step of pusher movement.
 
@@ -15,35 +45,6 @@ class AtomicMove:
         - pusher selection - single step in sequence describing focus change of
           active pusher in Multiban games
     """
-
-    class Characters(str, Enum):
-        """
-        Characters used in textual representation of :class:`.AtomicMove`.
-
-        Not all variants use all characters. Also, for different variants, same
-        character may have different meaning (represent different
-        :class:`.Direction`).
-        """
-        LOWER_L = 'l'
-        LOWER_U = 'u'
-        LOWER_R = 'r'
-        LOWER_D = 'd'
-        UPPER_L = 'L'
-        UPPER_U = 'U'
-        UPPER_R = 'R'
-        UPPER_D = 'D'
-        LOWER_NW = 'w'
-        UPPER_NW = 'W'
-        LOWER_SE = 'e'
-        UPPER_SE = 'E'
-        LOWER_NE = 'n'
-        UPPER_NE = 'N'
-        LOWER_SW = 's'
-        UPPER_SW = 'S'
-
-        @classmethod
-        def values(cls):
-            return (o for o in cls)
 
     def __init__(self, direction=tessellation.Direction.LEFT, box_moved=False):
         self._box_moved = False

@@ -3,8 +3,7 @@ import pytest
 
 from sokoenginepy import (CellOrientation, Direction, HexobanBoard,
                           OctobanBoard, SokobanBoard, Tessellation,
-                          TriobanBoard)
-from sokoenginepy import UnknownDirectionError
+                          TriobanBoard, UnknownDirectionError)
 from sokoenginepy.utilities import index_1d, is_on_board_1d
 
 

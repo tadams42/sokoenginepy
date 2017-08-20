@@ -9,7 +9,7 @@ from .board import (DEFAULT_PIECE_ID, BoardCell, BoardCellCharacters,
 from .game import IllegalMoveError, Mover, NonPlayableBoardError, SolvingMode
 from .input_output import (Puzzle, PuzzlesCollection, PuzzleSnapshot,
                            SOKFileFormat, SOKTags)
-from .snapshot import (AtomicMove, Snapshot,
+from .snapshot import (AtomicMove, AtomicMoveCharacters, Snapshot,
                        SnapshotConversionError)
 from .tessellation import (CellOrientation, Direction, Tessellation,
                            UnknownDirectionError, UnknownTessellationError)

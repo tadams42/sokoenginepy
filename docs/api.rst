@@ -11,4 +11,3 @@ API reference
     _api/sokoenginepy.input_output
     _api/sokoenginepy.settings
     _api/sokoenginepy.utilities
-    _api/sokoenginepy.exceptions

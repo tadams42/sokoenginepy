@@ -4,9 +4,9 @@ from itertools import permutations
 import pytest
 from pytest_mock import mocker
 
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction, Mover,
+from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction,
+                          IllegalMoveError, Mover, NonPlayableBoardError,
                           SokobanBoard, SolvingMode)
-from sokoenginepy import IllegalMoveError, NonPlayableBoardError
 from sokoenginepy.utilities import index_1d
 
 from .. import fixtures

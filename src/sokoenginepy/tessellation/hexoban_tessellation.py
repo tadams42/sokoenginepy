@@ -19,18 +19,18 @@ class HexobanTessellation(
     )
 
     _CHR_TO_ATOMIC_MOVE = {
-        snapshot.AtomicMove.Characters.LOWER_L: (Direction.LEFT, False),
-        snapshot.AtomicMove.Characters.UPPER_L: (Direction.LEFT, True),
-        snapshot.AtomicMove.Characters.LOWER_R: (Direction.RIGHT, False),
-        snapshot.AtomicMove.Characters.UPPER_R: (Direction.RIGHT, True),
-        snapshot.AtomicMove.Characters.LOWER_U: (Direction.NORTH_WEST, False),
-        snapshot.AtomicMove.Characters.UPPER_U: (Direction.NORTH_WEST, True),
-        snapshot.AtomicMove.Characters.LOWER_D: (Direction.SOUTH_EAST, False),
-        snapshot.AtomicMove.Characters.UPPER_D: (Direction.SOUTH_EAST, True),
-        snapshot.AtomicMove.Characters.LOWER_NE: (Direction.NORTH_EAST, False),
-        snapshot.AtomicMove.Characters.UPPER_NE: (Direction.NORTH_EAST, True),
-        snapshot.AtomicMove.Characters.LOWER_SW: (Direction.SOUTH_WEST, False),
-        snapshot.AtomicMove.Characters.UPPER_SW: (Direction.SOUTH_WEST, True),
+        snapshot.AtomicMoveCharacters.l: (Direction.LEFT, False),
+        snapshot.AtomicMoveCharacters.L: (Direction.LEFT, True),
+        snapshot.AtomicMoveCharacters.r: (Direction.RIGHT, False),
+        snapshot.AtomicMoveCharacters.R: (Direction.RIGHT, True),
+        snapshot.AtomicMoveCharacters.u: (Direction.NORTH_WEST, False),
+        snapshot.AtomicMoveCharacters.U: (Direction.NORTH_WEST, True),
+        snapshot.AtomicMoveCharacters.d: (Direction.SOUTH_EAST, False),
+        snapshot.AtomicMoveCharacters.D: (Direction.SOUTH_EAST, True),
+        snapshot.AtomicMoveCharacters.n: (Direction.NORTH_EAST, False),
+        snapshot.AtomicMoveCharacters.N: (Direction.NORTH_EAST, True),
+        snapshot.AtomicMoveCharacters.s: (Direction.SOUTH_WEST, False),
+        snapshot.AtomicMoveCharacters.S: (Direction.SOUTH_WEST, True),
     }
 
     _ATOMIC_MOVE_TO_CHR = inverted(_CHR_TO_ATOMIC_MOVE)

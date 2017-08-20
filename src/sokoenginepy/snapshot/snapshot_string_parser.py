@@ -4,11 +4,11 @@ from functools import reduce
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
 from .. import settings, utilities
-from .atomic_move import AtomicMove
+from .atomic_move import AtomicMove, AtomicMoveCharacters
 from .snapshot import Snapshot, SnapshotConversionError
 
 _RE_SNAPSHOT_STRING = re.compile(
-    r"^([0-9\s" + re.escape("".join(c for c in AtomicMove.Characters)) +
+    r"^([0-9\s" + re.escape("".join(c for c in AtomicMoveCharacters)) +
     re.escape("".join(c for c in Snapshot.NonMoveCharacters)
              ) + re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
 )
@@ -21,7 +21,7 @@ class SnapshotStringParser:
     """
 
     atomic_moves = Regex(
-        "([" + "".join(c for c in AtomicMove.Characters) + "])+"
+        "([" + "".join(c for c in AtomicMoveCharacters) + "])+"
     )
     jump = Group(
         oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN) + ZeroOrMore(atomic_moves)

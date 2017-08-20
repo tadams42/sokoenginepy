@@ -1,7 +1,7 @@
 import pytest
 
-from sokoenginepy import AtomicMove, Direction, SolvingMode, Tessellation
-from sokoenginepy import SnapshotConversionError
+from sokoenginepy import (AtomicMove, Direction, SnapshotConversionError,
+                          SolvingMode, Tessellation)
 from sokoenginepy.snapshot.snapshot_string_parser import SnapshotStringParser
 
 from ..fixtures import SnapshotFactory
