@@ -3,5 +3,6 @@
 
 #include "common_types.hpp"
 #include "direction.hpp"
+#include "board_cell.hpp"
 
 #endif // HEADER_GUARD

@@ -29,11 +29,13 @@ libsokoengine = Extension(
     sources=[
         os.path.join('src', 'libsokoengine', file_name) for file_name in [
             'direction.cpp',
+            'board_cell.cpp',
         ]
     ] + [
         os.path.join('src', 'ext', file_name) for file_name in [
             'export_common.cpp',
             'export_direction.cpp',
+            'export_board_cell.cpp',
             'export_libsokoengine.cpp',
         ]
     ],
