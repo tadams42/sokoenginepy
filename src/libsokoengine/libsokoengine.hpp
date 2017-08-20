@@ -5,6 +5,7 @@
 #include "direction.hpp"
 #include "board_cell.hpp"
 #include "atomic_move.hpp"
+#include "board_graph.hpp"
 #include "sokoban_tessellation.hpp"
 #include "hexoban_tessellation.hpp"
 #include "octoban_tessellation.hpp"
