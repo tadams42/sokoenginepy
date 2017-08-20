@@ -31,6 +31,12 @@ libsokoengine = Extension(
             'direction.cpp',
             'board_cell.cpp',
             'atomic_move.cpp',
+            'exceptions.cpp',
+            'tessellation_base.cpp',
+            'sokoban_tessellation.cpp',
+            'hexoban_tessellation.cpp',
+            'octoban_tessellation.cpp',
+            'trioban_tessellation.cpp',
         ]
     ] + [
         os.path.join('src', 'ext', file_name) for file_name in [
@@ -38,6 +44,7 @@ libsokoengine = Extension(
             'export_direction.cpp',
             'export_board_cell.cpp',
             'export_atomic_move.cpp',
+            'export_tessellations.cpp',
             'export_libsokoengine.cpp',
         ]
     ],

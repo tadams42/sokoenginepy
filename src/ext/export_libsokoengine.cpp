@@ -6,6 +6,7 @@ void export_common();
 void export_direction();
 void export_board_cell();
 void export_atomic_move();
+void export_tessellations();
 
 BOOST_PYTHON_MODULE(libsokoengine)
 {
@@ -13,4 +14,5 @@ BOOST_PYTHON_MODULE(libsokoengine)
   export_direction();
   export_board_cell();
   export_atomic_move();
+  export_tessellations();
 }

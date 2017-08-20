@@ -19,6 +19,11 @@ enum class LIBSOKOENGINE_API CellOrientation : int {
   OCTAGON = 2
 };
 
+enum class LIBSOKOENGINE_API GraphType : int {
+  DIRECTED = 0,
+  DIRECTED_MULTI = 1
+};
+
 enum BoardConstants {
   ///
   /// Default ID of a piece (box, goal or pusher)
