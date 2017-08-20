@@ -419,31 +419,31 @@ class DescribeBoardGraph:
                 self.board_graph.normalized_pusher_position(42000)
 
     class describe_path_destination:
-        def it_calculates_destination_position_from_source_and_direction_path(
+        def it_calculates_destination_position_from_source_and_directions_path(
             self, board_graph, board_width
         ):
-            direction_path = [Direction.UP, Direction.RIGHT]
+            directions_path = [Direction.UP, Direction.RIGHT]
             start_position = index_1d(11, 8, board_width)
             assert board_graph.path_destination(
-                start_position, direction_path
+                start_position, directions_path
             ) == index_1d(12, 7, board_width)
 
         def it_silently_stops_search_on_first_off_board_position(
             self, board_graph, board_width
         ):
-            direction_path = [Direction.DOWN, Direction.DOWN, Direction.DOWN]
+            directions_path = [Direction.DOWN, Direction.DOWN, Direction.DOWN]
             start_position = index_1d(11, 8, board_width)
             assert board_graph.path_destination(
-                start_position, direction_path
+                start_position, directions_path
             ) == index_1d(11, 10, board_width)
 
         def it_silently_stops_search_on_illegal_direction(
             self, board_graph, board_width
         ):
-            direction_path = [Direction.DOWN, Direction.NORTH_WEST]
+            directions_path = [Direction.DOWN, Direction.NORTH_WEST]
             start_position = index_1d(11, 8, board_width)
             assert board_graph.path_destination(
-                start_position, direction_path
+                start_position, directions_path
             ) == index_1d(11, 9, board_width)
 
         def it_raises_if_start_position_is_of_board(self, board_graph):

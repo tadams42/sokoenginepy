@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from sokoenginepy import BoardCell, BoardCellCharacters, settings
+from sokoenginepy import BoardCell, BoardCellCharacters
 
 from ..fixtures import BoardCellFactory
 

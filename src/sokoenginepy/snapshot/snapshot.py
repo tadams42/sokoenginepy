@@ -190,9 +190,14 @@ class Snapshot(MutableSequence):
         self._jumps_count_invalidated = False
         self._moves = []
 
-    def __str__(self):
+    def to_str(self, break_long_lines_at=80, rle_encode=False):
         from .snapshot_string_parser import SnapshotStringParser
-        return SnapshotStringParser.convert_to_string(self)
+        return SnapshotStringParser.convert_to_string(
+            self, break_long_lines_at=break_long_lines_at, rle_encode=rle_encode
+        )
+
+    def __str__(self):
+        return self.to_str()
 
     def _before_removing_move(self, atomic_move):
         if not atomic_move.is_pusher_selection:

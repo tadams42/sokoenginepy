@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from collections.abc import Container
 from functools import reduce
 
-from .. import settings, tessellation, utilities
+from .. import tessellation, utilities
 from .board_cell import BoardCell, BoardCellCharacters, BoardConversionError
 from .graph import BoardGraph
 
@@ -42,7 +42,6 @@ class VariantBoard(Container, metaclass=ABCMeta):
         cls, tessellation_or_description, board_width=0, board_height=0,
         board_str=""
     ):
-
         #pylint: disable=unused-variable
         from .hexoban_board import HexobanBoard
         from .octoban_board import OctobanBoard
@@ -61,28 +60,6 @@ class VariantBoard(Container, metaclass=ABCMeta):
                 )
 
         raise tessellation.UnknownTessellationError(tessellation)
-
-    def __init__(
-        self, tessellation_or_description, board_width=0, board_height=0,
-        board_str=""
-    ):
-        super().__init__()
-        self._tessellation_instance = tessellation.Tessellation.instance_from(
-            tessellation_or_description
-        ).value
-        self._graph = None
-        self._width = 0
-        self._height = 0
-        self._resizer = self._resizer_class(self)
-
-        if not utilities.is_blank(board_str):
-            self._reinit_with_string(board_str)
-        else:
-            self._reinit(board_width, board_height)
-
-    @property
-    def tessellation(self):
-        return self._tessellation_instance
 
     @classmethod
     def is_board_string(cls, line):
@@ -121,6 +98,28 @@ class VariantBoard(Container, metaclass=ABCMeta):
         line = utilities.rle_decode(line)
         return utilities.normalize_width(line.split('\n'))
 
+    def __init__(
+        self, tessellation_or_description, board_width=0, board_height=0,
+        board_str=""
+    ):
+        super().__init__()
+        self._tessellation_instance = tessellation.Tessellation.instance_from(
+            tessellation_or_description
+        ).value
+        self._graph = None
+        self._width = 0
+        self._height = 0
+        self._resizer = self._resizer_class(self)
+
+        if not utilities.is_blank(board_str):
+            self._reinit_with_string(board_str)
+        else:
+            self._reinit(board_width, board_height)
+
+    @property
+    def tessellation(self):
+        return self._tessellation_instance
+
     @property
     @abstractmethod
     def _resizer_class(self):
@@ -154,8 +153,8 @@ class VariantBoard(Container, metaclass=ABCMeta):
     def _reinit_with_string(self, board_str, reconfigure_edges=True):
         if not utilities.is_blank(board_str):
             board_rows = self._parse_string(board_str)
-            width = len(board_rows[0]) if len(board_rows) > 0 else 0
             height = len(board_rows)
+            width = len(board_rows[0]) if height > 0 else 0
             self._reinit(width, height, reconfigure_edges)
             for y, row in enumerate(board_rows):
                 for x, character in enumerate(row):
@@ -196,16 +195,11 @@ class VariantBoard(Container, metaclass=ABCMeta):
     def __contains__(self, position):
         return position in self._graph
 
-    def __str__(self):
-        """
-        Override this in subclass to handle tessellation speciffic strings.
-        """
+    def to_str(self, use_visible_floor=False, rle_encode=False):
         rows = []
         for y in range(0, self.height):
             row = "".join(
-                cell.to_str(
-                    use_visible_floor=settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
-                )
+                cell.to_str(use_visible_floor=use_visible_floor)
                 for cell in (
                     self[utilities.index_1d(x, y, self.width)]
                     for x in range(0, self.width)
@@ -213,14 +207,17 @@ class VariantBoard(Container, metaclass=ABCMeta):
             )
             # Intentionally rstripping only if not using visible floors
             row = row.rstrip()
-            if settings.RLE_ENCODE_BOARD_STRINGS:
+            if rle_encode:
                 row = utilities.rle_encode(row)
             rows.append(row)
 
-        if settings.RLE_ENCODE_BOARD_STRINGS:
+        if rle_encode:
             return utilities.RleCharacters.RLE_ROW_SEPARATOR.join(rows)
         else:
             return "\n".join(rows)
+
+    def __str__(self):
+        return self.to_str(use_visible_floor=False, rle_encode=False)
 
     def __repr__(self):
         board_str = textwrap.indent(
@@ -304,8 +301,8 @@ class VariantBoard(Container, metaclass=ABCMeta):
             pusher_position, excluded_positions
         )
 
-    def path_destination(self, start_position, direction_path):
-        return self._graph.path_destination(start_position, direction_path)
+    def path_destination(self, start_position, directions_path):
+        return self._graph.path_destination(start_position, directions_path)
 
     def find_jump_path(self, start_position, end_position):
         """
@@ -331,18 +328,18 @@ class VariantBoard(Container, metaclass=ABCMeta):
             position, self._width, self._height
         )
 
-    def positions_path_to_directions_path(self, position_path):
+    def positions_path_to_directions_path(self, positions_path):
         """
         Converts path expressed as vertices' indexes to one expressed as
         :class:`.Direction`
 
         Args:
-            position_path (list): list of integer positions
+            positions_path (list): list of integer positions
 
         Returns:
             list: of :class:`.Direction` instances
         """
-        return self._graph.positions_path_to_directions_path(position_path)
+        return self._graph.positions_path_to_directions_path(positions_path)
 
     def add_row_top(self):
         self._resizer.add_row_top(reconfigure_edges=True)

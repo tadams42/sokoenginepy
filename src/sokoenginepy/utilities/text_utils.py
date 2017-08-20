@@ -59,3 +59,12 @@ def drop_blank(string_list):
 def drop_empty(string_list):
     """Removes empty strings from list."""
     return [l for l in string_list if len(l) > 0]
+
+
+def should_insert_line_break_at(position, line_length=80):
+    """
+    For given ``position`` in string, should we insert line break?
+    """
+    if line_length > 0 and position:
+        return (position % line_length) == 0
+    return False

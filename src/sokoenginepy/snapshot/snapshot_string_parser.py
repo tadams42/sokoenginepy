@@ -3,7 +3,7 @@ from functools import reduce
 
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
-from .. import settings, utilities
+from .. import utilities
 from .atomic_move import AtomicMove, AtomicMoveCharacters
 from .snapshot import Snapshot, SnapshotConversionError
 
@@ -66,7 +66,9 @@ class SnapshotStringParser:
             to_snapshot.append(atomic_move)
 
     @classmethod
-    def convert_to_string(cls, snapshot):
+    def convert_to_string(
+        cls, snapshot, rle_encode, break_long_lines_at=80
+    ):
         from .. import game
 
         retv = ""
@@ -129,14 +131,16 @@ class SnapshotStringParser:
                     conversion_ok = False
                 i += 1
 
-        if conversion_ok and settings.RLE_ENCODE_BOARD_STRINGS:
+        if conversion_ok and rle_encode:
             retv = utilities.rle_encode(retv)
 
-        if conversion_ok and settings.BREAK_LONG_SNAPSHOT_STRINGS:
+        if conversion_ok and break_long_lines_at:
             tmp = ""
             for i, character in enumerate(retv):
                 tmp += character
-                if settings.should_insert_line_break_at(i + 1):
+                if utilities.should_insert_line_break_at(
+                    i + 1, break_long_lines_at
+                ):
                     tmp += "\n"
             retv = tmp
 

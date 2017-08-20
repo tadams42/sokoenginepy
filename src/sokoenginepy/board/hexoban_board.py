@@ -1,4 +1,4 @@
-from .. import settings, tessellation, utilities
+from .. import tessellation, utilities
 from .board_cell import BoardCell, BoardCellCharacters, BoardConversionError
 from .sokoban_board import SokobanBoard
 from .variant_board import VariantBoard, VariantBoardResizer
@@ -17,8 +17,7 @@ class HexobanBoard(VariantBoard):
         return HexobanBoardResizer
 
     def _parse_string(self, board_str):
-        parsed, layout_ok = HexobanTextConverter(
-        ).convert_to_internal(board_str)
+        parsed, layout_ok = HexobanTextConverter().convert_to_internal(board_str)
 
         if layout_ok:
             return parsed
@@ -28,8 +27,10 @@ class HexobanBoard(VariantBoard):
                 "multiple characters per single board cell"
             )
 
-    def __str__(self):
-        return HexobanTextConverter().convert_to_string(self)
+    def to_str(self, use_visible_floor=False, rle_encode=False):
+        return HexobanTextConverter().convert_to_string(
+            self, use_visible_floor, rle_encode
+        )
 
 
 class HexobanBoardResizer(VariantBoardResizer):
@@ -71,32 +72,6 @@ class HexobanBoardResizer(VariantBoardResizer):
 
 
 class HexobanTextConverter:
-    # def _debug_print(self, input, expected):
-    #     print(
-    #         "{0:<30}{1:<30}{2:<30}{3:<30}".
-    #         format("input", "expected", "converted", "internal")
-    #     )
-    #
-    #     input_lines = input.splitlines()
-    #     expected_lines = expected.splitlines()
-    #
-    #     tmp_use_visible_floors = settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
-    #     settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = True
-    #
-    #     converted_lines = str(HexobanBoard(board_str=input)).splitlines()
-    #
-    #     settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = tmp_use_visible_floors
-    #
-    #     internal_lines = self.convert_to_internal(input)[0]
-    #
-    #     for i in range(0, len(internal_lines)):
-    #         print(
-    #             "{0:<30}{1:<30}{2:<30}{3:<30}".format(
-    #                 input_lines[i], expected_lines[i], converted_lines[i],
-    #                 internal_lines[i]
-    #             )
-    #         )
-
     def convert_to_internal(self, src_str):
         # Converts textual Hexoban into 2D array and validates textual layout
 
@@ -138,31 +113,36 @@ class HexobanTextConverter:
 
         return internal, layout_ok
 
-    def convert_to_string(self, hexoban_board):
+    def convert_to_string(
+        self, hexoban_board, use_visible_floor=False, rle_encode=False
+    ):
+        floor_character = (
+            BoardCellCharacters.VISIBLE_FLOOR
+            if use_visible_floor else BoardCellCharacters.FLOOR
+        )
+
         retv = []
         for row in range(0, hexoban_board.height):
             line = []
             if row % 2 == 1:
                 # beginning half hex for odd rows
-                line.append(self.floor_character)
+                line.append(floor_character)
 
             for col in range(0, hexoban_board.width):
-                line.append(self.floor_character)
+                line.append(floor_character)
                 line.append(
                     hexoban_board[
                         utilities. index_1d(col, row, hexoban_board.width)
-                    ].to_str(
-                        settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS
-                    )
+                    ].to_str(use_visible_floor)
                 )
 
             retv.append("".join(line))
 
-        retv = utilities.normalize_width(retv, self.floor_character)
+        retv = utilities.normalize_width(retv, floor_character)
         if self._is_type1(retv):
             retv = self._remove_column_right(retv)
 
-        if settings.RLE_ENCODE_BOARD_STRINGS:
+        if rle_encode:
             return utilities.RleCharacters.RLE_ROW_SEPARATOR.join(
                 utilities.rle_encode(line) for line in retv
             )
@@ -270,19 +250,11 @@ class HexobanTextConverter:
 
         return parsed, width, height, even_row_x_parity, odd_row_x_parity
 
-    @property
-    def floor_character(self):
-        return (
-            BoardCellCharacters.VISIBLE_FLOOR
-            if settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS else
-            BoardCellCharacters.FLOOR
-        )
-
     def _add_column_left(self, string_list):
-        return [self.floor_character + line for line in string_list]
+        return [BoardCellCharacters.FLOOR + line for line in string_list]
 
     def _add_column_right(self, string_list):
-        return [line + self.floor_character for line in string_list]
+        return [line + BoardCellCharacters.FLOOR for line in string_list]
 
     @staticmethod
     def _remove_column_right(string_list):

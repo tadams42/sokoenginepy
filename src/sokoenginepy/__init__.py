@@ -1,4 +1,4 @@
-from . import settings, utilities
+from . import utilities
 from .board import (DEFAULT_PIECE_ID, BoardCell, BoardCellCharacters,
                     BoardConversionError, BoardGraph, BoardState,
                     BoxGoalSwitchError, CellAlreadyOccupiedError, GraphType,
