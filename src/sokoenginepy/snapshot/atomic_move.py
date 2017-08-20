@@ -3,6 +3,10 @@ from enum import Enum
 from .. import board, tessellation
 
 
+class InvalidAtomicMoveError(ValueError):
+    pass
+
+
 class AtomicMoveCharacters(str, Enum):
     """
     Characters used in textual representation of :class:`.Snapshot`.
@@ -46,19 +50,53 @@ class AtomicMove:
           active pusher in Multiban games
     """
 
-    def __init__(self, direction=tessellation.Direction.LEFT, box_moved=False):
+    def __init__(
+        self, direction=tessellation.Direction.LEFT, box_moved=False,
+        is_jump=False, is_pusher_selection=False,
+        pusher_id=board.DEFAULT_PIECE_ID, moved_box_id=None,
+    ):
+        if (box_moved or moved_box_id) and is_pusher_selection and is_jump:
+            raise InvalidAtomicMoveError(
+                "AtomicMove can't be all, a push, a jump and a pusher "
+                "selection!"
+            )
+
+        if is_jump and is_pusher_selection:
+            raise InvalidAtomicMoveError(
+                "AtomicMove can't be both, a jump and a pusher selection!"
+            )
+
+        if (box_moved or moved_box_id) and is_jump:
+            raise InvalidAtomicMoveError(
+                "AtomicMove can't be both, a push and a jump!"
+            )
+
+        if (box_moved or moved_box_id) and is_pusher_selection:
+            raise InvalidAtomicMoveError(
+                "AtomicMove can't be both, a push and a pusher selection!"
+            )
+
         self._box_moved = False
         self._pusher_selected = False
         self._pusher_jumped = False
         self._pusher_id = board.DEFAULT_PIECE_ID
         self._moved_box_id = None
-
         self.direction = direction
+
         #pylint: disable=simplifiable-if-statement
         if box_moved:
             self.is_push_or_pull = True
         else:
             self.is_move = True
+
+        if moved_box_id:
+            self.moved_box_id = moved_box_id
+
+        if is_jump:
+            self.is_jump = is_jump
+
+        if is_pusher_selection:
+            self.is_pusher_selection = is_pusher_selection
 
     @classmethod
     def is_atomic_move_chr(cls, character):

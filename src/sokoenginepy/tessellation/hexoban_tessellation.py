@@ -1,4 +1,3 @@
-from .. import snapshot
 from ..utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from .direction import Direction, UnknownDirectionError
 from .tessellation_base import (TessellationBase,
@@ -8,7 +7,6 @@ from .tessellation_base import (TessellationBase,
 class HexobanTessellation(
     TessellationBase, metaclass=TessellationBaseInheritableDocstrings
 ):
-
     _LEGAL_DIRECTIONS = (
         Direction.LEFT,
         Direction.RIGHT,
@@ -18,22 +16,8 @@ class HexobanTessellation(
         Direction.SOUTH_WEST,
     )
 
-    _CHR_TO_ATOMIC_MOVE = {
-        snapshot.AtomicMoveCharacters.l: (Direction.LEFT, False),
-        snapshot.AtomicMoveCharacters.L: (Direction.LEFT, True),
-        snapshot.AtomicMoveCharacters.r: (Direction.RIGHT, False),
-        snapshot.AtomicMoveCharacters.R: (Direction.RIGHT, True),
-        snapshot.AtomicMoveCharacters.u: (Direction.NORTH_WEST, False),
-        snapshot.AtomicMoveCharacters.U: (Direction.NORTH_WEST, True),
-        snapshot.AtomicMoveCharacters.d: (Direction.SOUTH_EAST, False),
-        snapshot.AtomicMoveCharacters.D: (Direction.SOUTH_EAST, True),
-        snapshot.AtomicMoveCharacters.n: (Direction.NORTH_EAST, False),
-        snapshot.AtomicMoveCharacters.N: (Direction.NORTH_EAST, True),
-        snapshot.AtomicMoveCharacters.s: (Direction.SOUTH_WEST, False),
-        snapshot.AtomicMoveCharacters.S: (Direction.SOUTH_WEST, True),
-    }
-
-    _ATOMIC_MOVE_TO_CHR = inverted(_CHR_TO_ATOMIC_MOVE)
+    _CHR_TO_ATOMIC_MOVE = None
+    _ATOMIC_MOVE_TO_CHR = None
 
     @property
     @copy_ancestor_docstring
@@ -79,10 +63,30 @@ class HexobanTessellation(
 
     @property
     def _char_to_atomic_move_dict(self):
+        if not self.__class__._CHR_TO_ATOMIC_MOVE:
+            from .. import snapshot
+            self.__class__._CHR_TO_ATOMIC_MOVE = {
+                snapshot.AtomicMoveCharacters.l: (Direction.LEFT, False),
+                snapshot.AtomicMoveCharacters.L: (Direction.LEFT, True),
+                snapshot.AtomicMoveCharacters.r: (Direction.RIGHT, False),
+                snapshot.AtomicMoveCharacters.R: (Direction.RIGHT, True),
+                snapshot.AtomicMoveCharacters.u: (Direction.NORTH_WEST, False),
+                snapshot.AtomicMoveCharacters.U: (Direction.NORTH_WEST, True),
+                snapshot.AtomicMoveCharacters.d: (Direction.SOUTH_EAST, False),
+                snapshot.AtomicMoveCharacters.D: (Direction.SOUTH_EAST, True),
+                snapshot.AtomicMoveCharacters.n: (Direction.NORTH_EAST, False),
+                snapshot.AtomicMoveCharacters.N: (Direction.NORTH_EAST, True),
+                snapshot.AtomicMoveCharacters.s: (Direction.SOUTH_WEST, False),
+                snapshot.AtomicMoveCharacters.S: (Direction.SOUTH_WEST, True),
+            }
         return self._CHR_TO_ATOMIC_MOVE
 
     @property
     def _atomic_move_to_char_dict(self):
+        if not self.__class__._ATOMIC_MOVE_TO_CHR:
+            self.__class__._ATOMIC_MOVE_TO_CHR = inverted(
+                self._char_to_atomic_move_dict
+            )
         return self._ATOMIC_MOVE_TO_CHR
 
     def __str__(self):

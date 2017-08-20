@@ -1,4 +1,3 @@
-from .. import snapshot
 from ..utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from .direction import Direction, UnknownDirectionError
 from .tessellation_base import (TessellationBase,
@@ -12,18 +11,8 @@ class SokobanTessellation(
         Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN
     )
 
-    _CHR_TO_ATOMIC_MOVE = {
-        snapshot.AtomicMoveCharacters.l: (Direction.LEFT, False),
-        snapshot.AtomicMoveCharacters.L: (Direction.LEFT, True),
-        snapshot.AtomicMoveCharacters.r: (Direction.RIGHT, False),
-        snapshot.AtomicMoveCharacters.R: (Direction.RIGHT, True),
-        snapshot.AtomicMoveCharacters.u: (Direction.UP, False),
-        snapshot.AtomicMoveCharacters.U: (Direction.UP, True),
-        snapshot.AtomicMoveCharacters.d: (Direction.DOWN, False),
-        snapshot.AtomicMoveCharacters.D: (Direction.DOWN, True),
-    }
-
-    _ATOMIC_MOVE_TO_CHR = inverted(_CHR_TO_ATOMIC_MOVE)
+    _CHR_TO_ATOMIC_MOVE = None
+    _ATOMIC_MOVE_TO_CHR = None
 
     @property
     @copy_ancestor_docstring
@@ -67,10 +56,26 @@ class SokobanTessellation(
 
     @property
     def _char_to_atomic_move_dict(self):
+        if not self.__class__._CHR_TO_ATOMIC_MOVE:
+            from .. import snapshot
+            self.__class__._CHR_TO_ATOMIC_MOVE = {
+                snapshot.AtomicMoveCharacters.l: (Direction.LEFT, False),
+                snapshot.AtomicMoveCharacters.L: (Direction.LEFT, True),
+                snapshot.AtomicMoveCharacters.r: (Direction.RIGHT, False),
+                snapshot.AtomicMoveCharacters.R: (Direction.RIGHT, True),
+                snapshot.AtomicMoveCharacters.u: (Direction.UP, False),
+                snapshot.AtomicMoveCharacters.U: (Direction.UP, True),
+                snapshot.AtomicMoveCharacters.d: (Direction.DOWN, False),
+                snapshot.AtomicMoveCharacters.D: (Direction.DOWN, True),
+            }
         return self._CHR_TO_ATOMIC_MOVE
 
     @property
     def _atomic_move_to_char_dict(self):
+        if not self.__class__._ATOMIC_MOVE_TO_CHR:
+            self.__class__._ATOMIC_MOVE_TO_CHR = inverted(
+                self._char_to_atomic_move_dict
+            )
         return self._ATOMIC_MOVE_TO_CHR
 
     def __str__(self):
