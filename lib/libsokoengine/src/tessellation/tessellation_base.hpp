@@ -4,10 +4,10 @@
 #include <stdexcept>
 
 #include "common_types.hpp"
+#include "direction.hpp"
 
 namespace sokoengine {
 
-class Direction;
 class AtomicMove;
 
 class LIBSOKOENGINE_API UnknownDirectionError: public std::invalid_argument {
@@ -45,7 +45,7 @@ public:
 ///
 /// Converts 2D board position to 1D board position
 ///
-constexpr position_t INDEX(position_t x, position_t y, size_t board_width) {
+constexpr position_t index_1d(position_t x, position_t y, size_t board_width) {
   return y * board_width + x;
 }
 

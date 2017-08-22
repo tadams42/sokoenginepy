@@ -6,9 +6,12 @@
 #include "board_cell.hpp"
 #include "atomic_move.hpp"
 #include "board_graph.hpp"
+
+#include "tessellation_base.hpp"
 #include "sokoban_tessellation.hpp"
 #include "hexoban_tessellation.hpp"
 #include "octoban_tessellation.hpp"
 #include "trioban_tessellation.hpp"
+#include "tessellation.hpp"
 
 #endif // HEADER_GUARD

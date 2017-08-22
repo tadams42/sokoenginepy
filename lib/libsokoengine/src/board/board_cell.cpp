@@ -6,6 +6,18 @@ using namespace std;
 
 namespace sokoengine {
 
+BoardConversionError::BoardConversionError(const string& mess):
+  runtime_error(mess)
+{}
+
+BoardConversionError::~BoardConversionError() = default;
+
+IllegalBoardCharacterError::IllegalBoardCharacterError(const string& mess):
+  invalid_argument(mess)
+{}
+
+IllegalBoardCharacterError::~IllegalBoardCharacterError() = default;
+
 BoardCell::BoardCell(char rv, bool is_in_playable_area, bool is_deadlock) :
   m_box(false), m_pusher(false), m_goal(false), m_wall(false),
   m_playable(is_in_playable_area), m_deadlock(is_deadlock)
@@ -26,7 +38,9 @@ BoardCell::BoardCell(char rv, bool is_in_playable_area, bool is_deadlock) :
     } else if (is_goal_chr(rv)) {
       set_has_goal(true);
     } else {
-      throw invalid_argument("Invalid character in BoardCell constructor!");
+      throw IllegalBoardCharacterError(
+        "Invalid character in BoardCell constructor!"
+      );
     }
   }
 }

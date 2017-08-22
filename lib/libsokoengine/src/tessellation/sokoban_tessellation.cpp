@@ -36,7 +36,7 @@ position_t SokobanTessellation::neighbor_position (
     row += shift.first;
     column += shift.second;
     if (ON_BOARD(column, row, board_width, board_height))
-      return INDEX(column, row, board_width);
+      return index_1d(column, row, board_width);
   }
   return NULL_POSITION;
 }

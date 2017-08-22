@@ -1,7 +1,9 @@
+#include <memory>
 #include <boost/python.hpp>
 #include <boost/python/raw_function.hpp>
 #include <sokoengine.hpp>
 
+using namespace std;
 using namespace boost::python;
 using namespace sokoengine;
 
@@ -40,87 +42,51 @@ void pusher_id_setter_wraper(AtomicMove &atomic_move, const object& val) {
   atomic_move.set_pusher_id(rv);
 }
 
-object AtomicMove_init(tuple args, dict kwargs) {
-  Direction direction = Direction::LEFT;
-  bool box_moved = false, is_jump = false, is_pusher_selection = false;
-  piece_id_t pusher_id = DEFAULT_PIECE_ID, moved_box_id = NULL_ID;
-
-  auto moved_box_id_extractor = [&] (const object& obj) -> piece_id_t {
-    if (!obj.is_none()) return extract<piece_id_t>(obj);
-    else return NULL_ID;
-  };
-
-  switch (len(args)) {
-    case 7:
-      direction = extract<Direction>(args[1]);
-      box_moved = extract<bool>(args[2]);
-      is_jump = extract<bool>(args[3]);
-      is_pusher_selection = extract<bool>(args[4]);
-      pusher_id = extract<piece_id_t>(args[5]);
-      moved_box_id = moved_box_id_extractor(args[6]);
-      break;
-    case 6:
-      direction = extract<Direction>(args[1]);
-      box_moved = extract<bool>(args[2]);
-      is_jump = extract<bool>(args[3]);
-      is_pusher_selection = extract<bool>(args[4]);
-      pusher_id = extract<piece_id_t>(args[5]);
-      break;
-    case 5:
-      direction = extract<Direction>(args[1]);
-      box_moved = extract<bool>(args[2]);
-      is_jump = extract<bool>(args[3]);
-      is_pusher_selection = extract<bool>(args[4]);
-      break;
-    case 4:
-      direction = extract<Direction>(args[1]);
-      box_moved = extract<bool>(args[2]);
-      is_jump = extract<bool>(args[3]);
-      break;
-    case 3:
-      direction = extract<Direction>(args[1]);
-      box_moved = extract<bool>(args[2]);
-      break;
-    case 2:
-      direction = extract<Direction>(args[1]);
-  }
-
-  if (kwargs.contains("direction"))
-    direction = extract<Direction>(kwargs["direction"]);
-  if (kwargs.contains("box_moved"))
-    box_moved = extract<bool>(kwargs["box_moved"]);
-  if (kwargs.contains("is_jump"))
-    is_jump = extract<bool>(kwargs["is_jump"]);
-  if (kwargs.contains("is_pusher_selection"))
-    is_pusher_selection = extract<bool>(kwargs["is_pusher_selection"]);
-  if (kwargs.contains("pusher_id"))
-    pusher_id = extract<piece_id_t>(kwargs["pusher_id"]);
-  if (kwargs.contains("moved_box_id"))
-    moved_box_id = moved_box_id_extractor(kwargs["moved_box_id"]);
-
-  return args[0].attr("__init__")(
-    direction, box_moved, is_jump, is_pusher_selection, pusher_id, moved_box_id
+shared_ptr<AtomicMove> AtomicMove_init(
+  const Direction& direction,
+  bool box_moved,
+  bool is_jump,
+  bool is_pusher_selection,
+  piece_id_t pusher_id,
+  const object& moved_box_id
+) {
+  int moved_box_id_converted = NULL_ID;
+  if (!moved_box_id.is_none())
+    moved_box_id_converted = extract<int>(moved_box_id);
+  return make_shared<AtomicMove>(
+    direction,
+    box_moved,
+    is_jump,
+    is_pusher_selection,
+    pusher_id,
+    moved_box_id_converted
   );
 }
 
 void export_atomic_move() {
-  scope in_AtomicMove = class_<AtomicMove>("AtomicMove", no_init)
-    .def("__init__", raw_function(AtomicMove_init)) // raw constructor
-    .def(
-      init<Direction, bool, bool, bool, piece_id_t, piece_id_t>(
-        args(
-          "direction", "box_moved", "is_jump", "is_pusher_selection",
-          "pusher_id", "moved_box_id"
-        )
+  class_<AtomicMove>("AtomicMove")
+    .def("__init__", make_constructor(
+      AtomicMove_init,
+      default_call_policies(),
+      (
+        boost::python::arg("direction")=Direction::LEFT,
+        boost::python::arg("box_moved")=false,
+        boost::python::arg("is_jump")=false,
+        boost::python::arg("is_pusher_selection")=false,
+        // Without this static_cast extension segfaults on import
+        boost::python::arg("pusher_id")=static_cast<int>(DEFAULT_PIECE_ID),
+        boost::python::arg("moved_box_id")=object()
       )
-    ) // C++ constructor, shadowed by raw ctor
+    ))
 
     // pickle support
     .def_pickle(AtomicMovePickle())
 
     // @classmethod
-    .def("is_atomic_move", &AtomicMove::is_atomic_move, args("character"))
-    .staticmethod("is_atomic_move")
+    .def(
+      "is_atomic_move", &AtomicMove::is_atomic_move,
+      (boost::python::arg("character"))
+    ).staticmethod("is_atomic_move")
 
     // protocols
     .def("__eq__", &AtomicMove::operator==)
@@ -142,5 +108,4 @@ void export_atomic_move() {
       &AtomicMove::set_direction
     )
   ;
-
 }

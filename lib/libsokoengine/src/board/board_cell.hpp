@@ -2,10 +2,23 @@
 #define BOARD_CELL_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include <string>
+#include <stdexcept>
 
 #include "sokoengine_config.hpp"
 
 namespace sokoengine {
+
+class LIBSOKOENGINE_API BoardConversionError: public std::runtime_error {
+public:
+  BoardConversionError(const std::string& mess);
+  virtual ~BoardConversionError();
+};
+
+class LIBSOKOENGINE_API IllegalBoardCharacterError: public std::invalid_argument {
+public:
+  IllegalBoardCharacterError(const std::string& mess);
+  virtual ~IllegalBoardCharacterError();
+};
 
 ///
 /// Stores properties of one cell in board layout.

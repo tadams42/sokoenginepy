@@ -170,7 +170,6 @@ class HexobanTextConverter:
     def _analyze_text_cell_position(
         cell, x, y, odd_row_x_parity, even_row_x_parity
     ):
-
         y_parity = y % 2
         x_parity = x % 2
 

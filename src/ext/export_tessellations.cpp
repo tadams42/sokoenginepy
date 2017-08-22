@@ -4,48 +4,8 @@
 using namespace boost::python;
 using namespace sokoengine;
 
-
-object sokoban_neighbor_position_wraper(
-  SokobanTessellation& tessellation, position_t position,
-  const Direction& direction, size_t board_width, size_t board_height
-) {
-  position_t retv = tessellation.neighbor_position(
-    position, direction, board_width, board_height
-  );
-  if (retv == NULL_POSITION) {
-    return object();  // return None
-  }
-  return object(retv);
-}
-
-object trioban_neighbor_position_wraper(
-  TriobanTessellation& tessellation, position_t position,
-  const Direction& direction, size_t board_width, size_t board_height
-) {
-  position_t retv = tessellation.neighbor_position(
-    position, direction, board_width, board_height
-  );
-  if (retv == NULL_POSITION) {
-    return object();  // return None
-  }
-  return object(retv);
-}
-
-object octoban_neighbor_position_wraper(
-  OctobanTessellation& tessellation, position_t position,
-  const Direction& direction, size_t board_width, size_t board_height
-) {
-  position_t retv = tessellation.neighbor_position(
-    position, direction, board_width, board_height
-  );
-  if (retv == NULL_POSITION) {
-    return object();  // return None
-  }
-  return object(retv);
-}
-
-object hexoban_neighbor_position_wraper(
-  HexobanTessellation& tessellation, position_t position,
+object neighbor_position_wraper(
+  TessellationBase& tessellation, position_t position,
   const Direction& direction, size_t board_width, size_t board_height
 ) {
   position_t retv = tessellation.neighbor_position(
@@ -58,7 +18,11 @@ object hexoban_neighbor_position_wraper(
 }
 
 void export_tessellations() {
-  class_<SokobanTessellation>("SokobanTessellation") //, no_init())
+  class_<TessellationBase , boost::noncopyable>("TessellationBase", no_init);
+
+  class_<SokobanTessellation, bases<TessellationBase> >(
+    "SokobanTessellation"
+  ) //, no_init())
     // protocols
     .def("__eq__", &SokobanTessellation::operator==)
     .def("__ne__", &SokobanTessellation::operator!=)
@@ -73,28 +37,30 @@ void export_tessellations() {
       )
     )
     .def(
-      "neighbor_position", &sokoban_neighbor_position_wraper,
-      args("position", "direction", "board_width", "board_height")
+      "neighbor_position", &neighbor_position_wraper,
+      (arg("position"), arg("direction"), arg("board_width"), arg("board_height"))
     )
     .add_property("graph_type", &SokobanTessellation::graph_type)
     .def(
       "char_to_atomic_move",
       &SokobanTessellation::char_to_atomic_move,
-      args("input_chr")
+      (arg("input_chr"))
     )
     .def(
       "atomic_move_to_char",
       &SokobanTessellation::atomic_move_to_char,
-      args("atomic_move")
+      (arg("atomic_move"))
     )
     .def(
       "cell_orientation",
       &SokobanTessellation::cell_orientation,
-      args("position", "board_width", "board_height")
+      (arg("position"), arg("board_width"), arg("board_height"))
     )
   ;
 
-  class_<HexobanTessellation>("HexobanTessellation") //, no_init())
+  class_<HexobanTessellation, bases<TessellationBase> >(
+    "HexobanTessellation"
+  ) //, no_init())
     // protocols
     .def("__eq__", &HexobanTessellation::operator==)
     .def("__ne__", &HexobanTessellation::operator!=)
@@ -108,28 +74,30 @@ void export_tessellations() {
       )
     )
     .def(
-      "neighbor_position", &hexoban_neighbor_position_wraper,
-      args("position", "direction", "board_width", "board_height")
+      "neighbor_position", &neighbor_position_wraper,
+      (arg("position"), arg("direction"), arg("board_width"), arg("board_height"))
     )
     .add_property("graph_type", &HexobanTessellation::graph_type)
     .def(
       "char_to_atomic_move",
       &HexobanTessellation::char_to_atomic_move,
-      args("input_chr")
+      (arg("input_chr"))
     )
     .def(
       "atomic_move_to_char",
       &HexobanTessellation::atomic_move_to_char,
-      args("atomic_move")
+      (arg("atomic_move"))
     )
     .def(
       "cell_orientation",
       &HexobanTessellation::cell_orientation,
-      args("position", "board_width", "board_height")
+      (arg("position"), arg("board_width"), arg("board_height"))
     )
   ;
 
-  class_<OctobanTessellation>("OctobanTessellation") //, no_init())
+  class_<OctobanTessellation, bases<TessellationBase> >(
+    "OctobanTessellation"
+  ) //, no_init())
     // protocols
     .def("__eq__", &OctobanTessellation::operator==)
     .def("__ne__", &OctobanTessellation::operator!=)
@@ -143,28 +111,30 @@ void export_tessellations() {
       )
     )
     .def(
-      "neighbor_position", &octoban_neighbor_position_wraper,
-      args("position", "direction", "board_width", "board_height")
+      "neighbor_position", &neighbor_position_wraper,
+      (arg("position"), arg("direction"), arg("board_width"), arg("board_height"))
     )
     .add_property("graph_type", &OctobanTessellation::graph_type)
     .def(
       "char_to_atomic_move",
       &OctobanTessellation::char_to_atomic_move,
-      args("input_chr")
+      (arg("input_chr"))
     )
     .def(
       "atomic_move_to_char",
       &OctobanTessellation::atomic_move_to_char,
-      args("atomic_move")
+      (arg("atomic_move"))
     )
     .def(
       "cell_orientation",
       &OctobanTessellation::cell_orientation,
-      args("position", "board_width", "board_height")
+      (arg("position"), arg("board_width"), arg("board_height"))
     )
   ;
 
-  class_<TriobanTessellation>("TriobanTessellation") //, no_init())
+  class_<TriobanTessellation, bases<TessellationBase> >(
+    "TriobanTessellation"
+  ) //, no_init())
     // protocols
     .def("__eq__", &TriobanTessellation::operator==)
     .def("__ne__", &TriobanTessellation::operator!=)
@@ -178,24 +148,24 @@ void export_tessellations() {
       )
     )
     .def(
-      "neighbor_position", &trioban_neighbor_position_wraper,
-      args("position", "direction", "board_width", "board_height")
+      "neighbor_position", &neighbor_position_wraper,
+      (arg("position"), arg("direction"), arg("board_width"), arg("board_height"))
     )
     .add_property("graph_type", &TriobanTessellation::graph_type)
     .def(
       "char_to_atomic_move",
       &TriobanTessellation::char_to_atomic_move,
-      args("input_chr")
+      (arg("input_chr"))
     )
     .def(
       "atomic_move_to_char",
       &TriobanTessellation::atomic_move_to_char,
-      args("atomic_move")
+      (arg("atomic_move"))
     )
     .def(
       "cell_orientation",
       &TriobanTessellation::cell_orientation,
-      args("position", "board_width", "board_height")
+      (arg("position"), arg("board_width"), arg("board_height"))
     )
   ;
 }
