@@ -14,7 +14,8 @@ import re
 from glob import glob
 from os.path import basename, dirname, join, splitext
 
-from setuptools import Extension, find_packages, setup
+import setup_ext
+from setuptools import find_packages, setup
 
 
 def read(*names, **kwargs):
@@ -22,68 +23,6 @@ def read(*names, **kwargs):
         join(dirname(__file__), *names),
         encoding=kwargs.get('encoding', 'utf8')
     ).read()
-
-
-def configure_native_extension():
-    # TODO: configure script for native extension should:
-    #     - figure out Python version under which we are installing
-    #     - find Boost.Python for that version
-    #     - be portable
-    LIBBOOST_PYTHON = (
-        'boost_python-py35'
-        if os.path.exists('/usr/lib/x86_64-linux-gnu/libboost_python-py35.so')
-        else None
-    )
-
-    LIBBOOST_GRAPH = (
-        'boost_graph'
-        if os.path.exists('/usr/lib/x86_64-linux-gnu/libboost_graph.so')
-        else None
-    )
-
-    if LIBBOOST_PYTHON and LIBBOOST_GRAPH:
-        libsokoengine = Extension(
-            name='libsokoengine',
-            sources=[
-                'lib/libsokoengine/src/board/board_cell.cpp',
-                'lib/libsokoengine/src/board/board_graph.cpp',
-                'lib/libsokoengine/src/snapshot/atomic_move.cpp',
-                'lib/libsokoengine/src/tessellation/direction.cpp',
-                'lib/libsokoengine/src/tessellation/tessellation_base.cpp',
-                'lib/libsokoengine/src/tessellation/sokoban_tessellation.cpp',
-                'lib/libsokoengine/src/tessellation/hexoban_tessellation.cpp',
-                'lib/libsokoengine/src/tessellation/octoban_tessellation.cpp',
-                'lib/libsokoengine/src/tessellation/trioban_tessellation.cpp',
-            ] + [
-                'src/ext/export_common.cpp',
-                'src/ext/export_direction.cpp',
-                'src/ext/export_board_cell.cpp',
-                'src/ext/export_atomic_move.cpp',
-                'src/ext/export_board_graph.cpp',
-                'src/ext/export_tessellations.cpp',
-                'src/ext/export_libsokoengine.cpp',
-            ],
-            libraries=[LIBBOOST_PYTHON, LIBBOOST_GRAPH],
-            include_dirs=[
-                'lib/libsokoengine/src',
-                'lib/libsokoengine/src/board',
-                'lib/libsokoengine/src/snapshot',
-                'lib/libsokoengine/src/tessellation',
-                'src/ext'
-            ],
-            language='c++',
-            extra_compile_args=[
-                '-std=c++14',
-                '-Wno-overloaded-virtual',
-                '-Wno-sign-compare',
-                '-Wno-unused-parameter',
-                '-Wno-attributes'
-            ],
-            optional=True
-        )
-        return [libsokoengine]
-
-    return []
 
 setup(
     name="sokoenginepy",
@@ -171,5 +110,5 @@ setup(
     # installed, specify them HERE.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={'sokoenginepy': ['res/*'],},
-    ext_modules=configure_native_extension()
+    ext_modules=setup_ext.native_extensions()
 )
