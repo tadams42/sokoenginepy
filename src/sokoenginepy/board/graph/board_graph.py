@@ -57,9 +57,11 @@ class BoardGraph:
     def __contains__(self, position):
         return position in self._graph
 
+    @property
     def vertices_count(self):
         return self._graph.number_of_nodes()
 
+    @property
     def edges_count(self):
         return self._graph.number_of_edges()
 
@@ -76,18 +78,28 @@ class BoardGraph:
             bool: True if edge exists. False if edge doesn't exist or one or
                   both verrtices are off board.
         """
+        retv = False
+        for out_edge in self.out_edges(source_vertex):
+            retv = retv or (
+                out_edge[1] == target_vertex and
+                out_edge[2][self._KEY_DIRECTION] == direction
+            )
+            if retv:
+                break
+
+        return retv
+
+    def out_edges(self, source_vertex):
         try:
-            retv = False
-            for out_edge in self._graph.out_edges_iter(source_vertex, data=True):
+            retv = tuple(
                 # edge: (source, target, data_dict)
-                retv = retv or (
-                    out_edge[1] == target_vertex and
-                    out_edge[2][self._KEY_DIRECTION] == direction
-                )
-                if retv:
-                    break
+                # out_edge[2][self._KEY_DIRECTION]
+                out_edge
+                for out_edge in
+                self._graph.out_edges_iter(source_vertex, data=True)
+            )
         except nx.NetworkXError as e:
-            retv = False
+            retv = tuple()
 
         return retv
 
@@ -169,7 +181,7 @@ class BoardGraph:
         if root not in self:
             raise IndexError('Starting position is off board!')
 
-        visited = self.vertices_count() * [False]
+        visited = self.vertices_count * [False]
         visited[root] = True
         reachables = deque()
         to_inspect = deque([root])
@@ -388,7 +400,7 @@ class BoardGraph:
         or pusher).
         """
         piece_positions = []
-        for vertex in range(0, self.vertices_count()):
+        for vertex in range(0, self.vertices_count):
             if self[vertex].has_box or self[vertex].has_pusher:
                 self[vertex].is_in_playable_area = True
                 piece_positions.append(vertex)

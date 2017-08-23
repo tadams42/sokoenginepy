@@ -10,6 +10,8 @@ void export_common() {
 
   class_<Directions>("Directions").def(vector_indexing_suite<Directions>());
 
+  class_<StringList>("StringList").def(vector_indexing_suite<StringList>());
+
   enum_<CellOrientation>("CellOrientation")
     .value("DEFAULT", CellOrientation::DEFAULT)
     .value("TRIANGLE_DOWN", CellOrientation::TRIANGLE_DOWN)

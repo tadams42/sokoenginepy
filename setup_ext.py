@@ -45,6 +45,7 @@ def configure_libsokoengine():
     ]
 
     sources = [
+        'src/ext/export_boards.cpp',
         'src/ext/export_common.cpp',
         'src/ext/export_atomic_move.cpp',
         'src/ext/export_board_cell.cpp',
@@ -56,6 +57,11 @@ def configure_libsokoengine():
         'lib/libsokoengine/src/board/text_utils.cpp',
         'lib/libsokoengine/src/board/board_cell.cpp',
         'lib/libsokoengine/src/board/board_graph.cpp',
+        'lib/libsokoengine/src/board/variant_board.cpp',
+        'lib/libsokoengine/src/board/sokoban_board.cpp',
+        'lib/libsokoengine/src/board/trioban_board.cpp',
+        'lib/libsokoengine/src/board/octoban_board.cpp',
+        'lib/libsokoengine/src/board/hexoban_board.cpp',
         'lib/libsokoengine/src/snapshot/atomic_move.cpp',
         'lib/libsokoengine/src/tessellation/direction.cpp',
         'lib/libsokoengine/src/tessellation/tessellation_base.cpp',

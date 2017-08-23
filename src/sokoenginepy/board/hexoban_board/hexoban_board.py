@@ -1,11 +1,11 @@
-from .. import tessellation, utilities
-from .board_cell import BoardCell, BoardCellCharacters, BoardConversionError
-from .sokoban_board import SokobanBoard
-from .variant_board import VariantBoard, VariantBoardResizer
+from ... import tessellation, utilities
+from ..board_cell import BoardCell, BoardCellCharacters, BoardConversionError
+from ..sokoban_board import SokobanBoard
+from ..variant_board import VariantBoard, VariantBoardResizer
 
 
 class HexobanBoard(VariantBoard):
-    def __init__(self, board_width=0, board_height=0, board_str=""):
+    def __init__(self, board_width=0, board_height=0, board_str=None):
         super().__init__(
             tessellation_or_description=tessellation.Tessellation.HEXOBAN,
             board_width=board_width, board_height=board_height,
@@ -116,9 +116,8 @@ class HexobanTextConverter:
     def convert_to_string(
         self, hexoban_board, use_visible_floor=False, rle_encode=False
     ):
-        floor_character = (
-            BoardCellCharacters.VISIBLE_FLOOR
-            if use_visible_floor else BoardCellCharacters.FLOOR
+        floor_character = BoardCell(BoardCellCharacters.FLOOR).to_str(
+            use_visible_floor
         )
 
         retv = []

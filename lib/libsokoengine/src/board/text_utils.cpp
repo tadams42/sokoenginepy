@@ -8,9 +8,32 @@ using namespace std;
 using std::placeholders::_1;
 
 namespace sokoengine {
+
+StringList TextUtils::normalize_width(
+  const StringList& string_list, char fill_chr
+) {
+  size_t width = calculate_width(string_list);
+  StringList retv = string_list;
+  for(string& line : retv) {
+    if (line.length() < width) {
+      line.insert(line.end(), width - line.length(), fill_chr);
+    }
+  }
+  return retv;
+}
+
+size_t TextUtils::calculate_width(const StringList& string_list) {
+  size_t width = 0;
+  for(auto line : string_list)
+    if (line.length() > width) width = line.length();
+  return width;
+}
+
   namespace implementation {
 
 class LIBSOKOENGINE_LOCAL RLE {
+  // TODO: Rewrite this whole monstrocity using Boost.Spirit
+  
   // Assumes @a tline was checked with check_groups.
   // @todo Implemented recursively, could that be changed?
   bool decode_with_groups (string& tline) const {
@@ -221,15 +244,6 @@ class LIBSOKOENGINE_LOCAL RLE {
     return retv;
   }
 
-  void clear_delimiters (string& str) const  {
-    str.erase(
-      remove_if(str.begin(), str.end(), [] (char c) {
-        return c == TextUtils::GROUP_LEFT_DELIM || c == TextUtils::GROUP_RIGHT_DELIM;
-      }),
-      str.end()
-    );
-  }
-
   char m_left_delimiter;
   char m_right_delimiter;
 public:
@@ -277,8 +291,19 @@ public:
     if ( check_groups(input) ) {
       retv = decode_with_groups(input);
     }
+
     if (retv) {
-      clear_delimiters(input);
+      input.erase(
+        remove_if(input.begin(), input.end(), [] (char c) {
+          return c == TextUtils::GROUP_LEFT_DELIM ||
+                 c == TextUtils::GROUP_RIGHT_DELIM;
+        }),
+        input.end()
+      );
+      replace(
+        input.begin(), input.end(),
+        static_cast<char>(TextUtils::RLE_ROW_SEPARATOR), '\n'
+      );
     }
     return retv;
   }
@@ -297,6 +322,10 @@ bool TextUtils::is_blank (const string& line) {
 
 bool TextUtils::rle_encode (string& str) {
   RLE rle;
+  replace(
+    str.begin(), str.end(), '\n',
+    static_cast<char>(TextUtils::RLE_ROW_SEPARATOR)
+  );
   return rle.encode(str);
 }
 

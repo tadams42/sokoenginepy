@@ -11,3 +11,8 @@ from .sokoban_board import SokobanBoard
 from .sokoban_plus import SokobanPlus, SokobanPlusDataError
 from .trioban_board import TriobanBoard
 from .variant_board import VariantBoard
+
+try:
+    from libsokoengine import VariantBoard
+except ImportError:
+    from .variant_board import VariantBoard

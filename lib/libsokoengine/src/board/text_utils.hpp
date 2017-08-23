@@ -34,6 +34,11 @@ public:
   static bool contains_only_digits_and_spaces (const std::string& line);
   static bool rle_encode (std::string& str);
   static bool rle_decode (std::string& str);
+
+  static StringList normalize_width(
+    const StringList& string_list, char fill_chr=' '
+  );
+  static size_t calculate_width(const StringList& string_list);
 };
 
 } // namespace sokoengine

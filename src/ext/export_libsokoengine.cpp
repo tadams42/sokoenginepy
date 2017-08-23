@@ -8,6 +8,7 @@ void export_board_cell();
 void export_atomic_move();
 void export_board_graph();
 void export_tessellations();
+void export_boards();
 
 BOOST_PYTHON_MODULE(libsokoengine)
 {
@@ -17,4 +18,5 @@ BOOST_PYTHON_MODULE(libsokoengine)
   export_atomic_move();
   export_board_graph();
   export_tessellations();
+  export_boards();
 }

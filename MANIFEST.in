@@ -11,7 +11,7 @@ include .editorconfig
 include LICENSE
 include README.rst
 
-include tox.ini .travis.yml
+include tox.ini .travis.yml setup_ext.py
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib
 

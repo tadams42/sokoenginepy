@@ -8,7 +8,13 @@
 
 namespace sokoengine {
 
-class AtomicMove;
+class LIBSOKOENGINE_API AtomicMove;
+
+namespace implementation {
+  class LIBSOKOENGINE_LOCAL VariantBoardResizer;
+  class LIBSOKOENGINE_LOCAL VariantBoardParser;
+  class LIBSOKOENGINE_LOCAL VariantBoardPrinter;
+}
 
 class LIBSOKOENGINE_API UnknownDirectionError: public std::invalid_argument {
 public:
@@ -37,6 +43,10 @@ public:
   ) const {
     return CellOrientation::DEFAULT;
   }
+
+  virtual const implementation::VariantBoardResizer& resizer() const;
+  virtual const implementation::VariantBoardPrinter& printer() const;
+  virtual const implementation::VariantBoardParser& parser() const;
 
   virtual std::string str() const = 0;
   virtual std::string repr() const = 0;

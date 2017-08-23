@@ -158,17 +158,17 @@ class Mover:
             >>> mover.undo_last_move()
             >>> mover.board
             SokobanBoard(board_str='\\n'.join([
-                '    #####',
-                '    #   #',
-                '    #$@ #',
-                '  ###  $##',
-                '  #  $ $ #',
+                '    #####          ',
+                '    #   #          ',
+                '    #$@ #          ',
+                '  ###  $##         ',
+                '  #  $ $ #         ',
                 '### # ## #   ######',
                 '#   # ## #####  ..#',
                 '# $  $          ..#',
                 '##### ### #@##  ..#',
                 '    #     #########',
-                '    #######'
+                '    #######        '
             ]))
             >>> mover.last_move
             [AtomicMove(Direction.LEFT, box_moved=False), AtomicMove(Direction.DOWN, box_moved=False)]

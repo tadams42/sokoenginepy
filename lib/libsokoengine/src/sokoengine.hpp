@@ -14,4 +14,10 @@
 #include "trioban_tessellation.hpp"
 #include "tessellation.hpp"
 
+#include "variant_board.hpp"
+#include "sokoban_board.hpp"
+#include "hexoban_board.hpp"
+#include "octoban_board.hpp"
+#include "trioban_board.hpp"
+
 #endif // HEADER_GUARD

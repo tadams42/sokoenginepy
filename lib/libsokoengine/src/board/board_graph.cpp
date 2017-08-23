@@ -257,7 +257,8 @@ size_t BoardGraph::out_edge_weight(position_t target_position) const {
 position_t BoardGraph::neighbor(
   position_t from_position, const Direction& direction
 ) const {
-  const auto edges = out_edges(from_position, m_impl->m_graph);
+  vertex_descriptor v = vertex(from_position, m_impl->m_graph);
+  const auto edges = out_edges(v, m_impl->m_graph);
   auto edge = find_if(
     edges.first, edges.second,
     [&] (const edge_descriptor& e) {
@@ -275,14 +276,12 @@ position_t BoardGraph::neighbor(
 position_t BoardGraph::neighbor_at(
   position_t from_position, const Direction& direction
 ) const {
-  if (!contains(from_position))
-    throw out_of_range("Board index out of range!");
+  if (!contains(from_position)) throw out_of_range("Board index out of range!");
   return neighbor(from_position, direction);
 }
 
 Positions BoardGraph::wall_neighbors(position_t from_position) const {
-  if (!contains(from_position))
-    throw out_of_range("Board index out of range!");
+  if (!contains(from_position)) throw out_of_range("Board index out of range!");
 
   Positions retv;
   BOOST_FOREACH(
@@ -301,8 +300,7 @@ Positions BoardGraph::wall_neighbors(position_t from_position) const {
 }
 
 Positions BoardGraph::all_neighbors(position_t from_position) const {
-  if (!contains(from_position))
-    throw out_of_range("Board index out of range!");
+  if (!contains(from_position)) throw out_of_range("Board index out of range!");
 
   Positions retv;
   BOOST_FOREACH(

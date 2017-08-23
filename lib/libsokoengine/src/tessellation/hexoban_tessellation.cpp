@@ -2,6 +2,7 @@
 #include <map>
 
 #include "hexoban_tessellation.hpp"
+#include "hexoban_board.hpp"
 #include "board_cell.hpp"
 #include "direction.hpp"
 #include "atomic_move.hpp"
@@ -9,6 +10,8 @@
 using namespace std;
 
 namespace sokoengine {
+
+using namespace implementation;
 
 const Directions& HexobanTessellation::legal_directions() const {
   static const Directions retv = {
@@ -94,5 +97,20 @@ char HexobanTessellation::atomic_move_to_char(const AtomicMove& rv) const {
 
 string HexobanTessellation::repr() const { return "HexobanTessellation()"; }
 string HexobanTessellation::str() const { return "hexoban"; }
+
+const VariantBoardResizer& HexobanTessellation::resizer() const {
+  static const HexobanBoardResizer retv = HexobanBoardResizer();
+  return retv;
+}
+
+const VariantBoardPrinter& HexobanTessellation::printer() const {
+  static const HexobanBoardPrinter retv = HexobanBoardPrinter();
+  return retv;
+}
+
+const VariantBoardParser& HexobanTessellation::parser() const {
+  static const HexobanBoardParser retv = HexobanBoardParser();
+  return retv;
+}
 
 } // namespace sokoengine

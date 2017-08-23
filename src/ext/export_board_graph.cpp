@@ -170,8 +170,8 @@ void export_board_graph() {
 
     .def("__contains__", &BoardGraph::contains, (arg("position")))
 
-    .def("vertices_count", &BoardGraph::vertices_count)
-    .def("edges_count", &BoardGraph::edges_count)
+    .add_property("vertices_count", &BoardGraph::vertices_count)
+    .add_property("edges_count", &BoardGraph::edges_count)
 
     .def(
       "has_edge", &BoardGraph::has_edge,
@@ -203,20 +203,20 @@ void export_board_graph() {
     )
     .def(
       "dijkstra_path", &dijkstra_path_wrapper,
-      (args("start_position"), arg("end_position"))
+      (arg("start_position"), arg("end_position"))
     )
     .def(
       "find_move_path", &find_move_path_wrapper,
-      (args("start_position"), arg("end_position"))
+      (arg("start_position"), arg("end_position"))
     )
     .def(
       "find_jump_path", &find_jump_path_wrapper,
-      (args("start_position"), arg("end_position"))
+      (arg("start_position"), arg("end_position"))
     )
     .def(
       "positions_path_to_directions_path",
       &positions_path_to_directions_path_wrapper,
-      args("positions_path")
+      (arg("positions_path"))
     )
     .def("mark_play_area", &BoardGraph::mark_play_area)
     .def(
