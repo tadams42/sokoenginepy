@@ -4,9 +4,7 @@ from enum import IntEnum
 from functools import reduce
 from textwrap import dedent
 
-from sokoenginepy import Direction, Mover, SokobanBoard, SolvingMode, settings
-
-settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = False
+from sokoenginepy import Direction, Mover, SokobanBoard, SolvingMode
 
 
 class BoardType(IntEnum):
@@ -80,8 +78,9 @@ class MovementBenchmark:
         self.board_type = board_type
         self.benchmark_type = benchmark_type
         self.moves_count = moves_count
+        self.board = self.board_type.board
         self.mover = Mover(
-            self.board_type.board,
+            self.board,
             (
                 SolvingMode.REVERSE
                 if self.benchmark_type.is_reverse
@@ -172,13 +171,13 @@ class MovementBenchmarkPrinter:
         print("--------------------------------------------------")
 
         runs = 10
-        moves_per_run = 3e4
+        moves_per_run = 3e5
 
         printer = MovementBenchmarkPrinter(runs, moves_per_run)
         print(printer.board_header(BoardType.SMALL))
 
         # C++ speed
-        pivot_speed = 5e6
+        pivot_speed = 3e6
 
         printer.run_and_print_experiment(
             BoardType.SMALL, BenchmarkType.FORWARD_MOVER, pivot_speed

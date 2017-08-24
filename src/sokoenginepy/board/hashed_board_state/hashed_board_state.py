@@ -1,7 +1,7 @@
 import random
 
-from .. import utilities
-from .board_state import BoardState
+from ... import utilities
+from ..board_state import BoardState
 
 
 class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):

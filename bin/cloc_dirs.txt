@@ -1,4 +1,5 @@
-src/sokoenginepy
+src/
 tests
 setup.py
 bin
+lib/libsokoengine

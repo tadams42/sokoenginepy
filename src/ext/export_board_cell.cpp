@@ -17,24 +17,27 @@ void export_board_cell() {
       // class Python name
       "BoardCell",
       // __init__
-      init<optional<char, bool, bool> >(
-        args("character", "is_in_playable_area", "is_deadlock")
-      )
+      init<optional<char, bool, bool> >((
+        // Without this static_cast extension segfaults on import
+        arg("character")=static_cast<char>(BoardCell::FLOOR),
+        arg("is_in_playable_area")=false,
+        arg("is_deadlock")=false
+      ))
     )
 
     // pickle support
     .def_pickle(BoardCellPickle())
 
     // @classmethod
-    .def("is_pusher_chr", &BoardCell::is_pusher_chr, args("character"))
+    .def("is_pusher_chr", &BoardCell::is_pusher_chr, (arg("character")))
     .staticmethod("is_pusher_chr")
-    .def("is_box_chr", &BoardCell::is_box_chr, args("character"))
+    .def("is_box_chr", &BoardCell::is_box_chr, (arg("character")))
     .staticmethod("is_box_chr")
-    .def("is_goal_chr", &BoardCell::is_goal_chr, args("character"))
+    .def("is_goal_chr", &BoardCell::is_goal_chr, (arg("character")))
     .staticmethod("is_goal_chr")
-    .def("is_empty_floor_chr", &BoardCell::is_empty_floor_chr, args("character"))
+    .def("is_empty_floor_chr", &BoardCell::is_empty_floor_chr, (arg("character")))
     .staticmethod("is_empty_floor_chr")
-    .def("is_wall_chr", &BoardCell::is_wall_chr, args("character"))
+    .def("is_wall_chr", &BoardCell::is_wall_chr, (arg("character")))
     .staticmethod("is_wall_chr")
 
     // protocols
@@ -44,7 +47,7 @@ void export_board_cell() {
     .def("__repr__", &BoardCell::repr)
 
     // instance methods and properties
-    .def("to_str", &BoardCell::to_str, args("use_visible_floor"))
+    .def("to_str", &BoardCell::to_str, (arg("use_visible_floor")))
     .def("clear", &BoardCell::clear)
     .add_property("has_piece", &BoardCell::has_piece)
     .add_property("is_empty_floor", &BoardCell::is_empty_floor)

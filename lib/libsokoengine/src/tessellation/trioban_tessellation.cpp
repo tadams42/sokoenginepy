@@ -1,10 +1,10 @@
-#include <memory>
-#include <map>
-
 #include "trioban_tessellation.hpp"
 #include "board_cell.hpp"
 #include "direction.hpp"
 #include "atomic_move.hpp"
+
+#include <memory>
+#include <map>
 
 using namespace std;
 
@@ -81,7 +81,7 @@ position_t TriobanTessellation::neighbor_position (
   row += dy;
   column += dx;
   if (ON_BOARD(column, row, board_width, board_height)) {
-    return INDEX(column, row, board_width);
+    return index_1d(column, row, board_width);
   }
   return NULL_POSITION;
 }

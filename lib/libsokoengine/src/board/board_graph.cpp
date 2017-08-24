@@ -1,13 +1,11 @@
+#include "board_graph.hpp"
+#include "board_cell.hpp"
+
 #include <algorithm>
 #include <boost/foreach.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/breadth_first_search.hpp>
-
-#include "common_types.hpp"
-#include "board_graph.hpp"
-#include "board_cell.hpp"
-#include "direction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -177,6 +175,14 @@ BoardCell& BoardGraph::cell(position_t position) {
   return m_impl->m_graph[position];
 }
 
+const BoardCell BoardGraph::operator[] (position_t position) const {
+  return m_impl->m_graph[position];
+}
+
+BoardCell& BoardGraph::operator[] (position_t position) {
+  return m_impl->m_graph[position];
+}
+
 bool BoardGraph::contains(position_t position) const {
   return m_impl->contains(position);
 }
@@ -249,9 +255,8 @@ size_t BoardGraph::out_edge_weight(position_t target_position) const {
 position_t BoardGraph::neighbor(
   position_t from_position, const Direction& direction
 ) const {
-  if (!contains(from_position))
-    throw out_of_range("Board index out of range!");
-  const auto edges = out_edges(from_position, m_impl->m_graph);
+  vertex_descriptor v = vertex(from_position, m_impl->m_graph);
+  const auto edges = out_edges(v, m_impl->m_graph);
   auto edge = find_if(
     edges.first, edges.second,
     [&] (const edge_descriptor& e) {
@@ -266,9 +271,15 @@ position_t BoardGraph::neighbor(
   return NULL_POSITION;
 }
 
+position_t BoardGraph::neighbor_at(
+  position_t from_position, const Direction& direction
+) const {
+  if (!contains(from_position)) throw out_of_range("Board index out of range!");
+  return neighbor(from_position, direction);
+}
+
 Positions BoardGraph::wall_neighbors(position_t from_position) const {
-  if (!contains(from_position))
-    throw out_of_range("Board index out of range!");
+  if (!contains(from_position)) throw out_of_range("Board index out of range!");
 
   Positions retv;
   BOOST_FOREACH(
@@ -287,8 +298,7 @@ Positions BoardGraph::wall_neighbors(position_t from_position) const {
 }
 
 Positions BoardGraph::all_neighbors(position_t from_position) const {
-  if (!contains(from_position))
-    throw out_of_range("Board index out of range!");
+  if (!contains(from_position)) throw out_of_range("Board index out of range!");
 
   Positions retv;
   BOOST_FOREACH(
@@ -518,7 +528,7 @@ position_t BoardGraph::path_destination(
 
   position_t retv = start_position, next_target;
   for (Direction direction : directions_path) {
-    next_target = neighbor(retv, direction);
+    next_target = neighbor_at(retv, direction);
     if (next_target != NULL_POSITION) {
       retv = next_target;
     } else {

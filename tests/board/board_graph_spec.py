@@ -42,11 +42,11 @@ class DescribeBoardGraph:
         def it_returns_number_of_graph_vertices(
             self, board_graph, board_width, board_height
         ):
-            assert board_graph.vertices_count() == board_width * board_height
+            assert board_graph.vertices_count == board_width * board_height
 
     class describe_edges_count:
         def it_returns_number_of_graph_edges(self, board_graph):
-            assert board_graph.edges_count() == 776
+            assert board_graph.edges_count == 776
 
     class describe_has_edge:
         def it_returs_true_if_edge_in_given_direction_exists(
@@ -82,13 +82,13 @@ class DescribeBoardGraph:
     class describe_remove_all_edges:
         def it_removes_all_eges_from_graph(self, board_graph):
             board_graph.remove_all_edges()
-            assert board_graph.edges_count() == 0
+            assert board_graph.edges_count == 0
 
     class describe_add_edge:
         def it_adds_edge_between_two_vertices(self, board_graph):
             board_graph.remove_all_edges()
             board_graph.add_edge(0, 1, Direction.LEFT)
-            assert board_graph.edges_count() == 1
+            assert board_graph.edges_count == 1
             assert board_graph.has_edge(0, 1, Direction.LEFT)
 
         def it_raises_IndexError_if_any_of_vertices_if_off_board(
@@ -107,13 +107,13 @@ class DescribeBoardGraph:
             board_graph = BoardGraph(4, GraphType.DIRECTED)
             board_graph.add_edge(0, 1, Direction.LEFT)
             board_graph.add_edge(0, 1, Direction.LEFT)
-            assert board_graph.edges_count() == 1
+            assert board_graph.edges_count == 1
             assert board_graph.has_edge(0, 1, Direction.LEFT)
 
             board_graph = BoardGraph(4, GraphType.DIRECTED_MULTI)
             board_graph.add_edge(0, 1, Direction.LEFT)
             board_graph.add_edge(0, 1, Direction.LEFT)
-            assert board_graph.edges_count() == 2
+            assert board_graph.edges_count == 2
             assert board_graph.has_edge(0, 1, Direction.LEFT)
 
     class describe_out_edge_weight:
@@ -311,7 +311,7 @@ class DescribeBoardGraph:
             self
         ):
             self.board_graph.mark_play_area()
-            for pos in range(self.board_graph.vertices_count()):
+            for pos in range(self.board_graph.vertices_count):
                 if pos in self.expected_playable_cells:
                     assert self.board_graph[pos].is_in_playable_area
                 else:

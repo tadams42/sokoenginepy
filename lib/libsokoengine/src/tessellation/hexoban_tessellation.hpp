@@ -17,6 +17,10 @@ public:
 
   virtual std::string str() const override;
   virtual std::string repr() const override;
+
+  virtual const implementation::VariantBoardResizer& resizer() const override;
+  virtual const implementation::VariantBoardPrinter& printer() const override;
+  virtual const implementation::VariantBoardParser& parser() const override;
 };
 
 } // namespace sokoengine

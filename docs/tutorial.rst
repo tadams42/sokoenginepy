@@ -28,18 +28,18 @@ Constructing an instance of board is as easy as:
     ...     '    #     #########',
     ...     '    #######'
     ... ]))
-    >>> print(board)
-        #####
-        #  @#
-        #$  #
-      ###  $##
-      #  $ $ #
-    ### # ## #   ######
-    #   # ## #####  ..#
-    # $  $          ..#
-    ##### ### #@##  ..#
-        #     #########
-        #######
+    >>> print(board.to_str(use_visible_floor=True))
+    ----#####----------
+    ----#--@#----------
+    ----#$--#----------
+    --###--$##---------
+    --#--$-$-#---------
+    ###-#-##-#---######
+    #---#-##-#####--..#
+    #-$--$----------..#
+    #####-###-#@##--..#
+    ----#-----#########
+    ----#######--------
 
 All boards implement rich API that allows editing individual board cells,
 resizing and exploring neighboring positions. Positions are expressed as 1D
@@ -81,17 +81,17 @@ mechanics, we can attach instance of :class:`.HashedBoardState` to our board.
     >>> state = HashedBoardState(board)
     >>> state
     HashedBoardState(SokobanBoard(board_str='\n'.join([
-        '    #####',
-        '    #  @#',
-        '    #$  #',
-        '  ###  $##',
-        '  #  $ $ #',
+        '    #####          ',
+        '    #  @#          ',
+        '    #$  #          ',
+        '  ###  $##         ',
+        '  #  $ $ #         ',
         '### # ## #   ######',
         '#   # ## #####  ..#',
         '# $  $          ..#',
         '##### ### #@##  ..#',
         '    #     #########',
-        '    #######'
+        '    #######        '
     ])))
 
 This class memoizes positions of pushers and boxes and assigns numerical IDs to
@@ -165,7 +165,7 @@ game mechanics like this:
     >>> # try to perform illegal move raises CellAlreadyOccupiedError
     >>> try:
     ...     forward_mover.move(Direction.UP)
-    ... except IllegalMoveError:
+    ... except RuntimeError:
     ...     print("IllegalMoveError risen!")
     ...
     IllegalMoveError risen!
@@ -185,18 +185,18 @@ game mechanics like this:
     ...     #######
     ... """[1:-1])
     >>> reverse_mover = Mover(board, SolvingMode.REVERSE)
-    >>> print(reverse_mover.board)
-        #####
-        #  @#
-        #.  #
-      ###  .##
-      #  . . #
-    ### # ## #   ######
-    #   # ## #####  $$#
-    # .  .          $$#
-    ##### ### #@##  $$#
-        #     #########
-        #######
+    >>> print(reverse_mover.board.to_str(use_visible_floor=True))
+    ----#####----------
+    ----#--@#----------
+    ----#.--#----------
+    --###--.##---------
+    --#--.-.-#---------
+    ###-#-##-#---######
+    #---#-##-#####--$$#
+    #-.--.----------$$#
+    #####-###-#@##--$$#
+    ----#-----#########
+    ----#######--------
 
     >>> # Sokoban+
     >>> reverse_mover.state.boxorder = '1 3 2'

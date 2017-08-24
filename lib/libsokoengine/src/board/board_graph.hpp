@@ -1,15 +1,23 @@
 #ifndef BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
+#include "sokoengine_config.hpp"
+#include "direction.hpp"
+
 #include <vector>
 #include <memory>
 
-#include "sokoengine_config.hpp"
-#include "common_types.hpp"
-
 namespace sokoengine {
 
+enum class LIBSOKOENGINE_API GraphType : int {
+  DIRECTED = 0,
+  DIRECTED_MULTI = 1
+};
+
 class LIBSOKOENGINE_API BoardCell;
+
+typedef std::vector<position_t> Positions;
+typedef std::vector<Direction> Directions;
 
 class LIBSOKOENGINE_API BoardGraph {
 public:
@@ -26,6 +34,8 @@ public:
   BoardCell& cell_at(position_t position);
   const BoardCell& cell(position_t position) const;
   BoardCell& cell(position_t position);
+  const BoardCell operator[] (position_t position) const;
+  BoardCell& operator[] (position_t position);
 
   bool contains(position_t position) const;
   size_t vertices_count() const;
@@ -38,6 +48,7 @@ public:
   size_t out_edge_weight(position_t target_position) const;
 
   position_t neighbor(position_t from_position, const Direction& direction) const;
+  position_t neighbor_at(position_t from_position, const Direction& direction) const;
   Positions wall_neighbors(position_t from_position) const;
   Positions all_neighbors(position_t from_position) const;
   Positions shortest_path(position_t start_position, position_t end_position) const;

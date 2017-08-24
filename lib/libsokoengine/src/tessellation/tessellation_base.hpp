@@ -1,14 +1,26 @@
 #ifndef TESSELLATION_BASE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TESSELLATION_BASE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include <stdexcept>
+#include "sokoengine_config.hpp"
+#include "board_graph.hpp"
 
-#include "common_types.hpp"
+#include <stdexcept>
 
 namespace sokoengine {
 
-class Direction;
-class AtomicMove;
+class LIBSOKOENGINE_API AtomicMove;
+
+enum class LIBSOKOENGINE_API CellOrientation : int {
+  DEFAULT = 0,
+  TRIANGLE_DOWN = 1,
+  OCTAGON = 2
+};
+
+namespace implementation {
+  class LIBSOKOENGINE_LOCAL VariantBoardResizer;
+  class LIBSOKOENGINE_LOCAL VariantBoardParser;
+  class LIBSOKOENGINE_LOCAL VariantBoardPrinter;
+}
 
 class LIBSOKOENGINE_API UnknownDirectionError: public std::invalid_argument {
 public:
@@ -38,6 +50,10 @@ public:
     return CellOrientation::DEFAULT;
   }
 
+  virtual const implementation::VariantBoardResizer& resizer() const;
+  virtual const implementation::VariantBoardPrinter& printer() const;
+  virtual const implementation::VariantBoardParser& parser() const;
+
   virtual std::string str() const = 0;
   virtual std::string repr() const = 0;
 };
@@ -45,7 +61,7 @@ public:
 ///
 /// Converts 2D board position to 1D board position
 ///
-constexpr position_t INDEX(position_t x, position_t y, size_t board_width) {
+constexpr position_t index_1d(position_t x, position_t y, size_t board_width) {
   return y * board_width + x;
 }
 

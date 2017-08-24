@@ -39,8 +39,8 @@ class VariantBoard(Container, metaclass=ABCMeta):
 
     @classmethod
     def instance_from(
-        cls, tessellation_or_description, board_width=0, board_height=0,
-        board_str=""
+        cls, tessellation_or_description='sokoban',
+        board_width=0, board_height=0, board_str=None
     ):
         #pylint: disable=unused-variable
         from .hexoban_board import HexobanBoard
@@ -100,7 +100,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
 
     def __init__(
         self, tessellation_or_description, board_width=0, board_height=0,
-        board_str=""
+        board_str=None
     ):
         super().__init__()
         self._tessellation_instance = tessellation.Tessellation.instance_from(
@@ -205,8 +205,6 @@ class VariantBoard(Container, metaclass=ABCMeta):
                     for x in range(0, self.width)
                 )
             )
-            # Intentionally rstripping only if not using visible floors
-            row = row.rstrip()
             if rle_encode:
                 row = utilities.rle_encode(row)
             rows.append(row)
