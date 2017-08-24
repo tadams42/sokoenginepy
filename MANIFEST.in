@@ -13,7 +13,7 @@ include README.rst
 
 include tox.ini .travis.yml setup_ext.py
 
-global-exclude *.py[cod] __pycache__ *.so *.dylib
+global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4 
 
 global-exclude .ipynb_checkpoints/*
 

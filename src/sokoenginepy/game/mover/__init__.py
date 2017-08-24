@@ -3,4 +3,4 @@ try:
 except ImportError:
     from .mover import Mover, SolvingMode
 
-from .mover import NonPlayableBoardError, IllegalMoveError
+from .mover import IllegalMoveError, NonPlayableBoardError
