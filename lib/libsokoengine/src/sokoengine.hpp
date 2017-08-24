@@ -23,4 +23,6 @@
 #include "board_state.hpp"
 #include "hashed_board_state.hpp"
 
+#include "mover.hpp"
+
 #endif // HEADER_GUARD

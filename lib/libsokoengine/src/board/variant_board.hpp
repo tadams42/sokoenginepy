@@ -49,6 +49,7 @@ public:
   );
 
   virtual ~VariantBoard();
+  virtual unique_ptr_t create_clone() const = 0;
 
   const TessellationBase& tessellation() const;
 

@@ -4,16 +4,18 @@
 set(SOKOENGINE_PUBLIC_HEADERS ${SOKOENGINE_PUBLIC_HEADERS}
   sokoengine.hpp
   sokoengine_config.hpp
-  common_types.hpp
 )
 
 add_subdirectory (board)
+add_subdirectory (game)
 add_subdirectory (snapshot)
 add_subdirectory (tessellation)
 
 set(SOKOENGINE_BUILD_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
                                   ${sokoenginecpp_BINARY_DIR}
+                                  "${CMAKE_CURRENT_SOURCE_DIR}/../.."
                                   board
+                                  game
                                   snapshot
                                   tessellation)
 

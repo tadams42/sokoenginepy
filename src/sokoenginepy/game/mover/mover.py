@@ -1,9 +1,17 @@
 from copy import deepcopy
 from itertools import groupby
+from enum import IntEnum
 
-from .. import board as module_board
-from .. import snapshot, utilities
-from .solving_mode import SolvingMode
+from ... import board as module_board
+from ... import snapshot, utilities
+
+
+class SolvingMode(IntEnum):
+    FORWARD = 0
+    REVERSE = 1
+
+    def __repr__(self):
+        return "SolvingMode." + self.name
 
 
 class NonPlayableBoardError(RuntimeError):
@@ -266,7 +274,7 @@ class Mover:
 
         try:
             self._state.move_pusher_from(old_position, new_position)
-        except RuntimeError as exc:
+        except module_board.CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
         path = self._state.board.positions_path_to_directions_path(
@@ -386,14 +394,14 @@ class Mover:
 
             try:
                 self._state.move_box_from(in_front_of_pusher, in_front_of_box)
-            except RuntimeError as exc:
+            except module_board.CellAlreadyOccupiedError as exc:
                 raise IllegalMoveError(str(exc))
 
         try:
             self._state.move_pusher_from(
                 initial_pusher_position, in_front_of_pusher
             )
-        except RuntimeError as exc:
+        except module_board.CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
         atomic_move = snapshot.AtomicMove(direction, is_push)
@@ -427,7 +435,7 @@ class Mover:
             self._state.move_pusher_from(
                 initial_pusher_position, in_front_of_pusher
             )
-        except RuntimeError as exc:
+        except module_board.CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
         is_pull = False
@@ -441,7 +449,7 @@ class Mover:
                     self._state.move_box_from(
                         behind_pusher, initial_pusher_position
                     )
-                except RuntimeError as exc:
+                except module_board.CellAlreadyOccupiedError as exc:
                     raise IllegalMoveError(str(exc))
                 if options.increase_pull_count:
                     self._pull_count += 1

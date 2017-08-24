@@ -39,6 +39,7 @@ public:
   HexobanBoard(HexobanBoard&& rv);
   HexobanBoard& operator=(HexobanBoard&& rv);
   virtual ~HexobanBoard();
+  virtual unique_ptr_t create_clone() const override;
 };
 
 namespace implementation {

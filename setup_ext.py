@@ -38,8 +38,10 @@ def configure_libsokoengine():
     ]
 
     include_dirs = [
+        'lib',
         'lib/libsokoengine/src',
         'lib/libsokoengine/src/board',
+        'lib/libsokoengine/src/game',
         'lib/libsokoengine/src/snapshot',
         'lib/libsokoengine/src/tessellation',
     ]
@@ -53,6 +55,7 @@ def configure_libsokoengine():
         for dir_path in [
             'src/ext/',
             'lib/libsokoengine/src/board/',
+            'lib/libsokoengine/src/game/',
             'lib/libsokoengine/src/snapshot/',
             'lib/libsokoengine/src/tessellation/',
         ]

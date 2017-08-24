@@ -34,4 +34,8 @@ OctobanBoard& OctobanBoard::operator=(OctobanBoard &&) = default;
 
 OctobanBoard::~OctobanBoard() = default;
 
+OctobanBoard::unique_ptr_t OctobanBoard::create_clone() const {
+  return make_unique<OctobanBoard>(*this);
+}
+
 } // namespace sokoengine

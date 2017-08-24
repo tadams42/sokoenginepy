@@ -48,6 +48,10 @@ HexobanBoard& HexobanBoard::operator=(HexobanBoard &&) = default;
 
 HexobanBoard::~HexobanBoard() = default;
 
+HexobanBoard::unique_ptr_t HexobanBoard::create_clone() const {
+  return make_unique<HexobanBoard>(*this);
+}
+
 namespace implementation {
 
 class LIBSOKOENGINE_LOCAL HexobanTextConverter {

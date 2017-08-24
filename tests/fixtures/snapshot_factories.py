@@ -14,7 +14,7 @@ class SnapshotFactory(factory.Factory):
         lambda x: fake.random_element(list(Tessellation))
     )
     solving_mode = factory.LazyAttribute(
-        lambda x: fake.random_element(list(SolvingMode))
+        lambda x: fake.random_element([SolvingMode.FORWARD, SolvingMode.REVERSE])
     )
     moves_data = ""
 

@@ -28,6 +28,7 @@ public:
   OctobanBoard(OctobanBoard&& rv);
   OctobanBoard& operator=(OctobanBoard&& rv);
   virtual ~OctobanBoard();
+  virtual unique_ptr_t create_clone() const override;
 };
 
 } // namespace sokoengine

@@ -22,6 +22,7 @@ public:
   SokobanBoard(SokobanBoard&& rv);
   SokobanBoard& operator=(SokobanBoard&& rv);
   virtual ~SokobanBoard();
+  virtual unique_ptr_t create_clone() const override;
 };
 
 } // namespace sokoengine

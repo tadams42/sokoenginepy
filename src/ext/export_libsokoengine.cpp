@@ -11,6 +11,7 @@ void export_board_graph();
 void export_tessellations();
 void export_boards();
 void export_board_state();
+void export_mover();
 
 void translator(const KeyError& exception) {
   PyErr_SetString(PyExc_KeyError, exception.what());
@@ -27,4 +28,5 @@ BOOST_PYTHON_MODULE(libsokoengine)
   export_tessellations();
   export_boards();
   export_board_state();
+  export_mover();
 }

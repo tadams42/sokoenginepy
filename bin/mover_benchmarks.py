@@ -171,13 +171,13 @@ class MovementBenchmarkPrinter:
         print("--------------------------------------------------")
 
         runs = 10
-        moves_per_run = 3e4
+        moves_per_run = 3e5
 
         printer = MovementBenchmarkPrinter(runs, moves_per_run)
         print(printer.board_header(BoardType.SMALL))
 
         # C++ speed
-        pivot_speed = 5e6
+        pivot_speed = 3e6
 
         printer.run_and_print_experiment(
             BoardType.SMALL, BenchmarkType.FORWARD_MOVER, pivot_speed

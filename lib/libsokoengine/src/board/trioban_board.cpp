@@ -34,4 +34,8 @@ TriobanBoard& TriobanBoard::operator=(TriobanBoard &&) = default;
 
 TriobanBoard::~TriobanBoard() = default;
 
+TriobanBoard::unique_ptr_t TriobanBoard::create_clone() const {
+  return make_unique<TriobanBoard>(*this);
+}
+
 } // namespace sokoengine

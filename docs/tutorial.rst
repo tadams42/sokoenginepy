@@ -165,7 +165,7 @@ game mechanics like this:
     >>> # try to perform illegal move raises CellAlreadyOccupiedError
     >>> try:
     ...     forward_mover.move(Direction.UP)
-    ... except IllegalMoveError:
+    ... except RuntimeError:
     ...     print("IllegalMoveError risen!")
     ...
     IllegalMoveError risen!

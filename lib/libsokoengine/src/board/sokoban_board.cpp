@@ -34,4 +34,8 @@ SokobanBoard& SokobanBoard::operator=(SokobanBoard &&) = default;
 
 SokobanBoard::~SokobanBoard() = default;
 
+SokobanBoard::unique_ptr_t SokobanBoard::create_clone() const {
+  return make_unique<SokobanBoard>(*this);
+}
+
 } // namespace sokoengine

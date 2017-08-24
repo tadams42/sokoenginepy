@@ -27,6 +27,7 @@ public:
   TriobanBoard(TriobanBoard&& rv);
   TriobanBoard& operator=(TriobanBoard&& rv);
   virtual ~TriobanBoard();
+  virtual unique_ptr_t create_clone() const override;
 };
 
 } // namespace sokoengine

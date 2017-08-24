@@ -23,8 +23,8 @@ endif()
 #                  CMake settings common to all targets.
 #..............................................................................
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Always produce position independent code (-fPIC on gcc)
-set(EXECUTABLE_OUTPUT_PATH "${sokoenginecpp_BINARY_DIR}/bin")
-set(LIBRARY_OUTPUT_PATH "${sokoenginecpp_BINARY_DIR}/bin")
+# set(EXECUTABLE_OUTPUT_PATH "${sokoenginecpp_BINARY_DIR}/bin")
+# set(LIBRARY_OUTPUT_PATH "${sokoenginecpp_BINARY_DIR}/bin")
 link_directories("${LIBRARY_OUTPUT_PATH}") # Linker should find libsokoengine binaries
 
 include(GNUInstallDirs)
