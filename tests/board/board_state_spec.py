@@ -921,19 +921,19 @@ class DescribeBoardState:
         box_id = DEFAULT_PIECE_ID
         box_position = board_state.box_position(box_id)
 
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_box(box_id, boxes_positions[DEFAULT_PIECE_ID + 1])
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_box_from(box_position, boxes_positions[DEFAULT_PIECE_ID + 1])
 
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_box(box_id, pushers_positions[DEFAULT_PIECE_ID])
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_box_from(box_position, pushers_positions[DEFAULT_PIECE_ID])
 
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_box(box_id, wall_position)
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_box_from(box_position, wall_position)
 
     def test_moving_pusher_onto_obstacle_raises_exception(
@@ -942,19 +942,19 @@ class DescribeBoardState:
         pusher_id = DEFAULT_PIECE_ID
         pusher_position = board_state.pusher_position(pusher_id)
 
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_pusher(pusher_id, boxes_positions[DEFAULT_PIECE_ID])
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_pusher_from(pusher_position, boxes_positions[DEFAULT_PIECE_ID])
 
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_pusher(pusher_id, pushers_positions[DEFAULT_PIECE_ID + 1])
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_pusher_from(pusher_position, pushers_positions[DEFAULT_PIECE_ID + 1])
 
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_pusher(pusher_id, wall_position)
-        with pytest.raises(CellAlreadyOccupiedError):
+        with pytest.raises(RuntimeError):
             board_state.move_pusher_from(pusher_position, wall_position)
 
     def it_implements_switching_box_and_goal_positions(
@@ -1003,7 +1003,8 @@ class DescribeBoardState:
             "########",
         ])
 
-        board_state = BoardState(SokobanBoard(board_str=board_str))
+        b = SokobanBoard(board_str=board_str)
+        board_state = BoardState(b)
 
         board_state.switch_boxes_and_goals()
         assert str(board_state.board) == switched_board_str

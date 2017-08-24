@@ -18,6 +18,14 @@ object neighbor_position_wraper(
 }
 
 void export_tessellations() {
+  enum_<CellOrientation>("CellOrientation")
+    .value("DEFAULT", CellOrientation::DEFAULT)
+    .value("TRIANGLE_DOWN", CellOrientation::TRIANGLE_DOWN)
+    .value("OCTAGON", CellOrientation::OCTAGON)
+    // We don't want constants be available in module scope
+    // .export_values()
+  ;
+
   class_<TessellationBase , boost::noncopyable>("TessellationBase", no_init);
 
   class_<SokobanTessellation, bases<TessellationBase> >(

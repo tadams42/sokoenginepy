@@ -1,15 +1,23 @@
 #ifndef BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
+#include "sokoengine_config.hpp"
+#include "direction.hpp"
+
 #include <vector>
 #include <memory>
 
-#include "sokoengine_config.hpp"
-#include "common_types.hpp"
-
 namespace sokoengine {
 
+enum class LIBSOKOENGINE_API GraphType : int {
+  DIRECTED = 0,
+  DIRECTED_MULTI = 1
+};
+
 class LIBSOKOENGINE_API BoardCell;
+
+typedef std::vector<position_t> Positions;
+typedef std::vector<Direction> Directions;
 
 class LIBSOKOENGINE_API BoardGraph {
 public:

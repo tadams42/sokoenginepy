@@ -1,14 +1,20 @@
 #ifndef TESSELLATION_BASE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TESSELLATION_BASE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include <stdexcept>
+#include "sokoengine_config.hpp"
+#include "board_graph.hpp"
 
-#include "common_types.hpp"
-#include "direction.hpp"
+#include <stdexcept>
 
 namespace sokoengine {
 
 class LIBSOKOENGINE_API AtomicMove;
+
+enum class LIBSOKOENGINE_API CellOrientation : int {
+  DEFAULT = 0,
+  TRIANGLE_DOWN = 1,
+  OCTAGON = 2
+};
 
 namespace implementation {
   class LIBSOKOENGINE_LOCAL VariantBoardResizer;

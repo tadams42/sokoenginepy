@@ -1,8 +1,8 @@
+#include "text_utils.hpp"
+
 #include <algorithm>
 #include <functional>
 #include <sstream>
-
-#include "text_utils.hpp"
 
 using namespace std;
 using std::placeholders::_1;
@@ -33,7 +33,7 @@ size_t TextUtils::calculate_width(const StringList& string_list) {
 
 class LIBSOKOENGINE_LOCAL RLE {
   // TODO: Rewrite this whole monstrocity using Boost.Spirit
-  
+
   // Assumes @a tline was checked with check_groups.
   // @todo Implemented recursively, could that be changed?
   bool decode_with_groups (string& tline) const {

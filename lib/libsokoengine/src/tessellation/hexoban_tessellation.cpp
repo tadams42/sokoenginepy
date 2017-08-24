@@ -1,11 +1,11 @@
-#include <memory>
-#include <map>
-
 #include "hexoban_tessellation.hpp"
 #include "hexoban_board.hpp"
 #include "board_cell.hpp"
 #include "direction.hpp"
 #include "atomic_move.hpp"
+
+#include <memory>
+#include <map>
 
 using namespace std;
 

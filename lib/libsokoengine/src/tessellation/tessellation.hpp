@@ -1,9 +1,9 @@
 #ifndef TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include <stdexcept>
-
 #include "sokoengine_config.hpp"
+
+#include <stdexcept>
 
 namespace sokoengine {
 

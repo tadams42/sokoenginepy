@@ -3,9 +3,9 @@ from itertools import permutations
 
 from cached_property import cached_property
 
-from .. import utilities
-from .piece import DEFAULT_PIECE_ID
-from .sokoban_plus import SokobanPlus
+from ... import utilities
+from ..piece import DEFAULT_PIECE_ID
+from ..sokoban_plus import SokobanPlus
 
 
 class CellAlreadyOccupiedError(RuntimeError):
@@ -65,19 +65,19 @@ class BoardState:
         edits back to our :class:`.BoardState` instance.
 
     Args:
-        board (VariantBoard): board for which we want to manage state
+        variant_board (VariantBoard): board for which we want to manage state
     """
 
-    def __init__(self, board):
-        self._board = board
+    def __init__(self, variant_board):
+        self._board = variant_board
         self._boxes = utilities.Flipdict()
         self._goals = utilities.Flipdict()
         self._pushers = utilities.Flipdict()
 
         pusher_id = box_id = goal_id = DEFAULT_PIECE_ID
 
-        for position in range(0, board.size):
-            cell = board[position]
+        for position in range(0, variant_board.size):
+            cell = variant_board[position]
 
             if cell.has_pusher:
                 self._pushers[pusher_id] = position

@@ -1,15 +1,13 @@
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>
-
-#include "board_graph.hpp"
 #include "variant_board.hpp"
 #include "board_cell.hpp"
-#include "tessellation_base.hpp"
 #include "tessellation.hpp"
 #include "sokoban_board.hpp"
 #include "trioban_board.hpp"
 #include "octoban_board.hpp"
 #include "hexoban_board.hpp"
+
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;

@@ -1,21 +1,19 @@
 #ifndef ATOMIC_MOVE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define ATOMIC_MOVE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
+#include "sokoengine_config.hpp"
+#include "direction.hpp"
+
 #include <string>
 #include <stdexcept>
 
-#include "common_types.hpp"
-#include "direction.hpp"
-
 namespace sokoengine {
-
 
 class LIBSOKOENGINE_API InvalidAtomicMoveError: public std::invalid_argument {
 public:
   InvalidAtomicMoveError(const std::string& mess);
   virtual ~InvalidAtomicMoveError();
 };
-
 
 class LIBSOKOENGINE_API AtomicMove {
 public:

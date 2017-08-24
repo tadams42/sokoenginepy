@@ -1,10 +1,10 @@
-#include <memory>
-#include <map>
-
 #include "octoban_tessellation.hpp"
 #include "board_cell.hpp"
 #include "direction.hpp"
 #include "atomic_move.hpp"
+
+#include <memory>
+#include <map>
 
 using namespace std;
 

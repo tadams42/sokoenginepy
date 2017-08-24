@@ -1,5 +1,3 @@
-#include <stdexcept>
-
 #include "board_cell.hpp"
 
 using namespace std;

@@ -4,9 +4,7 @@ from enum import IntEnum
 from functools import reduce
 from textwrap import dedent
 
-from sokoenginepy import Direction, Mover, SokobanBoard, SolvingMode, settings
-
-settings.OUTPUT_BOARDS_WITH_VISIBLE_FLOORS = False
+from sokoenginepy import Direction, Mover, SokobanBoard, SolvingMode
 
 
 class BoardType(IntEnum):
@@ -80,8 +78,9 @@ class MovementBenchmark:
         self.board_type = board_type
         self.benchmark_type = benchmark_type
         self.moves_count = moves_count
+        self.board = self.board_type.board
         self.mover = Mover(
-            self.board_type.board,
+            self.board,
             (
                 SolvingMode.REVERSE
                 if self.benchmark_type.is_reverse

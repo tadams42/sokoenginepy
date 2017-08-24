@@ -1,4 +1,5 @@
 #include <boost/python.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <sokoengine.hpp>
 
 using namespace boost::python;
@@ -151,6 +152,17 @@ void set_cell_wrapper(
 }
 
 void export_board_graph() {
+  class_<Positions>("Positions").def(vector_indexing_suite<Positions>());
+
+  class_<Directions>("Directions").def(vector_indexing_suite<Directions>());
+
+  enum_<GraphType>("GraphType")
+    .value("DIRECTED", GraphType::DIRECTED)
+    .value("DIRECTED_MULTI", GraphType::DIRECTED_MULTI)
+    // We don't want constants be available in module scope
+    // .export_values()
+  ;
+
   object BoardGraph_class = class_<BoardGraph>(
       // class name
       "BoardGraph",

@@ -1,14 +1,14 @@
-#include <algorithm>
-#include <functional>
-
-#include <boost/algorithm/string.hpp>
-
 #include "hexoban_board.hpp"
 #include "sokoban_board.hpp"
 #include "board_cell.hpp"
 #include "atomic_move.hpp"
 #include "tessellation_base.hpp"
 #include "tessellation.hpp"
+
+#include <algorithm>
+#include <functional>
+
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;

@@ -1,5 +1,3 @@
-#include <boost/algorithm/string.hpp>
-
 #include "tessellation.hpp"
 #include "tessellation_base.hpp"
 #include "text_utils.hpp"
@@ -8,6 +6,8 @@
 #include "trioban_tessellation.hpp"
 #include "octoban_tessellation.hpp"
 #include "hexoban_tessellation.hpp"
+
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 

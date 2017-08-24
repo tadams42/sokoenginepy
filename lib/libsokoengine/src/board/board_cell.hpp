@@ -1,10 +1,10 @@
 #ifndef BOARD_CELL_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_CELL_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
+#include "sokoengine_config.hpp"
+
 #include <string>
 #include <stdexcept>
-
-#include "sokoengine_config.hpp"
 
 namespace sokoengine {
 

@@ -45,37 +45,22 @@ def configure_libsokoengine():
     ]
 
     sources = [
-        'src/ext/export_boards.cpp',
-        'src/ext/export_common.cpp',
-        'src/ext/export_atomic_move.cpp',
-        'src/ext/export_board_cell.cpp',
-        'src/ext/export_direction.cpp',
-        'src/ext/export_tessellations.cpp',
-        'src/ext/export_libsokoengine.cpp',
-        'src/ext/export_board_graph.cpp',
-    ] + [
-        'lib/libsokoengine/src/board/text_utils.cpp',
-        'lib/libsokoengine/src/board/board_cell.cpp',
-        'lib/libsokoengine/src/board/board_graph.cpp',
-        'lib/libsokoengine/src/board/variant_board.cpp',
-        'lib/libsokoengine/src/board/sokoban_board.cpp',
-        'lib/libsokoengine/src/board/trioban_board.cpp',
-        'lib/libsokoengine/src/board/octoban_board.cpp',
-        'lib/libsokoengine/src/board/hexoban_board.cpp',
-        'lib/libsokoengine/src/snapshot/atomic_move.cpp',
-        'lib/libsokoengine/src/tessellation/direction.cpp',
-        'lib/libsokoengine/src/tessellation/tessellation_base.cpp',
-        'lib/libsokoengine/src/tessellation/tessellation.cpp',
-        'lib/libsokoengine/src/tessellation/sokoban_tessellation.cpp',
-        'lib/libsokoengine/src/tessellation/hexoban_tessellation.cpp',
-        'lib/libsokoengine/src/tessellation/octoban_tessellation.cpp',
-        'lib/libsokoengine/src/tessellation/trioban_tessellation.cpp',
+        [
+            os.path.join(dir_path, file_name)
+            for file_name in os.listdir(dir_path)
+            if file_name.endswith(".cpp")
+        ]
+        for dir_path in [
+            'src/ext/',
+            'lib/libsokoengine/src/board/',
+            'lib/libsokoengine/src/snapshot/',
+            'lib/libsokoengine/src/tessellation/',
+        ]
     ]
+    sources = [item for sublist in sources for item in sublist]
 
     if _DEBUG:
-        extra_compile_args += [
-            "-g3", "-O0", "-DDEBUG=1", "-UNDEBUG"
-        ]
+        extra_compile_args += ["-g3", "-O0", "-DDEBUG=1", "-UNDEBUG"]
         undef_macros=["NDEBUG"]
 
         # ----------------------------------------------------------------------

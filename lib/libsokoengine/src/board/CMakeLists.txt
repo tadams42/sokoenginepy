@@ -7,6 +7,9 @@ set(SOKOENGINE_SOURCES ${SOKOENGINE_SOURCES}
   board/octoban_board.cpp
   board/trioban_board.cpp
   board/hexoban_board.cpp
+  board/board_state.cpp
+  board/sokoban_plus.cpp
+  board/hashed_board_state.cpp
 PARENT_SCOPE)
 
 set(SOKOENGINE_PUBLIC_HEADERS ${SOKOENGINE_PUBLIC_HEADERS}
@@ -18,4 +21,7 @@ set(SOKOENGINE_PUBLIC_HEADERS ${SOKOENGINE_PUBLIC_HEADERS}
   board/octoban_board.hpp
   board/trioban_board.hpp
   board/hexoban_board.hpp
+  board/board_state.hpp
+  board/sokoban_plus.hpp
+  board/hashed_board_state.hpp
 PARENT_SCOPE)

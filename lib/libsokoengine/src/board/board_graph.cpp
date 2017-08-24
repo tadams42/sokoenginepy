@@ -1,13 +1,11 @@
+#include "board_graph.hpp"
+#include "board_cell.hpp"
+
 #include <algorithm>
 #include <boost/foreach.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/breadth_first_search.hpp>
-
-#include "common_types.hpp"
-#include "board_graph.hpp"
-#include "board_cell.hpp"
-#include "direction.hpp"
 
 using namespace std;
 using namespace boost;

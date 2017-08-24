@@ -1,4 +1,5 @@
 #include <boost/python.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <sokoengine.hpp>
 
 using namespace boost::python;
@@ -256,6 +257,8 @@ object instance_from_wrapper(
 }
 
 void export_boards() {
+  class_<StringList>("StringList").def(vector_indexing_suite<StringList>());
+
   class_<VariantBoard , boost::noncopyable>("VariantBoard", no_init)
     // @classmethod
     .def(

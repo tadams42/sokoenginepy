@@ -1,9 +1,9 @@
 #ifndef DIRECTION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define DIRECTION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include <string>
-
 #include "sokoengine_config.hpp"
+
+#include <string>
 
 namespace sokoengine {
 

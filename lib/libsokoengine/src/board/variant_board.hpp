@@ -1,15 +1,16 @@
 #ifndef VARIANT_BOARD_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define VARIANT_BOARD_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include <memory>
-
+#include "sokoengine_config.hpp"
+#include "board_graph.hpp"
+#include "tessellation_base.hpp"
 #include "text_utils.hpp"
-#include "common_types.hpp"
+
+#include <memory>
 
 namespace sokoengine {
 
 class LIBSOKOENGINE_API BoardCell;
-class LIBSOKOENGINE_API BoardGraph;
 class LIBSOKOENGINE_API TessellationBase;
 
 namespace implementation {

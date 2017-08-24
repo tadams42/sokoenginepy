@@ -1,7 +1,7 @@
-#include <typeinfo>
-
 #include "tessellation_base.hpp"
 #include "variant_board.hpp"
+
+#include <typeinfo>
 
 using namespace std;
 
