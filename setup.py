@@ -9,10 +9,12 @@ https://github.com/pypa/sampleproject
 from __future__ import absolute_import, print_function
 
 import io
+import os
 import re
 from glob import glob
 from os.path import basename, dirname, join, splitext
 
+import setup_ext
 from setuptools import find_packages, setup
 
 
@@ -22,14 +24,14 @@ def read(*names, **kwargs):
         encoding=kwargs.get('encoding', 'utf8')
     ).read()
 
-
 setup(
     name="sokoenginepy",
-    version='0.4.3',
+    version='0.5.0',
     license="GPLv3",
     description="Sokoban and variants game engine",
-    long_description='%s' % (
-        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst'))
+    long_description='%s\n%s' % (
+        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
+        re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
     ),
     author="Tomislav Adamic",
     author_email="tomislav.adamic@gmail.com",
@@ -44,7 +46,6 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
@@ -65,8 +66,6 @@ setup(
         'pytz >=2016.6.1',
         'pyparsing >=2.1.0',
         'networkx >=1.11',
-        # Alternative that is A LOT faster but install through pip is not supported
-        # 'graph-tool >=2.11'
         'cached-property >=1.2.0'
     ],
     # List additional groups of dependencies HERE (e.g. development
@@ -112,4 +111,5 @@ setup(
     # installed, specify them HERE.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={'sokoenginepy': ['res/*'],},
+    ext_modules=setup_ext.native_extensions()
 )

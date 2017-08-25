@@ -1,7 +1,6 @@
 import pytest
 
-from sokoenginepy import SokobanPlus
-from sokoenginepy.exceptions import SokobanPlusDataError
+from sokoenginepy import SokobanPlus, SokobanPlusDataError
 
 from ..fixtures import SokobanPlusFactory
 

@@ -4,7 +4,7 @@ from enum import Enum
 from .. import tessellation, utilities
 
 
-class SnapshotConversionError(utilities.SokoengineError):
+class SnapshotConversionError(ValueError):
     """
     Exception risen when converting game snapshot to or from snapshot strings.
     """
@@ -56,9 +56,9 @@ class Snapshot(MutableSequence):
             self._solving_mode = solving_mode
 
         if self._solving_mode is None:
-            raise utilities.SokoengineError(
+            raise RuntimeError(
                 "Snapshot not correctly initialized! Missing solving_mode. " +
-                "Either provide it explcitly or provide moves_data." +
+                "Either provide it explicitly or provide moves_data." +
                 "tessellation_or_description: '{0}', solving_mode: {1},".format(
                     tessellation_or_description, solving_mode
                 ) + " moves_data: {0}".format(moves_data)
@@ -190,9 +190,14 @@ class Snapshot(MutableSequence):
         self._jumps_count_invalidated = False
         self._moves = []
 
-    def __str__(self):
+    def to_str(self, break_long_lines_at=80, rle_encode=False):
         from .snapshot_string_parser import SnapshotStringParser
-        return SnapshotStringParser.convert_to_string(self)
+        return SnapshotStringParser.convert_to_string(
+            self, break_long_lines_at=break_long_lines_at, rle_encode=rle_encode
+        )
+
+    def __str__(self):
+        return self.to_str()
 
     def _before_removing_move(self, atomic_move):
         if not atomic_move.is_pusher_selection:
@@ -209,7 +214,7 @@ class Snapshot(MutableSequence):
             self._solving_mode == game.SolvingMode.FORWARD and
             atomic_move.is_jump
         ):
-            raise utilities.SokoengineError(
+            raise ValueError(
                 "Forward mode snapshots are not allowed to contain jumps!"
             )
 

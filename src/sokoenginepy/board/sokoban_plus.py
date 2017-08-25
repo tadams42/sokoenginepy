@@ -2,7 +2,7 @@ from .. import utilities
 from .piece import DEFAULT_PIECE_ID
 
 
-class SokobanPlusDataError(utilities.SokoengineError):
+class SokobanPlusDataError(ValueError):
     pass
 
 
@@ -134,7 +134,7 @@ class SokobanPlus:
             self._goal_plus_ids = self._parse_and_clean_ids_string(
                 self._goalorder
             )
-        except SokobanPlusDataError as exc:
+        except ValueError as exc:
             self.errors.append(str(exc))
 
         self._validate_plus_ids(self._box_plus_ids)

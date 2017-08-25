@@ -28,18 +28,18 @@ Constructing an instance of board is as easy as:
     ...     '    #     #########',
     ...     '    #######'
     ... ]))
-    >>> print(board)
-        #####
-        #  @#
-        #$  #
-      ###  $##
-      #  $ $ #
-    ### # ## #   ######
-    #   # ## #####  ..#
-    # $  $          ..#
-    ##### ### #@##  ..#
-        #     #########
-        #######
+    >>> print(board.to_str(use_visible_floor=True))
+    ----#####----------
+    ----#--@#----------
+    ----#$--#----------
+    --###--$##---------
+    --#--$-$-#---------
+    ###-#-##-#---######
+    #---#-##-#####--..#
+    #-$--$----------..#
+    #####-###-#@##--..#
+    ----#-----#########
+    ----#######--------
 
 All boards implement rich API that allows editing individual board cells,
 resizing and exploring neighboring positions. Positions are expressed as 1D
@@ -47,7 +47,7 @@ array indexes which can be retrieved fro 2D coordinates using :func:`.index_1d`
 
 .. code-block:: python
 
-    >>> from sokoenginepy import BoardCell, Direction
+    >>> from sokoenginepy import BoardCell, BoardCellCharacters, Direction
     >>> from sokoenginepy.utilities import index_1d
     >>> position = index_1d(11, 8, board.width)
     >>>
@@ -55,7 +55,7 @@ array indexes which can be retrieved fro 2D coordinates using :func:`.index_1d`
     BoardCell('@')
     >>> print(board[position])
     @
-    >>> board[position] = BoardCell.Characters.BOX
+    >>> board[position] = BoardCellCharacters.BOX
     >>> board[position]
     BoardCell('$')
     >>> board[position].has_pusher
@@ -63,7 +63,6 @@ array indexes which can be retrieved fro 2D coordinates using :func:`.index_1d`
     >>> board[position].has_box
     True
     >>> board[position].put_pusher()
-    BoardCell('@')
     >>> board.neighbor(position, Direction.RIGHT)
     164
 
@@ -82,17 +81,17 @@ mechanics, we can attach instance of :class:`.HashedBoardState` to our board.
     >>> state = HashedBoardState(board)
     >>> state
     HashedBoardState(SokobanBoard(board_str='\n'.join([
-        '    #####',
-        '    #  @#',
-        '    #$  #',
-        '  ###  $##',
-        '  #  $ $ #',
+        '    #####          ',
+        '    #  @#          ',
+        '    #$  #          ',
+        '  ###  $##         ',
+        '  #  $ $ #         ',
         '### # ## #   ######',
         '#   # ## #####  ..#',
         '# $  $          ..#',
         '##### ### #@##  ..#',
         '    #     #########',
-        '    #######'
+        '    #######        '
     ])))
 
 This class memoizes positions of pushers and boxes and assigns numerical IDs to
@@ -155,8 +154,7 @@ game mechanics like this:
 
 .. code-block:: python
 
-    >>> from sokoenginepy import Mover, SolvingMode
-    >>> from sokoenginepy.exceptions import IllegalMoveError
+    >>> from sokoenginepy import Mover, SolvingMode, IllegalMoveError
     >>>
     >>> # regular, forward solving mode
     >>> forward_mover = Mover(board)
@@ -167,7 +165,7 @@ game mechanics like this:
     >>> # try to perform illegal move raises CellAlreadyOccupiedError
     >>> try:
     ...     forward_mover.move(Direction.UP)
-    ... except IllegalMoveError:
+    ... except RuntimeError:
     ...     print("IllegalMoveError risen!")
     ...
     IllegalMoveError risen!
@@ -187,18 +185,18 @@ game mechanics like this:
     ...     #######
     ... """[1:-1])
     >>> reverse_mover = Mover(board, SolvingMode.REVERSE)
-    >>> print(reverse_mover.board)
-        #####
-        #  @#
-        #.  #
-      ###  .##
-      #  . . #
-    ### # ## #   ######
-    #   # ## #####  $$#
-    # .  .          $$#
-    ##### ### #@##  $$#
-        #     #########
-        #######
+    >>> print(reverse_mover.board.to_str(use_visible_floor=True))
+    ----#####----------
+    ----#--@#----------
+    ----#.--#----------
+    --###--.##---------
+    --#--.-.-#---------
+    ###-#-##-#---######
+    #---#-##-#####--$$#
+    #-.--.----------$$#
+    #####-###-#@##--$$#
+    ----#-----#########
+    ----#######--------
 
     >>> # Sokoban+
     >>> reverse_mover.state.boxorder = '1 3 2'

@@ -27,7 +27,7 @@ sokoenginepy - Sokoban and variants game engine
 
 .. |travis| image:: https://api.travis-ci.org/tadams42/sokoenginepy.svg
     :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/tadams42/sokoenginepy.svg?branch=master
+    :target: https://travis-ci.org/tadams42/sokoenginepy
 
 .. |docs| image:: https://readthedocs.org/projects/sokoenginepy/badge/?style=flat
     :target: http://sokoenginepy.readthedocs.io/en/latest/
@@ -39,11 +39,11 @@ sokoenginepy - Sokoban and variants game engine
 
 .. |codacy_grade| image:: https://api.codacy.com/project/badge/Grade/492a7c08b97e4dbe991b0190dd3abf02
     :alt: Codacy grade
-    :target: https://www.codacy.com/app/tadams42/sokoenginepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tadams42/sokoenginepy&amp;utm_campaign=Badge_Grade
+    :target: https://www.codacy.com/app/tadams42/sokoenginepy/dashboard
 
 .. |codacy_coverage| image:: https://api.codacy.com/project/badge/Coverage/492a7c08b97e4dbe991b0190dd3abf02
     :alt: Codacy coverage
-    :target: https://www.codacy.com/app/tadams42/sokoenginepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tadams42/sokoenginepy&amp;utm_campaign=Badge_Coverage
+    :target: https://www.codacy.com/app/tadams42/sokoenginepy/dashboard
 
 .. end-badges
 

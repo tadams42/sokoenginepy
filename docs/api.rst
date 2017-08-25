@@ -9,6 +9,4 @@ API reference
     _api/sokoenginepy.snapshot
     _api/sokoenginepy.game
     _api/sokoenginepy.input_output
-    _api/sokoenginepy.settings
     _api/sokoenginepy.utilities
-    _api/sokoenginepy.exceptions

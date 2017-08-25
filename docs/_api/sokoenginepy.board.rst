@@ -10,6 +10,10 @@ Boards
 BoardCell
 ---------
 
+.. autoexception:: sokoenginepy.board.board_cell.BoardConversionError
+
+.. autoexception:: sokoenginepy.board.board_cell.IllegalBoardCharacterError
+
 .. autoclass:: sokoenginepy.BoardCell
     :members:
     :undoc-members:
@@ -18,6 +22,10 @@ BoardCell
 
 BoardState
 ----------
+
+.. autoexception:: sokoenginepy.board.board_state.BoxGoalSwitchError
+
+.. autoexception:: sokoenginepy.board.board_state.CellAlreadyOccupiedError
 
 .. autoclass:: sokoenginepy.board.board_state.BoardState
     :members:
@@ -42,13 +50,7 @@ BoardGraph
     :inherited-members:
     :show-inheritance:
 
-.. autoclass:: sokoenginepy.BoardGraph
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-.. autoclass:: sokoenginepy.board.graph.board_graph_networkx.BoardGraphNetworkx
+.. autoclass:: sokoenginepy.board.graph.board_graph.BoardGraph
     :members:
     :undoc-members:
     :inherited-members:
@@ -96,6 +98,8 @@ OctobanBoard
 
 SokobanPlus
 -----------
+
+.. autoexception:: sokoenginepy.board.sokoban_plus.SokobanPlusDataError
 
 .. autoclass:: sokoenginepy.SokobanPlus
     :members:

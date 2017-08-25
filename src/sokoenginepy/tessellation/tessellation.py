@@ -7,7 +7,7 @@ from .sokoban_tessellation import SokobanTessellation
 from .trioban_tessellation import TriobanTessellation
 
 
-class UnknownTessellationError(utilities.SokoengineError):
+class UnknownTessellationError(ValueError):
     pass
 
 

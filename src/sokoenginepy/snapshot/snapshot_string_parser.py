@@ -3,12 +3,12 @@ from functools import reduce
 
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
-from .. import settings, utilities
-from .atomic_move import AtomicMove
+from .. import utilities
+from .atomic_move import AtomicMove, AtomicMoveCharacters
 from .snapshot import Snapshot, SnapshotConversionError
 
 _RE_SNAPSHOT_STRING = re.compile(
-    r"^([0-9\s" + re.escape("".join(c for c in AtomicMove.Characters)) +
+    r"^([0-9\s" + re.escape("".join(c for c in AtomicMoveCharacters)) +
     re.escape("".join(c for c in Snapshot.NonMoveCharacters)
              ) + re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
 )
@@ -21,7 +21,7 @@ class SnapshotStringParser:
     """
 
     atomic_moves = Regex(
-        "([" + "".join(c for c in AtomicMove.Characters) + "])+"
+        "([" + "".join(c for c in AtomicMoveCharacters) + "])+"
     )
     jump = Group(
         oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN) + ZeroOrMore(atomic_moves)
@@ -66,7 +66,9 @@ class SnapshotStringParser:
             to_snapshot.append(atomic_move)
 
     @classmethod
-    def convert_to_string(cls, snapshot):
+    def convert_to_string(
+        cls, snapshot, rle_encode, break_long_lines_at=80
+    ):
         from .. import game
 
         retv = ""
@@ -109,7 +111,7 @@ class SnapshotStringParser:
                         retv += snapshot.tessellation.atomic_move_to_char(
                             snapshot[i]
                         )
-                    except utilities.SokoengineError:
+                    except RuntimeError:
                         conversion_ok = False
                     i += 1
                     if i < iend:
@@ -125,18 +127,20 @@ class SnapshotStringParser:
                     retv += snapshot.tessellation.atomic_move_to_char(
                         snapshot[i]
                     )
-                except utilities.SokoengineError:
+                except RuntimeError:
                     conversion_ok = False
                 i += 1
 
-        if conversion_ok and settings.RLE_ENCODE_BOARD_STRINGS:
+        if conversion_ok and rle_encode:
             retv = utilities.rle_encode(retv)
 
-        if conversion_ok and settings.BREAK_LONG_SNAPSHOT_STRINGS:
+        if conversion_ok and break_long_lines_at:
             tmp = ""
             for i, character in enumerate(retv):
                 tmp += character
-                if settings.should_insert_line_break_at(i + 1):
+                if utilities.should_insert_line_break_at(
+                    i + 1, break_long_lines_at
+                ):
                     tmp += "\n"
             retv = tmp
 
@@ -235,7 +239,7 @@ class SnapshotStringParser:
             atomic_move = None
             try:
                 atomic_move = tessellation.char_to_atomic_move(character)
-            except utilities.SokoengineError:
+            except ValueError:
                 atomic_move = None
 
             if atomic_move is None:

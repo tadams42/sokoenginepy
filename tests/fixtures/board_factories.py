@@ -1,8 +1,9 @@
 import factory
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, BoardState, HashedBoardState,
-                          SokobanBoard, SokobanPlus, Tessellation)
+from sokoenginepy import (DEFAULT_PIECE_ID, BoardState, Direction,
+                          HashedBoardState, SokobanBoard, SokobanPlus,
+                          Tessellation)
 from sokoenginepy.utilities import index_1d
 
 from ..test_helpers import fake
@@ -13,17 +14,17 @@ def board_str():
     # yapf: disable
     return "\n".join([
         # 123456789012345678
-        "    #####",            # 0
-        "    #  @#",            # 1
-        "    #$  #",            # 2
-        "  ###  $##",           # 3
-        "  #  $ $ #",           # 4
+        "    #####          ",  # 0
+        "    #  @#          ",  # 1
+        "    #$  #          ",  # 2
+        "  ###  $##         ",  # 3
+        "  #  $ $ #         ",  # 4
         "### # ## #   ######",  # 5
         "#   # ## #####  ..#",  # 6
         "# $  $          ..#",  # 7
         "##### ### #@##  ..#",  # 8
         "    #     #########",  # 9
-        "    #######",          # 0
+        "    #######        ",  # 0
     ])
     # yapf: enable
 
@@ -32,20 +33,42 @@ def board_str():
 def switched_board_str():
     # yapf: disable
     return "\n".join([
-        "    #####",
-        "    #  @#",
-        "    #.  #",
-        "  ###  .##",
-        "  #  . . #",
+        "    #####          ",
+        "    #  @#          ",
+        "    #.  #          ",
+        "  ###  .##         ",
+        "  #  . . #         ",
         "### # ## #   ######",
         "#   # ## #####  $$#",
         "# .  .          $$#",
         "##### ### #@##  $$#",
         "    #     #########",
-        "    #######",
+        "    #######        ",
     ])
     # yapf: enable
 
+
+@pytest.fixture
+def positions_path(board_width):
+    return [
+        index_1d(7, 1, board_width),
+        index_1d(6, 1, board_width),
+        index_1d(6, 2, board_width),
+        index_1d(6, 3, board_width),
+        index_1d(6, 4, board_width),
+        index_1d(5, 4, board_width),
+    ]
+
+
+@pytest.fixture
+def directions_path():
+    return [
+        Direction.LEFT,
+        Direction.DOWN,
+        Direction.DOWN,
+        Direction.DOWN,
+        Direction.LEFT,
+    ]
 
 @pytest.fixture
 def board_width():

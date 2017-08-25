@@ -1,5 +1,7 @@
-from .board_cell import BoardCell, BoardConversionError
-from .board_state import BoardState, CellAlreadyOccupiedError
+from .board_cell import (BoardCell, BoardCellCharacters, BoardConversionError,
+                         IllegalBoardCharacterError)
+from .board_state import (BoardState, BoxGoalSwitchError,
+                          CellAlreadyOccupiedError)
 from .graph import BoardGraph, GraphType
 from .hashed_board_state import HashedBoardState
 from .hexoban_board import HexobanBoard
@@ -9,3 +11,8 @@ from .sokoban_board import SokobanBoard
 from .sokoban_plus import SokobanPlus, SokobanPlusDataError
 from .trioban_board import TriobanBoard
 from .variant_board import VariantBoard
+
+try:
+    from libsokoengine import VariantBoard
+except ImportError:
+    from .variant_board import VariantBoard

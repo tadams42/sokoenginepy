@@ -13,6 +13,10 @@ SolvingMode
 Mover
 -----
 
+.. autoexception:: sokoenginepy.game.mover.IllegalMoveError
+
+.. autoexception:: sokoenginepy.game.mover.NonPlayableBoardError
+
 .. autoclass:: sokoenginepy.Mover
     :members:
     :undoc-members:
