@@ -8,17 +8,20 @@ include .bumpversion.cfg
 include .coveragerc
 include .editorconfig
 
+include CHANGELOG.rst
 include LICENSE
 include README.rst
 
 include tox.ini .travis.yml setup_ext.py
 
-global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4 
+global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4
 
-global-exclude .ipynb_checkpoints/*
+global-exclude .ipynb_checkpoints/* lib/libsokoengine/lib/cppitertools
 
 prune docs/_build
 prune lib/libsokoengine/build
+prune lib/libsokoengine/lib/cppitertools
+prune lib/libsokoengine/lib/backward-cpp
 
 recursive-include res *.ipynb
 recursive-include res *.py
