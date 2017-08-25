@@ -73,7 +73,7 @@ Note, to combine the coverage data from all the tox environments run:
       - ::
 
             PYTEST_ADDOPTS=--cov-append tox
-            
+
 Running under PyPy3
 -------------------
 
@@ -143,6 +143,19 @@ An upload it
 .. code-block:: sh
 
     twine upload -r pypitest dist/*
+
+Native extenstion
+-----------------
+
+There is optional C++ native extension that is built with ``python setup.py`` automatically if all dependencies are in place.
+
+Configuring dependencies needs more work, currently it is guaranteed to work on only on Ubuntu and only on Python 3.5.
+
+Native extnsion relies on Boost.Python and Boost.Graph:
+
+.. code-block:: sh
+
+    sudo apt install python3-dev python3-dbg libboost-python-dev libboost-graph-dev
 
 .. _Boost Graph Library: http://www.boost.org/doc/libs/1_61_0/libs/graph/doc/index.html
 .. _graph-tool: https://graph-tool.skewed.de/download

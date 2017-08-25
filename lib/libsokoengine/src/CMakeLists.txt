@@ -13,7 +13,6 @@ add_subdirectory (tessellation)
 
 set(SOKOENGINE_BUILD_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
                                   ${sokoenginecpp_BINARY_DIR}
-                                  "${CMAKE_CURRENT_SOURCE_DIR}/../.."
                                   board
                                   game
                                   snapshot
@@ -24,7 +23,7 @@ set(SOKOENGINE_BUILD_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
 #..............................................................................
 add_library(sokoengine_obj OBJECT ${SOKOENGINE_SOURCES}
                                   ${SOKOENGINE_PUBLIC_HEADERS}
-                                  ${LIBBACKWARD_SOURCE})
+                                  ${LIBBACKWARD_SOURCES})
 
 target_compile_definitions(sokoengine_obj PRIVATE "LIBSOKOENGINE_DLL_EXPORTS")
 target_include_directories(sokoengine_obj PUBLIC ${SOKOENGINE_BUILD_INCLUDE_DIRS})

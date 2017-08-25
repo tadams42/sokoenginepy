@@ -95,56 +95,53 @@ configure_file(
 add_custom_target(uninstall
   "${CMAKE_COMMAND}" -P "${sokoenginecpp_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
+#..............................................................................
+#                                cppitertools library
+#..............................................................................
+if(NOT EXISTS "${sokoenginecpp_SOURCE_DIR}/lib/cppitertools/")
+  execute_process(
+    COMMAND git clone https://github.com/ryanhaining/cppitertools.git
+    WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/lib"
+  )
+endif()
 
+include_directories("${sokoenginecpp_SOURCE_DIR}/lib")
 
+#..............................................................................
+#                                Backward library
+#..............................................................................
+# sudo apt-get install libdw-dev
+# or
+# sudo apt-get install binutils-dev
+if(LIBSOKONGINE_SYSTEM_IS_LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
+  if(NOT EXISTS "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/")
+    execute_process(
+      COMMAND git clone https://github.com/bombela/backward-cpp.git
+      WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/lib"
+    )
+  endif()
 
+  # Following two don't work for some reason...
+  # list(APPEND CMAKE_MODULE_PATH "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/")
+  # find_package(Backward)
 
+  CHECK_INCLUDE_FILE("elfutils/libdw.h" HAVE_DW_H)
+  if(HAVE_DW_H)
+    include_directories("${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp")
+    add_definitions(-DBACKWARD_HAS_DW=1)
+    set(LIBBACKWARD_DEPENDENCIES dw)
+    set(LIBBACKWARD_SOURCES "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
+  else()
+    CHECK_INCLUDE_FILE("bfd.h" HAVE_BFD_H)
+    if (HAVE_BFD_H)
+      include_directories("${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp")
+      add_definitions(-DBACKWARD_HAS_BFD=1)
+      set(LIBBACKWARD_DEPENDENCIES bfd)
+      set(LIBBACKWARD_SOURCES "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
+    endif()
+  endif()
+endif()
 
-
-
-# #..............................................................................
-# #                                Backward library
-# #..............................................................................
-# # sudo apt-get install libdw-dev
-# # or
-# # sudo apt-get install binutils-dev
-# if(LIBSOKONGINE_SYSTEM_IS_LINUX)
-#   if(CMAKE_BUILD_TYPE MATCHES Debug)
-#     include(ExternalProject)
-#
-#     # set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
-#     #
-#     # ExternalProject_Add(googletest
-#     #     GIT_REPOSITORY https://github.com/google/googletest
-#     #     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}
-#     # )
-#     #
-#     # include_directories(${EXTERNAL_INSTALL_LOCATION}/include)
-#     # link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
-#     #
-#     # set(LIBBACKWARD_SOURCE "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
-#
-#     CHECK_INCLUDE_FILE("elfutils/libdw.h" HAVE_DW_H)
-#     if(HAVE_DW_H)
-#       add_definitions(-DBACKWARD_HAS_DW=1)
-#       set(LIBBACKWARD_DEPENDENCIES dw)
-#     else()
-#       CHECK_INCLUDE_FILE("bfd.h" HAVE_BFD_H)
-#       if (HAVE_BFD_H)
-#         add_definitions(-DBACKWARD_HAS_BFD=1)
-#         set(LIBBACKWARD_DEPENDENCIES bfd)
-#       endif()
-#     endif()
-#   endif()
-# endif()
-#
-#
-# #..............................................................................
-# #                                cppitertools library
-# #..............................................................................
-# include_directories("${sokoenginecpp_SOURCE_DIR}/lib/cppitertools")
-#
-#
 # #..............................................................................#
 # #                                   doc target                                 #
 # #..............................................................................#

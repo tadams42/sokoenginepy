@@ -29,6 +29,14 @@ def configure_libsokoengine():
         )
     }
 
+    cppitertools_dir = os.path.abspath('lib/libsokoengine/lib/cppitertools')
+    if not os.path.exists(cppitertools_dir):
+        os.system(
+            'git clone https://github.com/ryanhaining/cppitertools.git "{}"'.format(
+                cppitertools_dir
+            )
+        )
+
     extra_compile_args = [
         '-std=c++14',
         '-Wno-overloaded-virtual',
@@ -39,6 +47,7 @@ def configure_libsokoengine():
 
     include_dirs = [
         'lib',
+        'lib/libsokoengine/lib',
         'lib/libsokoengine/src',
         'lib/libsokoengine/src/board',
         'lib/libsokoengine/src/game',
@@ -65,17 +74,6 @@ def configure_libsokoengine():
     if _DEBUG:
         extra_compile_args += ["-g3", "-O0", "-DDEBUG=1", "-UNDEBUG"]
         undef_macros=["NDEBUG"]
-
-        # ----------------------------------------------------------------------
-        # Requires `apt-get install binutils-dev` or `apt-get install libdw-dev`
-        # and
-        # `#define BACKWARD_HAS_BFD 1` or `#define BACKWARD_HAS_DW 1`
-        # ----------------------------------------------------------------------
-        if os.path.exists('lib/backward-cpp'):
-            libraries['backward_cpp'] = 'bfd'
-            sources += ['lib/backward-cpp/backward.cpp']
-            include_dirs += ['lib/backward-cpp']
-            extra_compile_args += ['-DBACKWARD_HAS_BFD=1']
     else:
         extra_compile_args += ["-DNDEBUG", "-O3"]
         undef_macros = []

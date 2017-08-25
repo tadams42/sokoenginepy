@@ -5,15 +5,14 @@
 Required: [git], [make], recent C++ compiler with C++11 support ([gcc] v4.7, [clang] v3.0), [boost], [CMake]
 
 ~~~~~~sh
-$ sudo apt-get install git build-essential libboost-graph-dev \
-                       cmake cmake-qt-gui
+$ sudo apt-get install git build-essential libboost-graph-dev cmake
 ~~~~~~
 
 Useful for development:
 
 ~~~~~~sh
 $ sudo apt-get install lcov libdw-dev binutils-dev doxygen valgrind \
-kcachegrind gcov lcov genhtml ninja-build
+kcachegrind gcov lcov genhtml ninja-build cmake-qt-gui
 ~~~~~~
 
 ## Compile and install
@@ -27,7 +26,7 @@ $ git clone https://github.com/tadams42/sokoenginepy.git
 Configure sources:
 
 ~~~~~~sh
-$ cd lib/libsokoengine && mkdir build && cd build
+$ cd libsokoengine && mkdir build && cd build
 $ cmake ../
 ~~~~~~
 
