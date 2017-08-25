@@ -1,4 +1,5 @@
 import os
+import sys
 
 from setuptools import Extension
 
@@ -18,8 +19,8 @@ def configure_libsokoengine():
 
     libraries={
         'Boost.Python': (
-            'boost_python-py35'
-            if os.path.exists('/usr/lib/x86_64-linux-gnu/libboost_python-py35.so')
+            'boost_python-py3{}'.format(sys.version_info.minor)
+            if os.path.exists('/usr/lib/x86_64-linux-gnu/libboost_python-py3{}.so'.format(sys.version_info.minor))
             else None
         ),
         'Boost.Graph': (

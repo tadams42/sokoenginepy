@@ -980,25 +980,3 @@ class DescribeMover:
         def when_fails_it_leaves_sucessful_moves_in_last_move(self):
             # TODO
             pass
-
-    class DescribeMoverBenchmark:
-        def it_benchmarks_forward_mover(
-            self, benchmark, forward_mover, forward_mover_moves_cycle
-        ):
-            benchmark(
-                lambda: [
-                    forward_mover.move(d)
-                    for d in 100*forward_mover_moves_cycle
-                ]
-            )
-
-        def it_benchmarks_reverse_mover(
-            self, benchmark, reverse_mover, reverse_mover_moves_cycle
-        ):
-            reverse_mover.pulls_boxes = True
-            benchmark(
-                lambda: [
-                    reverse_mover.move(d)
-                    for d in 100*reverse_mover_moves_cycle
-                ]
-            )
