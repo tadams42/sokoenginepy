@@ -21,5 +21,4 @@ endif()
 include("${sokoenginecpp_SOURCE_DIR}/cmake/configure.cmake")
 
 add_subdirectory (src)
-add_subdirectory (benchmarks)
-add_subdirectory (playground)
+add_subdirectory (bin)

@@ -5,7 +5,7 @@ using namespace boost::python;
 using namespace sokoengine;
 
 object neighbor_position_wraper(
-  TessellationBase& tessellation, position_t position,
+  Tessellation& tessellation, position_t position,
   const Direction& direction, size_t board_width, size_t board_height
 ) {
   position_t retv = tessellation.neighbor_position(
@@ -26,9 +26,9 @@ void export_tessellations() {
     // .export_values()
   ;
 
-  class_<TessellationBase , boost::noncopyable>("TessellationBase", no_init);
+  class_<Tessellation , boost::noncopyable>("TessellationBase", no_init);
 
-  class_<SokobanTessellation, bases<TessellationBase> >(
+  class_<SokobanTessellation, bases<Tessellation> >(
     "SokobanTessellation"
   ) //, no_init())
     // protocols
@@ -66,7 +66,7 @@ void export_tessellations() {
     )
   ;
 
-  class_<HexobanTessellation, bases<TessellationBase> >(
+  class_<HexobanTessellation, bases<Tessellation> >(
     "HexobanTessellation"
   ) //, no_init())
     // protocols
@@ -103,7 +103,7 @@ void export_tessellations() {
     )
   ;
 
-  class_<OctobanTessellation, bases<TessellationBase> >(
+  class_<OctobanTessellation, bases<Tessellation> >(
     "OctobanTessellation"
   ) //, no_init())
     // protocols
@@ -140,7 +140,7 @@ void export_tessellations() {
     )
   ;
 
-  class_<TriobanTessellation, bases<TessellationBase> >(
+  class_<TriobanTessellation, bases<Tessellation> >(
     "TriobanTessellation"
   ) //, no_init())
     // protocols

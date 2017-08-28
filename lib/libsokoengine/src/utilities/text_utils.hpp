@@ -39,6 +39,10 @@ public:
     const StringList& string_list, char fill_chr=' '
   );
   static size_t calculate_width(const StringList& string_list);
+
+  // static std::string& strip_and_downcase(std::string& line);
+  // static std::string strip_and_downcase(const std::string& line);
+  // static void assign_to_blank(std::string& dest, const std::string& src);
 };
 
 } // namespace sokoengine

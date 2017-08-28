@@ -10,13 +10,15 @@ add_subdirectory (board)
 add_subdirectory (game)
 add_subdirectory (snapshot)
 add_subdirectory (tessellation)
+add_subdirectory (utilities)
 
 set(SOKOENGINE_BUILD_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
                                   ${sokoenginecpp_BINARY_DIR}
                                   board
                                   game
                                   snapshot
-                                  tessellation)
+                                  tessellation
+                                  utilities)
 
 #..............................................................................
 #                          sokoengine OBJECT library

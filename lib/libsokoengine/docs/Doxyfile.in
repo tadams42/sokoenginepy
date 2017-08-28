@@ -782,8 +782,7 @@ WARN_LOGFILE           = "${sokoenginecpp_BINARY_DIR}/doc/Doxygen.log"
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = "${sokoenginecpp_SOURCE_DIR}/src" \
-                         "${sokoenginecpp_SOURCE_DIR}/INSTALL.md" \
-                         "${sokoenginecpp_SOURCE_DIR}/TUTORIAL.md"
+                         "${sokoenginecpp_SOURCE_DIR}/INSTALL.md" 
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -870,7 +869,7 @@ EXCLUDE_SYMBOLS        = *boost* \
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = "${sokoenginecpp_SOURCE_DIR}/res/SOK_format_specification.md"
+EXAMPLE_PATH           =
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -890,7 +889,7 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             = "${sokoenginecpp_SOURCE_DIR}/doc/img"
+IMAGE_PATH             =
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

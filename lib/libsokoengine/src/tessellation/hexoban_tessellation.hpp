@@ -1,11 +1,11 @@
 #ifndef HEXOBAN_TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define HEXOBAN_TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "tessellation_base.hpp"
+#include "tessellation.hpp"
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API HexobanTessellation : public TessellationBase {
+class LIBSOKOENGINE_API HexobanTessellation : public Tessellation {
 public:
   virtual const Directions& legal_directions() const override;
   virtual position_t neighbor_position(

@@ -20,10 +20,10 @@ public:
   size_t m_width;
   size_t m_height;
   // non owned ptr
-  const TessellationBase* m_tessellation;
+  const Tessellation* m_tessellation;
 
   PIMPL(
-    const TessellationBase& tessellation, size_t board_width,
+    const Tessellation& tessellation, size_t board_width,
     size_t board_height
   ):
     m_graph(board_width * board_height, tessellation.graph_type()),
@@ -33,7 +33,7 @@ public:
     reconfigure_edges();
   }
 
-  PIMPL(const TessellationBase& tessellation, const string& board_str) :
+  PIMPL(const Tessellation& tessellation, const string& board_str) :
     m_graph(0, tessellation.graph_type()), m_width(0), m_height(0),
     m_tessellation(&(Tessellation::instance_from(tessellation)))
   {
@@ -95,7 +95,7 @@ public:
 };
 
 VariantBoard::unique_ptr_t VariantBoard::instance_from(
-  const TessellationBase& tessellation, size_t board_width, size_t board_height
+  const Tessellation& tessellation, size_t board_width, size_t board_height
 ) {
   return instance_from(tessellation.str(), board_width, board_height);
 }
@@ -118,7 +118,7 @@ VariantBoard::unique_ptr_t VariantBoard::instance_from(
 }
 
 VariantBoard::unique_ptr_t VariantBoard::instance_from(
-  const TessellationBase& tessellation, const string& board_str
+  const Tessellation& tessellation, const string& board_str
 ) {
   return instance_from(tessellation.str(), board_str);
 }
@@ -173,13 +173,13 @@ StringList VariantBoard::parse_board_string(const string& source) {
 }
 
 VariantBoard::VariantBoard(
-  const TessellationBase& tessellation, size_t board_width, size_t board_height
+  const Tessellation& tessellation, size_t board_width, size_t board_height
 ) :
   m_impl(make_unique<PIMPL>(tessellation, board_width, board_height))
 {}
 
 VariantBoard::VariantBoard(
-  const TessellationBase& tessellation, const string& board_str
+  const Tessellation& tessellation, const string& board_str
 ) :
   m_impl(make_unique<PIMPL>(tessellation, board_str))
 {}
@@ -199,7 +199,7 @@ VariantBoard& VariantBoard::operator=(VariantBoard &&) = default;
 
 VariantBoard::~VariantBoard() = default;
 
-const TessellationBase& VariantBoard::tessellation() const {
+const Tessellation& VariantBoard::tessellation() const {
   return *(m_impl->m_tessellation);
 }
 

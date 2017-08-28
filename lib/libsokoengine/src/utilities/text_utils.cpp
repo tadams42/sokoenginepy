@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <functional>
 #include <sstream>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using std::placeholders::_1;
@@ -28,6 +29,24 @@ size_t TextUtils::calculate_width(const StringList& string_list) {
     if (line.length() > width) width = line.length();
   return width;
 }
+
+// string& TextUtils::strip_and_downcase(string& line) {
+//   boost::trim(line);
+//   boost::to_lower(line);
+//   return line;
+// }
+//
+// string TextUtils::strip_and_downcase_copy(const string& line) {
+//   string retv = boost::trim_copy(line);
+//   boost::to_lower(retv);
+//   return retv;
+// }
+//
+// void TextUtils::assign_to_blank(string& dest, const string& src) {
+//   if (TextUtils::is_blank(dest)) dest = src;
+// }
+
+// constexpr const char* tag_author() { return "author"; }
 
   namespace implementation {
 

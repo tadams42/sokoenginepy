@@ -46,15 +46,16 @@ def configure_libsokoengine():
         '-Wno-attributes'
     ]
 
-    include_dirs = [
-        'lib',
-        'lib/libsokoengine/lib',
+    libsokoengine_include_dirs = [
         'lib/libsokoengine/src',
         'lib/libsokoengine/src/board',
         'lib/libsokoengine/src/game',
         'lib/libsokoengine/src/snapshot',
         'lib/libsokoengine/src/tessellation',
+        'lib/libsokoengine/src/utilities',
     ]
+
+    include_dirs = libsokoengine_include_dirs + ['lib/libsokoengine/lib']
 
     sources = [
         [
@@ -62,13 +63,7 @@ def configure_libsokoengine():
             for file_name in os.listdir(dir_path)
             if file_name.endswith(".cpp")
         ]
-        for dir_path in [
-            'src/ext/',
-            'lib/libsokoengine/src/board/',
-            'lib/libsokoengine/src/game/',
-            'lib/libsokoengine/src/snapshot/',
-            'lib/libsokoengine/src/tessellation/',
-        ]
+        for dir_path in (libsokoengine_include_dirs + ['src/ext/'])
     ]
     sources = [item for sublist in sources for item in sublist]
 

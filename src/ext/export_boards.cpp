@@ -200,7 +200,7 @@ object instance_from_wrapper(
   shared_ptr<VariantBoard> retv;
 
   extract<string> string_obj(tessellation_or_description);
-  extract<const TessellationBase&> tessellation_obj(tessellation_or_description);
+  extract<const Tessellation&> tessellation_obj(tessellation_or_description);
 
   if (string_obj.check()) {
     string description = string_obj;
@@ -226,7 +226,7 @@ object instance_from_wrapper(
       "Don't know about tessellation: " + description
     );
   } else if (tessellation_obj.check()) {
-    const TessellationBase& tessellation = tessellation_obj;
+    const Tessellation& tessellation = tessellation_obj;
     if (!board_str.is_none()) {
       string board_str_converted = extract<string>(board_str);
       retv = std::move(

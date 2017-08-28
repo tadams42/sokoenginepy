@@ -1,5 +1,5 @@
 #include "tessellation.hpp"
-#include "tessellation_base.hpp"
+#include "variant_board.hpp"
 #include "text_utils.hpp"
 
 #include "sokoban_tessellation.hpp"
@@ -7,11 +7,21 @@
 #include "octoban_tessellation.hpp"
 #include "hexoban_tessellation.hpp"
 
+#include <typeinfo>
+
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
 
 namespace sokoengine {
+
+using namespace implementation;
+
+UnknownDirectionError::UnknownDirectionError(const string& mess):
+  invalid_argument(mess)
+{}
+
+UnknownDirectionError::~UnknownDirectionError() = default;
 
 UnknownTessellationError::UnknownTessellationError(const string& mess):
   invalid_argument(mess)
@@ -19,9 +29,7 @@ UnknownTessellationError::UnknownTessellationError(const string& mess):
 
 UnknownTessellationError::~UnknownTessellationError() = default;
 
-Tessellation::~Tessellation() = default;
-
-const TessellationBase& Tessellation::instance_from(const string& name) {
+const Tessellation& Tessellation::instance_from(const string& name) {
   static const SokobanTessellation sokoban_tessellation = SokobanTessellation();
   static const TriobanTessellation trioban_tessellation = TriobanTessellation();
   static const OctobanTessellation octoban_tessellation = OctobanTessellation();
@@ -39,10 +47,34 @@ const TessellationBase& Tessellation::instance_from(const string& name) {
   throw UnknownTessellationError(name);
 }
 
-const TessellationBase& Tessellation::instance_from(
-  const TessellationBase& tessellation
+const Tessellation& Tessellation::instance_from(
+  const Tessellation& tessellation
 ) {
   return instance_from(tessellation.str());
+}
+
+Tessellation::~Tessellation() = default;
+
+bool Tessellation::operator== (const Tessellation& rv) const {
+  return typeid(*this) == typeid(rv);
+}
+bool Tessellation::operator!= (const Tessellation& rv) const {
+  return !(*this == rv);
+}
+
+const VariantBoardResizer& Tessellation::resizer() const {
+  static const VariantBoardResizer retv = VariantBoardResizer();
+  return retv;
+}
+
+const VariantBoardPrinter& Tessellation::printer() const {
+  static const VariantBoardPrinter retv = VariantBoardPrinter();
+  return retv;
+}
+
+const VariantBoardParser& Tessellation::parser() const {
+  static const VariantBoardParser retv = VariantBoardParser();
+  return retv;
 }
 
 } // namespace sokoengine

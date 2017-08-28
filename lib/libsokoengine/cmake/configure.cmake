@@ -142,25 +142,25 @@ if(LIBSOKONGINE_SYSTEM_IS_LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
   endif()
 endif()
 
-# #..............................................................................#
-# #                                   doc target                                 #
-# #..............................................................................#
-# find_package(Doxygen)
-# if(DOXYGEN_FOUND)
-#   set(SOKOENGINECPP_DOCS_OUTPUT_ROOT "${sokoenginecpp_BINARY_DIR}/doc/libsokoengine-v${SOKOENGINECPP_VERSION}")
-#   # set(SOKOENGINECPP_DOCS_OUTPUT_ROOT "${sokoenginecpp_SOURCE_DIR}/doc")
-#   set(DOXYFILE_TEMPLATE "${sokoenginecpp_SOURCE_DIR}/doc/Doxyfile.in")
-#   configure_file("${DOXYFILE_TEMPLATE}" "${sokoenginecpp_BINARY_DIR}/doc/Doxyfile")
-#   add_custom_target(doc
-#     COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
-#     WORKING_DIRECTORY "${sokoenginecpp_BINARY_DIR}/doc"
-#     SOURCES "${DOXYFILE_TEMPLATE}"
-#     DEPENDS "${sokoenginecpp_SOURCE_DIR}/VERSION" )
-#   set_target_properties(doc PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
-# else()
-#   message("Doxygen not found, 'make doc' target will not be configured...")
-# endif()
-#
+#..............................................................................#
+#                                   docs target                                 #
+#..............................................................................#
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+  file(MAKE_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build/")
+  set(SOKOENGINECPP_DOCS_OUTPUT_ROOT "${sokoenginecpp_SOURCE_DIR}/docs/_build/libsokoengine-v${SOKOENGINECPP_VERSION}")
+  set(DOXYFILE_TEMPLATE "${sokoenginecpp_SOURCE_DIR}/docs/Doxyfile.in")
+  configure_file("${DOXYFILE_TEMPLATE}" "${sokoenginecpp_SOURCE_DIR}/docs/_build/Doxyfile")
+  add_custom_target(docs
+    COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
+    WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build"
+    SOURCES "${DOXYFILE_TEMPLATE}"
+    DEPENDS "${sokoenginecpp_SOURCE_DIR}/VERSION" )
+  set_target_properties(docs PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
+else()
+  message("Doxygen not found, 'make docs' target will not be configured...")
+endif()
+
 # #..............................................................................#
 # #                             valgrind targets
 # #..............................................................................#
@@ -202,74 +202,3 @@ endif()
 #     set_target_properties(${valgrind_target_name} PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
 #   endif()
 # endfunction(add_valgrind_memory_check_target)
-#
-# #..............................................................................#
-# #                             'make dist' target
-# #..............................................................................#
-# set(dist_archive "libsokoengine-${SOKOENGINECPP_VERSION}.tar.gz")
-# add_custom_target(dist
-#   COMMAND
-#     git archive HEAD --format=tar.gz --output="${sokoenginecpp_BINARY_DIR}/${dist_archive}" --prefix="libsokoengine-${SOKOENGINECPP_VERSION}/"
-#   WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}")
-#
-# #..............................................................................#
-# #                           gcov coverage option
-# #..............................................................................#
-# if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-#   option(WITH_COVERAGE "Build for code coverage report (only for gcc, requires gcov, lcov and genhtml)" OFF)
-#
-#   if(WITH_COVERAGE)
-#     find_program(GCOV_PATH gcov)
-#     mark_as_advanced(GCOV_PATH)
-#     find_program(LCOV_PATH lcov)
-#     mark_as_advanced(LCOV_PATH)
-#     find_program(GENHTML_PATH genhtml)
-#     mark_as_advanced(GENHTML_PATH)
-#
-#     if(NOT GCOV_PATH)
-#         messagE(FATAL_ERROR "gcov not found! Aborting...")
-#     endif()
-#
-#     if(NOT LCOV_PATH)
-#         message(FATAL_ERROR "lcov not found! Aborting...")
-#     endif()
-#
-#     if(NOT GENHTML_PATH)
-#         message(FATAL_ERROR "genhtml not found! Aborting...")
-#     endif()
-#
-#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-#   endif()
-# endif()
-#
-# function(SETUP_TARGET_FOR_COVERAGE for_target)
-#   if(WITH_COVERAGE AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-#     set(_outputname "coverage_${for_target}_output")
-#     set(_targetname "coverage_${for_target}")
-#
-#     add_custom_target(${_targetname}
-#       # Reset all execution counts to zero.
-#       COMMAND ${LCOV_PATH} --directory . --zerocounters
-#
-#       # Run tests.
-#       COMMAND ${for_target} ${ARGV3}
-#
-#       # Capture coverage data.
-#       COMMAND ${LCOV_PATH} --compat-libtool --directory . --capture --output-file ${_outputname}.info
-#       COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'spec/*' '/usr/*' 'lib/*' '${sokoenginecpp_BINARY_DIR}/*' 'tmp/*' --output-file coverage.info
-#
-#       # Generating the report.
-#       COMMAND ${GENHTML_PATH} -o ${_outputname} coverage.info
-#
-#       # COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
-#       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-#       COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."
-#     )
-#
-#     # Show info where to find the report
-#     ADD_CUSTOM_COMMAND(TARGET ${_targetname} POST_BUILD
-#       COMMAND ;
-#       COMMENT "Open ./${_outputname}/index.html in your browser to view the coverage report."
-#     )
-#   endif()
-# endfunction()

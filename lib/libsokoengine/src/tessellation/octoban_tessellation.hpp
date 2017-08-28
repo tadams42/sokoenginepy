@@ -1,11 +1,11 @@
 #ifndef OCTOBAN_TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define OCTOBAN_TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "tessellation_base.hpp"
+#include "tessellation.hpp"
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API OctobanTessellation : public TessellationBase {
+class LIBSOKOENGINE_API OctobanTessellation : public Tessellation {
 public:
   virtual const Directions& legal_directions() const override;
   virtual position_t neighbor_position(

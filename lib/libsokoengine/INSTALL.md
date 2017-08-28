@@ -2,7 +2,8 @@
 
 ## Prerequisites
 
-Required: [git], [make], recent C++ compiler with C++11 support ([gcc] v4.7, [clang] v3.0), [boost], [CMake]
+Required: [git], [make], recent C++ compiler with C++11 support, [boost],
+[CMake]
 
 ~~~~~~sh
 $ sudo apt-get install git build-essential libboost-graph-dev cmake
@@ -26,7 +27,7 @@ $ git clone https://github.com/tadams42/sokoenginepy.git
 Configure sources:
 
 ~~~~~~sh
-$ cd libsokoengine && mkdir build && cd build
+$ cd lib/libsokoengine && mkdir build && cd build
 $ cmake ../
 ~~~~~~
 
@@ -44,7 +45,7 @@ $ make && make install
 $ cmake -DOPTION_NAME=OPTION_VALUE
 ~~~~~~
 
-For sokoengine, these are probably most usable options:
+For `libsokoengine`, these are probably most usable options:
 
   - `CMAKE_INSTALL_PREFIX`
     + string, default: `/usr/local`
@@ -62,7 +63,7 @@ cmake -DCMAKE_INSTALL_PREFIX="/tmp" -DCMAKE_BUILD_TYPE="Debug"
 
 ### Integrating with [CMake]
 
-`liboskoengine` installs everything needed to be used in [CMake] projects including [CMake Config-Package](http://www.cmake.org/cmake/help/git-master/manual/cmake-packages.7.html#using-packages). Minimal project for [CMake] would look like this:
+`liboskoengine` installs everything needed to be used in [CMake] projects including [CMake Config-Package]. Minimal project for [CMake] would look like this:
 
 ```cmake
 cmake_minimum_required (VERSION 2.8.12)
@@ -82,3 +83,4 @@ target_link_libraries( tester sokoengine )
 [make]:http://www.gnu.org/software/make/
 [Doxygen]:http://www.doxygen.org/
 [Graphviz]:http://www.graphviz.org
+[CMake Config-Package]:https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html#using-packages

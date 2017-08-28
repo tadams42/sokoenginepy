@@ -3,7 +3,7 @@
 
 #include "sokoengine_config.hpp"
 #include "board_graph.hpp"
-#include "tessellation_base.hpp"
+#include "tessellation.hpp"
 #include "text_utils.hpp"
 
 #include <memory>
@@ -11,7 +11,7 @@
 namespace sokoengine {
 
 class LIBSOKOENGINE_API BoardCell;
-class LIBSOKOENGINE_API TessellationBase;
+class LIBSOKOENGINE_API Tessellation;
 
 namespace implementation {
   class LIBSOKOENGINE_LOCAL VariantBoardResizer;
@@ -23,7 +23,7 @@ public:
   typedef std::unique_ptr<VariantBoard> unique_ptr_t;
 
   static unique_ptr_t instance_from(
-    const TessellationBase& tessellation, size_t board_width,
+    const Tessellation& tessellation, size_t board_width,
     size_t board_height
   );
   static unique_ptr_t instance_from(
@@ -31,7 +31,7 @@ public:
     size_t board_height
   );
   static unique_ptr_t instance_from(
-    const TessellationBase& tessellation, const std::string& board_str
+    const Tessellation& tessellation, const std::string& board_str
   );
   static unique_ptr_t instance_from(
     const std::string& tessellation_name, const std::string& board_str
@@ -41,17 +41,17 @@ public:
   static StringList parse_board_string(const std::string& the_line);
 
   VariantBoard(
-    const TessellationBase& tessellation,
+    const Tessellation& tessellation,
     size_t board_width=0, size_t board_height=0
   );
   VariantBoard(
-    const TessellationBase& tessellation, const std::string& board_str=""
+    const Tessellation& tessellation, const std::string& board_str=""
   );
 
   virtual ~VariantBoard();
   virtual unique_ptr_t create_clone() const = 0;
 
-  const TessellationBase& tessellation() const;
+  const Tessellation& tessellation() const;
 
   bool operator==(const VariantBoard& rv) const;
   bool operator!=(const VariantBoard& rv) const;
