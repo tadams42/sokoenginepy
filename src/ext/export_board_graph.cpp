@@ -249,5 +249,5 @@ void export_board_graph() {
     )
   ;
 
-  BoardGraph_class.attr("_MAX_EDGE_WEIGHT") = BoardGraph::_MAX_EDGE_WEIGHT;
+  BoardGraph_class.attr("_MAX_EDGE_WEIGHT") = int(BoardGraph::_MAX_EDGE_WEIGHT);
 }

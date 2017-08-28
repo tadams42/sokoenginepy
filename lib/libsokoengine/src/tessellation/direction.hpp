@@ -11,14 +11,14 @@ namespace sokoengine {
 /// Direction values.
 ///
 enum class LIBSOKOENGINE_API EDirection : int {
-  E_UP         = 0,
-  E_NORTH_EAST = 1,
-  E_RIGHT      = 2,
-  E_SOUTH_EAST = 3,
-  E_DOWN       = 4,
-  E_SOUTH_WEST = 5,
-  E_LEFT       = 6,
-  E_NORTH_WEST = 7
+  UP         = 0,
+  NORTH_EAST = 1,
+  RIGHT      = 2,
+  SOUTH_EAST = 3,
+  DOWN       = 4,
+  SOUTH_WEST = 5,
+  LEFT       = 6,
+  NORTH_WEST = 7
 };
 
 ///
@@ -36,7 +36,7 @@ public:
   static const Direction SOUTH_WEST;
   static const Direction SOUTH_EAST;
 
-  explicit Direction(EDirection value = EDirection::E_UP) : m_value(value) {};
+  explicit Direction(EDirection value = EDirection::UP) : m_value(value) {};
 
   bool operator== (const Direction& rv) const { return m_value == rv.m_value; }
   bool operator!= (const Direction& rv) const { return !(*this == rv); }

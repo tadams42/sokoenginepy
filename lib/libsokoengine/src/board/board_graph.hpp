@@ -35,10 +35,12 @@ typedef std::vector<Direction> Directions;
 ///
 class LIBSOKOENGINE_API BoardGraph {
 public:
-  ///
-  /// Internaly used by Dijkstra searches
-  ///
-  constexpr static const int _MAX_EDGE_WEIGHT = Direction::len() + 1;
+  enum {
+    ///
+    /// Internaly used by Dijkstra searches
+    ///
+    _MAX_EDGE_WEIGHT = Direction::len() + 1
+  };
 
   explicit BoardGraph(size_t number_of_vertices=0, const GraphType& graph_type=GraphType::DIRECTED);
   BoardGraph(const BoardGraph& rv);
