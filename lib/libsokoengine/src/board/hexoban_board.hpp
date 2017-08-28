@@ -6,28 +6,7 @@
 namespace sokoengine {
 
 ///
-/// Board space is laid out on vertical hexagons with following coordinate system:
-///
-/// ![Hexoban coordinates](doc/img/hexoban_coordinates.png)
-///
-/// Textual representation uses two characters for each hexagon. This allows
-/// different encoding schemes.
-///
-/// |            Scheme 1          |            Scheme 2          |
-/// | :--------------------------: |:----------------------------:|
-/// | ![Scheme 1][hexoban_scheme1] | ![Scheme 2][hexoban_scheme2] |
-///
-/// [hexoban_scheme1]:doc/img/hexoban_scheme1.png
-/// [hexoban_scheme2]:doc/img/hexoban_scheme2.png
-///
-/// As long as encoding of single board is consistent, all methods handle any scheme
-/// transparently - parsing of board strings 'Just Works (TM)'
-///
-/// Direction <-> character mapping:
-///
-/// | Direction::LEFT | Direction::RIGHT | Direction::NORTH_WEST | Direction::SOUTH_WEST | Direction::NORTH_EAST | Direction::SOUTH_EAST |
-/// |:----:|:-----:|:----------:|:----------:|:----------:|:----------:|
-/// | l, L |  r, R |    u, U    |    d, D    |    n, N    |    s, S    |
+/// Board implementation for Hexoban.
 ///
 class LIBSOKOENGINE_API HexobanBoard : public VariantBoard {
 public:

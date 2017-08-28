@@ -6,14 +6,23 @@
 #include <string>
 #include <stdexcept>
 
+///
+/// Top namespace for libsokoengine
+///
 namespace sokoengine {
 
+///
+/// Exception.
+///
 class LIBSOKOENGINE_API BoardConversionError: public std::runtime_error {
 public:
   BoardConversionError(const std::string& mess);
   virtual ~BoardConversionError();
 };
 
+///
+/// Exception.
+///
 class LIBSOKOENGINE_API IllegalBoardCharacterError: public std::invalid_argument {
 public:
   IllegalBoardCharacterError(const std::string& mess);
@@ -110,14 +119,8 @@ public:
       return !(m_wall || m_pusher || m_box || m_goal);
   }
 
-  ///
-  /// Returns true if this is either wall or box on goal.
-  ///
   bool is_border_element() const { return m_wall || (m_box && m_goal); }
 
-  ///
-  /// Pusher or box can be dropped on empty goal or empty floor
-  ///
   bool can_put_pusher_or_box() const { return !(m_box || m_pusher || m_wall); }
 
   bool has_box() const { return m_box; }
@@ -185,12 +188,12 @@ public:
   void set_is_deadlock(bool rv) { m_deadlock = rv; }
 
 private:
-  bool m_box      : 1; ///< Does it contain box?
-  bool m_pusher   : 1; ///< Does it contain pusher?
-  bool m_goal     : 1; ///< Does it contain goal?
-  bool m_wall     : 1; ///< Does it contain wall?
-  bool m_playable : 1; ///< Is in playable area?
-  bool m_deadlock : 1; ///< Is movement deadlock?
+  bool m_box      : 1; // Does it contain box?
+  bool m_pusher   : 1; // Does it contain pusher?
+  bool m_goal     : 1; // Does it contain goal?
+  bool m_wall     : 1; // Does it contain wall?
+  bool m_playable : 1; // Is in playable area?
+  bool m_deadlock : 1; // Is movement deadlock?
 };
 
 } // namespace sokoengine

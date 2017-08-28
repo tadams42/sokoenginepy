@@ -13,6 +13,8 @@ using namespace boost::graph;
 
 namespace sokoengine {
 
+namespace implementation {
+
 struct GraphEdgePropertyT {
   GraphEdgePropertyT() : weight(1), direction(Direction::LEFT) {}
   char weight;
@@ -42,6 +44,10 @@ typedef GraphT::vertex_descriptor vertex_descriptor;
 typedef GraphT::edge_descriptor edge_descriptor;
 typedef GraphT::vertex_iterator vertex_iterator;
 typedef GraphT::out_edge_iterator out_edge_iterator;
+
+} // namespace implementation
+
+using namespace implementation;
 
 class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
 public:
@@ -137,8 +143,6 @@ public:
     return reachables;
   }
 };
-
-const int BoardGraph::_MAX_EDGE_WEIGHT = Direction::len() + 1;
 
 BoardGraph::BoardGraph(size_t number_of_vertices, const GraphType& graph_type) :
   m_impl(std::make_unique<PIMPL>(number_of_vertices, graph_type))

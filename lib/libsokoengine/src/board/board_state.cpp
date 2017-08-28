@@ -492,9 +492,6 @@ void BoardState::disable_sokoban_plus() {
   return m_impl->m_plus.disable();
 }
 
-///
-/// Map of all box IDs and positions that constitute all solutions.
-///
 BoardState::solutions_vector_t BoardState::solutions() const {
   solutions_vector_t retv;
 

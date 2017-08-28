@@ -5,6 +5,9 @@
 
 namespace sokoengine {
 
+///
+/// Tessellation for Octoban.
+///
 class LIBSOKOENGINE_API OctobanTessellation : public Tessellation {
 public:
   virtual const Directions& legal_directions() const override;

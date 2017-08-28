@@ -12,18 +12,28 @@ namespace sokoengine {
 
 class LIBSOKOENGINE_API VariantBoard;
 
+///
+/// Exception.
+///
 class LIBSOKOENGINE_API CellAlreadyOccupiedError: public std::runtime_error {
 public:
   CellAlreadyOccupiedError(const std::string& mess);
   virtual ~CellAlreadyOccupiedError();
 };
 
+///
+/// Exception.
+///
 class LIBSOKOENGINE_API BoxGoalSwitchError: public std::runtime_error {
 public:
   BoxGoalSwitchError(const std::string& mess);
   virtual ~BoxGoalSwitchError();
 };
 
+///
+/// Pieces' position, ID and Sokoban+ tracking.
+/// Fast piece access.
+///
 class LIBSOKOENGINE_API BoardState {
 public:
   constexpr static bool is_valid_piece_id(piece_id_t pid) {
@@ -40,7 +50,13 @@ public:
   bool operator== (const BoardState& rv) const;
   bool operator!= (const BoardState& rv) const;
 
+  ///
+  /// Collection of piece IDs
+  ///
   typedef std::vector<piece_id_t> piece_ids_vector_t;
+  ///
+  /// Mapping between piece's ID and its position
+  ///
   typedef std::map<piece_id_t, position_t> piece_positions_map_t;
 
   const VariantBoard& board() const;
@@ -86,6 +102,9 @@ public:
   virtual void enable_sokoban_plus();
   virtual void disable_sokoban_plus();
 
+  ///
+  /// All boxes coonfigurations that are solution to board.
+  ///
   typedef std::vector<piece_positions_map_t> solutions_vector_t;
   solutions_vector_t solutions() const;
   virtual void switch_boxes_and_goals();

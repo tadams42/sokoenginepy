@@ -7,8 +7,14 @@
 
 namespace sokoengine {
 
+///
+/// Zobrist key storage.
+///
 typedef uint64_t zobrist_key_t;
 
+///
+/// Implements Zobrist hashing of BoardState
+///
 class LIBSOKOENGINE_API HashedBoardState : public BoardState
 {
 public:
@@ -36,6 +42,9 @@ public:
 
   bool is_solved() const;
 
+  ///
+  /// Hashes of all soulution box configurations.
+  ///
   typedef std::set<zobrist_key_t> solution_hashes_t;
   const solution_hashes_t& solution_hashes() const;
 

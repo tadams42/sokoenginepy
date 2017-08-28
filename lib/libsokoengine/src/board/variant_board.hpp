@@ -18,8 +18,14 @@ namespace implementation {
   class LIBSOKOENGINE_LOCAL HexobanBoardResizer;
 }
 
+///
+/// Base class for boards.
+///
 class LIBSOKOENGINE_API VariantBoard {
 public:
+  ///
+  /// Pointer to VariantBoard
+  ///
   typedef std::unique_ptr<VariantBoard> unique_ptr_t;
 
   static unique_ptr_t instance_from(

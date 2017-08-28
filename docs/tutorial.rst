@@ -251,6 +251,3 @@ hand, :class:`.Puzzle` and :class:`.PuzzleSnapshot` can be easily converted to
 
     collection[0].snapshots[0].moves = str(some_recorded_snapshot)
     collection[0].board = str(some_edited_board)
-
-To control output options (ie. line breaks, RLE encoding, etc...) use
-:mod:`.settings`.

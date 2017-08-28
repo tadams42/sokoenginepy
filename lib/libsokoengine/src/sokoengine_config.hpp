@@ -49,27 +49,33 @@
 //                      typedefs and global constants
 // #############################################################################
 
-enum {
-  ///
-  /// Default ID of a piece (box, goal or pusher)
-  /// Piece ids are assigned sequentially on board creation and are not changed
-  /// during lifetime of a board. Piece id is used to diferentiate this piece
-  /// from other pieces of the same kind: ie. one box from another.
-  ///
-  DEFAULT_PIECE_ID = 1,
-  ///
-  /// Value that represents piece ID in cases where one ID was requested but it
-  /// cant't be returned.
-  ///
-  NULL_ID = -2,
-  ///
-  /// Value that represents board position in cases where position was requested
-  /// but it cant't be returned.
-  ///
-  NULL_POSITION = -1
-};
 
+///
+/// Default ID of a piece (box, goal or pusher)
+/// Piece ids are assigned sequentially on board creation and are not changed
+/// during lifetime of a board. Piece id is used to diferentiate this piece
+/// from other pieces of the same kind: ie. one box from another.
+///
+constexpr static const int DEFAULT_PIECE_ID = 1;
+///
+/// Value that represents piece ID in cases where one ID was requested but it
+/// cant't be returned.
+///
+constexpr static const int NULL_ID = -2;
+///
+/// Value that represents board position in cases where position was requested
+/// but it cant't be returned.
+///
+constexpr static const int NULL_POSITION = -1;
+
+///
+/// Board position type.
+///
 typedef int position_t;
+
+///
+/// Piece ID and Sokoban+ ID type.
+///
 typedef int piece_id_t;
 
 #endif // HEADER_GUARD

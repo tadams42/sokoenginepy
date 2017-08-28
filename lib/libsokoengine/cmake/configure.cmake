@@ -122,7 +122,8 @@ if(LIBSOKONGINE_SYSTEM_IS_LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
   endif()
 
   # Following two don't work for some reason...
-  # list(APPEND CMAKE_MODULE_PATH "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/")
+  # list(APPEND CMAKE_MODULE_PATH
+  #               "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/")
   # find_package(Backward)
 
   CHECK_INCLUDE_FILE("elfutils/libdw.h" HAVE_DW_H)
@@ -130,14 +131,16 @@ if(LIBSOKONGINE_SYSTEM_IS_LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     include_directories("${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp")
     add_definitions(-DBACKWARD_HAS_DW=1)
     set(LIBBACKWARD_DEPENDENCIES dw)
-    set(LIBBACKWARD_SOURCES "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
+    set(LIBBACKWARD_SOURCES
+        "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
   else()
     CHECK_INCLUDE_FILE("bfd.h" HAVE_BFD_H)
     if (HAVE_BFD_H)
       include_directories("${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp")
       add_definitions(-DBACKWARD_HAS_BFD=1)
       set(LIBBACKWARD_DEPENDENCIES bfd)
-      set(LIBBACKWARD_SOURCES "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
+      set(LIBBACKWARD_SOURCES
+          "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
     endif()
   endif()
 endif()
@@ -148,15 +151,19 @@ endif()
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
   file(MAKE_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build/")
-  set(SOKOENGINECPP_DOCS_OUTPUT_ROOT "${sokoenginecpp_SOURCE_DIR}/docs/_build/libsokoengine-v${SOKOENGINECPP_VERSION}")
-  set(DOXYFILE_TEMPLATE "${sokoenginecpp_SOURCE_DIR}/docs/Doxyfile.in")
-  configure_file("${DOXYFILE_TEMPLATE}" "${sokoenginecpp_SOURCE_DIR}/docs/_build/Doxyfile")
+  set(SOKOENGINECPP_DOCS_OUTPUT_ROOT
+      "${sokoenginecpp_SOURCE_DIR}/docs/_build/libsokoengine-v${SOKOENGINECPP_VERSION}")
+  set(DOXYFILE_TEMPLATE
+      "${sokoenginecpp_SOURCE_DIR}/docs/Doxyfile.in")
+  configure_file("${DOXYFILE_TEMPLATE}"
+                 "${sokoenginecpp_SOURCE_DIR}/docs/_build/Doxyfile")
   add_custom_target(docs
-    COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
-    WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build"
-    SOURCES "${DOXYFILE_TEMPLATE}"
-    DEPENDS "${sokoenginecpp_SOURCE_DIR}/VERSION" )
+                    COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
+                    WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build"
+                    SOURCES "${DOXYFILE_TEMPLATE}"
+                    DEPENDS "${sokoenginecpp_SOURCE_DIR}/VERSION" )
   set_target_properties(docs PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
+  # add_dependencies(docs, sokoengine)
 else()
   message("Doxygen not found, 'make docs' target will not be configured...")
 endif()

@@ -9,6 +9,9 @@
 
 namespace sokoengine {
 
+///
+/// Type of graph
+///
 enum class LIBSOKOENGINE_API GraphType : int {
   DIRECTED = 0,
   DIRECTED_MULTI = 1
@@ -16,12 +19,26 @@ enum class LIBSOKOENGINE_API GraphType : int {
 
 class LIBSOKOENGINE_API BoardCell;
 
+///
+/// Ordered collection of board positions usually describing continuous board
+/// path.
+///
 typedef std::vector<position_t> Positions;
+
+///
+/// Ordered collection of Directions usually describing continuous board path.
+///
 typedef std::vector<Direction> Directions;
 
+///
+/// Board graph implementation.
+///
 class LIBSOKOENGINE_API BoardGraph {
 public:
-  static const int _MAX_EDGE_WEIGHT;
+  ///
+  /// Internaly used by Dijkstra searches
+  ///
+  constexpr static const int _MAX_EDGE_WEIGHT = Direction::len() + 1;
 
   explicit BoardGraph(size_t number_of_vertices=0, const GraphType& graph_type=GraphType::DIRECTED);
   BoardGraph(const BoardGraph& rv);

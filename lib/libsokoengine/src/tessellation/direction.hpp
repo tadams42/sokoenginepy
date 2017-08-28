@@ -7,6 +7,9 @@
 
 namespace sokoengine {
 
+///
+/// Direction values.
+///
 enum class LIBSOKOENGINE_API EDirection : int {
   E_UP         = 0,
   E_NORTH_EAST = 1,
@@ -19,7 +22,7 @@ enum class LIBSOKOENGINE_API EDirection : int {
 };
 
 ///
-/// Movement direction for Mover, AtomicMove, etc...
+/// Movement directions.
 ///
 class LIBSOKOENGINE_API Direction {
   EDirection m_value;
