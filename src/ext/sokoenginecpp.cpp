@@ -17,7 +17,7 @@ void translator(const KeyError& exception) {
   PyErr_SetString(PyExc_KeyError, exception.what());
 }
 
-BOOST_PYTHON_MODULE(libsokoengine)
+BOOST_PYTHON_MODULE(sokoenginecpp)
 {
   register_exception_translator<KeyError>(translator);
 

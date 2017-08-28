@@ -1,5 +1,5 @@
 try:
-    from libsokoengine import Direction
+    from sokoenginecpp import Direction
     Direction.__len__ = Direction._len()
 except ImportError:
     from .direction import Direction

@@ -1,4 +1,4 @@
 try:
-    from libsokoengine import SokobanBoard
+    from sokoenginecpp import SokobanBoard
 except ImportError:
     from .sokoban_board import SokobanBoard
