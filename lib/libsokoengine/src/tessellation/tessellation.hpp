@@ -66,14 +66,11 @@ public:
   ) const = 0;
   virtual AtomicMove char_to_atomic_move (char input_chr) const = 0;
   virtual char atomic_move_to_char (const AtomicMove& atomic_move) const = 0;
-  virtual GraphType graph_type() const { return GraphType::DIRECTED; }
+  virtual GraphType graph_type() const;
 
   virtual CellOrientation cell_orientation(
     position_t position, size_t board_width, size_t board_height
-  ) const {
-    return CellOrientation::DEFAULT;
-  }
-
+  ) const;
   virtual const implementation::VariantBoardResizer& resizer() const;
   virtual const implementation::VariantBoardPrinter& printer() const;
   virtual const implementation::VariantBoardParser& parser() const;

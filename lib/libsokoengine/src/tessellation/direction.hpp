@@ -30,67 +30,23 @@ public:
   static const Direction& SOUTH_WEST;
   static const Direction& SOUTH_EAST;
 
-  explicit constexpr Direction(EDirection value = EDirection::UP) :
-    m_direction(value)
-  {};
+  explicit Direction(EDirection value = EDirection::UP);
 
-  bool operator== (const Direction& rv) const { return m_direction == rv.m_direction; }
-  bool operator!= (const Direction& rv) const { return !(*this == rv); }
-  bool operator< (const Direction& rv) const { return m_direction < rv.m_direction; }
+  bool operator== (const Direction& rv) const;
+  bool operator!= (const Direction& rv) const;
+  bool operator< (const Direction& rv) const;
 
   static constexpr unsigned char len() { return 8; }
 
-  const Direction& opposite() const {
-    switch (m_direction) {
-      case EDirection::UP:
-        return DOWN;
-      case EDirection::DOWN:
-        return UP;
-      case EDirection::LEFT:
-        return RIGHT;
-      case EDirection::RIGHT:
-        return LEFT;
-      case EDirection::NORTH_WEST:
-        return SOUTH_EAST;
-      case EDirection::NORTH_EAST:
-        return SOUTH_WEST;
-      case EDirection::SOUTH_WEST:
-        return NORTH_EAST;
-      case EDirection::SOUTH_EAST:
-      default:
-        return NORTH_WEST;
-    };
-  }
+  const Direction& opposite() const;
 
   ///
   /// Type for compact Direction representation
   ///
   typedef unsigned char packed_t;
 
-  static const Direction& unpack(packed_t c) {
-    switch (c) {
-      case static_cast<packed_t>(EDirection::LEFT):
-        return LEFT;
-      case static_cast<packed_t>(EDirection::RIGHT):
-        return RIGHT;
-      case static_cast<packed_t>(EDirection::UP):
-        return UP;
-      case static_cast<packed_t>(EDirection::DOWN):
-        return DOWN;
-      case static_cast<packed_t>(EDirection::NORTH_WEST):
-        return NORTH_WEST;
-      case static_cast<packed_t>(EDirection::NORTH_EAST):
-        return NORTH_EAST;
-      case static_cast<packed_t>(EDirection::SOUTH_WEST):
-        return SOUTH_WEST;
-      case static_cast<packed_t>(EDirection::SOUTH_EAST):
-      default:
-        return SOUTH_EAST;
-    }
-  }
-
-  packed_t pack() const { return static_cast<packed_t>(m_direction); }
-
+  static const Direction& unpack(packed_t c);
+  packed_t pack() const;
   std::string repr() const;
   std::string str() const;
 };

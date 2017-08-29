@@ -40,112 +40,31 @@ public:
            ch == W || ch == E || ch == N || ch == S;
   }
 
-  AtomicMove(
+  explicit AtomicMove(
     const Direction& direction=Direction::LEFT, bool box_moved=false,
     bool is_jump=false, bool is_pusher_selection=false,
     piece_id_t pusher_id=DEFAULT_PIECE_ID, piece_id_t moved_box_id=NULL_ID
   );
 
-  bool operator== (const AtomicMove& rv) const {
-    return m_direction == rv.m_direction &&
-           m_box_moved == rv.m_box_moved &&
-           m_pusher_selected == rv.m_pusher_selected &&
-           m_pusher_jumped == rv.m_pusher_jumped;
-  }
-  bool operator!= (const AtomicMove& rv) const { return !(*this == rv); }
+  bool operator== (const AtomicMove& rv) const;
+  bool operator!= (const AtomicMove& rv) const;
 
   std::string str() const;
   std::string repr() const;
-
-  piece_id_t moved_box_id() const {
-    if (is_push_or_pull()) return m_moved_box_id;
-    else return NULL_ID;
-  }
-
-  void set_moved_box_id(piece_id_t id) {
-    if (id >= DEFAULT_PIECE_ID) {
-      m_moved_box_id = id;
-      set_is_push_or_pull(true);
-    } else {
-      m_moved_box_id = NULL_ID;
-      set_is_push_or_pull(false);
-    }
-  }
-
-  piece_id_t pusher_id() const { return m_pusher_id; }
-
-  void set_pusher_id (piece_id_t id) {
-    if (id >= DEFAULT_PIECE_ID) m_pusher_id = id;
-    else m_pusher_id = DEFAULT_PIECE_ID;
-  }
-
-  bool is_move() const {
-    return !m_box_moved && !m_pusher_selected && !m_pusher_jumped;
-  }
-
-  void set_is_move(bool flag) {
-    if (flag) {
-      m_box_moved = false;
-      m_pusher_jumped = false;
-      m_pusher_selected = false;
-      m_moved_box_id = NULL_ID;
-    } else {
-      m_box_moved = true;
-      m_pusher_jumped = false;
-      m_pusher_selected = false;
-    }
-  }
-
-  bool is_push_or_pull() const {
-    return m_box_moved && !m_pusher_selected && !m_pusher_jumped;
-  }
-
-  void set_is_push_or_pull(bool flag) {
-    if (flag) {
-      m_box_moved = true;
-      m_pusher_jumped = false;
-      m_pusher_selected = false;
-    } else {
-      m_box_moved = false;
-      m_moved_box_id = NULL_ID;
-    }
-  }
-
-  bool is_pusher_selection() const {
-    return m_pusher_selected && !m_box_moved && !m_pusher_jumped;
-  }
-
-  void set_is_pusher_selection(bool flag) {
-    if (flag) {
-      m_pusher_selected = true;
-      m_box_moved = false;
-      m_pusher_jumped = false;
-      m_moved_box_id = NULL_ID;
-    } else {
-      m_pusher_selected = false;
-    }
-  }
-
-  bool is_jump() const {
-    return m_pusher_jumped && !m_pusher_selected && !m_box_moved;
-  }
-
-  void set_is_jump(bool flag) {
-    if (flag) {
-      m_pusher_jumped = true;
-      m_pusher_selected = false;
-      m_box_moved = false;
-      m_moved_box_id = NULL_ID;
-    } else {
-      m_pusher_jumped = false;
-    }
-  }
-
-  const Direction& direction() const { return Direction::unpack(m_direction); }
-
-  void set_direction(const Direction& direction) {
-    m_direction = direction.pack();
-  }
+  piece_id_t moved_box_id() const;
+  void set_moved_box_id(piece_id_t id);
+  piece_id_t pusher_id() const;
+  void set_pusher_id (piece_id_t id);
+  bool is_move() const;
+  void set_is_move(bool flag);
+  bool is_push_or_pull() const;
+  void set_is_push_or_pull(bool flag);
+  bool is_pusher_selection() const;
+  void set_is_pusher_selection(bool flag);
+  bool is_jump() const;
+  void set_is_jump(bool flag);
+  const Direction& direction() const;
+  void set_direction(const Direction& direction);
 
 private:
   bool m_box_moved                : 1;

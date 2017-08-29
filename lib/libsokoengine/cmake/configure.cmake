@@ -5,6 +5,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   SET(LIBSOKONGINE_SYSTEM_IS_LINUX TRUE)
 ENDIF()
 
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION, TRUE)
+
 #..............................................................................
 #                  GCC compiler settings common to all targets.
 #..............................................................................
@@ -12,10 +14,15 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER}" MATCHES ".*clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
   set(DISABLED_CXX_WARNINGS "-Wno-overloaded-virtual -Wno-sign-compare -Wno-unused-parameter -Wno-attributes")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wpedantic -Wall -Wextra ${DISABLED_CXX_WARNINGS}")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -flto")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -flto")
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
 
 if("${CMAKE_CXX_COMPILER}" MATCHES ".*clang")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lstdc++")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -flto")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -flto")
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
 

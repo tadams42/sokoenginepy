@@ -1,9 +1,14 @@
 #..............................................................................
 #                          sokoengine sources configuration
 #..............................................................................
-set(SOKOENGINE_PUBLIC_HEADERS ${SOKOENGINE_PUBLIC_HEADERS}
-  sokoengine.hpp
-  sokoengine_config.hpp
+set(SOKOENGINE_HEADERS ${SOKOENGINE_HEADERS}
+                       ${CMAKE_CURRENT_SOURCE_DIR}/sokoengine.hpp
+                       ${CMAKE_CURRENT_SOURCE_DIR}/sokoengine_config.hpp
+)
+
+set(SOKOENGINE_INCLUDE_DIRS ${SOKOENGINE_INCLUDE_DIRS}
+                            ${sokoenginecpp_BINARY_DIR}
+                            ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_subdirectory (board)
@@ -12,23 +17,15 @@ add_subdirectory (snapshot)
 add_subdirectory (tessellation)
 add_subdirectory (utilities)
 
-set(SOKOENGINE_BUILD_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-                                  ${sokoenginecpp_BINARY_DIR}
-                                  board
-                                  game
-                                  snapshot
-                                  tessellation
-                                  utilities)
-
 #..............................................................................
 #                          sokoengine OBJECT library
 #..............................................................................
 add_library(sokoengine_obj OBJECT ${SOKOENGINE_SOURCES}
-                                  ${SOKOENGINE_PUBLIC_HEADERS}
+                                  ${SOKOENGINE_HEADERS}
                                   ${LIBBACKWARD_SOURCES})
 
 target_compile_definitions(sokoengine_obj PRIVATE "LIBSOKOENGINE_DLL_EXPORTS")
-target_include_directories(sokoengine_obj PUBLIC ${SOKOENGINE_BUILD_INCLUDE_DIRS})
+target_include_directories(sokoengine_obj PUBLIC ${SOKOENGINE_INCLUDE_DIRS})
 
 #..............................................................................
 #                          sokoengine SHARED library
@@ -62,7 +59,7 @@ install(TARGETS sokoengine
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         INCLUDES DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/sokoengine)
 
-install(FILES ${SOKOENGINE_PUBLIC_HEADERS}
+install(FILES ${SOKOENGINE_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sokoengine)
 
 #..............................................................................

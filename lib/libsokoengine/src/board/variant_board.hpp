@@ -74,7 +74,7 @@ public:
   std::string to_str(
     bool use_visible_floor=false, bool rle_encode=false
   ) const;
-  std::string str() const { return to_str(false, false); }
+  std::string str() const;
   std::string repr() const;
 
   size_t width() const;
