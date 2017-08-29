@@ -57,13 +57,13 @@ public:
   ///
   /// Mapping between piece's ID and its position
   ///
-  typedef std::map<piece_id_t, position_t> piece_positions_map_t;
+  typedef std::map<piece_id_t, position_t> positions_by_id_t;
 
   const VariantBoard& board() const;
 
   size_t pushers_count() const;
   piece_ids_vector_t pushers_ids() const;
-  piece_positions_map_t pushers_positions() const;
+  positions_by_id_t pushers_positions() const;
   position_t pusher_position(piece_id_t pusher_id) const;
   piece_id_t pusher_id_on(position_t position) const;
   bool has_pusher(piece_id_t pusher_id) const;
@@ -73,7 +73,7 @@ public:
 
   size_t boxes_count() const;
   piece_ids_vector_t boxes_ids() const;
-  piece_positions_map_t boxes_positions() const;
+  positions_by_id_t boxes_positions() const;
   position_t box_position(piece_id_t box_id) const;
   piece_id_t box_id_on(position_t position) const;
   bool has_box(piece_id_t box_id) const;
@@ -83,7 +83,7 @@ public:
 
   size_t goals_count() const;
   piece_ids_vector_t goals_ids() const;
-  piece_positions_map_t goals_positions() const;
+  positions_by_id_t goals_positions() const;
   position_t goal_position(piece_id_t goal_id) const;
   piece_id_t goal_id_on(position_t position) const;
   bool has_goal(piece_id_t goal_id) const;
@@ -105,13 +105,13 @@ public:
   ///
   /// All boxes coonfigurations that are solution to board.
   ///
-  typedef std::vector<piece_positions_map_t> solutions_vector_t;
+  typedef std::vector<positions_by_id_t> solutions_vector_t;
   solutions_vector_t solutions() const;
   virtual void switch_boxes_and_goals();
   bool is_playable() const;
 
   static std::string to_str(const piece_ids_vector_t& v);
-  static std::string to_str(const piece_positions_map_t& m);
+  static std::string to_str(const positions_by_id_t& m);
   static std::string to_str(const solutions_vector_t& v, int add_indent=0);
   virtual std::string str() const;
   virtual std::string repr() const;
