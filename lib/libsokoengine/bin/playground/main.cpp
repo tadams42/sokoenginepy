@@ -4,23 +4,26 @@ using namespace std;
 using namespace sokoengine;
 
 int main() {
-  SokobanBoard forward_board(string() +
-    // 12345678
-    "#########\n" +  // 0
-    "#$  .  .#\n" +  // 1
-    "#   @$# #\n" +  // 2
-    "#.$    @#\n" +  // 3
-    "#########\n"    // 4
+  SokobanBoard board(string() +
+    "###########\n" +
+    "#       **#\n" +
+    "#       **#\n" +
+    "#  *@   **#\n" +
+    "#       **#\n" +
+    "###########"
   );
 
-  Mover forward_mover(forward_board);
+  Mover mover(board);
 
-  forward_mover.select_pusher(2);
-  forward_mover.undo_last_move();
+  Directions moves_cycle = {
+    Direction::LEFT, Direction::DOWN, Direction::LEFT, Direction::LEFT,
+    Direction::UP, Direction::RIGHT, Direction::DOWN, Direction::RIGHT,
+    Direction::RIGHT, Direction::UP
+  };
 
-  auto sp = forward_mover.selected_pusher();
-
-  bool foo = false;
+  for(int i = 0; i < 1000; ++i)
+    for (const Direction& direction : moves_cycle)
+      mover.move(direction);
 
   return 0;
 }

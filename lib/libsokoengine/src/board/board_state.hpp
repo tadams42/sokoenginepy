@@ -10,7 +10,7 @@
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API VariantBoard;
+class VariantBoard;
 
 ///
 /// Exception.

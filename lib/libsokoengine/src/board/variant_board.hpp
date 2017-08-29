@@ -10,8 +10,8 @@
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API BoardCell;
-class LIBSOKOENGINE_API Tessellation;
+class BoardCell;
+class Tessellation;
 
 namespace implementation {
   class LIBSOKOENGINE_LOCAL VariantBoardResizer;
@@ -136,9 +136,7 @@ protected:
   VariantBoard(VariantBoard&& rv);
   VariantBoard& operator=(VariantBoard&& rv);
 
-  void reinit(
-    size_t board_width, size_t board_height, bool reconf_edges
-  );
+  void reinit(size_t board_width, size_t board_height, bool reconf_edges);
   void reinit(const std::string& src, bool reconf_edges);
 
 private:

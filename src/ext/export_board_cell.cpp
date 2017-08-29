@@ -47,7 +47,7 @@ void export_board_cell() {
     .def("__repr__", &BoardCell::repr)
 
     // instance methods and properties
-    .def("to_str", &BoardCell::to_str, (arg("use_visible_floor")))
+    .def("to_str", &BoardCell::to_str, (arg("use_visible_floor")=false))
     .def("clear", &BoardCell::clear)
     .add_property("has_piece", &BoardCell::has_piece)
     .add_property("is_empty_floor", &BoardCell::is_empty_floor)

@@ -33,7 +33,7 @@ public:
     n = 'n', N = 'N', s = 's', S = 'S'
   };
 
-  constexpr static bool is_atomic_move(char ch) {
+  constexpr static bool is_atomic_move_chr(char ch) {
     return ch == l || ch == u || ch == r || ch == d ||
            ch == w || ch == e || ch == n || ch == s ||
            ch == L || ch == U || ch == R || ch == D ||
@@ -47,10 +47,10 @@ public:
   );
 
   bool operator== (const AtomicMove& rv) const {
-    return direction() == rv.direction() &&
-           is_push_or_pull() == rv.is_push_or_pull() &&
-           is_pusher_selection() == rv.is_pusher_selection() &&
-           is_jump() == rv.is_jump();
+    return m_direction == rv.m_direction &&
+           m_box_moved == rv.m_box_moved &&
+           m_pusher_selected == rv.m_pusher_selected &&
+           m_pusher_jumped == rv.m_pusher_jumped;
   }
   bool operator!= (const AtomicMove& rv) const { return !(*this == rv); }
 
@@ -58,11 +58,8 @@ public:
   std::string repr() const;
 
   piece_id_t moved_box_id() const {
-    if (is_push_or_pull()) {
-      return m_moved_box_id;
-    } else {
-      return NULL_ID;
-    }
+    if (is_push_or_pull()) return m_moved_box_id;
+    else return NULL_ID;
   }
 
   void set_moved_box_id(piece_id_t id) {
@@ -78,11 +75,8 @@ public:
   piece_id_t pusher_id() const { return m_pusher_id; }
 
   void set_pusher_id (piece_id_t id) {
-    if (id >= DEFAULT_PIECE_ID) {
-      m_pusher_id = id;
-    } else {
-      m_pusher_id = DEFAULT_PIECE_ID;
-    }
+    if (id >= DEFAULT_PIECE_ID) m_pusher_id = id;
+    else m_pusher_id = DEFAULT_PIECE_ID;
   }
 
   bool is_move() const {
@@ -147,46 +141,17 @@ public:
     }
   }
 
-  const Direction& direction() const {
-    switch (m_direction) {
-      case 0:
-        return Direction::LEFT;
-      case 1:
-        return Direction::RIGHT;
-      case 2:
-        return Direction::UP;
-      case 3:
-        return Direction::DOWN;
-      case 4:
-        return Direction::NORTH_WEST;
-      case 5:
-        return Direction::NORTH_EAST;
-      case 6:
-        return Direction::SOUTH_WEST;
-      case 7:
-      default:
-        return Direction::SOUTH_EAST;
-    }
-  }
+  const Direction& direction() const { return Direction::unpack(m_direction); }
 
   void set_direction(const Direction& direction) {
-    if (direction == Direction::LEFT) m_direction = 0;
-    else if (direction == Direction::RIGHT) m_direction = 1;
-    else if (direction == Direction::UP) m_direction = 2;
-    else if (direction == Direction::DOWN) m_direction = 3;
-    else if (direction == Direction::NORTH_WEST) m_direction = 4;
-    else if (direction == Direction::NORTH_EAST) m_direction = 5;
-    else if (direction == Direction::SOUTH_WEST) m_direction = 6;
-    else
-      // if (direction == Direction::SOUTH_EAST)
-      m_direction = 7;
+    m_direction = direction.pack();
   }
 
 private:
-  bool m_box_moved          : 1;
-  bool m_pusher_selected    : 1;
-  bool m_pusher_jumped      : 1;
-  unsigned char m_direction : 5;
+  bool m_box_moved                : 1;
+  bool m_pusher_selected          : 1;
+  bool m_pusher_jumped            : 1;
+  Direction::packed_t m_direction : 5;
   piece_id_t m_pusher_id;
   piece_id_t m_moved_box_id;
 };

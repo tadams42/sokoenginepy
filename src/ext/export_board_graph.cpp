@@ -168,7 +168,7 @@ void export_board_graph() {
       "BoardGraph",
       // __init__
       init<optional<size_t, GraphType> >((
-        arg("number_of_vertices"), arg("graph_type")
+        arg("number_of_vertices")=0, arg("graph_type")=GraphType::DIRECTED
       ))
     )
 
@@ -249,5 +249,5 @@ void export_board_graph() {
     )
   ;
 
-  BoardGraph_class.attr("_MAX_EDGE_WEIGHT") = int(BoardGraph::_MAX_EDGE_WEIGHT);
+  BoardGraph_class.attr("_MAX_EDGE_WEIGHT") = BoardGraph::_MAX_EDGE_WEIGHT;
 }

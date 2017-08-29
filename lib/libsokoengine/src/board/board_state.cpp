@@ -346,9 +346,7 @@ void BoardState::pusher_moved(position_t old_position, position_t to_new_positio
 void BoardState::move_pusher_from(
   position_t old_position, position_t to_new_position
 ) {
-  if (old_position == to_new_position) {
-    return;
-  }
+  if (old_position == to_new_position) return;
 
   BoardCell& dest_cell = m_impl->m_board->cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {
@@ -401,9 +399,7 @@ void BoardState::box_moved(position_t old_position, position_t to_new_position) 
 }
 
 void BoardState::move_box_from(position_t old_position, position_t to_new_position) {
-  if (old_position == to_new_position) {
-    return;
-  }
+  if (old_position == to_new_position) return;
 
   BoardCell& dest_cell = m_impl->m_board->cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {

@@ -161,51 +161,64 @@ if(DOXYGEN_FOUND)
                     COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
                     WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build"
                     SOURCES "${DOXYFILE_TEMPLATE}"
-                    DEPENDS "${sokoenginecpp_SOURCE_DIR}/VERSION" )
+                    DEPENDS "${sokoenginecpp_SOURCE_DIR}/VERSION")
   set_target_properties(docs PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
   # add_dependencies(docs, sokoengine)
 else()
   message("Doxygen not found, 'make docs' target will not be configured...")
 endif()
 
-# #..............................................................................#
-# #                             valgrind targets
-# #..............................................................................#
-# function(add_valgrind_profile_dump_target for_target_name)
-#   if(LIBSOKONGINE_SYSTEM_IS_LINUX)
-#     set(dump_file "${sokoenginecpp_BINARY_DIR}/${for_target_name}_dump.pid")
-#     set(valgrind_args --dump-line=yes
-#                       --dump-instr=yes
-#                       --tool=callgrind
-#                       --collect-jumps=yes
-#                       --callgrind-out-file="${dump_file}" )
-#     set(valgrind_target_name "valgrind_profile_${for_target_name}")
-#     # get_target_property(binary_location ${for_target_name} LOCATION)
-#     # add_custom_target(${valgrind_target_name} COMMAND valgrind ${valgrind_args} ${binary_location})
-#     add_custom_target(${valgrind_target_name} COMMAND valgrind ${valgrind_args} $<TARGET_FILE:${for_target_name}>)
-#     add_dependencies(${valgrind_target_name} ${for_target_name})
-#     set_target_properties(${valgrind_target_name} PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
-#   endif()
-# endfunction(add_valgrind_profile_dump_target)
-#
-# function(add_valgrind_memory_check_target for_target_name)
-#   if(LIBSOKONGINE_SYSTEM_IS_LINUX)
-#     set(valgrind_args --num-callers=50
-#                       --leak-check=full
-#                       --partial-loads-ok=yes
-#                       --undef-value-errors=no
-#                       --show-reachable=yes
-#                       --error-limit=no
-#                       # uncomment next two lines to generate suppression blocks in valgrind log
-#                       # These blocks can then be added to .libsokoengine.supp
-#                       # --gen-suppressions=all
-#                       # --log-file="${sokoenginecpp_BINARY_DIR}/valgrind_memcheck.log"
-#                       --suppressions="${sokoenginecpp_SOURCE_DIR}/.libsokoengine.supp" )
-#     set(valgrind_target_name "valgrind_check_${for_target_name}")
-#     # get_target_property(binary_location ${for_target_name} LOCATION)
-#     # add_custom_target(${valgrind_target_name} COMMAND G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind ${valgrind_args} ${binary_location})
-#     add_custom_target(${valgrind_target_name} COMMAND G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind ${valgrind_args} $<TARGET_FILE:${for_target_name}>)
-#     add_dependencies(${valgrind_target_name} ${for_target_name})
-#     set_target_properties(${valgrind_target_name} PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
-#   endif()
-# endfunction(add_valgrind_memory_check_target)
+#..............................................................................#
+#                             valgrind targets
+#..............................................................................#
+function(add_valgrind_profile_dump_target for_target_name)
+  if(LIBSOKONGINE_SYSTEM_IS_LINUX)
+    set(dump_file "${sokoenginecpp_BINARY_DIR}/${for_target_name}_dump.pid")
+    set(valgrind_args
+      --dump-line=yes
+      --dump-instr=yes
+      --tool=callgrind
+      --collect-jumps=yes
+      --callgrind-out-file="${dump_file}"
+    )
+    set(valgrind_target_name "valgrind_profile_${for_target_name}")
+    # get_target_property(binary_location ${for_target_name} LOCATION)
+    # add_custom_target(${valgrind_target_name} COMMAND valgrind ${valgrind_args} ${binary_location})
+    add_custom_target(
+      ${valgrind_target_name}
+      COMMAND valgrind ${valgrind_args} $<TARGET_FILE:${for_target_name}>
+    )
+    add_dependencies(${valgrind_target_name} ${for_target_name})
+    set_target_properties(
+      ${valgrind_target_name} PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1
+    )
+  endif()
+endfunction(add_valgrind_profile_dump_target)
+
+function(add_valgrind_memory_check_target for_target_name)
+  if(LIBSOKONGINE_SYSTEM_IS_LINUX)
+    set(valgrind_args
+      --num-callers=50
+      --leak-check=full
+      --partial-loads-ok=yes
+      --undef-value-errors=no
+      --show-reachable=yes
+      --error-limit=no
+      # uncomment next two lines to generate suppression blocks in valgrind log
+      # These blocks can then be added to .libsokoengine.supp
+      # --gen-suppressions=all
+      # --log-file="${sokoenginecpp_BINARY_DIR}/valgrind_memcheck.log"
+      # --suppressions="${sokoenginecpp_SOURCE_DIR}/.libsokoengine.supp"
+    )
+    set(valgrind_target_name "valgrind_check_${for_target_name}")
+    # get_target_property(binary_location ${for_target_name} LOCATION)
+    # add_custom_target(${valgrind_target_name} COMMAND G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind ${valgrind_args} ${binary_location})
+    add_custom_target(
+      ${valgrind_target_name}
+      COMMAND G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind ${valgrind_args} $<TARGET_FILE:${for_target_name}>
+    )
+    add_dependencies(${valgrind_target_name} ${for_target_name})
+    set_target_properties(${valgrind_target_name}
+                          PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
+  endif()
+endfunction(add_valgrind_memory_check_target)

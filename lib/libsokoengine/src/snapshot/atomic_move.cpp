@@ -10,13 +10,13 @@ InvalidAtomicMoveError::InvalidAtomicMoveError(const string& mess):
 
 InvalidAtomicMoveError::~InvalidAtomicMoveError() = default;
 
-
 AtomicMove::AtomicMove(
   const Direction& direction, bool box_moved, bool is_jump,
   bool is_pusher_selection, piece_id_t pusher_id, piece_id_t moved_box_id
 ) :
   m_box_moved(false), m_pusher_selected(false), m_pusher_jumped(false),
-  m_direction(0), m_pusher_id(DEFAULT_PIECE_ID), m_moved_box_id(NULL_ID)
+  m_direction(Direction::LEFT.pack()), m_pusher_id(DEFAULT_PIECE_ID),
+  m_moved_box_id(NULL_ID)
 {
   if ((box_moved || moved_box_id != NULL_ID) && is_pusher_selection && is_jump)
     throw InvalidAtomicMoveError(

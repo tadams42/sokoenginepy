@@ -6,9 +6,6 @@
 #include <string>
 #include <stdexcept>
 
-///
-/// Top namespace for libsokoengine
-///
 namespace sokoengine {
 
 ///
@@ -103,9 +100,7 @@ public:
            m_goal == rv.m_goal;
   }
 
-  bool operator!= (const BoardCell& rv) const {
-    return !(*this == rv);
-  }
+  bool operator!= (const BoardCell& rv) const { return !(*this == rv); }
 
   char str() const;
   std::string repr() const;

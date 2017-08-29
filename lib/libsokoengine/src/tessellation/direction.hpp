@@ -10,69 +10,89 @@ namespace sokoengine {
 ///
 /// Direction values.
 ///
-enum class LIBSOKOENGINE_API EDirection : int {
-  UP         = 0,
-  NORTH_EAST = 1,
-  RIGHT      = 2,
-  SOUTH_EAST = 3,
-  DOWN       = 4,
-  SOUTH_WEST = 5,
-  LEFT       = 6,
-  NORTH_WEST = 7
+enum class LIBSOKOENGINE_API EDirection : unsigned char {
+  UP, NORTH_EAST, RIGHT, SOUTH_EAST, DOWN, SOUTH_WEST, LEFT, NORTH_WEST
 };
 
 ///
 /// Movement directions.
 ///
 class LIBSOKOENGINE_API Direction {
-  EDirection m_value;
 public:
-  static const Direction UP;
-  static const Direction DOWN;
-  static const Direction LEFT;
-  static const Direction RIGHT;
-  static const Direction NORTH_WEST;
-  static const Direction NORTH_EAST;
-  static const Direction SOUTH_WEST;
-  static const Direction SOUTH_EAST;
+  EDirection m_direction;
 
-  explicit Direction(EDirection value = EDirection::UP) : m_value(value) {};
+  static const Direction& UP;
+  static const Direction& DOWN;
+  static const Direction& LEFT;
+  static const Direction& RIGHT;
+  static const Direction& NORTH_WEST;
+  static const Direction& NORTH_EAST;
+  static const Direction& SOUTH_WEST;
+  static const Direction& SOUTH_EAST;
 
-  bool operator== (const Direction& rv) const { return m_value == rv.m_value; }
+  explicit constexpr Direction(EDirection value = EDirection::UP) :
+    m_direction(value)
+  {};
+
+  bool operator== (const Direction& rv) const { return m_direction == rv.m_direction; }
   bool operator!= (const Direction& rv) const { return !(*this == rv); }
-  bool operator< (const Direction& rv) const { return m_value < rv.m_value; }
+  bool operator< (const Direction& rv) const { return m_direction < rv.m_direction; }
 
-  EDirection get_value() const { return m_value; }
-
-  static constexpr int len() { return 8; }
+  static constexpr unsigned char len() { return 8; }
 
   const Direction& opposite() const {
-    if (m_value == UP.m_value) return DOWN;
-    else if (m_value == DOWN.m_value) return UP;
-    else if (m_value == LEFT.m_value) return RIGHT;
-    else if (m_value == RIGHT.m_value) return LEFT;
-    else if (m_value == NORTH_EAST.m_value) return SOUTH_WEST;
-    else if (m_value == SOUTH_EAST.m_value) return NORTH_WEST;
-    else if (m_value == NORTH_WEST.m_value) return SOUTH_EAST;
-    else
-      // if (m_value == SOUTH_WEST.m_value)
-      return NORTH_EAST;
+    switch (m_direction) {
+      case EDirection::UP:
+        return DOWN;
+      case EDirection::DOWN:
+        return UP;
+      case EDirection::LEFT:
+        return RIGHT;
+      case EDirection::RIGHT:
+        return LEFT;
+      case EDirection::NORTH_WEST:
+        return SOUTH_EAST;
+      case EDirection::NORTH_EAST:
+        return SOUTH_WEST;
+      case EDirection::SOUTH_WEST:
+        return NORTH_EAST;
+      case EDirection::SOUTH_EAST:
+      default:
+        return NORTH_WEST;
+    };
   }
 
-  std::string repr() const {
-    if (m_value == UP.m_value) return "Direction.UP";
-    else if (m_value == DOWN.m_value) return "Direction.DOWN";
-    else if (m_value == LEFT.m_value) return "Direction.LEFT";
-    else if (m_value == RIGHT.m_value) return "Direction.RIGHT";
-    else if (m_value == NORTH_EAST.m_value) return "Direction.NORTH_EAST";
-    else if (m_value == SOUTH_EAST.m_value) return "Direction.SOUTH_EAST";
-    else if (m_value == NORTH_WEST.m_value) return "Direction.NORTH_WEST";
-    else
-      // if (m_value == SOUTH_WEST.m_value)
-      return "Direction.SOUTH_WEST";
+  ///
+  /// Type for compact Direction representation
+  ///
+  typedef unsigned char packed_t;
+
+  static const Direction& unpack(packed_t c) {
+    switch (c) {
+      case static_cast<packed_t>(EDirection::LEFT):
+        return LEFT;
+      case static_cast<packed_t>(EDirection::RIGHT):
+        return RIGHT;
+      case static_cast<packed_t>(EDirection::UP):
+        return UP;
+      case static_cast<packed_t>(EDirection::DOWN):
+        return DOWN;
+      case static_cast<packed_t>(EDirection::NORTH_WEST):
+        return NORTH_WEST;
+      case static_cast<packed_t>(EDirection::NORTH_EAST):
+        return NORTH_EAST;
+      case static_cast<packed_t>(EDirection::SOUTH_WEST):
+        return SOUTH_WEST;
+      case static_cast<packed_t>(EDirection::SOUTH_EAST):
+      default:
+        return SOUTH_EAST;
+    }
   }
 
-  std::string str() const { return repr(); }
+  packed_t pack() const { return static_cast<packed_t>(m_direction); }
+
+  std::string repr() const;
+  std::string str() const;
 };
 
 } // namespace sokoengine

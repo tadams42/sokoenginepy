@@ -10,9 +10,9 @@
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API VariantBoard;
-class LIBSOKOENGINE_API Direction;
-class LIBSOKOENGINE_API HashedBoardState;
+class VariantBoard;
+class Direction;
+class HashedBoardState;
 
 ///
 /// Movement mode of operation.

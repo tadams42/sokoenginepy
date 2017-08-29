@@ -6,7 +6,7 @@ using namespace sokoengine;
 
 struct DirectionPickle : boost::python::pickle_suite {
   static boost::python::tuple getinitargs(Direction const& d) {
-    return boost::python::make_tuple(d.get_value());
+    return boost::python::make_tuple(d.m_direction);
   }
 };
 
@@ -45,12 +45,12 @@ void export_direction() {
     )
   ;
 
-  Direction_class.attr("UP") = object(ptr(&Direction::UP));
-  Direction_class.attr("DOWN") = object(ptr(&Direction::DOWN));
-  Direction_class.attr("LEFT") = object(ptr(&Direction::LEFT));
-  Direction_class.attr("RIGHT") = object(ptr(&Direction::RIGHT));
-  Direction_class.attr("NORTH_EAST") = object(ptr(&Direction::NORTH_EAST));
-  Direction_class.attr("NORTH_WEST") = object(ptr(&Direction::NORTH_WEST));
-  Direction_class.attr("SOUTH_EAST") = object(ptr(&Direction::SOUTH_EAST));
-  Direction_class.attr("SOUTH_WEST") = object(ptr(&Direction::SOUTH_WEST));
+  Direction_class.attr("UP") = Direction::UP;
+  Direction_class.attr("DOWN") = Direction::DOWN;
+  Direction_class.attr("LEFT") = Direction::LEFT;
+  Direction_class.attr("RIGHT") = Direction::RIGHT;
+  Direction_class.attr("NORTH_EAST") = Direction::NORTH_EAST;
+  Direction_class.attr("NORTH_WEST") = Direction::NORTH_WEST;
+  Direction_class.attr("SOUTH_EAST") = Direction::SOUTH_EAST;
+  Direction_class.attr("SOUTH_WEST") = Direction::SOUTH_WEST;
 }

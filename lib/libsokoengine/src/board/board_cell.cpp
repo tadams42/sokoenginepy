@@ -67,8 +67,6 @@ char BoardCell::to_str(bool use_visible_floor) const {
 
 char BoardCell::str() const { return to_str(false); }
 
-string BoardCell::repr() const {
-  return string("BoardCell('") + str() + "')";
-}
+string BoardCell::repr() const { return string("BoardCell('") + str() + "')"; }
 
 } // namespace sokoengine

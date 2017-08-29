@@ -8,7 +8,7 @@
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API AtomicMove;
+class AtomicMove;
 
 ///
 /// Special property of BoardCell that is needed in some tessellations and that

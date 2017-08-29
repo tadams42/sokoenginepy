@@ -178,7 +178,9 @@ zobrist_key_t HashedBoardState::boxes_and_pushers_layout_hash() const {
   return m_impl->m_layout_with_pushers_hash;
 }
 
-zobrist_key_t HashedBoardState::external_position_hash(const piece_positions_map_t& boxes_positions) const {
+zobrist_key_t HashedBoardState::external_position_hash(
+  const piece_positions_map_t& boxes_positions
+) const {
   if (boxes_positions.size() != boxes_count() ||
       boxes_positions.size() != goals_count()) {
     return 0;
