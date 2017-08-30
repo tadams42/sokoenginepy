@@ -19,6 +19,14 @@ pybind11_add_module(
   sokoenginepyext
   $<TARGET_OBJECTS:sokoengine_obj>
   sokoenginepyext.cpp
+  export_direction.cpp
+  export_atomic_move.cpp
+  export_board_cell.cpp
+  export_board_graph.cpp
+  export_tessellations.cpp
+  export_boards.cpp
+  export_board_state.cpp
+  export_mover.cpp
 )
 
 target_include_directories(

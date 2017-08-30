@@ -30,7 +30,7 @@ public:
   static const Direction& SOUTH_WEST;
   static const Direction& SOUTH_EAST;
 
-  explicit Direction(EDirection value = EDirection::UP);
+  explicit Direction(const EDirection& value = EDirection::UP);
 
   bool operator== (const Direction& rv) const;
   bool operator!= (const Direction& rv) const;
