@@ -13,7 +13,7 @@ include LICENSE
 include README.rst
 include TODO.rst
 
-include tox.ini .travis.yml setup_ext.py
+include tox.ini .travis.yml
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4
 

@@ -13,19 +13,18 @@ matrix:
     - python: '3.4.6'
       env:
         - TOXENV=3.4
-    - python: '3.4.6'
-      addons:
-        apt:
-          sources:
-            - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages:
-            - g++-6
-            - libboost-python-dev
-            - libboost-graph-dev
-      env:
-        - TOXENV=3.4_native_extension
-        - CC=gcc-6
-        - CXX=g++-6
+    # - python: '3.4.6'
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - sourceline: 'ppa:ubuntu-toolchain-r/test'
+    #       packages:
+    #         - g++-6
+    #         - libboost-graph-dev
+    #   env:
+    #     - TOXENV=3.4_native_extension
+    #     - CC=gcc-6
+    #     - CXX=g++-6
     - python: '3.5'
       env:
         - TOXENV=3.5

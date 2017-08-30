@@ -14,7 +14,6 @@ import re
 from glob import glob
 from os.path import basename, dirname, join, splitext
 
-import setup_ext
 from setuptools import find_packages, setup
 
 
@@ -110,6 +109,5 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them HERE.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    package_data={'sokoenginepy': ['res/*'],},
-    ext_modules=setup_ext.native_extensions()
+    package_data={'sokoenginepy': ['res/*'],}
 )
