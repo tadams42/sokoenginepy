@@ -13,6 +13,6 @@ from .trioban_board import TriobanBoard
 from .variant_board import VariantBoard
 
 try:
-    from libsokoengine import VariantBoard
+    from sokoenginecpp import VariantBoard
 except ImportError:
     from .variant_board import VariantBoard

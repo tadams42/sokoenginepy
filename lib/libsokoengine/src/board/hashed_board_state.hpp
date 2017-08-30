@@ -30,7 +30,7 @@ public:
 
   zobrist_key_t boxes_layout_hash() const;
   zobrist_key_t boxes_and_pushers_layout_hash() const;
-  zobrist_key_t external_position_hash(const piece_positions_map_t& boxes_positions) const;
+  zobrist_key_t external_position_hash(const positions_by_id_t& boxes_positions) const;
 
   virtual void set_boxorder(const std::string& rv) override;
   virtual void set_goalorder(const std::string& rv) override;

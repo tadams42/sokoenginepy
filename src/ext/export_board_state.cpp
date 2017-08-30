@@ -210,8 +210,8 @@ void export_board_state() {
     .add_property("is_playable", &BoardState::is_playable)
   ;
 
-  class_<BoardState::piece_positions_map_t>(
-    "Positions").def(map_indexing_suite<BoardState::piece_positions_map_t>()
+  class_<BoardState::positions_by_id_t>(
+    "Positions").def(map_indexing_suite<BoardState::positions_by_id_t>()
   );
 
   class_<HashedBoardState, bases<BoardState> >(

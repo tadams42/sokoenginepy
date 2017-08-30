@@ -1,5 +1,5 @@
 try:
-    from libsokoengine import Mover, SolvingMode
+    from sokoenginecpp import Mover, SolvingMode
 except ImportError:
     from .mover import Mover, SolvingMode
 

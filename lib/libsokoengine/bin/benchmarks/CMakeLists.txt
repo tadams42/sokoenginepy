@@ -5,5 +5,5 @@ set_target_properties(benchmarks PROPERTIES
 
 target_link_libraries(benchmarks sokoengine)
 
-# add_valgrind_profile_dump_target(benchmarks)
-# add_valgrind_memory_check_target(benchmarks)
+add_valgrind_profile_dump_target(benchmarks)
+add_valgrind_memory_check_target(benchmarks)

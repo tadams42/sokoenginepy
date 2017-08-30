@@ -5,5 +5,5 @@ set_target_properties(playground PROPERTIES
 
 target_link_libraries(playground sokoengine)
 
-# add_valgrind_profile_dump_target(playground)
-# add_valgrind_memory_check_target(playground)
+add_valgrind_profile_dump_target(playground)
+add_valgrind_memory_check_target(playground)

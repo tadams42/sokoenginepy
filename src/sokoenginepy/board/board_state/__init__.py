@@ -1,5 +1,5 @@
 try:
-    from libsokoengine import BoardState
+    from sokoenginecpp import BoardState
 except ImportError:
     from .board_state import BoardState
 

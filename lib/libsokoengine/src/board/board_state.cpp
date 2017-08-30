@@ -4,16 +4,15 @@
 #include "board_cell.hpp"
 #include "hashed_board_state.hpp"
 
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/member.hpp>
-#include <boost/multi_index/mem_fun.hpp>
-#include <boost/range/counting_range.hpp>
+#include <algorithm>
+
 #include <boost/algorithm/string.hpp>
+#include <boost/bimap.hpp>
+#include <boost/bimap/set_of.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace boost;
-using namespace boost::multi_index;
+using namespace boost::bimaps;
 using namespace std;
 
 namespace sokoengine {
@@ -32,68 +31,9 @@ BoxGoalSwitchError::~BoxGoalSwitchError() = default;
 
 namespace implementation {
 
-class LIBSOKOENGINE_LOCAL InvalidPieceId: public invalid_argument {
-public:
-  InvalidPieceId() : invalid_argument("Invalid Piece ID") {}
-  virtual ~InvalidPieceId() = default;
-};
-
-class LIBSOKOENGINE_LOCAL Piece {
-public:
-  Piece() {}
-
-  Piece(position_t position, piece_id_t id) :
-    m_position (position), m_id (id)
-  {}
-
-  virtual ~Piece() = default;
-
-  void set_position(position_t position) {
-    m_position = position;
-  }
-
-  void set_id(piece_id_t rv) {
-    if(!BoardState::is_valid_piece_id(rv)) throw InvalidPieceId();
-    m_id = rv;
-  }
-
-  bool operator== (const Piece& rv) const {
-    return (m_position == rv.m_position && m_id == rv.m_id);
-  }
-
-  bool operator!= (const Piece& rv) const {
-    return !(*this == rv);
-  }
-
-  position_t position() const { return m_position; }
-  piece_id_t id() const { return m_id; }
-
-private:
-  position_t m_position = 0;
-  piece_id_t m_id       = DEFAULT_PIECE_ID;
-};
-
-struct LIBSOKOENGINE_LOCAL id_tag_t {}; // Attribute extractor
-struct LIBSOKOENGINE_LOCAL position_tag_t {}; // Attribute extractor
-
-// index_type <tag, key_extractor, comparator predicate>
-typedef multi_index_container<
-  Piece,
-  indexed_by<
-    ordered_non_unique<
-      tag<id_tag_t>,
-      const_mem_fun<Piece, piece_id_t, &Piece::id>
-    >,
-    ordered_non_unique<
-      tag<position_tag_t>,
-      const_mem_fun<Piece, position_t, &Piece::position>
-    >
-  >
->
-IndexedPieceArray;
-
-typedef IndexedPieceArray::index<id_tag_t>::type::iterator id_iterator_t;
-typedef IndexedPieceArray::index<position_tag_t>::type::iterator position_iterator_t;
+  enum class Selectors : char {
+    BOXES, GOALS, PUSHERS
+  };
 
 } // namespace implementation
 
@@ -101,22 +41,16 @@ using namespace implementation;
 
 class LIBSOKOENGINE_LOCAL BoardState::PIMPL {
 public:
-  struct LIBSOKOENGINE_LOCAL change_position { // Attribte modifier
-    change_position(position_t new_position) :
-      n_value(new_position)
-    {}
+  typedef boost::bimap<
+    set_of<piece_id_t>, set_of<position_t>
+  > ids_to_positions_map_t;
 
-    void operator()(Piece& p) {
-      p.set_position(n_value);
-    }
+  typedef ids_to_positions_map_t::left_iterator left_iterator;
+  typedef ids_to_positions_map_t::right_iterator right_iterator;
 
-  private:
-    position_t n_value;
-  };
-
-  IndexedPieceArray m_boxes;
-  IndexedPieceArray m_goals;
-  IndexedPieceArray m_pushers;
+  ids_to_positions_map_t m_pushers;
+  ids_to_positions_map_t m_boxes;
+  ids_to_positions_map_t m_goals;
 
   // non owned pointer
   VariantBoard* m_board;
@@ -132,13 +66,13 @@ public:
       const BoardCell& cell = m_board->cell(curent_pos);
 
       if (cell.has_pusher()) {
-        m_pushers.insert(m_pushers.end(), Piece(curent_pos, pusher_id++));
+        m_pushers.insert(ids_to_positions_map_t::value_type(pusher_id++, curent_pos));
       }
       if (cell.has_box()) {
-        m_boxes.insert(m_boxes.end(), Piece(curent_pos, box_id++));
+        m_boxes.insert(ids_to_positions_map_t::value_type(box_id++, curent_pos));
       }
       if (cell.has_goal()) {
-        m_goals.insert(m_goals.end(), Piece(curent_pos, goal_id++));
+        m_goals.insert(ids_to_positions_map_t::value_type(goal_id++, curent_pos));
       }
     }
 
@@ -150,127 +84,152 @@ public:
   PIMPL(PIMPL&& rv) = default;
   PIMPL& operator=(PIMPL&& rv) = default;
 
-  id_iterator_t piece_by_id(piece_id_t id, const IndexedPieceArray& from) {
-    auto i = from.get<id_tag_t>().find(id);
-    if (i == from.get<id_tag_t>().end()) {
-      string piece_name;
-      if (&from == &m_pushers) {
-        piece_name = "pusher";
-      } else if (&from == &m_boxes) {
-        piece_name = "box";
-      } else {
-        piece_name = "goal";
-      }
+  position_t position_by_id(piece_id_t id, const Selectors& which) const {
+    try {
+      return which == Selectors::PUSHERS ? m_pushers.left.at(id) :
+             which == Selectors::BOXES   ? m_boxes.left.at(id) :
+                                           m_goals.left.at(id);
+    } catch (const out_of_range&) {
       throw KeyError(
-        string("No ") + piece_name + " with ID: " + std::to_string(id)
+        string("No ") + (
+          which == Selectors::PUSHERS ? "pusher" :
+          which == Selectors::BOXES   ? "box" :
+                                        "goal"
+        ) + " with ID: " + std::to_string(id)
       );
-    } else {
-      return i;
     }
   }
 
-  position_iterator_t piece_by_position(
-    position_t position, const IndexedPieceArray& from
-  ) {
-    auto i = from.get<position_tag_t>().find(position);
-    if (i == from.get<position_tag_t>().end()) {
-      string piece_name;
-      if (&from == &m_pushers) {
-        piece_name = "pusher";
-      } else if (&from == &m_boxes) {
-        piece_name = "box";
-      } else {
-        piece_name = "goal";
-      }
+  piece_id_t id_by_position(position_t position, const Selectors& which) const {
+    try {
+      return which == Selectors::PUSHERS ? m_pushers.right.at(position) :
+             which == Selectors::BOXES   ? m_boxes.right.at(position) :
+                                           m_goals.right.at(position);
+    } catch (const out_of_range&) {
       throw KeyError(
-        string("No ") + piece_name + " on position: " + std::to_string(position)
+        string("No ") + (
+          which == Selectors::PUSHERS ? "pusher" :
+          which == Selectors::BOXES   ? "box" :
+                                        "goal"
+        ) + " on position: " + std::to_string(position)
       );
-    } else {
-      return i;
     }
   }
 
-  bool has_piece(piece_id_t id, const IndexedPieceArray& from) const {
-    return from.get<id_tag_t>().find(id) != from.get<id_tag_t>().end();
+  bool has_piece(piece_id_t id, const Selectors& which) const {
+    return
+      which == Selectors::PUSHERS ?
+        m_pushers.left.find(id) != m_pushers.left.end() :
+      which == Selectors::BOXES   ?
+        m_boxes.left.find(id) != m_boxes.left.end() :
+      m_goals.left.find(id) != m_goals.left.end();
   }
 
-  bool has_piece_on_position(
-    position_t on_position, const IndexedPieceArray& from
-  ) const {
-    return from.get<position_tag_t>().find(on_position) !=
-           from.get<position_tag_t>().end();
+  bool has_piece_on_position(position_t on_position, const Selectors& which) const {
+    return
+      which == Selectors::PUSHERS ?
+        m_pushers.right.find(on_position) != m_pushers.right.end() :
+      which == Selectors::BOXES   ?
+        m_boxes.right.find(on_position) != m_boxes.right.end() :
+      m_goals.right.find(on_position) != m_goals.right.end();
   }
 
-  BoardState::piece_ids_vector_t pieces_ids(
-    const IndexedPieceArray& from
-  ) const {
-    BoardState::piece_ids_vector_t retv;
-    auto i = from.template get<id_tag_t>().begin();
-    auto iend = from.template get<id_tag_t>().end();
-    for (; i != iend; ++i) {
-      retv.push_back(i->id());
-    }
+  piece_ids_vector_t pieces_ids(const Selectors& which) const {
+    piece_ids_vector_t retv;
+
+    switch (which) {
+      case Selectors::PUSHERS:
+        for(auto pusher : m_pushers.left) retv.push_back(pusher.first);
+        break;
+      case Selectors::BOXES:
+        for(auto box : m_boxes.left) retv.push_back(box.first);
+        break;
+      case Selectors::GOALS:
+      default:
+        for(auto goal : m_goals.left) retv.push_back(goal.first);
+    };
+
     return retv;
   }
 
-  BoardState::piece_positions_map_t pieces_positions(
-    const IndexedPieceArray from
-  ) const {
-    BoardState::piece_positions_map_t retv;
-    auto i = from.template get<id_tag_t>().begin();
-    auto iend = from.template get<id_tag_t>().end();
-    for (; i != iend; ++i) {
-      retv[i->id()] = i->position();
-    }
+  positions_by_id_t pieces_positions(const Selectors& which) const {
+    positions_by_id_t retv;
+
+    switch (which) {
+      case Selectors::PUSHERS:
+        for(auto pusher : m_pushers.left) retv[pusher.first] = pusher.second;
+        break;
+      case Selectors::BOXES:
+        for(auto box : m_boxes.left) retv[box.first] = box.second;
+        break;
+      case Selectors::GOALS:
+      default:
+        for(auto goal : m_goals.left) retv[goal.first] = goal.second;
+    };
+
     return retv;
   }
 
-  void update_position(piece_id_t for_id, IndexedPieceArray& from,
+  void update_position(piece_id_t for_id, const Selectors& which,
                        position_t to_new_position) {
-    from.get<id_tag_t>().modify(
-      piece_by_id(for_id, from), change_position(to_new_position)
-    );
+    switch (which) {
+      case Selectors::PUSHERS:
+        m_pushers.left.replace_data(m_pushers.left.find(for_id), to_new_position);
+        break;
+      case Selectors::BOXES:
+        m_boxes.left.replace_data(m_boxes.left.find(for_id), to_new_position);
+        break;
+      case Selectors::GOALS:
+      default:
+        m_boxes.left.replace_data(m_boxes.left.find(for_id), to_new_position);
+    }
   }
 
-  void update_position_on(position_t old_position, IndexedPieceArray& from,
+  void update_position_on(position_t old_position, const Selectors& which,
                           position_t to_new_position) {
-    from.get<position_tag_t>().modify(
-      piece_by_position(old_position, from), change_position(to_new_position)
-    );
+    switch (which) {
+      case Selectors::PUSHERS:
+        m_pushers.right.replace_key(m_pushers.right.find(old_position), to_new_position);
+        break;
+      case Selectors::BOXES:
+        m_boxes.right.replace_key(m_boxes.right.find(old_position), to_new_position);
+        break;
+      case Selectors::GOALS:
+      default:
+        m_goals.right.replace_key(m_goals.right.find(old_position), to_new_position);
+    }
   }
 
+  typedef pair<piece_id_t, position_t> Piece;
   typedef pair<Piece, Piece> BoxGoalPair;
   typedef deque<BoxGoalPair> BoxGoalPairs;
-  BoxGoalPairs find_box_goal_pairs() {
+
+  BoxGoalPairs find_box_goal_pairs() const {
     auto b_count = m_boxes.size();
     auto g_count = m_goals.size();
     bool is_plus_enabled = m_plus.is_enabled();
 
     BoxGoalPairs retv;
 
-    if (g_count != b_count) {
-      return retv;
-    }
+    if (g_count != b_count) return retv;
 
-    deque<Piece> boxes_todo;
-    for(auto box : m_boxes) {
-      boxes_todo.push_back(box);
-    }
+    auto boxes_todo = m_boxes;
 
-    for(auto goal: m_goals) {
-      auto box_iter = find_if(boxes_todo.begin(), boxes_todo.end(),
-        [&] (const Piece& box) -> bool {
-          if (is_plus_enabled) {
-            return
-              m_plus.box_plus_id(box.id())
-              ==
-              m_plus.goal_plus_id(goal.id());
-          } else {
-            return box.id() == goal.id();
-          }
-        });
-      retv.push_back(BoxGoalPair(*box_iter, goal));
-      boxes_todo.erase(box_iter);
+    for(auto goal: m_goals.left) {
+      auto box_iter = find_if(
+        boxes_todo.left.begin(), boxes_todo.left.end(),
+        [&] (auto box) -> bool {
+          if (is_plus_enabled)
+            return m_plus.box_plus_id(box.first) == m_plus.goal_plus_id(goal.first);
+          else
+            return box.first == goal.first;
+        }
+      );
+      retv.push_back(make_pair(
+        make_pair(box_iter->first, box_iter->second),
+        make_pair(goal.first, goal.second)
+      ));
+      boxes_todo.left.erase(box_iter);
     }
 
     return retv;
@@ -286,9 +245,8 @@ BoardState::BoardState(const BoardState& rv) :
 {}
 
 BoardState& BoardState::operator=(const BoardState& rv) {
-  if (this != &rv) {
+  if (this != &rv)
     m_impl = make_unique<PIMPL>(*rv.m_impl);
-  }
   return *this;
 }
 
@@ -299,56 +257,52 @@ BoardState& BoardState::operator=(BoardState &&) = default;
 BoardState::~BoardState() = default;
 
 bool BoardState::operator== (const BoardState& rv) const {
-  return m_impl->m_boxes == rv.m_impl->m_boxes &&
-         m_impl->m_goals == rv.m_impl->m_goals &&
-         m_impl->m_pushers == rv.m_impl->m_pushers;
+  return m_impl->m_pushers == rv.m_impl->m_pushers &&
+         m_impl->m_boxes == rv.m_impl->m_boxes &&
+         m_impl->m_goals == rv.m_impl->m_goals;
 }
 
 bool BoardState::operator!= (const BoardState& rv) const {
   return !(*this == rv);
 }
 
-const VariantBoard& BoardState::board() const {
-  return *m_impl->m_board;
-}
+const VariantBoard& BoardState::board() const { return *m_impl->m_board; }
 
 size_t BoardState::pushers_count() const {
   return m_impl->m_pushers.size();
 }
 
 BoardState::piece_ids_vector_t BoardState::pushers_ids() const {
-  return m_impl->pieces_ids(m_impl->m_pushers);
+  return m_impl->pieces_ids(Selectors::PUSHERS);
 }
 
-BoardState::piece_positions_map_t BoardState::pushers_positions() const {
-  return m_impl->pieces_positions(m_impl->m_pushers);
+BoardState::positions_by_id_t BoardState::pushers_positions() const {
+  return m_impl->pieces_positions(Selectors::PUSHERS);
 }
 
 position_t BoardState::pusher_position(piece_id_t pusher_id) const {
-  return m_impl->piece_by_id(pusher_id, m_impl->m_pushers)->position();
+  return m_impl->position_by_id(pusher_id, Selectors::PUSHERS);
 }
 
 piece_id_t BoardState::pusher_id_on(position_t position) const {
-  return m_impl->piece_by_position(position, m_impl->m_pushers)->id();
+  return m_impl->id_by_position(position, Selectors::PUSHERS);
 }
 
 bool BoardState::has_pusher(piece_id_t pusher_id) const {
-  return m_impl->has_piece(pusher_id, m_impl->m_pushers);
+  return m_impl->has_piece(pusher_id, Selectors::PUSHERS);
 }
 
 bool BoardState::has_pusher_on(position_t position) const {
-  return m_impl->has_piece_on_position(position, m_impl->m_pushers);
+  return m_impl->has_piece_on_position(position, Selectors::PUSHERS);
 }
 
-void BoardState::pusher_moved(position_t old_position, position_t to_new_position) {
+void BoardState::pusher_moved(position_t old_position, position_t o_new_position) {
 }
 
 void BoardState::move_pusher_from(
   position_t old_position, position_t to_new_position
 ) {
-  if (old_position == to_new_position) {
-    return;
-  }
+  if (old_position == to_new_position) return;
 
   BoardCell& dest_cell = m_impl->m_board->cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {
@@ -361,7 +315,7 @@ void BoardState::move_pusher_from(
 
   m_impl->m_board->cell_at(old_position).remove_pusher();
   dest_cell.put_pusher();
-  m_impl->update_position_on(old_position, m_impl->m_pushers, to_new_position);
+  m_impl->update_position_on(old_position, Selectors::PUSHERS, to_new_position);
   pusher_moved(old_position, to_new_position);
 }
 
@@ -374,36 +328,34 @@ size_t BoardState::boxes_count() const {
 }
 
 BoardState::piece_ids_vector_t BoardState::boxes_ids() const {
-  return m_impl->pieces_ids(m_impl->m_boxes);
+  return m_impl->pieces_ids(Selectors::BOXES);
 }
 
-BoardState::piece_positions_map_t BoardState::boxes_positions() const {
-  return m_impl->pieces_positions(m_impl->m_boxes);
+BoardState::positions_by_id_t BoardState::boxes_positions() const {
+  return m_impl->pieces_positions(Selectors::BOXES);
 }
 
 position_t BoardState::box_position(piece_id_t box_id) const {
-  return m_impl->piece_by_id(box_id, m_impl->m_boxes)->position();
+  return m_impl->position_by_id(box_id, Selectors::BOXES);
 }
 
 piece_id_t BoardState::box_id_on(position_t position) const {
-  return m_impl->piece_by_position(position, m_impl->m_boxes)->id();
+  return m_impl->id_by_position(position, Selectors::BOXES);
 }
 
 bool BoardState::has_box(piece_id_t box_id) const {
-  return m_impl->has_piece(box_id, m_impl->m_boxes);
+  return m_impl->has_piece(box_id, Selectors::BOXES);
 }
 
 bool BoardState::has_box_on(position_t position) const {
-  return m_impl->has_piece_on_position(position, m_impl->m_boxes);
+  return m_impl->has_piece_on_position(position, Selectors::BOXES);
 }
 
-void BoardState::box_moved(position_t old_position, position_t to_new_position) {
+void BoardState::box_moved(position_t old_position, position_t o_new_position) {
 }
 
 void BoardState::move_box_from(position_t old_position, position_t to_new_position) {
-  if (old_position == to_new_position) {
-    return;
-  }
+  if (old_position == to_new_position) return;
 
   BoardCell& dest_cell = m_impl->m_board->cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {
@@ -416,7 +368,7 @@ void BoardState::move_box_from(position_t old_position, position_t to_new_positi
 
   m_impl->m_board->cell_at(old_position).remove_box();
   dest_cell.put_box();
-  m_impl->update_position_on(old_position, m_impl->m_boxes, to_new_position);
+  m_impl->update_position_on(old_position, Selectors::BOXES, to_new_position);
   box_moved(old_position, to_new_position);
 }
 
@@ -429,27 +381,27 @@ size_t BoardState::goals_count() const {
 }
 
 BoardState::piece_ids_vector_t BoardState::goals_ids() const {
-  return m_impl->pieces_ids(m_impl->m_goals);
+  return m_impl->pieces_ids(Selectors::GOALS);
 }
 
-BoardState::piece_positions_map_t BoardState::goals_positions() const {
-  return m_impl->pieces_positions(m_impl->m_goals);
+BoardState::positions_by_id_t BoardState::goals_positions() const {
+  return m_impl->pieces_positions(Selectors::GOALS);
 }
 
 position_t BoardState::goal_position(piece_id_t goal_id) const {
-  return m_impl->piece_by_id(goal_id, m_impl->m_goals)->position();
+  return m_impl->position_by_id(goal_id, Selectors::GOALS);
 }
 
 piece_id_t BoardState::goal_id_on(position_t position) const {
-  return m_impl->piece_by_position(position, m_impl->m_goals)->id();
+  return m_impl->id_by_position(position, Selectors::GOALS);
 }
 
 bool BoardState::has_goal(piece_id_t goal_id) const {
-  return m_impl->has_piece(goal_id, m_impl->m_goals);
+  return m_impl->has_piece(goal_id, Selectors::GOALS);
 }
 
 bool BoardState::has_goal_on(position_t position) const {
-  return m_impl->has_piece_on_position(position, m_impl->m_goals);
+  return m_impl->has_piece_on_position(position, Selectors::GOALS);
 }
 
 piece_id_t BoardState::box_plus_id(piece_id_t box_id) const {
@@ -495,9 +447,7 @@ void BoardState::disable_sokoban_plus() {
 BoardState::solutions_vector_t BoardState::solutions() const {
   solutions_vector_t retv;
 
-  if (boxes_count() != goals_count()) {
-    return retv;
-  }
+  if (boxes_count() != goals_count()) return retv;
 
   typedef vector<position_t> positions_vector_t;
 
@@ -512,22 +462,19 @@ BoardState::solutions_vector_t BoardState::solutions() const {
       index++;
 
       retv = retv && (b_plus_id == g_plus_id);
-      if (!retv) {
-        break;
-      }
+      if (!retv) break;
     }
     return retv;
   };
 
   positions_vector_t g_positions;
-  for (auto goal : m_impl->m_goals) {
-    g_positions.push_back(goal.position());
-  }
+  for (auto goal : m_impl->m_goals.left)
+    g_positions.push_back(goal.second);
   sort(g_positions.begin(), g_positions.end());
 
   do {
     if (is_valid_solution(g_positions)) {
-      piece_positions_map_t solution;
+      positions_by_id_t solution;
       size_t index = 0;
       for (position_t b_position : g_positions) {
         solution[index + DEFAULT_PIECE_ID] = b_position;
@@ -548,28 +495,28 @@ void BoardState::switch_boxes_and_goals() {
   }
 
   for (const auto& bg_pair : m_impl->find_box_goal_pairs()) {
-    auto old_box_position = box_position(bg_pair.first.id());
-    auto old_goal_position = goal_position(bg_pair.second.id());
+    auto old_box_position = box_position(bg_pair.first.first);
+    auto old_goal_position = goal_position(bg_pair.second.first);
 
     if (old_box_position != old_goal_position) {
       piece_id_t moved_pusher_id = DEFAULT_PIECE_ID - 1;
       if (has_pusher_on(old_goal_position)) {
         moved_pusher_id = pusher_id_on(old_goal_position);
-        m_impl->update_position(moved_pusher_id, m_impl->m_pushers, -1);
+        m_impl->update_position(moved_pusher_id, Selectors::PUSHERS, -1);
         m_impl->m_board->cell(old_goal_position).remove_pusher();
       }
 
-      m_impl->update_position_on(old_goal_position, m_impl->m_goals, old_box_position);
+      m_impl->update_position_on(old_goal_position, Selectors::GOALS, old_box_position);
       m_impl->m_board->cell(old_goal_position).remove_goal();
       m_impl->m_board->cell(old_box_position).put_goal();
 
-      m_impl->update_position_on(old_box_position, m_impl->m_boxes, old_goal_position);
+      m_impl->update_position_on(old_box_position, Selectors::BOXES, old_goal_position);
       m_impl->m_board->cell(old_box_position).remove_box();
       m_impl->m_board->cell(old_goal_position).put_box();
       box_moved(old_box_position, old_goal_position);
 
       if (moved_pusher_id != DEFAULT_PIECE_ID - 1) {
-        m_impl->update_position(moved_pusher_id, m_impl->m_pushers, old_box_position);
+        m_impl->update_position(moved_pusher_id, Selectors::PUSHERS, old_box_position);
         m_impl->m_board->cell(old_box_position).put_pusher();
         pusher_moved(old_goal_position, old_box_position);
       }
@@ -596,7 +543,7 @@ string BoardState::to_str(const piece_ids_vector_t& v) {
   return string("[") + boost::join(converter(), ", ") + "]";
 }
 
-string BoardState::to_str(const piece_positions_map_t& m) {
+string BoardState::to_str(const positions_by_id_t& m) {
   auto converter = [&]() {
     StringList retv;
     for (auto p : m) {
@@ -625,7 +572,7 @@ string BoardState::to_str(const solutions_vector_t& v, int add_indent) {
 }
 
 string BoardState::str() const {
-  piece_positions_map_t boxes_plus_ids, goals_plus_ids;
+  positions_by_id_t boxes_plus_ids, goals_plus_ids;
 
   for (auto b_id : boxes_ids()) {
     boxes_plus_ids[b_id] = box_plus_id(b_id);

@@ -49,24 +49,10 @@
 //                      typedefs and global constants
 // #############################################################################
 
-
 ///
-/// Default ID of a piece (box, goal or pusher)
-/// Piece ids are assigned sequentially on board creation and are not changed
-/// during lifetime of a board. Piece id is used to diferentiate this piece
-/// from other pieces of the same kind: ie. one box from another.
+/// Top namespace for libsokoengine
 ///
-constexpr static const int DEFAULT_PIECE_ID = 1;
-///
-/// Value that represents piece ID in cases where one ID was requested but it
-/// cant't be returned.
-///
-constexpr static const int NULL_ID = -2;
-///
-/// Value that represents board position in cases where position was requested
-/// but it cant't be returned.
-///
-constexpr static const int NULL_POSITION = -1;
+namespace sokoengine {
 
 ///
 /// Board position type.
@@ -77,5 +63,28 @@ typedef int position_t;
 /// Piece ID and Sokoban+ ID type.
 ///
 typedef int piece_id_t;
+
+///
+/// Default ID of a piece (box, goal or pusher) - ID assigned to first pusher,
+/// box or goal on board.
+///
+/// Piece ids are assigned sequentially to all board pieces starting  with
+/// DEFAULT_PIECE_ID.
+///
+constexpr static const piece_id_t DEFAULT_PIECE_ID = 1;
+
+///
+/// Value that represents piece ID in cases where one ID was requested but it
+/// cant't be returned.
+///
+constexpr static const piece_id_t NULL_ID = -2;
+
+///
+/// Value that represents board position in cases where position was requested
+/// but it cant't be returned.
+///
+constexpr static const position_t NULL_POSITION = -1;
+
+} // namespace sokoengine
 
 #endif // HEADER_GUARD

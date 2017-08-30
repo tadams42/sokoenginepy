@@ -168,7 +168,7 @@ void export_board_graph() {
       "BoardGraph",
       // __init__
       init<optional<size_t, GraphType> >((
-        arg("number_of_vertices"), arg("graph_type")
+        arg("number_of_vertices")=0, arg("graph_type")=GraphType::DIRECTED
       ))
     )
 

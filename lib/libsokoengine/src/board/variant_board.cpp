@@ -267,6 +267,8 @@ string VariantBoard::to_str(bool use_visible_floor, bool rle_encode) const {
   );
 }
 
+string VariantBoard::str() const { return to_str(false, false); }
+
 string VariantBoard::repr() const {
   string class_name = "VariantBoard";
   if (typeid(*this) == typeid(const SokobanBoard&)) class_name = "SokobanBoard";

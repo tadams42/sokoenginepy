@@ -153,7 +153,7 @@ class MovementBenchmarkPrinter:
         mean_speed = reduce(operator.add, speeds, 0.0) / len(speeds)
         mean_time = reduce(operator.add, times, 0.0) / len(times)
         print(
-            " {:.2f} [ms] {:.2f} [moves/s]".format(mean_time, mean_speed),
+            " {:.2f} [ms] {:.2e} [moves/s]".format(mean_time, mean_speed),
             end='', flush=True
         )
 

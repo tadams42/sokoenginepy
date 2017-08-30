@@ -1,4 +1,4 @@
 try:
-    from libsokoengine import CellOrientation
+    from sokoenginecpp import CellOrientation
 except ImportError:
     from .cell_orientation import CellOrientation

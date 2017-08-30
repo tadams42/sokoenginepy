@@ -1,4 +1,4 @@
 try:
-    from libsokoengine import OctobanTessellation
+    from sokoenginecpp import OctobanTessellation
 except ImportError:
     from .octoban_tessellation import OctobanTessellation

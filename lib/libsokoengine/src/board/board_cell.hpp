@@ -6,9 +6,6 @@
 #include <string>
 #include <stdexcept>
 
-///
-/// Top namespace for libsokoengine
-///
 namespace sokoengine {
 
 ///
@@ -96,96 +93,36 @@ public:
     char rv = ' ', bool is_in_playable_area=false, bool is_deadlock=false
   );
 
-  bool operator== (const BoardCell& rv) const {
-    return m_wall == rv.m_wall &&
-           m_pusher == rv.m_pusher &&
-           m_box == rv.m_box &&
-           m_goal == rv.m_goal;
-  }
-
-  bool operator!= (const BoardCell& rv) const {
-    return !(*this == rv);
-  }
+  bool operator== (const BoardCell& rv) const;
+  bool operator!= (const BoardCell& rv) const;
 
   char str() const;
   std::string repr() const;
   char to_str(bool use_visible_floor = false) const;
 
-  void clear() { m_wall = m_goal = m_pusher = m_box = false; }
-
-  bool has_piece() const { return m_goal || m_box || m_pusher; }
-
-  bool is_empty_floor() const {
-      return !(m_wall || m_pusher || m_box || m_goal);
-  }
-
-  bool is_border_element() const { return m_wall || (m_box && m_goal); }
-
-  bool can_put_pusher_or_box() const { return !(m_box || m_pusher || m_wall); }
-
-  bool has_box() const { return m_box; }
-
-  void set_has_box(bool rv) {
-    if (rv == true) {
-      m_box = true;
-      m_wall = false;
-      m_pusher = false;
-    } else {
-      m_box = false;
-    }
-  }
-
-  void put_box() { set_has_box(true); }
-
-  void remove_box() { set_has_box(false); }
-
-  bool has_goal() const { return m_goal; }
-
-  void set_has_goal(bool rv) {
-    if (rv == true) {
-      m_goal = true;
-      m_wall = false;
-    } else {
-      m_goal = false;
-    }
-  }
-
-  void put_goal() { set_has_goal(true); }
-
-  void remove_goal() { set_has_goal(false); }
-
-  bool has_pusher() const { return m_pusher; }
-
-  void set_has_pusher(bool rv) {
-    if (rv == true) {
-      m_pusher = true;
-      m_box = false;
-      m_wall = false;
-    } else {
-      m_pusher = false;
-    }
-  }
-
-  void put_pusher() { set_has_pusher(true); }
-
-  void remove_pusher() { set_has_pusher(false); }
-
-  bool is_wall() const { return m_wall; }
-
-  void set_is_wall(bool rv) {
-    if (rv == true) {
-      m_wall = true;
-      m_goal = m_pusher = m_box = false;
-    } else {
-      m_wall = false;
-    }
-  }
-
-  bool is_in_playable_area() const { return m_playable; }
-  void set_is_in_playable_area(bool rv) { m_playable = rv; }
-
-  bool is_deadlock() const { return m_deadlock; }
-  void set_is_deadlock(bool rv) { m_deadlock = rv; }
+  void clear();
+  bool has_piece() const;
+  bool is_empty_floor() const;
+  bool is_border_element() const;
+  bool can_put_pusher_or_box() const;
+  bool has_box() const;
+  void set_has_box(bool rv);
+  void put_box();
+  void remove_box();
+  bool has_goal() const;
+  void set_has_goal(bool rv);
+  void put_goal();
+  void remove_goal();
+  bool has_pusher() const;
+  void set_has_pusher(bool rv);
+  void put_pusher();
+  void remove_pusher();
+  bool is_wall() const;
+  void set_is_wall(bool rv);
+  bool is_in_playable_area() const;
+  void set_is_in_playable_area(bool rv);
+  bool is_deadlock() const;
+  void set_is_deadlock(bool rv);
 
 private:
   bool m_box      : 1; // Does it contain box?

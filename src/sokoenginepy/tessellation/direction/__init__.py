@@ -1,5 +1,5 @@
 try:
-    from libsokoengine import Direction
+    from sokoenginecpp import Direction
 except ImportError:
     from .direction import Direction
 

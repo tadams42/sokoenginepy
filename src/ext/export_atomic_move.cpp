@@ -52,7 +52,7 @@ shared_ptr<AtomicMove> AtomicMove_init(
 ) {
   int moved_box_id_converted = NULL_ID;
   if (!moved_box_id.is_none())
-    moved_box_id_converted = extract<int>(moved_box_id);
+    moved_box_id_converted = extract<piece_id_t>(moved_box_id);
   return make_shared<AtomicMove>(
     direction,
     box_moved,
@@ -73,8 +73,7 @@ void export_atomic_move() {
         boost::python::arg("box_moved")=false,
         boost::python::arg("is_jump")=false,
         boost::python::arg("is_pusher_selection")=false,
-        // Without this static_cast extension segfaults on import
-        boost::python::arg("pusher_id")=static_cast<int>(DEFAULT_PIECE_ID),
+        boost::python::arg("pusher_id")=DEFAULT_PIECE_ID,
         boost::python::arg("moved_box_id")=object()
       )
     ))
@@ -84,9 +83,9 @@ void export_atomic_move() {
 
     // @classmethod
     .def(
-      "is_atomic_move", &AtomicMove::is_atomic_move,
+      "is_atomic_move_chr", &AtomicMove::is_atomic_move_chr,
       (boost::python::arg("character"))
-    ).staticmethod("is_atomic_move")
+    ).staticmethod("is_atomic_move_chr")
 
     // protocols
     .def("__eq__", &AtomicMove::operator==)

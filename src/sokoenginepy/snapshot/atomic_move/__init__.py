@@ -1,5 +1,5 @@
 try:
-    from libsokoengine import AtomicMove
+    from sokoenginecpp import AtomicMove
 except ImportError:
     from .atomic_move import AtomicMove
 

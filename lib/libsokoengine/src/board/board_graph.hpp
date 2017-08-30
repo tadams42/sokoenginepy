@@ -9,6 +9,8 @@
 
 namespace sokoengine {
 
+class BoardCell;
+
 ///
 /// Type of graph
 ///
@@ -16,8 +18,6 @@ enum class LIBSOKOENGINE_API GraphType : int {
   DIRECTED = 0,
   DIRECTED_MULTI = 1
 };
-
-class LIBSOKOENGINE_API BoardCell;
 
 ///
 /// Ordered collection of board positions usually describing continuous board
@@ -36,11 +36,19 @@ typedef std::vector<Direction> Directions;
 class LIBSOKOENGINE_API BoardGraph {
 public:
   ///
+  /// Edge weight type
+  ///
+  typedef unsigned char weight_t;
+
+  ///
   /// Internaly used by Dijkstra searches
   ///
-  constexpr static const int _MAX_EDGE_WEIGHT = Direction::len() + 1;
+  static constexpr const weight_t _MAX_EDGE_WEIGHT = Direction::len() + 1;
 
-  explicit BoardGraph(size_t number_of_vertices=0, const GraphType& graph_type=GraphType::DIRECTED);
+  explicit BoardGraph(
+    size_t number_of_vertices=0,
+    const GraphType& graph_type=GraphType::DIRECTED
+  );
   BoardGraph(const BoardGraph& rv);
   BoardGraph& operator=(const BoardGraph& rv);
   BoardGraph(BoardGraph&& rv);
@@ -62,7 +70,7 @@ public:
   size_t out_edges_count(position_t source_vertex, position_t target_vertex) const;
   void remove_all_edges();
   void add_edge(position_t source_vertex, position_t neighbor_vertex, const Direction& direction);
-  size_t out_edge_weight(position_t target_position) const;
+  weight_t out_edge_weight(position_t target_position) const;
 
   position_t neighbor(position_t from_position, const Direction& direction) const;
   position_t neighbor_at(position_t from_position, const Direction& direction) const;
