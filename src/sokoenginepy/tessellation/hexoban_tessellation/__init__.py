@@ -1,4 +1,4 @@
 try:
-    from sokoenginecpp import HexobanTessellation
+    from sokoenginepyext import HexobanTessellation
 except ImportError:
     from .hexoban_tessellation import HexobanTessellation

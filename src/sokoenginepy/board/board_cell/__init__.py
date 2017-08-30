@@ -1,5 +1,5 @@
 try:
-    from sokoenginecpp import BoardCell
+    from sokoenginepyext import BoardCell
 except ImportError:
     from .board_cell import BoardCell
 

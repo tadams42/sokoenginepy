@@ -7,11 +7,11 @@ _DEBUG = False
 
 
 def native_extensions():
-    sokoenginecpp = configure_sokoenginecpp()
-    return [sokoenginecpp] if sokoenginecpp else []
+    sokoenginepyext = configure_sokoenginepyext()
+    return [sokoenginepyext] if sokoenginepyext else []
 
 
-def configure_sokoenginecpp():
+def configure_sokoenginepyext():
     # TODO: configure script for native extension should:
     #     - figure out Python version under which we are installing
     #     - find Boost.Python for that version
@@ -76,7 +76,7 @@ def configure_sokoenginecpp():
 
     if libraries['Boost.Python'] and libraries['Boost.Graph']:
         return Extension(
-            name='sokoenginecpp',
+            name='sokoenginepyext',
             sources=sources,
             include_dirs=include_dirs,
             libraries=list(libraries.values()),

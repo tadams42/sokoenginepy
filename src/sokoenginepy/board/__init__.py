@@ -13,6 +13,6 @@ from .trioban_board import TriobanBoard
 from .variant_board import VariantBoard
 
 try:
-    from sokoenginecpp import VariantBoard
+    from sokoenginepyext import VariantBoard
 except ImportError:
     from .variant_board import VariantBoard

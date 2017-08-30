@@ -1,5 +1,5 @@
 try:
-    from sokoenginecpp import Mover, SolvingMode
+    from sokoenginepyext import Mover, SolvingMode
 except ImportError:
     from .mover import Mover, SolvingMode
 

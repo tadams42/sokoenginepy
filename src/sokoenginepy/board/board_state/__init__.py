@@ -1,5 +1,5 @@
 try:
-    from sokoenginecpp import BoardState
+    from sokoenginepyext import BoardState
 except ImportError:
     from .board_state import BoardState
 
