@@ -14,6 +14,7 @@ import re
 from glob import glob
 from os.path import basename, dirname, join, splitext
 
+import setup_ext_pybind
 from setuptools import find_packages, setup
 
 
@@ -23,42 +24,44 @@ def read(*names, **kwargs):
         encoding=kwargs.get('encoding', 'utf8')
     ).read()
 
+native_extensions = setup_ext_pybind.configure()
+
 setup(
-    name="sokoenginepy",
+    name='sokoenginepy',
     version='0.5.0',
-    license="GPLv3",
-    description="Sokoban and variants game engine",
+    license='GPLv3',
+    description='Sokoban and variants game engine',
     long_description='%s\n%s' % (
         re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
     ),
-    author="Tomislav Adamic",
-    author_email="tomislav.adamic@gmail.com",
-    url="https://github.com/tadams42/sokoenginepy",
+    author='Tomislav Adamic',
+    author_email='tomislav.adamic@gmail.com',
+    url='https://github.com/tadams42/sokoenginepy',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     include_package_data=True,
     zip_safe=False,
     classifiers=[
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Programming Language :: Python :: 3 :: Only',
-        "Operating System :: OS Independent",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Games/Entertainment :: Puzzle Games",
+        'Operating System :: OS Independent',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Games/Entertainment :: Puzzle Games',
     ],
     keywords=[
         'game', 'sokoban', 'hexoban', 'octoban', 'trioban'
     ],
     # List run-time dependencies HERE.  These will be installed by pip when
-    # your project is installed. For an analysis of "install_requires" vs pip's
+    # your project is installed. For an analysis of 'install_requires' vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
@@ -66,7 +69,7 @@ setup(
         'pyparsing >=2.1.0',
         'networkx >=1.11',
         'cached-property >=1.2.0'
-    ],
+    ] + native_extensions['install_requires'],
     # List additional groups of dependencies HERE (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
@@ -109,5 +112,6 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them HERE.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    package_data={'sokoenginepy': ['res/*'],}
+    package_data={'sokoenginepy': ['res/*'],},
+    ext_modules=native_extensions['ext_modules']
 )
