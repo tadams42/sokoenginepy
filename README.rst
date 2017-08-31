@@ -76,7 +76,20 @@ Using
 - For quick glance of features and usage check the `Tutorial`_.
 - For in-depth docs of whole package see `API Reference`_.
 
+Optional native extenstion
+---------------------------
 
+There is optional C++ native extension that is built automatically with ``pip
+install`` if all dependencies are met. It relies on `Boost.Graph`_:
+
+.. code-block:: sh
+
+    sudo apt install python3-dev libboost-graph-dev
+
+
+.. _pybind11: http://pybind11.readthedocs.io/en/stable/index.html
+.. _NetworkX: https://networkx.github.io/
+.. _Boost.Graph: http://www.boost.org/doc/libs/1_61_0/libs/graph/doc/index.html
 .. _SokobanYASC: https://sourceforge.net/projects/sokobanyasc/
 .. _JSoko: http://www.sokoban-online.de/jsoko.html
 .. _Sokobano: http://sokobano.de/en/index.php

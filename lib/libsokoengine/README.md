@@ -15,7 +15,6 @@ C++ implementation of classic Sokoban game inspired by [SokobanYASC], [JSoko] an
 - fast and game engine implementation with single step undo/redo
 - TODO: self sufficient, clients are not required to link to any dependencies (not even Boost which is linked statically)
 
-
 ## Install
 
 - [Install](INSTALL.md) - Detailed build and install instructions (including integration with your [CMake] projects, etc...)
@@ -162,22 +161,9 @@ attach two movers to same game board.
 `HashedBoardState` is what allows fast `Mover` implementation and these two
 classes are intended to be used for future implementations of solvers.
 
-## Test suite
-
-`libsokoengine` is exported as native Python extension (part of `sokoenginepy`)
-and tested using Python test suite.
-
 ## Troubleshooting, issues and bugs
 
 Pull requests and issue reports are welcome and greatly appreciated.
-
-### Debugging Python extension
-
-~~~
-pip install gdbgui --upgrade
-gdbgui 'python crash.py'
-gdbgui '.venv/bin/python .venv/bin/py.test tests/crash_test.py'
-~~~
 
 [SokobanYASC]:http://sourceforge.net/projects/sokobanyasc/
 [JSoko]:http://www.sokoban-online.de/
