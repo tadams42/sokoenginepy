@@ -12,16 +12,8 @@ matrix:
   include:
     - python: '3.5'
       env:
-        - TOXENV=check
-    - python: '3.5'
-      env:
-        - TOXENV=docs
-    - python: '3.5'
-      env:
-        - TOXENV=codacy
-    - python: '3.5'
-      env:
         - TOXENV=3.5
+
     - python: '3.5'
       addons:
         apt:
@@ -29,22 +21,46 @@ matrix:
             - sourceline: 'ppa:ubuntu-toolchain-r/test'
           packages:
             - g++-6
-            - libboost-python-dev
             - libboost-graph-dev
       env:
         - TOXENV=3.5_native_extension
         - CC=gcc-6
         - CXX=g++-6
+
     - python: '3.6'
       env:
         - TOXENV=3.6
+
+    - python: '3.6'
+      addons:
+        apt:
+          sources:
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - g++-6
+            - libboost-graph-dev
+      env:
+        - TOXENV=3.6_native_extension
+        - CC=gcc-6
+        - CXX=g++-6
+
     - python: pypy3.5-5.8.0
       env:
         - TOXENV=pypy3
+
+    - python: '3.5'
+      env:
+        - TOXENV=check
+
+    - python: '3.5'
+      env:
+        - TOXENV=docs
+
+    - python: '3.5'
+      env:
+        - TOXENV=codacy
+
 install:
-  - pip install tox-travis
+  - pip install tox
 script:
-  - tox -v
-after_failure:
-  - more .tox/log/* | cat
-  - more .tox/*/log/* | cat
+  - tox

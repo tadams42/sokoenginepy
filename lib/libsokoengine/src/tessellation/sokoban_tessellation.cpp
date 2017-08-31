@@ -10,6 +10,8 @@ using namespace std;
 
 namespace sokoengine {
 
+using namespace implementation;
+
 const Directions& SokobanTessellation::legal_directions() const {
   static const Directions retv = {
     Direction::LEFT, Direction::RIGHT, Direction::UP, Direction::DOWN

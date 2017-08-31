@@ -93,23 +93,19 @@ class Tessellation(Enum):
     def instance_from(cls, tessellation_or_description):
         if (
             not tessellation_or_description or
-            tessellation_or_description == cls.SOKOBAN or
             'sokoban' in str(tessellation_or_description).lower() or
             utilities.is_blank(str(tessellation_or_description))
         ):
             return cls.SOKOBAN
         elif (
-            tessellation_or_description == cls.TRIOBAN or
             'trioban' in str(tessellation_or_description).lower()
         ):
             return cls.TRIOBAN
         elif (
-            tessellation_or_description == cls.HEXOBAN or
             'hexoban' in str(tessellation_or_description).lower()
         ):
             return cls.HEXOBAN
         elif (
-            tessellation_or_description == cls.OCTOBAN or
             'octoban' in str(tessellation_or_description).lower()
         ):
             return cls.OCTOBAN

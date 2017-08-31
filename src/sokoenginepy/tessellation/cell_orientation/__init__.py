@@ -1,4 +1,4 @@
 try:
-    from libsokoengine import CellOrientation
+    from sokoenginepyext import CellOrientation
 except ImportError:
     from .cell_orientation import CellOrientation

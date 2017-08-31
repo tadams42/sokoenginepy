@@ -13,35 +13,42 @@ using namespace boost::graph;
 
 namespace sokoengine {
 
-struct GraphEdgePropertyT {
-  GraphEdgePropertyT() : weight(1), direction(Direction::LEFT) {}
-  char weight;
-  Direction direction;
-};
+namespace implementation {
 
-//
-// Notes: Trioban needs to store parallel edges
-//   => we must store edges in sequence, not associative container.
-//   => we must keep track when adding edges not to add duplicate ones (although parallel are allowed)
-//   => longer graph construction/rebuilding times
-//   => doesn't impact gameplay/movement (which is performed on already constructed graph)
-// Generally there is no edge adding or removal once graph is constructed (thus,
-// no speed improvement in choosing listS instead of vecS).
-//
-typedef boost::adjacency_list<
-  boost::vecS,             // OutEdgeList
-  boost::vecS,             // VertexList
-  boost::directedS,        // Directed
-  BoardCell,               // VertexProperties
-  GraphEdgePropertyT,      // EdgeProperties
-  boost::no_property,      // GraphProperties
-  boost::vecS              // EdgeList
-> GraphT;
+  struct GraphEdgePropertyT {
+    GraphEdgePropertyT() : weight(1), direction(Direction::LEFT.pack()) {}
+    BoardGraph::weight_t weight;
+    Direction::packed_t direction;
+  };
 
-typedef GraphT::vertex_descriptor vertex_descriptor;
-typedef GraphT::edge_descriptor edge_descriptor;
-typedef GraphT::vertex_iterator vertex_iterator;
-typedef GraphT::out_edge_iterator out_edge_iterator;
+  //
+  // Notes: Trioban needs to store parallel edges
+  //   => we must store edges in sequence, not associative container.
+  //   => we must keep track when adding edges not to add duplicate ones (although parallel are allowed)
+  //   => longer graph construction/rebuilding times
+  //   => doesn't impact gameplay/movement (which is performed on already constructed graph)
+  // Generally there is no edge adding or removal once graph is constructed (thus,
+  // no speed improvement in choosing listS instead of vecS).
+  //
+  typedef boost::adjacency_list<
+    boost::vecS,             // OutEdgeList
+    boost::vecS,             // VertexList
+    boost::directedS,        // Directed
+    BoardCell,               // VertexProperties
+    GraphEdgePropertyT,      // EdgeProperties
+    boost::no_property,      // GraphProperties
+    boost::vecS              // EdgeList
+  > GraphT;
+
+  typedef GraphT::vertex_descriptor vertex_descriptor;
+  typedef GraphT::edge_descriptor edge_descriptor;
+  typedef GraphT::vertex_iterator vertex_iterator;
+  typedef GraphT::out_edge_iterator out_edge_iterator;
+} // namespace implementation
+
+using namespace implementation;
+
+const BoardGraph::weight_t BoardGraph::_MAX_EDGE_WEIGHT;
 
 class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
 public:
@@ -49,9 +56,15 @@ public:
   GraphT m_graph;
   GraphType m_graph_type;
 
+  /// Cached values of some of graph properties
+  size_t m_number_of_vertices;
+
   PIMPL(size_t number_of_vertices, const GraphType& graph_type) :
-    m_graph(number_of_vertices), m_graph_type(graph_type)
-  {}
+    m_graph(number_of_vertices), m_graph_type(graph_type),
+    m_number_of_vertices(0)
+  {
+    m_number_of_vertices = num_vertices(m_graph);
+  }
 
   PIMPL(const PIMPL& rv) = default;
   PIMPL& operator=(const PIMPL& rv) = default;
@@ -68,33 +81,24 @@ public:
   }
 
   bool contains(position_t position) const {
-    return position <= num_vertices(m_graph);
+    return position < m_number_of_vertices;
   }
 
-  size_t out_edge_weight(position_t target_position) const {
+  BoardGraph::weight_t out_edge_weight(position_t target_position) const {
     const BoardCell& target_cell = cell_at(target_position);
-    size_t weight = 1;
+    weight_t weight = 1;
     if (
-      target_cell.is_wall() ||
-      target_cell.has_box() ||
-      target_cell.has_pusher()
+      target_cell.is_wall() || target_cell.has_box() || target_cell.has_pusher()
     )
-    weight = _MAX_EDGE_WEIGHT;
+      weight = _MAX_EDGE_WEIGHT;
 
     return weight;
   }
 
   void set_weights_to_edges() {
-    vertex_iterator v_i, v_end;
-    for (tie(v_i, v_end) = vertices(m_graph); v_i != v_end; ++v_i) {
-      vertex_descriptor src_vertex = *v_i;
-
-      out_edge_iterator oe_i, oe_end;
-      for (tie(oe_i, oe_end) = out_edges(src_vertex, m_graph); oe_i != oe_end; ++oe_i) {
-        edge_descriptor e = *oe_i;
+    BOOST_FOREACH(const vertex_descriptor& v, vertices(m_graph))
+      BOOST_FOREACH(const edge_descriptor& e, out_edges(v, m_graph))
         m_graph[e].weight = out_edge_weight(boost::target(e, m_graph));
-      }
-    }
   }
 
   Positions reachables(
@@ -105,14 +109,13 @@ public:
 
     Positions reachables;
 
-    auto is_excluded = [&] (const Positions& lp, const Positions::value_type& lv) {
+    auto is_excluded = [&] (const Positions& lp, position_t lv) {
       return any_of(
-        lp.cbegin(), lp.cend(),
-        [&lv](const Positions::value_type& rv){ return lv == rv; }
+        lp.cbegin(), lp.cend(), [&lv](position_t rv){ return lv == rv; }
       );
     };
 
-    vector<bool> visited(num_vertices(m_graph), false);
+    vector<bool> visited(m_number_of_vertices, false);
     visited[root] = true;
 
     typedef deque<position_t> PositionsQueue;
@@ -123,7 +126,7 @@ public:
       position_t current_position = to_inspect.front();
       to_inspect.pop_front();
 
-      if( current_position == root || !is_excluded(excluded, current_position) )
+      if(current_position == root || !is_excluded(excluded, current_position))
         reachables.push_back(current_position);
 
       BOOST_FOREACH(const edge_descriptor& e, out_edges(current_position, m_graph)) {
@@ -137,8 +140,6 @@ public:
     return reachables;
   }
 };
-
-const int BoardGraph::_MAX_EDGE_WEIGHT = Direction::len() + 1;
 
 BoardGraph::BoardGraph(size_t number_of_vertices, const GraphType& graph_type) :
   m_impl(std::make_unique<PIMPL>(number_of_vertices, graph_type))
@@ -188,12 +189,10 @@ bool BoardGraph::contains(position_t position) const {
 }
 
 size_t BoardGraph::vertices_count() const {
-  return num_vertices(m_impl->m_graph);
+  return m_impl->m_number_of_vertices;
 }
 
-size_t BoardGraph::edges_count() const {
-  return num_edges(m_impl->m_graph);
-}
+size_t BoardGraph::edges_count() const { return num_edges(m_impl->m_graph); }
 
 bool BoardGraph::has_edge(
   position_t source_vertex, position_t dest_vertex, const Direction& direction
@@ -201,10 +200,11 @@ bool BoardGraph::has_edge(
   if (!contains(source_vertex) || !contains(dest_vertex)) return false;
 
   const auto edges = out_edges(source_vertex, m_impl->m_graph);
+  char d = direction.pack();
   return edges.second != find_if(
     edges.first, edges.second,
     [&] (const edge_descriptor& e) {
-      return m_impl->m_graph[e].direction == direction;
+      return m_impl->m_graph[e].direction == d;
     }
   );
 }
@@ -214,18 +214,14 @@ size_t BoardGraph::out_edges_count(
 ) const {
   if (!contains(source_vertex) || !contains(target_vertex)) return 0;
   size_t retv = 0;
-  out_edge_iterator edge_iterator, edges_end;
-  tie(edge_iterator, edges_end) = out_edges(source_vertex, m_impl->m_graph);
-  for (; edge_iterator != edges_end; ++edge_iterator) {
-    if (target(*edge_iterator, m_impl->m_graph) == target_vertex) retv += 1;
-  }
+  BOOST_FOREACH(const edge_descriptor& e, out_edges(source_vertex, m_impl->m_graph))
+    if (target(e, m_impl->m_graph) == target_vertex) retv += 1;
   return retv;
 }
 
 void BoardGraph::remove_all_edges() {
-  for (auto vp = vertices(m_impl->m_graph); vp.first != vp.second; ++vp.first) {
-    clear_vertex(*vp.first, m_impl->m_graph);
-  }
+  BOOST_FOREACH(const vertex_descriptor& v, vertices(m_impl->m_graph))
+    clear_vertex(v, m_impl->m_graph);
 }
 
 void BoardGraph::add_edge(
@@ -243,12 +239,12 @@ void BoardGraph::add_edge(
 
   if (should_add) {
     GraphEdgePropertyT e;
-    e.direction = direction;
+    e.direction = direction.pack();
     boost::add_edge(source_vertex, neighbor_vertex, e, m_impl->m_graph);
   }
 }
 
-size_t BoardGraph::out_edge_weight(position_t target_position) const {
+BoardGraph::weight_t BoardGraph::out_edge_weight(position_t target_position) const {
   return m_impl->out_edge_weight(target_position);
 }
 
@@ -257,10 +253,11 @@ position_t BoardGraph::neighbor(
 ) const {
   vertex_descriptor v = vertex(from_position, m_impl->m_graph);
   const auto edges = out_edges(v, m_impl->m_graph);
+  char d = direction.pack();
   auto edge = find_if(
     edges.first, edges.second,
     [&] (const edge_descriptor& e) {
-      return m_impl->m_graph[e].direction == direction;
+      return m_impl->m_graph[e].direction == d;
     }
   );
   if (edge != edges.second)
@@ -284,7 +281,7 @@ Positions BoardGraph::wall_neighbors(position_t from_position) const {
   Positions retv;
   BOOST_FOREACH(
     const edge_descriptor& edge, out_edges(from_position, m_impl->m_graph)
-  ) {
+  )
     if (m_impl->m_graph[boost::target(edge, m_impl->m_graph)].is_wall())
       retv.push_back(
         get(
@@ -292,7 +289,6 @@ Positions BoardGraph::wall_neighbors(position_t from_position) const {
           boost::target(edge, m_impl->m_graph)
         )
       );
-  }
 
   return retv;
 }
@@ -303,14 +299,13 @@ Positions BoardGraph::all_neighbors(position_t from_position) const {
   Positions retv;
   BOOST_FOREACH(
     const edge_descriptor& edge, out_edges(from_position, m_impl->m_graph)
-  ) {
+  )
     retv.push_back(
       get(
         boost::vertex_index, m_impl->m_graph,
         boost::target(edge, m_impl->m_graph)
       )
     );
-  }
 
   return retv;
 }
@@ -321,7 +316,7 @@ Positions BoardGraph::shortest_path(
   if (!contains(start_position) || !contains(end_position))
     throw out_of_range("Board index out of range!");
 
-  deque<vertex_descriptor> predecesors(num_vertices(m_impl->m_graph));
+  deque<vertex_descriptor> predecesors(m_impl->m_number_of_vertices);
   auto predecessors_map = make_iterator_property_map(
     predecesors.begin(), get(boost::vertex_index, m_impl->m_graph)
   );
@@ -348,9 +343,8 @@ Positions BoardGraph::shortest_path(
     // Set the current vertex to the current predecessor, and the
     // predecessor to one level up
     v = u, u = predecessors_map[v]
-  ) {
+  )
     path.push_back(v);
-  }
   path.push_back(start_position);
   reverse(path.begin(), path.end());
   return path;
@@ -364,8 +358,8 @@ Positions BoardGraph::dijkstra_path(
 
   const_cast<BoardGraph*>(this)->m_impl->set_weights_to_edges();
 
-  deque<double> distances(num_vertices(m_impl->m_graph));
-  deque<vertex_descriptor> predecesors(num_vertices(m_impl->m_graph));
+  deque<double> distances(m_impl->m_number_of_vertices);
+  deque<vertex_descriptor> predecesors(m_impl->m_number_of_vertices);
 
   auto weightmap = get(&GraphEdgePropertyT::weight, m_impl->m_graph);
   auto distances_map = make_iterator_property_map(
@@ -396,9 +390,8 @@ Positions BoardGraph::dijkstra_path(
     // Set the current vertex to the current predecessor, and the
     // predecessor to one level up
     v = u, u = predecessors_map[v]
-  ) {
+  )
     path.push_back(v);
-  }
   path.push_back(start_position);
   reverse(path.begin(), path.end());
   return path;
@@ -460,10 +453,11 @@ Directions BoardGraph::positions_path_to_directions_path(
 
     BOOST_FOREACH(
       const edge_descriptor& edge, out_edges(src_vertex, m_impl->m_graph)
-    ) {
+    )
       if (boost::target(edge, m_impl->m_graph) == target_vertex)
-        retv.push_back(m_impl->m_graph[edge].direction);
-    }
+        retv.push_back(
+          Direction::unpack(m_impl->m_graph[edge].direction)
+        );
   }
 
   return retv;
@@ -512,12 +506,9 @@ position_t BoardGraph::normalized_pusher_position(
   Positions reachables_pos = positions_reachable_by_pusher(
     pusher_position, excluded_positions
   );
-
-  if (reachables_pos.size() > 0) {
+  if (reachables_pos.size() > 0)
     return *min_element(reachables_pos.cbegin(), reachables_pos.cend());
-  } else {
-    return pusher_position;
-  }
+  else return pusher_position;
 }
 
 position_t BoardGraph::path_destination(
@@ -527,7 +518,7 @@ position_t BoardGraph::path_destination(
     throw out_of_range("Starting position is off board!");
 
   position_t retv = start_position, next_target;
-  for (Direction direction : directions_path) {
+  for (const Direction& direction : directions_path) {
     next_target = neighbor_at(retv, direction);
     if (next_target != NULL_POSITION) {
       retv = next_target;

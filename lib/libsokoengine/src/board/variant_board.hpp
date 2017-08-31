@@ -3,27 +3,33 @@
 
 #include "sokoengine_config.hpp"
 #include "board_graph.hpp"
-#include "tessellation_base.hpp"
+#include "tessellation.hpp"
 #include "text_utils.hpp"
 
 #include <memory>
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API BoardCell;
-class LIBSOKOENGINE_API TessellationBase;
+class BoardCell;
+class Tessellation;
 
 namespace implementation {
   class LIBSOKOENGINE_LOCAL VariantBoardResizer;
   class LIBSOKOENGINE_LOCAL HexobanBoardResizer;
 }
 
+///
+/// Base class for boards.
+///
 class LIBSOKOENGINE_API VariantBoard {
 public:
+  ///
+  /// Pointer to VariantBoard
+  ///
   typedef std::unique_ptr<VariantBoard> unique_ptr_t;
 
   static unique_ptr_t instance_from(
-    const TessellationBase& tessellation, size_t board_width,
+    const Tessellation& tessellation, size_t board_width,
     size_t board_height
   );
   static unique_ptr_t instance_from(
@@ -31,7 +37,7 @@ public:
     size_t board_height
   );
   static unique_ptr_t instance_from(
-    const TessellationBase& tessellation, const std::string& board_str
+    const Tessellation& tessellation, const std::string& board_str
   );
   static unique_ptr_t instance_from(
     const std::string& tessellation_name, const std::string& board_str
@@ -41,17 +47,17 @@ public:
   static StringList parse_board_string(const std::string& the_line);
 
   VariantBoard(
-    const TessellationBase& tessellation,
+    const Tessellation& tessellation,
     size_t board_width=0, size_t board_height=0
   );
   VariantBoard(
-    const TessellationBase& tessellation, const std::string& board_str=""
+    const Tessellation& tessellation, const std::string& board_str=""
   );
 
   virtual ~VariantBoard();
   virtual unique_ptr_t create_clone() const = 0;
 
-  const TessellationBase& tessellation() const;
+  const Tessellation& tessellation() const;
 
   bool operator==(const VariantBoard& rv) const;
   bool operator!=(const VariantBoard& rv) const;
@@ -68,7 +74,7 @@ public:
   std::string to_str(
     bool use_visible_floor=false, bool rle_encode=false
   ) const;
-  std::string str() const { return to_str(false, false); }
+  std::string str() const;
   std::string repr() const;
 
   size_t width() const;
@@ -130,9 +136,7 @@ protected:
   VariantBoard(VariantBoard&& rv);
   VariantBoard& operator=(VariantBoard&& rv);
 
-  void reinit(
-    size_t board_width, size_t board_height, bool reconf_edges
-  );
+  void reinit(size_t board_width, size_t board_height, bool reconf_edges);
   void reinit(const std::string& src, bool reconf_edges);
 
 private:

@@ -10,29 +10,44 @@
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API VariantBoard;
-class LIBSOKOENGINE_API Direction;
-class LIBSOKOENGINE_API HashedBoardState;
+class VariantBoard;
+class Direction;
+class HashedBoardState;
 
+///
+/// Movement mode of operation.
+///
 enum class LIBSOKOENGINE_API SolvingMode : char {
   FORWARD,
   REVERSE,
 };
 
+///
+/// Exception.
+///
 class LIBSOKOENGINE_API NonPlayableBoardError: public std::runtime_error {
 public:
   NonPlayableBoardError();
   virtual ~NonPlayableBoardError();
 };
 
+///
+/// Exception.
+///
 class LIBSOKOENGINE_API IllegalMoveError: public std::runtime_error {
 public:
   IllegalMoveError(const std::string& mess);
   virtual ~IllegalMoveError();
 };
 
+///
+/// Implements movement rules on VariantBoard.
+///
 class LIBSOKOENGINE_API Mover {
 public:
+  ///
+  /// Ordered sequence of AtomicMove.
+  ///
   typedef std::deque<AtomicMove> Moves;
 
   Mover(VariantBoard& board, SolvingMode mode=SolvingMode::FORWARD);

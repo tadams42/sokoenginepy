@@ -7,69 +7,48 @@
 
 namespace sokoengine {
 
-enum class LIBSOKOENGINE_API EDirection : int {
-  E_UP         = 0,
-  E_NORTH_EAST = 1,
-  E_RIGHT      = 2,
-  E_SOUTH_EAST = 3,
-  E_DOWN       = 4,
-  E_SOUTH_WEST = 5,
-  E_LEFT       = 6,
-  E_NORTH_WEST = 7
+///
+/// Direction values.
+///
+enum class LIBSOKOENGINE_API EDirection : unsigned char {
+  UP, NORTH_EAST, RIGHT, SOUTH_EAST, DOWN, SOUTH_WEST, LEFT, NORTH_WEST
 };
 
 ///
-/// Movement direction for Mover, AtomicMove, etc...
+/// Movement directions.
 ///
 class LIBSOKOENGINE_API Direction {
-  EDirection m_value;
 public:
-  static const Direction UP;
-  static const Direction DOWN;
-  static const Direction LEFT;
-  static const Direction RIGHT;
-  static const Direction NORTH_WEST;
-  static const Direction NORTH_EAST;
-  static const Direction SOUTH_WEST;
-  static const Direction SOUTH_EAST;
+  EDirection m_direction;
 
-  explicit Direction(EDirection value = EDirection::E_UP) : m_value(value) {};
+  static const Direction& UP;
+  static const Direction& DOWN;
+  static const Direction& LEFT;
+  static const Direction& RIGHT;
+  static const Direction& NORTH_WEST;
+  static const Direction& NORTH_EAST;
+  static const Direction& SOUTH_WEST;
+  static const Direction& SOUTH_EAST;
 
-  bool operator== (const Direction& rv) const { return m_value == rv.m_value; }
-  bool operator!= (const Direction& rv) const { return !(*this == rv); }
-  bool operator< (const Direction& rv) const { return m_value < rv.m_value; }
+  explicit Direction(const EDirection& value = EDirection::UP);
 
-  EDirection get_value() const { return m_value; }
+  bool operator== (const Direction& rv) const;
+  bool operator!= (const Direction& rv) const;
+  bool operator< (const Direction& rv) const;
 
-  static constexpr int len() { return 8; }
+  static constexpr unsigned char len() { return 8; }
 
-  const Direction& opposite() const {
-    if (m_value == UP.m_value) return DOWN;
-    else if (m_value == DOWN.m_value) return UP;
-    else if (m_value == LEFT.m_value) return RIGHT;
-    else if (m_value == RIGHT.m_value) return LEFT;
-    else if (m_value == NORTH_EAST.m_value) return SOUTH_WEST;
-    else if (m_value == SOUTH_EAST.m_value) return NORTH_WEST;
-    else if (m_value == NORTH_WEST.m_value) return SOUTH_EAST;
-    else
-      // if (m_value == SOUTH_WEST.m_value)
-      return NORTH_EAST;
-  }
+  const Direction& opposite() const;
 
-  std::string repr() const {
-    if (m_value == UP.m_value) return "Direction.UP";
-    else if (m_value == DOWN.m_value) return "Direction.DOWN";
-    else if (m_value == LEFT.m_value) return "Direction.LEFT";
-    else if (m_value == RIGHT.m_value) return "Direction.RIGHT";
-    else if (m_value == NORTH_EAST.m_value) return "Direction.NORTH_EAST";
-    else if (m_value == SOUTH_EAST.m_value) return "Direction.SOUTH_EAST";
-    else if (m_value == NORTH_WEST.m_value) return "Direction.NORTH_WEST";
-    else
-      // if (m_value == SOUTH_WEST.m_value)
-      return "Direction.SOUTH_WEST";
-  }
+  ///
+  /// Type for compact Direction representation
+  ///
+  typedef unsigned char packed_t;
 
-  std::string str() const { return repr(); }
+  static const Direction& unpack(packed_t c);
+  packed_t pack() const;
+  std::string repr() const;
+  std::string str() const;
 };
 
 } // namespace sokoengine

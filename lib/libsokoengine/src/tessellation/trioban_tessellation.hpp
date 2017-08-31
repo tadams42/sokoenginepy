@@ -1,11 +1,14 @@
 #ifndef TRIOBAN_TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TRIOBAN_TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "tessellation_base.hpp"
+#include "tessellation.hpp"
 
 namespace sokoengine {
 
-class LIBSOKOENGINE_API TriobanTessellation : public TessellationBase {
+///
+/// Tessellation for Trioban.
+///
+class LIBSOKOENGINE_API TriobanTessellation : public Tessellation {
 public:
   virtual const Directions& legal_directions() const override;
   virtual position_t neighbor_position(

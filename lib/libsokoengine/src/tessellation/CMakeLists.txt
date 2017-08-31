@@ -1,19 +1,21 @@
 set(SOKOENGINE_SOURCES ${SOKOENGINE_SOURCES}
-  tessellation/direction.cpp
-  tessellation/tessellation.cpp
-  tessellation/tessellation_base.cpp
-  tessellation/hexoban_tessellation.cpp
-  tessellation/octoban_tessellation.cpp
-  tessellation/sokoban_tessellation.cpp
-  tessellation/trioban_tessellation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/direction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/tessellation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/hexoban_tessellation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/octoban_tessellation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/sokoban_tessellation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/trioban_tessellation.cpp
 PARENT_SCOPE)
 
-set(SOKOENGINE_PUBLIC_HEADERS ${SOKOENGINE_PUBLIC_HEADERS}
-  tessellation/direction.hpp
-  tessellation/tessellation.hpp
-  tessellation/tessellation_base.hpp
-  tessellation/hexoban_tessellation.hpp
-  tessellation/octoban_tessellation.hpp
-  tessellation/sokoban_tessellation.hpp
-  tessellation/trioban_tessellation.hpp
+set(SOKOENGINE_HEADERS ${SOKOENGINE_HEADERS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/direction.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/tessellation.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/hexoban_tessellation.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/octoban_tessellation.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/sokoban_tessellation.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/trioban_tessellation.hpp
+PARENT_SCOPE)
+
+set(SOKOENGINE_INCLUDE_DIRS ${SOKOENGINE_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}
 PARENT_SCOPE)

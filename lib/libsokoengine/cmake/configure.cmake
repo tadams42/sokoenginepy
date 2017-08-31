@@ -5,6 +5,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   SET(LIBSOKONGINE_SYSTEM_IS_LINUX TRUE)
 ENDIF()
 
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION, TRUE)
+
 #..............................................................................
 #                  GCC compiler settings common to all targets.
 #..............................................................................
@@ -12,10 +14,15 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER}" MATCHES ".*clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
   set(DISABLED_CXX_WARNINGS "-Wno-overloaded-virtual -Wno-sign-compare -Wno-unused-parameter -Wno-attributes")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wpedantic -Wall -Wextra ${DISABLED_CXX_WARNINGS}")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -flto")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -flto")
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
 
 if("${CMAKE_CXX_COMPILER}" MATCHES ".*clang")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lstdc++")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -flto")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -flto")
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
 
@@ -122,7 +129,8 @@ if(LIBSOKONGINE_SYSTEM_IS_LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
   endif()
 
   # Following two don't work for some reason...
-  # list(APPEND CMAKE_MODULE_PATH "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/")
+  # list(APPEND CMAKE_MODULE_PATH
+  #               "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/")
   # find_package(Backward)
 
   CHECK_INCLUDE_FILE("elfutils/libdw.h" HAVE_DW_H)
@@ -130,146 +138,94 @@ if(LIBSOKONGINE_SYSTEM_IS_LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     include_directories("${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp")
     add_definitions(-DBACKWARD_HAS_DW=1)
     set(LIBBACKWARD_DEPENDENCIES dw)
-    set(LIBBACKWARD_SOURCES "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
+    set(LIBBACKWARD_SOURCES
+        "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
   else()
     CHECK_INCLUDE_FILE("bfd.h" HAVE_BFD_H)
     if (HAVE_BFD_H)
       include_directories("${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp")
       add_definitions(-DBACKWARD_HAS_BFD=1)
       set(LIBBACKWARD_DEPENDENCIES bfd)
-      set(LIBBACKWARD_SOURCES "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
+      set(LIBBACKWARD_SOURCES
+          "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
     endif()
   endif()
 endif()
 
-# #..............................................................................#
-# #                                   doc target                                 #
-# #..............................................................................#
-# find_package(Doxygen)
-# if(DOXYGEN_FOUND)
-#   set(SOKOENGINECPP_DOCS_OUTPUT_ROOT "${sokoenginecpp_BINARY_DIR}/doc/libsokoengine-v${SOKOENGINECPP_VERSION}")
-#   # set(SOKOENGINECPP_DOCS_OUTPUT_ROOT "${sokoenginecpp_SOURCE_DIR}/doc")
-#   set(DOXYFILE_TEMPLATE "${sokoenginecpp_SOURCE_DIR}/doc/Doxyfile.in")
-#   configure_file("${DOXYFILE_TEMPLATE}" "${sokoenginecpp_BINARY_DIR}/doc/Doxyfile")
-#   add_custom_target(doc
-#     COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
-#     WORKING_DIRECTORY "${sokoenginecpp_BINARY_DIR}/doc"
-#     SOURCES "${DOXYFILE_TEMPLATE}"
-#     DEPENDS "${sokoenginecpp_SOURCE_DIR}/VERSION" )
-#   set_target_properties(doc PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
-# else()
-#   message("Doxygen not found, 'make doc' target will not be configured...")
-# endif()
-#
-# #..............................................................................#
-# #                             valgrind targets
-# #..............................................................................#
-# function(add_valgrind_profile_dump_target for_target_name)
-#   if(LIBSOKONGINE_SYSTEM_IS_LINUX)
-#     set(dump_file "${sokoenginecpp_BINARY_DIR}/${for_target_name}_dump.pid")
-#     set(valgrind_args --dump-line=yes
-#                       --dump-instr=yes
-#                       --tool=callgrind
-#                       --collect-jumps=yes
-#                       --callgrind-out-file="${dump_file}" )
-#     set(valgrind_target_name "valgrind_profile_${for_target_name}")
-#     # get_target_property(binary_location ${for_target_name} LOCATION)
-#     # add_custom_target(${valgrind_target_name} COMMAND valgrind ${valgrind_args} ${binary_location})
-#     add_custom_target(${valgrind_target_name} COMMAND valgrind ${valgrind_args} $<TARGET_FILE:${for_target_name}>)
-#     add_dependencies(${valgrind_target_name} ${for_target_name})
-#     set_target_properties(${valgrind_target_name} PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
-#   endif()
-# endfunction(add_valgrind_profile_dump_target)
-#
-# function(add_valgrind_memory_check_target for_target_name)
-#   if(LIBSOKONGINE_SYSTEM_IS_LINUX)
-#     set(valgrind_args --num-callers=50
-#                       --leak-check=full
-#                       --partial-loads-ok=yes
-#                       --undef-value-errors=no
-#                       --show-reachable=yes
-#                       --error-limit=no
-#                       # uncomment next two lines to generate suppression blocks in valgrind log
-#                       # These blocks can then be added to .libsokoengine.supp
-#                       # --gen-suppressions=all
-#                       # --log-file="${sokoenginecpp_BINARY_DIR}/valgrind_memcheck.log"
-#                       --suppressions="${sokoenginecpp_SOURCE_DIR}/.libsokoengine.supp" )
-#     set(valgrind_target_name "valgrind_check_${for_target_name}")
-#     # get_target_property(binary_location ${for_target_name} LOCATION)
-#     # add_custom_target(${valgrind_target_name} COMMAND G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind ${valgrind_args} ${binary_location})
-#     add_custom_target(${valgrind_target_name} COMMAND G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind ${valgrind_args} $<TARGET_FILE:${for_target_name}>)
-#     add_dependencies(${valgrind_target_name} ${for_target_name})
-#     set_target_properties(${valgrind_target_name} PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
-#   endif()
-# endfunction(add_valgrind_memory_check_target)
-#
-# #..............................................................................#
-# #                             'make dist' target
-# #..............................................................................#
-# set(dist_archive "libsokoengine-${SOKOENGINECPP_VERSION}.tar.gz")
-# add_custom_target(dist
-#   COMMAND
-#     git archive HEAD --format=tar.gz --output="${sokoenginecpp_BINARY_DIR}/${dist_archive}" --prefix="libsokoengine-${SOKOENGINECPP_VERSION}/"
-#   WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}")
-#
-# #..............................................................................#
-# #                           gcov coverage option
-# #..............................................................................#
-# if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-#   option(WITH_COVERAGE "Build for code coverage report (only for gcc, requires gcov, lcov and genhtml)" OFF)
-#
-#   if(WITH_COVERAGE)
-#     find_program(GCOV_PATH gcov)
-#     mark_as_advanced(GCOV_PATH)
-#     find_program(LCOV_PATH lcov)
-#     mark_as_advanced(LCOV_PATH)
-#     find_program(GENHTML_PATH genhtml)
-#     mark_as_advanced(GENHTML_PATH)
-#
-#     if(NOT GCOV_PATH)
-#         messagE(FATAL_ERROR "gcov not found! Aborting...")
-#     endif()
-#
-#     if(NOT LCOV_PATH)
-#         message(FATAL_ERROR "lcov not found! Aborting...")
-#     endif()
-#
-#     if(NOT GENHTML_PATH)
-#         message(FATAL_ERROR "genhtml not found! Aborting...")
-#     endif()
-#
-#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-#   endif()
-# endif()
-#
-# function(SETUP_TARGET_FOR_COVERAGE for_target)
-#   if(WITH_COVERAGE AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-#     set(_outputname "coverage_${for_target}_output")
-#     set(_targetname "coverage_${for_target}")
-#
-#     add_custom_target(${_targetname}
-#       # Reset all execution counts to zero.
-#       COMMAND ${LCOV_PATH} --directory . --zerocounters
-#
-#       # Run tests.
-#       COMMAND ${for_target} ${ARGV3}
-#
-#       # Capture coverage data.
-#       COMMAND ${LCOV_PATH} --compat-libtool --directory . --capture --output-file ${_outputname}.info
-#       COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'spec/*' '/usr/*' 'lib/*' '${sokoenginecpp_BINARY_DIR}/*' 'tmp/*' --output-file coverage.info
-#
-#       # Generating the report.
-#       COMMAND ${GENHTML_PATH} -o ${_outputname} coverage.info
-#
-#       # COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
-#       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-#       COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."
-#     )
-#
-#     # Show info where to find the report
-#     ADD_CUSTOM_COMMAND(TARGET ${_targetname} POST_BUILD
-#       COMMAND ;
-#       COMMENT "Open ./${_outputname}/index.html in your browser to view the coverage report."
-#     )
-#   endif()
-# endfunction()
+#..............................................................................#
+#                                   docs target                                 #
+#..............................................................................#
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+  file(MAKE_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build/")
+  set(SOKOENGINECPP_DOCS_OUTPUT_ROOT
+      "${sokoenginecpp_SOURCE_DIR}/docs/_build/libsokoengine-v${SOKOENGINECPP_VERSION}")
+  set(DOXYFILE_TEMPLATE
+      "${sokoenginecpp_SOURCE_DIR}/docs/Doxyfile.in")
+  configure_file("${DOXYFILE_TEMPLATE}"
+                 "${sokoenginecpp_SOURCE_DIR}/docs/_build/Doxyfile")
+  add_custom_target(docs
+                    COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
+                    WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build"
+                    SOURCES "${DOXYFILE_TEMPLATE}"
+                    DEPENDS "${sokoenginecpp_SOURCE_DIR}/VERSION")
+  set_target_properties(docs PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
+  # add_dependencies(docs, sokoengine)
+else()
+  message("Doxygen not found, 'make docs' target will not be configured...")
+endif()
+
+#..............................................................................#
+#                             valgrind targets
+#..............................................................................#
+function(add_valgrind_profile_dump_target for_target_name)
+  if(LIBSOKONGINE_SYSTEM_IS_LINUX)
+    set(dump_file "${sokoenginecpp_BINARY_DIR}/${for_target_name}_dump.pid")
+    set(valgrind_args
+      --dump-line=yes
+      --dump-instr=yes
+      --tool=callgrind
+      --collect-jumps=yes
+      --callgrind-out-file="${dump_file}"
+    )
+    set(valgrind_target_name "valgrind_profile_${for_target_name}")
+    # get_target_property(binary_location ${for_target_name} LOCATION)
+    # add_custom_target(${valgrind_target_name} COMMAND valgrind ${valgrind_args} ${binary_location})
+    add_custom_target(
+      ${valgrind_target_name}
+      COMMAND valgrind ${valgrind_args} $<TARGET_FILE:${for_target_name}>
+    )
+    add_dependencies(${valgrind_target_name} ${for_target_name})
+    set_target_properties(
+      ${valgrind_target_name} PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1
+    )
+  endif()
+endfunction(add_valgrind_profile_dump_target)
+
+function(add_valgrind_memory_check_target for_target_name)
+  if(LIBSOKONGINE_SYSTEM_IS_LINUX)
+    set(valgrind_args
+      --num-callers=50
+      --leak-check=full
+      --partial-loads-ok=yes
+      --undef-value-errors=no
+      --show-reachable=yes
+      --error-limit=no
+      # uncomment next two lines to generate suppression blocks in valgrind log
+      # These blocks can then be added to .libsokoengine.supp
+      # --gen-suppressions=all
+      # --log-file="${sokoenginecpp_BINARY_DIR}/valgrind_memcheck.log"
+      # --suppressions="${sokoenginecpp_SOURCE_DIR}/.libsokoengine.supp"
+    )
+    set(valgrind_target_name "valgrind_check_${for_target_name}")
+    # get_target_property(binary_location ${for_target_name} LOCATION)
+    # add_custom_target(${valgrind_target_name} COMMAND G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind ${valgrind_args} ${binary_location})
+    add_custom_target(
+      ${valgrind_target_name}
+      COMMAND G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind ${valgrind_args} $<TARGET_FILE:${for_target_name}>
+    )
+    add_dependencies(${valgrind_target_name} ${for_target_name})
+    set_target_properties(${valgrind_target_name}
+                          PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
+  endif()
+endfunction(add_valgrind_memory_check_target)

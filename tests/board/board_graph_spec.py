@@ -19,7 +19,7 @@ class DescribeBoardGraph:
     class describe_setitem:
         def it_sets_board_cell_on_position(self, board_graph):
             board_graph[0].is_in_playable_area = True
-            board_graph[0].is_deatdlock = True
+            board_graph[0].is_deadlock = True
             board_graph[0].is_wall = True
 
             bc = BoardCell(BoardCellCharacters.PUSHER)
@@ -163,7 +163,6 @@ class DescribeBoardGraph:
                 "#######",  # 2
             ])
             board_graph = SokobanBoard(board_str=board_str)._graph
-
             wall_neighbors = board_graph.wall_neighbors(0)
             assert index_1d(0, 1, 7) in wall_neighbors
             assert index_1d(1, 0, 7) in wall_neighbors

@@ -260,21 +260,5 @@ int main() {
 
   MovementBenchmarkPrinter::run_all();
 
-  // const string forward_board_str = string() +
-  //   //12345678
-  //   "#########\n" +  // 0
-  //   "#$  .  .#\n" +  // 1
-  //   "#   @$# #\n" +  // 2
-  //   "#.$    @#\n" +  // 3
-  //   "#########\n";   // 4
-  // SokobanBoard forward_board(forward_board_str);
-  //
-  // Mover forward_mover(forward_board);
-  //
-  // forward_mover.move(Direction::LEFT);
-  // cout << to_string(forward_mover.last_move()[0].direction()) << endl;
-  // forward_mover.undo();
-  // cout << to_string(forward_mover.last_move()[0].direction()) << endl;
-
   return 0;
 }

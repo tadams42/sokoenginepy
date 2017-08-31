@@ -70,7 +70,7 @@ class DescribeVariantBoard:
                   "##   z####\n" +\
                   "#   a #\n" +\
                   "#######\n"
-            with pytest.raises(RuntimeError):
+            with pytest.raises(BoardConversionError):
                 VariantBoard.parse_board_string(src)
 
         def it_discards_empty_but_not_blank_lines(self):
@@ -118,7 +118,7 @@ class DescribeVariantBoard:
             assert b.to_str(use_visible_floor=False) == board_str
 
         def it_raises_on_illegal_board_string(self):
-            with pytest.raises(RuntimeError):
+            with pytest.raises(BoardConversionError):
                 SokobanBoard(board_str="ZOOMG!")
 
         def it_reconfigures_all_edges_in_board(self):

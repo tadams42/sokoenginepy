@@ -9,6 +9,8 @@
 using namespace std;
 
 namespace sokoengine {
+  
+using namespace implementation;
 
 const Directions& OctobanTessellation::legal_directions() const {
   static const Directions retv = {

@@ -6,17 +6,7 @@
 namespace sokoengine {
 
 ///
-/// Board space is laid out on alternating squares and octagons with
-/// origin of coordinate system being octagon. Tessellation allows all
-/// 8 directions of movement from Direction and depending on current
-/// pusher position some of these directions do not result in successful
-/// move.
-///
-/// Direction <-> character mapping:
-///
-/// |  Direction::UP  | Direction::NORTH_EAST | Direction::RIGHT | Direction::SOUTH_EAST | Direction::DOWN | Direction::SOUTH_WEST | Direction::LEFT | Direction::NORTH_WEST |
-/// |:----:|:----------:|:-----:|:----------:|:----:|:----------:|:----:|:----------:|
-/// | u, U |    n, N    |  r, R |    e, E    | d, D |    s, S    | l, L |    w, W    |
+/// Board implementation for Octoban.
 ///
 class LIBSOKOENGINE_API OctobanBoard : public VariantBoard {
 public:

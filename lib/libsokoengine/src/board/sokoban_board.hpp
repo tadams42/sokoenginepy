@@ -6,11 +6,7 @@
 namespace sokoengine {
 
 ///
-/// Board is laid out on squares. Direction <-> character mapping:
-///
-/// |   Direction::LEFT  |  Direction::RIGHT  |    Direction::UP   |   Direction::DOWN  |
-/// |:-------:|:-------:|:-------:|:-------:|
-/// |   l, L  |   r, R  |   u, U  |  d, D   |
+/// Board implementation for Sokoban.
 ///
 class LIBSOKOENGINE_API SokobanBoard : public VariantBoard {
 public:

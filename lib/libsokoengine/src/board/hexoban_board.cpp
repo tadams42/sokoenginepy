@@ -2,7 +2,7 @@
 #include "sokoban_board.hpp"
 #include "board_cell.hpp"
 #include "atomic_move.hpp"
-#include "tessellation_base.hpp"
+#include "tessellation.hpp"
 #include "tessellation.hpp"
 
 #include <algorithm>

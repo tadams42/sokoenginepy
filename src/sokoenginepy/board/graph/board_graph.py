@@ -25,7 +25,7 @@ class BoardGraph:
 
     _KEY_CELL = 'cell'
     _KEY_DIRECTION = 'direction'
-    _MAX_EDGE_WEIGHT = module_tessellation.Direction.__len__() + 1
+    _MAX_EDGE_WEIGHT = len(module_tessellation.Direction) + 1
 
     def __init__(self, number_of_vertices, graph_type):
         # assert graph_type in GraphType

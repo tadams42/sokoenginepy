@@ -253,10 +253,6 @@ void SokobanPlus::set_goalorder(const string& rv) {
   }
 }
 
-///
-/// True if this contains valid Sokoban+ sequences for
-/// given count of boxes and goals.
-///
 bool SokobanPlus::is_valid() const {
   if (m_impl->m_validated == false) {
     m_impl->m_validated = true;
@@ -294,11 +290,6 @@ void SokobanPlus::disable() {
   m_impl->m_enabled = false;
 }
 
-///
-/// Returns Sokoban+ ID for box Sokoban+ is enabled.
-/// Returns DEFAULT_PLUS_ID if Sokoban+ is not enabled.
-/// Throws KeyError if Sokoban+ is enabled and there is no ID equal to @a for_id
-///
 piece_id_t SokobanPlus::box_plus_id(piece_id_t for_id) const {
   try {
     return m_impl->get_plus_id(for_id, m_impl->m_box_plus_ids);
@@ -308,11 +299,6 @@ piece_id_t SokobanPlus::box_plus_id(piece_id_t for_id) const {
   }
 }
 
-///
-/// Returns Sokoban+ ID for goal Sokoban+ is enabled.
-/// Returns DEFAULT_PLUS_ID if Sokoban+ is not enabled.
-/// Throws KeyError if Sokoban+ is enabled and there is no ID equal to @a for_id
-///
 piece_id_t SokobanPlus::goal_plus_id(piece_id_t for_id) const {
   try {
     return m_impl->get_plus_id(for_id, m_impl->m_goal_plus_ids);

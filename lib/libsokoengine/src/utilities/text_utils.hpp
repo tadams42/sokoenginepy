@@ -8,21 +8,19 @@
 
 namespace sokoengine {
 
+///
+/// Collection of strings.
+///
 typedef std::deque<std::string> StringList;
 
 ///
-/// Helper utilities for string manipulation and Sokoban data
-/// parsing. Mostly related to SOK file format, but
-/// probably useful for parsing any Sokoban file format.
-///
-/// @see SOKFileFormat
+/// Helper utilities for string manipulation.
 ///
 class LIBSOKOENGINE_API TextUtils {
 public:
   ///
   /// Separators used in RLE encoded board and snapshot texts
   ///
-  /// @see SOKFileFormat
   ///
   enum RleCharacters {
     GROUP_LEFT_DELIM  = '(',
@@ -39,6 +37,10 @@ public:
     const StringList& string_list, char fill_chr=' '
   );
   static size_t calculate_width(const StringList& string_list);
+
+  // static std::string& strip_and_downcase(std::string& line);
+  // static std::string strip_and_downcase(const std::string& line);
+  // static void assign_to_blank(std::string& dest, const std::string& src);
 };
 
 } // namespace sokoengine

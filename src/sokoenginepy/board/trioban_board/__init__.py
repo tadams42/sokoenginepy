@@ -1,4 +1,4 @@
 try:
-    from libsokoengine import TriobanBoard
+    from sokoenginepyext import TriobanBoard
 except ImportError:
     from .trioban_board import TriobanBoard

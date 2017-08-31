@@ -57,23 +57,6 @@ and finally, tests can be run with tox_
 
     tox
 
-Note, to combine the coverage data from all the tox environments run:
-
-.. list-table::
-    :widths: 10 90
-    :stub-columns: 1
-
-    - - Windows
-      - ::
-
-            set PYTEST_ADDOPTS=--cov-append
-            tox
-
-    - - Other
-      - ::
-
-            PYTEST_ADDOPTS=--cov-append tox
-
 Running under PyPy3
 -------------------
 
@@ -106,6 +89,24 @@ or as call graph through KCacheGrind
 
     pyprof2calltree -i program.prof
     kcachegrind program.prof.log
+
+There is also a suite of ``Mover`` benchmarks:
+
+.. code-block:: sh
+
+    python bin/mover_benchmarks.py
+
+And useful ``Mover`` profiling script:
+
+.. code-block:: sh
+
+    python bin/mover_benchmarks.py
+    pip install pyprof2calltree
+    python bin/mover_profiling.py
+    pyprof2calltree -i moves_profile.prof
+    pyprof2calltree -i single_move_profile.prof
+    kcachegrind moves_profile.prof.log
+    kcachegrind single_move_profile.prof.log
 
 Uploading to PyPI
 -----------------
@@ -144,21 +145,27 @@ An upload it
 
     twine upload -r pypitest dist/*
 
-Native extenstion
------------------
+Native extension
+----------------
 
-There is optional C++ native extension that is built with ``python setup.py`` automatically if all dependencies are in place.
+If all dependencies are met, ``python setup.py develop`` and ``pip install sokoenginepy`` will produce native C++ extension that is then used automatically (for example, running tests will actually use native code and effectively test native extension instead of Python code)
 
-Configuring dependencies needs more work, currently it is guaranteed to work on only on Ubuntu and only on Python 3.5.
-
-Native extnsion relies on Boost.Python and Boost.Graph:
+To debug native code, use ``gdb`` like this:
 
 .. code-block:: sh
 
-    sudo apt install python3-dev python3-dbg libboost-python-dev libboost-graph-dev
+    sudo apt install python3-dbg
+    pip install gdbgui --upgrade
+    gdbgui 'python crash.py'
+    gdbgui '.venv/bin/python .venv/bin/py.test tests/crash_test.py'
 
-.. _Boost Graph Library: http://www.boost.org/doc/libs/1_61_0/libs/graph/doc/index.html
-.. _graph-tool: https://graph-tool.skewed.de/download
+In cases where developing against native extension is undesireable, use this:
+
+.. code-block:: sh
+
+    python setup.py develop --uninstall
+    python setup.py clean
+    SKIP_SOKOENGINEPY_NATIVE_EXTENSION=True python setup.py develop
+
 .. _PyPI: https://pypi.python.org/pypi
 .. _tox: https://tox.readthedocs.io/en/latest/
-.. _NetworkX: https://networkx.github.io/

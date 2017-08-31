@@ -6,16 +6,7 @@
 namespace sokoengine {
 
 ///
-/// Board is laid out on alternating triangles with origin triangle poiting up.
-/// Direction <-> character mapping:
-///
-/// | Direction::LEFT | Direction::RIGHT | Direction::NORTH_EAST | Direction::NORTH_WEST | Direction::SOUTH_EAST | Direction::SOUTH_WEST |
-/// |:----:|:-----:|:----------:|:----------:|:----------:|:----------:|
-/// | l, L |  r, R |    n, N    |    u, U    |    d, D    |    s, S    |
-///
-/// Depending on current pusher position, some moves are not allowed:
-///
-/// ![Trioban movement](doc/img/trioban_am.png)
+/// Board implementation for Trioban.
 ///
 class LIBSOKOENGINE_API TriobanBoard : public VariantBoard {
 public:

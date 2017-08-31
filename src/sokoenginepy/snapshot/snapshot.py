@@ -41,7 +41,7 @@ class Snapshot(MutableSequence):
         super().__init__()
         self._tessellation_instance = tessellation.Tessellation.instance_from(
             tessellation_or_description
-        ).value
+        )
         self._solving_mode = None
         self._moves_count = 0
         self._pushes_count = 0
@@ -56,7 +56,7 @@ class Snapshot(MutableSequence):
             self._solving_mode = solving_mode
 
         if self._solving_mode is None:
-            raise RuntimeError(
+            raise SnapshotConversionError(
                 "Snapshot not correctly initialized! Missing solving_mode. " +
                 "Either provide it explicitly or provide moves_data." +
                 "tessellation_or_description: '{0}', solving_mode: {1},".format(
@@ -84,7 +84,7 @@ class Snapshot(MutableSequence):
 
     @property
     def tessellation(self):
-        return self._tessellation_instance
+        return self._tessellation_instance.value
 
     # Iterable
     def __iter__(self):
@@ -214,7 +214,7 @@ class Snapshot(MutableSequence):
             self._solving_mode == game.SolvingMode.FORWARD and
             atomic_move.is_jump
         ):
-            raise ValueError(
+            raise SnapshotConversionError (
                 "Forward mode snapshots are not allowed to contain jumps!"
             )
 

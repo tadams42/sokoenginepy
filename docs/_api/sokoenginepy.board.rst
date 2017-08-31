@@ -27,7 +27,7 @@ BoardState
 
 .. autoexception:: sokoenginepy.board.board_state.CellAlreadyOccupiedError
 
-.. autoclass:: sokoenginepy.board.board_state.BoardState
+.. autoclass:: sokoenginepy.board.board_state.board_state.BoardState
     :members:
     :undoc-members:
     :inherited-members:

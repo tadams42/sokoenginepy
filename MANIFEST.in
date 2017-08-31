@@ -11,17 +11,20 @@ include .editorconfig
 include CHANGELOG.rst
 include LICENSE
 include README.rst
+include TODO.rst
 
-include tox.ini .travis.yml setup_ext.py
+include tox.ini .travis.yml setup_ext_pybind.py
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4
 
-global-exclude .ipynb_checkpoints/* lib/libsokoengine/lib/cppitertools
+global-exclude .ipynb_checkpoints/*
 
 prune docs/_build
+prune lib/libsokoengine/docs/_build
 prune lib/libsokoengine/build
 prune lib/libsokoengine/lib/cppitertools
 prune lib/libsokoengine/lib/backward-cpp
+prune lib/libsokoengine/lib/pybind11
 
 recursive-include res *.ipynb
 recursive-include res *.py

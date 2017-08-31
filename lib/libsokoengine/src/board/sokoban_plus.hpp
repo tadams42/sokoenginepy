@@ -8,18 +8,27 @@
 
 namespace sokoengine {
 
+///
+/// Exception.
+///
 class LIBSOKOENGINE_API SokobanPlusDataError: public std::invalid_argument {
 public:
   SokobanPlusDataError(const std::string& mess);
   virtual ~SokobanPlusDataError();
 };
 
+///
+/// Exception.
+///
 class LIBSOKOENGINE_API KeyError: public std::invalid_argument {
 public:
   KeyError(const std::string& mess);
   virtual ~KeyError();
 };
 
+///
+/// SokobanPlus+ parsing and management.
+///
 class LIBSOKOENGINE_API SokobanPlus {
 public:
   enum {

@@ -1,19 +1,26 @@
 # Install
 
-## Prerequisites
-
-Required: [git], [make], recent C++ compiler with C++11 support ([gcc] v4.7, [clang] v3.0), [boost], [CMake]
+## Runtime dependencies
 
 ~~~~~~sh
-$ sudo apt-get install git build-essential libboost-graph-dev cmake
+$ sudo apt install libboost-graph
 ~~~~~~
 
-Useful for development:
+## Compile time dependencies
+
+[git], [make], recent C++ compiler with C++11 support, [boost] and [CMake]
 
 ~~~~~~sh
-$ sudo apt-get install lcov libdw-dev binutils-dev doxygen valgrind \
-kcachegrind gcov lcov genhtml ninja-build cmake-qt-gui
+$ sudo apt install git build-essential libboost-graph-dev cmake libdw-dev \
+                   binutils-dev doxygen
 ~~~~~~
+
+There are also few dependencies that [CMake] pulls automatically from GutHub
+during build:
+
+- [cppitertools]
+- [backward-cpp]
+- [pybind11]
 
 ## Compile and install
 
@@ -26,7 +33,7 @@ $ git clone https://github.com/tadams42/sokoenginepy.git
 Configure sources:
 
 ~~~~~~sh
-$ cd libsokoengine && mkdir build && cd build
+$ cd lib/libsokoengine && mkdir build && cd build
 $ cmake ../
 ~~~~~~
 
@@ -36,7 +43,7 @@ Build and install:
 $ make && make install
 ~~~~~~
 
-## Customizing source
+## Customizing build
 
 [CMake] accepts compile options in the form of:
 
@@ -44,7 +51,7 @@ $ make && make install
 $ cmake -DOPTION_NAME=OPTION_VALUE
 ~~~~~~
 
-For sokoengine, these are probably most usable options:
+For `libsokoengine`, these are probably most usable ones:
 
   - `CMAKE_INSTALL_PREFIX`
     + string, default: `/usr/local`
@@ -56,13 +63,13 @@ For sokoengine, these are probably most usable options:
 
 Example:
 
-~~~
-cmake -DCMAKE_INSTALL_PREFIX="/tmp" -DCMAKE_BUILD_TYPE="Debug"
+~~~sh
+$ cmake -DCMAKE_INSTALL_PREFIX="/tmp" -DCMAKE_BUILD_TYPE="Debug"
 ~~~
 
-### Integrating with [CMake]
+## Integrating with other projects through [CMake]
 
-`liboskoengine` installs everything needed to be used in [CMake] projects including [CMake Config-Package](http://www.cmake.org/cmake/help/git-master/manual/cmake-packages.7.html#using-packages). Minimal project for [CMake] would look like this:
+`liboskoengine` installs everything needed to be used in [CMake] projects including [CMake Config-Package]. Minimal project for [CMake] would look like this:
 
 ```cmake
 cmake_minimum_required (VERSION 2.8.12)
@@ -73,6 +80,47 @@ add_executable(tester main.cpp)
 target_link_libraries( tester sokoengine )
 ```
 
+## Python bindings
+
+All `libsokoengine` classes are exposed to Python using [pybind11]. To compile
+Python bindings:
+
+~~~sh
+$ make sokoenginepyext
+~~~
+
+Which will produce shred library importable in Python:
+
+~~~python
+import sokoenginepyext
+~~~
+
+## Tests
+
+All tests are written in Python. This requires creation of Python
+environment and [sokoenginepy] (which will also build `sokoenginepyext`)
+
+After that, tests can be run with Python test runner.
+
+For details see: http://sokoenginepy.readthedocs.io/en/latest/development.html
+
+## Other [make] targets
+
+- `benchmarks` - a suite of benchmarks for `Mover`
+
+~~~sh
+$ make benchmarks
+$ ./bin/benchmarks/benchmarks
+~~~
+
+- `valgrind_profile_playground` - a profiling data generator
+
+~~~sh
+$ sudo apt install kcachegrind valgrind
+$ make valgrind_profile_playground
+$ kcachegrind playground_dump.pid
+~~~
+
 [C++ symbols wrapup]:http://www.eyrie.org/~eagle/journal/2012-02/001.html
 [git]:http://git-scm.com/
 [gcc]:http://gcc.gnu.org/
@@ -82,3 +130,8 @@ target_link_libraries( tester sokoengine )
 [make]:http://www.gnu.org/software/make/
 [Doxygen]:http://www.doxygen.org/
 [Graphviz]:http://www.graphviz.org
+[CMake Config-Package]:https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html#using-packages
+[pybind11]:http://pybind11.readthedocs.io/en/stable/index.html
+[cppitertools]:https://github.com/ryanhaining/cppitertools
+[backward-cpp]:https://github.com/bombela/backward-cpp
+[sokoenginepy]:https://github.com/tadams42/sokoenginepy
