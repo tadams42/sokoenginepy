@@ -57,9 +57,12 @@ def libsokoengine_sources():
 
 
 def configure():
-    skip = os.environ.get('SKIP_SOKOENGINEPY_NATIVE_EXTENSION', False)
+    on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+    skip = str(
+        os.environ.get('SKIP_SOKOENGINEPY_NATIVE_EXTENSION', False)
+    ).lower() in ['yes', 'true', 'y']
 
-    if str(skip).lower() in ['yes', 'true', 'y']:
+    if skip or on_rtd:
         return {'ext_modules': [], 'install_requires': []}
 
     clone_cppitertools('lib/libsokoengine/lib/')
