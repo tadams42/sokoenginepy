@@ -2,7 +2,7 @@
 
 Sokoban and variants game engine
 
-![Version](http://img.shields.io/badge/version-0.5.0-blue.svg)
+![Version](http://img.shields.io/badge/version-0.5.1-blue.svg)
 [![Language](http://img.shields.io/badge/language-C++11-lightgrey.svg)](http://en.cppreference.com/w/)
 [![License](http://img.shields.io/badge/license-GPLv3-brightgreen.svg)](http://opensource.org/licenses/GPL-3.0)
 
