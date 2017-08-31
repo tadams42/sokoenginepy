@@ -111,7 +111,7 @@ class SnapshotStringParser:
                         retv += snapshot.tessellation.atomic_move_to_char(
                             snapshot[i]
                         )
-                    except RuntimeError:
+                    except InvalidAtomicMoveError:
                         conversion_ok = False
                     i += 1
                     if i < iend:
@@ -127,7 +127,7 @@ class SnapshotStringParser:
                     retv += snapshot.tessellation.atomic_move_to_char(
                         snapshot[i]
                     )
-                except RuntimeError:
+                except InvalidAtomicMoveError:
                     conversion_ok = False
                 i += 1
 
@@ -234,12 +234,13 @@ class SnapshotStringParser:
     def _convert_token(
         self, token, tessellation, is_jump=False, is_pusher_change=False
     ):
+        from ..tessellation import UnknownDirectionError
 
         for character in token:
             atomic_move = None
             try:
                 atomic_move = tessellation.char_to_atomic_move(character)
-            except ValueError:
+            except UnknownDirectionError:
                 atomic_move = None
 
             if atomic_move is None:

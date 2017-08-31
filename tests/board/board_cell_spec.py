@@ -2,7 +2,8 @@ import copy
 
 import pytest
 
-from sokoenginepy import BoardCell, BoardCellCharacters
+from sokoenginepy import (BoardCell, BoardCellCharacters,
+                          IllegalBoardCharacterError)
 
 from ..fixtures import BoardCellFactory
 
@@ -71,7 +72,7 @@ class DescribeBoardCell:
             assert not board_cell.is_deadlock
 
         def it_raises_on_illegal_character(self):
-            with pytest.raises(ValueError):
+            with pytest.raises(IllegalBoardCharacterError):
                 BoardCell(character="4")
 
     class Describe_equality_comparisson:

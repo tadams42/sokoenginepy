@@ -56,7 +56,7 @@ class Snapshot(MutableSequence):
             self._solving_mode = solving_mode
 
         if self._solving_mode is None:
-            raise RuntimeError(
+            raise SnapshotConversionError(
                 "Snapshot not correctly initialized! Missing solving_mode. " +
                 "Either provide it explicitly or provide moves_data." +
                 "tessellation_or_description: '{0}', solving_mode: {1},".format(
@@ -214,7 +214,7 @@ class Snapshot(MutableSequence):
             self._solving_mode == game.SolvingMode.FORWARD and
             atomic_move.is_jump
         ):
-            raise ValueError(
+            raise SnapshotConversionError (
                 "Forward mode snapshots are not allowed to contain jumps!"
             )
 

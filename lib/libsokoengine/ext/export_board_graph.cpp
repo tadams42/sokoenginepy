@@ -22,7 +22,7 @@ void export_board_graph(py::module& m) {
     )
 
     .def(
-      "__getitem__", [](const BoardGraph& self, position_t position) {
+      "__getitem__", [](BoardGraph& self, position_t position) -> BoardCell& {
         return self.cell_at(position);
       },
       py::return_value_policy::reference,
@@ -31,13 +31,21 @@ void export_board_graph(py::module& m) {
 
     .def(
       "__setitem__", [](
-        const BoardGraph& self, position_t position,
-        const BoardCell& board_cell
+        BoardGraph& self, position_t position, const BoardCell& board_cell
       ) {
-        return self.cell_at(position);
+        self.cell_at(position) = board_cell;
       },
       py::arg("position"), py::arg("board_cell")
     )
+
+    .def(
+      "__setitem__", [](
+        BoardGraph& self, position_t position, char board_cell
+      ) {
+        self.cell_at(position) = boardCell(board_cell);
+      },
+      py::arg("position"), py::arg("board_cell")
+
 
     .def("__contains__", &BoardGraph::contains, py::arg("position"))
 

@@ -14,7 +14,7 @@ from .. import fixtures
 
 class DescribeMover:
     def it_raises_if_board_is_not_playable(self, non_playable_board):
-        with pytest.raises(RuntimeError):
+        with pytest.raises(NonPlayableBoardError):
             mover = Mover(non_playable_board)
 
     def it_assumes_forward_solving_mode(self, forward_board):
@@ -104,7 +104,7 @@ class DescribeMover:
         def it_refuses_to_jump_in_forward_solving_mode(
             self, forward_mover, jump_dest
         ):
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 forward_mover.jump(jump_dest)
             assert not forward_mover.last_move
 
@@ -112,7 +112,7 @@ class DescribeMover:
             reverse_mover.pulls_boxes = True
             reverse_mover.move(Direction.DOWN)
             reverse_mover.last_move = None
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 reverse_mover.jump(jump_dest)
             assert not reverse_mover.last_move
 
@@ -132,7 +132,7 @@ class DescribeMover:
         def it_refuses_to_jump_onto_obstacles(
             self, reverse_mover, jump_obstacle_position
         ):
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 reverse_mover.jump(jump_obstacle_position)
             assert not reverse_mover.last_move
 
@@ -164,7 +164,7 @@ class DescribeMover:
             self, reverse_mover, jump_dest, jump_obstacle_position):
             reverse_mover.jump(jump_dest)
             last_move = deepcopy(reverse_mover.last_move)
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 reverse_mover.jump(jump_obstacle_position)
             assert reverse_mover.last_move == last_move
 
@@ -172,7 +172,7 @@ class DescribeMover:
             self, forward_mover, jumps
         ):
             forward_mover.last_move = jumps[0]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 forward_mover.undo_last_move()
             assert forward_mover.last_move == jumps[0]
 
@@ -258,7 +258,7 @@ class DescribeMover:
             last_move = mover.last_move
 
             for direction in [Direction.UP, Direction.DOWN, Direction.LEFT]:
-                with pytest.raises(RuntimeError):
+                with pytest.raises(IllegalMoveError):
                     mover.move(direction)
                 assert mover.state.pusher_position(selected_pusher) == src
                 assert board[src].has_pusher
@@ -337,7 +337,7 @@ class DescribeMover:
                 Direction.DOWN, Direction.UP, Direction.LEFT, Direction.RIGHT
             ]:
                 mover.last_move = [AtomicMove(direction)]
-                with pytest.raises(RuntimeError):
+                with pytest.raises(IllegalMoveError):
                     mover.undo_last_move()
                 assert mover.state.pusher_position(selected_pusher) == src
                 assert board[src].has_pusher
@@ -429,7 +429,7 @@ class DescribeMover:
             for direction in [
                 Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT
             ]:
-                with pytest.raises(RuntimeError):
+                with pytest.raises(IllegalMoveError):
                     mover.move(direction)
 
                 assert mover.state.pusher_position(selected_pusher) == pusher_src
@@ -488,7 +488,7 @@ class DescribeMover:
 
             # Undo into off board
             mover.last_move = [AtomicMove(Direction.RIGHT, box_moved=True)]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.state.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
@@ -499,7 +499,7 @@ class DescribeMover:
 
             # Undo into wall
             mover.last_move = [AtomicMove(Direction.DOWN, box_moved=True)]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.state.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
@@ -514,7 +514,7 @@ class DescribeMover:
 
             # Undo into pusher
             mover.last_move = [AtomicMove(Direction.RIGHT, box_moved=True)]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.state.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
@@ -525,7 +525,7 @@ class DescribeMover:
 
             # Undo into box
             mover.last_move = [AtomicMove(Direction.DOWN, box_moved=True)]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.state.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
@@ -550,7 +550,7 @@ class DescribeMover:
             mover.select_pusher(selected_pusher)
 
             mover.last_move = [AtomicMove(Direction.RIGHT, box_moved=True)]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
 
@@ -626,7 +626,7 @@ class DescribeMover:
             for direction in [
                 Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT
             ]:
-                with pytest.raises(RuntimeError):
+                with pytest.raises(IllegalMoveError):
                     mover.move(direction)
                 assert mover.state.pusher_position(selected_pusher) == src
                 assert board[src].has_pusher
@@ -758,22 +758,22 @@ class DescribeMover:
             mover.select_pusher(DEFAULT_PIECE_ID + 1)
             mover.last_move = []
 
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.move(Direction.LEFT)
             assert mover.last_move == []
 
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.move(Direction.UP)
             assert mover.last_move == []
 
             mover.select_pusher(DEFAULT_PIECE_ID + 3)
             mover.last_move = []
 
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.move(Direction.LEFT)
             assert mover.last_move == []
 
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.move(Direction.UP)
             assert mover.last_move == []
 
@@ -891,7 +891,7 @@ class DescribeMover:
 
             # undo into off board
             mover.last_move = [AtomicMove(Direction.RIGHT, box_moved=True)]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
@@ -899,7 +899,7 @@ class DescribeMover:
 
             # undo into wall
             mover.last_move = [AtomicMove(Direction.DOWN, box_moved=True)]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.last_move == [AtomicMove(Direction.DOWN, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
@@ -909,7 +909,7 @@ class DescribeMover:
 
             # undo into box
             mover.last_move = [AtomicMove(Direction.RIGHT, box_moved=True)]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
@@ -917,7 +917,7 @@ class DescribeMover:
 
             # undo into pusher
             mover.last_move = [AtomicMove(Direction.LEFT, box_moved=True)]
-            with pytest.raises(RuntimeError):
+            with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.last_move == [AtomicMove(Direction.LEFT, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID

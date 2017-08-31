@@ -1,6 +1,7 @@
 import pytest
 
-from sokoenginepy import DEFAULT_PIECE_ID, AtomicMove, Direction
+from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction,
+                          InvalidAtomicMoveError)
 
 from ..fixtures import AtomicMoveFactory
 
@@ -20,26 +21,26 @@ class DescribeAtomicMove:
             assert atomic_move.moved_box_id is None
 
         def it_validates_parameters(self):
-            with pytest.raises(ValueError):
+            with pytest.raises(InvalidAtomicMoveError):
                 AtomicMove(
                     box_moved=True, is_pusher_selection=True, is_jump=True
                 )
-            with pytest.raises(ValueError):
+            with pytest.raises(InvalidAtomicMoveError):
                 AtomicMove(
                     moved_box_id=42, is_pusher_selection=True, is_jump=True
                 )
 
-            with pytest.raises(ValueError):
+            with pytest.raises(InvalidAtomicMoveError):
                 AtomicMove(box_moved=True, is_jump=True)
-            with pytest.raises(ValueError):
+            with pytest.raises(InvalidAtomicMoveError):
                 AtomicMove(moved_box_id=42, is_jump=True)
 
-            with pytest.raises(ValueError):
+            with pytest.raises(InvalidAtomicMoveError):
                 AtomicMove(box_moved=True, is_pusher_selection=True)
-            with pytest.raises(ValueError):
+            with pytest.raises(InvalidAtomicMoveError):
                 AtomicMove(moved_box_id=42, is_pusher_selection=True)
 
-            with pytest.raises(ValueError):
+            with pytest.raises(InvalidAtomicMoveError):
                 AtomicMove(is_jump=True, is_pusher_selection=True)
 
     class Describe_moved_box_id:

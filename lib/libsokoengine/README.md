@@ -171,6 +171,14 @@ and tested using Python test suite.
 
 Pull requests and issue reports are welcome and greatly appreciated.
 
+### Debugging Python extension
+
+~~~
+pip install gdbgui --upgrade
+gdbgui 'python crash.py'
+gdbgui '.venv/bin/python .venv/bin/py.test tests/crash_test.py'
+~~~
+
 [SokobanYASC]:http://sourceforge.net/projects/sokobanyasc/
 [JSoko]:http://www.sokoban-online.de/
 [MazezaM]:http://webpages.dcu.ie/~tyrrelma/MazezaM/
