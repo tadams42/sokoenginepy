@@ -30,7 +30,7 @@ native_extensions = setup_ext_pybind.configure()
 
 setup(
     name='sokoenginepy',
-    version='0.5.0',
+    version='0.5.1',
     license='GPLv3',
     description='Sokoban and variants game engine',
     long_description='%s\n%s' % (

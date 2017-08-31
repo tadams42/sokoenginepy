@@ -14,4 +14,4 @@ from .snapshot import (AtomicMove, AtomicMoveCharacters, InvalidAtomicMoveError,
 from .tessellation import (CellOrientation, Direction, Tessellation,
                            UnknownDirectionError, UnknownTessellationError)
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
