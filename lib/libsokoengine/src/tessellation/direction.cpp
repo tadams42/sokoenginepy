@@ -13,7 +13,7 @@ const Direction& Direction::NORTH_WEST = Direction(EDirection::NORTH_WEST);
 const Direction& Direction::SOUTH_EAST = Direction(EDirection::SOUTH_EAST);
 const Direction& Direction::SOUTH_WEST = Direction(EDirection::SOUTH_WEST);
 
-Direction::Direction(EDirection value) :
+Direction::Direction(const EDirection& value) :
   m_direction(value)
 {}
 

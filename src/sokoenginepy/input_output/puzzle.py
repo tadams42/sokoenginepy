@@ -40,13 +40,13 @@ class Puzzle:
 
     @property
     def tessellation(self):
-        return self._tessellation
+        return self._tessellation.value
 
     @tessellation.setter
     def tessellation(self, tessellation_or_description):
         self._tessellation = module_tessellation.Tessellation.instance_from(
             tessellation_or_description
-        ).value
+        )
 
     @property
     def board(self):
@@ -64,7 +64,7 @@ class Puzzle:
 
     def clear(self):
         self.board = ""
-        self.tessellation = module_tessellation.Tessellation.SOKOBAN.value
+        self.tessellation = module_tessellation.Tessellation.SOKOBAN
         self.title = ""
         self.author = ""
         self.boxorder = ""
@@ -142,13 +142,13 @@ class PuzzleSnapshot:
 
     @property
     def tessellation(self):
-        return self._tessellation
+        return self._tessellation.value
 
     @tessellation.setter
     def tessellation(self, tessellation_or_description):
         self._tessellation = module_tessellation.Tessellation.instance_from(
             tessellation_or_description
-        ).value
+        )
 
     @property
     def moves(self):

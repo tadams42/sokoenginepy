@@ -1,6 +1,4 @@
 try:
-    from sokoenginecpp import Direction
+    from sokoenginepyext import Direction, UnknownDirectionError
 except ImportError:
-    from .direction import Direction
-
-from .direction import UnknownDirectionError
+    from .direction import Direction, UnknownDirectionError

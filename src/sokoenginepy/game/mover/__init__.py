@@ -1,6 +1,6 @@
 try:
-    from sokoenginecpp import Mover, SolvingMode
+    from sokoenginepyext import (IllegalMoveError, Mover,
+                                 NonPlayableBoardError, SolvingMode)
 except ImportError:
-    from .mover import Mover, SolvingMode
-
-from .mover import IllegalMoveError, NonPlayableBoardError
+    from .mover import (IllegalMoveError, Mover, NonPlayableBoardError,
+                        SolvingMode)

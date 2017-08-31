@@ -43,8 +43,7 @@ class SOKReader:
         self.supplied_tessellation_hint = (
             str(
                 tessellation.Tessellation.instance_from(tessellation_hint).value
-            ).lower() if tessellation_hint else
-            str(tessellation.Tessellation.SOKOBAN.value)
+            ).lower()
         )
 
     def read(self):
@@ -411,7 +410,7 @@ class SOKWriter:
 
         written = False
 
-        if puzzle.tessellation != tessellation.Tessellation.SOKOBAN.value:
+        if puzzle.tessellation != tessellation.Tessellation.SOKOBAN:
             written = self._write_tagged(
                 SOKTags.VARIANT, str(puzzle.tessellation)
             ) or written

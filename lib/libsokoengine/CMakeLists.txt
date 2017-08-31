@@ -22,3 +22,4 @@ include("${sokoenginecpp_SOURCE_DIR}/cmake/configure.cmake")
 
 add_subdirectory (src)
 add_subdirectory (bin)
+add_subdirectory (ext)
