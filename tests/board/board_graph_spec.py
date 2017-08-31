@@ -163,7 +163,6 @@ class DescribeBoardGraph:
                 "#######",  # 2
             ])
             board_graph = SokobanBoard(board_str=board_str)._graph
-
             wall_neighbors = board_graph.wall_neighbors(0)
             assert index_1d(0, 1, 7) in wall_neighbors
             assert index_1d(1, 0, 7) in wall_neighbors

@@ -6,8 +6,6 @@ namespace py = pybind11;
 using namespace sokoengine;
 
 void export_mover(py::module& m) {
-  // py::class_<Mover::Moves>("Moves").def(vector_indexing_suite<Mover::Moves>());
-
   py::enum_<SolvingMode>(m, "SolvingMode")
     .value("FORWARD", SolvingMode::FORWARD)
     .value("REVERSE", SolvingMode::REVERSE)
@@ -33,7 +31,7 @@ void export_mover(py::module& m) {
     .def_property_readonly("solving_mode", &Mover::solving_mode)
 
     .def_property_readonly(
-      "state", &Mover::state, py::return_value_policy::reference
+      "state", &Mover::state, py::return_value_policy::reference_internal
     )
 
     .def_property_readonly("selected_pusher", &Mover::selected_pusher)

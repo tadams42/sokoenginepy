@@ -41,7 +41,7 @@ class Snapshot(MutableSequence):
         super().__init__()
         self._tessellation_instance = tessellation.Tessellation.instance_from(
             tessellation_or_description
-        ).value
+        )
         self._solving_mode = None
         self._moves_count = 0
         self._pushes_count = 0
@@ -84,7 +84,7 @@ class Snapshot(MutableSequence):
 
     @property
     def tessellation(self):
-        return self._tessellation_instance
+        return self._tessellation_instance.value
 
     # Iterable
     def __iter__(self):

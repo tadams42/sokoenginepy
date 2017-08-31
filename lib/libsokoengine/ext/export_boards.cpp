@@ -110,7 +110,8 @@ void export_boards(py::module& m) {
     )
 
     .def_property_readonly(
-      "_graph", &VariantBoard::graph, py::return_value_policy::reference
+      "_graph", &VariantBoard::graph,
+      py::return_value_policy::reference_internal
     )
 
     .def_property_readonly(
@@ -120,10 +121,11 @@ void export_boards(py::module& m) {
 
     // protocols
     .def(
-      "__getitem__", [](VariantBoard& self, position_t position) {
+      "__getitem__", [](VariantBoard& self, position_t position) -> BoardCell& {
         return self.cell_at(position);
       },
-      py::arg("position"), py::return_value_policy::reference
+      py::return_value_policy::reference_internal,
+      py::arg("position")
     )
 
     .def(

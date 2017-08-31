@@ -25,7 +25,7 @@ void export_board_graph(py::module& m) {
       "__getitem__", [](BoardGraph& self, position_t position) -> BoardCell& {
         return self.cell_at(position);
       },
-      py::return_value_policy::reference,
+      py::return_value_policy::reference_internal,
       py::arg("position")
     )
 
@@ -42,10 +42,10 @@ void export_board_graph(py::module& m) {
       "__setitem__", [](
         BoardGraph& self, position_t position, char board_cell
       ) {
-        self.cell_at(position) = boardCell(board_cell);
+        self.cell_at(position) = BoardCell(board_cell);
       },
       py::arg("position"), py::arg("board_cell")
-
+    )
 
     .def("__contains__", &BoardGraph::contains, py::arg("position"))
 
