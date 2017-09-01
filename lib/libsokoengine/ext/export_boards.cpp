@@ -18,73 +18,48 @@ void export_boards(py::module& m) {
         py::extract<string> string_obj(tessellation_or_description);
         py::extract<const Tessellation&> tessellation_obj(tessellation_or_description);
 
-        shared_ptr<VariantBoard> retv;
-
+        string description;
         if (string_obj.check()) {
-          string description = string_obj();
-          if (!board_str.is_none()) {
-            string board_str_converted = py::extract<string>(board_str)();
-            retv = std::move(
-              VariantBoard::instance_from(description, board_str_converted)
-            );
-          } else {
-            retv = std::move(
-              VariantBoard::instance_from(description, board_width, board_height)
-            );
-          }
-          if (description == "sokoban")
-            return py::cast<shared_ptr<SokobanBoard> >(
-              dynamic_pointer_cast<SokobanBoard>(retv)
-            );
-          else if (description == "trioban")
-            return py::cast<shared_ptr<TriobanBoard> >(
-              dynamic_pointer_cast<TriobanBoard>(retv)
-            );
-          else if (description == "octoban")
-            return py::cast<shared_ptr<OctobanBoard> >(
-              dynamic_pointer_cast<OctobanBoard>(retv)
-            );
-          else if (description == "hexoban")
-            return py::cast<shared_ptr<HexobanBoard> >(
-              dynamic_pointer_cast<HexobanBoard>(retv)
-            );
-          else throw UnknownTessellationError(
-            "Don't know about tessellation: " + description
-          );
+          description = string_obj();
         } else if (tessellation_obj.check()) {
           const Tessellation& tessellation = tessellation_obj();
-          if (!board_str.is_none()) {
-            string board_str_converted = py::extract<string>(board_str)();
-            retv = std::move(
-              VariantBoard::instance_from(tessellation, board_str_converted)
-            );
-          } else {
-            retv = std::move(
-              VariantBoard::instance_from(tessellation, board_width, board_height)
-            );
-          }
-          if (tessellation.str() == "sokoban")
-            return py::cast<shared_ptr<SokobanBoard> >(
-              dynamic_pointer_cast<SokobanBoard>(retv)
-            );
-          else if (tessellation.str() == "trioban")
-            return py::cast<shared_ptr<TriobanBoard> >(
-              dynamic_pointer_cast<TriobanBoard>(retv)
-            );
-          else if (tessellation.str() == "octoban")
-            return py::cast<shared_ptr<OctobanBoard> >(
-              dynamic_pointer_cast<OctobanBoard>(retv)
-            );
-          else if (tessellation.str() == "hexoban")
-            return py::cast<shared_ptr<HexobanBoard> >(
-              dynamic_pointer_cast<HexobanBoard>(retv)
-            );
-          else throw UnknownTessellationError(
-            "Don't know about tessellation: " + tessellation.str()
-          );
+          description = tessellation.str();
         } else throw UnknownTessellationError(
-          string() + "tessellation_or_description can't be converted to known " +
-          "tessellation type"
+          string() + "tessellation_or_description can't be converted to " + 
+          "known tessellation type"
+        );
+
+        shared_ptr<VariantBoard> retv;
+
+        if (!board_str.is_none()) {
+          string board_str_converted = py::extract<string>(board_str)();
+          retv = std::move(
+            VariantBoard::instance_from(description, board_str_converted)
+          );
+        } else {
+          retv = std::move(
+            VariantBoard::instance_from(description, board_width, board_height)
+          );
+        }
+
+        if (description == "sokoban")
+          return py::cast<shared_ptr<SokobanBoard> >(
+            dynamic_pointer_cast<SokobanBoard>(retv)
+          );
+        else if (description == "trioban")
+          return py::cast<shared_ptr<TriobanBoard> >(
+            dynamic_pointer_cast<TriobanBoard>(retv)
+          );
+        else if (description == "octoban")
+          return py::cast<shared_ptr<OctobanBoard> >(
+            dynamic_pointer_cast<OctobanBoard>(retv)
+          );
+        else if (description == "hexoban")
+          return py::cast<shared_ptr<HexobanBoard> >(
+            dynamic_pointer_cast<HexobanBoard>(retv)
+          );
+        else throw UnknownTessellationError(
+          "Don't know about tessellation: " + description
         );
 
         return py::none();
@@ -325,17 +300,16 @@ void export_boards(py::module& m) {
 
   py::class_<SokobanBoard, VariantBoard, std::shared_ptr<SokobanBoard> >(m, "SokobanBoard")
     .def(
-      "__init__", [](
-        SokobanBoard& instance, size_t board_width, size_t board_height,
-        const py::object& board_str
+      py::init([](
+        size_t board_width, size_t board_height, const py::object& board_str
       ) {
         if (!board_str.is_none()) {
           string board_str_converted = board_str.cast<string>();
-          new (&instance) SokobanBoard(board_str_converted);
+          return make_unique<SokobanBoard>(board_str_converted);
         } else {
-          new (&instance) SokobanBoard(board_width, board_height);
+          return make_unique<SokobanBoard>(board_width, board_height);
         }
-      },
+      }),
       py::arg("board_width")=0,
       py::arg("board_height")=0,
       py::arg("board_str")=py::none()
@@ -348,17 +322,16 @@ void export_boards(py::module& m) {
 
   py::class_<HexobanBoard, VariantBoard, std::shared_ptr<HexobanBoard> >(m, "HexobanBoard")
     .def(
-      "__init__", [](
-        HexobanBoard& instance, size_t board_width, size_t board_height,
-        const py::object& board_str
+      py::init([](
+        size_t board_width, size_t board_height, const py::object& board_str
       ) {
         if (!board_str.is_none()) {
           string board_str_converted = board_str.cast<string>();
-          new (&instance) HexobanBoard(board_str_converted);
+          return make_unique<HexobanBoard>(board_str_converted);
         } else {
-          new (&instance) HexobanBoard(board_width, board_height);
+          return make_unique<HexobanBoard>(board_width, board_height);
         }
-      },
+      }),
       py::arg("board_width")=0,
       py::arg("board_height")=0,
       py::arg("board_str")=py::none()
@@ -371,17 +344,16 @@ void export_boards(py::module& m) {
 
   py::class_<TriobanBoard, VariantBoard, std::shared_ptr<TriobanBoard> >(m, "TriobanBoard")
     .def(
-      "__init__", [](
-        TriobanBoard& instance, size_t board_width, size_t board_height,
-        const py::object& board_str
+      py::init([](
+        size_t board_width, size_t board_height, const py::object& board_str
       ) {
         if (!board_str.is_none()) {
           string board_str_converted = board_str.cast<string>();
-          new (&instance) TriobanBoard(board_str_converted);
+          return make_unique<TriobanBoard>(board_str_converted);
         } else {
-          new (&instance) TriobanBoard(board_width, board_height);
+          return make_unique<TriobanBoard>(board_width, board_height);
         }
-      },
+      }),
       py::arg("board_width")=0,
       py::arg("board_height")=0,
       py::arg("board_str")=py::none()
@@ -394,17 +366,16 @@ void export_boards(py::module& m) {
 
   py::class_<OctobanBoard, VariantBoard, std::shared_ptr<OctobanBoard> >(m, "OctobanBoard")
     .def(
-      "__init__", [](
-        OctobanBoard& instance, size_t board_width, size_t board_height,
-        const py::object& board_str
+      py::init([](
+        size_t board_width, size_t board_height, const py::object& board_str
       ) {
         if (!board_str.is_none()) {
           string board_str_converted = board_str.cast<string>();
-          new (&instance) OctobanBoard(board_str_converted);
+          return make_unique<OctobanBoard>(board_str_converted);
         } else {
-          new (&instance) OctobanBoard(board_width, board_height);
+          return make_unique<OctobanBoard>(board_width, board_height);
         }
-      },
+      }),
       py::arg("board_width")=0,
       py::arg("board_height")=0,
       py::arg("board_str")=py::none()

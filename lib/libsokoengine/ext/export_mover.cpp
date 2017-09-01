@@ -14,13 +14,10 @@ void export_mover(py::module& m) {
   ;
 
   py::class_<Mover>(m, "Mover")
-
     .def(
-      "__init__", [](
-        Mover& instance, VariantBoard& board, const SolvingMode& solving_mode
-      ) {
-        new (&instance) Mover(board, solving_mode);
-      },
+      py::init([](VariantBoard& board, const SolvingMode& solving_mode) {
+        return make_unique<Mover>(board, solving_mode);
+      }),
       py::arg("board"), py::arg("solving_mode")=SolvingMode::FORWARD
     )
 

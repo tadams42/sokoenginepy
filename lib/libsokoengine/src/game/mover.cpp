@@ -332,7 +332,7 @@ public:
   }
 };
 
-Mover::Mover(VariantBoard& board, SolvingMode mode) :
+Mover::Mover(VariantBoard& board, const SolvingMode& mode) :
   m_impl(std::make_unique<PIMPL>(board, mode))
 {}
 

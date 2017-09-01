@@ -24,9 +24,12 @@ def read(*names, **kwargs):
         encoding=kwargs.get('encoding', 'utf8')
     ).read()
 
-os.system('pip install "pybind11>=1.7"')
 
 native_extensions = setup_ext_pybind.configure()
+
+os.system(
+    'pip install "' + ' '.join(native_extensions['install_requires']) + '"'
+)
 
 setup(
     name='sokoenginepy',

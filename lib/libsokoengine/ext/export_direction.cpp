@@ -58,17 +58,14 @@ void export_direction(py::module& m) {
       "SOUTH_WEST", &Direction::SOUTH_WEST, py::return_value_policy::reference
     )
 
-    // pickle support
-    .def("__getstate__", [](const Direction& self) {
-      return py::make_tuple(self.m_direction);
-    })
-
-    .def("__setstate__", [](py::object self, py::tuple t) {
-      if (t.size() != 1)
-          throw std::runtime_error("Invalid state!");
-
-      auto& p = self.cast<Direction&>();
-      new (&p) Direction(t[0].cast<EDirection>());
-    })
+    .def(py::pickle(
+      [](const Direction &self) { // __getstate__
+        return py::make_tuple(self.m_direction);
+      },
+      [](py::tuple t) { // __setstate__
+        if (t.size() != 1) throw std::runtime_error("Invalid state!");
+        return make_unique<Direction>(t[0].cast<EDirection>());
+      }
+    ))
   ;
 }

@@ -163,8 +163,7 @@ In cases where developing against native extension is undesireable, use this:
 
 .. code-block:: sh
 
-    python setup.py develop --uninstall
-    python setup.py clean
+    rm -r build/
     SKIP_SOKOENGINEPY_NATIVE_EXTENSION=True python setup.py develop
 
 .. _PyPI: https://pypi.python.org/pypi

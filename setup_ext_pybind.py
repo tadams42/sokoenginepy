@@ -73,18 +73,18 @@ def configure():
         pybind11_include_dir(user=True)
     ]
 
-    extra_compile_args = ['-std=c++14', '-fvisibility=hidden']
+    extra_compile_args = [
+        '-std=c++14',
+        '-fvisibility=hidden',
+        '-Wno-sign-compare'
+    ]
 
     if _DEBUG:
-        extra_compile_args += ['-g3', '-O0']
+        extra_compile_args += ['-g3', '-O0', '-UNDEBUG', '-DDEBUG']
         extra_link_args = []
-        undef_macros=[('NDEBUG',)]
-        define_macros=[('DEBUG', '1',)]
     else:
         extra_compile_args += ['-O3', '-flto', '-fno-fat-lto-objects']
         extra_link_args = ['-flto']
-        undef_macros=[('DEBUG',)]
-        define_macros=[('NDEBUG',)]
 
     return {
         'ext_modules': [
@@ -95,12 +95,10 @@ def configure():
                 language='c++',
                 extra_compile_args=extra_compile_args,
                 extra_link_args=extra_link_args,
-                undef_macros=undef_macros,
-                define_macros=define_macros,
                 optional=True
             ),
         ],
         'install_requires': [
-            'pybind11>=1.7'
+            'pybind11>=2.2.0'
         ]
     }
