@@ -61,6 +61,6 @@ matrix:
         - TOXENV=codacy
 
 install:
-  - pip install tox
+  - pip install tox==2.7.0
 script:
   - tox

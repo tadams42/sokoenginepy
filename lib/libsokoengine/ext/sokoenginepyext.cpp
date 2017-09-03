@@ -15,9 +15,7 @@ void export_board_state(py::module& m);
 void export_mover(py::module& m);
 
 
-PYBIND11_PLUGIN(sokoenginepyext) {
-  py::module m("sokoenginepyext");
-
+PYBIND11_MODULE(sokoenginepyext, m) {
   py::register_exception<sokoengine::BoardConversionError>(
     m, "BoardConversionError", PyExc_RuntimeError
   );
@@ -78,6 +76,4 @@ PYBIND11_PLUGIN(sokoenginepyext) {
   export_boards(m);
   export_board_state(m);
   export_mover(m);
-
-  return m.ptr();
 }

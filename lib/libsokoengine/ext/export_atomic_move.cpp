@@ -7,23 +7,22 @@ using namespace sokoengine;
 
 void export_atomic_move(py::module& m) {
   py::class_<AtomicMove>(m, "AtomicMove")
-
     .def(
-      "__init__", [](
-        AtomicMove& instance, const Direction& direction,
-        bool box_moved, bool is_jump, bool is_pusher_selection,
-        piece_id_t pusher_id, const py::object& moved_box_id
+      py::init([](
+        const Direction& direction, bool box_moved, bool is_jump,
+        bool is_pusher_selection, piece_id_t pusher_id,
+        const py::object& moved_box_id
       ) {
         int moved_box_id_converted = NULL_ID;
 
         if (!moved_box_id.is_none())
           moved_box_id_converted = moved_box_id.cast<piece_id_t>();
 
-        new (&instance) AtomicMove(
+        return make_unique<AtomicMove>(
           direction, box_moved, is_jump, is_pusher_selection, pusher_id,
           moved_box_id_converted
         );
-      },
+      }),
       py::arg("direction")=Direction::LEFT,
       py::arg("box_moved")=false,
       py::arg("is_jump")=false,
@@ -34,7 +33,8 @@ void export_atomic_move(py::module& m) {
 
     // @classmethod
     .def_static(
-      "is_atomic_move_chr", &AtomicMove::is_atomic_move_chr, py::arg("character")
+      "is_atomic_move_chr",
+      &AtomicMove::is_atomic_move_chr, py::arg("character")
     )
 
     // protocols
@@ -43,25 +43,22 @@ void export_atomic_move(py::module& m) {
     .def("__str__", &AtomicMove::str)
     .def("__repr__", &AtomicMove::repr)
 
-    // pickle support
-    .def("__getstate__", [](const AtomicMove& self) {
-      return py::make_tuple(
-        self.direction(), self.is_push_or_pull(), self.is_jump(),
-        self.is_pusher_selection(), self.pusher_id(), self.moved_box_id()
-      );
-    })
-
-    .def("__setstate__", [](py::object self, py::tuple t) {
-      if (t.size() != 6)
-          throw std::runtime_error("Invalid state!");
-
-      auto& p = self.cast<AtomicMove&>();
-      new (&p) AtomicMove(
-        t[0].cast<Direction>(),
-        t[1].cast<bool>(), t[2].cast<bool>(), t[3].cast<bool>(),
-        t[4].cast<piece_id_t>(), t[5].cast<piece_id_t>()
-      );
-    })
+    .def(py::pickle(
+      [](const AtomicMove &self) { // __getstate__
+        return py::make_tuple(
+          self.direction(), self.is_push_or_pull(), self.is_jump(),
+          self.is_pusher_selection(), self.pusher_id(), self.moved_box_id()
+        );
+      },
+      [](py::tuple t) { // __setstate__
+        if (t.size() != 6) throw std::runtime_error("Invalid state!");
+        return make_unique<AtomicMove>(
+          t[0].cast<Direction>(),
+          t[1].cast<bool>(), t[2].cast<bool>(), t[3].cast<bool>(),
+          t[4].cast<piece_id_t>(), t[5].cast<piece_id_t>()
+        );
+      }
+    ))
 
     // instance methods and properties
     .def_property(

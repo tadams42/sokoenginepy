@@ -7,14 +7,7 @@ using namespace sokoengine;
 
 void export_board_state(py::module& m) {
   py::class_<BoardState>(m, "BoardState")
-    .def(
-      "__init__", [](
-        BoardState& instance, VariantBoard& board
-      ) {
-        new (&instance) BoardState(board);
-      },
-      py::arg("variant_board")
-    )
+    .def(py::init<VariantBoard&>(), py::arg("variant_board"))
 
     // protocols
     .def("__eq__", &BoardState::operator==)
@@ -187,14 +180,7 @@ void export_board_state(py::module& m) {
   ;
 
   py::class_<HashedBoardState, BoardState>(m, "HashedBoardState")
-    .def(
-      "__init__", [](
-        HashedBoardState& instance, VariantBoard& board
-      ) {
-        new (&instance) HashedBoardState(board);
-      },
-      py::arg("variant_board")
-    )
+    .def(py::init<VariantBoard&>(), py::arg("variant_board"))
 
     .def("__eq__", &HashedBoardState::operator==)
     .def("__ne__", &HashedBoardState::operator!=)

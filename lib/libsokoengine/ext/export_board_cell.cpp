@@ -21,22 +21,19 @@ void export_board_cell(py::module& m) {
     .def("__str__", &BoardCell::str)
     .def("__repr__", &BoardCell::repr)
 
-    // pickle support
-    .def("__getstate__", [](const BoardCell& self) {
-      return py::make_tuple(
-        self.str(), self.is_in_playable_area(), self.is_deadlock()
-      );
-    })
-
-    .def("__setstate__", [](py::object self, py::tuple t) {
-      if (t.size() != 3)
-          throw std::runtime_error("Invalid state!");
-
-      auto& p = self.cast<BoardCell&>();
-      new (&p) BoardCell(
-        t[0].cast<char>(), t[1].cast<bool>(), t[2].cast<bool>()
-      );
-    })
+    .def(py::pickle(
+      [](const BoardCell &self) { // __getstate__
+        return py::make_tuple(
+          self.str(), self.is_in_playable_area(), self.is_deadlock()
+        );
+      },
+      [](py::tuple t) { // __setstate__
+        if (t.size() != 3) throw std::runtime_error("Invalid state!");
+        return make_unique<BoardCell>(
+          t[0].cast<char>(), t[1].cast<bool>(), t[2].cast<bool>()
+        );
+      }
+    ))
 
     // @classmethod
     .def_static("is_pusher_chr", &BoardCell::is_pusher_chr, py::arg("character"))

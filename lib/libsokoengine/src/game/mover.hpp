@@ -50,7 +50,7 @@ public:
   ///
   typedef std::deque<AtomicMove> Moves;
 
-  Mover(VariantBoard& board, SolvingMode mode=SolvingMode::FORWARD);
+  Mover(VariantBoard& board, const SolvingMode& mode=SolvingMode::FORWARD);
   Mover(const Mover& rv);
   Mover& operator=(const Mover& rv);
   Mover(Mover&& rv);

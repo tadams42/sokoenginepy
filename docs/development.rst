@@ -156,6 +156,8 @@ To debug native code, use ``gdb`` like this:
 
     sudo apt install python3-dbg
     pip install gdbgui --upgrade
+    rm -r build/
+    SOKOENGINEPYEXT_DEBUG=True python setup.py develop
     gdbgui 'python crash.py'
     gdbgui '.venv/bin/python .venv/bin/py.test tests/crash_test.py'
 
@@ -163,9 +165,9 @@ In cases where developing against native extension is undesireable, use this:
 
 .. code-block:: sh
 
-    python setup.py develop --uninstall
-    python setup.py clean
-    SKIP_SOKOENGINEPY_NATIVE_EXTENSION=True python setup.py develop
+    rm -r build/
+    SOKOENGINEPYEXT_BUILD=False python setup.py develop
+    
 
 .. _PyPI: https://pypi.python.org/pypi
 .. _tox: https://tox.readthedocs.io/en/latest/

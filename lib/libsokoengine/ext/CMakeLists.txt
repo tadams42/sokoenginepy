@@ -7,7 +7,7 @@
 #..............................................................................
 if(NOT EXISTS "${sokoenginecpp_SOURCE_DIR}/lib/pybind11/")
   execute_process(
-    COMMAND git clone https://github.com/pybind/pybind11.git
+    COMMAND git clone --branch v2.2.0 https://github.com/pybind/pybind11.git
     WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/lib"
   )
 endif()

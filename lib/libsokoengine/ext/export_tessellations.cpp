@@ -6,24 +6,6 @@ using namespace std;
 namespace py = pybind11;
 using namespace sokoengine;
 
-// py::list get_legal_directions (const Tessellation& self) {
-//   auto native_retv = self.legal_directions();
-//   py::list retv;
-//   for(auto d : native_retv) retv.append(d);
-//   return retv;
-// }
-//
-// const py::list& legal_directions_wrapper(const Tessellation& self) {
-//   static const map<string, py::object> tessellations_directions = {
-//     {SokobanTessellation().str(), get_legal_directions(SokobanTessellation())},
-//     {HexobanTessellation().str(), get_legal_directions(HexobanTessellation())},
-//     {OctobanTessellation().str(), get_legal_directions(OctobanTessellation())},
-//     {TriobanTessellation().str(), get_legal_directions(TriobanTessellation())},
-//   };
-//   const py::list& retv = tessellations_directions.at(self.str());
-//   return retv;
-// }
-
 void export_tessellations(py::module& m) {
   py::enum_<CellOrientation>(m, "CellOrientation")
     .value("DEFAULT", CellOrientation::DEFAULT)
@@ -34,7 +16,6 @@ void export_tessellations(py::module& m) {
   ;
 
   py::class_<Tessellation>(m, "TessellationBase")
-
     // protocols
     .def("__eq__", &Tessellation::operator==)
     .def("__ne__", &Tessellation::operator!=)
@@ -43,8 +24,6 @@ void export_tessellations(py::module& m) {
 
     .def_property_readonly(
       "legal_directions",
-      // &legal_directions_wrapper,
-      // py::return_value_policy::reference
       [](const Tessellation& self) -> py::list {
         auto native_retv = self.legal_directions();
         py::list retv;
@@ -91,33 +70,57 @@ void export_tessellations(py::module& m) {
 
   py::class_<SokobanTessellation, Tessellation>(m, "SokobanTessellation")
     .def(
-      "__init__", [](SokobanTessellation& instance) {
-        new (&instance) SokobanTessellation();
-      }
+      py::init([]() {
+        SokobanTessellation& retv = const_cast<SokobanTessellation&>(
+          dynamic_cast<const SokobanTessellation&>(
+            Tessellation::instance_from("sokoban")
+          )
+        );
+        return retv;
+      }),
+      py::return_value_policy::reference
     )
   ;
 
   py::class_<HexobanTessellation, Tessellation>(m, "HexobanTessellation")
     .def(
-      "__init__", [](HexobanTessellation& instance) {
-        new (&instance) HexobanTessellation();
-      }
+      py::init([]() {
+        HexobanTessellation& retv = const_cast<HexobanTessellation&>(
+          dynamic_cast<const HexobanTessellation&>(
+            Tessellation::instance_from("hexoban")
+          )
+        );
+        return retv;
+      }),
+      py::return_value_policy::reference
     )
   ;
 
   py::class_<OctobanTessellation, Tessellation>(m, "OctobanTessellation")
     .def(
-      "__init__", [](OctobanTessellation& instance) {
-        new (&instance) OctobanTessellation();
-      }
+      py::init([]() {
+        OctobanTessellation& retv = const_cast<OctobanTessellation&>(
+          dynamic_cast<const OctobanTessellation&>(
+            Tessellation::instance_from("octoban")
+          )
+        );
+        return retv;
+      }),
+      py::return_value_policy::reference
     )
   ;
 
   py::class_<TriobanTessellation, Tessellation>(m, "TriobanTessellation")
     .def(
-      "__init__", [](TriobanTessellation& instance) {
-        new (&instance) TriobanTessellation();
-      }
+      py::init([]() {
+        TriobanTessellation& retv = const_cast<TriobanTessellation&>(
+          dynamic_cast<const TriobanTessellation&>(
+            Tessellation::instance_from("trioban")
+          )
+        );
+        return retv;
+      }),
+      py::return_value_policy::reference
     )
   ;
 }
