@@ -613,9 +613,8 @@ void VariantBoardResizer::remove_column_right(VariantBoard& board, bool reconf_e
 void VariantBoardResizer::trim_left(VariantBoard& board, bool reconf_edges) const {
   size_t amount = board.m_impl->m_width;
   for(size_t y = 0; y < board.m_impl->m_height; y++) {
-    bool border_found = false;
     for(size_t x = 0; x < board.m_impl->m_width; x++) {
-      border_found = board[
+      bool border_found = board[
         index_1d(x, y, board.m_impl->m_width)
       ].is_border_element();
       if (border_found) {

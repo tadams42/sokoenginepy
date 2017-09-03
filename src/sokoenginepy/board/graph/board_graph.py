@@ -4,7 +4,6 @@ from enum import IntEnum
 import networkx as nx
 
 from ... import tessellation as module_tessellation
-from ... import utilities
 from ..board_cell import BoardCell
 
 

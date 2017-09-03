@@ -1,9 +1,8 @@
-from copy import deepcopy
 from enum import IntEnum
 from itertools import groupby
 
 from ... import board as module_board
-from ... import snapshot, utilities
+from ... import snapshot
 
 
 class SolvingMode(IntEnum):

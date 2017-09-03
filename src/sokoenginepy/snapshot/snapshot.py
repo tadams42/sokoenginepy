@@ -138,9 +138,9 @@ class Snapshot(MutableSequence):
         self._moves.__delitem__(index)
 
     # MutableSequence
-    def insert(self, index, atomic_move):
-        self._before_inserting_move(atomic_move)
-        self._moves.insert(index, atomic_move)
+    def insert(self, index, value):
+        self._before_inserting_move(value)
+        self._moves.insert(index, value)
 
     def __repr__(self):
         return (

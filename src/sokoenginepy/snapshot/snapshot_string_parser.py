@@ -4,7 +4,7 @@ from functools import reduce
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
 from .. import utilities
-from .atomic_move import AtomicMove, AtomicMoveCharacters
+from .atomic_move import AtomicMoveCharacters
 from .snapshot import Snapshot, SnapshotConversionError
 
 _RE_SNAPSHOT_STRING = re.compile(

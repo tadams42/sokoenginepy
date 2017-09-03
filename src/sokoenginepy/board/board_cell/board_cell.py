@@ -1,7 +1,5 @@
 from enum import Enum
 
-from ... import utilities
-
 
 class BoardCellCharacters(str, Enum):
     """Characters used in textual representation of boards."""

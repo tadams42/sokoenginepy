@@ -31,7 +31,7 @@ namespace implementation {
 ///
 class LIBSOKOENGINE_API UnknownDirectionError: public std::invalid_argument {
 public:
-  UnknownDirectionError(const std::string& mess);
+  explicit UnknownDirectionError(const std::string& mess);
   virtual ~UnknownDirectionError();
 };
 
@@ -40,7 +40,7 @@ public:
 ///
 class LIBSOKOENGINE_API UnknownTessellationError: public std::invalid_argument {
 public:
-  UnknownTessellationError(const std::string& mess);
+  explicit UnknownTessellationError(const std::string& mess);
   virtual ~UnknownTessellationError();
 };
 

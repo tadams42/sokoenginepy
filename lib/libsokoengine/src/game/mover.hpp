@@ -36,7 +36,7 @@ public:
 ///
 class LIBSOKOENGINE_API IllegalMoveError: public std::runtime_error {
 public:
-  IllegalMoveError(const std::string& mess);
+  explicit IllegalMoveError(const std::string& mess);
   virtual ~IllegalMoveError();
 };
 

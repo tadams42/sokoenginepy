@@ -60,7 +60,7 @@ class LIBSOKOENGINE_LOCAL HexobanTextConverter {
   typedef tuple<bool, bool> text_cell_position_status_t;
 
   public:
-  pair<StringList, bool> convert_to_internal(const string board_str) const {
+  pair<StringList, bool> convert_to_internal(const string& board_str) const {
     StringList parsed;
     size_t height, width;
     int even_row_x_parity, odd_row_x_parity;

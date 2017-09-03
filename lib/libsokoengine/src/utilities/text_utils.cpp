@@ -130,10 +130,9 @@ class LIBSOKOENGINE_LOCAL RLE {
       instr.str(to_decode);
       to_decode.clear();
 
-      char c;
       string::size_type nr_chars;
       while (instr) {
-        c = static_cast<char>( instr.peek() );
+        char c = static_cast<char>( instr.peek() );
         if ( !instr.eof() ) {
           if ( isdigit(c) ) {
             instr >> nr_chars;
@@ -190,16 +189,16 @@ class LIBSOKOENGINE_LOCAL RLE {
     if (retv != str_end) {
       bool non_digit_found = false;
       if (retv != from) {
-        retv--;
+        --retv;
       }
       do {
         if ( isdigit(*retv) ) {
           if (retv != from) {
-            retv--;
+            --retv;
           }
         } else {
           if (*retv != m_left_delimiter) {
-            retv++;
+            ++retv;
           }
           non_digit_found = true;
         }

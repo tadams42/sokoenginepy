@@ -9,7 +9,6 @@ https://github.com/pypa/sampleproject
 from __future__ import absolute_import, print_function
 
 import io
-import os
 import re
 from glob import glob
 from os.path import basename, dirname, join, splitext

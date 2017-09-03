@@ -18,7 +18,7 @@ typedef uint64_t zobrist_key_t;
 class LIBSOKOENGINE_API HashedBoardState : public BoardState
 {
 public:
-  HashedBoardState(VariantBoard &board);
+  explicit HashedBoardState(VariantBoard &board);
   HashedBoardState(const HashedBoardState &rv);
   HashedBoardState &operator=(const HashedBoardState &rv);
   HashedBoardState(HashedBoardState &&rv);
