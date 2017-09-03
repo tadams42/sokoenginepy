@@ -14,7 +14,7 @@ import re
 from glob import glob
 from os.path import basename, dirname, join, splitext
 
-import setup_ext_pybind
+import setup_ext
 from setuptools import find_packages, setup
 
 
@@ -24,12 +24,6 @@ def read(*names, **kwargs):
         encoding=kwargs.get('encoding', 'utf8')
     ).read()
 
-
-native_extensions = setup_ext_pybind.configure()
-
-os.system(
-    'pip install "' + ' '.join(native_extensions['install_requires']) + '"'
-)
 
 setup(
     name='sokoenginepy',
@@ -73,8 +67,9 @@ setup(
         'pytz >=2016.6.1',
         'pyparsing >=2.1.0',
         'networkx >=1.11',
-        'cached-property >=1.2.0'
-    ] + native_extensions['install_requires'],
+        'cached-property >=1.2.0',
+        'pybind11>=2.2.0'
+    ],
     # List additional groups of dependencies HERE (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
@@ -118,5 +113,6 @@ setup(
     # installed, specify them HERE.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={'sokoenginepy': ['res/*'],},
-    ext_modules=native_extensions['ext_modules']
+    ext_modules=[setup_ext.SokoenginepyExtension()],
+    cmdclass={'build_ext': setup_ext.BuildExt}
 )

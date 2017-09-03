@@ -1,3 +1,6 @@
+include(CheckIncludeFileCXX)
+include(CheckTypeSize)
+
 #..............................................................................
 #         Check if we are on Linux to enable some development goodies
 #..............................................................................
@@ -37,46 +40,6 @@ link_directories("${LIBRARY_OUTPUT_PATH}") # Linker should find libsokoengine bi
 include(GNUInstallDirs)
 set(CMAKE_INSTALL_CMAKEPACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/sokoengine/cmake CACHE PATH  "cmake Config-Package files installation destination")
 mark_as_advanced(FORCE CMAKE_INSTALL_CMAKEPACKAGEDIR)
-
-#..............................................................................
-#                           Standard headers
-#..............................................................................
-include(CheckIncludeFileCXX)
-CHECK_INCLUDE_FILE_CXX(iostream LIBSOKOENGINE_HAVE_STD_IOSTREAM)
-CHECK_INCLUDE_FILE_CXX(iomanip LIBSOKOENGINE_HAVE_STD_IOMANIP)
-CHECK_INCLUDE_FILE_CXX(fstream LIBSOKOENGINE_HAVE_STD_FSTREAM)
-CHECK_INCLUDE_FILE_CXX(sstream LIBSOKOENGINE_HAVE_STD_SSTREAM)
-
-CHECK_INCLUDE_FILE_CXX(string LIBSOKOENGINE_HAVE_STD_STRING)
-CHECK_INCLUDE_FILE_CXX(cctype LIBSOKOENGINE_HAVE_STD_CCTYPE)
-
-CHECK_INCLUDE_FILE_CXX(vector LIBSOKOENGINE_HAVE_STD_VECTOR)
-CHECK_INCLUDE_FILE_CXX(deque LIBSOKOENGINE_HAVE_STD_DEQUE)
-CHECK_INCLUDE_FILE_CXX(set LIBSOKOENGINE_HAVE_STD_SET)
-CHECK_INCLUDE_FILE_CXX(map LIBSOKOENGINE_HAVE_STD_MAP)
-CHECK_INCLUDE_FILE_CXX(unordered_map LIBSOKOENGINE_HAVE_STD_UNORDERED_MAP)
-CHECK_INCLUDE_FILE_CXX(tuple LIBSOKOENGINE_HAVE_STD_TUPLE)
-CHECK_INCLUDE_FILE_CXX(array LIBSOKOENGINE_HAVE_STD_ARRAY)
-CHECK_INCLUDE_FILE_CXX(bitset LIBSOKOENGINE_HAVE_STD_BITSET)
-
-CHECK_INCLUDE_FILE_CXX(algorithm LIBSOKOENGINE_HAVE_STD_ALGORITHM)
-CHECK_INCLUDE_FILE_CXX(iterator LIBSOKOENGINE_HAVE_STD_ITERATOR)
-CHECK_INCLUDE_FILE_CXX(functional LIBSOKOENGINE_HAVE_STD_FUNCTIONAL)
-
-CHECK_INCLUDE_FILE_CXX(stdexcept LIBSOKOENGINE_HAVE_STD_STDEXCEPT)
-CHECK_INCLUDE_FILE_CXX(typeinfo LIBSOKOENGINE_HAVE_STD_TYPEINFO)
-
-CHECK_INCLUDE_FILE_CXX(memory LIBSOKOENGINE_HAVE_STD_MEMORY)
-CHECK_INCLUDE_FILE_CXX(numeric LIBSOKOENGINE_HAVE_STD_NUMERIC)
-CHECK_INCLUDE_FILE_CXX(random LIBSOKOENGINE_HAVE_STD_RANDOM)
-
-CHECK_INCLUDE_FILE_CXX(ctime LIBSOKOENGINE_HAVE_STD_CTIME)
-CHECK_INCLUDE_FILE_CXX(cstdint LIBSOKOENGINE_HAVE_STD_CSTDINT)
-
-include(CheckTypeSize)
-CHECK_TYPE_SIZE(size_t LIBSOKOENGINE_HAVE_SIZE_T)
-CHECK_TYPE_SIZE(time_t LIBSOKOENGINE_HAVE_TIME_T)
-CHECK_TYPE_SIZE(wchar_t LIBSOKOENGINE_HAVE_WCHAR_T)
 
 #..............................................................................
 #                                 Boost library
