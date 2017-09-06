@@ -97,10 +97,10 @@ import sokoenginepyext
 
 ## Tests
 
-All tests are written in Python. This requires creation of Python
-environment and [sokoenginepy] (which will also build `sokoenginepyext`)
+All tests are written in Python.
 
-After that, tests can be run with Python test runner.
+To run tests, install [sokoenginepy] (which will also build `sokoenginepyext`)
+and run Python test suite.
 
 For details see: http://sokoenginepy.readthedocs.io/en/latest/development.html
 

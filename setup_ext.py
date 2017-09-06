@@ -22,7 +22,7 @@ class pybind11_include_dir(object):
 
 class SokoenginepyExtension(Extension):
     def __init__(self):
-        self._required_boost_headers = None
+        self._included_boost_headers = None
         super().__init__(
             name='sokoenginepyext',
             sources=self.libsokoengine_sources,
@@ -80,19 +80,19 @@ class SokoenginepyExtension(Extension):
             print('All compile dependencies already present, continuing...')
 
     @property
-    def required_boost_headers(self):
-        if self._required_boost_headers is None:
-            self._required_boost_headers = []
+    def included_boost_headers(self):
+        if self._included_boost_headers is None:
+            self._included_boost_headers = []
             for source_path in self.libsokoengine_sources:
                 with open(source_path, 'r') as f:
-                    self._required_boost_headers += [
+                    self._included_boost_headers += [
                         l.strip()
                         for l in f
                         if l.strip().startswith('#include <boost')
                     ]
-            self._required_boost_headers = set(self._required_boost_headers)
+            self._included_boost_headers = set(self._included_boost_headers)
 
-        return self._required_boost_headers
+        return self._included_boost_headers
 
 
 class BuildExt(build_ext):
@@ -100,11 +100,11 @@ class BuildExt(build_ext):
         self._is_debug_build = None
         super().__init__(*args, **kwargs)
 
-    def boost_ok(self, required_boost_headers):
+    def boost_ok(self, included_boost_headers):
         print("Checking if Boost headers are available...")
         retv = True
         with tempfile.NamedTemporaryFile('w', suffix='.cpp') as f:
-            f.write("\n".join(required_boost_headers) + "\n")
+            f.write("\n".join(included_boost_headers) + "\n")
             f.write('int main (int argc, char **argv) { return 0; }')
 
             try:
@@ -135,16 +135,12 @@ class BuildExt(build_ext):
 
     @property
     def sokoenginepyext_extra_compile_args(self):
-        retv = [
-            '-std=c++14',
-            '-fvisibility=hidden',
-            '-Wno-sign-compare'
-        ]
+        retv = ['-std=c++14', '-Wno-sign-compare', '-fvisibility=hidden']
 
         if self.is_debug_build:
             retv += ['-g3', '-O0', '-UNDEBUG', '-DDEBUG']
         else:
-            retv += ['-O3', '-flto', '-fno-fat-lto-objects']
+            retv += ['-O3', '-flto']
 
         return retv
 
@@ -189,7 +185,7 @@ class BuildExt(build_ext):
             boost_ok = False
             for ext in self.extensions:
                 if ext.name == 'sokoenginepyext':
-                    boost_ok = self.boost_ok(ext.required_boost_headers)
+                    boost_ok = self.boost_ok(ext.included_boost_headers)
 
             if not boost_ok:
                 print(

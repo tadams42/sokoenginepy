@@ -167,7 +167,15 @@ In cases where developing against native extension is undesireable, use this:
 
     rm -r build/
     SOKOENGINEPYEXT_BUILD=False python setup.py develop
-    
+
+profiling native extension from Python:
+
+.. code-block:: sh
+
+    rm -r build/
+    SOKOENGINEPYEXT_DEBUG=True python setup.py develop
+    valgrind --dump-line=yes --dump-instr=yes --tool=callgrind --collect-jumps=yes --callgrind-out-file=mover_profiling.log python bin/mover_profiling.py
+    kcachegrind mover_profiling.log
 
 .. _PyPI: https://pypi.python.org/pypi
 .. _tox: https://tox.readthedocs.io/en/latest/

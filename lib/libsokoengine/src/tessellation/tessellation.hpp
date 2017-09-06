@@ -8,8 +8,6 @@
 
 namespace sokoengine {
 
-class AtomicMove;
-
 ///
 /// Special property of BoardCell that is needed in some tessellations and that
 /// depends on cell position.
@@ -19,17 +17,6 @@ enum class LIBSOKOENGINE_API CellOrientation : int {
   TRIANGLE_DOWN = 1,
   OCTAGON = 2
 };
-
-namespace implementation {
-  class LIBSOKOENGINE_LOCAL VariantBoardResizer;
-  class LIBSOKOENGINE_LOCAL VariantBoardParser;
-  class LIBSOKOENGINE_LOCAL VariantBoardPrinter;
-}
-
-class LIBSOKOENGINE_API SokobanTessellation;
-class LIBSOKOENGINE_API HexobanTessellation;
-class LIBSOKOENGINE_API TriobanTessellation;
-class LIBSOKOENGINE_API OctobanTessellation;
 
 ///
 /// Exception.
@@ -48,6 +35,18 @@ public:
   explicit UnknownTessellationError(const std::string& mess);
   virtual ~UnknownTessellationError();
 };
+
+namespace implementation {
+  class LIBSOKOENGINE_LOCAL VariantBoardResizer;
+  class LIBSOKOENGINE_LOCAL VariantBoardParser;
+  class LIBSOKOENGINE_LOCAL VariantBoardPrinter;
+}
+
+class LIBSOKOENGINE_API AtomicMove;
+class LIBSOKOENGINE_API SokobanTessellation;
+class LIBSOKOENGINE_API HexobanTessellation;
+class LIBSOKOENGINE_API TriobanTessellation;
+class LIBSOKOENGINE_API OctobanTessellation;
 
 ///
 /// Base class for tessellations.
