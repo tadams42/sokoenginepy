@@ -18,15 +18,13 @@ typedef uint64_t zobrist_key_t;
 class LIBSOKOENGINE_API HashedBoardState : public BoardState
 {
 public:
-  explicit HashedBoardState(VariantBoard &board);
-  HashedBoardState(const HashedBoardState &rv);
-  HashedBoardState &operator=(const HashedBoardState &rv);
-  HashedBoardState(HashedBoardState &&rv);
-  HashedBoardState &operator=(HashedBoardState &&rv);
+  explicit HashedBoardState(VariantBoard& board);
+  HashedBoardState(HashedBoardState&& rv);
+  HashedBoardState &operator=(HashedBoardState&& rv);
   virtual ~HashedBoardState();
 
-  bool operator==(const HashedBoardState &rv) const;
-  bool operator!=(const HashedBoardState &rv) const;
+  bool operator==(const HashedBoardState& rv) const;
+  bool operator!=(const HashedBoardState& rv) const;
 
   zobrist_key_t boxes_layout_hash() const;
   zobrist_key_t boxes_and_pushers_layout_hash() const;
@@ -55,6 +53,9 @@ public:
 protected:
   virtual void pusher_moved(position_t old_position, position_t to_new_position) override;
   virtual void box_moved(position_t old_position, position_t to_new_position) override;
+
+  HashedBoardState(const HashedBoardState&) = delete;
+  HashedBoardState& operator=(const HashedBoardState&) = delete;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;

@@ -79,8 +79,6 @@ public:
     m_plus = SokobanPlus(m_boxes.size());
   }
 
-  PIMPL(const PIMPL& rv) = default;
-  PIMPL& operator=(const PIMPL& rv) = default;
   PIMPL(PIMPL&& rv) = default;
   PIMPL& operator=(PIMPL&& rv) = default;
 
@@ -234,21 +232,15 @@ public:
 
     return retv;
   }
+
+protected:
+  PIMPL(const PIMPL&) = delete;
+  PIMPL& operator=(const PIMPL&) = delete;
 }; // BoardState::PIMPL
 
 BoardState::BoardState(VariantBoard& board) :
   m_impl(make_unique<PIMPL>(board))
 {}
-
-BoardState::BoardState(const BoardState& rv) :
-  m_impl(make_unique<PIMPL>(*rv.m_impl))
-{}
-
-BoardState& BoardState::operator=(const BoardState& rv) {
-  if (this != &rv)
-    m_impl = make_unique<PIMPL>(*rv.m_impl);
-  return *this;
-}
 
 BoardState::BoardState(BoardState &&) = default;
 

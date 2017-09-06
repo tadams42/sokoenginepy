@@ -41,8 +41,6 @@ public:
   }
 
   explicit BoardState(VariantBoard& board);
-  BoardState(const BoardState& rv);
-  BoardState& operator=(const BoardState& rv);
   BoardState(BoardState&& rv);
   BoardState& operator=(BoardState&& rv);
   virtual ~BoardState();
@@ -119,6 +117,9 @@ public:
 protected:
   virtual void pusher_moved(position_t old_position, position_t to_new_position);
   virtual void box_moved(position_t old_position, position_t to_new_position);
+
+  BoardState(const BoardState&) = delete;
+  BoardState& operator=(const BoardState&) = delete;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;

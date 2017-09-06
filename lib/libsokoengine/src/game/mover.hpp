@@ -51,8 +51,6 @@ public:
   typedef std::deque<AtomicMove> Moves;
 
   Mover(VariantBoard& board, const SolvingMode& mode=SolvingMode::FORWARD);
-  Mover(const Mover& rv);
-  Mover& operator=(const Mover& rv);
   Mover(Mover&& rv);
   Mover& operator=(Mover&& rv);
   virtual ~Mover();
@@ -76,6 +74,9 @@ public:
 
 protected:
   const VariantBoard& initial_board() const;
+
+  Mover(const Mover&) = delete;
+  Mover& operator=(const Mover&) = delete;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;
