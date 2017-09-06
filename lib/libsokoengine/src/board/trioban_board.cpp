@@ -1,5 +1,5 @@
 #include "trioban_board.hpp"
-#include "tessellation.hpp"
+#include "trioban_tessellation.hpp"
 
 using namespace std;
 
@@ -10,11 +10,11 @@ TriobanBoard::TriobanBoard() :
 {}
 
 TriobanBoard::TriobanBoard(size_t width, size_t height) :
-  VariantBoard(Tessellation::instance_from("trioban"), width, height)
+  VariantBoard(Tessellation::TRIOBAN, width, height)
 {}
 
 TriobanBoard::TriobanBoard(const string& src) :
-  VariantBoard(Tessellation::instance_from("trioban"), src)
+  VariantBoard(Tessellation::TRIOBAN, src)
 {}
 
 TriobanBoard::TriobanBoard(const TriobanBoard& rv) :

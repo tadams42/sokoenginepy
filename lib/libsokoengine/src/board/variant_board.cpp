@@ -28,14 +28,14 @@ public:
   ):
     m_graph(board_width * board_height, tessellation.graph_type()),
     m_width(board_width), m_height(board_height),
-    m_tessellation(&(Tessellation::instance_from(tessellation)))
+    m_tessellation(&tessellation)
   {
     reconfigure_edges();
   }
 
   PIMPL(const Tessellation& tessellation, const string& board_str) :
     m_graph(0, tessellation.graph_type()), m_width(0), m_height(0),
-    m_tessellation(&(Tessellation::instance_from(tessellation)))
+    m_tessellation(&tessellation)
   {
     if (!TextUtils::is_blank(board_str)) reinit(board_str, true);
     else reconfigure_edges();

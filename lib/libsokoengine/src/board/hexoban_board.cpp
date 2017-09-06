@@ -2,8 +2,7 @@
 #include "sokoban_board.hpp"
 #include "board_cell.hpp"
 #include "atomic_move.hpp"
-#include "tessellation.hpp"
-#include "tessellation.hpp"
+#include "hexoban_tessellation.hpp"
 
 #include <algorithm>
 #include <functional>
@@ -24,11 +23,11 @@ HexobanBoard::HexobanBoard() :
 {}
 
 HexobanBoard::HexobanBoard(size_t width, size_t height) :
-  VariantBoard(Tessellation::instance_from("hexoban"), width, height)
+  VariantBoard(Tessellation::HEXOBAN, width, height)
 {}
 
-HexobanBoard::HexobanBoard(const string& board_str) :
-  VariantBoard(Tessellation::instance_from("hexoban"), board_str)
+HexobanBoard::HexobanBoard(const string& src) :
+  VariantBoard(Tessellation::HEXOBAN, src)
 {}
 
 HexobanBoard::HexobanBoard(const HexobanBoard& rv) :

@@ -71,9 +71,7 @@ public:
 
   bool contains(position_t position) const;
 
-  std::string to_str(
-    bool use_visible_floor=false, bool rle_encode=false
-  ) const;
+  std::string to_str(bool use_visible_floor=false, bool rle_encode=false) const;
   std::string str() const;
   std::string repr() const;
 
@@ -89,12 +87,10 @@ public:
   void clear();
   void mark_play_area();
   Positions positions_reachable_by_pusher(
-    position_t pusher_position,
-    const Positions& excluded_positions=Positions()
+    position_t pusher_position, const Positions& excluded_positions=Positions()
   ) const;
   position_t normalized_pusher_position(
-    position_t pusher_position,
-    const Positions& excluded_positions=Positions()
+    position_t pusher_position, const Positions& excluded_positions=Positions()
   ) const;
   position_t path_destination(
     position_t start_position, const Directions& directions_path

@@ -26,6 +26,11 @@ namespace implementation {
   class LIBSOKOENGINE_LOCAL VariantBoardPrinter;
 }
 
+class LIBSOKOENGINE_API SokobanTessellation;
+class LIBSOKOENGINE_API HexobanTessellation;
+class LIBSOKOENGINE_API TriobanTessellation;
+class LIBSOKOENGINE_API OctobanTessellation;
+
 ///
 /// Exception.
 ///
@@ -49,12 +54,14 @@ public:
 ///
 class LIBSOKOENGINE_API Tessellation {
 public:
+  static const SokobanTessellation& SOKOBAN;
+  static const HexobanTessellation& HEXOBAN;
+  static const OctobanTessellation& OCTOBAN;
+  static const TriobanTessellation& TRIOBAN;
+
   virtual ~Tessellation() = 0;
 
   static const Tessellation& instance_from(const std::string& name);
-  static const Tessellation& instance_from(
-    const Tessellation& tessellation
-  );
 
   bool operator== (const Tessellation& rv) const;
   bool operator!= (const Tessellation& rv) const;
@@ -77,6 +84,9 @@ public:
 
   virtual std::string str() const = 0;
   virtual std::string repr() const = 0;
+
+protected:
+  Tessellation() = default;
 };
 
 ///

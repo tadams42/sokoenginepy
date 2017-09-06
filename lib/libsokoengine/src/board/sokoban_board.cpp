@@ -1,5 +1,5 @@
 #include "sokoban_board.hpp"
-#include "tessellation.hpp"
+#include "sokoban_tessellation.hpp"
 
 using namespace std;
 
@@ -10,11 +10,11 @@ SokobanBoard::SokobanBoard() :
 {}
 
 SokobanBoard::SokobanBoard(size_t width, size_t height) :
-  VariantBoard(Tessellation::instance_from("sokoban"), width, height)
+  VariantBoard(Tessellation::SOKOBAN, width, height)
 {}
 
 SokobanBoard::SokobanBoard(const string& src) :
-  VariantBoard(Tessellation::instance_from("sokoban"), src)
+  VariantBoard(Tessellation::SOKOBAN, src)
 {}
 
 SokobanBoard::SokobanBoard(const SokobanBoard& rv) :

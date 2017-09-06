@@ -70,56 +70,28 @@ void export_tessellations(py::module& m) {
 
   py::class_<SokobanTessellation, Tessellation>(m, "SokobanTessellation")
     .def(
-      py::init([]() {
-        SokobanTessellation& retv = const_cast<SokobanTessellation&>(
-          dynamic_cast<const SokobanTessellation&>(
-            Tessellation::instance_from("sokoban")
-          )
-        );
-        return retv;
-      }),
+      py::init([]() { return Tessellation::SOKOBAN; }),
       py::return_value_policy::reference
     )
   ;
 
   py::class_<HexobanTessellation, Tessellation>(m, "HexobanTessellation")
     .def(
-      py::init([]() {
-        HexobanTessellation& retv = const_cast<HexobanTessellation&>(
-          dynamic_cast<const HexobanTessellation&>(
-            Tessellation::instance_from("hexoban")
-          )
-        );
-        return retv;
-      }),
+      py::init([]() { return Tessellation::HEXOBAN; }),
       py::return_value_policy::reference
     )
   ;
 
   py::class_<OctobanTessellation, Tessellation>(m, "OctobanTessellation")
     .def(
-      py::init([]() {
-        OctobanTessellation& retv = const_cast<OctobanTessellation&>(
-          dynamic_cast<const OctobanTessellation&>(
-            Tessellation::instance_from("octoban")
-          )
-        );
-        return retv;
-      }),
+      py::init([]() { return Tessellation::OCTOBAN; }),
       py::return_value_policy::reference
     )
   ;
 
   py::class_<TriobanTessellation, Tessellation>(m, "TriobanTessellation")
     .def(
-      py::init([]() {
-        TriobanTessellation& retv = const_cast<TriobanTessellation&>(
-          dynamic_cast<const TriobanTessellation&>(
-            Tessellation::instance_from("trioban")
-          )
-        );
-        return retv;
-      }),
+      py::init([]() { return Tessellation::TRIOBAN; }),
       py::return_value_policy::reference
     )
   ;
