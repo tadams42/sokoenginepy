@@ -37,8 +37,8 @@ public:
     m_graph(0, tessellation.graph_type()), m_width(0), m_height(0),
     m_tessellation(&tessellation)
   {
-    if (!TextUtils::is_blank(board_str)) reinit(board_str, true);
-    else reconfigure_edges();
+    if (TextUtils::is_blank(board_str)) reconfigure_edges();
+    else reinit(board_str, true);
   }
 
   PIMPL(const PIMPL& rv) = default;
@@ -111,10 +111,10 @@ VariantBoard::unique_ptr_t VariantBoard::instance_from(
     return make_unique<OctobanBoard>(board_width, board_height);
   else if (tessellation_name == "hexoban")
     return make_unique<HexobanBoard>(board_width, board_height);
-  else throw UnknownTessellationError(
+
+  throw UnknownTessellationError(
     string() + "Don't know about tessellation: " + tessellation_name
   );
-  return unique_ptr_t(nullptr);
 }
 
 VariantBoard::unique_ptr_t VariantBoard::instance_from(
@@ -134,10 +134,9 @@ VariantBoard::unique_ptr_t VariantBoard::instance_from(
     return make_unique<OctobanBoard>(board_str);
   else if (tessellation_name == "hexoban")
     return make_unique<HexobanBoard>(board_str);
-  else throw UnknownTessellationError(
+  throw UnknownTessellationError(
     string() + "Don't know about tessellation: " + tessellation_name
   );
-  return unique_ptr_t(nullptr);
 }
 
 bool VariantBoard::is_board_string(const string& line) {
@@ -226,7 +225,8 @@ bool VariantBoard::operator==(const VariantBoard& rv) const {
     for(position = 0; position < s && !non_equal_found; ++position)
       non_equal_found = ( cell(position) != rv.cell(position) );
     return !non_equal_found;
-  } else return false;
+  }
+  return false;
 }
 
 bool VariantBoard::operator!=(const VariantBoard& rv) const {

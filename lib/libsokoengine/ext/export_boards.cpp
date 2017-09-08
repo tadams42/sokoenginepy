@@ -25,7 +25,7 @@ void export_boards(py::module& m) {
           const Tessellation& tessellation = tessellation_obj();
           description = tessellation.str();
         } else throw UnknownTessellationError(
-          string() + "tessellation_or_description can't be converted to " + 
+          string() + "tessellation_or_description can't be converted to " +
           "known tessellation type"
         );
 
@@ -33,12 +33,10 @@ void export_boards(py::module& m) {
 
         if (!board_str.is_none()) {
           string board_str_converted = py::extract<string>(board_str)();
-          retv = std::move(
-            VariantBoard::instance_from(description, board_str_converted)
-          );
+          retv = VariantBoard::instance_from(description, board_str_converted);
         } else {
-          retv = std::move(
-            VariantBoard::instance_from(description, board_width, board_height)
+          retv = VariantBoard::instance_from(
+            description, board_width, board_height
           );
         }
 

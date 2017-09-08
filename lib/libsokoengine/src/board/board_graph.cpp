@@ -508,7 +508,7 @@ position_t BoardGraph::normalized_pusher_position(
   );
   if (reachables_pos.size() > 0)
     return *min_element(reachables_pos.cbegin(), reachables_pos.cend());
-  else return pusher_position;
+  return pusher_position;
 }
 
 position_t BoardGraph::path_destination(
@@ -520,10 +520,10 @@ position_t BoardGraph::path_destination(
   position_t retv = start_position, next_target;
   for (const Direction& direction : directions_path) {
     next_target = neighbor_at(retv, direction);
-    if (next_target != NULL_POSITION) {
-      retv = next_target;
-    } else {
+    if (next_target == NULL_POSITION) {
       break;
+    } else {
+      retv = next_target;
     }
   }
   return retv;

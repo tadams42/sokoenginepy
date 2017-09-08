@@ -145,6 +145,7 @@ public:
       case Selectors::GOALS:
       default:
         for(auto goal : m_goals.left) retv.push_back(goal.first);
+        break;
     };
 
     return retv;
@@ -163,6 +164,7 @@ public:
       case Selectors::GOALS:
       default:
         for(auto goal : m_goals.left) retv[goal.first] = goal.second;
+        break;
     };
 
     return retv;
@@ -180,6 +182,7 @@ public:
       case Selectors::GOALS:
       default:
         m_boxes.left.replace_data(m_boxes.left.find(for_id), to_new_position);
+        break;
     }
   }
 
@@ -195,6 +198,7 @@ public:
       case Selectors::GOALS:
       default:
         m_goals.right.replace_key(m_goals.right.find(old_position), to_new_position);
+        break;
     }
   }
 
@@ -219,8 +223,7 @@ public:
         [&] (auto box) -> bool {
           if (is_plus_enabled)
             return m_plus.box_plus_id(box.first) == m_plus.goal_plus_id(goal.first);
-          else
-            return box.first == goal.first;
+          return box.first == goal.first;
         }
       );
       retv.push_back(make_pair(

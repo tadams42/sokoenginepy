@@ -98,15 +98,17 @@ class LIBSOKOENGINE_LOCAL RLE {
   bool decode_token(string& to_decode) const {
     // Condition also includes situation where input consists exclusively from digits
     bool ends_with_digit = to_decode.empty() ? false : isdigit(to_decode.back()) != 0;
-    if(ends_with_digit) {
-      return false;
-    }
 
-    if(TextUtils::is_blank(to_decode)) {
-      return true;
-    }
+    if(ends_with_digit) return false;
 
-    if ( any_of(to_decode.begin(), to_decode.end(), [] (char c) { return isdigit(c) != 0; }) ) {
+    if(TextUtils::is_blank(to_decode)) return true;
+
+    if (
+      any_of(
+        to_decode.begin(), to_decode.end(),
+        [] (char c) { return isdigit(c) != 0; }
+      )
+    ) {
       istringstream instr;
       noskipws(instr);
       instr.str(to_decode);
@@ -156,9 +158,9 @@ class LIBSOKOENGINE_LOCAL RLE {
     string::difference_type ld = count(tline.begin(), tline.end(), m_left_delimiter);
     string::difference_type rd = count(tline.begin(), tline.end(), m_right_delimiter);
 
-    bool count_ok = (ld == rd);
+    bool count_ok = ld == rd;
 
-    return (begin_ok && end_ok && count_ok);
+    return begin_ok && end_ok && count_ok;
   }
 
   // Marks beginning of RLE group (digits before beginning delimiter are also detected).
@@ -222,11 +224,7 @@ class LIBSOKOENGINE_LOCAL RLE {
 
     bool non_digit_found;
     if (str_beg != str_end) {
-      if ( !isdigit(*str_beg) ) {
-        non_digit_found = true;
-      } else {
-        non_digit_found = false;
-      }
+      non_digit_found = !isdigit(*str_beg);
     } else {
       non_digit_found = true;
     }

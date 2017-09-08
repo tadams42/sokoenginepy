@@ -38,6 +38,8 @@ AtomicMove::AtomicMove(
       "AtomicMove can't be both, a push and a pusher selection!"
     );
 
+  set_pusher_id(pusher_id);
+
   set_direction(direction);
   if (box_moved) set_is_push_or_pull(true);
   else set_is_move(true);
@@ -82,7 +84,7 @@ string AtomicMove::repr() const {
 
 piece_id_t AtomicMove::moved_box_id() const {
   if (is_push_or_pull()) return m_moved_box_id;
-  else return NULL_ID;
+  return NULL_ID;
 }
 
 void AtomicMove::set_moved_box_id(piece_id_t id) {

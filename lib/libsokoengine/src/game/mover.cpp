@@ -54,9 +54,9 @@ public:
   PIMPL& operator=(PIMPL&& rv) = default;
 
   struct MoveWorkerOptions {
-    bool decrease_pull_count;
-    bool increase_pull_count;
-    bool force_pulls;
+    bool decrease_pull_count = false;
+    bool increase_pull_count = false;
+    bool force_pulls = false;
   };
 
   void select_pusher (piece_id_t pusher_id) {
