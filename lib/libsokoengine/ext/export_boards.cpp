@@ -31,13 +31,13 @@ void export_boards(py::module& m) {
 
         shared_ptr<VariantBoard> retv;
 
-        if (!board_str.is_none()) {
-          string board_str_converted = py::extract<string>(board_str)();
-          retv = VariantBoard::instance_from(description, board_str_converted);
-        } else {
+        if (board_str.is_none()) {
           retv = VariantBoard::instance_from(
             description, board_width, board_height
           );
+        } else {
+          string board_str_converted = py::extract<string>(board_str)();
+          retv = VariantBoard::instance_from(description, board_str_converted);
         }
 
         if (description == "sokoban")
@@ -56,11 +56,9 @@ void export_boards(py::module& m) {
           return py::cast<shared_ptr<HexobanBoard> >(
             dynamic_pointer_cast<HexobanBoard>(retv)
           );
-        else throw UnknownTessellationError(
+        throw UnknownTessellationError(
           "Don't know about tessellation: " + description
         );
-
-        return py::none();
       },
       py::arg("tessellation_or_description")=py::cast<string>("sokoban"),
       py::arg("board_width")=0,
@@ -142,7 +140,7 @@ void export_boards(py::module& m) {
       ) -> py::object {
         auto retv = self.neighbor_at(from_position, direction);
         if (retv == NULL_POSITION) return py::none();
-        else return py::cast(retv);
+        return py::cast(retv);
       },
       py::arg("from_position"), py::arg("direction")
     )
@@ -301,12 +299,10 @@ void export_boards(py::module& m) {
       py::init([](
         size_t board_width, size_t board_height, const py::object& board_str
       ) {
-        if (!board_str.is_none()) {
-          string board_str_converted = board_str.cast<string>();
-          return make_unique<SokobanBoard>(board_str_converted);
-        } else {
+        if (board_str.is_none())
           return make_unique<SokobanBoard>(board_width, board_height);
-        }
+        string board_str_converted = board_str.cast<string>();
+        return make_unique<SokobanBoard>(board_str_converted);
       }),
       py::arg("board_width")=0,
       py::arg("board_height")=0,
@@ -323,12 +319,10 @@ void export_boards(py::module& m) {
       py::init([](
         size_t board_width, size_t board_height, const py::object& board_str
       ) {
-        if (!board_str.is_none()) {
-          string board_str_converted = board_str.cast<string>();
-          return make_unique<HexobanBoard>(board_str_converted);
-        } else {
+        if (board_str.is_none())
           return make_unique<HexobanBoard>(board_width, board_height);
-        }
+        string board_str_converted = board_str.cast<string>();
+        return make_unique<HexobanBoard>(board_str_converted);
       }),
       py::arg("board_width")=0,
       py::arg("board_height")=0,
@@ -345,12 +339,10 @@ void export_boards(py::module& m) {
       py::init([](
         size_t board_width, size_t board_height, const py::object& board_str
       ) {
-        if (!board_str.is_none()) {
-          string board_str_converted = board_str.cast<string>();
-          return make_unique<TriobanBoard>(board_str_converted);
-        } else {
+        if (board_str.is_none())
           return make_unique<TriobanBoard>(board_width, board_height);
-        }
+        string board_str_converted = board_str.cast<string>();
+        return make_unique<TriobanBoard>(board_str_converted);
       }),
       py::arg("board_width")=0,
       py::arg("board_height")=0,
@@ -367,12 +359,10 @@ void export_boards(py::module& m) {
       py::init([](
         size_t board_width, size_t board_height, const py::object& board_str
       ) {
-        if (!board_str.is_none()) {
-          string board_str_converted = board_str.cast<string>();
-          return make_unique<OctobanBoard>(board_str_converted);
-        } else {
+        if (board_str.is_none()) 
           return make_unique<OctobanBoard>(board_width, board_height);
-        }
+        string board_str_converted = board_str.cast<string>();
+        return make_unique<OctobanBoard>(board_str_converted);
       }),
       py::arg("board_width")=0,
       py::arg("board_height")=0,

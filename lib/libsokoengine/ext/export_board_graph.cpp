@@ -80,7 +80,7 @@ void export_board_graph(py::module& m) {
       ) -> py::object {
         position_t retv = self.neighbor_at(from_position, direction);
         if (retv == NULL_POSITION) return py::none();
-        else return py::cast(retv);
+        return py::cast(retv);
       },
       py::arg("from_position"), py::arg("direction")
     )

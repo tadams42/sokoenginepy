@@ -81,7 +81,7 @@ void export_board_state(py::module& m) {
     .def(
       "has_box_on", [](const BoardState& self, const py::object& position) {
         if (position.is_none()) return false;
-        else return self.has_box_on(position.cast<position_t>());
+        return self.has_box_on(position.cast<position_t>());
       },
       py::arg("position")
     )

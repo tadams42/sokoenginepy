@@ -41,7 +41,7 @@ void export_tessellations(py::module& m) {
           position, direction, board_width, board_height
         );
         if (retv == NULL_POSITION) return py::none();
-        else return py::cast(retv);
+        return py::cast(retv);
       },
       py::arg("position"), py::arg("direction"), py::arg("board_width"),
       py::arg("board_height")
