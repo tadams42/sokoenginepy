@@ -7,6 +7,7 @@ graft lib
 include .bumpversion.cfg
 include .coveragerc
 include .editorconfig
+include .style.yapf
 
 include CHANGELOG.rst
 include LICENSE
