@@ -210,7 +210,9 @@ class Mover:
         if pusher_id == self._selected_pusher:
             return
 
-        old_pusher_position = self._state.pusher_position(self._selected_pusher)
+        old_pusher_position = self._state.pusher_position(
+            self._selected_pusher
+        )
         new_pusher_position = self._state.pusher_position(pusher_id)
         selection_path = self._state.board.positions_path_to_directions_path(
             self._state.board.
@@ -265,7 +267,9 @@ class Mover:
             raise IllegalMoveError('Jumps not allowed after first pull')
 
         if self._solving_mode != SolvingMode.REVERSE:
-            raise IllegalMoveError('Jumps allowed only in reverse solving mode')
+            raise IllegalMoveError(
+                'Jumps allowed only in reverse solving mode'
+            )
 
         old_position = self._state.pusher_position(self._selected_pusher)
         if old_position == new_position:
@@ -300,6 +304,7 @@ class Mover:
         jump_key = 0
         pusher_change_key = 1
         move_key = 2
+
         def key_functor(elem):
             if elem.is_jump:
                 return jump_key
@@ -370,8 +375,7 @@ class Mover:
 
         if not in_front_of_pusher:
             raise IllegalMoveError(
-                "Can't move pusher off board! (ID: " +
-                "{0}, direction: {1})".
+                "Can't move pusher off board! (ID: " + "{0}, direction: {1})".
                 format(self._selected_pusher, str(direction))
             )
 
@@ -425,8 +429,7 @@ class Mover:
 
         if not in_front_of_pusher:
             raise IllegalMoveError(
-                "Can't move pusher off board! (ID: " +
-                "{0}, direction: {1})".
+                "Can't move pusher off board! (ID: " + "{0}, direction: {1})".
                 format(self._selected_pusher, str(direction))
             )
 

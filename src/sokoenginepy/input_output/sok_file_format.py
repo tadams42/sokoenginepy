@@ -9,7 +9,9 @@ from .puzzle import Puzzle, PuzzleSnapshot
 class SOKFileFormat:
     @classmethod
     def read(
-        cls, src_stream, dest_collection,
+        cls,
+        src_stream,
+        dest_collection,
         tessellation_hint=tessellation.Tessellation.SOKOBAN
     ):
 
@@ -42,7 +44,8 @@ class SOKReader:
         self.dest_collection = dest_collection
         self.supplied_tessellation_hint = (
             str(
-                tessellation.Tessellation.instance_from(tessellation_hint).value
+                tessellation.Tessellation.instance_from(tessellation_hint)
+                .value
             ).lower()
         )
 
@@ -166,8 +169,8 @@ class SOKReader:
     @staticmethod
     def _is_tagged_as(tag, line):
         return (
-            any(chr in list(SOKTags.TAG_DELIMITERS) for chr in line) and
-            line.lstrip().lower().startswith(tag.strip().lower())
+            any(chr in list(SOKTags.TAG_DELIMITERS) for chr in line)
+            and line.lstrip().lower().startswith(tag.strip().lower())
         )
 
     def _is_collection_tag_line(self, line):
@@ -276,24 +279,24 @@ class SOKReader:
         for line in self.dest_collection.notes:
             if self._is_collection_tag_line(line):
                 self.coll_header_tessellation_hint = (
-                    self.coll_header_tessellation_hint or
-                    self._get_tag_data(SOKTags.VARIANT, line)
+                    self.coll_header_tessellation_hint
+                    or self._get_tag_data(SOKTags.VARIANT, line)
                 )
                 self.dest_collection.title = (
-                    self.dest_collection.title or
-                    self._get_tag_data(SOKTags.TITLE, line)
+                    self.dest_collection.title
+                    or self._get_tag_data(SOKTags.TITLE, line)
                 )
                 self.dest_collection.author = (
-                    self.dest_collection.author or
-                    self._get_tag_data(SOKTags.AUTHOR, line)
+                    self.dest_collection.author
+                    or self._get_tag_data(SOKTags.AUTHOR, line)
                 )
                 self.dest_collection.created_at = (
-                    self.dest_collection.created_at or
-                    self._get_tag_data(SOKTags.CREATED_AT, line)
+                    self.dest_collection.created_at
+                    or self._get_tag_data(SOKTags.CREATED_AT, line)
                 )
                 self.dest_collection.updated_at = (
-                    self.dest_collection.updated_at or
-                    self._get_tag_data(SOKTags.UPDATED_AT, line)
+                    self.dest_collection.updated_at
+                    or self._get_tag_data(SOKTags.UPDATED_AT, line)
                 )
             elif not self._is_raw_file_notes_line(line):
                 remaining_lines.append(line)
@@ -313,19 +316,20 @@ class SOKReader:
                 if self._is_puzzle_tag_line(line):
                     tess = (tess or self._get_tag_data(SOKTags.VARIANT, line))
                     puzzle.title = (
-                        puzzle.title or self._get_tag_data(SOKTags.TITLE, line)
+                        puzzle.title
+                        or self._get_tag_data(SOKTags.TITLE, line)
                     )
                     puzzle.author = (
-                        puzzle.author or
-                        self._get_tag_data(SOKTags.AUTHOR, line)
+                        puzzle.author
+                        or self._get_tag_data(SOKTags.AUTHOR, line)
                     )
                     puzzle.boxorder = (
-                        puzzle.boxorder or
-                        self._get_tag_data(SOKTags.BOXORDER, line)
+                        puzzle.boxorder
+                        or self._get_tag_data(SOKTags.BOXORDER, line)
                     )
                     puzzle.goalorder = (
-                        puzzle.goalorder or
-                        self._get_tag_data(SOKTags.GOALORDER, line)
+                        puzzle.goalorder
+                        or self._get_tag_data(SOKTags.GOALORDER, line)
                     )
                 else:
                     remaining_lines.append(line)
@@ -347,18 +351,20 @@ class SOKReader:
             for line in snap.notes:
                 if self._is_snapshot_tag_line(line):
                     snap.solver = (
-                        snap.solver or self._get_tag_data(SOKTags.AUTHOR, line)
+                        snap.solver
+                        or self._get_tag_data(SOKTags.AUTHOR, line)
                     )
                     snap.solver = (
-                        snap.solver or self._get_tag_data(SOKTags.SOLVER, line)
+                        snap.solver
+                        or self._get_tag_data(SOKTags.SOLVER, line)
                     )
                     snap.created_at = (
-                        snap.created_at or
-                        self._get_tag_data(SOKTags.CREATED_AT, line)
+                        snap.created_at
+                        or self._get_tag_data(SOKTags.CREATED_AT, line)
                     )
                     snap.duration = (
-                        snap.duration or
-                        self._get_tag_data(SOKTags.DURATION, line)
+                        snap.duration
+                        or self._get_tag_data(SOKTags.DURATION, line)
                     )
                     snap.created_at = (
                         snap.created_at or
@@ -446,13 +452,13 @@ class SOKWriter:
 
         self._write_tagged(
             SOKTags.CREATED_AT,
-            puzzle_collection.created_at.strip() or
-            utilities.utcnow().isoformat()
+            puzzle_collection.created_at.strip()
+            or utilities.utcnow().isoformat()
         )
         self._write_tagged(
             SOKTags.UPDATED_AT,
-            puzzle_collection.updated_at.strip() or
-            utilities.utcnow().isoformat()
+            puzzle_collection.updated_at.strip()
+            or utilities.utcnow().isoformat()
         )
 
         self.dest_stream.write(
@@ -489,7 +495,9 @@ class SOKWriter:
         written = self._write_tagged(
             SOKTags.SNAPSHOT_CREATED_AT, snap.created_at
         ) or written
-        written = self._write_tagged(SOKTags.DURATION, snap.duration) or written
+        written = self._write_tagged(
+            SOKTags.DURATION, snap.duration
+        ) or written
 
         if not utilities.is_blank(snap.notes):
             self.dest_stream.write(snap.notes.rstrip() + "\n")

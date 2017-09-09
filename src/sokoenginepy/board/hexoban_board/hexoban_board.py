@@ -8,7 +8,8 @@ class HexobanBoard(VariantBoard):
     def __init__(self, board_width=0, board_height=0, board_str=None):
         super().__init__(
             tessellation_or_description=tessellation.Tessellation.HEXOBAN,
-            board_width=board_width, board_height=board_height,
+            board_width=board_width,
+            board_height=board_height,
             board_str=board_str
         )
 
@@ -17,7 +18,8 @@ class HexobanBoard(VariantBoard):
         return HexobanBoardResizer
 
     def _parse_string(self, board_str):
-        parsed, layout_ok = HexobanTextConverter().convert_to_internal(board_str)
+        parsed, layout_ok = HexobanTextConverter(
+        ).convert_to_internal(board_str)
 
         if layout_ok:
             return parsed
@@ -116,9 +118,8 @@ class HexobanTextConverter:
     def convert_to_string(
         self, hexoban_board, use_visible_floor=False, rle_encode=False
     ):
-        floor_character = BoardCell(BoardCellCharacters.FLOOR).to_str(
-            use_visible_floor
-        )
+        floor_character = BoardCell(BoardCellCharacters.FLOOR
+                                   ).to_str(use_visible_floor)
 
         retv = []
         for row in range(0, hexoban_board.height):
@@ -130,9 +131,9 @@ class HexobanTextConverter:
             for col in range(0, hexoban_board.width):
                 line.append(floor_character)
                 line.append(
-                    hexoban_board[
-                        utilities. index_1d(col, row, hexoban_board.width)
-                    ].to_str(use_visible_floor)
+                    hexoban_board[utilities.index_1d(
+                        col, row, hexoban_board.width
+                    )].to_str(use_visible_floor)
                 )
 
             retv.append("".join(line))
@@ -224,8 +225,8 @@ class HexobanTextConverter:
                     break
                 has_non_floor_left_in_odd_row = (
                     has_non_floor_left_in_odd_row or (
-                        i % 2 == 1 and
-                        not BoardCell.is_empty_floor_chr(parsed[i][0])
+                        i % 2 == 1
+                        and not BoardCell.is_empty_floor_chr(parsed[i][0])
                     )
                 )
 

@@ -3,8 +3,9 @@ from itertools import permutations
 import factory
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction, Mover,
-                          SokobanBoard, SolvingMode)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID, AtomicMove, Direction, Mover, SokobanBoard, SolvingMode
+)
 from sokoenginepy.game import JumpCommand, MoveCommand, SelectPusherCommand
 from sokoenginepy.utilities import index_1d
 
@@ -95,12 +96,10 @@ def pusher_selections():
 
 @pytest.fixture
 def undone_pusher_selections():
-    return [
-        [init_atomic_select(direction) for direction in permutation]
-        for permutation in permutations([
-            Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT
-        ])
-    ]
+    return [[init_atomic_select(direction) for direction in permutation]
+            for permutation in permutations([
+                Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT
+            ])]
 
 
 def init_atomic_jump(direction):
@@ -123,14 +122,13 @@ def jump_obstacle_position(reverse_board):
 def off_board_position():
     return index_1d(42, 42, 42)
 
+
 @pytest.fixture
 def jumps():
-    return [
-        [init_atomic_jump(direction) for direction in permutation]
-        for permutation in permutations([
-            Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT
-        ])
-    ]
+    return [[init_atomic_jump(direction) for direction in permutation]
+            for permutation in permutations([
+                Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT
+            ])]
 
 
 @pytest.fixture
@@ -141,6 +139,7 @@ def undone_jumps():
             Direction.DOWN, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT
         ])
     ]
+
 
 @pytest.fixture
 def jump_command(reverse_mover, jump_dest):

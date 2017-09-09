@@ -65,7 +65,7 @@ setup(
     install_requires=[
         'pytz >=2016.6.1',
         'pyparsing >=2.1.0',
-        'networkx >=1.11',
+        'networkx <2.0.0',
         'cached-property >=1.2.0',
         'pybind11>=2.2.0'
     ],

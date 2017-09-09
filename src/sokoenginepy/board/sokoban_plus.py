@@ -70,8 +70,8 @@ class SokobanPlus:
     @classmethod
     def is_sokoban_plus_string(cls, line):
         return (
-            utilities.contains_only_digits_and_spaces(line) and
-            not utilities.is_blank(line)
+            utilities.contains_only_digits_and_spaces(line)
+            and not utilities.is_blank(line)
         )
 
     @classmethod
@@ -241,13 +241,14 @@ class SokobanPlus:
 
         cleaned = [
             self.DEFAULT_PLUS_ID if (
-                i == self._LEGACY_DEFAULT_PLUS_ID and
-                self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID
+                i == self._LEGACY_DEFAULT_PLUS_ID
+                and self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID
             ) else i for i in trimmed
         ]
 
-        expanded = cleaned + [self.DEFAULT_PLUS_ID] * (
-            self.pieces_count - len(cleaned)
+        expanded = (
+            cleaned + [self.DEFAULT_PLUS_ID] *
+            (self.pieces_count - len(cleaned))
         )
 
         retv = dict()

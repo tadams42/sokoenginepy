@@ -39,8 +39,11 @@ class VariantBoard(Container, metaclass=ABCMeta):
 
     @classmethod
     def instance_from(
-        cls, tessellation_or_description='sokoban',
-        board_width=0, board_height=0, board_str=None
+        cls,
+        tessellation_or_description='sokoban',
+        board_width=0,
+        board_height=0,
+        board_str=None
     ):
         #pylint: disable=unused-variable
         from .hexoban_board import HexobanBoard
@@ -55,7 +58,8 @@ class VariantBoard(Container, metaclass=ABCMeta):
         for klass in VariantBoard.__subclasses__():
             if tessellation_instance.name.lower() in klass.__name__.lower():
                 return klass(
-                    board_width=board_width, board_height=board_height,
+                    board_width=board_width,
+                    board_height=board_height,
                     board_str=board_str
                 )
 
@@ -99,7 +103,10 @@ class VariantBoard(Container, metaclass=ABCMeta):
         return utilities.normalize_width(line.split('\n'))
 
     def __init__(
-        self, tessellation_or_description, board_width=0, board_height=0,
+        self,
+        tessellation_or_description,
+        board_width=0,
+        board_height=0,
         board_str=None
     ):
         super().__init__()
@@ -218,12 +225,12 @@ class VariantBoard(Container, metaclass=ABCMeta):
         return self.to_str(use_visible_floor=False, rle_encode=False)
 
     def __repr__(self):
-        board_str = textwrap.indent(
-            ',\n'.join(["'{0}'".format(l) for l in str(self).split('\n')]),
-            '    '
-        )
         return "{klass}(board_str='\\n'.join([\n{board_str}\n]))".format(
-            klass=self.__class__.__name__, board_str=board_str
+            klass=self.__class__.__name__,
+            board_str=textwrap.indent(
+                ',\n'.join(["'{0}'".format(l)
+                            for l in str(self).split('\n')]), '    '
+            )
         )
 
     @property
@@ -455,7 +462,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
         old_height = self.board.height
 
         self.board._reinit(
-            self.board.width, self.board.height + 1,
+            self.board.width,
+            self.board.height + 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -469,7 +477,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
         old_height = self.board.height
 
         self.board._reinit(
-            self.board.width, self.board.height + 1,
+            self.board.width,
+            self.board.height + 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -483,7 +492,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width + 1, self.board.height,
+            self.board.width + 1,
+            self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -497,7 +507,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width + 1, self.board.height,
+            self.board.width + 1,
+            self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -510,7 +521,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
         old_body = self.board._graph
 
         self.board._reinit(
-            self.board.width, self.board.height - 1,
+            self.board.width,
+            self.board.height - 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -523,7 +535,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
         old_body = self.board._graph
 
         self.board._reinit(
-            self.board.width, self.board.height - 1,
+            self.board.width,
+            self.board.height - 1,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -537,7 +550,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width - 1, self.board.height,
+            self.board.width - 1,
+            self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 
@@ -551,7 +565,8 @@ class VariantBoardResizer(metaclass=ABCMeta):
         old_width = self.board.width
 
         self.board._reinit(
-            self.board.width - 1, self.board.height,
+            self.board.width - 1,
+            self.board.height,
             reconfigure_edges=reconfigure_edges
         )
 

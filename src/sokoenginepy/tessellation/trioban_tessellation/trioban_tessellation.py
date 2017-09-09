@@ -1,8 +1,9 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from ..cell_orientation import CellOrientation
 from ..direction import Direction, UnknownDirectionError
-from ..tessellation_base import (TessellationBase,
-                                 TessellationBaseInheritableDocstrings)
+from ..tessellation_base import (
+    TessellationBase, TessellationBaseInheritableDocstrings
+)
 
 
 class TriobanTessellation(
@@ -28,15 +29,17 @@ class TriobanTessellation(
         return board.GraphType.DIRECTED_MULTI
 
     @copy_ancestor_docstring
-    def neighbor_position(self, position, direction, board_width, board_height):
+    def neighbor_position(
+        self, position, direction, board_width, board_height
+    ):
         # if not is_on_board_1d(position, board_width, board_height):
         #     return None
 
         row = ROW(position, board_width)
         column = COLUMN(position, board_width)
         triangle_points_down = (
-            self.cell_orientation(position, board_width, board_height) ==
-            CellOrientation.TRIANGLE_DOWN
+            self.cell_orientation(position, board_width, board_height
+                                 ) == CellOrientation.TRIANGLE_DOWN
         )
 
         dx, dy = 0, 0

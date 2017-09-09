@@ -20,7 +20,9 @@ class TessellationBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def neighbor_position(self, position, direction, board_width, board_height):
+    def neighbor_position(
+        self, position, direction, board_width, board_height
+    ):
         """Calculates neighbor position in given direction.
 
         Position is always expressed as 1D index of board graph vertex. To

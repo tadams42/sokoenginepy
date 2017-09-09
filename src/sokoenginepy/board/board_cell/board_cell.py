@@ -43,41 +43,41 @@ class BoardCell:
     @classmethod
     def is_pusher_chr(cls, character):
         return (
-            character == BoardCellCharacters.PUSHER or
-            character == BoardCellCharacters.ALT_PUSHER1 or
-            character == BoardCellCharacters.ALT_PUSHER2 or
-            character == BoardCellCharacters.PUSHER_ON_GOAL or
-            character == BoardCellCharacters.ALT_PUSHER_ON_GOAL1 or
-            character == BoardCellCharacters.ALT_PUSHER_ON_GOAL2
+            character == BoardCellCharacters.PUSHER
+            or character == BoardCellCharacters.ALT_PUSHER1
+            or character == BoardCellCharacters.ALT_PUSHER2
+            or character == BoardCellCharacters.PUSHER_ON_GOAL
+            or character == BoardCellCharacters.ALT_PUSHER_ON_GOAL1
+            or character == BoardCellCharacters.ALT_PUSHER_ON_GOAL2
         )
 
     @classmethod
     def is_box_chr(cls, character):
         return (
-            character == BoardCellCharacters.BOX or
-            character == BoardCellCharacters.ALT_BOX1 or
-            character == BoardCellCharacters.BOX_ON_GOAL or
-            character == BoardCellCharacters.ALT_BOX_ON_GOAL1
+            character == BoardCellCharacters.BOX
+            or character == BoardCellCharacters.ALT_BOX1
+            or character == BoardCellCharacters.BOX_ON_GOAL
+            or character == BoardCellCharacters.ALT_BOX_ON_GOAL1
         )
 
     @classmethod
     def is_goal_chr(cls, character):
         return (
-            character == BoardCellCharacters.GOAL or
-            character == BoardCellCharacters.ALT_GOAL1 or
-            character == BoardCellCharacters.BOX_ON_GOAL or
-            character == BoardCellCharacters.ALT_BOX_ON_GOAL1 or
-            character == BoardCellCharacters.PUSHER_ON_GOAL or
-            character == BoardCellCharacters.ALT_PUSHER_ON_GOAL1 or
-            character == BoardCellCharacters.ALT_PUSHER_ON_GOAL2
+            character == BoardCellCharacters.GOAL
+            or character == BoardCellCharacters.ALT_GOAL1
+            or character == BoardCellCharacters.BOX_ON_GOAL
+            or character == BoardCellCharacters.ALT_BOX_ON_GOAL1
+            or character == BoardCellCharacters.PUSHER_ON_GOAL
+            or character == BoardCellCharacters.ALT_PUSHER_ON_GOAL1
+            or character == BoardCellCharacters.ALT_PUSHER_ON_GOAL2
         )
 
     @classmethod
     def is_empty_floor_chr(cls, character):
         return (
-            character == BoardCellCharacters.FLOOR or
-            character == BoardCellCharacters.VISIBLE_FLOOR or
-            character == BoardCellCharacters.ALT_VISIBLE_FLOOR1
+            character == BoardCellCharacters.FLOOR
+            or character == BoardCellCharacters.VISIBLE_FLOOR
+            or character == BoardCellCharacters.ALT_VISIBLE_FLOOR1
         )
 
     @classmethod
@@ -85,8 +85,10 @@ class BoardCell:
         return character == BoardCellCharacters.WALL
 
     def __init__(
-        self, character=BoardCellCharacters.FLOOR,
-        is_in_playable_area=False, is_deadlock=False
+        self,
+        character=BoardCellCharacters.FLOOR,
+        is_in_playable_area=False,
+        is_deadlock=False
     ):
         self._has_box = False
         self._has_pusher = False
@@ -119,8 +121,8 @@ class BoardCell:
 
     def __eq__(self, rv):
         return (
-            self.is_wall == rv.is_wall and self.has_pusher == rv.has_pusher and
-            self.has_box == rv.has_box and self.has_goal == rv.has_goal
+            self.is_wall == rv.is_wall and self.has_pusher == rv.has_pusher
+            and self.has_box == rv.has_box and self.has_goal == rv.has_goal
         )
 
     def __ne__(self, rv):

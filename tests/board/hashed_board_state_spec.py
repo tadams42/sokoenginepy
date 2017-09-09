@@ -13,14 +13,20 @@ class DescribeHashedBoardState:
         initial_box_hash = hashed_board_state.boxes_layout_hash
         initial_pus_hash = hashed_board_state.boxes_and_pushers_layout_hash
 
-        initial_box_position = hashed_board_state.box_position(DEFAULT_PIECE_ID)
+        initial_box_position = hashed_board_state.box_position(
+            DEFAULT_PIECE_ID
+        )
         new_box_position = initial_box_position + 1
 
-        hashed_board_state.move_box_from(initial_box_position, new_box_position)
+        hashed_board_state.move_box_from(
+            initial_box_position, new_box_position
+        )
         assert hashed_board_state.boxes_layout_hash != initial_box_hash
         assert hashed_board_state.boxes_and_pushers_layout_hash != initial_pus_hash
 
-        hashed_board_state.move_box_from(new_box_position, initial_box_position)
+        hashed_board_state.move_box_from(
+            new_box_position, initial_box_position
+        )
         assert hashed_board_state.boxes_layout_hash == initial_box_hash
         assert hashed_board_state.boxes_and_pushers_layout_hash == initial_pus_hash
 

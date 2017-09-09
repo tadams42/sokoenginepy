@@ -153,15 +153,18 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
             self._layout_hash ^= self._boxes_factors[box_plus_id][old_position]
             self._layout_hash ^= self._boxes_factors[box_plus_id
                                                     ][to_new_position]
-            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id
-                                                                 ][old_position]
+            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
+                old_position
+            ]
             self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
                 to_new_position
             ]
 
     def _pusher_moved(self, old_position, to_new_position):
         if old_position != to_new_position:
-            self._layout_with_pushers_hash ^= self._pushers_factors[old_position]
+            self._layout_with_pushers_hash ^= self._pushers_factors[
+                old_position
+            ]
             self._layout_with_pushers_hash ^= self._pushers_factors[
                 to_new_position
             ]

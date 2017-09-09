@@ -80,8 +80,8 @@ class BoardGraph:
         retv = False
         for out_edge in self.out_edges(source_vertex):
             retv = retv or (
-                out_edge[1] == target_vertex and
-                out_edge[2][self._KEY_DIRECTION] == direction
+                out_edge[1] == target_vertex
+                and out_edge[2][self._KEY_DIRECTION] == direction
             )
             if retv:
                 break
@@ -146,16 +146,18 @@ class BoardGraph:
 
         weight = 1
         if target_cell and (
-            target_cell.is_wall or
-            target_cell.has_box or
-            target_cell.has_pusher
+            target_cell.is_wall or target_cell.has_box
+            or target_cell.has_pusher
         ):
             weight = self._MAX_EDGE_WEIGHT
 
         return weight
 
     def _reachables(
-        self, root, excluded_positions=None, is_obstacle_callable=None,
+        self,
+        root,
+        excluded_positions=None,
+        is_obstacle_callable=None,
         add_animation_frame_hook=None
     ):
         """
@@ -205,8 +207,10 @@ class BoardGraph:
 
             if add_animation_frame_hook is not None:
                 add_animation_frame_hook(
-                    current_position=current_position, reachables=reachables,
-                    to_inspect=to_inspect, excluded=excluded_positions
+                    current_position=current_position,
+                    reachables=reachables,
+                    to_inspect=to_inspect,
+                    excluded=excluded_positions
                 )
 
         if root in excluded_positions:
@@ -229,7 +233,9 @@ class BoardGraph:
             IndexError: if there is no vertex with index of ``from_position``
         """
         try:
-            for out_edge in self._graph.out_edges_iter(from_position, data=True):
+            for out_edge in self._graph.out_edges_iter(
+                from_position, data=True
+            ):
                 # edge: (source, target, data_dict)
                 if out_edge[2][self._KEY_DIRECTION] == direction:
                     return out_edge[1]
@@ -430,7 +436,8 @@ class BoardGraph:
             return not self[position].can_put_pusher_or_box
 
         return self._reachables(
-            root=pusher_position, is_obstacle_callable=is_obstacle,
+            root=pusher_position,
+            is_obstacle_callable=is_obstacle,
             excluded_positions=excluded_positions
         )
 

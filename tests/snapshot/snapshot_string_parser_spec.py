@@ -1,7 +1,8 @@
 import pytest
 
-from sokoenginepy import (AtomicMove, Direction, SnapshotConversionError,
-                          SolvingMode, Tessellation)
+from sokoenginepy import (
+    AtomicMove, Direction, SnapshotConversionError, SolvingMode, Tessellation
+)
 from sokoenginepy.snapshot.snapshot_string_parser import SnapshotStringParser
 
 from ..fixtures import SnapshotFactory
@@ -114,7 +115,8 @@ class DescribeSnapshotStringParser:
             parser._convert_token("lurD", Tessellation.SOKOBAN.value)
             assert (
                 parser._resulting_moves == [
-                    AtomicMove(Direction.LEFT), AtomicMove(Direction.UP),
+                    AtomicMove(Direction.LEFT),
+                    AtomicMove(Direction.UP),
                     AtomicMove(Direction.RIGHT),
                     AtomicMove(Direction.DOWN, box_moved=True)
                 ]

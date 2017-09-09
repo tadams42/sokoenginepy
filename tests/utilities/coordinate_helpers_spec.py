@@ -1,5 +1,6 @@
-from sokoenginepy.utilities import (X, Y, index_1d, is_on_board_1d,
-                                    is_on_board_2d)
+from sokoenginepy.utilities import (
+    X, Y, index_1d, is_on_board_1d, is_on_board_2d
+)
 
 
 class Describe_INDEX:

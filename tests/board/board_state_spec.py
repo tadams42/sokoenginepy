@@ -2,8 +2,10 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, BoardState,
-                          CellAlreadyOccupiedError, SokobanBoard, SokobanPlus)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID, BoardState, CellAlreadyOccupiedError, SokobanBoard,
+    SokobanPlus
+)
 
 
 class DescribeBoardState:
@@ -11,7 +13,8 @@ class DescribeBoardState:
         self, board_state, pushers_positions, invalid_pusher_position
     ):
         assert board_state.pushers_count == 2
-        assert sorted(board_state.pushers_ids) == list(pushers_positions.keys())
+        assert sorted(board_state.pushers_ids
+                     ) == list(pushers_positions.keys())
         assert board_state.pushers_positions == pushers_positions
 
         for pusher_id, pusher_position in pushers_positions.items():
@@ -46,7 +49,9 @@ class DescribeBoardState:
             assert board_state.has_box_on(box_position) is True
 
         with pytest.raises(KeyError):
-            board_state.box_position(DEFAULT_PIECE_ID + board_state.boxes_count)
+            board_state.box_position(
+                DEFAULT_PIECE_ID + board_state.boxes_count
+            )
         with pytest.raises(KeyError):
             board_state.box_id_on(invalid_box_position)
 
@@ -198,12 +203,16 @@ class DescribeBoardState:
         with pytest.raises(CellAlreadyOccupiedError):
             board_state.move_box(box_id, boxes_positions[DEFAULT_PIECE_ID + 1])
         with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_box_from(box_position, boxes_positions[DEFAULT_PIECE_ID + 1])
+            board_state.move_box_from(
+                box_position, boxes_positions[DEFAULT_PIECE_ID + 1]
+            )
 
         with pytest.raises(CellAlreadyOccupiedError):
             board_state.move_box(box_id, pushers_positions[DEFAULT_PIECE_ID])
         with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_box_from(box_position, pushers_positions[DEFAULT_PIECE_ID])
+            board_state.move_box_from(
+                box_position, pushers_positions[DEFAULT_PIECE_ID]
+            )
 
         with pytest.raises(CellAlreadyOccupiedError):
             board_state.move_box(box_id, wall_position)
@@ -217,14 +226,22 @@ class DescribeBoardState:
         pusher_position = board_state.pusher_position(pusher_id)
 
         with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_pusher(pusher_id, boxes_positions[DEFAULT_PIECE_ID])
+            board_state.move_pusher(
+                pusher_id, boxes_positions[DEFAULT_PIECE_ID]
+            )
         with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_pusher_from(pusher_position, boxes_positions[DEFAULT_PIECE_ID])
+            board_state.move_pusher_from(
+                pusher_position, boxes_positions[DEFAULT_PIECE_ID]
+            )
 
         with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_pusher(pusher_id, pushers_positions[DEFAULT_PIECE_ID + 1])
+            board_state.move_pusher(
+                pusher_id, pushers_positions[DEFAULT_PIECE_ID + 1]
+            )
         with pytest.raises(CellAlreadyOccupiedError):
-            board_state.move_pusher_from(pusher_position, pushers_positions[DEFAULT_PIECE_ID + 1])
+            board_state.move_pusher_from(
+                pusher_position, pushers_positions[DEFAULT_PIECE_ID + 1]
+            )
 
         with pytest.raises(CellAlreadyOccupiedError):
             board_state.move_pusher(pusher_id, wall_position)

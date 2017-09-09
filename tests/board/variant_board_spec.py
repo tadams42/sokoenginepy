@@ -2,9 +2,10 @@ from unittest.mock import patch
 
 import pytest
 
-from sokoenginepy import (BoardConversionError, BoardGraph, Direction,
-                          GraphType, SokobanBoard, Tessellation, TriobanBoard,
-                          VariantBoard)
+from sokoenginepy import (
+    BoardConversionError, BoardGraph, Direction, GraphType, SokobanBoard,
+    Tessellation, TriobanBoard, VariantBoard
+)
 from sokoenginepy.utilities import index_1d
 
 
@@ -140,6 +141,7 @@ class DescribeVariantBoard:
             assert board._graph.out_edges_count(1, 0) == 2
 
     if hasattr(VariantBoard, '_reinit'):
+
         class describe__reinit:
             def it_reinitializes_graph_vertices(self, variant_board):
                 variant_board._reinit(width=2, height=3)
@@ -154,7 +156,9 @@ class DescribeVariantBoard:
                 assert variant_board.height == 5
 
             def it_optionally_recreates_all_adges(self, variant_board):
-                variant_board._reinit(width=4, height=5, reconfigure_edges=False)
+                variant_board._reinit(
+                    width=4, height=5, reconfigure_edges=False
+                )
                 assert variant_board._graph.edges_count == 0
                 variant_board._reinit(width=4, height=5)
                 assert variant_board._graph.edges_count > 0

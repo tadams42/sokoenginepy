@@ -19,8 +19,16 @@ class Puzzle:
 
     #pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
-        self, board="", title="", author="", boxorder="", goalorder="",
-        notes="", snapshots=None, created_at="", updated_at="",
+        self,
+        board="",
+        title="",
+        author="",
+        boxorder="",
+        goalorder="",
+        notes="",
+        snapshots=None,
+        created_at="",
+        updated_at="",
         tessellation_or_description=module_tessellation.Tessellation.SOKOBAN
     ):
         self._tessellation = None
@@ -81,7 +89,8 @@ class Puzzle:
 
     def to_game_board(self):
         retv = module_board.VariantBoard.instance_from(
-            tessellation_or_description=self.tessellation, board_str=self.board
+            tessellation_or_description=self.tessellation,
+            board_str=self.board
         )
         return retv
 
@@ -123,8 +132,14 @@ class PuzzleSnapshot:
 
     #pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
-        self, moves="", title="", duration=None, solver="", notes="",
-        created_at="", updated_at="",
+        self,
+        moves="",
+        title="",
+        duration=None,
+        solver="",
+        notes="",
+        created_at="",
+        updated_at="",
         tessellation_or_description=module_tessellation.Tessellation.SOKOBAN
     ):
         self._tessellation = None
@@ -166,7 +181,8 @@ class PuzzleSnapshot:
 
     def to_game_snapshot(self):
         return snapshot.Snapshot(
-            tessellation_or_description=self.tessellation, moves_data=self.moves
+            tessellation_or_description=self.tessellation,
+            moves_data=self.moves
         )
 
     def reformat(self):
@@ -176,9 +192,10 @@ class PuzzleSnapshot:
     def pushes_count(self):
         return reduce(
             add, [
-                1 if
-                (snapshot.AtomicMove.is_atomic_move_chr(chr) and
-                 chr.isupper()) else 0 for chr in self.moves
+                1 if (
+                    snapshot.AtomicMove.is_atomic_move_chr(chr)
+                    and chr.isupper()
+                ) else 0 for chr in self.moves
             ], 0
         )
 
@@ -191,9 +208,10 @@ class PuzzleSnapshot:
         """
         return reduce(
             add, [
-                1 if
-                (snapshot.AtomicMove.is_atomic_move_chr(chr) and
-                 chr.islower()) else 0 for chr in self.moves
+                1 if (
+                    snapshot.AtomicMove.is_atomic_move_chr(chr)
+                    and chr.islower()
+                ) else 0 for chr in self.moves
             ], 0
         )
 
@@ -201,8 +219,8 @@ class PuzzleSnapshot:
     def is_reverse(self):
         return reduce(
             or_, [
-                chr == snapshot.Snapshot.NonMoveCharacters.JUMP_BEGIN or
-                chr == snapshot.Snapshot.NonMoveCharacters.JUMP_END
+                chr == snapshot.Snapshot.NonMoveCharacters.JUMP_BEGIN
+                or chr == snapshot.Snapshot.NonMoveCharacters.JUMP_END
                 for chr in self.moves
             ], False
         )

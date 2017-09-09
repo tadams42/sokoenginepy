@@ -1,8 +1,9 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from ..cell_orientation import CellOrientation
 from ..direction import Direction, UnknownDirectionError
-from ..tessellation_base import (TessellationBase,
-                                 TessellationBaseInheritableDocstrings)
+from ..tessellation_base import (
+    TessellationBase, TessellationBaseInheritableDocstrings
+)
 
 
 class OctobanTessellation(
@@ -45,16 +46,18 @@ class OctobanTessellation(
     }
 
     @copy_ancestor_docstring
-    def neighbor_position(self, position, direction, board_width, board_height):
+    def neighbor_position(
+        self, position, direction, board_width, board_height
+    ):
         # if not is_on_board_1d(position, board_width, board_height):
         #     return None
 
         if self.cell_orientation(position, board_width, board_height
                                 ) != CellOrientation.OCTAGON and (
-                                    direction == Direction.NORTH_EAST or
-                                    direction == Direction.NORTH_WEST or
-                                    direction == Direction.SOUTH_EAST or
-                                    direction == Direction.SOUTH_WEST
+                                    direction == Direction.NORTH_EAST
+                                    or direction == Direction.NORTH_WEST
+                                    or direction == Direction.SOUTH_EAST
+                                    or direction == Direction.SOUTH_WEST
                                 ):
             return None
 

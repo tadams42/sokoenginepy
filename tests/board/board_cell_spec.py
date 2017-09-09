@@ -2,8 +2,9 @@ import copy
 
 import pytest
 
-from sokoenginepy import (BoardCell, BoardCellCharacters,
-                          IllegalBoardCharacterError)
+from sokoenginepy import (
+    BoardCell, BoardCellCharacters, IllegalBoardCharacterError
+)
 
 from ..fixtures import BoardCellFactory
 
@@ -281,4 +282,6 @@ class DescribeBoardCell:
 
             assert str(board_cell) == BoardCellCharacters.FLOOR
 
-            assert board_cell.to_str(use_visible_floor=True) == BoardCellCharacters.VISIBLE_FLOOR
+            assert board_cell.to_str(
+                use_visible_floor=True
+            ) == BoardCellCharacters.VISIBLE_FLOOR

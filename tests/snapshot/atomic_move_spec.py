@@ -1,7 +1,8 @@
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction,
-                          InvalidAtomicMoveError)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID, AtomicMove, Direction, InvalidAtomicMoveError
+)
 
 from ..fixtures import AtomicMoveFactory
 
@@ -214,7 +215,9 @@ class DescribeAtomicMove:
             atomic_move.is_push_or_pull = True
             assert not atomic_move.is_pusher_selection
 
-        def test_setter_sets_to_state_of_pusher_was_selected(self, atomic_move):
+        def test_setter_sets_to_state_of_pusher_was_selected(
+            self, atomic_move
+        ):
             atomic_move.is_pusher_selection = True
             assert atomic_move.is_pusher_selection
 
