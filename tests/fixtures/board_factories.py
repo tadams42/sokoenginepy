@@ -1,11 +1,11 @@
-import factory
 from itertools import permutations
+
+import factory
 import pytest
 
-from sokoenginepy import (
-    DEFAULT_PIECE_ID, BoardState, Direction, HashedBoardState, SokobanBoard,
-    SokobanPlus, Tessellation
-)
+from sokoenginepy import (DEFAULT_PIECE_ID, BoardState, Direction,
+                          HashedBoardState, SokobanBoard, SokobanPlus,
+                          Tessellation)
 from sokoenginepy.utilities import index_1d
 
 from ..test_helpers import fake

@@ -2,9 +2,8 @@ import copy
 
 import pytest
 
-from sokoenginepy import (
-    BoardCell, BoardCellCharacters, IllegalBoardCharacterError
-)
+from sokoenginepy import (BoardCell, BoardCellCharacters,
+                          IllegalBoardCharacterError)
 
 from ..fixtures import BoardCellFactory
 

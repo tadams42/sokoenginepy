@@ -1,9 +1,8 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from ..cell_orientation import CellOrientation
 from ..direction import Direction, UnknownDirectionError
-from ..tessellation_base import (
-    TessellationBase, TessellationBaseInheritableDocstrings
-)
+from ..tessellation_base import (TessellationBase,
+                                 TessellationBaseInheritableDocstrings)
 
 
 class OctobanTessellation(

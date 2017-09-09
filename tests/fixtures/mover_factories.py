@@ -3,9 +3,8 @@ from itertools import permutations
 import factory
 import pytest
 
-from sokoenginepy import (
-    DEFAULT_PIECE_ID, AtomicMove, Direction, Mover, SokobanBoard, SolvingMode
-)
+from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction, Mover,
+                          SokobanBoard, SolvingMode)
 from sokoenginepy.game import JumpCommand, MoveCommand, SelectPusherCommand
 from sokoenginepy.utilities import index_1d
 

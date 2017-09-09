@@ -1,8 +1,7 @@
 import pytest
 
-from sokoenginepy import (
-    DEFAULT_PIECE_ID, AtomicMove, Direction, InvalidAtomicMoveError
-)
+from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction,
+                          InvalidAtomicMoveError)
 
 from ..fixtures import AtomicMoveFactory
 

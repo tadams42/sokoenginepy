@@ -2,10 +2,8 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy import (
-    BoardCell, BoardCellCharacters, BoardGraph, Direction, GraphType,
-    SokobanBoard
-)
+from sokoenginepy import (BoardCell, BoardCellCharacters, BoardGraph,
+                          Direction, GraphType, SokobanBoard)
 from sokoenginepy.utilities import index_1d
 
 

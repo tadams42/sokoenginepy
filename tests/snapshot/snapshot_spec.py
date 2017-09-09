@@ -2,10 +2,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from sokoenginepy import (
-    AtomicMove, Direction, Snapshot, SolvingMode, Tessellation,
-    UnknownDirectionError
-)
+from sokoenginepy import (AtomicMove, Direction, Snapshot, SolvingMode,
+                          Tessellation, UnknownDirectionError)
 
 from ..fixtures import SnapshotFactory
 
