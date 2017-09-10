@@ -77,16 +77,13 @@ def reverse_select_command(reverse_mover):
     return SelectPusherCommand(reverse_mover, DEFAULT_PIECE_ID + 1)
 
 
-def init_atomic_select(direction):
-    retv = AtomicMove(direction)
-    retv.is_pusher_selection = True
-    return retv
-
-
 @pytest.fixture
 def pusher_selections():
     return [
-        [init_atomic_select(direction) for direction in permutation]
+        [
+            AtomicMove(direction, is_pusher_selection=True)
+            for direction in permutation
+        ]
         for permutation in permutations([
             Direction.DOWN, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT
         ])
@@ -95,16 +92,13 @@ def pusher_selections():
 
 @pytest.fixture
 def undone_pusher_selections():
-    return [[init_atomic_select(direction) for direction in permutation]
+    return [[
+        AtomicMove(direction, is_pusher_selection=True)
+        for direction in permutation
+    ]
             for permutation in permutations([
                 Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT
             ])]
-
-
-def init_atomic_jump(direction):
-    retv = AtomicMove(direction)
-    retv.is_jump = True
-    return retv
 
 
 @pytest.fixture
@@ -124,7 +118,7 @@ def off_board_position():
 
 @pytest.fixture
 def jumps():
-    return [[init_atomic_jump(direction) for direction in permutation]
+    return [[AtomicMove(direction, is_jump=True) for direction in permutation]
             for permutation in permutations([
                 Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT
             ])]
@@ -133,7 +127,7 @@ def jumps():
 @pytest.fixture
 def undone_jumps():
     return [
-        [init_atomic_jump(direction) for direction in permutation]
+        [AtomicMove(direction, is_jump=True) for direction in permutation]
         for permutation in permutations([
             Direction.DOWN, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT
         ])

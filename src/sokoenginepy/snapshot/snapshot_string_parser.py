@@ -4,6 +4,7 @@ from functools import reduce
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
 from .. import utilities
+from ..tessellation import UnknownDirectionError
 from .atomic_move import AtomicMoveCharacters
 from .snapshot import Snapshot, SnapshotConversionError
 
@@ -232,8 +233,6 @@ class SnapshotStringParser:
     def _convert_token(
         self, token, tessellation, is_jump=False, is_pusher_change=False
     ):
-        from ..tessellation import UnknownDirectionError
-
         for character in token:
             atomic_move = None
             try:

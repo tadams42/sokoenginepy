@@ -3,9 +3,6 @@ from enum import IntEnum
 
 import networkx as nx
 
-from ... import tessellation as module_tessellation
-from ..board_cell import BoardCell
-
 
 class GraphType(IntEnum):
     DIRECTED = 0
@@ -24,10 +21,10 @@ class BoardGraph:
 
     _KEY_CELL = 'cell'
     _KEY_DIRECTION = 'direction'
-    _MAX_EDGE_WEIGHT = len(module_tessellation.Direction) + 1
+    _MAX_EDGE_WEIGHT = 100  # must be > len(Direction)
 
     def __init__(self, number_of_vertices, graph_type):
-        # assert graph_type in GraphType
+        from ..board import BoardCell
 
         if graph_type == GraphType.DIRECTED:
             self._graph = nx.DiGraph()
@@ -35,7 +32,7 @@ class BoardGraph:
             self._graph = nx.MultiDiGraph()
 
         for vertex in range(0, number_of_vertices):
-            self._graph.add_node(vertex, cell=BoardCell())
+            self._graph.add_node(vertex, **{self._KEY_CELL: BoardCell()})
 
     def __getitem__(self, position):
         try:

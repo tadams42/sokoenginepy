@@ -1,4 +1,4 @@
-from ... import tessellation, utilities
+from ... import utilities
 from ..board_cell import BoardCell, BoardCellCharacters, BoardConversionError
 from ..sokoban_board import SokobanBoard
 from ..variant_board import VariantBoard, VariantBoardResizer
@@ -7,7 +7,7 @@ from ..variant_board import VariantBoard, VariantBoardResizer
 class HexobanBoard(VariantBoard):
     def __init__(self, board_width=0, board_height=0, board_str=None):
         super().__init__(
-            tessellation_or_description=tessellation.Tessellation.HEXOBAN,
+            tessellation_or_description='hexoban',
             board_width=board_width,
             board_height=board_height,
             board_str=board_str

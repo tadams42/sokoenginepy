@@ -63,7 +63,7 @@ class TessellationBase(metaclass=ABCMeta):
         Raises:
             :exc:`.UnknownDirectionError` if conversion not possible.
         """
-        from .. import snapshot
+        from ..snapshot import AtomicMove
 
         direction, box_moved = self._char_to_atomic_move_dict.get(
             input_chr, (None, None)
@@ -72,7 +72,7 @@ class TessellationBase(metaclass=ABCMeta):
         if direction is None:
             raise UnknownDirectionError(input_chr)
 
-        return snapshot.AtomicMove(direction=direction, box_moved=box_moved)
+        return AtomicMove(direction=direction, box_moved=box_moved)
 
     @property
     @abstractmethod

@@ -1,18 +1,10 @@
 from . import utilities
-from .board import (DEFAULT_PIECE_ID, BoardCell, BoardCellCharacters,
-                    BoardConversionError, BoardGraph, BoardState,
-                    BoxGoalSwitchError, CellAlreadyOccupiedError, GraphType,
-                    HashedBoardState, HexobanBoard, IllegalBoardCharacterError,
-                    InvalidPieceIdError, OctobanBoard, SokobanBoard,
-                    SokobanPlus, SokobanPlusDataError, TriobanBoard,
-                    VariantBoard, is_valid_piece_id)
-from .game import IllegalMoveError, Mover, NonPlayableBoardError, SolvingMode
-from .input_output import (Puzzle, PuzzlesCollection, PuzzleSnapshot,
-                           SOKFileFormat, SOKTags)
-from .snapshot import (AtomicMove, AtomicMoveCharacters,
-                       InvalidAtomicMoveError, Snapshot,
-                       SnapshotConversionError)
-from .tessellation import (CellOrientation, Direction, Tessellation,
-                           UnknownDirectionError, UnknownTessellationError)
+from .board import *
+from .game import *
+from .graph import *
+from .input_output import *
+from .snapshot import *
+from .state import *
+from .tessellation import *
 
 __version__ = "0.5.2"

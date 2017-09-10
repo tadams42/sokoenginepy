@@ -4,9 +4,10 @@ from abc import ABCMeta, abstractmethod
 from collections.abc import Container
 from functools import reduce
 
-from .. import tessellation, utilities
-from .board_cell import BoardCell, BoardCellCharacters, BoardConversionError
-from .graph import BoardGraph
+from ... import utilities
+from ...graph import BoardGraph
+from ...tessellation import Tessellation, UnknownTessellationError
+from ..board_cell import BoardCell, BoardCellCharacters, BoardConversionError
 
 _RE_BOARD_STRING = re.compile(
     r"^([0-9\s" + re.escape("".join(c for c in BoardCellCharacters)) +
@@ -46,12 +47,12 @@ class VariantBoard(Container, metaclass=ABCMeta):
         board_str=None
     ):
         #pylint: disable=unused-variable
-        from .hexoban_board import HexobanBoard
-        from .octoban_board import OctobanBoard
-        from .sokoban_board import SokobanBoard
-        from .trioban_board import TriobanBoard
+        from ..hexoban_board import HexobanBoard
+        from ..octoban_board import OctobanBoard
+        from ..sokoban_board import SokobanBoard
+        from ..trioban_board import TriobanBoard
 
-        tessellation_instance = tessellation.Tessellation.instance_from(
+        tessellation_instance = Tessellation.instance_from(
             tessellation_or_description
         )
 
@@ -63,7 +64,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
                     board_str=board_str
                 )
 
-        raise tessellation.UnknownTessellationError(tessellation)
+        raise UnknownTessellationError(tessellation)
 
     @classmethod
     def is_board_string(cls, line):
@@ -110,7 +111,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
         board_str=None
     ):
         super().__init__()
-        self._tessellation_instance = tessellation.Tessellation.instance_from(
+        self._tessellation = Tessellation.instance_from(
             tessellation_or_description
         )
         self._graph = None
@@ -125,7 +126,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
 
     @property
     def tessellation(self):
-        return self._tessellation_instance.value
+        return self._tessellation.value
 
     @property
     @abstractmethod

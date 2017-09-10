@@ -1,6 +1,7 @@
 from enum import Enum
 
-from ... import board, tessellation
+from ...state import DEFAULT_PIECE_ID, is_valid_piece_id
+from ...tessellation import Direction
 
 
 class InvalidAtomicMoveError(ValueError):
@@ -52,11 +53,11 @@ class AtomicMove:
 
     def __init__(
         self,
-        direction=tessellation.Direction.LEFT,
+        direction=Direction.LEFT,
         box_moved=False,
         is_jump=False,
         is_pusher_selection=False,
-        pusher_id=board.DEFAULT_PIECE_ID,
+        pusher_id=DEFAULT_PIECE_ID,
         moved_box_id=None,
     ):
         if (box_moved or moved_box_id) and is_pusher_selection and is_jump:
@@ -149,7 +150,7 @@ class AtomicMove:
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
-        if board.is_valid_piece_id(value):
+        if is_valid_piece_id(value):
             self._moved_box_id = value
             self.is_push_or_pull = True
         else:
@@ -163,10 +164,10 @@ class AtomicMove:
 
     @pusher_id.setter
     def pusher_id(self, value):
-        if board.is_valid_piece_id(value):
+        if is_valid_piece_id(value):
             self._pusher_id = value
         else:
-            self._pusher_id = board.DEFAULT_PIECE_ID
+            self._pusher_id = DEFAULT_PIECE_ID
 
     @property
     def is_move(self):

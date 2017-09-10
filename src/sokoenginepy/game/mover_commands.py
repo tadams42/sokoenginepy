@@ -24,7 +24,7 @@ class MoverCommand(ABC):
         return self._mover
 
     @property
-    def render(self):
+    def rendered(self):
         """
         Sequence of :class:`.AtomicMove` from last command execution (redo or
         undo).

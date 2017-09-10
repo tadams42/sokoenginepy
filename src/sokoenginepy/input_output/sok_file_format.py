@@ -2,7 +2,10 @@ import os
 import re
 from enum import Enum
 
-from .. import board, snapshot, tessellation, utilities
+from .. import utilities
+from ..board import VariantBoard
+from ..snapshot import Snapshot
+from ..tessellation import Tessellation
 from .puzzle import Puzzle, PuzzleSnapshot
 
 
@@ -12,7 +15,7 @@ class SOKFileFormat:
         cls,
         src_stream,
         dest_collection,
-        tessellation_hint=tessellation.Tessellation.SOKOBAN
+        tessellation_hint=Tessellation.SOKOBAN
     ):
 
         SOKReader(src_stream, dest_collection, tessellation_hint).read()
@@ -43,10 +46,7 @@ class SOKReader:
         self.src_stream = src_stream
         self.dest_collection = dest_collection
         self.supplied_tessellation_hint = (
-            str(
-                tessellation.Tessellation.instance_from(tessellation_hint)
-                .value
-            ).lower()
+            str(Tessellation.instance_from(tessellation_hint).value).lower()
         )
 
     def read(self):
@@ -59,7 +59,7 @@ class SOKReader:
 
     def _split_input(self, input_lines):
         first_board_line = utilities.first_index_of(
-            input_lines, board.VariantBoard.is_board_string
+            input_lines, VariantBoard.is_board_string
         )
         if first_board_line is not None:
             self.dest_collection.notes = input_lines[:first_board_line]
@@ -77,8 +77,7 @@ class SOKReader:
             puzzle = Puzzle()
 
             first_note_line = utilities.first_index_of(
-                remaining_lines,
-                lambda x: not board.VariantBoard.is_board_string(x)
+                remaining_lines, lambda x: not VariantBoard.is_board_string(x)
             )
             if first_note_line is not None:
                 puzzle.board = "".join(remaining_lines[:first_note_line])
@@ -89,7 +88,7 @@ class SOKReader:
 
             if len(remaining_lines) > 0:
                 first_board_line = utilities.first_index_of(
-                    remaining_lines, board.VariantBoard.is_board_string
+                    remaining_lines, VariantBoard.is_board_string
                 )
 
                 if first_board_line is not None:
@@ -108,7 +107,7 @@ class SOKReader:
             remaining_lines = puzzle.notes
 
             first_moves_line = utilities.first_index_of(
-                remaining_lines, snapshot.Snapshot.is_snapshot_string
+                remaining_lines, Snapshot.is_snapshot_string
             )
             if first_moves_line is not None:
                 puzzle.notes = remaining_lines[:first_moves_line]
@@ -124,7 +123,7 @@ class SOKReader:
 
                 first_note_line = utilities.first_index_of(
                     remaining_lines,
-                    lambda x: not snapshot.Snapshot.is_snapshot_string(x)
+                    lambda x: not Snapshot.is_snapshot_string(x)
                 )
                 if first_note_line is not None:
                     snap.moves = "".join(
@@ -140,7 +139,7 @@ class SOKReader:
 
                 if len(remaining_lines) > 0:
                     first_moves_line = utilities.first_index_of(
-                        remaining_lines, snapshot.Snapshot.is_snapshot_string
+                        remaining_lines, Snapshot.is_snapshot_string
                     )
 
                     if first_moves_line is not None:
@@ -416,7 +415,7 @@ class SOKWriter:
 
         written = False
 
-        if puzzle.tessellation != tessellation.Tessellation.SOKOBAN:
+        if puzzle.tessellation != Tessellation.SOKOBAN:
             written = self._write_tagged(
                 SOKTags.VARIANT, str(puzzle.tessellation)
             ) or written

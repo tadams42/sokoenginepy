@@ -1,7 +1,8 @@
 from collections.abc import Iterable, MutableSequence
 from enum import Enum
 
-from .. import tessellation, utilities
+from .. import utilities
+from ..tessellation import Tessellation, UnknownDirectionError
 
 
 class SnapshotConversionError(ValueError):
@@ -39,7 +40,7 @@ class Snapshot(MutableSequence):
         self, tessellation_or_description, solving_mode=None, moves_data=""
     ):
         super().__init__()
-        self._tessellation_instance = tessellation.Tessellation.instance_from(
+        self._tessellation_instance = Tessellation.instance_from(
             tessellation_or_description
         )
         self._solving_mode = None
@@ -223,7 +224,7 @@ class Snapshot(MutableSequence):
             )
 
         if atomic_move.direction not in self.tessellation.legal_directions:
-            raise tessellation.UnknownDirectionError(
+            raise UnknownDirectionError(
                 "Invalid direction for tessellation '{0}'".
                 format(self.tessellation)
             )

@@ -22,8 +22,8 @@ class SokobanTessellation(
     @property
     @copy_ancestor_docstring
     def graph_type(self):
-        from ... import board
-        return board.GraphType.DIRECTED
+        from ...graph import GraphType
+        return GraphType.DIRECTED
 
     _NEIGHBOR_SHIFT = {
         Direction.LEFT: (0, -1),
@@ -59,16 +59,16 @@ class SokobanTessellation(
     @property
     def _char_to_atomic_move_dict(self):
         if not self.__class__._CHR_TO_ATOMIC_MOVE:
-            from ... import snapshot
+            from ...snapshot import AtomicMoveCharacters
             self.__class__._CHR_TO_ATOMIC_MOVE = {
-                snapshot.AtomicMoveCharacters.l: (Direction.LEFT, False),
-                snapshot.AtomicMoveCharacters.L: (Direction.LEFT, True),
-                snapshot.AtomicMoveCharacters.r: (Direction.RIGHT, False),
-                snapshot.AtomicMoveCharacters.R: (Direction.RIGHT, True),
-                snapshot.AtomicMoveCharacters.u: (Direction.UP, False),
-                snapshot.AtomicMoveCharacters.U: (Direction.UP, True),
-                snapshot.AtomicMoveCharacters.d: (Direction.DOWN, False),
-                snapshot.AtomicMoveCharacters.D: (Direction.DOWN, True),
+                AtomicMoveCharacters.l: (Direction.LEFT, False),
+                AtomicMoveCharacters.L: (Direction.LEFT, True),
+                AtomicMoveCharacters.r: (Direction.RIGHT, False),
+                AtomicMoveCharacters.R: (Direction.RIGHT, True),
+                AtomicMoveCharacters.u: (Direction.UP, False),
+                AtomicMoveCharacters.U: (Direction.UP, True),
+                AtomicMoveCharacters.d: (Direction.DOWN, False),
+                AtomicMoveCharacters.D: (Direction.DOWN, True),
             }
         return self._CHR_TO_ATOMIC_MOVE
 

@@ -987,7 +987,10 @@ class DescribeMover:
             moves += reverse_mover.last_move
             selection = deepcopy(reverse_mover.last_move)
             undone_selections = [[
-                fixtures.init_atomic_select(am.direction.opposite)
+                AtomicMove(
+                    direction=am.direction.opposite,
+                    is_pusher_selection=True
+                )
                 for am in permutation
             ] for permutation in permutations(selection)]
 

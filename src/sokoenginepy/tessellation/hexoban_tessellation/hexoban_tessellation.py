@@ -27,8 +27,8 @@ class HexobanTessellation(
     @property
     @copy_ancestor_docstring
     def graph_type(self):
-        from ... import board
-        return board.GraphType.DIRECTED
+        from ...graph import GraphType
+        return GraphType.DIRECTED
 
     @copy_ancestor_docstring
     def neighbor_position(
@@ -66,20 +66,20 @@ class HexobanTessellation(
     @property
     def _char_to_atomic_move_dict(self):
         if not self.__class__._CHR_TO_ATOMIC_MOVE:
-            from ... import snapshot
+            from ...snapshot import AtomicMoveCharacters
             self.__class__._CHR_TO_ATOMIC_MOVE = {
-                snapshot.AtomicMoveCharacters.l: (Direction.LEFT, False),
-                snapshot.AtomicMoveCharacters.L: (Direction.LEFT, True),
-                snapshot.AtomicMoveCharacters.r: (Direction.RIGHT, False),
-                snapshot.AtomicMoveCharacters.R: (Direction.RIGHT, True),
-                snapshot.AtomicMoveCharacters.u: (Direction.NORTH_WEST, False),
-                snapshot.AtomicMoveCharacters.U: (Direction.NORTH_WEST, True),
-                snapshot.AtomicMoveCharacters.d: (Direction.SOUTH_EAST, False),
-                snapshot.AtomicMoveCharacters.D: (Direction.SOUTH_EAST, True),
-                snapshot.AtomicMoveCharacters.n: (Direction.NORTH_EAST, False),
-                snapshot.AtomicMoveCharacters.N: (Direction.NORTH_EAST, True),
-                snapshot.AtomicMoveCharacters.s: (Direction.SOUTH_WEST, False),
-                snapshot.AtomicMoveCharacters.S: (Direction.SOUTH_WEST, True),
+                AtomicMoveCharacters.l: (Direction.LEFT, False),
+                AtomicMoveCharacters.L: (Direction.LEFT, True),
+                AtomicMoveCharacters.r: (Direction.RIGHT, False),
+                AtomicMoveCharacters.R: (Direction.RIGHT, True),
+                AtomicMoveCharacters.u: (Direction.NORTH_WEST, False),
+                AtomicMoveCharacters.U: (Direction.NORTH_WEST, True),
+                AtomicMoveCharacters.d: (Direction.SOUTH_EAST, False),
+                AtomicMoveCharacters.D: (Direction.SOUTH_EAST, True),
+                AtomicMoveCharacters.n: (Direction.NORTH_EAST, False),
+                AtomicMoveCharacters.N: (Direction.NORTH_EAST, True),
+                AtomicMoveCharacters.s: (Direction.SOUTH_WEST, False),
+                AtomicMoveCharacters.S: (Direction.SOUTH_WEST, True),
             }
         return self._CHR_TO_ATOMIC_MOVE
 

@@ -1,12 +1,12 @@
-Tessellations
-=============
+Tessellation
+============
 
 Direction
 ---------
 
-.. autoexception:: sokoenginepy.tessellation.direction.UnknownDirectionError
+.. autoexception:: sokoenginepy.tessellation.UnknownDirectionError
 
-.. autoclass:: sokoenginepy.Direction
+.. autoclass:: sokoenginepy.tessellation.Direction
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ Direction
 CellOrientation
 ---------------
 
-.. autoclass:: sokoenginepy.CellOrientation
+.. autoclass:: sokoenginepy.tessellation.CellOrientation
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,7 +28,7 @@ Tessellation
 
 .. autoexception:: sokoenginepy.tessellation.tessellation.UnknownTessellationError
 
-.. autoclass:: sokoenginepy.Tessellation
+.. autoclass:: sokoenginepy.tessellation.Tessellation
     :members:
     :undoc-members:
     :show-inheritance:

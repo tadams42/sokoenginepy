@@ -3,9 +3,9 @@ from operator import add, or_
 
 from cached_property import cached_property
 
-from .. import board as module_board
-from .. import tessellation as module_tessellation
-from .. import snapshot
+from ..board import BoardCell, VariantBoard
+from ..snapshot import AtomicMove, Snapshot
+from ..tessellation import Tessellation
 
 
 class Puzzle:
@@ -29,7 +29,7 @@ class Puzzle:
         snapshots=None,
         created_at="",
         updated_at="",
-        tessellation_or_description=module_tessellation.Tessellation.SOKOBAN
+        tessellation_or_description=Tessellation.SOKOBAN
     ):
         self._tessellation = None
         self.tessellation = tessellation_or_description
@@ -52,7 +52,7 @@ class Puzzle:
 
     @tessellation.setter
     def tessellation(self, tessellation_or_description):
-        self._tessellation = module_tessellation.Tessellation.instance_from(
+        self._tessellation = Tessellation.instance_from(
             tessellation_or_description
         )
 
@@ -72,7 +72,7 @@ class Puzzle:
 
     def clear(self):
         self.board = ""
-        self.tessellation = module_tessellation.Tessellation.SOKOBAN
+        self.tessellation = Tessellation.SOKOBAN
         self.title = ""
         self.author = ""
         self.boxorder = ""
@@ -88,7 +88,7 @@ class Puzzle:
             snap.reformat()
 
     def to_game_board(self):
-        retv = module_board.VariantBoard.instance_from(
+        retv = VariantBoard.instance_from(
             tessellation_or_description=self.tessellation,
             board_str=self.board
         )
@@ -97,37 +97,31 @@ class Puzzle:
     @cached_property
     def pushers_count(self):
         return reduce(
-            add, [
-                1 if module_board.BoardCell.is_pusher_chr(chr) else 0
-                for chr in self.board
-            ], 0
+            add,
+            [1 if BoardCell.is_pusher_chr(chr) else 0 for chr in self.board], 0
         )
 
     @cached_property
     def boxes_count(self):
         return reduce(
-            add, [
-                1 if module_board.BoardCell.is_box_chr(chr) else 0
-                for chr in self.board
-            ], 0
+            add, [1 if BoardCell.is_box_chr(chr) else 0
+                  for chr in self.board], 0
         )
 
     @cached_property
     def goals_count(self):
         return reduce(
-            add, [
-                1 if module_board.BoardCell.is_goal_chr(chr) else 0
-                for chr in self.board
-            ], 0
+            add,
+            [1 if BoardCell.is_goal_chr(chr) else 0 for chr in self.board], 0
         )
 
 
 class PuzzleSnapshot:
-    """snapshot.Snapshot with all its meta data.
+    """:class:`.Snapshot` with all its meta data.
 
     No data validation is performed, to make parsing of Sokoban files as fast
     as possible. Proper validation is triggered when PuzzleSnapshot is
-    converted into snapshot.Snapshot.
+    converted into :class:`.Snapshot`.
     """
 
     #pylint: disable=too-many-arguments,too-many-instance-attributes
@@ -140,7 +134,7 @@ class PuzzleSnapshot:
         notes="",
         created_at="",
         updated_at="",
-        tessellation_or_description=module_tessellation.Tessellation.SOKOBAN
+        tessellation_or_description=Tessellation.SOKOBAN
     ):
         self._tessellation = None
         self.tessellation = tessellation_or_description
@@ -161,7 +155,7 @@ class PuzzleSnapshot:
 
     @tessellation.setter
     def tessellation(self, tessellation_or_description):
-        self._tessellation = module_tessellation.Tessellation.instance_from(
+        self._tessellation = Tessellation.instance_from(
             tessellation_or_description
         )
 
@@ -180,7 +174,7 @@ class PuzzleSnapshot:
             del self.__dict__['is_reverse']
 
     def to_game_snapshot(self):
-        return snapshot.Snapshot(
+        return Snapshot(
             tessellation_or_description=self.tessellation,
             moves_data=self.moves
         )
@@ -192,10 +186,8 @@ class PuzzleSnapshot:
     def pushes_count(self):
         return reduce(
             add, [
-                1 if (
-                    snapshot.AtomicMove.is_atomic_move_chr(chr)
-                    and chr.isupper()
-                ) else 0 for chr in self.moves
+                1 if (AtomicMove.is_atomic_move_chr(chr) and chr.isupper())
+                else 0 for chr in self.moves
             ], 0
         )
 
@@ -208,10 +200,8 @@ class PuzzleSnapshot:
         """
         return reduce(
             add, [
-                1 if (
-                    snapshot.AtomicMove.is_atomic_move_chr(chr)
-                    and chr.islower()
-                ) else 0 for chr in self.moves
+                1 if (AtomicMove.is_atomic_move_chr(chr) and chr.islower())
+                else 0 for chr in self.moves
             ], 0
         )
 
@@ -219,8 +209,8 @@ class PuzzleSnapshot:
     def is_reverse(self):
         return reduce(
             or_, [
-                chr == snapshot.Snapshot.NonMoveCharacters.JUMP_BEGIN
-                or chr == snapshot.Snapshot.NonMoveCharacters.JUMP_END
+                chr == Snapshot.NonMoveCharacters.JUMP_BEGIN
+                or chr == Snapshot.NonMoveCharacters.JUMP_END
                 for chr in self.moves
             ], False
         )
