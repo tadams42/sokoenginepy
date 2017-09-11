@@ -143,6 +143,30 @@ And board is solved only when matching Sokoban+ ids are paired.
 The last thing that :class:`.HashedBoardState` does is Zobrist hashing of board.
 This is mainly useful for implementing game solvers.
 
+When initialized, :class:`.HashedBoardState` hashes board using positions and
+IDs of boxes and produces 64b integer hash. After that, whenever position
+changes, this hash is updated. The ``Zobrist`` part means hashing is
+deterministic which then means that undoing box move will return hash value to
+previous one. All this allows for creation of position tables that contain many
+board layouts and can be quickly compared (since we are not comparing positions
+but only hashes of these positions). Being able to quickly compare and find
+current board layout in some big table, speeds up searching through game space
+which is needed for effective solver implementations.
+
+.. code-block:: python
+
+    >>> from sokoenginepy import Mover, Direction
+    >>> mover = Mover(board)
+    >>> initial_hash = mover.state.boxes_layout_hash
+    >>> mover.move(Direction.DOWN)
+    >>> moved_hash = mover.state.boxes_layout_hash
+    >>> mover.undo_last_move()
+    >>> mover.state.boxes_layout_hash == initial_hash
+    True
+    >>> mover.move(Direction.DOWN)
+    >>> mover.state.boxes_layout_hash == moved_hash
+    True
+
 Movement
 ^^^^^^^^
 
@@ -162,13 +186,15 @@ game mechanics like this:
     >>> forward_mover.select_pusher(DEFAULT_PIECE_ID + 1)
     >>> # perform movement
     >>> forward_mover.move(Direction.UP)
-    >>> # try to perform illegal move raises CellAlreadyOccupiedError
+    >>> # try to perform illegal move raises IllegalMoveError
     >>> try:
     ...     forward_mover.move(Direction.UP)
-    ... except RuntimeError:
+    ... except IllegalMoveError as e:
     ...     print("IllegalMoveError risen!")
+    ...     print(e)
     ...
     IllegalMoveError risen!
+    Pusher ID: 2 can't be placed in position 125 occupied by '#'
 
     >>> # reverse solving mode
     >>> board = SokobanBoard(board_str="""
@@ -225,8 +251,8 @@ Reading and writing Sokoban files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 :class:`.Puzzle` and :class:`.PuzzlesCollection` are collections of strings
-representing boards, snapshots and meta data like author or title.
-These classes are intermediate results of parsing Sokoban files.
+representing boards, snapshots and meta data like author or title. These classes
+are intermediate results of parsing Sokoban files.
 
 This intermediary data is faster to manipulate and less memory hungry than full
 game board and game snapshot. That way it is possible to efficiently and quickly
