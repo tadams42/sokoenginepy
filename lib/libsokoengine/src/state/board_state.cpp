@@ -52,18 +52,17 @@ public:
   ids_to_positions_map_t m_boxes;
   ids_to_positions_map_t m_goals;
 
-  // non owned pointer
-  VariantBoard* m_board;
+  VariantBoard& m_board;
   SokobanPlus m_plus;
 
   PIMPL(VariantBoard& board) :
-    m_board(&board)
+    m_board(board)
   {
     piece_id_t pusher_id, box_id, goal_id;
     pusher_id = box_id = goal_id = DEFAULT_PIECE_ID;
 
-    for (position_t curent_pos = 0; curent_pos < m_board->size(); ++curent_pos) {
-      const BoardCell& cell = m_board->cell(curent_pos);
+    for (position_t curent_pos = 0; curent_pos < m_board.size(); ++curent_pos) {
+      const BoardCell& cell = m_board.cell(curent_pos);
 
       if (cell.has_pusher()) {
         m_pushers.insert(ids_to_positions_map_t::value_type(pusher_id++, curent_pos));
@@ -137,14 +136,14 @@ public:
 
     switch (which) {
       case Selectors::PUSHERS:
-        for(auto pusher : m_pushers.left) retv.push_back(pusher.first);
+        for (auto pusher : m_pushers.left) retv.push_back(pusher.first);
         break;
       case Selectors::BOXES:
-        for(auto box : m_boxes.left) retv.push_back(box.first);
+        for (auto box : m_boxes.left) retv.push_back(box.first);
         break;
       case Selectors::GOALS:
       default:
-        for(auto goal : m_goals.left) retv.push_back(goal.first);
+        for (auto goal : m_goals.left) retv.push_back(goal.first);
         break;
     };
 
@@ -156,14 +155,14 @@ public:
 
     switch (which) {
       case Selectors::PUSHERS:
-        for(auto pusher : m_pushers.left) retv[pusher.first] = pusher.second;
+        for (auto pusher : m_pushers.left) retv[pusher.first] = pusher.second;
         break;
       case Selectors::BOXES:
-        for(auto box : m_boxes.left) retv[box.first] = box.second;
+        for (auto box : m_boxes.left) retv[box.first] = box.second;
         break;
       case Selectors::GOALS:
       default:
-        for(auto goal : m_goals.left) retv[goal.first] = goal.second;
+        for (auto goal : m_goals.left) retv[goal.first] = goal.second;
         break;
     };
 
@@ -217,7 +216,7 @@ public:
 
     auto boxes_todo = m_boxes;
 
-    for(auto goal: m_goals.left) {
+    for (auto goal: m_goals.left) {
       auto box_iter = find_if(
         boxes_todo.left.begin(), boxes_todo.left.end(),
         [&] (auto box) -> bool {
@@ -261,7 +260,7 @@ bool BoardState::operator!= (const BoardState& rv) const {
   return !(*this == rv);
 }
 
-const VariantBoard& BoardState::board() const { return *m_impl->m_board; }
+const VariantBoard& BoardState::board() const { return m_impl->m_board; }
 
 size_t BoardState::pushers_count() const {
   return m_impl->m_pushers.size();
@@ -299,7 +298,7 @@ void BoardState::move_pusher_from(
 ) {
   if (old_position == to_new_position) return;
 
-  BoardCell& dest_cell = m_impl->m_board->cell_at(to_new_position);
+  BoardCell& dest_cell = m_impl->m_board.cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {
     throw CellAlreadyOccupiedError(
       string("Pusher ID: ") + std::to_string(pusher_id_on(old_position)) +
@@ -308,7 +307,7 @@ void BoardState::move_pusher_from(
     );
   }
 
-  m_impl->m_board->cell_at(old_position).remove_pusher();
+  m_impl->m_board.cell_at(old_position).remove_pusher();
   dest_cell.put_pusher();
   m_impl->update_position_on(old_position, Selectors::PUSHERS, to_new_position);
   pusher_moved(old_position, to_new_position);
@@ -352,7 +351,7 @@ void BoardState::box_moved(position_t old_position, position_t o_new_position) {
 void BoardState::move_box_from(position_t old_position, position_t to_new_position) {
   if (old_position == to_new_position) return;
 
-  BoardCell& dest_cell = m_impl->m_board->cell_at(to_new_position);
+  BoardCell& dest_cell = m_impl->m_board.cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {
     throw CellAlreadyOccupiedError(
       string("Box ID: ") + std::to_string(box_id_on(old_position)) +
@@ -361,7 +360,7 @@ void BoardState::move_box_from(position_t old_position, position_t to_new_positi
     );
   }
 
-  m_impl->m_board->cell_at(old_position).remove_box();
+  m_impl->m_board.cell_at(old_position).remove_box();
   dest_cell.put_box();
   m_impl->update_position_on(old_position, Selectors::BOXES, to_new_position);
   box_moved(old_position, to_new_position);
@@ -498,21 +497,21 @@ void BoardState::switch_boxes_and_goals() {
       if (has_pusher_on(old_goal_position)) {
         moved_pusher_id = pusher_id_on(old_goal_position);
         m_impl->update_position(moved_pusher_id, Selectors::PUSHERS, -1);
-        m_impl->m_board->cell(old_goal_position).remove_pusher();
+        m_impl->m_board.cell(old_goal_position).remove_pusher();
       }
 
       m_impl->update_position_on(old_goal_position, Selectors::GOALS, old_box_position);
-      m_impl->m_board->cell(old_goal_position).remove_goal();
-      m_impl->m_board->cell(old_box_position).put_goal();
+      m_impl->m_board.cell(old_goal_position).remove_goal();
+      m_impl->m_board.cell(old_box_position).put_goal();
 
       m_impl->update_position_on(old_box_position, Selectors::BOXES, old_goal_position);
-      m_impl->m_board->cell(old_box_position).remove_box();
-      m_impl->m_board->cell(old_goal_position).put_box();
+      m_impl->m_board.cell(old_box_position).remove_box();
+      m_impl->m_board.cell(old_goal_position).put_box();
       box_moved(old_box_position, old_goal_position);
 
       if (moved_pusher_id != DEFAULT_PIECE_ID - 1) {
         m_impl->update_position(moved_pusher_id, Selectors::PUSHERS, old_box_position);
-        m_impl->m_board->cell(old_box_position).put_pusher();
+        m_impl->m_board.cell(old_box_position).put_pusher();
         pusher_moved(old_goal_position, old_box_position);
       }
     }
@@ -529,7 +528,7 @@ bool BoardState::is_playable() const {
 string BoardState::to_str(const piece_ids_vector_t& v) {
   auto converter = [&]() {
     StringList retv;
-    for(auto id : v) {
+    for (auto id : v) {
       retv.push_back(boost::lexical_cast<string>(id));
     }
     return retv;
@@ -590,7 +589,7 @@ string BoardState::str() const {
 }
 
 string BoardState::repr() const {
-  return "BoardState(" + m_impl->m_board->repr() + ")";
+  return "BoardState(" + m_impl->m_board.repr() + ")";
 }
 
 } // namespace sokoengine

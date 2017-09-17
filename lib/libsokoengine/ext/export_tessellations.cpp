@@ -27,7 +27,7 @@ void export_tessellations(py::module& m) {
       [](const Tessellation& self) -> py::list {
         auto native_retv = self.legal_directions();
         py::list retv;
-        for(auto d : native_retv) retv.append(d);
+        for (auto d : native_retv) retv.append(d);
         return retv;
       }
     )

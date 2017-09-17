@@ -317,8 +317,8 @@ class Mover:
             reversed(old_last_moves), key_functor
         ):
             if moves_type == move_key:
-                for am in moves_group:
-                    self._undo_atomic_move(am)
+                for atomic_move in moves_group:
+                    self._undo_atomic_move(atomic_move)
                     new_last_moves += self._last_move
             elif moves_type == jump_key:
                 self._undo_jump(moves_group)
@@ -351,13 +351,13 @@ class Mover:
             self._push_or_move(atomic_move.direction.opposite, options)
 
     def _undo_jump(self, jump_moves):
-        path = [am.direction.opposite for am in jump_moves]
+        path = [atomic_move.direction.opposite for atomic_move in jump_moves]
         old_position = self._state.pusher_position(self._selected_pusher)
         new_position = self._state.board.path_destination(old_position, path)
         self.jump(new_position)
 
     def _undo_pusher_selection(self, selection_moves):
-        path = [am.direction.opposite for am in selection_moves]
+        path = [atomic_move.direction.opposite for atomic_move in selection_moves]
         old_position = self._state.pusher_position(self._selected_pusher)
         new_position = self._state.board.path_destination(old_position, path)
         self.select_pusher(self._state.pusher_id_on(new_position))

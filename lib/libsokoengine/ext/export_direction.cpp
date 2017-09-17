@@ -21,6 +21,8 @@ void export_direction(py::module& m) {
     .def("__str__", &Direction::str)
     .def("__repr__", &Direction::repr)
 
+    .def_static("__len__", []() { return static_cast<int>(Direction::len()); })
+
     .def_property_readonly(
       "opposite", &Direction::opposite, py::return_value_policy::reference
     )

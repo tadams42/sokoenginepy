@@ -124,27 +124,27 @@ class DescribeVariantBoard:
         def it_reconfigures_all_edges_in_board(self):
             board = SokobanBoard(2, 2)
 
-            assert board._graph.edges_count == 8
-            assert board._graph.has_edge(0, 1, Direction.RIGHT)
-            assert board._graph.has_edge(1, 0, Direction.LEFT)
-            assert board._graph.has_edge(0, 2, Direction.DOWN)
-            assert board._graph.has_edge(2, 0, Direction.UP)
-            assert board._graph.has_edge(2, 3, Direction.RIGHT)
-            assert board._graph.has_edge(3, 2, Direction.LEFT)
-            assert board._graph.has_edge(1, 3, Direction.DOWN)
-            assert board._graph.has_edge(3, 1, Direction.UP)
+            assert board.graph.edges_count == 8
+            assert board.graph.has_edge(0, 1, Direction.RIGHT)
+            assert board.graph.has_edge(1, 0, Direction.LEFT)
+            assert board.graph.has_edge(0, 2, Direction.DOWN)
+            assert board.graph.has_edge(2, 0, Direction.UP)
+            assert board.graph.has_edge(2, 3, Direction.RIGHT)
+            assert board.graph.has_edge(3, 2, Direction.LEFT)
+            assert board.graph.has_edge(1, 3, Direction.DOWN)
+            assert board.graph.has_edge(3, 1, Direction.UP)
 
         def it_doesnt_create_duplicate_direction_edges_in_multidigraph(self):
             board = TriobanBoard(2, 2)
-            assert board._graph.out_edges_count(0, 1) == 2
-            assert board._graph.out_edges_count(1, 0) == 2
+            assert board.graph.out_edges_count(0, 1) == 2
+            assert board.graph.out_edges_count(1, 0) == 2
 
     if hasattr(VariantBoard, '_reinit'):
 
         class describe__reinit:
             def it_reinitializes_graph_vertices(self, variant_board):
                 variant_board._reinit(width=2, height=3)
-                assert variant_board._graph.vertices_count == 2 * 3
+                assert variant_board.graph.vertices_count == 2 * 3
 
                 for position in range(0, variant_board.size):
                     assert variant_board[position].is_empty_floor
@@ -158,9 +158,9 @@ class DescribeVariantBoard:
                 variant_board._reinit(
                     width=4, height=5, reconfigure_edges=False
                 )
-                assert variant_board._graph.edges_count == 0
+                assert variant_board.graph.edges_count == 0
                 variant_board._reinit(width=4, height=5)
-                assert variant_board._graph.edges_count > 0
+                assert variant_board.graph.edges_count > 0
 
     class describe_clear:
         def it_clears_board_cells_in_all_nodes(self, variant_board):
@@ -222,13 +222,14 @@ class DescribeVariantBoard:
             assert variant_board.height == old_height - 2
             assert variant_board.to_str(use_visible_floor=True) == output
 
-        def test_reconfigures_graph_edges_only_once(self, variant_board):
-            if (hasattr(VariantBoard, '_reconfigure_edges')):
-                with patch.object(
-                    VariantBoard, '_reconfigure_edges', return_value=None
-                ) as mock_method:
+        def test_reconfigures_graph_edges_only_once(self, variant_board, mocker):
+            if VariantBoard.__module__.startswith('sokoenginepy.'):
+                with mocker.patch(
+                    'sokoenginepy.BoardGraph.reconfigure_edges',
+                    return_value=None
+                ):
                     variant_board.resize(2, 2)
-                assert mock_method.call_count == 1
+                    assert variant_board.graph.reconfigure_edges.call_count == 1
 
     class describe_resize_and_center:
         def test_adds_columns_and_rows_when_enlarging(self, variant_board):
@@ -278,13 +279,14 @@ class DescribeVariantBoard:
             assert variant_board.height == old_height - 2
             assert variant_board.to_str(use_visible_floor=True) == output
 
-        def test_reconfigures_graph_edges_only_once(self, variant_board):
-            if hasattr(VariantBoard, '_reconfigure_edges'):
-                with patch.object(
-                    VariantBoard, '_reconfigure_edges', return_value=None
-                ) as mock_method:
-                    variant_board.resize(2, 2)
-                assert mock_method.call_count == 1
+        def test_reconfigures_graph_edges_only_once(self, variant_board, mocker):
+            if VariantBoard.__module__.startswith('sokoenginepy.'):
+                with mocker.patch(
+                    'sokoenginepy.BoardGraph.reconfigure_edges',
+                    return_value=None
+                ):
+                    variant_board.resize_and_center(42, 42)
+                    assert variant_board.graph.reconfigure_edges.call_count == 1
 
     class describe_trim:
         def test_removes_empty_outer_rows_and_columns(self, variant_board):
@@ -299,13 +301,14 @@ class DescribeVariantBoard:
             assert variant_board.height == old_height
             assert str(variant_board) == output
 
-        def test_reconfigures_graph_edges_only_once(self, variant_board):
-            if hasattr(VariantBoard, '_reconfigure_edges'):
-                with patch.object(
-                    VariantBoard, '_reconfigure_edges', return_value=None
-                ) as mock_method:
+        def test_reconfigures_graph_edges_only_once(self, variant_board, mocker):
+            if VariantBoard.__module__.startswith('sokoenginepy.'):
+                with mocker.patch(
+                    'sokoenginepy.BoardGraph.reconfigure_edges',
+                    return_value=None
+                ):
                     variant_board.resize(2, 2)
-                assert mock_method.call_count == 1
+                    assert variant_board.graph.reconfigure_edges.call_count == 1
 
     class describe_reverse_rows:
         def test_mirrors_board_up_down(self, variant_board):

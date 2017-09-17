@@ -15,7 +15,7 @@ StringList TextUtils::normalize_width(
 ) {
   size_t width = calculate_width(string_list);
   StringList retv = string_list;
-  for(string& line : retv) {
+  for (string& line : retv) {
     if (line.length() < width) {
       line.insert(line.end(), width - line.length(), fill_chr);
     }
@@ -25,7 +25,7 @@ StringList TextUtils::normalize_width(
 
 size_t TextUtils::calculate_width(const StringList& string_list) {
   size_t width = 0;
-  for(auto line : string_list)
+  for (auto line : string_list)
     if (line.length() > width) width = line.length();
   return width;
 }

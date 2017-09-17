@@ -23,18 +23,37 @@ class BoardGraph:
     _KEY_DIRECTION = 'direction'
     _MAX_EDGE_WEIGHT = 100  # must be > len(Direction)
 
-    def __init__(self, number_of_vertices, graph_type):
+    def __init__(self, board_width, board_height, graph_type):
         from ..board import BoardCell
+
+        self._board_width = board_width
+        self._board_height = board_height
 
         if graph_type == GraphType.DIRECTED:
             self._graph = nx.DiGraph()
         else:
             self._graph = nx.MultiDiGraph()
 
-        for vertex in range(0, number_of_vertices):
+        for vertex in range(0, self.board_width * self.board_height):
             self._graph.add_node(vertex, **{self._KEY_CELL: BoardCell()})
 
+    @property
+    def board_width(self):
+        return self._board_width
+
+    @property
+    def board_height(self):
+        return self._board_height
+
     def __getitem__(self, position):
+        """Get :class:`.BoardCell` on ``position``
+
+        Returns:
+            BoardCell: reference to :class:`.BoardCell`
+
+        Raises:
+            IndexError: if there is no vertex with index ``position``
+        """
         try:
             return self._graph.node[position][self._KEY_CELL]
         except KeyError as e:
@@ -43,6 +62,11 @@ class BoardGraph:
             raise IndexError(str(e))
 
     def __setitem__(self, position, board_cell):
+        """Set :class:`.BoardCell` on ``position``
+
+        Raises:
+            IndexError: if there is no vertex with index ``position``
+        """
         try:
             self._graph.node[position][self._KEY_CELL] = board_cell
         except KeyError as e:
@@ -51,14 +75,29 @@ class BoardGraph:
             raise IndexError(str(e))
 
     def __contains__(self, position):
+        """Tests if vertex on ``position`` exists.
+
+        Returns:
+            bool: True if vertex exists
+        """
         return position in self._graph
 
     @property
     def vertices_count(self):
+        """Number of vertices in graph.
+
+        Returns:
+            int: number of vertices in graph
+        """
         return self._graph.number_of_nodes()
 
     @property
     def edges_count(self):
+        """Number of edges in graph.
+
+        Returns:
+            int: number of edges in graph
+        """
         return self._graph.number_of_edges()
 
     def has_edge(self, source_vertex, target_vertex, direction):
@@ -94,7 +133,7 @@ class BoardGraph:
                 for out_edge in
                 self._graph.out_edges_iter(source_vertex, data=True)
             )
-        except nx.NetworkXError as e:
+        except nx.NetworkXError:
             retv = tuple()
 
         return retv
@@ -112,7 +151,7 @@ class BoardGraph:
         """
         try:
             retv = len(self._graph[source_vertex][target_vertex])
-        except KeyError as e:
+        except KeyError:
             retv = 0
 
         return retv
@@ -466,3 +505,24 @@ class BoardGraph:
             else:
                 break
         return retv
+
+    def reconfigure_edges(self, tessellation):
+        """Recreate all edges using ``tessellation``.
+
+        Args:
+            width (int): board width
+            height (int): board height
+            tessellation (TessellationBase): tessellation instance to use for
+                edges calculation
+        """
+        self.remove_all_edges()
+        for source_vertex in range(self.vertices_count):
+            for direction in tessellation.legal_directions:
+                neighbor_vertex = tessellation.neighbor_position(
+                    source_vertex, direction, self.board_width,
+                    self.board_height
+                )
+                if neighbor_vertex is not None:
+                    self.add_edge(
+                        source_vertex, neighbor_vertex, direction
+                    )

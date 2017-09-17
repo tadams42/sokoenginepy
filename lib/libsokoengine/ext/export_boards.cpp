@@ -74,15 +74,14 @@ void export_boards(py::module& m) {
       "parse_board_string", [](const string& line) {
         auto native_retv = VariantBoard::parse_board_string(line);
         py::list retv;
-        for(auto str: native_retv) retv.append(str);
+        for (auto str: native_retv) retv.append(str);
         return retv;
       },
       py::arg("line")
     )
 
     .def_property_readonly(
-      "_graph", &VariantBoard::graph,
-      py::return_value_policy::reference_internal
+      "graph", &VariantBoard::graph, py::return_value_policy::reference_internal
     )
 
     .def_property_readonly(
@@ -151,7 +150,7 @@ void export_boards(py::module& m) {
       ) {
         auto native_retv = self.wall_neighbors(from_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("from_position")
@@ -162,7 +161,7 @@ void export_boards(py::module& m) {
         const VariantBoard& self, position_t from_position) {
         auto native_retv = self.all_neighbors(from_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("from_position")
@@ -229,7 +228,7 @@ void export_boards(py::module& m) {
       ) {
         auto native_retv = self.find_move_path(start_position, end_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("start_position"), py::arg("end_position")
@@ -242,7 +241,7 @@ void export_boards(py::module& m) {
       ) {
         auto native_retv = self.find_jump_path(start_position, end_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("start_position"), py::arg("end_position")
@@ -253,10 +252,10 @@ void export_boards(py::module& m) {
         const VariantBoard& self, const py::list& positions_path
       ) {
         Positions path;
-        for(auto val : positions_path) path.push_back(val.cast<position_t>());
+        for (auto val : positions_path) path.push_back(val.cast<position_t>());
         auto native_retv = self.positions_path_to_directions_path(path);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("positions_path")
@@ -359,7 +358,7 @@ void export_boards(py::module& m) {
       py::init([](
         size_t board_width, size_t board_height, const py::object& board_str
       ) {
-        if (board_str.is_none()) 
+        if (board_str.is_none())
           return make_unique<OctobanBoard>(board_width, board_height);
         string board_str_converted = board_str.cast<string>();
         return make_unique<OctobanBoard>(board_str_converted);

@@ -165,7 +165,7 @@ void export_board_state(py::module& m) {
         py::list retv;
         for (auto i = native_retv.begin(); i != native_retv.end(); ++i) {
           py::dict d;
-          for(auto j = (*i).begin(); j != (*i).end(); j++) {
+          for (auto j = (*i).begin(); j != (*i).end(); j++) {
             d[py::int_(j->first)] = j->second;
           }
           retv.append(d);

@@ -92,7 +92,7 @@ def variant_board(board_str):
 
 @pytest.fixture
 def board_graph(variant_board):
-    return variant_board._graph
+    return variant_board.graph
 
 
 @pytest.fixture

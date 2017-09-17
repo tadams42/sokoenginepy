@@ -73,7 +73,7 @@ public:
     );
 
     vector<piece_id_t> cleaned;
-    for(const string& str_id : trimmed) {
+    for (const string& str_id : trimmed) {
       if (!TextUtils::is_blank(str_id)) {
         piece_id_t converted_id;
         try {
@@ -100,7 +100,7 @@ public:
 
     IdsMap retv;
     piece_id_t index = 0;
-    for(const auto& plus_id : cleaned) {
+    for (const auto& plus_id : cleaned) {
       retv[index + DEFAULT_PIECE_ID] = plus_id;
       index++;
     }

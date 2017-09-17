@@ -15,7 +15,6 @@ class Tessellation;
 
 namespace implementation {
   class LIBSOKOENGINE_LOCAL VariantBoardResizer;
-  class LIBSOKOENGINE_LOCAL HexobanBoardResizer;
 }
 
 ///
@@ -139,7 +138,6 @@ private:
   class LIBSOKOENGINE_LOCAL PIMPL;
   std::unique_ptr<PIMPL> m_impl;
 
-  void reconfigure_edges();
   friend class implementation::VariantBoardResizer;
 };
 

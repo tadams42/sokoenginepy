@@ -43,7 +43,7 @@ public:
       StringList retv;
 
       StringList tmp;
-      for(auto id : v) {
+      for (auto id : v) {
         tmp.push_back(boost::lexical_cast<string>(id));
         if (tmp.size() == 5) {
           retv.push_back(indent + "    " + boost::join(tmp, ", "));
@@ -271,7 +271,7 @@ const HashedBoardState::solution_hashes_t& HashedBoardState::solution_hashes() c
 string HashedBoardState::to_str(const solution_hashes_t& v) {
   auto converter = [&]() {
     StringList retv;
-    for(auto id : v) {
+    for (auto id : v) {
       retv.push_back(boost::lexical_cast<string>(id));
     }
     return retv;

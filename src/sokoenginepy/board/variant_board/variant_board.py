@@ -115,14 +115,12 @@ class VariantBoard(Container, metaclass=ABCMeta):
             tessellation_or_description
         )
         self._graph = None
-        self._width = 0
-        self._height = 0
         self._resizer = self._resizer_class(self)
 
         if not utilities.is_blank(board_str):
             self._reinit_with_string(board_str)
         else:
-            self._reinit(board_width, board_height)
+            self._reinit(board_width, board_height, reconfigure_edges=True)
 
     @property
     def tessellation(self):
@@ -136,27 +134,19 @@ class VariantBoard(Container, metaclass=ABCMeta):
         """
         pass
 
+    @property
+    def graph(self):
+        return self._graph
+
     def _reconfigure_edges(self):
         """Recreate all edges using :attr:`.tessellation`."""
-        self._graph.remove_all_edges()
-        for source_vertex in range(self.size):
-            for direction in self.tessellation.legal_directions:
-                neighbor_vertex = self.tessellation.neighbor_position(
-                    source_vertex, direction, self.width, self.height
-                )
-                if neighbor_vertex is not None:
-                    self._graph.add_edge(
-                        source_vertex, neighbor_vertex, direction
-                    )
+        self.graph.reconfigure_edges(self.tessellation)
 
     def _reinit(self, width, height, reconfigure_edges=True):
-        self._graph = BoardGraph(width * height, self.tessellation.graph_type)
-
-        self._width = width
-        self._height = height
+        self._graph = BoardGraph(width, height, self.tessellation.graph_type)
 
         if reconfigure_edges:
-            self._reconfigure_edges()
+            self.graph.reconfigure_edges(self.tessellation)
 
     def _reinit_with_string(self, board_str, reconfigure_edges=True):
         if not utilities.is_blank(board_str):
@@ -166,7 +156,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             self._reinit(width, height, reconfigure_edges)
             for y, row in enumerate(board_rows):
                 for x, character in enumerate(row):
-                    self._graph[utilities.index_1d(x, y, self._width)
+                    self.graph[utilities.index_1d(x, y, self.width)
                                ] = BoardCell(character)
 
     def __eq__(self, rv):
@@ -192,16 +182,16 @@ class VariantBoard(Container, metaclass=ABCMeta):
         return self.parse_board_string(board_str)
 
     def __getitem__(self, position):
-        return self._graph[position]
+        return self.graph[position]
 
     def __setitem__(self, position, board_cell):
         if isinstance(board_cell, BoardCell):
-            self._graph[position] = board_cell
+            self.graph[position] = board_cell
         else:
-            self._graph[position] = BoardCell(board_cell)
+            self.graph[position] = BoardCell(board_cell)
 
     def __contains__(self, position):
-        return position in self._graph
+        return position in self.graph
 
     def to_str(self, use_visible_floor=False, rle_encode=False):
         rows = []
@@ -236,15 +226,15 @@ class VariantBoard(Container, metaclass=ABCMeta):
 
     @property
     def width(self):
-        return self._width
+        return self.graph.board_width
 
     @property
     def height(self):
-        return self._height
+        return self.graph.board_height
 
     @property
     def size(self):
-        return self._width * self._height
+        return self.graph.board_width * self.graph.board_height
 
     def neighbor(self, from_position, direction):
         """
@@ -257,21 +247,21 @@ class VariantBoard(Container, metaclass=ABCMeta):
         Raises:
             IndexError: if ``from_position`` is out of board position
         """
-        return self._graph.neighbor(from_position, direction)
+        return self.graph.neighbor(from_position, direction)
 
     def wall_neighbors(self, from_position):
         """
         Returns:
             list: of neighbor positions that are walls
         """
-        return self._graph.wall_neighbors(from_position)
+        return self.graph.wall_neighbors(from_position)
 
     def all_neighbors(self, from_position):
         """
         Returns:
             list: of neighbor positions
         """
-        return self._graph.all_neighbors(from_position)
+        return self.graph.all_neighbors(from_position)
 
     def clear(self):
         """Empties all board cells."""
@@ -282,7 +272,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
         """
         Marks all BoardCell that are playable (reachable by any box or pusher).
         """
-        self._graph.mark_play_area()
+        self.graph.mark_play_area()
 
     def positions_reachable_by_pusher(
         self, pusher_position, excluded_positions=None
@@ -292,7 +282,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             list: of positions that are reachable by pusher standing on
             ``position``
         """
-        return self._graph.positions_reachable_by_pusher(
+        return self.graph.positions_reachable_by_pusher(
             pusher_position, excluded_positions
         )
 
@@ -303,19 +293,19 @@ class VariantBoard(Container, metaclass=ABCMeta):
         Returns:
             int: Top-left position reachable by pusher
         """
-        return self._graph.normalized_pusher_position(
+        return self.graph.normalized_pusher_position(
             pusher_position, excluded_positions
         )
 
     def path_destination(self, start_position, directions_path):
-        return self._graph.path_destination(start_position, directions_path)
+        return self.graph.path_destination(start_position, directions_path)
 
     def find_jump_path(self, start_position, end_position):
         """
         Returns:
             list: of positions through which pusher must pass when jumping
         """
-        return self._graph.find_jump_path(start_position, end_position)
+        return self.graph.find_jump_path(start_position, end_position)
 
     def find_move_path(self, start_position, end_position):
         """
@@ -323,7 +313,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             list: of positions through which pusher must pass when moving
             without pushing boxes
         """
-        return self._graph.find_move_path(start_position, end_position)
+        return self.graph.find_move_path(start_position, end_position)
 
     def cell_orientation(self, position):
         """
@@ -331,7 +321,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             CellOrientation: game variant specific parameter
         """
         return self.tessellation.cell_orientation(
-            position, self._width, self._height
+            position, self.width, self.height
         )
 
     def positions_path_to_directions_path(self, positions_path):
@@ -345,7 +335,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
         Returns:
             list: of :class:`.Direction` instances
         """
-        return self._graph.positions_path_to_directions_path(positions_path)
+        return self.graph.positions_path_to_directions_path(positions_path)
 
     def add_row_top(self):
         self._resizer.add_row_top(reconfigure_edges=True)
@@ -414,7 +404,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
                     self._resizer.remove_column_right(reconfigure_edges=False)
 
         if old_width != self.width or old_height != self.height:
-            self._reconfigure_edges()
+            self.graph.reconfigure_edges(self.tessellation)
 
     def resize_and_center(self, new_width, new_height):
         left = right = top = bottom = 0
@@ -433,7 +423,10 @@ class VariantBoard(Container, metaclass=ABCMeta):
             for _ in range(0, top):
                 self._resizer.add_row_top(reconfigure_edges=False)
 
-            self.resize(self.width + right, self.height + bottom)
+            if (right, bottom) != (0, 0):
+                self.resize(self.width + right, self.height + bottom)
+            else:
+                self.graph.reconfigure_edges(self.tessellation)
 
     def trim(self):
         old_width = self.width
@@ -445,7 +438,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
         self._resizer.trim_right(reconfigure_edges=False)
 
         if old_width != self.width or old_height != old_height:
-            self._reconfigure_edges()
+            self.graph.reconfigure_edges(self.tessellation)
 
 
 class VariantBoardResizer(metaclass=ABCMeta):
@@ -459,7 +452,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
         self.board = variant_board
 
     def add_row_top(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
         old_height = self.board.height
 
         self.board._reinit(
@@ -474,7 +467,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     old_body[utilities.index_1d(x, y, self.board.width)]
 
     def add_row_bottom(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
         old_height = self.board.height
 
         self.board._reinit(
@@ -489,7 +482,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     old_body[utilities.index_1d(x, y, self.board.width)]
 
     def add_column_left(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
         old_width = self.board.width
 
         self.board._reinit(
@@ -504,7 +497,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     old_body[utilities.index_1d(x, y, old_width)]
 
     def add_column_right(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
         old_width = self.board.width
 
         self.board._reinit(
@@ -519,7 +512,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     old_body[utilities.index_1d(x, y, old_width)]
 
     def remove_row_top(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
 
         self.board._reinit(
             self.board.width,
@@ -533,7 +526,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     old_body[utilities.index_1d(x, y + 1, self.board.width)]
 
     def remove_row_bottom(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
 
         self.board._reinit(
             self.board.width,
@@ -547,7 +540,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     old_body[utilities.index_1d(x, y, self.board.width)]
 
     def remove_column_left(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
         old_width = self.board.width
 
         self.board._reinit(
@@ -562,7 +555,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     old_body[utilities.index_1d(x + 1, y, old_width)]
 
     def remove_column_right(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
         old_width = self.board.width
 
         self.board._reinit(
@@ -584,16 +577,15 @@ class VariantBoardResizer(metaclass=ABCMeta):
                 border_found = self.board[utilities.index_1d(
                     x, y, self.board.width
                 )].is_border_element
-                if border_found:
-                    if x < amount:
-                        amount = x
+                if border_found and x < amount:
+                    amount = x
                     break
 
         for _ in range(0, amount):
             self.remove_column_left(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board.graph.reconfigure_edges(self.board.tessellation)
 
     def trim_right(self, reconfigure_edges):
         self.reverse_columns(reconfigure_edges=False)
@@ -601,7 +593,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
         self.reverse_columns(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board.graph.reconfigure_edges(self.board.tessellation)
 
     def trim_top(self, reconfigure_edges):
         amount = self.board.height
@@ -620,7 +612,7 @@ class VariantBoardResizer(metaclass=ABCMeta):
             self.remove_row_top(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board.graph.reconfigure_edges(self.board.tessellation)
 
     def trim_bottom(self, reconfigure_edges):
         self.reverse_rows(reconfigure_edges=False)
@@ -628,10 +620,10 @@ class VariantBoardResizer(metaclass=ABCMeta):
         self.reverse_rows(reconfigure_edges=False)
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board.graph.reconfigure_edges(self.board.tessellation)
 
     def reverse_rows(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
 
         self.board._reinit(
             self.board.width, self.board.height, reconfigure_edges=False
@@ -645,10 +637,10 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     )]
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board.graph.reconfigure_edges(self.board.tessellation)
 
     def reverse_columns(self, reconfigure_edges):
-        old_body = self.board._graph
+        old_body = self.board.graph
 
         self.board._reinit(
             self.board.width, self.board.height, reconfigure_edges=False
@@ -662,4 +654,4 @@ class VariantBoardResizer(metaclass=ABCMeta):
                     )]
 
         if reconfigure_edges:
-            self.board._reconfigure_edges()
+            self.board.graph.reconfigure_edges(self.board.tessellation)

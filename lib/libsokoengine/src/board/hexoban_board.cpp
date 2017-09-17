@@ -73,7 +73,7 @@ class LIBSOKOENGINE_LOCAL HexobanTextConverter {
     if (width == 0 || height == 0) {
       return make_pair(StringList(), true);
     } else if (even_row_x_parity < 0 || odd_row_x_parity < 0) {
-      for(size_t i = 0; i < height; ++i) {
+      for (size_t i = 0; i < height; ++i) {
         internal_list.push_back(
           string(width / 2, BoardCell::VISIBLE_FLOOR)
         );
@@ -209,12 +209,12 @@ class LIBSOKOENGINE_LOCAL HexobanTextConverter {
 
     // Compensate for scheme2
     bool has_non_floor_left_in_odd_row = false;
-    for(size_t i = 0; i < height && !has_non_floor_left_in_odd_row; ++i) {
+    for (size_t i = 0; i < height && !has_non_floor_left_in_odd_row; ++i) {
       has_non_floor_left_in_odd_row = has_non_floor_left_in_odd_row ||
         (i % 2 == 1 && !BoardCell::is_empty_floor_chr(parsed[i][0]));
     }
     if(has_non_floor_left_in_odd_row) {
-      for(string& line : parsed) line.insert(line.begin(), BoardCell::FLOOR);
+      for (string& line : parsed) line.insert(line.begin(), BoardCell::FLOOR);
       width += 1;
     }
 
@@ -239,7 +239,7 @@ class LIBSOKOENGINE_LOCAL HexobanTextConverter {
   }
 
   void remove_column_right(StringList& list) const {
-    for(string& line: list) line.pop_back();
+    for (string& line: list) line.pop_back();
   }
 
   position_t find_first_non_floor(const StringList& list) const {
