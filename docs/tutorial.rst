@@ -200,6 +200,19 @@ Example of `.HashedBoardState` usage:
 .. code-block:: python
 
     >>> from sokoenginepy import HashedBoardState
+    >>> board = SokobanBoard(board_str="""
+    ...     #####
+    ...     #  @#
+    ...     #$  #
+    ...   ###  $##
+    ...   #  $ $ #
+    ... ### # ## #   ######
+    ... #   # ## #####  ..#
+    ... # $  $          ..#
+    ... ##### ### #@##  ..#
+    ...     #     #########
+    ...     #######
+    ... """[1:-1])
     >>> state = HashedBoardState(board)
     >>> state
     HashedBoardState(SokobanBoard(board_str='\n'.join([
