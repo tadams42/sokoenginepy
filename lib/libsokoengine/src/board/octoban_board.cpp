@@ -1,5 +1,5 @@
 #include "octoban_board.hpp"
-#include "tessellation.hpp"
+#include "octoban_tessellation.hpp"
 
 using namespace std;
 
@@ -10,11 +10,11 @@ OctobanBoard::OctobanBoard() :
 {}
 
 OctobanBoard::OctobanBoard(size_t width, size_t height) :
-  VariantBoard(Tessellation::instance_from("octoban"), width, height)
+  VariantBoard(Tessellation::OCTOBAN, width, height)
 {}
 
 OctobanBoard::OctobanBoard(const string& src) :
-  VariantBoard(Tessellation::instance_from("octoban"), src)
+  VariantBoard(Tessellation::OCTOBAN, src)
 {}
 
 OctobanBoard::OctobanBoard(const OctobanBoard& rv) :

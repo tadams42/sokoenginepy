@@ -268,7 +268,9 @@ class DescribeGameSnapshot:
             assert reverse_sokoban_snapshot._jumps_count_invalidated == before_jumps_invalidate
 
     class Describe_recalc_jumps_count:
-        def it_recalcs_jumps_count_if_necessary(self, reverse_sokoban_snapshot):
+        def it_recalcs_jumps_count_if_necessary(
+            self, reverse_sokoban_snapshot
+        ):
             reverse_sokoban_snapshot._count_jumps = Mock()
 
             reverse_sokoban_snapshot._jumps_count_invalidated = False

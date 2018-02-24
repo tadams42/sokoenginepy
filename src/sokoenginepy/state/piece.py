@@ -1,5 +1,3 @@
-from .. import utilities
-
 #: All pieces on board (pushers, boxes) and goals are assigned ID to be used for
 #: referring them.
 #:

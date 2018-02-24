@@ -10,6 +10,7 @@
 namespace sokoengine {
 
 class BoardCell;
+class Tessellation;
 
 ///
 /// Type of graph
@@ -40,13 +41,8 @@ public:
   ///
   typedef unsigned char weight_t;
 
-  ///
-  /// Internaly used by Dijkstra searches
-  ///
-  static constexpr const weight_t _MAX_EDGE_WEIGHT = Direction::len() + 1;
-
   explicit BoardGraph(
-    size_t number_of_vertices=0,
+    size_t board_width=0, size_t board_height=0,
     const GraphType& graph_type=GraphType::DIRECTED
   );
   BoardGraph(const BoardGraph& rv);
@@ -65,6 +61,8 @@ public:
   bool contains(position_t position) const;
   size_t vertices_count() const;
   size_t edges_count() const;
+  size_t board_width() const;
+  size_t board_height() const;
 
   bool has_edge(position_t source_vertex, position_t dest_vertex, const Direction& direction) const;
   size_t out_edges_count(position_t source_vertex, position_t target_vertex) const;
@@ -86,6 +84,8 @@ public:
   position_t normalized_pusher_position(position_t pusher_position, const Positions& excluded_positions = Positions()) const;
   void mark_play_area();
   position_t path_destination(position_t start_position, const Directions& directions_path) const;
+
+  void reconfigure_edges(const Tessellation& tessellation);
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;

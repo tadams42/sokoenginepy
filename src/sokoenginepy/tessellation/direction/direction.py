@@ -1,7 +1,5 @@
 from enum import IntEnum
 
-from ... import utilities
-
 
 class UnknownDirectionError(ValueError):
     pass

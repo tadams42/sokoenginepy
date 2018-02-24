@@ -15,7 +15,7 @@ StringList TextUtils::normalize_width(
 ) {
   size_t width = calculate_width(string_list);
   StringList retv = string_list;
-  for(string& line : retv) {
+  for (string& line : retv) {
     if (line.length() < width) {
       line.insert(line.end(), width - line.length(), fill_chr);
     }
@@ -25,28 +25,10 @@ StringList TextUtils::normalize_width(
 
 size_t TextUtils::calculate_width(const StringList& string_list) {
   size_t width = 0;
-  for(auto line : string_list)
+  for (auto line : string_list)
     if (line.length() > width) width = line.length();
   return width;
 }
-
-// string& TextUtils::strip_and_downcase(string& line) {
-//   boost::trim(line);
-//   boost::to_lower(line);
-//   return line;
-// }
-//
-// string TextUtils::strip_and_downcase_copy(const string& line) {
-//   string retv = boost::trim_copy(line);
-//   boost::to_lower(retv);
-//   return retv;
-// }
-//
-// void TextUtils::assign_to_blank(string& dest, const string& src) {
-//   if (TextUtils::is_blank(dest)) dest = src;
-// }
-
-// constexpr const char* tag_author() { return "author"; }
 
   namespace implementation {
 
@@ -116,24 +98,25 @@ class LIBSOKOENGINE_LOCAL RLE {
   bool decode_token(string& to_decode) const {
     // Condition also includes situation where input consists exclusively from digits
     bool ends_with_digit = to_decode.empty() ? false : isdigit(to_decode.back()) != 0;
-    if(ends_with_digit) {
-      return false;
-    }
 
-    if(TextUtils::is_blank(to_decode)) {
-      return true;
-    }
+    if(ends_with_digit) return false;
 
-    if ( any_of(to_decode.begin(), to_decode.end(), [] (char c) { return isdigit(c) != 0; }) ) {
+    if(TextUtils::is_blank(to_decode)) return true;
+
+    if (
+      any_of(
+        to_decode.begin(), to_decode.end(),
+        [] (char c) { return isdigit(c) != 0; }
+      )
+    ) {
       istringstream instr;
       noskipws(instr);
       instr.str(to_decode);
       to_decode.clear();
 
-      char c;
       string::size_type nr_chars;
       while (instr) {
-        c = static_cast<char>( instr.peek() );
+        char c = static_cast<char>( instr.peek() );
         if ( !instr.eof() ) {
           if ( isdigit(c) ) {
             instr >> nr_chars;
@@ -175,9 +158,9 @@ class LIBSOKOENGINE_LOCAL RLE {
     string::difference_type ld = count(tline.begin(), tline.end(), m_left_delimiter);
     string::difference_type rd = count(tline.begin(), tline.end(), m_right_delimiter);
 
-    bool count_ok = (ld == rd);
+    bool count_ok = ld == rd;
 
-    return (begin_ok && end_ok && count_ok);
+    return begin_ok && end_ok && count_ok;
   }
 
   // Marks beginning of RLE group (digits before beginning delimiter are also detected).
@@ -190,16 +173,16 @@ class LIBSOKOENGINE_LOCAL RLE {
     if (retv != str_end) {
       bool non_digit_found = false;
       if (retv != from) {
-        retv--;
+        --retv;
       }
       do {
         if ( isdigit(*retv) ) {
           if (retv != from) {
-            retv--;
+            --retv;
           }
         } else {
           if (*retv != m_left_delimiter) {
-            retv++;
+            ++retv;
           }
           non_digit_found = true;
         }
@@ -241,11 +224,7 @@ class LIBSOKOENGINE_LOCAL RLE {
 
     bool non_digit_found;
     if (str_beg != str_end) {
-      if ( !isdigit(*str_beg) ) {
-        non_digit_found = true;
-      } else {
-        non_digit_found = false;
-      }
+      non_digit_found = !isdigit(*str_beg);
     } else {
       non_digit_found = true;
     }

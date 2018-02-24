@@ -13,6 +13,17 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
     Zobrist hash is 64b integer hash derived from positions of all boxes on
     board.
 
+    When initialized, :class:`.HashedBoardState` hashes board using positions
+    and IDs of boxes and produces 64b integer hash. After that, whenever
+    position changes, this hash is updated. The ``Zobrist`` part means hashing
+    is deterministic which then means that undoing box move will return hash
+    value to previous one. All this allows for creation of position tables that
+    contain many board layouts and can be quickly compared (since we are not
+    comparing positions but only hashes of these positions). Being able to
+    quickly compare and find current board layout in some big table, speeds up
+    searching through game space which is needed for effective solver
+    implementations.
+
     For most applications, it is only interesting to use hash of boxes'
     positions. Sometimes might be usefull to have hash derived from both,
     boxes' and pushers' positions.
@@ -153,15 +164,18 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
             self._layout_hash ^= self._boxes_factors[box_plus_id][old_position]
             self._layout_hash ^= self._boxes_factors[box_plus_id
                                                     ][to_new_position]
-            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id
-                                                                 ][old_position]
+            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
+                old_position
+            ]
             self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
                 to_new_position
             ]
 
     def _pusher_moved(self, old_position, to_new_position):
         if old_position != to_new_position:
-            self._layout_with_pushers_hash ^= self._pushers_factors[old_position]
+            self._layout_with_pushers_hash ^= self._pushers_factors[
+                old_position
+            ]
             self._layout_with_pushers_hash ^= self._pushers_factors[
                 to_new_position
             ]

@@ -16,8 +16,9 @@ void export_board_graph(py::module& m) {
   py::class_<BoardGraph>(m, "BoardGraph")
 
     .def(
-      py::init<size_t, GraphType>(),
-      py::arg("number_of_vertices")=0,
+      py::init<size_t, size_t, GraphType>(),
+      py::arg("board_width")=0,
+      py::arg("board_height")=0,
       py::arg("graph_type")=GraphType::DIRECTED
     )
 
@@ -51,6 +52,8 @@ void export_board_graph(py::module& m) {
 
     .def_property_readonly("vertices_count", &BoardGraph::vertices_count)
     .def_property_readonly("edges_count", &BoardGraph::edges_count)
+    .def_property_readonly("board_width", &BoardGraph::board_width)
+    .def_property_readonly("board_height", &BoardGraph::board_height)
 
     .def(
       "has_edge", &BoardGraph::has_edge,
@@ -80,7 +83,7 @@ void export_board_graph(py::module& m) {
       ) -> py::object {
         position_t retv = self.neighbor_at(from_position, direction);
         if (retv == NULL_POSITION) return py::none();
-        else return py::cast(retv);
+        return py::cast(retv);
       },
       py::arg("from_position"), py::arg("direction")
     )
@@ -91,7 +94,7 @@ void export_board_graph(py::module& m) {
       ) {
         auto native_retv = self.wall_neighbors(from_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("from_position")
@@ -103,7 +106,7 @@ void export_board_graph(py::module& m) {
       ) {
         auto native_retv = self.all_neighbors(from_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("from_position")
@@ -116,7 +119,7 @@ void export_board_graph(py::module& m) {
       ) {
         auto native_retv = self.shortest_path(start_position, end_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("start_position"), py::arg("end_position")
@@ -129,7 +132,7 @@ void export_board_graph(py::module& m) {
       ) {
         auto native_retv = self.dijkstra_path(start_position, end_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("start_position"), py::arg("end_position")
@@ -142,7 +145,7 @@ void export_board_graph(py::module& m) {
       ) {
         auto native_retv = self.find_move_path(start_position, end_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("start_position"), py::arg("end_position")
@@ -155,7 +158,7 @@ void export_board_graph(py::module& m) {
       ) {
         auto native_retv = self.find_jump_path(start_position, end_position);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("start_position"), py::arg("end_position")
@@ -166,10 +169,10 @@ void export_board_graph(py::module& m) {
         const BoardGraph& self, const py::list& positions_path
       ) {
         Positions path;
-        for(auto val : positions_path) path.push_back(val.cast<position_t>());
+        for (auto val : positions_path) path.push_back(val.cast<position_t>());
         auto native_retv = self.positions_path_to_directions_path(path);
         py::list retv;
-        for(auto val : native_retv) retv.append(py::cast(val));
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       },
       py::arg("positions_path")
@@ -228,10 +231,9 @@ void export_board_graph(py::module& m) {
       py::arg("start_position"), py::arg("directions_path")
     )
 
-    .def_property_readonly_static(
-      "_MAX_EDGE_WEIGHT", [](const py::object&) {
-        return BoardGraph::_MAX_EDGE_WEIGHT;
-      }
+    .def(
+      "reconfigure_edges", &BoardGraph::reconfigure_edges,
+      py::arg("tessellation")
     )
   ;
 }

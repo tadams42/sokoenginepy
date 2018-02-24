@@ -29,28 +29,22 @@ UnknownTessellationError::UnknownTessellationError(const string& mess):
 
 UnknownTessellationError::~UnknownTessellationError() = default;
 
-const Tessellation& Tessellation::instance_from(const string& name) {
-  static const SokobanTessellation sokoban_tessellation = SokobanTessellation();
-  static const TriobanTessellation trioban_tessellation = TriobanTessellation();
-  static const OctobanTessellation octoban_tessellation = OctobanTessellation();
-  static const HexobanTessellation hexoban_tessellation = HexobanTessellation();
+const SokobanTessellation& Tessellation::SOKOBAN = SokobanTessellation();
+const HexobanTessellation& Tessellation::HEXOBAN = HexobanTessellation();
+const TriobanTessellation& Tessellation::TRIOBAN = TriobanTessellation();
+const OctobanTessellation& Tessellation::OCTOBAN = OctobanTessellation();
 
+const Tessellation& Tessellation::instance_from(const string& name) {
   string check_name = boost::trim_copy(name);
   boost::to_lower(check_name);
 
   if (check_name == "sokoban" or TextUtils::is_blank(name))
-    return sokoban_tessellation;
-  if (check_name == "trioban") return trioban_tessellation;
-  if (check_name == "hexoban") return hexoban_tessellation;
-  if (check_name == "octoban") return octoban_tessellation;
+    return SOKOBAN;
+  if (check_name == "trioban") return TRIOBAN;
+  if (check_name == "hexoban") return HEXOBAN;
+  if (check_name == "octoban") return OCTOBAN;
 
   throw UnknownTessellationError(name);
-}
-
-const Tessellation& Tessellation::instance_from(
-  const Tessellation& tessellation
-) {
-  return instance_from(tessellation.str());
 }
 
 Tessellation::~Tessellation() = default;

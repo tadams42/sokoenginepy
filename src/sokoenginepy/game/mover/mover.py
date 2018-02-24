@@ -1,9 +1,9 @@
-from copy import deepcopy
 from enum import IntEnum
 from itertools import groupby
 
-from ... import board as module_board
-from ... import snapshot, utilities
+from ...snapshot import AtomicMove
+from ...state import (DEFAULT_PIECE_ID, CellAlreadyOccupiedError,
+                      HashedBoardState)
 
 
 class SolvingMode(IntEnum):
@@ -77,10 +77,10 @@ class Mover:
     """
 
     def __init__(self, board, solving_mode=SolvingMode.FORWARD):
-        self._state = module_board.HashedBoardState(board)
+        self._state = HashedBoardState(board)
         self._solving_mode = solving_mode
         self._pulls_boxes = True
-        self._selected_pusher = module_board.DEFAULT_PIECE_ID
+        self._selected_pusher = DEFAULT_PIECE_ID
         self._pull_count = 0
         self._last_move = []
 
@@ -211,7 +211,9 @@ class Mover:
         if pusher_id == self._selected_pusher:
             return
 
-        old_pusher_position = self._state.pusher_position(self._selected_pusher)
+        old_pusher_position = self._state.pusher_position(
+            self._selected_pusher
+        )
         new_pusher_position = self._state.pusher_position(pusher_id)
         selection_path = self._state.board.positions_path_to_directions_path(
             self._state.board.
@@ -220,7 +222,7 @@ class Mover:
 
         self._last_move = []
         for direction in selection_path:
-            atomic_move = snapshot.AtomicMove(direction, False)
+            atomic_move = AtomicMove(direction, False)
             atomic_move.is_pusher_selection = True
             self._last_move.append(atomic_move)
 
@@ -266,7 +268,9 @@ class Mover:
             raise IllegalMoveError('Jumps not allowed after first pull')
 
         if self._solving_mode != SolvingMode.REVERSE:
-            raise IllegalMoveError('Jumps allowed only in reverse solving mode')
+            raise IllegalMoveError(
+                'Jumps allowed only in reverse solving mode'
+            )
 
         old_position = self._state.pusher_position(self._selected_pusher)
         if old_position == new_position:
@@ -274,7 +278,7 @@ class Mover:
 
         try:
             self._state.move_pusher_from(old_position, new_position)
-        except module_board.CellAlreadyOccupiedError as exc:
+        except CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
         path = self._state.board.positions_path_to_directions_path(
@@ -282,7 +286,7 @@ class Mover:
         )
 
         def jump_am(direction):
-            atomic_move = snapshot.AtomicMove(direction, False)
+            atomic_move = AtomicMove(direction, False)
             atomic_move.is_jump = True
             atomic_move.pusher_id = self._selected_pusher
             return atomic_move
@@ -301,6 +305,7 @@ class Mover:
         jump_key = 0
         pusher_change_key = 1
         move_key = 2
+
         def key_functor(elem):
             if elem.is_jump:
                 return jump_key
@@ -312,8 +317,8 @@ class Mover:
             reversed(old_last_moves), key_functor
         ):
             if moves_type == move_key:
-                for am in moves_group:
-                    self._undo_atomic_move(am)
+                for atomic_move in moves_group:
+                    self._undo_atomic_move(atomic_move)
                     new_last_moves += self._last_move
             elif moves_type == jump_key:
                 self._undo_jump(moves_group)
@@ -346,13 +351,13 @@ class Mover:
             self._push_or_move(atomic_move.direction.opposite, options)
 
     def _undo_jump(self, jump_moves):
-        path = [am.direction.opposite for am in jump_moves]
+        path = [atomic_move.direction.opposite for atomic_move in jump_moves]
         old_position = self._state.pusher_position(self._selected_pusher)
         new_position = self._state.board.path_destination(old_position, path)
         self.jump(new_position)
 
     def _undo_pusher_selection(self, selection_moves):
-        path = [am.direction.opposite for am in selection_moves]
+        path = [atomic_move.direction.opposite for atomic_move in selection_moves]
         old_position = self._state.pusher_position(self._selected_pusher)
         new_position = self._state.board.path_destination(old_position, path)
         self.select_pusher(self._state.pusher_id_on(new_position))
@@ -371,8 +376,7 @@ class Mover:
 
         if not in_front_of_pusher:
             raise IllegalMoveError(
-                "Can't move pusher off board! (ID: " +
-                "{0}, direction: {1})".
+                "Can't move pusher off board! (ID: " + "{0}, direction: {1})".
                 format(self._selected_pusher, str(direction))
             )
 
@@ -394,17 +398,17 @@ class Mover:
 
             try:
                 self._state.move_box_from(in_front_of_pusher, in_front_of_box)
-            except module_board.CellAlreadyOccupiedError as exc:
+            except CellAlreadyOccupiedError as exc:
                 raise IllegalMoveError(str(exc))
 
         try:
             self._state.move_pusher_from(
                 initial_pusher_position, in_front_of_pusher
             )
-        except module_board.CellAlreadyOccupiedError as exc:
+        except CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
-        atomic_move = snapshot.AtomicMove(direction, is_push)
+        atomic_move = AtomicMove(direction, is_push)
         atomic_move.pusher_id = self._selected_pusher
         if is_push:
             atomic_move.moved_box_id = self._state.box_id_on(in_front_of_box)
@@ -426,8 +430,7 @@ class Mover:
 
         if not in_front_of_pusher:
             raise IllegalMoveError(
-                "Can't move pusher off board! (ID: " +
-                "{0}, direction: {1})".
+                "Can't move pusher off board! (ID: " + "{0}, direction: {1})".
                 format(self._selected_pusher, str(direction))
             )
 
@@ -435,7 +438,7 @@ class Mover:
             self._state.move_pusher_from(
                 initial_pusher_position, in_front_of_pusher
             )
-        except module_board.CellAlreadyOccupiedError as exc:
+        except CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
         is_pull = False
@@ -449,12 +452,12 @@ class Mover:
                     self._state.move_box_from(
                         behind_pusher, initial_pusher_position
                     )
-                except module_board.CellAlreadyOccupiedError as exc:
+                except CellAlreadyOccupiedError as exc:
                     raise IllegalMoveError(str(exc))
                 if options.increase_pull_count:
                     self._pull_count += 1
 
-        atomic_move = snapshot.AtomicMove(direction, is_pull)
+        atomic_move = AtomicMove(direction, is_pull)
         atomic_move.pusher_id = self._selected_pusher
         if is_pull:
             atomic_move.moved_box_id = self._state.box_id_on(

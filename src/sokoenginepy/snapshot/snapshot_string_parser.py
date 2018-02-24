@@ -4,13 +4,14 @@ from functools import reduce
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
 from .. import utilities
-from .atomic_move import AtomicMove, AtomicMoveCharacters
+from ..tessellation import UnknownDirectionError
+from .atomic_move import AtomicMoveCharacters
 from .snapshot import Snapshot, SnapshotConversionError
 
 _RE_SNAPSHOT_STRING = re.compile(
     r"^([0-9\s" + re.escape("".join(c for c in AtomicMoveCharacters)) +
-    re.escape("".join(c for c in Snapshot.NonMoveCharacters)
-             ) + re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
+    re.escape("".join(c for c in Snapshot.NonMoveCharacters)) +
+    re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
 )
 
 
@@ -24,13 +25,13 @@ class SnapshotStringParser:
         "([" + "".join(c for c in AtomicMoveCharacters) + "])+"
     )
     jump = Group(
-        oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN) + ZeroOrMore(atomic_moves)
-        + oneOf(Snapshot.NonMoveCharacters.JUMP_END)
+        oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN) +
+        ZeroOrMore(atomic_moves) + oneOf(Snapshot.NonMoveCharacters.JUMP_END)
     )
     pusher_change = Group(
-        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN) + ZeroOrMore(
-            atomic_moves
-        ) + oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_END)
+        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN) +
+        ZeroOrMore(atomic_moves) +
+        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_END)
     )
     grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
 
@@ -47,8 +48,8 @@ class SnapshotStringParser:
     @classmethod
     def is_snapshot_string(cls, line):
         return (
-            not utilities.is_blank(line) and
-            not utilities.contains_only_digits_and_spaces(line) and reduce(
+            not utilities.is_blank(line)
+            and not utilities.contains_only_digits_and_spaces(line) and reduce(
                 lambda x, y: x and y, [
                     True if _RE_SNAPSHOT_STRING.match(l) else False
                     for l in line.splitlines()
@@ -66,9 +67,7 @@ class SnapshotStringParser:
             to_snapshot.append(atomic_move)
 
     @classmethod
-    def convert_to_string(
-        cls, snapshot, rle_encode, break_long_lines_at=80
-    ):
+    def convert_to_string(cls, snapshot, rle_encode, break_long_lines_at=80):
         from .. import game
 
         retv = ""
@@ -104,8 +103,8 @@ class SnapshotStringParser:
                 )
 
                 while (
-                    i < iend and conversion_ok and
-                    (jump_flag or pusher_selected_flag)
+                    i < iend and conversion_ok
+                    and (jump_flag or pusher_selected_flag)
                 ):
                     try:
                         retv += snapshot.tessellation.atomic_move_to_char(
@@ -216,7 +215,7 @@ class SnapshotStringParser:
                 convert_success = self._convert_token(
                     token=token[1],
                     tessellation=tessellation,
-                    is_jump=(token[0] == Snapshot.NonMoveCharacters.JUMP_BEGIN),
+                    is_jump=token[0] == Snapshot.NonMoveCharacters.JUMP_BEGIN,
                     is_pusher_change=(
                         token[0] ==
                         Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
@@ -234,8 +233,6 @@ class SnapshotStringParser:
     def _convert_token(
         self, token, tessellation, is_jump=False, is_pusher_change=False
     ):
-        from ..tessellation import UnknownDirectionError
-
         for character in token:
             atomic_move = None
             try:

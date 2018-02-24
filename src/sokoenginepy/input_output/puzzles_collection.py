@@ -1,6 +1,6 @@
 import os
 
-from .. import tessellation
+from ..tessellation import Tessellation
 from .sok_file_format import SOKFileFormat
 
 
@@ -44,13 +44,13 @@ class PuzzlesCollection:
             file_extension == '.txt' or
             file_extension == '.xsb'
         ):
-            return tessellation.Tessellation.SOKOBAN
+            return Tessellation.SOKOBAN
         elif file_extension == '.tsb':
-            return tessellation.Tessellation.TRIOBAN
+            return Tessellation.TRIOBAN
         elif file_extension == '.hsb':
-            return tessellation.Tessellation.HEXOBAN
+            return Tessellation.HEXOBAN
 
-        return tessellation.Tessellation.SOKOBAN
+        return Tessellation.SOKOBAN
 
     def load(self, path):
         with open(path, 'r') as src_file:

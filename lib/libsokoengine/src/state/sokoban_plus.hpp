@@ -13,7 +13,7 @@ namespace sokoengine {
 ///
 class LIBSOKOENGINE_API SokobanPlusDataError: public std::invalid_argument {
 public:
-  SokobanPlusDataError(const std::string& mess);
+  explicit SokobanPlusDataError(const std::string& mess);
   virtual ~SokobanPlusDataError();
 };
 
@@ -22,7 +22,7 @@ public:
 ///
 class LIBSOKOENGINE_API KeyError: public std::invalid_argument {
 public:
-  KeyError(const std::string& mess);
+  explicit KeyError(const std::string& mess);
   virtual ~KeyError();
 };
 

@@ -1,0 +1,6 @@
+src/
+tests/
+setup.py
+setup_ext.py
+bin/
+lib/libsokoengine/

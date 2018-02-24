@@ -79,7 +79,9 @@ class DescribeSokobanPlus:
         ):
             assert sokoban_plus.box_plus_id(42) == SokobanPlus.DEFAULT_PLUS_ID
 
-        def it_returns_box_plus_id_for_enabled_sokoban_plus(self, sokoban_plus):
+        def it_returns_box_plus_id_for_enabled_sokoban_plus(
+            self, sokoban_plus
+        ):
             sokoban_plus.is_enabled = True
             assert sokoban_plus.box_plus_id(2) == sokoban_plus._box_plus_ids[2]
 
@@ -93,8 +95,8 @@ class DescribeSokobanPlus:
             self, sokoban_plus
         ):
             sokoban_plus.is_enabled = True
-            assert sokoban_plus.goal_plus_id(2) == sokoban_plus._goal_plus_ids[2
-                                                                              ]
+            assert sokoban_plus.goal_plus_id(2
+                                            ) == sokoban_plus._goal_plus_ids[2]
 
     class When_it_is_set_to_enabled:
         def it_parses_init_data(self, sokoban_plus):
@@ -117,7 +119,8 @@ class DescribeSokobanPlus:
             self
         ):
             sokoban_plus = SokobanPlusFactory(
-                pieces_count=10, boxorder="1 5 42 {0} 23".
+                pieces_count=10,
+                boxorder="1 5 42 {0} 23".
                 format(SokobanPlus._LEGACY_DEFAULT_PLUS_ID),
                 goalorder="1 5 42 {0} 23".
                 format(SokobanPlus._LEGACY_DEFAULT_PLUS_ID)
@@ -223,6 +226,8 @@ class DescribeSokobanPlus:
             self
         ):
             sokoban_plus = SokobanPlusFactory(
-                goalorder="1 1 2 2 3 3", boxorder="2 2 3 3 1 1", pieces_count=10
+                goalorder="1 1 2 2 3 3",
+                boxorder="2 2 3 3 1 1",
+                pieces_count=10
             )
             assert sokoban_plus.is_valid

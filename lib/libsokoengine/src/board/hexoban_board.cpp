@@ -2,8 +2,7 @@
 #include "sokoban_board.hpp"
 #include "board_cell.hpp"
 #include "atomic_move.hpp"
-#include "tessellation.hpp"
-#include "tessellation.hpp"
+#include "hexoban_tessellation.hpp"
 
 #include <algorithm>
 #include <functional>
@@ -24,11 +23,11 @@ HexobanBoard::HexobanBoard() :
 {}
 
 HexobanBoard::HexobanBoard(size_t width, size_t height) :
-  VariantBoard(Tessellation::instance_from("hexoban"), width, height)
+  VariantBoard(Tessellation::HEXOBAN, width, height)
 {}
 
-HexobanBoard::HexobanBoard(const string& board_str) :
-  VariantBoard(Tessellation::instance_from("hexoban"), board_str)
+HexobanBoard::HexobanBoard(const string& src) :
+  VariantBoard(Tessellation::HEXOBAN, src)
 {}
 
 HexobanBoard::HexobanBoard(const HexobanBoard& rv) :
@@ -60,7 +59,7 @@ class LIBSOKOENGINE_LOCAL HexobanTextConverter {
   typedef tuple<bool, bool> text_cell_position_status_t;
 
   public:
-  pair<StringList, bool> convert_to_internal(const string board_str) const {
+  pair<StringList, bool> convert_to_internal(const string& board_str) const {
     StringList parsed;
     size_t height, width;
     int even_row_x_parity, odd_row_x_parity;
@@ -74,7 +73,7 @@ class LIBSOKOENGINE_LOCAL HexobanTextConverter {
     if (width == 0 || height == 0) {
       return make_pair(StringList(), true);
     } else if (even_row_x_parity < 0 || odd_row_x_parity < 0) {
-      for(size_t i = 0; i < height; ++i) {
+      for (size_t i = 0; i < height; ++i) {
         internal_list.push_back(
           string(width / 2, BoardCell::VISIBLE_FLOOR)
         );
@@ -114,7 +113,7 @@ class LIBSOKOENGINE_LOCAL HexobanTextConverter {
     const size_t width = board.width();
     for (position_t row = 0; row < height; ++row) {
       string tmp;
-      if (row % 2 == 1) {
+      if (row % 2 != 0) {
         tmp += floor_character; // beginning half hex for odd rows
       }
       for (position_t col = 0; col < width; ++col) {
@@ -203,31 +202,33 @@ class LIBSOKOENGINE_LOCAL HexobanTextConverter {
     width = height > 0 ? parsed.front().size() : 0;
     int even_row_x_parity = -1, odd_row_x_parity = -1;
 
-    if (height != 0 && width != 0) {
+    if (height == 0 || width == 0)
+      return make_tuple(
+        parsed, width, height, even_row_x_parity, odd_row_x_parity
+      );
 
-      // Compensate for scheme2
-      bool has_non_floor_left_in_odd_row = false;
-      for(size_t i = 0; i < height && !has_non_floor_left_in_odd_row; ++i) {
-        has_non_floor_left_in_odd_row = has_non_floor_left_in_odd_row ||
-          (i % 2 == 1 && !BoardCell::is_empty_floor_chr(parsed[i][0]));
-      }
-      if(has_non_floor_left_in_odd_row) {
-        for(string& line : parsed) line.insert(line.begin(), BoardCell::FLOOR);
-        width += 1;
-      }
+    // Compensate for scheme2
+    bool has_non_floor_left_in_odd_row = false;
+    for (size_t i = 0; i < height && !has_non_floor_left_in_odd_row; ++i) {
+      has_non_floor_left_in_odd_row = has_non_floor_left_in_odd_row ||
+        (i % 2 == 1 && !BoardCell::is_empty_floor_chr(parsed[i][0]));
+    }
+    if(has_non_floor_left_in_odd_row) {
+      for (string& line : parsed) line.insert(line.begin(), BoardCell::FLOOR);
+      width += 1;
+    }
 
-      position_t first_cell = find_first_non_floor(parsed);
-      if (first_cell != NULL_POSITION) {
-        int first_cell_x_parity = X(first_cell, width) % 2;
-        int first_cell_y_parity = Y(first_cell, width) % 2;
+    position_t first_cell = find_first_non_floor(parsed);
+    if (first_cell != NULL_POSITION) {
+      int first_cell_x_parity = X(first_cell, width) % 2;
+      int first_cell_y_parity = Y(first_cell, width) % 2;
 
-        if (first_cell_y_parity == 0) {
-          even_row_x_parity = first_cell_x_parity;
-        } else {
-          even_row_x_parity = (first_cell_x_parity + 1) % 2;
-        }
-        odd_row_x_parity = (even_row_x_parity + 1) % 2;
+      if (first_cell_y_parity == 0) {
+        even_row_x_parity = first_cell_x_parity;
+      } else {
+        even_row_x_parity = (first_cell_x_parity + 1) % 2;
       }
+      odd_row_x_parity = (even_row_x_parity + 1) % 2;
     }
 
     // cout << "Source: " << endl << board_string << endl << "Parsed: " << endl;
@@ -238,7 +239,7 @@ class LIBSOKOENGINE_LOCAL HexobanTextConverter {
   }
 
   void remove_column_right(StringList& list) const {
-    for(string& line: list) line.pop_back();
+    for (string& line: list) line.pop_back();
   }
 
   position_t find_first_non_floor(const StringList& list) const {

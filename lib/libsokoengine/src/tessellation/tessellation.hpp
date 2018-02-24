@@ -8,8 +8,6 @@
 
 namespace sokoengine {
 
-class AtomicMove;
-
 ///
 /// Special property of BoardCell that is needed in some tessellations and that
 /// depends on cell position.
@@ -20,18 +18,12 @@ enum class LIBSOKOENGINE_API CellOrientation : int {
   OCTAGON = 2
 };
 
-namespace implementation {
-  class LIBSOKOENGINE_LOCAL VariantBoardResizer;
-  class LIBSOKOENGINE_LOCAL VariantBoardParser;
-  class LIBSOKOENGINE_LOCAL VariantBoardPrinter;
-}
-
 ///
 /// Exception.
 ///
 class LIBSOKOENGINE_API UnknownDirectionError: public std::invalid_argument {
 public:
-  UnknownDirectionError(const std::string& mess);
+  explicit UnknownDirectionError(const std::string& mess);
   virtual ~UnknownDirectionError();
 };
 
@@ -40,21 +32,35 @@ public:
 ///
 class LIBSOKOENGINE_API UnknownTessellationError: public std::invalid_argument {
 public:
-  UnknownTessellationError(const std::string& mess);
+  explicit UnknownTessellationError(const std::string& mess);
   virtual ~UnknownTessellationError();
 };
+
+namespace implementation {
+  class LIBSOKOENGINE_LOCAL VariantBoardResizer;
+  class LIBSOKOENGINE_LOCAL VariantBoardParser;
+  class LIBSOKOENGINE_LOCAL VariantBoardPrinter;
+}
+
+class LIBSOKOENGINE_API AtomicMove;
+class LIBSOKOENGINE_API SokobanTessellation;
+class LIBSOKOENGINE_API HexobanTessellation;
+class LIBSOKOENGINE_API TriobanTessellation;
+class LIBSOKOENGINE_API OctobanTessellation;
 
 ///
 /// Base class for tessellations.
 ///
 class LIBSOKOENGINE_API Tessellation {
 public:
+  static const SokobanTessellation& SOKOBAN;
+  static const HexobanTessellation& HEXOBAN;
+  static const OctobanTessellation& OCTOBAN;
+  static const TriobanTessellation& TRIOBAN;
+
   virtual ~Tessellation() = 0;
 
   static const Tessellation& instance_from(const std::string& name);
-  static const Tessellation& instance_from(
-    const Tessellation& tessellation
-  );
 
   bool operator== (const Tessellation& rv) const;
   bool operator!= (const Tessellation& rv) const;
@@ -77,6 +83,9 @@ public:
 
   virtual std::string str() const = 0;
   virtual std::string repr() const = 0;
+
+protected:
+  Tessellation() = default;
 };
 
 ///

@@ -23,6 +23,10 @@ public:
 
   virtual std::string str() const override;
   virtual std::string repr() const override;
+
+protected:
+  OctobanTessellation() = default;
+  friend class Tessellation;
 };
 
 } // namespace sokoengine

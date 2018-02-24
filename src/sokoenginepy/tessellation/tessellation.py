@@ -53,7 +53,7 @@ class Tessellation(Enum):
     #: +----------+----------+
     #: | Scheme 1 | Scheme 2 |
     #: +==========+==========+
-    #: |  |img1|  |  |img1|  |
+    #: |  |img1|  |  |img2|  |
     #: +----------+----------+
     #:
     #: As long as encoding of single board is consistent, all methods handle any
@@ -97,17 +97,11 @@ class Tessellation(Enum):
             utilities.is_blank(str(tessellation_or_description))
         ):
             return cls.SOKOBAN
-        elif (
-            'trioban' in str(tessellation_or_description).lower()
-        ):
+        elif 'trioban' in str(tessellation_or_description).lower():
             return cls.TRIOBAN
-        elif (
-            'hexoban' in str(tessellation_or_description).lower()
-        ):
+        elif 'hexoban' in str(tessellation_or_description).lower():
             return cls.HEXOBAN
-        elif (
-            'octoban' in str(tessellation_or_description).lower()
-        ):
+        elif 'octoban' in str(tessellation_or_description).lower():
             return cls.OCTOBAN
         else:
             raise UnknownTessellationError(tessellation_or_description)

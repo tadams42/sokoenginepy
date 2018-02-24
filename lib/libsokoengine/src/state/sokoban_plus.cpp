@@ -43,11 +43,8 @@ public:
   };
 
   piece_id_t get_plus_id(piece_id_t for_id, const IdsMap& from_where) const {
-    if(m_enabled) {
-      return from_where.at(for_id);
-    } else {
-      return DEFAULT_PLUS_ID;
-    }
+    if(m_enabled) return from_where.at(for_id);
+    return DEFAULT_PLUS_ID;
   }
 
   string rstrip_default_plus_ids(const string& str) const {
@@ -58,14 +55,13 @@ public:
         boost::is_any_of(lexical_cast<string>(SokobanPlus::DEFAULT_PLUS_ID)) ||
         boost::is_space()
       );
-    } else {
-      return trim_right_copy_if(
-        str,
-        boost::is_any_of(
-          lexical_cast<string>(SokobanPlus::DEFAULT_PLUS_ID)
-        ) || boost::is_space()
-      );
     }
+    return trim_right_copy_if(
+      str,
+      boost::is_any_of(
+        lexical_cast<string>(SokobanPlus::DEFAULT_PLUS_ID)
+      ) || boost::is_space()
+    );
   }
 
   IdsMap parse_and_clean_ids_string(const string& ids_str) const {
@@ -77,7 +73,7 @@ public:
     );
 
     vector<piece_id_t> cleaned;
-    for(const string& str_id : trimmed) {
+    for (const string& str_id : trimmed) {
       if (!TextUtils::is_blank(str_id)) {
         piece_id_t converted_id;
         try {
@@ -104,7 +100,7 @@ public:
 
     IdsMap retv;
     piece_id_t index = 0;
-    for(const auto& plus_id : cleaned) {
+    for (const auto& plus_id : cleaned) {
       retv[index + DEFAULT_PIECE_ID] = plus_id;
       index++;
     }
@@ -219,9 +215,8 @@ string SokobanPlus::boxorder() const {
     }
     string tmp2 = boost::algorithm::join(tmp, " ");
     return m_impl->rstrip_default_plus_ids(tmp2);
-  } else {
-    return m_impl->m_boxorder;
   }
+  return m_impl->m_boxorder;
 }
 
 void SokobanPlus::set_boxorder(const string& rv) {
@@ -240,9 +235,8 @@ string SokobanPlus::goalorder() const {
     }
     string tmp2 = boost::algorithm::join(tmp, " ");
     return m_impl->rstrip_default_plus_ids(tmp2);
-  } else {
-    return m_impl->m_goalorder;
   }
+  return m_impl->m_goalorder;
 }
 
 void SokobanPlus::set_goalorder(const string& rv) {
@@ -271,7 +265,6 @@ bool SokobanPlus::is_valid() const {
     m_impl->validate_ids_counts();
     m_impl->validate_id_sets_equality();
   }
-
   return m_impl->m_errors.empty();
 }
 

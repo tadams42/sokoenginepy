@@ -1,7 +1,8 @@
 from collections.abc import Iterable, MutableSequence
 from enum import Enum
 
-from .. import tessellation, utilities
+from .. import utilities
+from ..tessellation import Tessellation, UnknownDirectionError
 
 
 class SnapshotConversionError(ValueError):
@@ -18,7 +19,7 @@ class Snapshot(MutableSequence):
         tessellation_or_description (Tessellation): game tessellation as string
             or :class:`.Tessellation` instance
         solving_mode (SolvingMode): game solving mode
-        moves_data (string): Strings consisting of characters representing
+        moves_data (str): Strings consisting of characters representing
             :class:`.AtomicMove`. If not empty it will be parsed. Also, if not
             empty, solving mode will be parsed from it, and the value of
             ``solving_mode`` argument will be ignored
@@ -39,7 +40,7 @@ class Snapshot(MutableSequence):
         self, tessellation_or_description, solving_mode=None, moves_data=""
     ):
         super().__init__()
-        self._tessellation_instance = tessellation.Tessellation.instance_from(
+        self._tessellation_instance = Tessellation.instance_from(
             tessellation_or_description
         )
         self._solving_mode = None
@@ -59,9 +60,9 @@ class Snapshot(MutableSequence):
             raise SnapshotConversionError(
                 "Snapshot not correctly initialized! Missing solving_mode. " +
                 "Either provide it explicitly or provide moves_data." +
-                "tessellation_or_description: '{0}', solving_mode: {1},".format(
-                    tessellation_or_description, solving_mode
-                ) + " moves_data: {0}".format(moves_data)
+                "tessellation_or_description: '{0}', solving_mode: {1},".
+                format(tessellation_or_description, solving_mode
+                      ) + " moves_data: {0}".format(moves_data)
             )
 
     @classmethod
@@ -138,25 +139,27 @@ class Snapshot(MutableSequence):
         self._moves.__delitem__(index)
 
     # MutableSequence
-    def insert(self, index, atomic_move):
-        self._before_inserting_move(atomic_move)
-        self._moves.insert(index, atomic_move)
+    def insert(self, index, value):
+        self._before_inserting_move(value)
+        self._moves.insert(index, value)
 
     def __repr__(self):
         return (
-            "Snapshot(tessellation=" + "{0}, solving_mode={1}, moves_data={2})".
-            format(repr(self.tessellation), self.solving_mode, str(self))
+            "Snapshot(tessellation=" +
+            "{0}, solving_mode={1}, moves_data={2})".format(
+                repr(self.tessellation), self.solving_mode, str(self)
+            )
         )
 
     def __eq__(self, rv):
         #pylint: disable=protected-access
         return (
-            self.tessellation == rv.tessellation and
-            len(self._moves) == len(rv._moves) and
-            self.solving_mode == rv.solving_mode and
-            self.moves_count == rv.moves_count and
-            self.pushes_count == rv.pushes_count and
-            self.jumps_count == rv.jumps_count and self._moves == rv._moves
+            self.tessellation == rv.tessellation
+            and len(self._moves) == len(rv._moves)
+            and self.solving_mode == rv.solving_mode
+            and self.moves_count == rv.moves_count
+            and self.pushes_count == rv.pushes_count
+            and self.jumps_count == rv.jumps_count and self._moves == rv._moves
         )
 
     def __ne__(self, rv):
@@ -193,7 +196,9 @@ class Snapshot(MutableSequence):
     def to_str(self, break_long_lines_at=80, rle_encode=False):
         from .snapshot_string_parser import SnapshotStringParser
         return SnapshotStringParser.convert_to_string(
-            self, break_long_lines_at=break_long_lines_at, rle_encode=rle_encode
+            self,
+            break_long_lines_at=break_long_lines_at,
+            rle_encode=rle_encode
         )
 
     def __str__(self):
@@ -214,12 +219,12 @@ class Snapshot(MutableSequence):
             self._solving_mode == game.SolvingMode.FORWARD and
             atomic_move.is_jump
         ):
-            raise SnapshotConversionError (
+            raise SnapshotConversionError(
                 "Forward mode snapshots are not allowed to contain jumps!"
             )
 
         if atomic_move.direction not in self.tessellation.legal_directions:
-            raise tessellation.UnknownDirectionError(
+            raise UnknownDirectionError(
                 "Invalid direction for tessellation '{0}'".
                 format(self.tessellation)
             )

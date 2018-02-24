@@ -20,7 +20,7 @@ public:
     SMALL, LARGE
   };
 
-  BoardType(EBoardType which) : m_board_type(which) {}
+  explicit BoardType(EBoardType which) : m_board_type(which) {}
 
   SokobanBoard board() const {
     if (m_board_type == SMALL) {
@@ -74,7 +74,7 @@ public:
     FORWARD_MOVER, REVERSE_MOVER
   };
 
-  BenchmarkType(EBenchmarkType which) : m_type(which) {}
+  explicit BenchmarkType(EBenchmarkType which) : m_type(which) {}
 
   bool is_reverse() const {
     return m_type == REVERSE_MOVER;

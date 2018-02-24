@@ -4,7 +4,7 @@ Game
 SolvingMode
 -----------
 
-.. autoclass:: sokoenginepy.SolvingMode
+.. autoclass:: sokoenginepy.game.SolvingMode
     :members:
     :undoc-members:
     :inherited-members:
@@ -13,11 +13,11 @@ SolvingMode
 Mover
 -----
 
-.. autoexception:: sokoenginepy.game.mover.IllegalMoveError
+.. autoexception:: sokoenginepy.game.IllegalMoveError
 
-.. autoexception:: sokoenginepy.game.mover.NonPlayableBoardError
+.. autoexception:: sokoenginepy.game.NonPlayableBoardError
 
-.. autoclass:: sokoenginepy.Mover
+.. autoclass:: sokoenginepy.game.Mover
     :members:
     :undoc-members:
     :inherited-members:

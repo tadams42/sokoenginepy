@@ -7,27 +7,21 @@ using namespace sokoengine;
 
 
 void export_direction(py::module& m) {
-  py::enum_<EDirection>(m, "EDirection")
-    .value("UP", EDirection::UP)
-    .value("NORTH_EAST", EDirection::NORTH_EAST)
-    .value("RIGHT", EDirection::RIGHT)
-    .value("SOUTH_EAST", EDirection::SOUTH_EAST)
-    .value("DOWN", EDirection::DOWN)
-    .value("SOUTH_WEST", EDirection::SOUTH_WEST)
-    .value("LEFT", EDirection::LEFT)
-    .value("NORTH_WEST", EDirection::NORTH_WEST)
-    // We don't want constants be available in module scope
-    // .export_values()
-  ;
-
   py::class_<Direction>(m, "Direction")
-    .def(py::init<const EDirection&>(), py::arg("value")=EDirection::UP)
+    .def(
+      py::init(
+        [](Direction::packed_t packed) { return Direction::unpack(packed); }
+      ),
+      py::return_value_policy::reference
+    )
 
     // protocols
     .def("__eq__", &Direction::operator==)
     .def("__ne__", &Direction::operator!=)
     .def("__str__", &Direction::str)
     .def("__repr__", &Direction::repr)
+
+    .def_static("__len__", []() { return static_cast<int>(Direction::len()); })
 
     .def_property_readonly(
       "opposite", &Direction::opposite, py::return_value_policy::reference
@@ -58,14 +52,17 @@ void export_direction(py::module& m) {
       "SOUTH_WEST", &Direction::SOUTH_WEST, py::return_value_policy::reference
     )
 
-    .def(py::pickle(
-      [](const Direction &self) { // __getstate__
-        return py::make_tuple(self.m_direction);
-      },
-      [](py::tuple t) { // __setstate__
-        if (t.size() != 1) throw std::runtime_error("Invalid state!");
-        return make_unique<Direction>(t[0].cast<EDirection>());
-      }
-    ))
+    .def(
+      py::pickle(
+        [](const Direction &self) { // __getstate__
+          return py::make_tuple(self.pack());
+        },
+        [](py::tuple t) { // __setstate__
+          if (t.size() != 1) throw std::runtime_error("Invalid state!");
+          return Direction::unpack(t[0].cast<Direction::packed_t>());
+        }
+      ),
+      py::return_value_policy::reference
+    )
   ;
 }

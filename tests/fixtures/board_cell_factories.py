@@ -8,7 +8,9 @@ class BoardCellFactory(factory.Factory):
     class Meta:
         model = BoardCell
 
-    character = factory.LazyAttribute(lambda x: BoardCellCharacters.FLOOR.value)
+    character = factory.LazyAttribute(
+        lambda x: BoardCellCharacters.FLOOR.value
+    )
 
 
 @pytest.fixture

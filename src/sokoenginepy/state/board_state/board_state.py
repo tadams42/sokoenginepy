@@ -581,7 +581,9 @@ class BoardState:
         goals_ids = list(self.goals_ids)
         for goal_id in goals_ids:
             predicate = partial(is_box_goal_pair, goal_id=goal_id)
-            index, box_id = next(filter(predicate, enumerate(boxes_todo)), None)
+            index, box_id = next(
+                filter(predicate, enumerate(boxes_todo)), None
+            )
             yield box_id, goal_id
             del boxes_todo[index]
 
@@ -626,6 +628,6 @@ class BoardState:
     @property
     def is_playable(self):
         return (
-            self.pushers_count > 0 and self.boxes_count == self.goals_count and
-            self.boxes_count > 0 and self.goals_count > 0
+            self.pushers_count > 0 and self.boxes_count == self.goals_count
+            and self.boxes_count > 0 and self.goals_count > 0
         )

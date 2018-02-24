@@ -1,4 +1,4 @@
-import cProfile
+# import cProfile
 from textwrap import dedent
 
 from sokoenginepy import Direction, Mover, SokobanBoard
@@ -20,15 +20,29 @@ moves_cycle =  3000 * [
     Direction.RIGHT, Direction.UP
 ]
 
-def main():
+def moves_profile():
     for d in moves_cycle:
         mover.move(d)
 
-# if __name__ == "__main__":
-#     main()
 
-cProfile.run('main()', 'moves_profile.prof')
-cProfile.run('mover.move(Direction.LEFT)', 'single_move_profile.prof')
+def single_move_profile():
+    mover.move(Direction.LEFT)
+
+
+def single_moves_cycle_profile():
+    moves_cycle = [
+        Direction.LEFT, Direction.DOWN, Direction.LEFT, Direction.LEFT,
+        Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.RIGHT,
+        Direction.RIGHT, Direction.UP
+    ]
+    for d in moves_cycle:
+        mover.move(d)
+
+if __name__ == "__main__":
+    single_moves_cycle_profile()
+
+# cProfile.run('main()', 'moves_profile.prof')
+# cProfile.run('mover.move(Direction.LEFT)', 'single_move_profile.prof')
 
 # pip install pyprof2calltree
 # python bin/mover_profiling.py

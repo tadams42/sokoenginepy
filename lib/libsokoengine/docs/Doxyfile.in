@@ -791,6 +791,7 @@ WARN_LOGFILE           = "${sokoenginecpp_BINARY_DIR}/doc/Doxygen.log"
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = "${sokoenginecpp_SOURCE_DIR}/src" \
+                         "${sokoenginecpp_SOURCE_DIR}/README.md" \
                          "${sokoenginecpp_SOURCE_DIR}/INSTALL.md"
 
 # This tag can be used to specify the character encoding of the source files

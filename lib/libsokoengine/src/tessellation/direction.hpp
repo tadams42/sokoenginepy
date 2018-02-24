@@ -8,19 +8,10 @@
 namespace sokoengine {
 
 ///
-/// Direction values.
-///
-enum class LIBSOKOENGINE_API EDirection : unsigned char {
-  UP, NORTH_EAST, RIGHT, SOUTH_EAST, DOWN, SOUTH_WEST, LEFT, NORTH_WEST
-};
-
-///
 /// Movement directions.
 ///
 class LIBSOKOENGINE_API Direction {
 public:
-  EDirection m_direction;
-
   static const Direction& UP;
   static const Direction& DOWN;
   static const Direction& LEFT;
@@ -29,8 +20,6 @@ public:
   static const Direction& NORTH_EAST;
   static const Direction& SOUTH_WEST;
   static const Direction& SOUTH_EAST;
-
-  explicit Direction(const EDirection& value = EDirection::UP);
 
   bool operator== (const Direction& rv) const;
   bool operator!= (const Direction& rv) const;
@@ -49,6 +38,15 @@ public:
   packed_t pack() const;
   std::string repr() const;
   std::string str() const;
+
+private:
+  enum class LIBSOKOENGINE_API EDirection : unsigned char {
+    UP, NORTH_EAST, RIGHT, SOUTH_EAST, DOWN, SOUTH_WEST, LEFT, NORTH_WEST
+  };
+
+  explicit Direction(const EDirection& value = EDirection::UP);
+
+  EDirection m_direction;
 };
 
 } // namespace sokoengine

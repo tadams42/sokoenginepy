@@ -24,6 +24,10 @@ public:
   virtual const implementation::VariantBoardResizer& resizer() const override;
   virtual const implementation::VariantBoardPrinter& printer() const override;
   virtual const implementation::VariantBoardParser& parser() const override;
+
+protected:
+  HexobanTessellation() = default;
+  friend class Tessellation;
 };
 
 } // namespace sokoengine

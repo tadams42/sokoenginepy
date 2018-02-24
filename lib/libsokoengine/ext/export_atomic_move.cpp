@@ -64,8 +64,8 @@ void export_atomic_move(py::module& m) {
     .def_property(
       "moved_box_id",
       [](const AtomicMove& self) -> py::object {
-        if (self.moved_box_id() == NULL_ID) return py::none();  // return None
-        else return py::cast(self.moved_box_id());
+        if (self.moved_box_id() == NULL_ID) return py::none();
+        return py::cast(self.moved_box_id());
       },
       [](AtomicMove& self, const py::object& val) {
         if (val.is_none()) self.set_moved_box_id(NULL_ID);
@@ -78,7 +78,7 @@ void export_atomic_move(py::module& m) {
       "pusher_id",
       [](const AtomicMove& self) -> py::object {
         if (self.pusher_id() == NULL_ID) return py::none();  // return None
-        else return py::cast(self.pusher_id());
+        return py::cast(self.pusher_id());
       },
       [](AtomicMove& self, const py::object& val) {
         if (val.is_none()) self.set_pusher_id(NULL_ID);

@@ -9,7 +9,6 @@ https://github.com/pypa/sampleproject
 from __future__ import absolute_import, print_function
 
 import io
-import os
 import re
 from glob import glob
 from os.path import basename, dirname, join, splitext
@@ -27,7 +26,7 @@ def read(*names, **kwargs):
 
 setup(
     name='sokoenginepy',
-    version='0.5.2',
+    version='0.5.3',
     license='GPLv3',
     description='Sokoban and variants game engine',
     long_description='%s\n%s' % (
@@ -66,7 +65,7 @@ setup(
     install_requires=[
         'pytz >=2016.6.1',
         'pyparsing >=2.1.0',
-        'networkx >=1.11',
+        'networkx <2.0.0',
         'cached-property >=1.2.0',
         'pybind11>=2.2.0'
     ],
@@ -83,6 +82,11 @@ setup(
             'bumpversion',
             'isort',
             'check-manifest',
+
+            # Cool linters
+            'pylama',
+            'pylint',
+            'radon',
 
             # IPython stuff
             'ipython',

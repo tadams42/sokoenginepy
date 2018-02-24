@@ -1,64 +1,23 @@
-Boards
-======
-
-.. automodule:: sokoenginepy.board.piece
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :exclude-members: InvalidPieceIdError
+Board
+=====
 
 BoardCell
 ---------
 
-.. autoexception:: sokoenginepy.board.board_cell.BoardConversionError
+.. autoexception:: sokoenginepy.board.BoardConversionError
 
-.. autoexception:: sokoenginepy.board.board_cell.IllegalBoardCharacterError
+.. autoexception:: sokoenginepy.board.IllegalBoardCharacterError
 
-.. autoclass:: sokoenginepy.BoardCell
+.. autoclass:: sokoenginepy.board.BoardCell
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-
-BoardState
-----------
-
-.. autoexception:: sokoenginepy.board.board_state.BoxGoalSwitchError
-
-.. autoexception:: sokoenginepy.board.board_state.CellAlreadyOccupiedError
-
-.. autoclass:: sokoenginepy.board.board_state.board_state.BoardState
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-HashedBoardState
-----------------
-
-.. autoclass:: sokoenginepy.board.hashed_board_state.HashedBoardState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-BoardGraph
-----------
-
-.. autoclass:: sokoenginepy.GraphType
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-.. autoclass:: sokoenginepy.board.graph.board_graph.BoardGraph
-    :members:
-    :undoc-members:
-    :inherited-members:
 
 VariantBoard
 ------------
 
-.. autoclass:: sokoenginepy.board.variant_board.VariantBoard
+.. autoclass:: sokoenginepy.board.variant_board.variant_board.VariantBoard
     :members:
     :undoc-members:
     :inherited-members:
@@ -67,7 +26,7 @@ VariantBoard
 SokobanBoard
 ------------
 
-.. autoclass:: sokoenginepy.SokobanBoard
+.. autoclass:: sokoenginepy.board.SokobanBoard
     :members:
     :undoc-members:
     :show-inheritance:
@@ -75,7 +34,7 @@ SokobanBoard
 HexobanBoard
 ------------
 
-.. autoclass:: sokoenginepy.HexobanBoard
+.. autoclass:: sokoenginepy.board.HexobanBoard
     :members:
     :undoc-members:
     :show-inheritance:
@@ -83,7 +42,7 @@ HexobanBoard
 TriobanBoard
 ------------
 
-.. autoclass:: sokoenginepy.TriobanBoard
+.. autoclass:: sokoenginepy.board.TriobanBoard
     :members:
     :undoc-members:
     :show-inheritance:
@@ -91,18 +50,7 @@ TriobanBoard
 OctobanBoard
 ------------
 
-.. autoclass:: sokoenginepy.OctobanBoard
+.. autoclass:: sokoenginepy.board.OctobanBoard
     :members:
     :undoc-members:
-    :show-inheritance:
-
-SokobanPlus
------------
-
-.. autoexception:: sokoenginepy.board.sokoban_plus.SokobanPlusDataError
-
-.. autoclass:: sokoenginepy.SokobanPlus
-    :members:
-    :undoc-members:
-    :inherited-members:
     :show-inheritance:

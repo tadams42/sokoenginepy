@@ -20,7 +20,9 @@ class TessellationBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def neighbor_position(self, position, direction, board_width, board_height):
+    def neighbor_position(
+        self, position, direction, board_width, board_height
+    ):
         """Calculates neighbor position in given direction.
 
         Position is always expressed as 1D index of board graph vertex. To
@@ -61,7 +63,7 @@ class TessellationBase(metaclass=ABCMeta):
         Raises:
             :exc:`.UnknownDirectionError` if conversion not possible.
         """
-        from .. import snapshot
+        from ..snapshot import AtomicMove
 
         direction, box_moved = self._char_to_atomic_move_dict.get(
             input_chr, (None, None)
@@ -70,7 +72,7 @@ class TessellationBase(metaclass=ABCMeta):
         if direction is None:
             raise UnknownDirectionError(input_chr)
 
-        return snapshot.AtomicMove(direction=direction, box_moved=box_moved)
+        return AtomicMove(direction=direction, box_moved=box_moved)
 
     @property
     @abstractmethod
@@ -84,7 +86,7 @@ class TessellationBase(metaclass=ABCMeta):
         """Converts :class:`.AtomicMove` to string
 
         Returns:
-           string: resulting string representation of :class:`.AtomicMove`
+           str: resulting string representation of :class:`.AtomicMove`
 
         Raises:
             :exc:`.UnknownDirectionError` if conversion not possible.

@@ -32,6 +32,10 @@ public:
   hash_vector_t m_pushers_factors;
   HashedBoardState::solution_hashes_t m_solutions_hashes;
 
+  PIMPL() {}
+  PIMPL(PIMPL&& rv) = default;
+  PIMPL& operator=(PIMPL&& rv) = default;
+
   static std::string to_str(const hash_vector_t& v, int add_indent = 0) {
     string indent(add_indent,  ' ');
 
@@ -39,7 +43,7 @@ public:
       StringList retv;
 
       StringList tmp;
-      for(auto id : v) {
+      for (auto id : v) {
         tmp.push_back(boost::lexical_cast<string>(id));
         if (tmp.size() == 5) {
           retv.push_back(indent + "    " + boost::join(tmp, ", "));
@@ -136,23 +140,15 @@ public:
 
     m_solutions_hashes.clear();
   }
+
+protected:
+  PIMPL(const PIMPL&) = delete;
+  PIMPL& operator=(const PIMPL&) = delete;
 }; // HashedBoardState::PIMPL
 
 HashedBoardState::HashedBoardState(VariantBoard &board)
     : BoardState(board), m_impl(std::make_unique<PIMPL>())
 {}
-
-HashedBoardState::HashedBoardState(const HashedBoardState &rv)
-    : BoardState(rv), m_impl(std::make_unique<PIMPL>(*rv.m_impl))
-{}
-
-HashedBoardState &HashedBoardState::operator=(const HashedBoardState &rv) {
-  if (this != &rv) {
-    BoardState::operator=(rv);
-    m_impl = std::make_unique<PIMPL>(*rv.m_impl);
-  }
-  return *this;
-}
 
 HashedBoardState::HashedBoardState(HashedBoardState &&) = default;
 
@@ -275,7 +271,7 @@ const HashedBoardState::solution_hashes_t& HashedBoardState::solution_hashes() c
 string HashedBoardState::to_str(const solution_hashes_t& v) {
   auto converter = [&]() {
     StringList retv;
-    for(auto id : v) {
+    for (auto id : v) {
       retv.push_back(boost::lexical_cast<string>(id));
     }
     return retv;

@@ -23,14 +23,18 @@ class DescribeOctobanTessellation(
     ]
 
     legal_moves = [
-        AtomicMove(Direction.LEFT, False), AtomicMove(Direction.RIGHT, False),
-        AtomicMove(Direction.UP, False), AtomicMove(Direction.DOWN, False),
+        AtomicMove(Direction.LEFT, False),
+        AtomicMove(Direction.RIGHT, False),
+        AtomicMove(Direction.UP, False),
+        AtomicMove(Direction.DOWN, False),
         AtomicMove(Direction.NORTH_WEST, False),
         AtomicMove(Direction.NORTH_EAST, False),
         AtomicMove(Direction.SOUTH_WEST, False),
         AtomicMove(Direction.SOUTH_EAST, False),
-        AtomicMove(Direction.LEFT, True), AtomicMove(Direction.RIGHT, True),
-        AtomicMove(Direction.UP, True), AtomicMove(Direction.DOWN, True),
+        AtomicMove(Direction.LEFT, True),
+        AtomicMove(Direction.RIGHT, True),
+        AtomicMove(Direction.UP, True),
+        AtomicMove(Direction.DOWN, True),
         AtomicMove(Direction.NORTH_WEST, True),
         AtomicMove(Direction.NORTH_EAST, True),
         AtomicMove(Direction.SOUTH_WEST, True),

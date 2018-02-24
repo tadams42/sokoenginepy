@@ -13,7 +13,7 @@ namespace sokoengine {
 ///
 class LIBSOKOENGINE_API BoardConversionError: public std::runtime_error {
 public:
-  BoardConversionError(const std::string& mess);
+  explicit BoardConversionError(const std::string& mess);
   virtual ~BoardConversionError();
 };
 
@@ -22,7 +22,7 @@ public:
 ///
 class LIBSOKOENGINE_API IllegalBoardCharacterError: public std::invalid_argument {
 public:
-  IllegalBoardCharacterError(const std::string& mess);
+  explicit IllegalBoardCharacterError(const std::string& mess);
   virtual ~IllegalBoardCharacterError();
 };
 

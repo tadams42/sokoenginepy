@@ -50,36 +50,13 @@ public:
     }
   }
 
-  PIMPL(const PIMPL& rv) :
-    m_initial_board(rv.m_initial_board->create_clone()),
-    m_state(rv.m_state),
-    m_solving_mode(rv.m_solving_mode),
-    m_pulls_boxes(rv.m_pulls_boxes),
-    m_selected_pusher(rv.m_selected_pusher),
-    m_pull_count(rv.m_pull_count),
-    m_last_move(rv.m_last_move)
-  {}
-
-  PIMPL& operator=(const PIMPL& rv) {
-    if (this != &rv) {
-      m_initial_board = rv.m_initial_board->create_clone();
-      m_state = rv.m_state;
-      m_solving_mode = rv.m_solving_mode;
-      m_pulls_boxes = rv.m_pulls_boxes;
-      m_selected_pusher = rv.m_selected_pusher;
-      m_pull_count = rv.m_pull_count;
-      m_last_move = rv.m_last_move;
-    }
-    return *this;
-  }
-
   PIMPL(PIMPL&& rv) = default;
   PIMPL& operator=(PIMPL&& rv) = default;
 
   struct MoveWorkerOptions {
-    bool decrease_pull_count;
-    bool increase_pull_count;
-    bool force_pulls;
+    bool decrease_pull_count = false;
+    bool increase_pull_count = false;
+    bool force_pulls = false;
   };
 
   void select_pusher (piece_id_t pusher_id) {
@@ -330,22 +307,15 @@ public:
     position_t new_position = m_state.board().path_destination(old_position, path);
     select_pusher(m_state.pusher_id_on(new_position));
   }
+
+protected:
+  PIMPL(const PIMPL&) = delete;
+  PIMPL& operator=(const PIMPL&) = delete;
 };
 
 Mover::Mover(VariantBoard& board, const SolvingMode& mode) :
   m_impl(std::make_unique<PIMPL>(board, mode))
 {}
-
-Mover::Mover(const Mover& rv) :
-  m_impl(std::make_unique<PIMPL>(*rv.m_impl))
-{}
-
-Mover& Mover::operator=(const Mover& rv) {
-  if (this != &rv) {
-      m_impl = std::make_unique<PIMPL>(*rv.m_impl);
-  }
-  return *this;
-}
 
 Mover::Mover(Mover &&) = default;
 

@@ -17,7 +17,7 @@ class VariantBoard;
 ///
 class LIBSOKOENGINE_API CellAlreadyOccupiedError: public std::runtime_error {
 public:
-  CellAlreadyOccupiedError(const std::string& mess);
+  explicit CellAlreadyOccupiedError(const std::string& mess);
   virtual ~CellAlreadyOccupiedError();
 };
 
@@ -26,7 +26,7 @@ public:
 ///
 class LIBSOKOENGINE_API BoxGoalSwitchError: public std::runtime_error {
 public:
-  BoxGoalSwitchError(const std::string& mess);
+  explicit BoxGoalSwitchError(const std::string& mess);
   virtual ~BoxGoalSwitchError();
 };
 
@@ -40,9 +40,7 @@ public:
     return pid >= DEFAULT_PIECE_ID;
   }
 
-  BoardState(VariantBoard& board);
-  BoardState(const BoardState& rv);
-  BoardState& operator=(const BoardState& rv);
+  explicit BoardState(VariantBoard& board);
   BoardState(BoardState&& rv);
   BoardState& operator=(BoardState&& rv);
   virtual ~BoardState();
@@ -119,6 +117,9 @@ public:
 protected:
   virtual void pusher_moved(position_t old_position, position_t to_new_position);
   virtual void box_moved(position_t old_position, position_t to_new_position);
+
+  BoardState(const BoardState&) = delete;
+  BoardState& operator=(const BoardState&) = delete;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;

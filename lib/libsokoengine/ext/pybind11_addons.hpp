@@ -25,7 +25,7 @@ namespace pybind11 {
   struct extract
   {
     py::handle obj;
-    extract( py::handle aobj ) : obj(aobj) {}
+    explicit extract( py::handle aobj ) : obj(aobj) {}
 
     bool check() { return CheckCast<T>(obj); }
     T operator()() { return obj.cast<T>(); }

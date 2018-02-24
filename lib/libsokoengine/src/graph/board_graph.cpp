@@ -1,5 +1,6 @@
 #include "board_graph.hpp"
 #include "board_cell.hpp"
+#include "tessellation.hpp"
 
 #include <algorithm>
 #include <boost/foreach.hpp>
@@ -48,23 +49,22 @@ namespace implementation {
 
 using namespace implementation;
 
-const BoardGraph::weight_t BoardGraph::_MAX_EDGE_WEIGHT;
+static constexpr const BoardGraph::weight_t _MAX_EDGE_WEIGHT = 100;
 
 class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
 public:
   typedef std::function<bool (position_t)> IsObstacleFunctor;
   GraphT m_graph;
   GraphType m_graph_type;
+  size_t m_board_width;
+  size_t m_board_height;
 
-  /// Cached values of some of graph properties
-  size_t m_number_of_vertices;
-
-  PIMPL(size_t number_of_vertices, const GraphType& graph_type) :
-    m_graph(number_of_vertices), m_graph_type(graph_type),
-    m_number_of_vertices(0)
-  {
-    m_number_of_vertices = num_vertices(m_graph);
-  }
+  PIMPL(
+    size_t board_width, size_t board_height, const GraphType& graph_type
+  ) :
+    m_graph(board_width * board_height), m_graph_type(graph_type),
+    m_board_width(board_width), m_board_height(board_height)
+  {}
 
   PIMPL(const PIMPL& rv) = default;
   PIMPL& operator=(const PIMPL& rv) = default;
@@ -81,7 +81,11 @@ public:
   }
 
   bool contains(position_t position) const {
-    return position < m_number_of_vertices;
+    return position < vertices_count();
+  }
+
+  size_t vertices_count() const {
+    return m_board_width * m_board_height;
   }
 
   BoardGraph::weight_t out_edge_weight(position_t target_position) const {
@@ -115,7 +119,7 @@ public:
       );
     };
 
-    vector<bool> visited(m_number_of_vertices, false);
+    vector<bool> visited(vertices_count(), false);
     visited[root] = true;
 
     typedef deque<position_t> PositionsQueue;
@@ -141,8 +145,10 @@ public:
   }
 };
 
-BoardGraph::BoardGraph(size_t number_of_vertices, const GraphType& graph_type) :
-  m_impl(std::make_unique<PIMPL>(number_of_vertices, graph_type))
+BoardGraph::BoardGraph(
+  size_t board_width, size_t board_height, const GraphType& graph_type
+) :
+  m_impl(std::make_unique<PIMPL>(board_width, board_height, graph_type))
 {}
 
 BoardGraph::BoardGraph(const BoardGraph& rv) :
@@ -189,10 +195,14 @@ bool BoardGraph::contains(position_t position) const {
 }
 
 size_t BoardGraph::vertices_count() const {
-  return m_impl->m_number_of_vertices;
+  return m_impl->vertices_count();
 }
 
 size_t BoardGraph::edges_count() const { return num_edges(m_impl->m_graph); }
+
+size_t BoardGraph::board_width() const { return m_impl->m_board_width; }
+
+size_t BoardGraph::board_height() const { return m_impl->m_board_height; }
 
 bool BoardGraph::has_edge(
   position_t source_vertex, position_t dest_vertex, const Direction& direction
@@ -316,7 +326,7 @@ Positions BoardGraph::shortest_path(
   if (!contains(start_position) || !contains(end_position))
     throw out_of_range("Board index out of range!");
 
-  deque<vertex_descriptor> predecesors(m_impl->m_number_of_vertices);
+  deque<vertex_descriptor> predecesors(m_impl->vertices_count());
   auto predecessors_map = make_iterator_property_map(
     predecesors.begin(), get(boost::vertex_index, m_impl->m_graph)
   );
@@ -337,7 +347,7 @@ Positions BoardGraph::shortest_path(
   predecessors_map[start] = start;
   vertex_descriptor u = predecessors_map[end];
   vertex_descriptor v = end;
-  for(;
+  for (;
     // Keep tracking the path until we get to the source
     u != v;
     // Set the current vertex to the current predecessor, and the
@@ -358,8 +368,8 @@ Positions BoardGraph::dijkstra_path(
 
   const_cast<BoardGraph*>(this)->m_impl->set_weights_to_edges();
 
-  deque<double> distances(m_impl->m_number_of_vertices);
-  deque<vertex_descriptor> predecesors(m_impl->m_number_of_vertices);
+  deque<double> distances(m_impl->vertices_count());
+  deque<vertex_descriptor> predecesors(m_impl->vertices_count());
 
   auto weightmap = get(&GraphEdgePropertyT::weight, m_impl->m_graph);
   auto distances_map = make_iterator_property_map(
@@ -384,7 +394,7 @@ Positions BoardGraph::dijkstra_path(
   predecessors_map[start] = start;
   vertex_descriptor u = predecessors_map[end];
   vertex_descriptor v = end;
-  for(;
+  for (;
     // Keep tracking the path until we get to the source
     u != v;
     // Set the current vertex to the current predecessor, and the
@@ -412,7 +422,7 @@ Positions BoardGraph::find_move_path(
     i++;
   }
 
-  for(; i != end; i++) {
+  for (; i != end; i++) {
     if (cell(*i).can_put_pusher_or_box()) retv.push_back(*i);
     else break;
   }
@@ -443,7 +453,7 @@ Directions BoardGraph::positions_path_to_directions_path(
   if (positions_path.size() <= 1) return retv;
 
   auto i = positions_path.begin(); i++;
-  for(; i != positions_path.end(); ++i) {
+  for (; i != positions_path.end(); ++i) {
     position_t src_vertex = positions_path[src_vertex_index];
     position_t target_vertex = *i;
     src_vertex_index += 1;
@@ -467,7 +477,7 @@ void BoardGraph::mark_play_area() {
   Positions piece_positions;
   size_t vertice_count = vertices_count();
 
-  for(position_t i = 0; i < vertice_count; ++i) {
+  for (position_t i = 0; i < vertice_count; ++i) {
     if (cell(i).has_box() || cell(i).has_pusher()) {
       cell(i).set_is_in_playable_area(true);
       piece_positions.push_back(i);
@@ -480,11 +490,11 @@ void BoardGraph::mark_play_area() {
     return cell(pos).is_wall();
   };
 
-  for(auto piece_position : piece_positions) {
+  for (auto piece_position : piece_positions) {
     Positions reachables_pos = m_impl->reachables(
       piece_position, piece_positions, is_obstacle
     );
-    for(auto reachable_position : reachables_pos) {
+    for (auto reachable_position : reachables_pos) {
       cell(reachable_position).set_is_in_playable_area(true);
     }
   }
@@ -508,7 +518,7 @@ position_t BoardGraph::normalized_pusher_position(
   );
   if (reachables_pos.size() > 0)
     return *min_element(reachables_pos.cbegin(), reachables_pos.cend());
-  else return pusher_position;
+  return pusher_position;
 }
 
 position_t BoardGraph::path_destination(
@@ -520,13 +530,26 @@ position_t BoardGraph::path_destination(
   position_t retv = start_position, next_target;
   for (const Direction& direction : directions_path) {
     next_target = neighbor_at(retv, direction);
-    if (next_target != NULL_POSITION) {
-      retv = next_target;
-    } else {
+    if (next_target == NULL_POSITION) {
       break;
+    } else {
+      retv = next_target;
     }
   }
   return retv;
+}
+
+void BoardGraph::reconfigure_edges(const Tessellation& tessellation) {
+  remove_all_edges();
+  for (size_t source_vertex=0; source_vertex < vertices_count(); ++source_vertex) {
+    for (const Direction& direction : tessellation.legal_directions()) {
+      auto neighbor_vertex = tessellation.neighbor_position(
+        source_vertex, direction, m_impl->m_board_width, m_impl->m_board_height
+      );
+      if (neighbor_vertex != NULL_POSITION)
+        add_edge(source_vertex, neighbor_vertex, direction);
+    }
+  }
 }
 
 } // namespace sokoengine

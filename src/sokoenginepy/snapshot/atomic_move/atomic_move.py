@@ -1,6 +1,7 @@
 from enum import Enum
 
-from ... import board, tessellation
+from ...state import DEFAULT_PIECE_ID, is_valid_piece_id
+from ...tessellation import Direction
 
 
 class InvalidAtomicMoveError(ValueError):
@@ -51,9 +52,13 @@ class AtomicMove:
     """
 
     def __init__(
-        self, direction=tessellation.Direction.LEFT, box_moved=False,
-        is_jump=False, is_pusher_selection=False,
-        pusher_id=board.DEFAULT_PIECE_ID, moved_box_id=None,
+        self,
+        direction=Direction.LEFT,
+        box_moved=False,
+        is_jump=False,
+        is_pusher_selection=False,
+        pusher_id=DEFAULT_PIECE_ID,
+        moved_box_id=None,
     ):
         if (box_moved or moved_box_id) and is_pusher_selection and is_jump:
             raise InvalidAtomicMoveError(
@@ -79,7 +84,7 @@ class AtomicMove:
         self._box_moved = False
         self._pusher_selected = False
         self._pusher_jumped = False
-        self._pusher_id = board.DEFAULT_PIECE_ID
+        self._pusher_id = pusher_id
         self._moved_box_id = None
         self.direction = direction
 
@@ -112,16 +117,20 @@ class AtomicMove:
             "AtomicMove({0}, box_moved={1}, is_jump={2}, "
             "is_pusher_selection={3} pusher_id={4} box_id={5})"
         ).format(
-            str(self.direction), self.is_push_or_pull, self.is_jump,
-            self.is_pusher_selection, self.pusher_id, self.moved_box_id,
+            str(self.direction),
+            self.is_push_or_pull,
+            self.is_jump,
+            self.is_pusher_selection,
+            self.pusher_id,
+            self.moved_box_id,
         )
 
     def __eq__(self, rv):
         return (
-            self.direction == rv.direction and
-            self.is_push_or_pull == rv.is_push_or_pull and
-            self.is_pusher_selection == rv.is_pusher_selection and
-            self.is_jump == rv.is_jump
+            self.direction == rv.direction
+            and self.is_push_or_pull == rv.is_push_or_pull
+            and self.is_pusher_selection == rv.is_pusher_selection
+            and self.is_jump == rv.is_jump
         )
 
     def __ne__(self, rv):
@@ -141,7 +150,7 @@ class AtomicMove:
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
-        if board.is_valid_piece_id(value):
+        if is_valid_piece_id(value):
             self._moved_box_id = value
             self.is_push_or_pull = True
         else:
@@ -155,10 +164,10 @@ class AtomicMove:
 
     @pusher_id.setter
     def pusher_id(self, value):
-        if board.is_valid_piece_id(value):
+        if is_valid_piece_id(value):
             self._pusher_id = value
         else:
-            self._pusher_id = board.DEFAULT_PIECE_ID
+            self._pusher_id = DEFAULT_PIECE_ID
 
     @property
     def is_move(self):
@@ -166,8 +175,8 @@ class AtomicMove:
         True if pusher didn't move box, jump or changed focus to other pusher.
         """
         return (
-            not self._box_moved and not self._pusher_selected and
-            not self._pusher_jumped
+            not self._box_moved and not self._pusher_selected
+            and not self._pusher_jumped
         )
 
     @is_move.setter
@@ -186,8 +195,8 @@ class AtomicMove:
     def is_push_or_pull(self):
         """True if pusher also moved a box."""
         return (
-            self._box_moved and not self._pusher_selected and
-            not self._pusher_jumped
+            self._box_moved and not self._pusher_selected
+            and not self._pusher_jumped
         )
 
     @is_push_or_pull.setter
@@ -207,8 +216,8 @@ class AtomicMove:
         games.
         """
         return (
-            self._pusher_selected and not self._pusher_jumped and
-            not self._box_moved
+            self._pusher_selected and not self._pusher_jumped
+            and not self._box_moved
         )
 
     @is_pusher_selection.setter
@@ -228,8 +237,8 @@ class AtomicMove:
         :attr:`.SolvingMode.REVERSE` games.
         """
         return (
-            self._pusher_jumped and not self._box_moved and
-            not self._pusher_selected
+            self._pusher_jumped and not self._box_moved
+            and not self._pusher_selected
         )
 
     @is_jump.setter

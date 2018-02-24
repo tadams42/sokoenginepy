@@ -2,8 +2,8 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy import (BoardCell, BoardCellCharacters, BoardGraph, Direction,
-                          GraphType, SokobanBoard)
+from sokoenginepy import (BoardCell, BoardCellCharacters, BoardGraph,
+                          Direction, GraphType, SokobanBoard, Tessellation)
 from sokoenginepy.utilities import index_1d
 
 
@@ -104,13 +104,13 @@ class DescribeBoardGraph:
                 board_graph.add_edge(42000, 42000, Direction.LEFT)
 
         def it_allows_adding_duplicate_edges(self):
-            board_graph = BoardGraph(4, GraphType.DIRECTED)
+            board_graph = BoardGraph(2, 2, GraphType.DIRECTED)
             board_graph.add_edge(0, 1, Direction.LEFT)
             board_graph.add_edge(0, 1, Direction.LEFT)
             assert board_graph.edges_count == 1
             assert board_graph.has_edge(0, 1, Direction.LEFT)
 
-            board_graph = BoardGraph(4, GraphType.DIRECTED_MULTI)
+            board_graph = BoardGraph(2, 2, GraphType.DIRECTED_MULTI)
             board_graph.add_edge(0, 1, Direction.LEFT)
             board_graph.add_edge(0, 1, Direction.LEFT)
             assert board_graph.edges_count == 2
@@ -119,15 +119,36 @@ class DescribeBoardGraph:
     class describe_out_edge_weight:
         def it_returns_max_weigth_for_wall_cell_target(self, board_graph):
             board_graph[1].is_wall = True
-            assert board_graph.out_edge_weight(1) == BoardGraph._MAX_EDGE_WEIGHT
+            if Direction.__module__.startswith('sokoenginepy.'):
+                assert board_graph.out_edge_weight(
+                    1
+                ) > len(Direction)
+            else:
+                assert board_graph.out_edge_weight(
+                    1
+                ) > Direction.__len__()
 
         def it_returns_max_weigth_for_pusher_cell_target(self, board_graph):
             board_graph[1].has_pusher = True
-            assert board_graph.out_edge_weight(1) == BoardGraph._MAX_EDGE_WEIGHT
+            if Direction.__module__.startswith('sokoenginepy.'):
+                assert board_graph.out_edge_weight(
+                    1
+                ) > len(Direction)
+            else:
+                assert board_graph.out_edge_weight(
+                    1
+                ) > Direction.__len__()
 
         def it_returns_max_weigth_for_box_cell_target(self, board_graph):
             board_graph[1].has_box = True
-            assert board_graph.out_edge_weight(1) == BoardGraph._MAX_EDGE_WEIGHT
+            if Direction.__module__.startswith('sokoenginepy.'):
+                assert board_graph.out_edge_weight(
+                    1
+                ) > len(Direction)
+            else:
+                assert board_graph.out_edge_weight(
+                    1
+                ) > Direction.__len__()
 
         def it_returns_one_for_other_cells(self, board_graph):
             board_graph[1].clear()
@@ -142,15 +163,15 @@ class DescribeBoardGraph:
                 board_graph.out_edge_weight(42000)
 
     class describe_neighbor:
-        def it_returns_neighbor_position_in_given_direction(
-            self, board_graph
-        ):
+        def it_returns_neighbor_position_in_given_direction(self, board_graph):
             assert board_graph.neighbor(0, Direction.RIGHT) == 1
 
         def it_returns_none_for_off_board_direction(self, board_graph):
             assert board_graph.neighbor(0, Direction.UP) is None
 
-        def it_raises_IndexError_for_off_board_source_position(self, board_graph):
+        def it_raises_IndexError_for_off_board_source_position(
+            self, board_graph
+        ):
             with pytest.raises(IndexError):
                 board_graph.neighbor(42000, Direction.UP)
 
@@ -162,7 +183,7 @@ class DescribeBoardGraph:
                 "#.$# @#",  # 1
                 "#######",  # 2
             ])
-            board_graph = SokobanBoard(board_str=board_str)._graph
+            board_graph = SokobanBoard(board_str=board_str).graph
             wall_neighbors = board_graph.wall_neighbors(0)
             assert index_1d(0, 1, 7) in wall_neighbors
             assert index_1d(1, 0, 7) in wall_neighbors
@@ -217,8 +238,12 @@ class DescribeBoardGraph:
             )
 
             assert tuple(expected) in permutations([
-                Direction.UP, Direction.UP, Direction.UP,
-                Direction.LEFT, Direction.LEFT, Direction.LEFT,
+                Direction.UP,
+                Direction.UP,
+                Direction.UP,
+                Direction.LEFT,
+                Direction.LEFT,
+                Direction.LEFT,
             ])
 
         def it_raises_IndexError_for_off_board_paramteres(self, board_graph):
@@ -240,8 +265,12 @@ class DescribeBoardGraph:
             )
 
             assert tuple(expected) in permutations([
-                Direction.LEFT, Direction.LEFT, Direction.LEFT,
-                Direction.UP, Direction.UP, Direction.UP,
+                Direction.LEFT,
+                Direction.LEFT,
+                Direction.LEFT,
+                Direction.UP,
+                Direction.UP,
+                Direction.UP,
             ])
 
         def it_raises_IndexError_for_off_board_paramteres(self, board_graph):
@@ -255,13 +284,14 @@ class DescribeBoardGraph:
         def it_returns_empty_sequence_if_movement_is_blocked(
             self, board_graph, board_width
         ):
-            assert board_graph.find_move_path(
-                index_1d(11, 8, board_width), 0
-            ) == []
+            assert board_graph.find_move_path(index_1d(11, 8, board_width),
+                                              0) == []
 
     class describe_positions_path_to_directions_path:
-        def it_converts_path(self, board_graph, positions_path, directions_path):
-            calculated_directions_path =  board_graph.positions_path_to_directions_path(
+        def it_converts_path(
+            self, board_graph, positions_path, directions_path
+        ):
+            calculated_directions_path = board_graph.positions_path_to_directions_path(
                 positions_path
             )
             assert calculated_directions_path == directions_path
@@ -269,16 +299,11 @@ class DescribeBoardGraph:
         def it_raises_IndexError_if_path_has_off_board_positions(
             self, board_graph, board_width
         ):
-            path = [
-                index_1d(-1, -1, board_width)
-            ]
+            path = [index_1d(-1, -1, board_width)]
             with pytest.raises(IndexError):
                 board_graph.positions_path_to_directions_path(path)
 
-            path = [
-                index_1d(0, 0, board_width),
-                index_1d(-1, -1, board_width)
-            ]
+            path = [index_1d(0, 0, board_width), index_1d(-1, -1, board_width)]
             with pytest.raises(IndexError):
                 board_graph.positions_path_to_directions_path(path)
 
@@ -297,7 +322,7 @@ class DescribeBoardGraph:
             "#     #",  # 3
             "#######",  # 4
         ])
-        board_graph = SokobanBoard(board_str=board_str)._graph
+        board_graph = SokobanBoard(board_str=board_str).graph
 
         expected_playable_cells = [
             index_1d(1, 1, 7),
@@ -325,7 +350,7 @@ class DescribeBoardGraph:
             "#   #  ",  # 3
             "#####  ",  # 4
         ])
-        board_graph = SokobanBoard(board_str=board_str)._graph
+        board_graph = SokobanBoard(board_str=board_str).graph
 
         def it_returns_list_of_positions_reachable_by_pusher_movement_only(
             self
@@ -345,7 +370,9 @@ class DescribeBoardGraph:
                 pusher_position=index_1d(5, 1, 7)
             ) == expected
 
-        def it_doesnt_require_that_start_position_actually_contain_pusher(self):
+        def it_doesnt_require_that_start_position_actually_contain_pusher(
+            self
+        ):
             expected = [
                 index_1d(4, 1, 7),
                 index_1d(3, 1, 7),
@@ -391,11 +418,9 @@ class DescribeBoardGraph:
             "#   #  ",  # 3
             "#####  ",  # 4
         ])
-        board_graph = SokobanBoard(board_str=board_str)._graph
+        board_graph = SokobanBoard(board_str=board_str).graph
 
-        def it_returns_top_left_position_of_pusher_in_his_reachable_area(
-            self
-        ):
+        def it_returns_top_left_position_of_pusher_in_his_reachable_area(self):
             assert self.board_graph.normalized_pusher_position(
                 pusher_position=index_1d(5, 1, 7)
             ) == index_1d(1, 1, 7)
@@ -458,24 +483,47 @@ class DescribeBoardGraph:
             "#     #",  # 3
             "#######",  # 4
         ])
-        board_graph = SokobanBoard(board_str=board_str)._graph
+        board_graph = SokobanBoard(board_str=board_str).graph
 
         def it_calculates_all_positions_reachable_from_root(self):
             if not hasattr(self.board_graph, '_reachables'):
                 return
 
             root = index_1d(5, 1, 7)
-            assert self.board_graph._reachables(root
-                                              ) == [root, index_1d(4, 1, 7)]
+            assert self.board_graph._reachables(root) == [
+                root, index_1d(4, 1, 7)
+            ]
 
         def it_skips_explicitly_excluded_positions(self):
             if not hasattr(self.board_graph, '_reachables'):
                 return
 
             root = index_1d(5, 1, 7)
-            assert self.board_graph._reachables(root, excluded_positions=[root]
-                                              ) == [index_1d(4, 1, 7)]
+            assert self.board_graph._reachables(
+                root, excluded_positions=[root]
+            ) == [index_1d(4, 1, 7)]
             root = index_1d(5, 1, 7)
             assert self.board_graph._reachables(
                 root, excluded_positions=[index_1d(4, 1, 7)]
             ) == [root]
+
+    class describe_reconfigure_edges:
+        def it_reconfigures_all_edges_in_board(self):
+            graph = BoardGraph(2, 2, GraphType.DIRECTED)
+            graph.reconfigure_edges(Tessellation.SOKOBAN.value)
+
+            assert graph.edges_count == 8
+            assert graph.has_edge(0, 1, Direction.RIGHT)
+            assert graph.has_edge(1, 0, Direction.LEFT)
+            assert graph.has_edge(0, 2, Direction.DOWN)
+            assert graph.has_edge(2, 0, Direction.UP)
+            assert graph.has_edge(2, 3, Direction.RIGHT)
+            assert graph.has_edge(3, 2, Direction.LEFT)
+            assert graph.has_edge(1, 3, Direction.DOWN)
+            assert graph.has_edge(3, 1, Direction.UP)
+
+        def it_doesnt_create_duplicate_direction_edges_in_multidigraph(self):
+            graph = BoardGraph(2, 2, GraphType.DIRECTED_MULTI)
+            graph.reconfigure_edges(Tessellation.TRIOBAN.value)
+            assert graph.out_edges_count(0, 1) == 2
+            assert graph.out_edges_count(1, 0) == 2

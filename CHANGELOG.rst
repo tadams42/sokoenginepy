@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.5.3 (2018-02-24)
+------------------
+* Documentation and build fixes
+
+
 0.5.2 (2017-09-03)
 ------------------
 * Improved native extension build cofiguration process.
