@@ -1,5 +1,20 @@
-Development
-===========
+Install
+=======
+
+Installing sokoenginepy should be as simple as
+
+.. code-block:: sh
+
+    pip install sokoenginepy
+
+There is optional C++ native extension that is built automatically with ``pip
+install`` if all dependencies are met. It relies on `Boost.Graph`_ and `pybind11`_. `Boost.Graph`_ needs to be installed on system, everything else is pulled automatically:
+
+.. code-block:: sh
+
+    sudo apt install python3-dev libboost-graph-dev
+
+Following are all the glory details of individual build and install steps, running tests, debugging, profiling, etc...
 
 Preparing development environment
 ---------------------------------
@@ -150,6 +165,11 @@ Native extension
 
 If all dependencies are met, ``python setup.py develop`` and ``pip install sokoenginepy`` will produce native C++ extension that is then used automatically (for example, running tests will actually use native code and effectively test native extension instead of Python code)
 
+.. code-block:: sh
+
+    $ sudo apt install git build-essential libboost-graph-dev cmake libdw-dev
+    binutils-dev doxygen
+
 To debug native code, use ``gdb`` like this:
 
 .. code-block:: sh
@@ -161,7 +181,7 @@ To debug native code, use ``gdb`` like this:
     gdbgui 'python crash.py'
     gdbgui '.venv/bin/python .venv/bin/py.test tests/crash_test.py'
 
-In cases where developing against native extension is undesireable, use this:
+In cases where developing against native extension is undesirable, use this:
 
 .. code-block:: sh
 
@@ -177,5 +197,15 @@ profiling native extension from Python:
     valgrind --dump-line=yes --dump-instr=yes --tool=callgrind --collect-jumps=yes --callgrind-out-file=mover_profiling.log python bin/mover_profiling.py
     kcachegrind mover_profiling.log
 
+Since native extension is itself a C++ library (``libsokoengine``), it can be used as a part of separate, independent C++ projects. The only downside of this is that there are no native tests for the library - whole test suite is written in Python only. Beside that, everything works and is nicely integrated using `CMake`_. For details see `libsokoengine docs`_.
+
 .. _PyPI: https://pypi.python.org/pypi
 .. _tox: https://tox.readthedocs.io/en/latest/
+.. _pybind11: http://pybind11.readthedocs.io/en/stable/index.html
+.. _NetworkX: https://networkx.github.io/
+.. _Boost.Graph: http://www.boost.org/doc/libs/1_61_0/libs/graph/doc/index.html
+.. _cppitertools: https://github.com/ryanhaining/cppitertools
+.. _backward-cpp: https://github.com/bombela/backward-cpp
+.. _sokoenginepy: https://github.com/tadams42/sokoenginepy
+.. _libsokoengine docs: http://tadams42.github.io/sokoenginepy/
+.. _CMake: https://cmake.org/

@@ -47,17 +47,14 @@ sokoenginepy - Sokoban and variants game engine
 
 .. end-badges
 
-sokoenginepy is game engine for Sokoban and variants written in Python and
-loaded with features:
+sokoenginepy is game engine for Sokoban and variants, written in Python and loaded with features:
 
 - implements game logic for ``Sokoban``, ``Hexoban``, ``Trioban`` and ``Octoban`` variants
     - supports ``Sokoban+`` for all implemented variants
     - supports ``Multiban`` (muliple pushers on board) for all variants
-- two game engines implementations
-    - fast and memory lightweight with single step undo/redo
-    - somewhat slower and larger with unlimited movement undo/redo
 - reading and writing level collections
     - fully compatible with `SokobanYASC`_ .sok file format and variants (.xsb, .tsb, .hsb, .txt)
+- Optional C++ native bindings using `pybind11`_ and `Boost.Graph`_ for ultimate speed
 
 sokoenginepy was inspired by `SokobanYASC`_, `JSoko`_, MazezaM
 
@@ -70,21 +67,19 @@ Installing sokoenginepy should be as simple as
 
     pip install sokoenginepy
 
+There is optional C++ native extension that is built automatically with ``pip
+install`` if all dependencies are met. It relies on `Boost.Graph`_ and `pybind11`_. `Boost.Graph`_ needs to be installed on system, everything else is pulled automatically:
+
+.. code-block:: sh
+
+    sudo apt install python3-dev libboost-graph-dev
+
 Using
 -----
 
 - For quick glance of features and usage check the `Tutorial`_.
 - For in-depth docs of whole package see `API Reference`_.
-
-Optional native extenstion
----------------------------
-
-There is optional C++ native extension that is built automatically with ``pip
-install`` if all dependencies are met. It relies on `Boost.Graph`_:
-
-.. code-block:: sh
-
-    sudo apt install python3-dev libboost-graph-dev
+- For C++ library API docs see `C++ API Reference`_
 
 
 .. _pybind11: http://pybind11.readthedocs.io/en/stable/index.html
@@ -94,5 +89,6 @@ install`` if all dependencies are met. It relies on `Boost.Graph`_:
 .. _JSoko: http://www.sokoban-online.de/jsoko.html
 .. _Sokobano: http://sokobano.de/en/index.php
 .. _Sokoban for Windows: http://www.sourcecode.se/sokoban/
-.. _Tutorial: https://sokoenginepy.readthedocs.io/en/development/tutorial.html
-.. _API reference: https://sokoenginepy.readthedocs.io/en/development/api.html
+.. _Tutorial: https://sokoenginepy.readthedocs.io/en/latest/tutorial.html
+.. _API reference: https://sokoenginepy.readthedocs.io/en/latest/api.html
+.. _C++ API Reference: http://tadams42.github.io/sokoenginepy/

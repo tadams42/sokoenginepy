@@ -166,9 +166,9 @@ class BuildExt(build_ext):
     def build_extension(self, ext):
         if ext.name == 'sokoenginepyext':
             # `python setup.py install` will try to build wheels before it
-            # installls packages from `setup_requires`. This will always fail
+            # installs packages from `setup_requires`. This will always fail
             # unless there is pybind11 already installed.
-            # So we employ this dirty hack that caould potentially break many
+            # So we employ this dirty hack that could potentially break many
             # builds that don't rely on pip.
             # No known way around it.
             os.system('pip install "pybind11>=2.2.0"')

@@ -7,9 +7,9 @@ Tables of contents and indices
 .. toctree::
     :maxdepth: 2
 
+    install
     tutorial
     api
-    development
     license
 
 * :ref:`genindex`

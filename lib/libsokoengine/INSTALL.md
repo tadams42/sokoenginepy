@@ -2,21 +2,20 @@
 
 ## Runtime dependencies
 
-~~~~~~sh
+~~~sh
 $ sudo apt install libboost-graph
-~~~~~~
+~~~
 
 ## Compile time dependencies
 
 [git], [make], recent C++ compiler with C++11 support, [boost] and [CMake]
 
-~~~~~~sh
+~~~sh
 $ sudo apt install git build-essential libboost-graph-dev cmake libdw-dev \
                    binutils-dev doxygen
-~~~~~~
+~~~
 
-There are also few dependencies that [CMake] pulls automatically from GutHub
-during build:
+There are also few dependencies that [CMake] pulls automatically from GutHub during build:
 
 - [cppitertools]
 - [backward-cpp]
@@ -24,32 +23,32 @@ during build:
 
 ## Compile and install
 
-Clone repo:
+Clone the repo:
 
-~~~~~~sh
+~~~sh
 $ git clone https://github.com/tadams42/sokoenginepy.git
-~~~~~~
+~~~
 
 Configure sources:
 
-~~~~~~sh
+~~~sh
 $ cd lib/libsokoengine && mkdir build && cd build
 $ cmake ../
-~~~~~~
+~~~
 
 Build and install:
 
-~~~~~~sh
+~~~sh
 $ make && make install
-~~~~~~
+~~~
 
 ## Customizing build
 
 [CMake] accepts compile options in the form of:
 
-~~~~~~sh
+~~~sh
 $ cmake -DOPTION_NAME=OPTION_VALUE
-~~~~~~
+~~~
 
 For `libsokoengine`, these are probably most usable ones:
 
@@ -71,14 +70,14 @@ $ cmake -DCMAKE_INSTALL_PREFIX="/tmp" -DCMAKE_BUILD_TYPE="Debug"
 
 `liboskoengine` installs everything needed to be used in [CMake] projects including [CMake Config-Package]. Minimal project for [CMake] would look like this:
 
-```cmake
+~~~cmake
 cmake_minimum_required (VERSION 2.8.12)
 project(test_libsokoengine)
 
 find_package(sokoengine 0.4 REQUIRED)
 add_executable(tester main.cpp)
 target_link_libraries( tester sokoengine )
-```
+~~~
 
 ## Python bindings
 
@@ -102,7 +101,7 @@ All tests are written in Python.
 To run tests, install [sokoenginepy] (which will also build `sokoenginepyext`)
 and run Python test suite.
 
-For details see: http://sokoenginepy.readthedocs.io/en/latest/development.html
+For details see [sokoenginepy docs].
 
 ## Other [make] targets
 
@@ -135,3 +134,4 @@ $ kcachegrind playground_dump.pid
 [cppitertools]:https://github.com/ryanhaining/cppitertools
 [backward-cpp]:https://github.com/bombela/backward-cpp
 [sokoenginepy]:https://github.com/tadams42/sokoenginepy
+[sokoenginepy docs]:http://sokoenginepy.readthedocs.io/en/latest/

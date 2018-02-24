@@ -53,7 +53,7 @@ class Tessellation(Enum):
     #: +----------+----------+
     #: | Scheme 1 | Scheme 2 |
     #: +==========+==========+
-    #: |  |img1|  |  |img1|  |
+    #: |  |img1|  |  |img2|  |
     #: +----------+----------+
     #:
     #: As long as encoding of single board is consistent, all methods handle any

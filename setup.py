@@ -83,6 +83,11 @@ setup(
             'isort',
             'check-manifest',
 
+            # Cool linters
+            'pylama',
+            'pylint',
+            'radon',
+
             # IPython stuff
             'ipython',
             'jupyter',

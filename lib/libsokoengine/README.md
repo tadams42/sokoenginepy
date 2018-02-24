@@ -12,16 +12,27 @@ C++ implementation of classic Sokoban game inspired by [SokobanYASC], [JSoko] an
 - supports Sokoban, Hexoban, Trioban and Octoban variants
   - Sokoban+ for all supported variants
   - multiple pushers (Multiban) for all variants
-- fast and game engine implementation with single step undo/redo
-- TODO: self sufficient, clients are not required to link to any dependencies (not even Boost which is linked statically)
+- fast game engine implementation with single step undo/redo
+- Optional Python 3 bindings using [pybind11]
+- TODO: self sufficient - clients are not required to link to any dependencies (not even Boost) because all compile time dependencies are either header-only or linked statically by default and also not exposed in own libsokoengine headers
+
+Full C++ API docs are available at http://tadams42.github.io/sokoenginepy/. Following sections describe key concepts of library.
+
+- [Install](#install)
+- [Usage & Documentation](#usage-documentation)
+- [Big picture view](#big-picture-view)
+    - [Game variant](#game-variant)
+    - [Game boards](#game-boards)
+    - [Game logic and movement](#game-logic-and-movement)
+    - [Piece tracking, position hashing and victory conditions](#piece-tracking-position-hashing-and-victory-conditions)
+    - [Game snapshots and movement recording](#game-snapshots-and-movement-recording)
+- [Troubleshooting, issues and bugs](#troubleshooting-issues-and-bugs)
 
 ## Install
 
-- [Install](INSTALL.md) - Detailed build and install instructions (including integration with your [CMake] projects, etc...)
+Detailed build and install instructions (including integration with your [CMake] projects, etc...) are in [INSTALL.md](INSTALL.md). Quick summary:
 
-Quick and dirty:
-
-~~~bash
+~~~sh
 $ git clone --recursive https://github.com/tadams42/sokoenginepy.git
 $ cd sokoenginepy && mkdir build && cd build
 $ cmake ../
@@ -30,12 +41,11 @@ $ make && make install
 
 ## Usage & Documentation
 
-Full docs can be generated from source using `make docs` target ([Doxygen]
-required)
+Full docs can be generated from source using `make docs` target ([Doxygen] required) and are also available online at http://tadams42.github.io/sokoenginepy/. Note that online docs are generated from `master` branch.
 
-Minimal example `main.cpp`:
+Minimal example `main.cpp` is:
 
-~~~C++
+~~~cpp
 #include <sokoengine.hpp>
 
 using namespace sokoengine;
@@ -48,28 +58,39 @@ int main() {
 
 ## Big picture view
 
-### Tessellation
+There are few key concepts implemented by library and explained by following sections.
 
-Everything that is variant dependent is implemented by `Tessellation`.
-`Tessellation` is then used to parametrize other base classes. Concrete
-implementations usually don't need to interact with `Tessellation` objects
-directly.
+### Game variant
+
+We implement four game variants: Sokoban, Hexoban, Trioban and Octoban. These differ by plane tessellation on which game board is laid out:
+
+- Sokoban boards consist of adjacent squares
+- Hexoban boards consist of adjacent hexagons
+- Trioban boards consist of adjacent triangles
+- Octoban boards consist of interchanging, adjacent octagons and squares
+
+Tessellation of game board determines available moves for game pieces. In general there are 8 supported movement directions: left, right, up, down, north west, north east, south west and south east. Of course, not all tessellations support all directions. Also, one set of directions may have different meaning in different tessellations.
+
+To abstract all these differences, we implement `Tessellation` class, with subclass for each of supported variants. Instances of `Tessellation` are then used by other classes to parameterize game variant.
+
+Note that `Tessellation` is low level implementation detail, and although it helps to be aware of its existence, client code doesn't usually need to interact with it directly.
 
 ### Game boards
 
-Boards consist of `BoardCell`. Individual `BoardCell` are accessed using 1D
-indexes because of speed optimization. Where needed, there are helper methods
-provided for coordinate conversion: `index_1d`, `X`, `Y`.
+Game board consists of 2D grid of cells. Each cell has a state describing its board element (ie. wall, pusher, box, goal...) and can have some additional flags added to that state. These flags are not displayed but are used internally by board editors, movement logic, etc.. Board elements (cells) are implemented by `BoardCell` class.
 
-Concrete boards are implemented as subclasses of `VariantBoard` class which is
-parametrized by `Tessellation` and does the following:
+Game board is implemented using `VariantBoard` base class with concrete implementations for each variant (ie. `SokobanBoard`, `HexobanBoard`, etc...). For speed efficiency, board's 2D grid can be thought of as a 1D array of `BoardCell`. This means that most methods in `VariantBoard` and in other places in library, use 1D indexes to reference individual cells. Utility functions are provided that convert 2D coordinates to 1D indexes and vice versa (ie. `index1d`).
 
-- manages individual board cells
-- provides board-space searching capabilities (internally it uses appropriate
-  graph structure for each tessellation)
-- implements `std::string` (de)serialization.
+`VariantBoard` has following responsibilities:
 
-~~~C++
+- stores and provides reference to individual board cells
+- manages board resizing (adding/removing rows and columns) for ie. editing sessions
+- provides board-space searching capabilities like getting neighbor cell of given cell, detecting playable area of board, finding movement path between two points for either pusher or box, etc... (internally, appropriate graph structure for each tessellation and appropriate `Tessellation` are used)
+- implements `std::string` (de)serialization. Traditional format for these strings is extended to support RLE compression of them, following specification of `SokobanYASC` `.sok` format.
+
+Following is some example code for `VariantBoard` usage:
+
+~~~cpp
 // construction from string
 HexobanBoard board(string() +
   "---#-#-#-#----------\n" +
@@ -97,23 +118,37 @@ Positions jump_path = board.find_jump_path(42, 24);
 string output = board.to_str();
 ~~~
 
-### Movement
+### Game logic and movement
 
-Class responsible for movement is `Mover`. It can be attached to `VariantBoard`
-object to perform movement on it.
+All game variants follow exactly same game rules. From [Wikipedia-Sokoban rules], classic rules of Sokoban are:
 
-`Mover` is attached to `VariantBoard` instance and:
+> The game is played on a board of squares, where each square is a floor or a wall. Some floor squares contain boxes, and some floor squares are marked as storage locations.
+>
+> The player is confined to the board, and may move horizontally or vertically onto empty squares (never through walls or boxes). The player can also move into a box, which pushes it into the square beyond. Boxes may not be pushed into other boxes or walls, and they cannot be pulled. The number of boxes is equal to the number of storage locations. The puzzle is solved when all boxes are at storage locations.
 
-- implements all movement rules for any tessellation.
+Beside classic rules of games, we implement two rule additions:
+
+1. Multiban - we allow and implement more than one pusher per board. In this situation, classic rules of game apply to each of the pushers on board with additional rule that *pusher can't move through another pusher*
+2. Reverse mode board solving. This is another way of playing game. When game is started, box and goal positions are switched and rules of game are slightly modified:
+    - pusher can only pull boxes, not push them
+    - before first box is pulled pusher is allowed to jump to any empty board cell
+    - when boxes' and goals' positions are switched, pusher may end up standing "on top" of box in which case first move for that pusher must be jump
+    - jumping after first pull can be optionally enabled if that helps searching for board solution
+
+Class responsible for implementing all movement rules is `Mover`. `Mover` instance is attached to `VariantBoard` instance and it then performs movement on it.
+
+Main responsibilities of `Mover` are:
+
+- implement all game rules and modes of playing
+- executes pusher and box movement on any `VariantBoard` instance
 - provides single step undo/redo
-- echoes performed moves (for movement display in rendering engines)
-- implements forward and reverse mode of puzzle solving
+- echoes performed moves (for movement display in rendering engines). This is especially interesting for future GUI implementations. To understand this feature better, consider following sequence of moves: `uuld` (up, up, left, down). When they are preformed, `Mover` echoes `uuld` which can be then rendered by ie. GUI. Now, let's say we want to undo them. We tell `Mover` to undo these moves and it echoes back `urdd` (up, right, down, down) which is straightforward to render in GUI. Without this feature, any rendering engine would have to actually know what undo of moves means and implement correct `undo` of performed movement making it (the rendering engine) both more complex and redundant.
 
-`Mover` strives to be fast and efficient so it lacks full game features (like
-infinite undo/redo, tracking and exporting movement history, etc.). It is
-intended to be used by full game implementations and solver implementations.
+`Mover` strives to be fast and efficient so it lacks full game features (like infinite undo/redo, tracking and exporting movement history, etc.). It is intended to be used by future full game implementations and solver implementations.
 
-~~~C++
+Examples of `Mover` use:
+
+~~~cpp
 // Forward solving mode is default
 SokobanBoard board(42, 24);
 Mover mover(board);
@@ -145,21 +180,26 @@ mover.undo_last_move();
 // moves[0].direction() == Direction::RIGHT;
 ~~~
 
-`Mover` operates directly on referenced `VariantBoard` so that instance should
-not be edited outside of its `Mover`. For the same reason, it is not allowed to
-attach two movers to same game board.
+`Mover` operates directly on referenced `VariantBoard` so that instance should not be edited outside of its `Mover`. For the same reason, it is not allowed to attach two movers to same game board.
 
-#### Tracking movement state and victory conditions
+### Piece tracking, position hashing and victory conditions
 
-`Mover` internally uses `HashedBoardState` which performs following:
+To allow fast pusher and box positions retrieval and tracking, we implement cache class - `BoardState`. This class stores positions of board pieces, and allows fast update and retrieval of them.
 
-- keeps track of piece IDs and manages Sokoban+
-- allows fast access to game pieces by either ID or position
-- keeps consistant Zobrist hash of attached `VariantBoard` and updates it with
-  each move
+On top of `BoardState` we implement `HashedBoardState`. Although `Mover` doesn't need board hashing in any way, future solver implementations will need it. `HashedBoardState` implements Zobrist hashing of current positions of pushers and boxes. This can then be used by solvers to implement and speed up game-space searches by storing visited board hashes in cache tables while performing game-space search.
 
-`HashedBoardState` is what allows fast `Mover` implementation and these two
-classes are intended to be used for future implementations of solvers.
+When `Mover` is attached to `VariantBoard` it also creates fresh instance of `HashedBoardState` and keeps it up to date with current board position.
+
+`BoardState` also implements checking of victory conditions. There are two main groups of those:
+
+1. Classic victory where any position in which each box is positioned on top of some goal
+2. Sokoban+ victory condition where each box is positioned on top of goal with the same id as that box
+
+Sokoban+ is optional feature that can be enabled by assigning `boxorder` and `goalorder` sequences to board. When these sequences are present, new victory conditions are activated. For example, having board with five boxes, we could assign these sequences: `1 1 2 2 3` and `2 1 3 1 2`. After that, board is considered solved only when boxes with ID 1 are a pushed onto goals with ID 1 etc...
+
+### Game snapshots and movement recording
+
+Each step of each pusher is recorded by instance of `AtomicMove`. Sequence of `AtomicMove` is implemented in `Snapshot`. Just like `VariantBoard`, `Snapshot` is serializable to `std::string`. Traditional snapshots string format is extended to support recording of jumps and selecting of different pushers in `Multiban` boards, again following `SokobanYASC` `.sok` format specification.
 
 ## Troubleshooting, issues and bugs
 
@@ -172,3 +212,5 @@ Pull requests and issue reports are welcome and greatly appreciated.
 [boost]:http://www.boost.org/
 [CMake]:http://www.cmake.org
 [Doxygen]:http://www.stack.nl/~dimitri/doxygen/
+[pybind11]: https://github.com/pybind/pybind11
+[Wikipedia-Sokoban rules]: https://en.wikipedia.org/wiki/Sokoban#Rules
