@@ -86,7 +86,7 @@ class TessellationBase(metaclass=ABCMeta):
         """Converts :class:`.AtomicMove` to string
 
         Returns:
-           string: resulting string representation of :class:`.AtomicMove`
+           str: resulting string representation of :class:`.AtomicMove`
 
         Raises:
             :exc:`.UnknownDirectionError` if conversion not possible.

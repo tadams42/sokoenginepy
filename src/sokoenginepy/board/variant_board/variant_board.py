@@ -35,7 +35,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             describing it
         board_width (int): number of columns
         board_height (int): number of rows
-        board_str (string): textual representation of board
+        board_str (str): textual representation of board
     """
 
     @classmethod

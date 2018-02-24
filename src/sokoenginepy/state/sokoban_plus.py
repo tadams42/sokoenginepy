@@ -43,9 +43,9 @@ class SokobanPlus:
             default value is converted transparently.
 
     Args:
-        boxorder (string): Space separated integers describing Sokoban+ IDs for
+        boxorder (str): Space separated integers describing Sokoban+ IDs for
             boxes
-        goalorder (string): Space separated integers describing Sokoban+ IDs for
+        goalorder (str): Space separated integers describing Sokoban+ IDs for
             goals
         pieces_count (int): Total count of boxes/goals on board
     """

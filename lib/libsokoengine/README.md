@@ -206,7 +206,7 @@ Each step of each pusher is recorded by instance of `AtomicMove`. Sequence of `A
 Pull requests and issue reports are welcome and greatly appreciated.
 
 [SokobanYASC]:http://sourceforge.net/projects/sokobanyasc/
-[JSoko]:http://www.sokoban-online.de/
+[JSoko]:https://www.sokoban-online.de/
 [MazezaM]:http://webpages.dcu.ie/~tyrrelma/MazezaM/
 [bandit]:http://banditcpp.org/
 [boost]:http://www.boost.org/

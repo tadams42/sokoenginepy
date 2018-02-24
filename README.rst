@@ -39,11 +39,11 @@ sokoenginepy - Sokoban and variants game engine
 
 .. |codacy_grade| image:: https://api.codacy.com/project/badge/Grade/492a7c08b97e4dbe991b0190dd3abf02
     :alt: Codacy grade
-    :target: https://www.codacy.com/app/tadams42/sokoenginepy/dashboard
+    :target: https://app.codacy.com/app/tadams42/sokoenginepy/dashboard
 
 .. |codacy_coverage| image:: https://api.codacy.com/project/badge/Coverage/492a7c08b97e4dbe991b0190dd3abf02
     :alt: Codacy coverage
-    :target: https://www.codacy.com/app/tadams42/sokoenginepy/dashboard
+    :target: https://app.codacy.com/app/tadams42/sokoenginepy/dashboard
 
 .. end-badges
 
@@ -86,7 +86,7 @@ Using
 .. _NetworkX: https://networkx.github.io/
 .. _Boost.Graph: http://www.boost.org/doc/libs/1_61_0/libs/graph/doc/index.html
 .. _SokobanYASC: https://sourceforge.net/projects/sokobanyasc/
-.. _JSoko: http://www.sokoban-online.de/jsoko.html
+.. _JSoko: https://www.sokoban-online.de/
 .. _Sokobano: http://sokobano.de/en/index.php
 .. _Sokoban for Windows: http://www.sourcecode.se/sokoban/
 .. _Tutorial: https://sokoenginepy.readthedocs.io/en/latest/tutorial.html

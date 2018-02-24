@@ -19,7 +19,7 @@ class Snapshot(MutableSequence):
         tessellation_or_description (Tessellation): game tessellation as string
             or :class:`.Tessellation` instance
         solving_mode (SolvingMode): game solving mode
-        moves_data (string): Strings consisting of characters representing
+        moves_data (str): Strings consisting of characters representing
             :class:`.AtomicMove`. If not empty it will be parsed. Also, if not
             empty, solving mode will be parsed from it, and the value of
             ``solving_mode`` argument will be ignored
