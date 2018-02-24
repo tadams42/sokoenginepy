@@ -122,7 +122,7 @@ Example usage of `.Mover`:
 
 .. code-block:: python
 
-    >>> from sokoenginepy import Mover, SolvingMode, IllegalMoveError
+    >>> from sokoenginepy import Mover, SolvingMode, IllegalMoveError, DEFAULT_PIECE_ID
     >>>
     >>> # regular, forward solving mode
     >>> forward_mover = Mover(board)
