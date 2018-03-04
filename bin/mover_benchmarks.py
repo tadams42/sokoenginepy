@@ -186,7 +186,7 @@ class MovementBenchmarkPrinter:
         printer = MovementBenchmarkPrinter(runs, moves_per_run)
         print(printer.board_header(BoardType.SMALL))
 
-        # C++ speed
+        # Speed of early, not thoroughly tested, C++ only implementation
         pivot_speed = 3e6
 
         printer.run_and_print_experiment(

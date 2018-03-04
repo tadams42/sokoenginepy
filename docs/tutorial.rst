@@ -339,4 +339,4 @@ hand, `.Puzzle` and `.PuzzleSnapshot` can be easily converted to
     collection[0].board = str(some_edited_board)
 
 .. _Wikipedia-Sokoban rules: https://en.wikipedia.org/wiki/Sokoban#Rules
-.. _SokobanYASC: http://sourceforge.net/projects/sokobanyasc/
+.. _SokobanYASC: https://sourceforge.net/projects/sokobanyasc/
