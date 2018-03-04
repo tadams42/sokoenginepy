@@ -170,8 +170,18 @@ class MovementBenchmarkPrinter:
         print("--              MOVER BENCHMARKS                --")
         print("--------------------------------------------------")
 
-        runs = 10
-        moves_per_run = 3e5
+        native_extension_available = True
+        try:
+            import sokoenginepyext
+        except ImportError:
+            native_extension_available = False
+
+        if native_extension_available:
+            runs = 10
+            moves_per_run = 3e5
+        else:
+            runs = 10
+            moves_per_run = 3e4
 
         printer = MovementBenchmarkPrinter(runs, moves_per_run)
         print(printer.board_header(BoardType.SMALL))
