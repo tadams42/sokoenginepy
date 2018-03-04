@@ -8,7 +8,7 @@ $ sudo apt install libboost-graph
 
 ## Compile time dependencies
 
-[git], [make], recent C++ compiler with C++11 support, [boost] and [CMake]
+[git], [make], recent C++ compiler with C++14 support, [boost] and [CMake]
 
 ~~~sh
 $ sudo apt install git build-essential libboost-graph-dev cmake libdw-dev \

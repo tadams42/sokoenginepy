@@ -140,7 +140,10 @@ class BuildExt(build_ext):
         if self.is_debug_build:
             retv += ['-g3', '-O0', '-UNDEBUG', '-DDEBUG']
         else:
-            retv += ['-O3', '-flto']
+            retv += [
+                '-O3',
+                # '-flto'
+            ]
 
         return retv
 
@@ -149,7 +152,9 @@ class BuildExt(build_ext):
         if self.is_debug_build:
             return []
         else:
-            return ['-flto']
+            return [
+                # '-flto'
+            ]
 
     @property
     def is_debug_build(self):

@@ -3,12 +3,12 @@
 Sokoban and variants game engine
 
 ![Version](http://img.shields.io/badge/version-0.5.3-blue.svg)
-[![Language](http://img.shields.io/badge/language-C++11-lightgrey.svg)](http://en.cppreference.com/w/)
+[![Language](http://img.shields.io/badge/language-C++14-lightgrey.svg)](http://en.cppreference.com/w/)
 [![License](http://img.shields.io/badge/license-GPLv3-brightgreen.svg)](http://opensource.org/licenses/GPL-3.0)
 
 C++ implementation of classic Sokoban game inspired by [SokobanYASC], [JSoko] and [MazezaM] featuring:
 
-- portable, using C++11 and [boost]
+- portable, using C++14 and [boost]
 - supports Sokoban, Hexoban, Trioban and Octoban variants
   - Sokoban+ for all supported variants
   - multiple pushers (Multiban) for all variants
