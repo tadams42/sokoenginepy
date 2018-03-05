@@ -67,12 +67,15 @@ Installing sokoenginepy should be as simple as
 
     pip install sokoenginepy
 
-There is optional C++ native extension that is built automatically with ``pip
-install`` if all dependencies are met. It relies on `Boost.Graph`_ and `pybind11`_. `Boost.Graph`_ needs to be installed on system, everything else is pulled automatically:
+This will also compile and install native C++ extension that greatly improves speed of ``sokoenginepy`` but is available only on Linux for now. To make this happen, you also need this:
 
 .. code-block:: sh
 
     sudo apt install python3-dev libboost-graph-dev
+
+On non-Linux systems, only pure Python gets installed, which gives you exactly same API but with less speed in some of CPU hungry operations.
+
+All other glory details are here: `INSTALL`_
 
 Using
 -----
@@ -91,4 +94,5 @@ Using
 .. _Sokoban for Windows: http://www.sourcecode.se/sokoban/
 .. _Tutorial: https://sokoenginepy.readthedocs.io/en/latest/tutorial.html
 .. _API reference: https://sokoenginepy.readthedocs.io/en/latest/api.html
+.. _INSTALL: http://sokoenginepy.readthedocs.io/en/latest/install.html
 .. _C++ API Reference: http://tadams42.github.io/sokoenginepy/
