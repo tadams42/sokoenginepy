@@ -14,7 +14,7 @@ include README.md
 include INSTALL.md
 include TODO.md
 
-include tox.ini .travis.yml setup_ext.py
+include tox.ini .travis.yml .readthedocs.yml
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4
 global-exclude .ipynb_checkpoints/*
