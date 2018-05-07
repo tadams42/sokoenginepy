@@ -275,6 +275,11 @@ setup(
     # for example:
     # $ pip install -e .[dev]
     extras_require={
+        'docs': [
+            'sphinx >= 1.4',
+            'sphinx_rtd_theme',
+            'm2r >= 0.1.14',
+        ],
         'dev': [
             'pycodestyle',
             # 'mccabe',
