@@ -225,9 +225,15 @@ setup(
     license='GPLv3',
     description='Sokoban and variants game engine',
     long_description='%s\n%s' % (
-        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
-        re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
+        re.compile(
+            '^' + re.escape('[//]: # (start-badges)') + '.*^'
+            + re.escape('[//]: # (end-badges)'), re.M | re.S
+        ).sub('', read('README.md')),
+        # re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
+        ''
     ),
+    # In the future this will correctly render Markdown on PyPi:
+    # long_description_content_type='text/markdown',
     author='Tomislav Adamic',
     author_email='tomislav.adamic@gmail.com',
     url='https://github.com/tadams42/sokoenginepy',
@@ -291,6 +297,7 @@ setup(
             # Docs and viewers
             'sphinx',
             'sphinx_rtd_theme',
+            'm2r',
 
             # py.test stuff
             'pytest >= 3.0.0',

@@ -8,17 +8,17 @@ include .coveragerc
 include .editorconfig
 include .style.yapf
 
-include CHANGELOG.rst
+include CHANGELOG.md
 include LICENSE
-include README.rst
-include INSTALL.rst
-include TODO.rst
+include README.md
+include INSTALL.md
+include TODO.md
 
 include tox.ini .travis.yml setup_ext.py
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4
-
 global-exclude .ipynb_checkpoints/*
+global-exclude .pytest_cache .pytest_cache/*
 
 prune docs/_build
 prune lib/libsokoengine/docs/_build
