@@ -11,6 +11,7 @@ Tables of contents and indices
     tutorial
     api
     license
+    changelog
 
 * :ref:`genindex`
 * :ref:`modindex`
