@@ -32,10 +32,10 @@ endif()
 #..............................................................................
 #                  CMake settings common to all targets.
 #..............................................................................
-set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Always produce position independent code (-fPIC on gcc)
-# set(EXECUTABLE_OUTPUT_PATH "${sokoenginecpp_BINARY_DIR}/bin")
-# set(LIBRARY_OUTPUT_PATH "${sokoenginecpp_BINARY_DIR}/bin")
-link_directories("${LIBRARY_OUTPUT_PATH}") # Linker should find libsokoengine binaries
+# Always produce position independent code (-fPIC on gcc)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# Linker should ba able to find libsokoengine binaries when building utilities
+link_directories("${LIBRARY_OUTPUT_PATH}")
 
 include(GNUInstallDirs)
 set(CMAKE_INSTALL_CMAKEPACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/sokoengine/cmake CACHE PATH  "cmake Config-Package files installation destination")
@@ -46,12 +46,15 @@ mark_as_advanced(FORCE CMAKE_INSTALL_CMAKEPACKAGEDIR)
 #..............................................................................
 # cmake --help-module FindBoost
 # Next line is needed if we want to avoid dependence on boost shared libs
-# Currently disabled because boost static libraries aren't compiled with position independent code on 64b Ubuntu
+# Currently disabled because boost static libraries aren't compiled with
+# position independent code on 64b Ubuntu
 # set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      OFF)
 set(Boost_USE_STATIC_RUNTIME     OFF)
-add_definitions(-DBOOST_BIND_NO_PLACEHOLDERS)              # We are using C++14 bind and placeholders, this prevents name clashes
-add_definitions(-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION) # Avoid name clashes with std, since we don't use Boost.Serialization
+# We are using C++14 bind and placeholders, this prevents name clashes
+add_definitions(-DBOOST_BIND_NO_PLACEHOLDERS)
+# Avoid name clashes with std, since we don't use Boost.Serialization
+add_definitions(-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION)
 find_package(Boost 1.55.0)
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -59,58 +62,64 @@ include_directories(${Boost_INCLUDE_DIRS})
 #                            uninstall target
 #..............................................................................
 configure_file(
-  "${sokoenginecpp_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-  "${sokoenginecpp_BINARY_DIR}/cmake/cmake_uninstall.cmake"
+  "${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+  "${CMAKE_BINARY_DIR}/cmake/cmake_uninstall.cmake"
   IMMEDIATE @ONLY)
 add_custom_target(uninstall
-  "${CMAKE_COMMAND}" -P "${sokoenginecpp_BINARY_DIR}/cmake/cmake_uninstall.cmake")
+  "${CMAKE_COMMAND}" -P "${CMAKE_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
 #..............................................................................
-#                                cppitertools library
+#                   external build dependencies' directory
 #..............................................................................
-if(NOT EXISTS "${sokoenginecpp_SOURCE_DIR}/lib/cppitertools/")
+set(EXTERNAL_DEPENDENCIES_DIR "${CMAKE_BINARY_DIR}/dependencies")
+file(MAKE_DIRECTORY "${EXTERNAL_DEPENDENCIES_DIR}")
+
+#..............................................................................
+#                           cppitertools library
+#..............................................................................
+if(NOT EXISTS "${EXTERNAL_DEPENDENCIES_DIR}/cppitertools/")
   execute_process(
-    COMMAND git clone https://github.com/ryanhaining/cppitertools.git
-    WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/lib"
+    COMMAND git clone --branch v1.0 https://github.com/ryanhaining/cppitertools.git
+    WORKING_DIRECTORY "${EXTERNAL_DEPENDENCIES_DIR}"
   )
 endif()
 
-include_directories("${sokoenginecpp_SOURCE_DIR}/lib")
+include_directories("${EXTERNAL_DEPENDENCIES_DIR}")
 
 #..............................................................................
-#                                Backward library
+#                              Backward library
 #..............................................................................
 # sudo apt-get install libdw-dev
 # or
 # sudo apt-get install binutils-dev
 if(LIBSOKONGINE_SYSTEM_IS_LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
-  if(NOT EXISTS "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/")
+  if(NOT EXISTS "${EXTERNAL_DEPENDENCIES_DIR}/backward-cpp/")
     execute_process(
       COMMAND git clone https://github.com/bombela/backward-cpp.git
-      WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/lib"
+      WORKING_DIRECTORY "${EXTERNAL_DEPENDENCIES_DIR}"
     )
   endif()
 
   # Following two don't work for some reason...
   # list(APPEND CMAKE_MODULE_PATH
-  #               "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/")
+  #               "${EXTERNAL_DEPENDENCIES_DIR}/backward-cpp/")
   # find_package(Backward)
 
   CHECK_INCLUDE_FILE("elfutils/libdw.h" HAVE_DW_H)
   if(HAVE_DW_H)
-    include_directories("${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp")
+    include_directories("${EXTERNAL_DEPENDENCIES_DIR}/backward-cpp")
     add_definitions(-DBACKWARD_HAS_DW=1)
     set(LIBBACKWARD_DEPENDENCIES dw)
     set(LIBBACKWARD_SOURCES
-        "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
+        "${EXTERNAL_DEPENDENCIES_DIR}/backward-cpp/backward.cpp")
   else()
     CHECK_INCLUDE_FILE("bfd.h" HAVE_BFD_H)
     if (HAVE_BFD_H)
-      include_directories("${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp")
+      include_directories("${EXTERNAL_DEPENDENCIES_DIR}/backward-cpp")
       add_definitions(-DBACKWARD_HAS_BFD=1)
       set(LIBBACKWARD_DEPENDENCIES bfd)
       set(LIBBACKWARD_SOURCES
-          "${sokoenginecpp_SOURCE_DIR}/lib/backward-cpp/backward.cpp")
+          "${EXTERNAL_DEPENDENCIES_DIR}/backward-cpp/backward.cpp")
     endif()
   endif()
 endif()
@@ -120,18 +129,17 @@ endif()
 #..............................................................................#
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-  file(MAKE_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build/")
+  set(SOKOENGINECPP_DOCS_BUILD_DIR "${CMAKE_BINARY_DIR}/docs")
+  file(MAKE_DIRECTORY "${SOKOENGINECPP_DOCS_BUILD_DIR}")
   set(SOKOENGINECPP_DOCS_OUTPUT_ROOT
-      "${sokoenginecpp_SOURCE_DIR}/docs/_build/libsokoengine-v${SOKOENGINECPP_VERSION}")
-  set(DOXYFILE_TEMPLATE
-      "${sokoenginecpp_SOURCE_DIR}/docs/Doxyfile.in")
-  configure_file("${DOXYFILE_TEMPLATE}"
-                 "${sokoenginecpp_SOURCE_DIR}/docs/_build/Doxyfile")
+      "${SOKOENGINECPP_DOCS_BUILD_DIR}/libsokoengine-v${SOKOENGINECPP_VERSION}")
+  set(DOXYFILE_TEMPLATE "${CMAKE_SOURCE_DIR}/docs/Doxyfile.in")
+  configure_file("${DOXYFILE_TEMPLATE}" "${SOKOENGINECPP_DOCS_BUILD_DIR}/Doxyfile")
   add_custom_target(docs
                     COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
-                    WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/docs/_build"
+                    WORKING_DIRECTORY "${SOKOENGINECPP_DOCS_BUILD_DIR}"
                     SOURCES "${DOXYFILE_TEMPLATE}"
-                    DEPENDS "${sokoenginecpp_SOURCE_DIR}/VERSION")
+                    DEPENDS "${CMAKE_SOURCE_DIR}/VERSION")
   set_target_properties(docs PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
   # add_dependencies(docs, sokoengine)
 else()
@@ -143,7 +151,7 @@ endif()
 #..............................................................................#
 function(add_valgrind_profile_dump_target for_target_name)
   if(LIBSOKONGINE_SYSTEM_IS_LINUX)
-    set(dump_file "${sokoenginecpp_BINARY_DIR}/${for_target_name}_dump.pid")
+    set(dump_file "${CMAKE_BINARY_DIR}/${for_target_name}_dump.pid")
     set(valgrind_args
       --dump-line=yes
       --dump-instr=yes
@@ -177,8 +185,8 @@ function(add_valgrind_memory_check_target for_target_name)
       # uncomment next two lines to generate suppression blocks in valgrind log
       # These blocks can then be added to .libsokoengine.supp
       # --gen-suppressions=all
-      # --log-file="${sokoenginecpp_BINARY_DIR}/valgrind_memcheck.log"
-      # --suppressions="${sokoenginecpp_SOURCE_DIR}/.libsokoengine.supp"
+      # --log-file="${CMAKE_BINARY_DIR}/valgrind_memcheck.log"
+      # --suppressions="${CMAKE_SOURCE_DIR}/.libsokoengine.supp"
     )
     set(valgrind_target_name "valgrind_check_${for_target_name}")
     # get_target_property(binary_location ${for_target_name} LOCATION)

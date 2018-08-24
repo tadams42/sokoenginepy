@@ -12,7 +12,7 @@ from pyexcel_ods3 import get_data
 
 # Directory where this file is found
 basedir = os.path.abspath(os.path.join(getsourcefile(lambda: 0), '..'))
-SOURCE_ROOT = os.path.abspath(os.path.join(basedir, '..'))
+SOURCE_ROOT = os.path.abspath(os.path.join(basedir, '..', '..', '..'))
 TESTS_DIR = os.path.abspath(os.path.join(SOURCE_ROOT, 'tests'))
 RES_DIR = os.path.abspath(os.path.join(TESTS_DIR, 'fixtures'))
 TEST_CASES_DIR = os.path.abspath(os.path.join(RES_DIR, 'test_cases'))
@@ -71,8 +71,7 @@ class SpecGenerator:
 
             from sokoenginepy import (CellOrientation, Direction, HexobanBoard,
                                       OctobanBoard, SokobanBoard, Tessellation,
-                                      TriobanBoard)
-            from sokoenginepy.exceptions import UnknownDirectionError
+                                      TriobanBoard, UnknownDirectionError)
             from sokoenginepy.utilities import index_1d, is_on_board_1d
 
 

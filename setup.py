@@ -27,35 +27,26 @@ def read(*names, **kwargs):
     ).read()
 
 
+def _is_extension_source_dir(dir_path):
+    return (
+        'libsokoengine/src/libsokoengine' in dir_path
+        or 'libsokoengine/src/sokoenginepyext' in dir_path
+    )
+
+
 class SokoenginepyExtension(Extension):
     """
     Describes ``sokoenginepyext`` native C++ extension for ``sokoenginepy``.
 
-    On ``Linux``, ``pip install sokoenginepy`` will try to configure and build
-    native extension. If this fails, extension will not be installed but package
-    still will be.
+    On ``Linux``, ``pip install sokoenginepy`` will try to configure and
+    build native extension. If this fails, extension will not be installed
+    but package still will be.
 
     On all other systems, native extension is not supported and will not be
     configured or built - only Python code will be installed by ``pip``.
     """
 
     NAME = 'sokoenginepyext'
-
-    SHOULD_TRY_BUILD = (
-        # We support building only on Linux...
-        os.name == 'posix'
-
-        # ... and not on Read The Docs
-        and os.environ.get('READTHEDOCS', 'false').lower() not in [
-            'yes', 'true', 'y', '1'
-        ]
-
-        # ... and allow build to be controlled by SOKOENGINEPYEXT_BUILD
-        # environment variable
-        and os.environ.get('SOKOENGINEPYEXT_BUILD', 'true').lower() in [
-            'yes', 'true', 'y', '1'
-        ]
-    )
 
     IS_DEBUG = os.environ.get('SOKOENGINEPYEXT_DEBUG', 'false').lower() in [
         'yes', 'true', 'y', '1'
@@ -81,10 +72,8 @@ class SokoenginepyExtension(Extension):
         ]
     )
 
-    LDFLAGS = [
-    ] + (
-        [
-        ]
+    LDFLAGS = [] + (
+        []
         if IS_DEBUG else
         [
             # Link time optimization is cool, but wreaks havoc in my current
@@ -93,29 +82,26 @@ class SokoenginepyExtension(Extension):
         ]
     )
 
-    SRC_DIR = 'lib/libsokoengine/src'
-    EXT_DIR = 'lib/libsokoengine/ext'
-    LIB_DIR = 'lib/libsokoengine/lib'
+    SRC_DIR = 'src/libsokoengine/src'
+    LIB_DIR = 'src/libsokoengine/build/dependencies'
 
-    SOURCES = [
+    _SOURCES = [
         os.path.join(dir_path, file_name)
-        for top_dir in [SRC_DIR, EXT_DIR]
+        for top_dir in [SRC_DIR]
         for dir_path, directories, files in os.walk(top_dir)
         for file_name in files
-        if file_name.endswith('.cpp')
+        if file_name.endswith('.cpp') and _is_extension_source_dir(dir_path)
     ]
 
     def __init__(self):
         super().__init__(
             name=self.NAME,
-            sources=self.SOURCES,
+            sources=self._SOURCES,
             include_dirs=(
                 [
                     dir_path
                     for dir_path, directories, files in os.walk(self.SRC_DIR)
-                ] + [
-                    dir_path
-                    for dir_path, directories, files in os.walk(self.EXT_DIR)
+                    if _is_extension_source_dir(dir_path)
                 ] + [
                     self.LIB_DIR,
                     self._pybind11_include_dir(user=False),
@@ -128,12 +114,28 @@ class SokoenginepyExtension(Extension):
             extra_link_args=self.LDFLAGS
         )
 
-    BOOST_HEADERS = list({
+    _BOOST_HEADERS = list({
         line.strip()
-        for file_path in SOURCES
+        for file_path in _SOURCES
         for line in open(file_path, 'r')
         if '#include <boost' in line
     })
+
+    _SHOULD_TRY_BUILD = (
+        # We support building only on Linux...
+        os.name == 'posix'
+
+        # ... and not on Read The Docs
+        and os.environ.get('READTHEDOCS', 'false').lower() not in [
+            'yes', 'true', 'y', '1'
+        ]
+
+        # ... and allow build to be controlled by SOKOENGINEPYEXT_BUILD
+        # environment variable
+        and os.environ.get('SOKOENGINEPYEXT_BUILD', 'true').lower() in [
+            'yes', 'true', 'y', '1'
+        ]
+    )
 
     @classmethod
     def configure(cls, compiler):
@@ -152,14 +154,14 @@ class SokoenginepyExtension(Extension):
                 configuration steps fail.
         """
 
-        if not cls.SHOULD_TRY_BUILD:
+        if not cls._SHOULD_TRY_BUILD:
             return False
 
         print("configuring '{}' extension".format(cls.NAME))
 
         boost_ok = True
         with tempfile.NamedTemporaryFile('w', suffix='.cpp') as f:
-            f.write("\n".join(sorted(cls.BOOST_HEADERS)) + "\n")
+            f.write("\n".join(sorted(cls._BOOST_HEADERS)) + "\n")
             f.write('int main (int argc, char **argv) { return 0; }')
             f.flush()
             try:
@@ -180,7 +182,7 @@ class SokoenginepyExtension(Extension):
         if not os.path.exists(cppitertools_dir):
             print('Cloning cppitertools...')
             os.system(
-                'git clone https://github.com/ryanhaining/cppitertools.git "{}"'.format(
+                'git clone --branch v1.0 https://github.com/ryanhaining/cppitertools.git "{}"'.format(
                     cppitertools_dir
                 )
             )
@@ -210,7 +212,7 @@ class BuildExt(build_ext):
     def build_extensions(self):
         if (
             'sokoenginepyext' in [ext.name for ext in self.extensions]
-            and SokoenginepyExtension.configure(self.compiler)
+            and not SokoenginepyExtension.configure(self.compiler)
         ):
             self.extensions = [
                 ext for ext in self.extensions if ext.name != 'sokoenginepyext'
@@ -254,11 +256,9 @@ setup(
         'Programming Language :: Python :: 3 :: Only',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Games/Entertainment :: Puzzle Games',
+        'Topic :: Games/Entertainment :: Puzzle Games'
     ],
-    keywords=[
-        'game', 'sokoban', 'hexoban', 'octoban', 'trioban'
-    ],
+    keywords=['game', 'sokoban', 'hexoban', 'octoban', 'trioban'],
     # List run-time dependencies HERE.  These will be installed by pip when
     # your project is installed. For an analysis of 'install_requires' vs pip's
     # requirements files see:
@@ -300,7 +300,6 @@ setup(
 
             # py.test stuff
             'pytest >= 3.0.0',
-            'pytest-pythonpath',
             'colored-traceback',
             'pytest-spec',
             'pytest-sugar',
@@ -313,10 +312,6 @@ setup(
             'faker',
         ]
     },
-    # If there are data files included in your packages that need to be
-    # installed, specify them HERE.  If using Python 2.6 or less, then these
-    # have to be included in MANIFEST.in as well.
-    package_data={'sokoenginepy': ['res/*'],},
     ext_modules=[SokoenginepyExtension()],
     cmdclass={'build_ext': BuildExt}
 )

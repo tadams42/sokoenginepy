@@ -2,7 +2,7 @@ cloc --exclude-list-file=bin/cloc_exclude_dirs.txt \
      --by-file \
      --skip-uniqueness \
      --quiet \
-     src/
+     src/sokoenginepy
 
 cloc --exclude-list-file=bin/cloc_exclude_dirs.txt \
      --by-file \
@@ -15,7 +15,7 @@ cloc --exclude-list-file=bin/cloc_exclude_dirs.txt \
      --by-file \
      --skip-uniqueness \
      --quiet \
-     lib/libsokoengine
+     src/libsokoengine
 
 cloc --exclude-list-file=bin/cloc_exclude_dirs.txt \
      --list-file=bin/cloc_include.txt \

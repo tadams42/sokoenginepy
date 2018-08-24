@@ -65,13 +65,13 @@ class Rle:
         return retv
 
     @classmethod
-    def proces_group_tokens(cls, tokens):
+    def process_group_tokens(cls, tokens):
         retv = ""
         ending_digits_num = 1
         for token in tokens:
             if isinstance(token, list):
                 retv += ending_digits_num * cls.decode_rle_token(
-                    cls.proces_group_tokens(token)
+                    cls.process_group_tokens(token)
                 )
                 ending_digits_num = 1
             else:
@@ -84,7 +84,7 @@ class Rle:
 
     @classmethod
     def decode(cls, line):
-        return cls.proces_group_tokens(cls.tokenize_grouped_rle(line))
+        return cls.process_group_tokens(cls.tokenize_grouped_rle(line))
 
 
 def rle_encode(line):

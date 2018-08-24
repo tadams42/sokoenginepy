@@ -75,7 +75,7 @@ write_basic_package_version_file(
   COMPATIBILITY AnyNewerVersion)
 
 configure_package_config_file(
-  "${sokoenginecpp_SOURCE_DIR}/cmake/sokoengine-config.cmake.in"
+  "${CMAKE_SOURCE_DIR}/cmake/sokoengine-config.cmake.in"
   "${sokoenginecpp_BINARY_DIR}/sokoengine-config.cmake"
   INSTALL_DESTINATION ${CMAKE_INSTALL_CMAKEPACKAGEDIR}
   PATH_VARS CMAKE_INSTALL_CMAKEPACKAGEDIR)

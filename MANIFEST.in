@@ -1,29 +1,15 @@
-graft docs
 graft src
-graft tests
-graft bin
-graft lib
 
-include .editorconfig
+prune bin
+prune docs
+prune res
+prune src/libsokoengine/build
+prune tests
 
-include CHANGELOG.md
 include LICENSE
 include README.md
-include INSTALL.md
-include TODO.md
 
-include tox.ini .travis.yml .readthedocs.yml
-
-global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4
-global-exclude .ipynb_checkpoints/*
+global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4 .directory
+global-exclude .ipynb_checkpoints/* .editorconfig .readthedocs.yml
 global-exclude .pytest_cache .pytest_cache/*
-
-prune docs/_build
-prune lib/libsokoengine/docs/_build
-prune lib/libsokoengine/build
-prune lib/libsokoengine/lib/cppitertools
-prune lib/libsokoengine/lib/backward-cpp
-prune lib/libsokoengine/lib/pybind11
-
-recursive-include res *.ipynb
-recursive-include res *.py
+global-exclude CHANGELOG.md TODO.md INSTALL.md tox.ini

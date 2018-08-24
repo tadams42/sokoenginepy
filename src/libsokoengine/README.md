@@ -16,32 +16,33 @@ C++ implementation of classic Sokoban game inspired by [SokobanYASC], [JSoko] an
 - Optional Python 3 bindings using [pybind11]
 - TODO: self sufficient - clients are not required to link to any dependencies (not even Boost) because all compile time dependencies are either header-only or linked statically by default and also not exposed in own libsokoengine headers
 
-Full C++ API docs are available at http://tadams42.github.io/sokoenginepy/. Following sections describe key concepts of library.
+Full C++ API docs are available at [http://tadams42.github.io/sokoenginepy/](http://tadams42.github.io/sokoenginepy/). Following sections describe key concepts of library.
 
-- [Install](#install)
-- [Usage & Documentation](#usage-documentation)
-- [Big picture view](#big-picture-view)
-    - [Game variant](#game-variant)
-    - [Game boards](#game-boards)
-    - [Game logic and movement](#game-logic-and-movement)
-    - [Piece tracking, position hashing and victory conditions](#piece-tracking-position-hashing-and-victory-conditions)
-    - [Game snapshots and movement recording](#game-snapshots-and-movement-recording)
-- [Troubleshooting, issues and bugs](#troubleshooting-issues-and-bugs)
+- [libsokoengine](#libsokoengine)
+    - [Install](#install)
+    - [Usage & Documentation](#usage--documentation)
+    - [Big picture view](#big-picture-view)
+        - [Game variant](#game-variant)
+        - [Game boards](#game-boards)
+        - [Game logic and movement](#game-logic-and-movement)
+        - [Piece tracking, position hashing and victory conditions](#piece-tracking-position-hashing-and-victory-conditions)
+        - [Game snapshots and movement recording](#game-snapshots-and-movement-recording)
+    - [Troubleshooting, issues and bugs](#troubleshooting-issues-and-bugs)
 
 ## Install
 
 Detailed build and install instructions (including integration with your [CMake] projects, etc...) are in [INSTALL.md](INSTALL.md). Quick summary:
 
 ~~~sh
-$ git clone --recursive https://github.com/tadams42/sokoenginepy.git
-$ cd sokoenginepy && mkdir build && cd build
-$ cmake ../
-$ make && make install
+git clone --recursive https://github.com/tadams42/sokoenginepy.git
+cd sokoenginepy && mkdir build && cd build
+cmake ../
+make && make install
 ~~~
 
 ## Usage & Documentation
 
-Full docs can be generated from source using `make docs` target ([Doxygen] required) and are also available online at http://tadams42.github.io/sokoenginepy/. Note that online docs are generated from `master` branch.
+Full docs can be generated from source using `make docs` target ([Doxygen] required) and are also available online at [http://tadams42.github.io/sokoenginepy/](http://tadams42.github.io/sokoenginepy/). Note that online docs are generated from `master` branch.
 
 Minimal example `main.cpp` is:
 
@@ -130,6 +131,7 @@ Beside classic rules of games, we implement two rule additions:
 
 1. Multiban - we allow and implement more than one pusher per board. In this situation, classic rules of game apply to each of the pushers on board with additional rule that *pusher can't move through another pusher*
 2. Reverse mode board solving. This is another way of playing game. When game is started, box and goal positions are switched and rules of game are slightly modified:
+
     - pusher can only pull boxes, not push them
     - before first box is pulled pusher is allowed to jump to any empty board cell
     - when boxes' and goals' positions are switched, pusher may end up standing "on top" of box in which case first move for that pusher must be jump

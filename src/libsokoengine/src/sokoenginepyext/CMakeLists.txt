@@ -5,15 +5,15 @@
 #..............................................................................
 #                                pybind11 library
 #..............................................................................
-if(NOT EXISTS "${sokoenginecpp_SOURCE_DIR}/lib/pybind11/")
+if(NOT EXISTS "${EXTERNAL_DEPENDENCIES_DIR}/pybind11")
   execute_process(
     COMMAND git clone --branch v2.2.0 https://github.com/pybind/pybind11.git
-    WORKING_DIRECTORY "${sokoenginecpp_SOURCE_DIR}/lib"
+    WORKING_DIRECTORY "${EXTERNAL_DEPENDENCIES_DIR}"
   )
 endif()
 
-add_subdirectory("${sokoenginecpp_SOURCE_DIR}/lib/pybind11/"
-                 "${sokoenginecpp_BINARY_DIR}/lib/pybind11/")
+add_subdirectory("${EXTERNAL_DEPENDENCIES_DIR}/pybind11/"
+                 "${CMAKE_BINARY_DIR}/pybind11/")
 
 pybind11_add_module(
   sokoenginepyext

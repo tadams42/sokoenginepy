@@ -18,8 +18,6 @@ if(NOT CMAKE_BUILD_TYPE)
       FORCE)
 endif()
 
-include("${sokoenginecpp_SOURCE_DIR}/cmake/configure.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/configure.cmake")
 
 add_subdirectory (src)
-add_subdirectory (bin)
-add_subdirectory (ext)
