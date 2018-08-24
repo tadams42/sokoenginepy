@@ -148,8 +148,8 @@ class SokoenginepyExtension(Extension):
 
         Returns:
             bool: True if everything is OK and extension can be compiled. False
-                if extension was not selected for build or some of configuration
-                steps fail.
+                if extension was not selected for build or some of
+                configuration steps fail.
         """
 
         if not cls.SHOULD_TRY_BUILD:
@@ -210,7 +210,7 @@ class BuildExt(build_ext):
     def build_extensions(self):
         if (
             'sokoenginepyext' in [ext.name for ext in self.extensions]
-            and not SokoenginepyExtension.configure(self.compiler)
+            and SokoenginepyExtension.configure(self.compiler)
         ):
             self.extensions = [
                 ext for ext in self.extensions if ext.name != 'sokoenginepyext'
@@ -282,17 +282,11 @@ setup(
         ],
         'dev': [
             'pycodestyle',
-            # 'mccabe',
-            # 'pylint',
+            'pylint',
             'yapf',
             'bumpversion',
             'isort',
             'check-manifest',
-
-            # Cool linters
-            # 'pylama',
-            'pylint',
-            # 'radon',
 
             # IPython stuff
             'ipython',
@@ -308,7 +302,6 @@ setup(
             'pytest >= 3.0.0',
             'pytest-pythonpath',
             'colored-traceback',
-            # 'pytest-colordots',
             'pytest-spec',
             'pytest-sugar',
             'pytest-cov',
