@@ -84,6 +84,11 @@ class BoardCell:
     def is_wall_chr(cls, character):
         return character == BoardCellCharacters.WALL
 
+    __slots__ = [
+        '_has_box', '_has_pusher', '_has_goal', '_is_wall',
+        'is_in_playable_area', 'is_deadlock'
+    ]
+
     def __init__(
         self,
         character=BoardCellCharacters.FLOOR,

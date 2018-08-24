@@ -22,7 +22,7 @@ Create new virtual environment
 cd path/to/cloned/repo/sokoenginepy
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -u pip wheel
+pip install -U pip wheel
 ~~~
 
 ## Installing in develop mode

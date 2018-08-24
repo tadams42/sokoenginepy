@@ -51,6 +51,11 @@ class AtomicMove:
           active pusher in Multiban games
     """
 
+    __slots__ = [
+        '_box_moved', '_pusher_selected', '_pusher_jumped', '_pusher_id',
+        '_moved_box_id', 'direction'
+    ]
+
     def __init__(
         self,
         direction=Direction.LEFT,

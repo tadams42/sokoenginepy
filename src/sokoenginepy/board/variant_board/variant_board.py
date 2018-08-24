@@ -444,7 +444,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
 class VariantBoardResizer(metaclass=ABCMeta):
     """
     Implements board graph transformations related to adding/removing board
-    rows and columnns.
+    rows and columns.
     """
 
     #pylint: disable=protected-access

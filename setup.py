@@ -290,9 +290,9 @@ setup(
             'check-manifest',
 
             # Cool linters
-            'pylama',
+            # 'pylama',
             'pylint',
-            'radon',
+            # 'radon',
 
             # IPython stuff
             'ipython',

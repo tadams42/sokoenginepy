@@ -4,9 +4,7 @@ graft tests
 graft bin
 graft lib
 
-include .coveragerc
 include .editorconfig
-include .style.yapf
 
 include CHANGELOG.md
 include LICENSE
