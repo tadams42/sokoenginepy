@@ -11,7 +11,7 @@
 [![docs](https://readthedocs.org/projects/sokoenginepy/badge/?style=flat)](http://sokoenginepy.readthedocs.io/en/latest/)
 [![requirements](https://requires.io/github/tadams42/sokoenginepy/requirements.svg?branch=master)](https://requires.io/github/tadams42/sokoenginepy/requirements/?branch=master)
 [![codacy_grade](https://api.codacy.com/project/badge/Grade/492a7c08b97e4dbe991b0190dd3abf02)](https://app.codacy.com/app/tadams42/sokoenginepy/dashboard)
-[![codacy_coverage](https://api.codacy.com/project/badge/Coverage/492a7c08b97e4dbe991b0190dd3abf02)](https://app.codacy.com/app/tadams42/sokoenginepy/dashboard)
+[![codecov](https://codecov.io/gh/tadams42/sokoenginepy/branch/development/graph/badge.svg)](https://codecov.io/gh/tadams42/sokoenginepy)
 
 [//]: # (end-badges)
 
