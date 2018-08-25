@@ -169,12 +169,12 @@ Example usage of `.Mover`:
     ----#######--------
 
     >>> # Sokoban+
-    >>> reverse_mover.state.boxorder = '1 3 2'
-    >>> reverse_mover.state.goalorder = '3 2 1'
-    >>> reverse_mover.state.enable_sokoban_plus()
+    >>> reverse_mover.board_manager.boxorder = '1 3 2'
+    >>> reverse_mover.board_manager.goalorder = '3 2 1'
+    >>> reverse_mover.board_manager.enable_sokoban_plus()
     >>>
     >>> # This check also considers if Sokoban+ is enabled...
-    >>> reverse_mover.state.is_solved()
+    >>> reverse_mover.board_manager.is_solved()
     False
 
 `.Mover` operates directly on referenced `.VariantBoard` so that instance should not be edited outside of its `.Mover`. For the same reason, it is not allowed to attach two movers to same game board.
@@ -182,24 +182,24 @@ Example usage of `.Mover`:
 Piece tracking, position hashing and victory conditions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To allow fast pusher and box positions retrieval and tracking, we implement cache class - `.BoardState`. This class stores positions of board pieces, and allows fast update and retrieval of them.
+To allow fast pusher and box positions retrieval and tracking, we implement cache class - `.BoardManager`. This class stores positions of board pieces, and allows fast update and retrieval of them.
 
-On top of `.BoardState` we implement `.HashedBoardState`. Although `.Mover` doesn't need board hashing in any way, future solver implementations will need it. `.HashedBoardState` implements Zobrist hashing of current positions of pushers and boxes. This can then be used by solvers to implement and speed up game-space searches by storing visited board hashes in cache tables while performing game-space search.
+On top of `.BoardManager` we implement `.HashedBoardManager`. Although `.Mover` doesn't need board hashing in any way, future solver implementations will need it. `.HashedBoardManager` implements Zobrist hashing of current positions of pushers and boxes. This can then be used by solvers to implement and speed up game-space searches by storing visited board hashes in cache tables while performing game-space search.
 
-When `.Mover` is attached to `.VariantBoard` it also creates fresh instance of `.HashedBoardState` and keeps it up to date with current board position.
+When `.Mover` is attached to `.VariantBoard` it also creates fresh instance of `.HashedBoardManager` and keeps it up to date with current board position.
 
-`.BoardState` also implements checking of victory conditions. There are two main groups of those:
+`.BoardManager` also implements checking of victory conditions. There are two main groups of those:
 
 1. Classic victory where any position in which each box is positioned on top of some goal
 2. Sokoban+ victory condition where each box is positioned on top of goal with the same id as that box
 
 Sokoban+ is optional feature that can be enabled by assigning ``boxorder`` and ``goalorder`` sequences to board. When these sequences are present, new victory conditions are activated. For example, having board with five boxes, we could assign these sequences: ``1 1 2 2 3`` and ``2 1 3 1 2``. After that, board is considered solved only when boxes with ID 1 are a pushed onto goals with ID 1 etc...
 
-Example of `.HashedBoardState` usage:
+Example of `.HashedBoardManager` usage:
 
 .. code-block:: python
 
-    >>> from sokoenginepy import HashedBoardState
+    >>> from sokoenginepy import HashedBoardManager
     >>> board = SokobanBoard(board_str="""
     ...     #####
     ...     #  @#
@@ -213,9 +213,9 @@ Example of `.HashedBoardState` usage:
     ...     #     #########
     ...     #######
     ... """[1:-1])
-    >>> state = HashedBoardState(board)
-    >>> state
-    HashedBoardState(SokobanBoard(board_str='\n'.join([
+    >>> manager = HashedBoardManager(board)
+    >>> manager
+    HashedBoardManager(SokobanBoard(board_str='\n'.join([
         '    #####          ',
         '    #  @#          ',
         '    #$  #          ',
@@ -235,17 +235,17 @@ them so they can be referred to in different contexts.
 .. code-block:: python
 
     >>> from sokoenginepy import DEFAULT_PIECE_ID
-    >>> state.pushers_ids
+    >>> manager.pushers_ids
     [1, 2]
-    >>> state.pushers_positions
+    >>> manager.pushers_positions
     {1: 26, 2: 163}
-    >>> state.has_pusher(42)
+    >>> manager.has_pusher(42)
     False
-    >>> state.has_pusher_on(163)
+    >>> manager.has_pusher_on(163)
     True
-    >>> state.pusher_position(DEFAULT_PIECE_ID)
+    >>> manager.pusher_position(DEFAULT_PIECE_ID)
     26
-    >>> state.box_position(DEFAULT_PIECE_ID + 2)
+    >>> manager.box_position(DEFAULT_PIECE_ID + 2)
     81
 
 Now that we have a way to refer to individual pushers, boxes and goals, we can
@@ -253,12 +253,12 @@ also use Sokoban+ strings which changes end game conditions:
 
 .. code-block:: python
 
-    >>> state.boxorder = '1 3 2'
-    >>> state.goalorder = '3 2 1'
-    >>> state.enable_sokoban_plus()
-    >>> state.is_sokoban_plus_enabled
+    >>> manager.boxorder = '1 3 2'
+    >>> manager.goalorder = '3 2 1'
+    >>> manager.enable_sokoban_plus()
+    >>> manager.is_sokoban_plus_enabled
     True
-    >>> state.is_sokoban_plus_valid
+    >>> manager.is_sokoban_plus_valid
     True
 
 Above code block means that pieces get following Sokoban+ IDs:
@@ -275,10 +275,10 @@ Above code block means that pieces get following Sokoban+ IDs:
 
 And board is solved only when matching Sokoban+ ids are paired.
 
-The last thing that `.HashedBoardState` does is Zobrist hashing of board.
+The last thing that `.HashedBoardManager` does is Zobrist hashing of board.
 This is mainly useful for implementing game solvers.
 
-When initialized, `.HashedBoardState` hashes board using positions and
+When initialized, `.HashedBoardManager` hashes board using positions and
 IDs of boxes and produces 64b integer hash. After that, whenever position
 changes, this hash is updated. The ``Zobrist`` part means hashing is
 deterministic which then means that undoing box move will return hash value to
@@ -292,14 +292,14 @@ which is needed for effective solver implementations.
 
     >>> from sokoenginepy import Mover, Direction
     >>> mover = Mover(board)
-    >>> initial_hash = mover.state.boxes_layout_hash
+    >>> initial_hash = mover.board_manager.boxes_layout_hash
     >>> mover.move(Direction.DOWN)
-    >>> moved_hash = mover.state.boxes_layout_hash
+    >>> moved_hash = mover.board_manager.boxes_layout_hash
     >>> mover.undo_last_move()
-    >>> mover.state.boxes_layout_hash == initial_hash
+    >>> mover.board_manager.boxes_layout_hash == initial_hash
     True
     >>> mover.move(Direction.DOWN)
-    >>> mover.state.boxes_layout_hash == moved_hash
+    >>> mover.board_manager.boxes_layout_hash == moved_hash
     True
 
 Game snapshots and movement recording

@@ -12,7 +12,7 @@ namespace sokoengine {
 
 class VariantBoard;
 class Direction;
-class HashedBoardState;
+class HashedBoardManager;
 
 ///
 /// Movement mode of operation.
@@ -57,7 +57,7 @@ public:
 
   const VariantBoard& board() const;
   SolvingMode solving_mode() const;
-  const HashedBoardState& state() const;
+  const HashedBoardManager& board_manager() const;
 
   virtual void select_pusher(piece_id_t pusher_id);
   piece_id_t selected_pusher() const;

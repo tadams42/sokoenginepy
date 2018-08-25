@@ -16,12 +16,12 @@ class BoxGoalSwitchError(RuntimeError):
     pass
 
 
-class BoardState:
+class BoardManager:
     """Memoizes, tracks and updates positions of all pieces.
 
     - Provides efficient means to inspect positions of pushers, boxes and goals.
       To understand how this works, we need to have a way of identifying
-      individual pushers, boxes and goals. :class:`.BoardState` does that by
+      individual pushers, boxes and goals. :class:`.BoardManager` does that by
       assigning numerical ID to each individual piece. This ID can then be used
       to refer to that piece in various contexts.
 
@@ -32,14 +32,14 @@ class BoardState:
           :alt: Assigning board elements' IDs
 
     - Provides efficient means of pieces movemet. Ie. we can move pushers and
-      boxes and :class:`.BoardState` will update internal state and board cells.
+      boxes and :class:`.BoardManager` will update internal state and board cells.
 
       This movement preserves piece IDs in contex of board state changes. To
-      ilustrate, let's assume we create :class:`.BoardState` from board with two
+      ilustrate, let's assume we create :class:`.BoardManager` from board with two
       pushers one above the other. After then we edit the board, placing pusher
       ID 2 in row above pusher ID 1. Finally, we create another instance of
-      :class:`.BoardState`. If we now inspect pusher IDs in first and second
-      :class:`.BoardState` instance, they will be different. Have we used
+      :class:`.BoardManager`. If we now inspect pusher IDs in first and second
+      :class:`.BoardManager` instance, they will be different. Have we used
       movement methods instead of board editing, these IDs would be preserved:
 
       .. |img1| image:: /images/movement_vs_transfer1.png
@@ -57,12 +57,12 @@ class BoardState:
         don't implement full game logic. For game logic see :class:`.Mover`
 
     Warning:
-        Once we create instance of :class:`.BoardState` from some
+        Once we create instance of :class:`.BoardManager` from some
         :class:`.VariantBoard` instance, that board should not be edited.
-        :class:`.BoardState` will update cells on board when pieces are moved,
+        :class:`.BoardManager` will update cells on board when pieces are moved,
         and editing board cells directly (ie. adding/removing pushers or boxes,
         changing board size, changing walls layout, etc...) will not sync these
-        edits back to our :class:`.BoardState` instance.
+        edits back to our :class:`.BoardManager` instance.
 
     Args:
         variant_board (VariantBoard): board for which we want to manage state
@@ -530,7 +530,7 @@ class BoardState:
         Generator for all configurations of boxes that result in solved board.
 
         Note:
-            Resultset depends on :attr:`.BoardState.is_sokoban_plus_enabled`.
+            Resultset depends on :attr:`.BoardManager.is_sokoban_plus_enabled`.
 
         Yields:
             dict: mapping of box IDs and positions of one board solution::

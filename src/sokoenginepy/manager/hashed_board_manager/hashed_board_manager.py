@@ -1,19 +1,19 @@
 import random
 
 from ... import utilities
-from ..board_state import BoardState
+from ..board_manager import BoardManager
 
 
-class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
-    """:class:`.BoardState` with Zobrist hashing
+class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings):
+    """:class:`.BoardManager` with Zobrist hashing
 
-    Adds Zobrist hashing on top of :class:`.BoardState` and keeps it up to date
+    Adds Zobrist hashing on top of :class:`.BoardManager` and keeps it up to date
     when pieces are moved.
 
     Zobrist hash is 64b integer hash derived from positions of all boxes on
     board.
 
-    When initialized, :class:`.HashedBoardState` hashes board using positions
+    When initialized, :class:`.HashedBoardManager` hashes board using positions
     and IDs of boxes and produces 64b integer hash. After that, whenever
     position changes, this hash is updated. The ``Zobrist`` part means hashing
     is deterministic which then means that undoing box move will return hash
@@ -180,19 +180,19 @@ class HashedBoardState(BoardState, metaclass=utilities.InheritableDocstrings):
                 to_new_position
             ]
 
-    @BoardState.boxorder.setter
+    @BoardManager.boxorder.setter
     @copy_ancestor_docstring
     def boxorder(self, rv):
         old_plus_enabled = self.is_sokoban_plus_enabled
-        BoardState.boxorder.fset(self, rv)
+        BoardManager.boxorder.fset(self, rv)
         if self.is_sokoban_plus_enabled != old_plus_enabled:
             self._zobrist_rehash()
 
-    @BoardState.goalorder.setter
+    @BoardManager.goalorder.setter
     @copy_ancestor_docstring
     def goalorder(self, rv):
         old_plus_enabled = self.is_sokoban_plus_enabled
-        BoardState.goalorder.fset(self, rv)
+        BoardManager.goalorder.fset(self, rv)
         if self.is_sokoban_plus_enabled != old_plus_enabled:
             self._zobrist_rehash()
 

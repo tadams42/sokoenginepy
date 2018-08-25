@@ -1,28 +1,28 @@
-State
-=====
+Manager
+=======
 
-BoardState
-----------
+BoardManager
+------------
 
-.. autoexception:: sokoenginepy.state.BoxGoalSwitchError
+.. autoexception:: sokoenginepy.manager.BoxGoalSwitchError
 
-.. autoexception:: sokoenginepy.state.CellAlreadyOccupiedError
+.. autoexception:: sokoenginepy.manager.CellAlreadyOccupiedError
 
-.. automodule:: sokoenginepy.state.piece
+.. automodule:: sokoenginepy.manager.piece
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. autoclass:: sokoenginepy.state.board_state.board_state.BoardState
+.. autoclass:: sokoenginepy.manager.board_manager.board_manager.BoardManager
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
 
-HashedBoardState
-----------------
+HashedBoardManager
+------------------
 
-.. autoclass:: sokoenginepy.state.HashedBoardState
+.. autoclass:: sokoenginepy.manager.hashed_board_manager.hashed_board_manager.HashedBoardManager
     :members:
     :undoc-members:
     :show-inheritance:
@@ -30,9 +30,9 @@ HashedBoardState
 SokobanPlus
 -----------
 
-.. autoexception:: sokoenginepy.state.SokobanPlusDataError
+.. autoexception:: sokoenginepy.manager.SokobanPlusDataError
 
-.. autoclass:: sokoenginepy.state.SokobanPlus
+.. autoclass:: sokoenginepy.manager.SokobanPlus
     :members:
     :undoc-members:
     :inherited-members:

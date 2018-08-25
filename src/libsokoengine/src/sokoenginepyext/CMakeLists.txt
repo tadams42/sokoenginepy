@@ -25,7 +25,7 @@ pybind11_add_module(
   export_board_graph.cpp
   export_tessellations.cpp
   export_boards.cpp
-  export_board_state.cpp
+  export_board_manager.cpp
   export_mover.cpp
 )
 

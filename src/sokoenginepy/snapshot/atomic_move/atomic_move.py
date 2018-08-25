@@ -1,6 +1,6 @@
 from enum import Enum
 
-from ...state import DEFAULT_PIECE_ID, is_valid_piece_id
+from ...manager import DEFAULT_PIECE_ID, is_valid_piece_id
 from ...tessellation import Direction
 
 

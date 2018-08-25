@@ -174,13 +174,13 @@ public:
 
   string board_header(const BoardType& board_type) const {
     SokobanBoard board = board_type.board();
-    BoardState state(board);
+    BoardManager manager(board);
     ostringstream ss;
     ss << setw(10) << left << "SokobanBoard: "
       << "W: " << setw(5) << left << board.width()
       << "H: " << setw(5) << left << board.height()
-      << "P: " << setw(5) << left << state.pushers_count()
-      << "B: " << setw(5) << left << state.boxes_count();
+      << "P: " << setw(5) << left << manager.pushers_count()
+      << "B: " << setw(5) << left << manager.boxes_count();
     return ss.str();
   }
 

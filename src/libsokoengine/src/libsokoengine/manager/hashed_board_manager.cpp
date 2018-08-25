@@ -1,4 +1,4 @@
-#include "hashed_board_state.hpp"
+#include "hashed_board_manager.hpp"
 #include "board_cell.hpp"
 #include "sokoban_plus.hpp"
 #include "variant_board.hpp"
@@ -17,7 +17,7 @@ namespace sokoengine
 
 using namespace implementation;
 
-class LIBSOKOENGINE_LOCAL HashedBoardState::PIMPL
+class LIBSOKOENGINE_LOCAL HashedBoardManager::PIMPL
 {
 public:
   bool          m_hash_invalidated          = true;
@@ -30,7 +30,7 @@ public:
 
   map<piece_id_t, hash_vector_t> m_boxes_factors;
   hash_vector_t m_pushers_factors;
-  HashedBoardState::solution_hashes_t m_solutions_hashes;
+  HashedBoardManager::solution_hashes_t m_solutions_hashes;
 
   PIMPL() {}
   PIMPL(PIMPL&& rv) = default;
@@ -94,7 +94,7 @@ public:
                                  random_pool_set.end());
   }
 
-  void zobrist_rehash(const HashedBoardState &parent) {
+  void zobrist_rehash(const HashedBoardManager &parent) {
     if (!m_hash_invalidated) {
       return;
     }
@@ -144,37 +144,37 @@ public:
 protected:
   PIMPL(const PIMPL&) = delete;
   PIMPL& operator=(const PIMPL&) = delete;
-}; // HashedBoardState::PIMPL
+}; // HashedBoardManager::PIMPL
 
-HashedBoardState::HashedBoardState(VariantBoard &board)
-    : BoardState(board), m_impl(std::make_unique<PIMPL>())
+HashedBoardManager::HashedBoardManager(VariantBoard &board)
+    : BoardManager(board), m_impl(std::make_unique<PIMPL>())
 {}
 
-HashedBoardState::HashedBoardState(HashedBoardState &&) = default;
+HashedBoardManager::HashedBoardManager(HashedBoardManager &&) = default;
 
-HashedBoardState &HashedBoardState::operator=(HashedBoardState &&) = default;
+HashedBoardManager &HashedBoardManager::operator=(HashedBoardManager &&) = default;
 
-HashedBoardState::~HashedBoardState() = default;
+HashedBoardManager::~HashedBoardManager() = default;
 
-bool HashedBoardState::operator==(const HashedBoardState &rv) const {
+bool HashedBoardManager::operator==(const HashedBoardManager &rv) const {
   return m_impl->m_layout_hash == rv.m_impl->m_layout_hash;
 }
 
-bool HashedBoardState::operator!=(const HashedBoardState &rv) const {
+bool HashedBoardManager::operator!=(const HashedBoardManager &rv) const {
   return !(*this == rv);
 }
 
-zobrist_key_t HashedBoardState::boxes_layout_hash() const {
-  const_cast<HashedBoardState*>(this)->m_impl->zobrist_rehash(*this);
+zobrist_key_t HashedBoardManager::boxes_layout_hash() const {
+  const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
   return m_impl->m_layout_hash;
 }
 
-zobrist_key_t HashedBoardState::boxes_and_pushers_layout_hash() const {
-  const_cast<HashedBoardState*>(this)->m_impl->zobrist_rehash(*this);
+zobrist_key_t HashedBoardManager::boxes_and_pushers_layout_hash() const {
+  const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
   return m_impl->m_layout_with_pushers_hash;
 }
 
-zobrist_key_t HashedBoardState::external_position_hash(
+zobrist_key_t HashedBoardManager::external_position_hash(
   const positions_by_id_t& boxes_positions
 ) const {
   if (boxes_positions.size() != boxes_count() ||
@@ -182,7 +182,7 @@ zobrist_key_t HashedBoardState::external_position_hash(
     return 0;
   }
 
-  const_cast<HashedBoardState*>(this)->m_impl->zobrist_rehash(*this);
+  const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
 
   zobrist_key_t retv = m_impl->m_initial_layout_hash;
   for (auto box : boxes_positions) {
@@ -192,17 +192,17 @@ zobrist_key_t HashedBoardState::external_position_hash(
   return retv;
 }
 
-void HashedBoardState::pusher_moved(position_t old_position, position_t to_new_position) {
+void HashedBoardManager::pusher_moved(position_t old_position, position_t to_new_position) {
   if (old_position != to_new_position) {
-    const_cast<HashedBoardState*>(this)->m_impl->zobrist_rehash(*this);
+    const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
     m_impl->m_layout_with_pushers_hash ^= m_impl->m_pushers_factors[old_position];
     m_impl->m_layout_with_pushers_hash ^= m_impl->m_pushers_factors[to_new_position];
   }
 }
 
-void HashedBoardState::box_moved(position_t old_position, position_t to_new_position) {
+void HashedBoardManager::box_moved(position_t old_position, position_t to_new_position) {
   if (old_position != to_new_position) {
-    const_cast<HashedBoardState*>(this)->m_impl->zobrist_rehash(*this);
+    const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
 
     auto b_plus_id = box_plus_id(box_id_on(to_new_position));
 
@@ -214,43 +214,43 @@ void HashedBoardState::box_moved(position_t old_position, position_t to_new_posi
   }
 }
 
-void HashedBoardState::set_boxorder(const std::string& rv) {
+void HashedBoardManager::set_boxorder(const std::string& rv) {
   bool old_plus_enabled = is_sokoban_plus_enabled();
-  BoardState::set_boxorder(rv);
+  BoardManager::set_boxorder(rv);
   if (is_sokoban_plus_enabled() != old_plus_enabled) {
     m_impl->m_hash_invalidated = true;
   }
 }
 
-void HashedBoardState::set_goalorder(const std::string& rv) {
+void HashedBoardManager::set_goalorder(const std::string& rv) {
   bool old_plus_enabled = is_sokoban_plus_enabled();
-  BoardState::set_goalorder(rv);
+  BoardManager::set_goalorder(rv);
   if (is_sokoban_plus_enabled() != old_plus_enabled) {
     m_impl->m_hash_invalidated = true;
   }
 }
 
-void HashedBoardState::enable_sokoban_plus() {
+void HashedBoardManager::enable_sokoban_plus() {
   if (!is_sokoban_plus_enabled()) {
-    BoardState::enable_sokoban_plus();
+    BoardManager::enable_sokoban_plus();
     m_impl->m_hash_invalidated = true;
   }
 }
 
-void HashedBoardState::disable_sokoban_plus() {
+void HashedBoardManager::disable_sokoban_plus() {
   if (is_sokoban_plus_enabled()) {
-    BoardState::disable_sokoban_plus();
+    BoardManager::disable_sokoban_plus();
     m_impl->m_hash_invalidated = true;
   }
 }
 
-void HashedBoardState::switch_boxes_and_goals() {
-  BoardState::switch_boxes_and_goals();
+void HashedBoardManager::switch_boxes_and_goals() {
+  BoardManager::switch_boxes_and_goals();
   m_impl->m_solutions_hashes.clear();
 }
 
-bool HashedBoardState::is_solved() const {
-  const_cast<HashedBoardState*>(this)->m_impl->zobrist_rehash(*this);
+bool HashedBoardManager::is_solved() const {
+  const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
 
   if (m_impl->m_solutions_hashes.empty()) {
     auto slns = solutions();
@@ -262,13 +262,13 @@ bool HashedBoardState::is_solved() const {
   return m_impl->m_solutions_hashes.count(m_impl->m_layout_hash) > 0;
 }
 
-const HashedBoardState::solution_hashes_t& HashedBoardState::solution_hashes() const {
+const HashedBoardManager::solution_hashes_t& HashedBoardManager::solution_hashes() const {
   // regenerate solution hashes
   is_solved();
   return m_impl->m_solutions_hashes;
 }
 
-string HashedBoardState::to_str(const solution_hashes_t& v) {
+string HashedBoardManager::to_str(const solution_hashes_t& v) {
   auto converter = [&]() {
     StringList retv;
     for (auto id : v) {
@@ -280,7 +280,7 @@ string HashedBoardState::to_str(const solution_hashes_t& v) {
   return string("[") + boost::join(converter(), ", ") + "]";
 }
 
-string HashedBoardState::str() const {
+string HashedBoardManager::str() const {
   positions_by_id_t boxes_plus_ids, goals_plus_ids;
 
   for (auto b_id : boxes_ids()) {
@@ -292,12 +292,12 @@ string HashedBoardState::str() const {
   }
 
   StringList l = {
-    string("    'pushers':   ") + BoardState::to_str(pushers_positions()),
-    string("    'boxes':     ") + BoardState::to_str(boxes_positions()),
-    string("    'goals':     ") + BoardState::to_str(goals_positions()),
-    string("    'boxes +':   ") + BoardState::to_str(boxes_plus_ids),
-    string("    'goals +':   ") + BoardState::to_str(goals_plus_ids),
-    string("    'solutions': ") + BoardState::to_str(solutions(), 4),
+    string("    'pushers':   ") + BoardManager::to_str(pushers_positions()),
+    string("    'boxes':     ") + BoardManager::to_str(boxes_positions()),
+    string("    'goals':     ") + BoardManager::to_str(goals_positions()),
+    string("    'boxes +':   ") + BoardManager::to_str(boxes_plus_ids),
+    string("    'goals +':   ") + BoardManager::to_str(goals_plus_ids),
+    string("    'solutions': ") + BoardManager::to_str(solutions(), 4),
     string("    'solution hashes': ") + to_str(solution_hashes()),
     string("    'boxes_factors:' : ") + PIMPL::to_str(m_impl->m_boxes_factors, 4),
     string("    'pushers_factors': ") + PIMPL::to_str(m_impl->m_pushers_factors, 4)
@@ -306,8 +306,8 @@ string HashedBoardState::str() const {
   return string("{\n") + boost::join(l, ",\n") + "\n}";
 }
 
-string HashedBoardState::repr() const {
-  return "HashedBoardState(" + board().repr() + ")";
+string HashedBoardManager::repr() const {
+  return "HashedBoardManager(" + board().repr() + ")";
 }
 
 } // namespace sokoengine

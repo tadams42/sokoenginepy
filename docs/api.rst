@@ -7,7 +7,7 @@ API reference
     _api/sokoenginepy.tessellation
     _api/sokoenginepy.board
     _api/sokoenginepy.graph
-    _api/sokoenginepy.state
+    _api/sokoenginepy.manager
     _api/sokoenginepy.snapshot
     _api/sokoenginepy.game
     _api/sokoenginepy.input_output

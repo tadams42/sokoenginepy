@@ -1,4 +1,4 @@
 try:
-    from sokoenginepyext import HashedBoardState
+    from sokoenginepyext import HashedBoardManager
 except ImportError:
-    from .hashed_board_state import HashedBoardState
+    from .hashed_board_manager import HashedBoardManager

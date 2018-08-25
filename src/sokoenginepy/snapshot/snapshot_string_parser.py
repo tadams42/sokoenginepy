@@ -5,13 +5,14 @@ from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
 from .. import utilities
 from ..tessellation import UnknownDirectionError
-from .atomic_move import AtomicMoveCharacters
+from .atomic_move import AtomicMoveCharacters, InvalidAtomicMoveError
 from .snapshot import Snapshot, SnapshotConversionError
 
 _RE_SNAPSHOT_STRING = re.compile(
-    r"^([0-9\s" + re.escape("".join(c for c in AtomicMoveCharacters)) +
-    re.escape("".join(c for c in Snapshot.NonMoveCharacters)) +
-    re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
+    r"^([0-9\s"
+    + re.escape("".join(c for c in AtomicMoveCharacters))
+    + re.escape("".join(c for c in Snapshot.NonMoveCharacters))
+    + re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
 )
 
 
@@ -25,19 +26,19 @@ class SnapshotStringParser:
         "([" + "".join(c for c in AtomicMoveCharacters) + "])+"
     )
     jump = Group(
-        oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN) +
-        ZeroOrMore(atomic_moves) + oneOf(Snapshot.NonMoveCharacters.JUMP_END)
+        oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN)
+        + ZeroOrMore(atomic_moves) + oneOf(Snapshot.NonMoveCharacters.JUMP_END)
     )
     pusher_change = Group(
-        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN) +
-        ZeroOrMore(atomic_moves) +
-        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_END)
+        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN)
+        + ZeroOrMore(atomic_moves)
+        + oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_END)
     )
     grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
 
     _re_snapshot_string_cleanup = re.compile(
-        "([" + re.escape(Snapshot.NonMoveCharacters.CURRENT_POSITION_CH) +
-        r"\s])+"
+        "([" + re.escape(Snapshot.NonMoveCharacters.CURRENT_POSITION_CH)
+        + r"\s])+"
     )
 
     def __init__(self):
@@ -145,8 +146,8 @@ class SnapshotStringParser:
 
         if not conversion_ok:
             raise SnapshotConversionError(
-                "Snapshot string contains directions not supported by requested"
-                "tessellation"
+                "Snapshot string contains directions not supported by "
+                "requested tessellation"
             )
         return retv
 
@@ -183,10 +184,9 @@ class SnapshotStringParser:
             )
             return False
 
-
         if (
-            Snapshot.NonMoveCharacters.JUMP_BEGIN in moves_string or
-            Snapshot.NonMoveCharacters.JUMP_END in moves_string
+            Snapshot.NonMoveCharacters.JUMP_BEGIN in moves_string
+            or Snapshot.NonMoveCharacters.JUMP_END in moves_string
         ):
 
             self._resulting_solving_mode = game.SolvingMode.REVERSE
@@ -201,8 +201,8 @@ class SnapshotStringParser:
         tokens = self._tokenize_moves_data(moves_string)
         if len(tokens) == 0:
             self._first_encountered_error = (
-                "Tokenizing snapshot string elements failed. Maybe there " +
-                "are unmatched parentheses"
+                "Tokenizing snapshot string elements failed. Maybe there "
+                + "are unmatched parentheses"
             )
             return False
 
@@ -217,8 +217,8 @@ class SnapshotStringParser:
                     tessellation=tessellation,
                     is_jump=token[0] == Snapshot.NonMoveCharacters.JUMP_BEGIN,
                     is_pusher_change=(
-                        token[0] ==
-                        Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
+                        token[0]
+                        == Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
                     ),
                 )
             else:

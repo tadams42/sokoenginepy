@@ -11,7 +11,7 @@ void export_board_cell(py::module &);
 void export_board_graph(py::module &);
 void export_tessellations(py::module &);
 void export_boards(py::module& m);
-void export_board_state(py::module& m);
+void export_board_manager(py::module& m);
 void export_mover(py::module& m);
 
 
@@ -74,6 +74,6 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   export_board_graph(m);
   export_tessellations(m);
   export_boards(m);
-  export_board_state(m);
+  export_board_manager(m);
   export_mover(m);
 }

@@ -1,5 +1,5 @@
-#ifndef BOARD_STATE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
-#define BOARD_STATE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#ifndef BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#define BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include "sokoengine_config.hpp"
 
@@ -34,19 +34,19 @@ public:
 /// Pieces' position, ID and Sokoban+ tracking.
 /// Fast piece access.
 ///
-class LIBSOKOENGINE_API BoardState {
+class LIBSOKOENGINE_API BoardManager {
 public:
   constexpr static bool is_valid_piece_id(piece_id_t pid) {
     return pid >= DEFAULT_PIECE_ID;
   }
 
-  explicit BoardState(VariantBoard& board);
-  BoardState(BoardState&& rv);
-  BoardState& operator=(BoardState&& rv);
-  virtual ~BoardState();
+  explicit BoardManager(VariantBoard& board);
+  BoardManager(BoardManager&& rv);
+  BoardManager& operator=(BoardManager&& rv);
+  virtual ~BoardManager();
 
-  bool operator== (const BoardState& rv) const;
-  bool operator!= (const BoardState& rv) const;
+  bool operator== (const BoardManager& rv) const;
+  bool operator!= (const BoardManager& rv) const;
 
   ///
   /// Collection of piece IDs
@@ -118,8 +118,8 @@ protected:
   virtual void pusher_moved(position_t old_position, position_t to_new_position);
   virtual void box_moved(position_t old_position, position_t to_new_position);
 
-  BoardState(const BoardState&) = delete;
-  BoardState& operator=(const BoardState&) = delete;
+  BoardManager(const BoardManager&) = delete;
+  BoardManager& operator=(const BoardManager&) = delete;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;

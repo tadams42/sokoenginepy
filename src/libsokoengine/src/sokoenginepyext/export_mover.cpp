@@ -28,7 +28,8 @@ void export_mover(py::module& m) {
     .def_property_readonly("solving_mode", &Mover::solving_mode)
 
     .def_property_readonly(
-      "state", &Mover::state, py::return_value_policy::reference_internal
+      "board_manager", &Mover::board_manager,
+      py::return_value_policy::reference_internal
     )
 
     .def_property_readonly("selected_pusher", &Mover::selected_pusher)
