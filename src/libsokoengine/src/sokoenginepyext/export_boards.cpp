@@ -1,11 +1,7 @@
-#include <pybind11/pybind11.h>
+#include "sokoenginepyext.h"
 #include <memory>
-#include <sokoengine.hpp>
-
-#include "pybind11_addons.hpp"
 
 using namespace std;
-namespace py = pybind11;
 using namespace sokoengine;
 
 void export_boards(py::module& m) {

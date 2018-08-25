@@ -92,7 +92,7 @@ public:
           which == Selectors::PUSHERS ? "pusher" :
           which == Selectors::BOXES   ? "box" :
                                         "goal"
-        ) + " with ID: " + std::to_string(id)
+        ) + " with ID: " + to_string(id)
       );
     }
   }
@@ -108,7 +108,7 @@ public:
           which == Selectors::PUSHERS ? "pusher" :
           which == Selectors::BOXES   ? "box" :
                                         "goal"
-        ) + " on position: " + std::to_string(position)
+        ) + " on position: " + to_string(position)
       );
     }
   }
@@ -301,8 +301,8 @@ void BoardManager::move_pusher_from(
   BoardCell& dest_cell = m_impl->m_board.cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {
     throw CellAlreadyOccupiedError(
-      string("Pusher ID: ") + std::to_string(pusher_id_on(old_position)) +
-      " can't be placed in position " + std::to_string(to_new_position) +
+      string("Pusher ID: ") + to_string(pusher_id_on(old_position)) +
+      " can't be placed in position " + to_string(to_new_position) +
       " occupied by '" + dest_cell.to_str() + "'"
     );
   }
@@ -354,8 +354,8 @@ void BoardManager::move_box_from(position_t old_position, position_t to_new_posi
   BoardCell& dest_cell = m_impl->m_board.cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {
     throw CellAlreadyOccupiedError(
-      string("Box ID: ") + std::to_string(box_id_on(old_position)) +
-      " can't be placed in position " + std::to_string(to_new_position) +
+      string("Box ID: ") + to_string(box_id_on(old_position)) +
+      " can't be placed in position " + to_string(to_new_position) +
       " occupied by '" + dest_cell.to_str() + "'"
     );
   }
@@ -590,6 +590,21 @@ string BoardManager::str() const {
 
 string BoardManager::repr() const {
   return "BoardManager(" + m_impl->m_board.repr() + ")";
+}
+
+BoardState BoardManager::state() const {
+  auto p_ids = pushers_ids();
+  auto b_ids = boxes_ids();
+
+  sort(p_ids.begin(), p_ids.end());
+  sort(b_ids.begin(), b_ids.end());
+
+  Positions pushers, boxes;
+
+  for (auto pid : p_ids) pushers.push_back(pusher_position(pid));
+  for (auto bid : b_ids) boxes.push_back(box_position(bid));
+
+  return BoardState(pushers, boxes);
 }
 
 } // namespace sokoengine

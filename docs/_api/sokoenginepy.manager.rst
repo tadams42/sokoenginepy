@@ -1,6 +1,15 @@
 Manager
 =======
 
+BoardState
+----------
+
+.. autoclass:: sokoenginepy.manager.board_state.board_state.BoardState
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
 BoardManager
 ------------
 

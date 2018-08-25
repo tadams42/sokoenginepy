@@ -1,13 +1,10 @@
-#include <pybind11/pybind11.h>
-#include <sokoengine.hpp>
+#include "sokoenginepyext.h"
 
 using namespace std;
-namespace py = pybind11;
 using namespace sokoengine;
 
 void export_board_cell(py::module& m) {
   py::class_<BoardCell>(m, "BoardCell")
-
     .def(
       py::init<char, bool, bool>(),
       py::arg("character")=static_cast<char>(BoardCell::FLOOR),

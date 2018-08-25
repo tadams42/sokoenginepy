@@ -1,8 +1,6 @@
-#include <pybind11/pybind11.h>
-#include <sokoengine.hpp>
+#include "sokoenginepyext.h"
 
 using namespace sokoengine;
-namespace py = pybind11;
 
 
 void export_direction(py::module &);

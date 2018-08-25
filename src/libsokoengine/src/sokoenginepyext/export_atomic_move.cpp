@@ -1,8 +1,6 @@
-#include <pybind11/pybind11.h>
-#include <sokoengine.hpp>
+#include "sokoenginepyext.h"
 
 using namespace std;
-namespace py = pybind11;
 using namespace sokoengine;
 
 void export_atomic_move(py::module& m) {

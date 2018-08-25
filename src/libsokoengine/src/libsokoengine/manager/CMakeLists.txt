@@ -1,10 +1,12 @@
 set(SOKOENGINE_SOURCES ${SOKOENGINE_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/board_state.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/board_manager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/sokoban_plus.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/hashed_board_manager.cpp
 PARENT_SCOPE)
 
 set(SOKOENGINE_HEADERS ${SOKOENGINE_HEADERS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/board_state.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/board_manager.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/sokoban_plus.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/hashed_board_manager.hpp

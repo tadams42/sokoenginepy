@@ -2,38 +2,38 @@ import random
 
 from ... import utilities
 from ..board_manager import BoardManager
+from ..piece import DEFAULT_PIECE_ID
 
 
-class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings):
+class HashedBoardManager(
+    BoardManager, metaclass=utilities.InheritableDocstrings
+):
     """:class:`.BoardManager` with Zobrist hashing
 
-    Adds Zobrist hashing on top of :class:`.BoardManager` and keeps it up to date
-    when pieces are moved.
+    Adds Zobrist hashing on top of :class:`.BoardManager` and keeps it up to
+    date when pieces are moved.
 
-    Zobrist hash is 64b integer hash derived from positions of all boxes on
-    board.
+    Zobrist hash is 64b integer hash derived from positions of all boxes and
+    pushers on board.
 
     When initialized, :class:`.HashedBoardManager` hashes board using positions
-    and IDs of boxes and produces 64b integer hash. After that, whenever
-    position changes, this hash is updated. The ``Zobrist`` part means hashing
-    is deterministic which then means that undoing box move will return hash
-    value to previous one. All this allows for creation of position tables that
-    contain many board layouts and can be quickly compared (since we are not
-    comparing positions but only hashes of these positions). Being able to
-    quickly compare and find current board layout in some big table, speeds up
-    searching through game space which is needed for effective solver
-    implementations.
-
-    For most applications, it is only interesting to use hash of boxes'
-    positions. Sometimes might be usefull to have hash derived from both,
-    boxes' and pushers' positions.
+    and IDs of boxes and pushers and produces 64b integer hash. After that,
+    whenever position of piece changes, this hash is updated. The ``Zobrist``
+    part means hashing is deterministic which then means that undoing movement
+    will return hash value to previous one. All this allows for creation of
+    position tables that contain many board layouts and can be quickly compared
+    (since we are not comparing positions but only hashes of these positions).
+    Being able to quickly compare and find current board layout in some big
+    table, speeds up searching through game space which is needed for effective
+    solver implementations.
 
     Boxes with same Sokoban+ ID are treated as equal meaning that if two of
     these boxes switch position, hash will not change. This also means that
-    hash is different when Sokoban+ is enabled from the one when it is disabled
+    hash is different when Sokoban+ is enabled from the one when it is
+    disabled
 
-    Pushers are all treated equal, meaning that if two pushers switch position,
-    hash will not change
+    Pushers are all treated equal, meaning that if two pushers switch
+    position, hash will not change
 
     Notes:
         - enabling/disabling Sokoban+ rehashes the board state
@@ -235,4 +235,10 @@ class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings
     def switch_boxes_and_goals(self):
         retv = super().switch_boxes_and_goals()
         self._solutions_hashes = None
+        return retv
+
+    @property
+    def state(self):
+        retv = super().state
+        retv.zobrist_hash = self.state_hash
         return retv

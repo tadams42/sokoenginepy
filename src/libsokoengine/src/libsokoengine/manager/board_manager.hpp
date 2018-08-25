@@ -2,6 +2,7 @@
 #define BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include "sokoengine_config.hpp"
+#include "board_state.hpp"
 
 #include <stdexcept>
 #include <vector>
@@ -101,7 +102,7 @@ public:
   virtual void disable_sokoban_plus();
 
   ///
-  /// All boxes coonfigurations that are solution to board.
+  /// All boxes configurations that are solution to board.
   ///
   typedef std::vector<positions_by_id_t> solutions_vector_t;
   solutions_vector_t solutions() const;
@@ -113,6 +114,8 @@ public:
   static std::string to_str(const solutions_vector_t& v, int add_indent=0);
   virtual std::string str() const;
   virtual std::string repr() const;
+
+  virtual BoardState state() const;
 
 protected:
   virtual void pusher_moved(position_t old_position, position_t to_new_position);

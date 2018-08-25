@@ -1,11 +1,91 @@
-#include <pybind11/pybind11.h>
-#include <sokoengine.hpp>
+#include "sokoenginepyext.h"
 
 using namespace std;
-namespace py = pybind11;
 using namespace sokoengine;
 
 void export_board_manager(py::module& m) {
+  py::class_<BoardState>(m, "BoardState")
+    .def(
+      py::init(
+        [](
+          const py::list& pushers_positions, const py::list& boxes_positions,
+          const py::object& zobrist_hash
+        ) {
+          Positions pushers_positions_native;
+          for (auto val : pushers_positions)
+            pushers_positions_native.push_back(val.cast<position_t>());
+
+          Positions boxes_positions_native;
+          for (auto val : boxes_positions)
+            boxes_positions_native.push_back(val.cast<position_t>());
+
+          zobrist_key_t zobrist_hash_native;
+          if (zobrist_hash.is_none()) zobrist_hash_native = 0;
+          else zobrist_hash_native = zobrist_hash.cast<zobrist_key_t>();
+
+          return make_unique<BoardState>(
+            pushers_positions_native, boxes_positions_native,
+            zobrist_hash_native
+          );
+        }
+      ),
+      py::arg("pushers_positions")=py::none(),
+      py::arg("boxes_positions")=py::none(),
+      py::arg("zobrist_hash")=py::none()
+    )
+
+    // protocols
+    .def("__eq__", &BoardState::operator==)
+    .def("__ne__", &BoardState::operator!=)
+    .def("__str__", &BoardState::str)
+    .def("__repr__", &BoardState::repr)
+
+    .def_property(
+      "pushers_positions",
+      [](BoardState& self) {
+        auto native_retv = self.pushers_positions();
+        py::list retv;
+        for (auto val : native_retv) retv.append(val);
+        return retv;
+      },
+      [](BoardState& self, const py::list& rv) {
+        self.pushers_positions() = Positions();
+        if (!rv.is_none()) {
+          for (auto val : rv)
+            self.pushers_positions().push_back(val.cast<position_t>());
+        }
+      }
+    )
+
+    .def_property(
+      "boxes_positions",
+      [](BoardState& self) {
+        auto native_retv = self.boxes_positions();
+        py::list retv;
+        for (auto val : native_retv) retv.append(val);
+        return retv;
+      },
+      [](BoardState& self, const py::list& rv) {
+        self.boxes_positions() = Positions();
+        if (!rv.is_none()) {
+          for (auto val : rv)
+            self.boxes_positions().push_back(val.cast<position_t>());
+        }
+      }
+    )
+
+    .def_property(
+      "zobrist_hash",
+      [](BoardState& self) {
+        return self.zobrist_hash();
+      },
+      [](BoardState& self, const py::object& rv) {
+        if (rv.is_none()) self.zobrist_hash() = 0;
+        else self.zobrist_hash() = rv.cast<zobrist_key_t>();
+      }
+    )
+  ;
+
   py::class_<BoardManager>(m, "BoardManager")
     .def(py::init<VariantBoard&>(), py::arg("variant_board"))
 
@@ -120,6 +200,8 @@ void export_board_manager(py::module& m) {
     .def("goal_id_on", &BoardManager::goal_id_on, py::arg("position"))
     .def("has_goal", &BoardManager::has_goal, py::arg("goal_id"))
     .def("has_goal_on", &BoardManager::has_goal_on, py::arg("position"))
+    .def_property_readonly("state", &BoardManager::state)
+
     .def("box_plus_id", &BoardManager::box_plus_id, py::arg("box_id"))
     .def("goal_plus_id", &BoardManager::goal_plus_id, py::arg("goal_id"))
 

@@ -8,11 +8,6 @@
 namespace sokoengine {
 
 ///
-/// Zobrist key storage.
-///
-typedef uint64_t zobrist_key_t;
-
-///
 /// Implements Zobrist hashing of BoardManager
 ///
 class LIBSOKOENGINE_API HashedBoardManager : public BoardManager
@@ -37,11 +32,12 @@ public:
   virtual void disable_sokoban_plus() override;
 
   virtual void switch_boxes_and_goals() override;
+  virtual BoardState state() const override;
 
   bool is_solved() const;
 
   ///
-  /// Hashes of all soulution box configurations.
+  /// Hashes of all solution box configurations.
   ///
   typedef std::set<zobrist_key_t> solution_hashes_t;
   const solution_hashes_t& solution_hashes() const;

@@ -19,6 +19,7 @@
 #include "trioban_board.hpp"
 
 #include "sokoban_plus.hpp"
+#include "board_state.hpp"
 #include "board_manager.hpp"
 #include "hashed_board_manager.hpp"
 

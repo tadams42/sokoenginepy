@@ -4,6 +4,7 @@ from itertools import permutations
 from cached_property import cached_property
 
 from ... import utilities
+from ..board_state import BoardState
 from ..piece import DEFAULT_PIECE_ID
 from ..sokoban_plus import SokobanPlus
 
@@ -19,11 +20,11 @@ class BoxGoalSwitchError(RuntimeError):
 class BoardManager:
     """Memoizes, tracks and updates positions of all pieces.
 
-    - Provides efficient means to inspect positions of pushers, boxes and goals.
-      To understand how this works, we need to have a way of identifying
-      individual pushers, boxes and goals. :class:`.BoardManager` does that by
-      assigning numerical ID to each individual piece. This ID can then be used
-      to refer to that piece in various contexts.
+    - Provides efficient means to inspect positions of pushers, boxes and
+      goals. To understand how this works, we need to have a way of
+      identifying individual pushers, boxes and goals. :class:`.BoardManager`
+      does that by assigning numerical ID to each individual piece. This ID
+      can then be used to refer to that piece in various contexts.
 
       IDs are assigned by simply counting from top left corner of board,
       starting with :data:`.DEFAULT_PIECE_ID`
@@ -32,15 +33,17 @@ class BoardManager:
           :alt: Assigning board elements' IDs
 
     - Provides efficient means of pieces movemet. Ie. we can move pushers and
-      boxes and :class:`.BoardManager` will update internal state and board cells.
+      boxes and :class:`.BoardManager` will update internal state and board
+      cells.
 
       This movement preserves piece IDs in contex of board state changes. To
-      ilustrate, let's assume we create :class:`.BoardManager` from board with two
-      pushers one above the other. After then we edit the board, placing pusher
-      ID 2 in row above pusher ID 1. Finally, we create another instance of
-      :class:`.BoardManager`. If we now inspect pusher IDs in first and second
-      :class:`.BoardManager` instance, they will be different. Have we used
-      movement methods instead of board editing, these IDs would be preserved:
+      ilustrate, let's assume we create :class:`.BoardManager` from board
+      with two pushers one above the other. After then we edit the board,
+      placing pusher ID 2 in row above pusher ID 1. Finally, we create
+      another instance of :class:`.BoardManager`. If we now inspect pusher
+      IDs in first and second :class:`.BoardManager` instance, they will be
+      different. Have we used movement methods instead of board editing,
+      these IDs would be preserved:
 
       .. |img1| image:: /images/movement_vs_transfer1.png
       .. |img2| image:: /images/movement_vs_transfer2.png
@@ -59,10 +62,10 @@ class BoardManager:
     Warning:
         Once we create instance of :class:`.BoardManager` from some
         :class:`.VariantBoard` instance, that board should not be edited.
-        :class:`.BoardManager` will update cells on board when pieces are moved,
-        and editing board cells directly (ie. adding/removing pushers or boxes,
-        changing board size, changing walls layout, etc...) will not sync these
-        edits back to our :class:`.BoardManager` instance.
+        :class:`.BoardManager` will update cells on board when pieces are
+        moved, and editing board cells directly (ie. adding/removing pushers
+        or boxes, changing board size, changing walls layout, etc...) will
+        not sync these edits back to our :class:`.BoardManager` instance.
 
     Args:
         variant_board (VariantBoard): board for which we want to manage state
@@ -630,4 +633,19 @@ class BoardManager:
         return (
             self.pushers_count > 0 and self.boxes_count == self.goals_count
             and self.boxes_count > 0 and self.goals_count > 0
+        )
+
+    @property
+    def state(self):
+        pushers_positions = self.pushers_positions
+        boxes_positions = self.boxes_positions
+        return BoardState(
+            pushers_positions=[
+                pushers_positions[key]
+                for key in sorted(pushers_positions.keys())
+            ],
+            boxes_positions=[
+                boxes_positions[key]
+                for key in sorted(boxes_positions.keys())
+            ]
         )

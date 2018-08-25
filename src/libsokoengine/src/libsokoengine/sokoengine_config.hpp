@@ -49,6 +49,8 @@
 //                      typedefs and global constants
 // #############################################################################
 
+#include <cstdint>
+
 ///
 /// Top namespace for libsokoengine
 ///
@@ -84,6 +86,11 @@ constexpr static const piece_id_t NULL_ID = -2;
 /// but it cant't be returned.
 ///
 constexpr static const position_t NULL_POSITION = -1;
+
+///
+/// Zobrist key storage.
+///
+typedef uint64_t zobrist_key_t;
 
 } // namespace sokoengine
 

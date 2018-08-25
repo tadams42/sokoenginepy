@@ -310,4 +310,10 @@ string HashedBoardManager::repr() const {
   return "HashedBoardManager(" + board().repr() + ")";
 }
 
+BoardState HashedBoardManager::state() const {
+  auto retv = BoardManager::state();
+  retv.zobrist_hash() = boxes_layout_hash();
+  return retv;
+}
+
 } // namespace sokoengine

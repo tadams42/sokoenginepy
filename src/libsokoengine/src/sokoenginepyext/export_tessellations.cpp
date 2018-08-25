@@ -1,9 +1,7 @@
-#include <pybind11/pybind11.h>
-#include <sokoengine.hpp>
+#include "sokoenginepyext.h"
 #include <map>
 
 using namespace std;
-namespace py = pybind11;
 using namespace sokoengine;
 
 void export_tessellations(py::module& m) {
