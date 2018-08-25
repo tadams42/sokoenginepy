@@ -81,7 +81,7 @@ class SelectPusherCommand(MoverCommand, metaclass=MetaclassMediator):
 class JumpCommand(MoverCommand, metaclass=MetaclassMediator):
     def __init__(self, mover, final_position):
         super().__init__(mover)
-        self._initial_position = mover.state.pusher_position(
+        self._initial_position = mover.board_manager.pusher_position(
             mover.selected_pusher
         )
         self._final_position = final_position

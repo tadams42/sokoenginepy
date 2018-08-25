@@ -127,8 +127,8 @@ class MovementBenchmarkPrinter:
             "Board: ",
             benchmarker.mover.board.width,
             benchmarker.mover.board.height,
-            benchmarker.mover.state.pushers_count,
-            benchmarker.mover.state.boxes_count
+            benchmarker.mover.board_manager.pushers_count,
+            benchmarker.mover.board_manager.boxes_count
         ) + "\n" + str(benchmarker.mover.board) + "Moves count: {0}".format(
             self.moves_per_run_count
         )

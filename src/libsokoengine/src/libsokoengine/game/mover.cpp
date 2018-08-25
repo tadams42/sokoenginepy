@@ -1,7 +1,7 @@
 #include "mover.hpp"
 #include "variant_board.hpp"
 #include "board_cell.hpp"
-#include "hashed_board_state.hpp"
+#include "hashed_board_manager.hpp"
 #include "cppitertools/groupby.hpp"
 
 #include <algorithm>
@@ -29,7 +29,7 @@ IllegalMoveError::~IllegalMoveError() = default;
 class LIBSOKOENGINE_LOCAL Mover::PIMPL {
 public:
   VariantBoard::unique_ptr_t m_initial_board;
-  HashedBoardState m_state;
+  HashedBoardManager m_manager;
   SolvingMode m_solving_mode;
   bool m_pulls_boxes = true;
   piece_id_t m_selected_pusher = DEFAULT_PIECE_ID;
@@ -38,15 +38,15 @@ public:
 
   PIMPL(VariantBoard& board, SolvingMode mode) :
     m_initial_board(board.create_clone()),
-    m_state(board),
+    m_manager(board),
     m_solving_mode(mode)
   {
-    if (!m_state.is_playable()) {
+    if (!m_manager.is_playable()) {
       throw NonPlayableBoardError();
     }
 
     if(m_solving_mode == SolvingMode::REVERSE) {
-      m_state.switch_boxes_and_goals();
+      m_manager.switch_boxes_and_goals();
     }
   }
 
@@ -63,11 +63,11 @@ public:
     if (pusher_id == m_selected_pusher)
       return;
 
-    position_t old_pusher_position = m_state.pusher_position(m_selected_pusher);
-    position_t new_pusher_position = m_state.pusher_position(pusher_id);
+    position_t old_pusher_position = m_manager.pusher_position(m_selected_pusher);
+    position_t new_pusher_position = m_manager.pusher_position(pusher_id);
 
-    auto selection_path = m_state.board().positions_path_to_directions_path(
-      m_state.board().find_jump_path(old_pusher_position, new_pusher_position)
+    auto selection_path = m_manager.board().positions_path_to_directions_path(
+      m_manager.board().find_jump_path(old_pusher_position, new_pusher_position)
     );
 
     m_last_move.clear();
@@ -89,19 +89,19 @@ public:
       throw IllegalMoveError("Jumps allowed only in reverse solving mode");
     }
 
-    position_t old_position = m_state.pusher_position(m_selected_pusher);
+    position_t old_position = m_manager.pusher_position(m_selected_pusher);
     if (old_position == new_position) {
       return;
     }
 
     try {
-      m_state.move_pusher_from(old_position, new_position);
+      m_manager.move_pusher_from(old_position, new_position);
     } catch (const CellAlreadyOccupiedError& exc) {
       throw IllegalMoveError(exc.what());
     }
 
-    auto path = m_state.board().positions_path_to_directions_path(
-      m_state.board().find_jump_path(old_position, new_position)
+    auto path = m_manager.board().positions_path_to_directions_path(
+      m_manager.board().find_jump_path(old_position, new_position)
     );
     m_last_move.clear();
     for (const Direction& direction : path) {
@@ -113,10 +113,10 @@ public:
   }
 
   void push_or_move(const Direction& direction, const MoveWorkerOptions& options) {
-    position_t initial_pusher_position = m_state.pusher_position(
+    position_t initial_pusher_position = m_manager.pusher_position(
       m_selected_pusher
     );
-    position_t in_front_of_pusher = m_state.board().neighbor(
+    position_t in_front_of_pusher = m_manager.board().neighbor(
       initial_pusher_position, direction
     );
 
@@ -131,28 +131,28 @@ public:
     bool is_push = false;
     position_t in_front_of_box = NULL_POSITION;
 
-    if (m_state.has_box_on(in_front_of_pusher)) {
+    if (m_manager.has_box_on(in_front_of_pusher)) {
       is_push = true;
-      in_front_of_box = m_state.board().neighbor(
+      in_front_of_box = m_manager.board().neighbor(
         in_front_of_pusher, direction
       );
       if (in_front_of_box == NULL_POSITION) {
         throw IllegalMoveError(
           "Can't push box off board (ID: " +
-          std::to_string(m_state.box_id_on(in_front_of_pusher)) +
+          std::to_string(m_manager.box_id_on(in_front_of_pusher)) +
           ", direction: " + direction.str() + ")"
         );
       }
 
       try {
-        m_state.move_box_from(in_front_of_pusher, in_front_of_box);
+        m_manager.move_box_from(in_front_of_pusher, in_front_of_box);
       } catch (const CellAlreadyOccupiedError& exc) {
         throw IllegalMoveError(exc.what());
       }
     }
 
     try {
-      m_state.move_pusher_from(initial_pusher_position, in_front_of_pusher);
+      m_manager.move_pusher_from(initial_pusher_position, in_front_of_pusher);
     } catch (const CellAlreadyOccupiedError& exc) {
       throw IllegalMoveError(exc.what());
     }
@@ -160,7 +160,7 @@ public:
     AtomicMove atomic_move(direction, is_push);
     atomic_move.set_pusher_id(m_selected_pusher);
     if (is_push) {
-      atomic_move.set_moved_box_id(m_state.box_id_on(in_front_of_box));
+      atomic_move.set_moved_box_id(m_manager.box_id_on(in_front_of_box));
       if (options.decrease_pull_count && m_pull_count > 0) {
         m_pull_count -= 1;
       }
@@ -170,10 +170,10 @@ public:
   }
 
   void pull_or_move(const Direction& direction, const MoveWorkerOptions& options) {
-    position_t initial_pusher_position = m_state.pusher_position(
+    position_t initial_pusher_position = m_manager.pusher_position(
       m_selected_pusher
     );
-    position_t in_front_of_pusher = m_state.board().neighbor(
+    position_t in_front_of_pusher = m_manager.board().neighbor(
       initial_pusher_position, direction
     );
 
@@ -186,7 +186,7 @@ public:
     }
 
     try {
-      m_state.move_pusher_from(initial_pusher_position, in_front_of_pusher);
+      m_manager.move_pusher_from(initial_pusher_position, in_front_of_pusher);
     } catch (const CellAlreadyOccupiedError& exc) {
       throw IllegalMoveError(exc.what());
     }
@@ -194,15 +194,15 @@ public:
     bool is_pull = false;
 
     if (options.force_pulls) {
-      position_t behind_pusher = m_state.board().neighbor(
+      position_t behind_pusher = m_manager.board().neighbor(
         initial_pusher_position, direction.opposite()
       );
 
       if (behind_pusher != NULL_POSITION &&
-          m_state.board().cell(behind_pusher).has_box()) {
+          m_manager.board().cell(behind_pusher).has_box()) {
         is_pull = true;
         try {
-          m_state.move_box_from(behind_pusher, initial_pusher_position);
+          m_manager.move_box_from(behind_pusher, initial_pusher_position);
         } catch (const CellAlreadyOccupiedError& exc) {
           throw IllegalMoveError(exc.what());
         }
@@ -215,7 +215,7 @@ public:
     AtomicMove atomic_move(direction, is_pull);
     atomic_move.set_pusher_id(m_selected_pusher);
     if (is_pull) {
-      atomic_move.set_moved_box_id(m_state.box_id_on(initial_pusher_position));
+      atomic_move.set_moved_box_id(m_manager.box_id_on(initial_pusher_position));
     }
     m_last_move.clear();
     m_last_move.push_back(atomic_move);
@@ -271,9 +271,9 @@ public:
   void undo_atomic_move(const AtomicMove& atomic_move) {
     MoveWorkerOptions options;
     if (m_solving_mode == SolvingMode::FORWARD) {
-      bool has_box_behind_pusher = m_state.has_box_on(
-        m_state.board().neighbor(
-          m_state.pusher_position(m_selected_pusher),
+      bool has_box_behind_pusher = m_manager.has_box_on(
+        m_manager.board().neighbor(
+          m_manager.pusher_position(m_selected_pusher),
           atomic_move.direction()
         )
       );
@@ -294,8 +294,8 @@ public:
     Directions path;
     for (const AtomicMove& am : jump_moves)
       path.push_back(am.direction().opposite());
-    position_t old_position = m_state.pusher_position(m_selected_pusher);
-    position_t new_position = m_state.board().path_destination(old_position, path);
+    position_t old_position = m_manager.pusher_position(m_selected_pusher);
+    position_t new_position = m_manager.board().path_destination(old_position, path);
     jump(new_position);
   }
 
@@ -303,9 +303,9 @@ public:
     Directions path;
     for (const AtomicMove& am : selection_moves)
       path.push_back(am.direction().opposite());
-    position_t old_position = m_state.pusher_position(m_selected_pusher);
-    position_t new_position = m_state.board().path_destination(old_position, path);
-    select_pusher(m_state.pusher_id_on(new_position));
+    position_t old_position = m_manager.pusher_position(m_selected_pusher);
+    position_t new_position = m_manager.board().path_destination(old_position, path);
+    select_pusher(m_manager.pusher_id_on(new_position));
   }
 
 protected:
@@ -323,11 +323,11 @@ Mover& Mover::operator=(Mover &&) = default;
 
 Mover::~Mover() = default;
 
-const VariantBoard& Mover::board() const { return m_impl->m_state.board(); }
+const VariantBoard& Mover::board() const { return m_impl->m_manager.board(); }
 
 SolvingMode Mover::solving_mode() const { return m_impl->m_solving_mode; }
 
-const HashedBoardState& Mover::state() const { return m_impl->m_state; }
+const HashedBoardManager& Mover::board_manager() const { return m_impl->m_manager; }
 
 piece_id_t Mover::selected_pusher() const { return m_impl->m_selected_pusher; }
 

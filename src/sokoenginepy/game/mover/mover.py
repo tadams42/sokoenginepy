@@ -1,9 +1,9 @@
 from enum import IntEnum
 from itertools import groupby
 
+from ...manager import (DEFAULT_PIECE_ID, CellAlreadyOccupiedError,
+                        HashedBoardManager)
 from ...snapshot import AtomicMove
-from ...state import (DEFAULT_PIECE_ID, CellAlreadyOccupiedError,
-                      HashedBoardState)
 
 
 class SolvingMode(IntEnum):
@@ -77,23 +77,23 @@ class Mover:
     """
 
     def __init__(self, board, solving_mode=SolvingMode.FORWARD):
-        self._state = HashedBoardState(board)
+        self._manager = HashedBoardManager(board)
         self._solving_mode = solving_mode
         self._pulls_boxes = True
         self._selected_pusher = DEFAULT_PIECE_ID
         self._pull_count = 0
         self._last_move = []
 
-        if not self._state.is_playable:
+        if not self._manager.is_playable:
             raise NonPlayableBoardError
 
         if self._solving_mode == SolvingMode.REVERSE:
-            self._state.switch_boxes_and_goals()
+            self._manager.switch_boxes_and_goals()
 
     @property
     def board(self):
         """Board on which :class:`.Mover` is operating on"""
-        return self._state.board
+        return self._manager.board
 
     @property
     def solving_mode(self):
@@ -101,9 +101,9 @@ class Mover:
         return self._solving_mode
 
     @property
-    def state(self):
-        """Current board state (:class:`.HashedBoardState`)."""
-        return self._state
+    def board_manager(self):
+        """Current board manager (:class:`.HashedBoardManager`)."""
+        return self._manager
 
     @property
     def selected_pusher(self):
@@ -205,18 +205,18 @@ class Mover:
             pusher_id (int): ID of pusher
 
         See Also:
-            :attr:`.BoardState.pushers_ids`
+            :attr:`.BoardManager.pushers_ids`
         """
 
         if pusher_id == self._selected_pusher:
             return
 
-        old_pusher_position = self._state.pusher_position(
+        old_pusher_position = self._manager.pusher_position(
             self._selected_pusher
         )
-        new_pusher_position = self._state.pusher_position(pusher_id)
-        selection_path = self._state.board.positions_path_to_directions_path(
-            self._state.board.
+        new_pusher_position = self._manager.pusher_position(pusher_id)
+        selection_path = self._manager.board.positions_path_to_directions_path(
+            self._manager.board.
             find_jump_path(old_pusher_position, new_pusher_position)
         )
 
@@ -272,17 +272,17 @@ class Mover:
                 'Jumps allowed only in reverse solving mode'
             )
 
-        old_position = self._state.pusher_position(self._selected_pusher)
+        old_position = self._manager.pusher_position(self._selected_pusher)
         if old_position == new_position:
             return
 
         try:
-            self._state.move_pusher_from(old_position, new_position)
+            self._manager.move_pusher_from(old_position, new_position)
         except CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
-        path = self._state.board.positions_path_to_directions_path(
-            self._state.board.find_jump_path(old_position, new_position)
+        path = self._manager.board.positions_path_to_directions_path(
+            self._manager.board.find_jump_path(old_position, new_position)
         )
 
         def jump_am(direction):
@@ -332,9 +332,9 @@ class Mover:
     def _undo_atomic_move(self, atomic_move):
         options = MoveWorkerOptions()
         if self._solving_mode == SolvingMode.FORWARD:
-            has_box_behind_pusher = self.state.has_box_on(
-                self._state.board.neighbor(
-                    self.state.pusher_position(self.selected_pusher),
+            has_box_behind_pusher = self.board_manager.has_box_on(
+                self._manager.board.neighbor(
+                    self.board_manager.pusher_position(self.selected_pusher),
                     atomic_move.direction
                 )
             )
@@ -352,25 +352,25 @@ class Mover:
 
     def _undo_jump(self, jump_moves):
         path = [atomic_move.direction.opposite for atomic_move in jump_moves]
-        old_position = self._state.pusher_position(self._selected_pusher)
-        new_position = self._state.board.path_destination(old_position, path)
+        old_position = self._manager.pusher_position(self._selected_pusher)
+        new_position = self._manager.board.path_destination(old_position, path)
         self.jump(new_position)
 
     def _undo_pusher_selection(self, selection_moves):
         path = [atomic_move.direction.opposite for atomic_move in selection_moves]
-        old_position = self._state.pusher_position(self._selected_pusher)
-        new_position = self._state.board.path_destination(old_position, path)
-        self.select_pusher(self._state.pusher_id_on(new_position))
+        old_position = self._manager.pusher_position(self._selected_pusher)
+        new_position = self._manager.board.path_destination(old_position, path)
+        self.select_pusher(self._manager.pusher_id_on(new_position))
 
     def _push_or_move(self, direction, options):
         """Perform movement of currently selected pusher in ``direction``.
 
         In case there is a box in front of pusher, pushes it.
         """
-        initial_pusher_position = self._state.pusher_position(
+        initial_pusher_position = self._manager.pusher_position(
             self._selected_pusher
         )
-        in_front_of_pusher = self._state.board.neighbor(
+        in_front_of_pusher = self._manager.board.neighbor(
             initial_pusher_position, direction
         )
 
@@ -382,27 +382,27 @@ class Mover:
 
         is_push = False
         in_front_of_box = None
-        if self._state.has_box_on(in_front_of_pusher):
+        if self._manager.has_box_on(in_front_of_pusher):
             is_push = True
-            in_front_of_box = self._state.board.neighbor(
+            in_front_of_box = self._manager.board.neighbor(
                 in_front_of_pusher, direction
             )
             if not in_front_of_box:
                 raise IllegalMoveError(
                     "Can't push box off board! (ID: " +
                     "{0}, direction: {1})".format(
-                        self._state.box_id_on(in_front_of_pusher),
+                        self._manager.box_id_on(in_front_of_pusher),
                         str(direction)
                     )
                 )
 
             try:
-                self._state.move_box_from(in_front_of_pusher, in_front_of_box)
+                self._manager.move_box_from(in_front_of_pusher, in_front_of_box)
             except CellAlreadyOccupiedError as exc:
                 raise IllegalMoveError(str(exc))
 
         try:
-            self._state.move_pusher_from(
+            self._manager.move_pusher_from(
                 initial_pusher_position, in_front_of_pusher
             )
         except CellAlreadyOccupiedError as exc:
@@ -411,7 +411,7 @@ class Mover:
         atomic_move = AtomicMove(direction, is_push)
         atomic_move.pusher_id = self._selected_pusher
         if is_push:
-            atomic_move.moved_box_id = self._state.box_id_on(in_front_of_box)
+            atomic_move.moved_box_id = self._manager.box_id_on(in_front_of_box)
             if options.decrease_pull_count and self._pull_count > 0:
                 self._pull_count -= 1
         self._last_move = [atomic_move]
@@ -421,10 +421,10 @@ class Mover:
 
         In case there is a box in behind of pusher, might pull it.
         """
-        initial_pusher_position = self._state.pusher_position(
+        initial_pusher_position = self._manager.pusher_position(
             self._selected_pusher
         )
-        in_front_of_pusher = self._state.board.neighbor(
+        in_front_of_pusher = self._manager.board.neighbor(
             initial_pusher_position, direction
         )
 
@@ -435,7 +435,7 @@ class Mover:
             )
 
         try:
-            self._state.move_pusher_from(
+            self._manager.move_pusher_from(
                 initial_pusher_position, in_front_of_pusher
             )
         except CellAlreadyOccupiedError as exc:
@@ -443,13 +443,13 @@ class Mover:
 
         is_pull = False
         if options.force_pulls:
-            behind_pusher = self._state.board.neighbor(
+            behind_pusher = self._manager.board.neighbor(
                 initial_pusher_position, direction.opposite
             )
-            if behind_pusher and self._state.board[behind_pusher].has_box:
+            if behind_pusher and self._manager.board[behind_pusher].has_box:
                 is_pull = True
                 try:
-                    self._state.move_box_from(
+                    self._manager.move_box_from(
                         behind_pusher, initial_pusher_position
                     )
                 except CellAlreadyOccupiedError as exc:
@@ -460,7 +460,7 @@ class Mover:
         atomic_move = AtomicMove(direction, is_pull)
         atomic_move.pusher_id = self._selected_pusher
         if is_pull:
-            atomic_move.moved_box_id = self._state.box_id_on(
+            atomic_move.moved_box_id = self._manager.box_id_on(
                 initial_pusher_position
             )
         self._last_move = [atomic_move]

@@ -15,7 +15,7 @@ add_subdirectory (board)
 add_subdirectory (game)
 add_subdirectory (graph)
 add_subdirectory (snapshot)
-add_subdirectory (state)
+add_subdirectory (manager)
 add_subdirectory (tessellation)
 add_subdirectory (utilities)
 

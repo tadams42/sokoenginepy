@@ -3,8 +3,8 @@ from itertools import permutations
 import factory
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, BoardState, Direction,
-                          HashedBoardState, SokobanBoard, SokobanPlus,
+from sokoenginepy import (DEFAULT_PIECE_ID, BoardManager, Direction,
+                          HashedBoardManager, SokobanBoard, SokobanPlus,
                           Tessellation)
 from sokoenginepy.utilities import index_1d
 
@@ -85,7 +85,7 @@ def board_height():
 
 @pytest.fixture
 def variant_board(board_str):
-    # We could use mock here, but it is not neccessary as long as we test only
+    # We could use mock here, but it is not necessary as long as we test only
     # common behavior."
     return SokobanBoard(board_str=board_str)
 
@@ -106,13 +106,13 @@ def trioban_tessellation():
 
 
 @pytest.fixture
-def board_state(variant_board):
-    return BoardState(variant_board)
+def board_manager(variant_board):
+    return BoardManager(variant_board)
 
 
 @pytest.fixture
-def hashed_board_state(variant_board):
-    return HashedBoardState(variant_board)
+def hashed_board_manager(variant_board):
+    return HashedBoardManager(variant_board)
 
 
 @pytest.fixture

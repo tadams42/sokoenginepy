@@ -1,7 +1,7 @@
-#ifndef HASHED_BOARD_STATE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
-#define HASHED_BOARD_STATE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#ifndef HASHED_BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#define HASHED_BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "board_state.hpp"
+#include "board_manager.hpp"
 
 #include <set>
 
@@ -13,18 +13,18 @@ namespace sokoengine {
 typedef uint64_t zobrist_key_t;
 
 ///
-/// Implements Zobrist hashing of BoardState
+/// Implements Zobrist hashing of BoardManager
 ///
-class LIBSOKOENGINE_API HashedBoardState : public BoardState
+class LIBSOKOENGINE_API HashedBoardManager : public BoardManager
 {
 public:
-  explicit HashedBoardState(VariantBoard& board);
-  HashedBoardState(HashedBoardState&& rv);
-  HashedBoardState &operator=(HashedBoardState&& rv);
-  virtual ~HashedBoardState();
+  explicit HashedBoardManager(VariantBoard& board);
+  HashedBoardManager(HashedBoardManager&& rv);
+  HashedBoardManager &operator=(HashedBoardManager&& rv);
+  virtual ~HashedBoardManager();
 
-  bool operator==(const HashedBoardState& rv) const;
-  bool operator!=(const HashedBoardState& rv) const;
+  bool operator==(const HashedBoardManager& rv) const;
+  bool operator!=(const HashedBoardManager& rv) const;
 
   zobrist_key_t boxes_layout_hash() const;
   zobrist_key_t boxes_and_pushers_layout_hash() const;
@@ -54,8 +54,8 @@ protected:
   virtual void pusher_moved(position_t old_position, position_t to_new_position) override;
   virtual void box_moved(position_t old_position, position_t to_new_position) override;
 
-  HashedBoardState(const HashedBoardState&) = delete;
-  HashedBoardState& operator=(const HashedBoardState&) = delete;
+  HashedBoardManager(const HashedBoardManager&) = delete;
+  HashedBoardManager& operator=(const HashedBoardManager&) = delete;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;

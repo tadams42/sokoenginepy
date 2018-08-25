@@ -186,13 +186,13 @@ mover.undo_last_move();
 
 ### Piece tracking, position hashing and victory conditions
 
-To allow fast pusher and box positions retrieval and tracking, we implement cache class - `BoardState`. This class stores positions of board pieces, and allows fast update and retrieval of them.
+To allow fast pusher and box positions retrieval and tracking, we implement cache class - `BoardManager`. This class stores positions of board pieces, and allows fast update and retrieval of them.
 
-On top of `BoardState` we implement `HashedBoardState`. Although `Mover` doesn't need board hashing in any way, future solver implementations will need it. `HashedBoardState` implements Zobrist hashing of current positions of pushers and boxes. This can then be used by solvers to implement and speed up game-space searches by storing visited board hashes in cache tables while performing game-space search.
+On top of `BoardManager` we implement `HashedBoardManager`. Although `Mover` doesn't need board hashing in any way, future solver implementations will need it. `HashedBoardManager` implements Zobrist hashing of current positions of pushers and boxes. This can then be used by solvers to implement and speed up game-space searches by storing visited board hashes in cache tables while performing game-space search.
 
-When `Mover` is attached to `VariantBoard` it also creates fresh instance of `HashedBoardState` and keeps it up to date with current board position.
+When `Mover` is attached to `VariantBoard` it also creates fresh instance of `HashedBoardManager` and keeps it up to date with current board position.
 
-`BoardState` also implements checking of victory conditions. There are two main groups of those:
+`BoardManager` also implements checking of victory conditions. There are two main groups of those:
 
 1. Classic victory where any position in which each box is positioned on top of some goal
 2. Sokoban+ victory condition where each box is positioned on top of goal with the same id as that box
