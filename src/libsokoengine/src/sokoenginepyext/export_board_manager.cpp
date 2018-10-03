@@ -205,6 +205,16 @@ void export_board_manager(py::module& m) {
     .def("goal_id_on", &BoardManager::goal_id_on, py::arg("position"))
     .def("has_goal", &BoardManager::has_goal, py::arg("goal_id"))
     .def("has_goal_on", &BoardManager::has_goal_on, py::arg("position"))
+
+    .def_property_readonly(
+      "walls_positions", [](const BoardManager& self) {
+        auto native_retv = self.walls_positions();
+        py::list retv;
+        for (auto val : native_retv) retv.append(py::cast(val));
+        return retv;
+      }
+    )
+
     .def_property_readonly("state", &BoardManager::state)
 
     .def("box_plus_id", &BoardManager::box_plus_id, py::arg("box_id"))

@@ -273,6 +273,7 @@ string HashedBoardManager::str() const {
   boost::replace_all(retv, "<BoardManager pushers:", "<HashedBoardManager pushers:");
   boost::replace_all(retv, "              boxes:", "                    boxes:");
   boost::replace_all(retv, "              goals:", "                    goals:");
+  boost::replace_all(retv, "              walls:", "                    walls:");
   boost::replace_all(retv, "              boxorder:", "                    boxorder:");
   boost::replace_all(retv, "              goalorder:", "                    goalorder:");
   boost::replace_all(retv, "              board:", "                    board:");

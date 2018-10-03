@@ -76,6 +76,7 @@ class BoardManager:
         self._boxes = utilities.Flipdict()
         self._goals = utilities.Flipdict()
         self._pushers = utilities.Flipdict()
+        self._walls = []
 
         pusher_id = box_id = goal_id = DEFAULT_PIECE_ID
 
@@ -94,6 +95,9 @@ class BoardManager:
                 self._goals[goal_id] = position
                 goal_id += 1
 
+            if cell.is_wall:
+                self._walls.append(position)
+
         self._sokoban_plus = SokobanPlus(
             pieces_count=len(self._boxes), boxorder=boxorder,
             goalorder=goalorder
@@ -108,6 +112,13 @@ class BoardManager:
             ),
             prefix + 'boxes: {},'.format(self.boxes_positions),
             prefix + 'goals: {},'.format(self.goals_positions),
+            prefix + 'walls: {},'.format(
+                self.walls_positions
+                if len(self.walls_positions) <= 10
+                else '[{}, ...]'.format(
+                    ', '.join(str(w) for w in self.walls_positions[:10])
+                )
+            ),
             prefix + "boxorder: '{}',".format(self.boxorder or ''),
             prefix + "goalorder: '{}',".format(self.goalorder or ''),
             prefix + 'board:\n' + str(self.board) + '>',
@@ -124,6 +135,10 @@ class BoardManager:
     @property
     def board(self):
         return self._board
+
+    @property
+    def walls_positions(self):
+        return self._walls
 
     # --------------------------------------------------------------------------
     # Pushers

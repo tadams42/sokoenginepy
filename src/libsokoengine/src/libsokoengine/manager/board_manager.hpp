@@ -94,6 +94,8 @@ public:
   bool has_goal(piece_id_t goal_id) const;
   bool has_goal_on(position_t position) const;
 
+  const Positions& walls_positions() const;
+
   piece_id_t box_plus_id(piece_id_t box_id) const;
   piece_id_t goal_plus_id(piece_id_t goal_id) const;
 

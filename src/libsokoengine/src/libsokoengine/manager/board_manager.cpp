@@ -51,6 +51,7 @@ public:
   ids_to_positions_map_t m_pushers;
   ids_to_positions_map_t m_boxes;
   ids_to_positions_map_t m_goals;
+  Positions m_walls;
 
   VariantBoard& m_board;
   SokobanPlus m_plus;
@@ -76,6 +77,8 @@ public:
       if (cell.has_goal()) {
         m_goals.insert(ids_to_positions_map_t::value_type(goal_id++, curent_pos));
       }
+
+      if (cell.is_wall()) m_walls.push_back(curent_pos);
     }
 
     m_plus = SokobanPlus(m_boxes.size(), boxorder, goalorder);
@@ -403,6 +406,10 @@ bool BoardManager::has_goal_on(position_t position) const {
   return m_impl->has_piece_on_position(position, Selectors::GOALS);
 }
 
+const Positions& BoardManager::walls_positions() const {
+  return m_impl->m_walls;
+}
+
 piece_id_t BoardManager::box_plus_id(piece_id_t box_id) const {
   return m_impl->m_plus.box_plus_id(box_id);
 }
@@ -563,6 +570,7 @@ string BoardManager::str() const {
     "<BoardManager pushers: " + to_str(pushers_positions()) + ",\n" +
     "              boxes: " + to_str(boxes_positions()) + ",\n" +
     "              goals: " + to_str(goals_positions()) + ",\n" +
+    "              walls: " + converter(walls_positions()) + ",\n" +
     "              boxorder: '" + boxorder() + "',\n" +
     "              goalorder: '" + boxorder() + "',\n" +
     "              board:\n" + board().to_str() + ">";
