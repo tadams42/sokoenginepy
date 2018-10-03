@@ -186,6 +186,7 @@ class HashedBoardManager(
         old_plus_enabled = self.is_sokoban_plus_enabled
         BoardManager.boxorder.fset(self, rv)
         if self.is_sokoban_plus_enabled != old_plus_enabled:
+            self._solutions_hashes = None
             self._zobrist_rehash()
 
     @BoardManager.goalorder.setter
@@ -194,6 +195,7 @@ class HashedBoardManager(
         old_plus_enabled = self.is_sokoban_plus_enabled
         BoardManager.goalorder.fset(self, rv)
         if self.is_sokoban_plus_enabled != old_plus_enabled:
+            self._solutions_hashes = None
             self._zobrist_rehash()
 
     @copy_ancestor_docstring
@@ -201,6 +203,7 @@ class HashedBoardManager(
         old_plus_enabled = self.is_sokoban_plus_enabled
         super().enable_sokoban_plus()
         if self.is_sokoban_plus_enabled != old_plus_enabled:
+            self._solutions_hashes = None
             self._zobrist_rehash()
 
     @copy_ancestor_docstring
@@ -208,27 +211,27 @@ class HashedBoardManager(
         old_plus_enabled = self.is_sokoban_plus_enabled
         super().disable_sokoban_plus()
         if self.is_sokoban_plus_enabled != old_plus_enabled:
+            self._solutions_hashes = None
             self._zobrist_rehash()
 
+    @property
     def is_solved(self):
-        if self._initial_layout_hash is None:
-            self._zobrist_rehash()
-
-        if not self._solutions_hashes:
-            self._solutions_hashes = set(
-                h
-                for h in [
-                    self.external_position_hash(solution)
-                    for solution in self.solutions()
-                ] if h
-            )
-
-        return self._layout_hash in self._solutions_hashes
+        return self.boxes_layout_hash in self.solutions_hashes
 
     @property
     def solutions_hashes(self):
-        # regenerate solution hashes
-        self.is_solved()
+        if not self._solutions_hashes:
+            self._solutions_hashes = set(
+                h for h in (
+                    self.external_position_hash({
+                        DEFAULT_PIECE_ID + box_id: box_position
+                        for box_id, box_position in enumerate(
+                            solution.boxes_positions
+                        )
+                    })
+                    for solution in self.solutions()
+                ) if h
+            )
         return self._solutions_hashes
 
     @copy_ancestor_docstring

@@ -39,7 +39,7 @@ public:
   virtual void switch_boxes_and_goals() override;
   virtual BoardState state() const override;
 
-  bool is_solved() const;
+  virtual bool is_solved() const override;
 
   ///
   /// Hashes of all solution box configurations.

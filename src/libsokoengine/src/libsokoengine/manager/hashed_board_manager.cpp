@@ -218,6 +218,7 @@ void HashedBoardManager::set_boxorder(const std::string& rv) {
   bool old_plus_enabled = is_sokoban_plus_enabled();
   BoardManager::set_boxorder(rv);
   if (is_sokoban_plus_enabled() != old_plus_enabled) {
+    m_impl->m_solutions_hashes.clear();
     m_impl->m_hash_invalidated = true;
   }
 }
@@ -226,6 +227,7 @@ void HashedBoardManager::set_goalorder(const std::string& rv) {
   bool old_plus_enabled = is_sokoban_plus_enabled();
   BoardManager::set_goalorder(rv);
   if (is_sokoban_plus_enabled() != old_plus_enabled) {
+    m_impl->m_solutions_hashes.clear();
     m_impl->m_hash_invalidated = true;
   }
 }
@@ -233,6 +235,7 @@ void HashedBoardManager::set_goalorder(const std::string& rv) {
 void HashedBoardManager::enable_sokoban_plus() {
   if (!is_sokoban_plus_enabled()) {
     BoardManager::enable_sokoban_plus();
+    m_impl->m_solutions_hashes.clear();
     m_impl->m_hash_invalidated = true;
   }
 }
@@ -240,6 +243,7 @@ void HashedBoardManager::enable_sokoban_plus() {
 void HashedBoardManager::disable_sokoban_plus() {
   if (is_sokoban_plus_enabled()) {
     BoardManager::disable_sokoban_plus();
+    m_impl->m_solutions_hashes.clear();
     m_impl->m_hash_invalidated = true;
   }
 }
@@ -250,21 +254,27 @@ void HashedBoardManager::switch_boxes_and_goals() {
 }
 
 bool HashedBoardManager::is_solved() const {
-  const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
-
-  if (m_impl->m_solutions_hashes.empty()) {
-    auto slns = solutions();
-    for (auto solution : slns) {
-      m_impl->m_solutions_hashes.insert(external_position_hash(solution));
-    }
-  }
-
-  return m_impl->m_solutions_hashes.count(m_impl->m_layout_hash) > 0;
+  return solutions_hashes().count(boxes_layout_hash()) > 0;
 }
 
 const HashedBoardManager::solutions_hashes_t& HashedBoardManager::solutions_hashes() const {
-  // regenerate solution hashes
-  is_solved();
+  if (m_impl->m_solutions_hashes.empty()) {
+    // regenerate hashes
+    auto slns = solutions();
+    for (auto solution : slns) {
+      positions_by_id_t boxes;
+      size_t i = DEFAULT_PIECE_ID;
+      for (auto box_pos: solution.boxes_positions()) {
+          boxes.insert(std::make_pair(i, box_pos));
+          i++;
+      }
+
+      const_cast<HashedBoardManager*>(this)->m_impl->m_solutions_hashes.insert(
+        external_position_hash(boxes)
+      );
+    }
+  }
+
   return m_impl->m_solutions_hashes;
 }
 

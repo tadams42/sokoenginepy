@@ -174,7 +174,7 @@ Example usage of `.Mover`:
     >>> reverse_mover.board_manager.enable_sokoban_plus()
     >>>
     >>> # This check also considers if Sokoban+ is enabled...
-    >>> reverse_mover.board_manager.is_solved()
+    >>> reverse_mover.board_manager.is_solved
     False
 
 `.Mover` operates directly on referenced `.VariantBoard` so that instance should not be edited outside of its `.Mover`. For the same reason, it is not allowed to attach two movers to same game board.

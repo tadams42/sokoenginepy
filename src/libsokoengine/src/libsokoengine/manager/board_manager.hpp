@@ -112,8 +112,10 @@ public:
   ///
   /// All boxes configurations that are solution to board.
   ///
-  typedef std::vector<positions_by_id_t> solutions_vector_t;
+  typedef std::vector<BoardState> solutions_vector_t;
   solutions_vector_t solutions() const;
+
+  virtual bool is_solved() const;
   virtual void switch_boxes_and_goals();
   bool is_playable() const;
 

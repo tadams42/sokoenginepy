@@ -557,9 +557,7 @@ class BoardManager:
             Resultset depends on :attr:`.BoardManager.is_sokoban_plus_enabled`.
 
         Yields:
-            dict: mapping of box IDs and positions of one board solution::
-
-                {1: 42, 2: 24, 3: 54}
+            `.BoardState`
         """
         if self.boxes_count != self.goals_count:
             return []
@@ -579,9 +577,9 @@ class BoardManager:
 
         for boxes_positions in permutations(self._goals.values()):
             if is_valid_solution(boxes_positions):
-                yield dict(
-                    (index + DEFAULT_PIECE_ID, box_position)
-                    for index, box_position in enumerate(boxes_positions)
+                yield BoardState(
+                    boxes_positions=list(boxes_positions),
+                    pushers_positions=[]
                 )
 
     def _box_goal_pairs(self):

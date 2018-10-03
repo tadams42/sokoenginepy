@@ -3,9 +3,9 @@ from itertools import permutations
 import factory
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, BoardManager, Direction,
-                          HashedBoardManager, SokobanBoard, SokobanPlus,
-                          Tessellation)
+from sokoenginepy import (DEFAULT_PIECE_ID, BoardManager, BoardState,
+                          Direction, HashedBoardManager, SokobanBoard,
+                          SokobanPlus, Tessellation)
 from sokoenginepy.utilities import index_1d
 
 from ..test_helpers import fake
@@ -51,6 +51,27 @@ def switched_board_str():
 
 
 @pytest.fixture
+def solved_board_str():
+    # yapf: disable
+    return "\n".join([
+        # 123456789012345678
+        "    #####          ",  # 0
+        "    #  @#          ",  # 1
+        "    #   #          ",  # 2
+        "  ###   ##         ",  # 3
+        "  #      #         ",  # 4
+        "### # ## #   ######",  # 5
+        "#   # ## #####  **#",  # 6
+        "#               **#",  # 7
+        "##### ### #@##  **#",  # 8
+        "    #     #########",  # 9
+        "    #######        ",  # 0
+    ])
+    # yapf: enable
+
+
+
+@pytest.fixture
 def positions_path(board_width):
     return [
         index_1d(7, 1, board_width),
@@ -88,6 +109,11 @@ def variant_board(board_str):
     # We could use mock here, but it is not necessary as long as we test only
     # common behavior."
     return SokobanBoard(board_str=board_str)
+
+
+@pytest.fixture
+def solved_board(solved_board_str):
+    return SokobanBoard(board_str=solved_board_str)
 
 
 @pytest.fixture
@@ -254,57 +280,24 @@ def switched_boxes_plus(goals_positions):
 def all_solutions(goals_positions):
     def calc():
         for boxes_positions in permutations(goals_positions.values()):
-            yield dict((index + DEFAULT_PIECE_ID, box_position)
-                       for index, box_position in enumerate(boxes_positions))
+            yield BoardState(
+                boxes_positions=list(boxes_positions),
+                pushers_positions=[]
+            )
 
     return list(calc())
 
 
 @pytest.fixture
 def sokoban_plus_solutions():
-    return [{
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 150,
-        5: 168,
-        6: 169
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 150,
-        5: 169,
-        6: 168
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 168,
-        5: 150,
-        6: 169
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 168,
-        5: 169,
-        6: 150
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 169,
-        5: 150,
-        6: 168
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 169,
-        5: 168,
-        6: 150
-    }]
+    return [
+        BoardState(boxes_positions=[149, 130, 131, 150, 168, 169], pushers_positions=[]),
+        BoardState(boxes_positions=[149, 130, 131, 150, 169, 168], pushers_positions=[]),
+        BoardState(boxes_positions=[149, 130, 131, 168, 150, 169], pushers_positions=[]),
+        BoardState(boxes_positions=[149, 130, 131, 168, 169, 150], pushers_positions=[]),
+        BoardState(boxes_positions=[149, 130, 131, 169, 150, 168], pushers_positions=[]),
+        BoardState(boxes_positions=[149, 130, 131, 169, 168, 150], pushers_positions=[])
+    ]
 
 
 @pytest.fixture

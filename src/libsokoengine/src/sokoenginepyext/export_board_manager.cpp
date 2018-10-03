@@ -258,19 +258,12 @@ void export_board_manager(py::module& m) {
     .def(
       "solutions", [](const BoardManager& self) {
         auto native_retv = self.solutions();
-
         py::list retv;
-        for (auto i = native_retv.begin(); i != native_retv.end(); ++i) {
-          py::dict d;
-          for (auto j = (*i).begin(); j != (*i).end(); j++) {
-            d[py::int_(j->first)] = j->second;
-          }
-          retv.append(d);
-        }
-
+        for (auto val : native_retv) retv.append(py::cast(val));
         return retv;
       }
     )
+    .def_property_readonly("is_solved", &BoardManager::is_solved)
 
     .def("switch_boxes_and_goals", &BoardManager::switch_boxes_and_goals)
     .def_property_readonly("is_playable", &BoardManager::is_playable)
@@ -304,14 +297,13 @@ void export_board_manager(py::module& m) {
       py::arg("boxes_positions")
     )
 
-    .def("is_solved", &HashedBoardManager::is_solved)
+    .def_property_readonly("is_solved", &HashedBoardManager::is_solved)
 
     .def_property_readonly(
       "solutions_hashes", [](const HashedBoardManager& self) {
-        auto native_retv = self.solutions_hashes();
-        py::list retv;
-        for (auto val : native_retv) retv.append(val);
-        return retv;
+        return py::copy_sequence_to_pylist<HashedBoardManager::solutions_hashes_t>(
+            self.solutions_hashes()
+        );
       }
     )
   ;

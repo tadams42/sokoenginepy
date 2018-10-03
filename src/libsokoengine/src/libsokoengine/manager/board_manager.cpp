@@ -480,13 +480,7 @@ BoardManager::solutions_vector_t BoardManager::solutions() const {
 
   do {
     if (is_valid_solution(g_positions)) {
-      positions_by_id_t solution;
-      size_t index = 0;
-      for (position_t b_position : g_positions) {
-        solution[index + DEFAULT_PIECE_ID] = b_position;
-        index++;
-      }
-      retv.push_back(solution);
+      retv.push_back(BoardState(Positions(), g_positions));
     }
   } while (std::next_permutation(g_positions.begin(), g_positions.end()));
 
@@ -528,6 +522,23 @@ void BoardManager::switch_boxes_and_goals() {
       }
     }
   }
+}
+
+bool BoardManager::is_solved() const {
+  if (boxes_count() != goals_count()) return false;
+
+  bool retv = true;
+
+  for (auto box : m_impl->m_boxes.left) {
+    retv =
+      retv &&
+      has_goal_on(box.second) &&
+      box_plus_id(box.first) == goal_plus_id(goal_id_on(box.second))
+    ;
+    if (!retv) break;
+  }
+
+  return retv;
 }
 
 bool BoardManager::is_playable() const {
