@@ -215,7 +215,7 @@ Example of `.HashedBoardManager` usage:
     ... """[1:-1])
     >>> manager = HashedBoardManager(board)
     >>> manager
-    HashedBoardManager(SokobanBoard(board_str='\n'.join([
+    HashedBoardManager(variant_board=SokobanBoard(board_str='\n'.join([
         '    #####          ',
         '    #  @#          ',
         '    #$  #          ',
@@ -227,7 +227,7 @@ Example of `.HashedBoardManager` usage:
         '##### ### #@##  ..#',
         '    #     #########',
         '    #######        '
-    ])))
+    ])), boxorder='', goalorder='')
 
 This class memoizes positions of pushers and boxes and assigns numerical IDs to
 them so they can be referred to in different contexts.

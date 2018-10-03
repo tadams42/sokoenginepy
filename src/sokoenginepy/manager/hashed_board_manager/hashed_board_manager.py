@@ -43,8 +43,8 @@ class HashedBoardManager(
           preformed
     """
 
-    def __init__(self, variant_board):
-        super().__init__(variant_board)
+    def __init__(self, variant_board, boxorder=None, goalorder=None):
+        super().__init__(variant_board, boxorder, goalorder)
         self._initial_layout_hash = None
         self._layout_hash = None
         self._initial_with_pushers_hash = None
@@ -240,5 +240,5 @@ class HashedBoardManager(
     @property
     def state(self):
         retv = super().state
-        retv.zobrist_hash = self.state_hash
+        retv.zobrist_hash = self.boxes_layout_hash
         return retv

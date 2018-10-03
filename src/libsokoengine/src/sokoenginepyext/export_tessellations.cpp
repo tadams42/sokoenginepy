@@ -23,10 +23,7 @@ void export_tessellations(py::module& m) {
     .def_property_readonly(
       "legal_directions",
       [](const Tessellation& self) -> py::list {
-        auto native_retv = self.legal_directions();
-        py::list retv;
-        for (auto d : native_retv) retv.append(d);
-        return retv;
+        return py::copy_sequence_to_pylist(self.legal_directions());
       }
     )
 
@@ -35,11 +32,10 @@ void export_tessellations(py::module& m) {
         const Tessellation& self, position_t position, const Direction& direction,
         size_t board_width, size_t board_height
       ) -> py::object {
-        position_t retv = self.neighbor_position(
-          position, direction, board_width, board_height
+        return py::none_if_equal_to<position_t>(
+            self.neighbor_position(position, direction, board_width, board_height),
+            NULL_POSITION
         );
-        if (retv == NULL_POSITION) return py::none();
-        return py::cast(retv);
       },
       py::arg("position"), py::arg("direction"), py::arg("board_width"),
       py::arg("board_height")

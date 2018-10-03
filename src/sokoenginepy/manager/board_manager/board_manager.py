@@ -71,7 +71,7 @@ class BoardManager:
         variant_board (VariantBoard): board for which we want to manage state
     """
 
-    def __init__(self, variant_board):
+    def __init__(self, variant_board, boxorder=None, goalorder=None):
         self._board = variant_board
         self._boxes = utilities.Flipdict()
         self._goals = utilities.Flipdict()
@@ -95,25 +95,31 @@ class BoardManager:
                 goal_id += 1
 
         self._sokoban_plus = SokobanPlus(
-            pieces_count=len(self._boxes), boxorder='', goalorder=''
+            pieces_count=len(self._boxes), boxorder=boxorder,
+            goalorder=goalorder
         )
 
     def __str__(self):
         prefix = (len(self.__class__.__name__) + 2) * ' '
         return '\n'.join([
-            "<{0} pushers: {1},".format(
-                self.__class__.__name__, self.pushers_positions
+            '<{} pushers: {},'.format(
+                self.__class__.__name__,
+                self.pushers_positions
             ),
-            prefix + "boxes: " + str(self.boxes_positions) + ",",
-            prefix + "goals: " + str(self.goals_positions) + ",",
-            prefix + "boxorder: " + str(self.boxorder) + ",",
-            prefix + "goalorder: " + str(self.goalorder) + ",",
-            prefix + "tessellation: " + str(self.board.tessellation) + ",",
-            prefix + "board:\n" + str(self.board) + ">",
+            prefix + 'boxes: {},'.format(self.boxes_positions),
+            prefix + 'goals: {},'.format(self.goals_positions),
+            prefix + "boxorder: '{}',".format(self.boxorder or ''),
+            prefix + "goalorder: '{}',".format(self.goalorder or ''),
+            prefix + 'board:\n' + str(self.board) + '>',
         ])
 
     def __repr__(self):
-        return "{0}({1})".format(self.__class__.__name__, repr(self.board))
+        return "{}(variant_board={}, boxorder='{}', goalorder='{}')".format(
+            self.__class__.__name__,
+            repr(self.board),
+            self.boxorder or '',
+            self.goalorder or ''
+        )
 
     @property
     def board(self):

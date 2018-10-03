@@ -90,14 +90,11 @@ public:
       random_pool_set.insert(random_key());
     }
 
-    return hash_vector_t(random_pool_set.begin(),
-                                 random_pool_set.end());
+    return hash_vector_t(random_pool_set.begin(), random_pool_set.end());
   }
 
   void zobrist_rehash(const HashedBoardManager &parent) {
-    if (!m_hash_invalidated) {
-      return;
-    }
+    if (!m_hash_invalidated) return;
     m_hash_invalidated = false;
 
     set<piece_id_t> distinct_box_plus_ids;
@@ -146,8 +143,11 @@ protected:
   PIMPL& operator=(const PIMPL&) = delete;
 }; // HashedBoardManager::PIMPL
 
-HashedBoardManager::HashedBoardManager(VariantBoard &board)
-    : BoardManager(board), m_impl(std::make_unique<PIMPL>())
+HashedBoardManager::HashedBoardManager(
+  VariantBoard &board, const string& boxorder, const string& goalorder
+):
+  BoardManager(board, boxorder, goalorder),
+  m_impl(std::make_unique<PIMPL>())
 {}
 
 HashedBoardManager::HashedBoardManager(HashedBoardManager &&) = default;
@@ -268,46 +268,22 @@ const HashedBoardManager::solution_hashes_t& HashedBoardManager::solution_hashes
   return m_impl->m_solutions_hashes;
 }
 
-string HashedBoardManager::to_str(const solution_hashes_t& v) {
-  auto converter = [&]() {
-    StringList retv;
-    for (auto id : v) {
-      retv.push_back(boost::lexical_cast<string>(id));
-    }
-    return retv;
-  };
-
-  return string("[") + boost::join(converter(), ", ") + "]";
-}
-
 string HashedBoardManager::str() const {
-  positions_by_id_t boxes_plus_ids, goals_plus_ids;
-
-  for (auto b_id : boxes_ids()) {
-    boxes_plus_ids[b_id] = box_plus_id(b_id);
-  }
-
-  for (auto g_id : goals_ids()) {
-    goals_plus_ids[g_id] = goal_plus_id(g_id);
-  }
-
-  StringList l = {
-    string("    'pushers':   ") + BoardManager::to_str(pushers_positions()),
-    string("    'boxes':     ") + BoardManager::to_str(boxes_positions()),
-    string("    'goals':     ") + BoardManager::to_str(goals_positions()),
-    string("    'boxes +':   ") + BoardManager::to_str(boxes_plus_ids),
-    string("    'goals +':   ") + BoardManager::to_str(goals_plus_ids),
-    string("    'solutions': ") + BoardManager::to_str(solutions(), 4),
-    string("    'solution hashes': ") + to_str(solution_hashes()),
-    string("    'boxes_factors:' : ") + PIMPL::to_str(m_impl->m_boxes_factors, 4),
-    string("    'pushers_factors': ") + PIMPL::to_str(m_impl->m_pushers_factors, 4)
-  };
-
-  return string("{\n") + boost::join(l, ",\n") + "\n}";
+  string retv = BoardManager::str();
+  boost::replace_all(retv, "<BoardManager pushers:", "<HashedBoardManager pushers:");
+  boost::replace_all(retv, "              boxes:", "                    boxes:");
+  boost::replace_all(retv, "              goals:", "                    goals:");
+  boost::replace_all(retv, "              boxorder:", "                    boxorder:");
+  boost::replace_all(retv, "              goalorder:", "                    goalorder:");
+  boost::replace_all(retv, "              board:", "                    board:");
+  return retv;
 }
 
 string HashedBoardManager::repr() const {
-  return "HashedBoardManager(" + board().repr() + ")";
+  return "HashedBoardManager(variant_board=" +
+         board().repr() + ", " +
+         "boxorder='" + boxorder() + "', " +
+         "goalorder='" + goalorder() + "')";
 }
 
 BoardState HashedBoardManager::state() const {

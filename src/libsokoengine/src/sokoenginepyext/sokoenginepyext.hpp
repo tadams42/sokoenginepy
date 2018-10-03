@@ -38,4 +38,20 @@ namespace pybind11 {
     return retv;
   }
 
+  template<typename NativeVectorT>
+  NativeVectorT copy_pylist_to_sequence(const py::list& rv) {
+    NativeVectorT retv;
+    if (!rv.is_none()) {
+      for (auto val : rv)
+        retv.push_back(val.cast<typename NativeVectorT::value_type>());
+    }
+    return retv;
+  }
+
+  template<typename NativeT>
+  py::object none_if_equal_to(const NativeT& to_cast, const NativeT& val) {
+      if (to_cast == val) return py::none();
+      return py::cast(to_cast);
+  }
+
 }

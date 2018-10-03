@@ -87,7 +87,12 @@ void export_board_manager(py::module& m) {
   ;
 
   py::class_<BoardManager>(m, "BoardManager")
-    .def(py::init<VariantBoard&>(), py::arg("variant_board"))
+    .def(
+        py::init<VariantBoard&, const string&, const string&>(),
+        py::arg("variant_board"),
+        py::arg("boxorder")="",
+        py::arg("goalorder")=""
+    )
 
     // protocols
     .def("__eq__", &BoardManager::operator==)
@@ -262,7 +267,12 @@ void export_board_manager(py::module& m) {
   ;
 
   py::class_<HashedBoardManager, BoardManager>(m, "HashedBoardManager")
-    .def(py::init<VariantBoard&>(), py::arg("variant_board"))
+    .def(
+        py::init<VariantBoard&, const string&, const string&>(),
+        py::arg("variant_board"),
+        py::arg("boxorder")="",
+        py::arg("goalorder")=""
+    )
 
     .def("__eq__", &HashedBoardManager::operator==)
     .def("__ne__", &HashedBoardManager::operator!=)

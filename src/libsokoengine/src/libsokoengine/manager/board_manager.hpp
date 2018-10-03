@@ -2,6 +2,7 @@
 #define BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include "sokoengine_config.hpp"
+#include "board_graph.hpp"
 #include "board_state.hpp"
 
 #include <stdexcept>
@@ -41,8 +42,13 @@ public:
     return pid >= DEFAULT_PIECE_ID;
   }
 
-  explicit BoardManager(VariantBoard& board);
+  explicit BoardManager(
+    VariantBoard& board, const std::string& boxorder="",
+    const std::string& goalorder=""
+  );
+  BoardManager(const BoardManager&) = delete;
   BoardManager(BoardManager&& rv);
+  BoardManager& operator=(const BoardManager&) = delete;
   BoardManager& operator=(BoardManager&& rv);
   virtual ~BoardManager();
 
@@ -109,20 +115,15 @@ public:
   virtual void switch_boxes_and_goals();
   bool is_playable() const;
 
-  static std::string to_str(const piece_ids_vector_t& v);
-  static std::string to_str(const positions_by_id_t& m);
-  static std::string to_str(const solutions_vector_t& v, int add_indent=0);
   virtual std::string str() const;
   virtual std::string repr() const;
 
   virtual BoardState state() const;
 
 protected:
+  static std::string to_str(const positions_by_id_t& m);
   virtual void pusher_moved(position_t old_position, position_t to_new_position);
   virtual void box_moved(position_t old_position, position_t to_new_position);
-
-  BoardManager(const BoardManager&) = delete;
-  BoardManager& operator=(const BoardManager&) = delete;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;

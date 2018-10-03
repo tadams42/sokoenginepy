@@ -36,10 +36,7 @@ void export_mover(py::module& m) {
     .def_property(
       "last_move",
       [](const Mover& self) {
-        auto native_retv = self.last_move();
-        py::list retv;
-        for (auto am : native_retv) retv.append(am);
-        return retv;
+        return py::copy_sequence_to_pylist(self.last_move());
       },
       [](Mover& self, const py::object& value) {
         if (value.is_none()) {

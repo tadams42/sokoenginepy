@@ -55,7 +55,10 @@ public:
   VariantBoard& m_board;
   SokobanPlus m_plus;
 
-  PIMPL(VariantBoard& board) :
+  PIMPL(
+    VariantBoard& board, const string& boxorder,
+    const string& goalorder
+  ) :
     m_board(board)
   {
     piece_id_t pusher_id, box_id, goal_id;
@@ -75,7 +78,7 @@ public:
       }
     }
 
-    m_plus = SokobanPlus(m_boxes.size());
+    m_plus = SokobanPlus(m_boxes.size(), boxorder, goalorder);
   }
 
   PIMPL(PIMPL&& rv) = default;
@@ -240,8 +243,10 @@ protected:
   PIMPL& operator=(const PIMPL&) = delete;
 }; // BoardManager::PIMPL
 
-BoardManager::BoardManager(VariantBoard& board) :
-  m_impl(make_unique<PIMPL>(board))
+BoardManager::BoardManager(
+  VariantBoard& board, const string& boxorder, const string& goalorder
+) :
+  m_impl(make_unique<PIMPL>(board, boxorder, goalorder))
 {}
 
 BoardManager::BoardManager(BoardManager &&) = default;
@@ -525,18 +530,6 @@ bool BoardManager::is_playable() const {
          boxes_count() == goals_count();
 }
 
-string BoardManager::to_str(const piece_ids_vector_t& v) {
-  auto converter = [&]() {
-    StringList retv;
-    for (auto id : v) {
-      retv.push_back(boost::lexical_cast<string>(id));
-    }
-    return retv;
-  };
-
-  return string("[") + boost::join(converter(), ", ") + "]";
-}
-
 string BoardManager::to_str(const positions_by_id_t& m) {
   auto converter = [&]() {
     StringList retv;
@@ -552,44 +545,34 @@ string BoardManager::to_str(const positions_by_id_t& m) {
   return string("{") + boost::join(converter(), ", ") + "}";
 }
 
-string BoardManager::to_str(const solutions_vector_t& v, int add_indent) {
-  string indent(add_indent,  ' ');
-  auto converter = [&]() {
-    StringList retv;
-    for (auto s : v) {
-      retv.push_back(indent + "    " + BoardManager::to_str(s));
-    }
-    return retv;
-  };
-
-  return string("[\n") + boost::join(converter(), ",\n") + "\n" + indent + "]";
-}
-
 string BoardManager::str() const {
-  positions_by_id_t boxes_plus_ids, goals_plus_ids;
+  auto converter = [](const Positions& positions) {
+    size_t max_members = 10;
+    StringList tmp;
+    for (size_t i = 0; i < min(positions.size(), max_members); ++i) {
+      tmp.push_back(boost::lexical_cast<string>(positions[i]));
+    }
 
-  for (auto b_id : boxes_ids()) {
-    boxes_plus_ids[b_id] = box_plus_id(b_id);
-  }
-
-  for (auto g_id : goals_ids()) {
-    goals_plus_ids[g_id] = goal_plus_id(g_id);
-  }
-
-  StringList l = {
-    string("    'pushers':   ") + to_str(pushers_positions()),
-    string("    'boxes':     ") + to_str(boxes_positions()),
-    string("    'goals':     ") + to_str(goals_positions()),
-    string("    'boxes +':   ") + to_str(boxes_plus_ids),
-    string("    'goals +':   ") + to_str(goals_plus_ids),
-    string("    'solutions': ") + to_str(solutions(), 4)
+    if (positions.size() <= max_members)
+      return string("[") + boost::join(tmp, ", ") + "]";
+    else
+      return string("[") + boost::join(tmp, ", ") + ", ...]";
   };
 
-  return string("{\n") + boost::join(l, ",\n") + "\n}";
+  return
+    "<BoardManager pushers: " + to_str(pushers_positions()) + ",\n" +
+    "              boxes: " + to_str(boxes_positions()) + ",\n" +
+    "              goals: " + to_str(goals_positions()) + ",\n" +
+    "              boxorder: '" + boxorder() + "',\n" +
+    "              goalorder: '" + boxorder() + "',\n" +
+    "              board:\n" + board().to_str() + ">";
 }
 
 string BoardManager::repr() const {
-  return "BoardManager(" + m_impl->m_board.repr() + ")";
+  return "BoardManager(variant_board=" +
+         m_impl->m_board.repr() + ", " +
+         "boxorder='" + m_impl->m_plus.boxorder() + "', " +
+         "goalorder='" + m_impl->m_plus.goalorder() + "')";
 }
 
 BoardState BoardManager::state() const {

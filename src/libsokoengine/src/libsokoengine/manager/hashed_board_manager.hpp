@@ -13,9 +13,14 @@ namespace sokoengine {
 class LIBSOKOENGINE_API HashedBoardManager : public BoardManager
 {
 public:
-  explicit HashedBoardManager(VariantBoard& board);
+  explicit HashedBoardManager(
+    VariantBoard& board, const std::string& boxorder="",
+    const std::string& goalorder=""
+  );
+  HashedBoardManager(const HashedBoardManager&) = delete;
   HashedBoardManager(HashedBoardManager&& rv);
-  HashedBoardManager &operator=(HashedBoardManager&& rv);
+  HashedBoardManager& operator=(const HashedBoardManager&) = delete;
+  HashedBoardManager& operator=(HashedBoardManager&& rv);
   virtual ~HashedBoardManager();
 
   bool operator==(const HashedBoardManager& rv) const;
@@ -42,16 +47,12 @@ public:
   typedef std::set<zobrist_key_t> solution_hashes_t;
   const solution_hashes_t& solution_hashes() const;
 
-  static std::string to_str(const solution_hashes_t& v);
   virtual std::string str() const override;
   virtual std::string repr() const override;
 
 protected:
   virtual void pusher_moved(position_t old_position, position_t to_new_position) override;
   virtual void box_moved(position_t old_position, position_t to_new_position) override;
-
-  HashedBoardManager(const HashedBoardManager&) = delete;
-  HashedBoardManager& operator=(const HashedBoardManager&) = delete;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;
