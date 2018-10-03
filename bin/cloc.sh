@@ -1,3 +1,5 @@
+#!/bin/sh
+
 cloc --exclude-list-file=bin/cloc_exclude_dirs.txt \
      --by-file \
      --skip-uniqueness \

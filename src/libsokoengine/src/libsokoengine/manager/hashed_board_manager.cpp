@@ -192,11 +192,12 @@ zobrist_key_t HashedBoardManager::external_state_hash(
   zobrist_key_t retv = m_impl->m_initial_state_hash;
 
   size_t index = 0;
-  for (auto box_position : board_state.boxes_positions())
+  for (auto box_position : board_state.boxes_positions()) {
     retv ^= m_impl->m_boxes_factors[box_plus_id(DEFAULT_PIECE_ID+ index)][
         box_position
     ];
     index++;
+  }
 
   for (auto pusher_position : board_state.pushers_positions())
     retv ^= m_impl->m_pushers_factors[pusher_position];
