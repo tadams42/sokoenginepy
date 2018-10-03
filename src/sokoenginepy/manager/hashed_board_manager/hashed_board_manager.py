@@ -226,7 +226,7 @@ class HashedBoardManager(
         return self._layout_hash in self._solutions_hashes
 
     @property
-    def solution_hashes(self):
+    def solutions_hashes(self):
         # regenerate solution hashes
         self.is_solved()
         return self._solutions_hashes

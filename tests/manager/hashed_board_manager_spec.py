@@ -162,16 +162,16 @@ class DescribeHashedBoardManager:
         assert hashed_board_manager.boxes_layout_hash == initial_box_hash
         assert hashed_board_manager.boxes_and_pushers_layout_hash == initial_pus_hash
 
-    def it_solution_hashes_are_different_for_enabled_and_disabled_sokoban_plus(
+    def it_solutions_hashes_are_different_for_enabled_and_disabled_sokoban_plus(
         self, hashed_board_manager
     ):
-        disabled_hashes = deepcopy(hashed_board_manager.solution_hashes)
+        disabled_hashes = deepcopy(hashed_board_manager.solutions_hashes)
 
         hashed_board_manager.boxorder = '1 3 2'
         hashed_board_manager.goalorder = '3 2 1'
         hashed_board_manager.enable_sokoban_plus()
 
-        enabled_hashes = deepcopy(hashed_board_manager.solution_hashes)
+        enabled_hashes = deepcopy(hashed_board_manager.solutions_hashes)
 
         assert len(disabled_hashes) != 0
         assert len(enabled_hashes) != 0
@@ -192,16 +192,16 @@ class DescribeHashedBoardManager:
         hashed_board_manager.switch_boxes_and_goals()
         assert hashed_board_manager.boxes_layout_hash == initial_hash
 
-    def test_switching_boxes_and_goals_invalidates_solution_hashes(
+    def test_switching_boxes_and_goals_invalidates_solutions_hashes(
         self, hashed_board_manager
     ):
-        initial_solution_hashes = hashed_board_manager.solution_hashes
+        initial_solutions_hashes = hashed_board_manager.solutions_hashes
         hashed_board_manager.switch_boxes_and_goals()
-        after_switch_solution_hashes = hashed_board_manager.solution_hashes
-        assert initial_solution_hashes != after_switch_solution_hashes
+        after_switch_solutions_hashes = hashed_board_manager.solutions_hashes
+        assert initial_solutions_hashes != after_switch_solutions_hashes
 
         hashed_board_manager.switch_boxes_and_goals()
-        assert hashed_board_manager.solution_hashes == initial_solution_hashes
+        assert hashed_board_manager.solutions_hashes == initial_solutions_hashes
 
         hashed_board_manager.switch_boxes_and_goals()
-        assert hashed_board_manager.solution_hashes == after_switch_solution_hashes
+        assert hashed_board_manager.solutions_hashes == after_switch_solutions_hashes

@@ -44,8 +44,8 @@ public:
   ///
   /// Hashes of all solution box configurations.
   ///
-  typedef std::set<zobrist_key_t> solution_hashes_t;
-  const solution_hashes_t& solution_hashes() const;
+  typedef std::set<zobrist_key_t> solutions_hashes_t;
+  const solutions_hashes_t& solutions_hashes() const;
 
   virtual std::string str() const override;
   virtual std::string repr() const override;

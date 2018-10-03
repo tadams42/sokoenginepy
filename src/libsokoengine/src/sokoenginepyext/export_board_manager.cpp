@@ -307,8 +307,8 @@ void export_board_manager(py::module& m) {
     .def("is_solved", &HashedBoardManager::is_solved)
 
     .def_property_readonly(
-      "solution_hashes", [](const HashedBoardManager& self) {
-        auto native_retv = self.solution_hashes();
+      "solutions_hashes", [](const HashedBoardManager& self) {
+        auto native_retv = self.solutions_hashes();
         py::list retv;
         for (auto val : native_retv) retv.append(val);
         return retv;

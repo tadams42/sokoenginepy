@@ -30,7 +30,7 @@ public:
 
   map<piece_id_t, hash_vector_t> m_boxes_factors;
   hash_vector_t m_pushers_factors;
-  HashedBoardManager::solution_hashes_t m_solutions_hashes;
+  HashedBoardManager::solutions_hashes_t m_solutions_hashes;
 
   PIMPL() {}
   PIMPL(PIMPL&& rv) = default;
@@ -262,7 +262,7 @@ bool HashedBoardManager::is_solved() const {
   return m_impl->m_solutions_hashes.count(m_impl->m_layout_hash) > 0;
 }
 
-const HashedBoardManager::solution_hashes_t& HashedBoardManager::solution_hashes() const {
+const HashedBoardManager::solutions_hashes_t& HashedBoardManager::solutions_hashes() const {
   // regenerate solution hashes
   is_solved();
   return m_impl->m_solutions_hashes;
