@@ -1,4 +1,4 @@
-#include "sokoenginepyext.h"
+#include "sokoenginepyext.hpp"
 #include <memory>
 
 using namespace std;

@@ -1,4 +1,4 @@
-#include "sokoenginepyext.h"
+#include "sokoenginepyext.hpp"
 
 using namespace std;
 using namespace sokoengine;
@@ -50,6 +50,7 @@ void export_atomic_move(py::module& m) {
       },
       [](py::tuple t) { // __setstate__
         if (t.size() != 6) throw std::runtime_error("Invalid state!");
+        // TODO: t[5].cast<piece_id_t>() - what if t[5] i s None?
         return make_unique<AtomicMove>(
           t[0].cast<Direction>(),
           t[1].cast<bool>(), t[2].cast<bool>(), t[3].cast<bool>(),

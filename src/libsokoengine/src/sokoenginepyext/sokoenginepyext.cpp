@@ -1,4 +1,4 @@
-#include "sokoenginepyext.h"
+#include "sokoenginepyext.hpp"
 
 using namespace sokoengine;
 

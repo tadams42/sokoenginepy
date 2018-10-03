@@ -21,7 +21,6 @@ namespace pybind11 {
     }
   }
 
-
   template <typename T>
   struct extract
   {
@@ -31,7 +30,6 @@ namespace pybind11 {
     bool check() { return CheckCast<T>(obj); }
     T operator()() { return obj.cast<T>(); }
   };
-
 
   template<typename NativeVectorT>
   py::list copy_sequence_to_pylist(const NativeVectorT& rv) {
