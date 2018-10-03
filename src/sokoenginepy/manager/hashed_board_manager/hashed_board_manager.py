@@ -45,10 +45,8 @@ class HashedBoardManager(
 
     def __init__(self, variant_board, boxorder=None, goalorder=None):
         super().__init__(variant_board, boxorder, goalorder)
-        self._initial_layout_hash = None
-        self._layout_hash = None
-        self._initial_with_pushers_hash = None
-        self._layout_with_pushers_hash = None
+        self._initial_state_hash = None
+        self._state_hash = None
         self._pushers_factors = None
         self._boxes_factors = None
         self._solutions_hashes = None
@@ -60,13 +58,16 @@ class HashedBoardManager(
             self.box_plus_id(box_id) for box_id in self.boxes_ids
         )
 
+        # We need random numbers only for this number of positions
+        board_without_walls_size = self.board.size - len(self.walls_positions)
+
         random_pool_size = (
             # one random number for each position pusher can occupy
-            self.board.size +
+            board_without_walls_size
             # one random number for position each distinct box can occupy
-            len(distinct_box_plus_ids) * self.board.size +
+            + len(distinct_box_plus_ids) * board_without_walls_size
             # one random number for initial hash
-            1
+            + 1
         )
 
         # generate required set of random numbers
@@ -80,105 +81,105 @@ class HashedBoardManager(
         random_pool = list(random_pool)
         # random.setstate(state_backup)
 
-        self._initial_layout_hash = self._layout_hash = random_pool[0]
+        self._initial_state_hash = self._state_hash = random_pool[0]
         random_pool = random_pool[1:]
 
         # Store position factors for all distinct positions of all distinct
         # boxes
         self._boxes_factors = dict()
         for box_plus_id in distinct_box_plus_ids:
-            self._boxes_factors[box_plus_id] = random_pool[:self.board.size]
-            random_pool = random_pool[self.board.size:]
+            self._boxes_factors[box_plus_id] = self._insert_wall_zeroes(
+                random_pool[:board_without_walls_size]
+            )
+            random_pool = random_pool[board_without_walls_size:]
 
         # Store position factors for all distinct pusher positions
-        self._pushers_factors = random_pool[:self.board.size]
+        self._pushers_factors = self._insert_wall_zeroes(
+            random_pool[:board_without_walls_size]
+        )
 
-        # Hash from boxes positions
         for box_id in self.boxes_ids:
-            self._layout_hash ^= (
+            self._state_hash ^= (
                 self._boxes_factors[self.box_plus_id(box_id)]
                 [self.box_position(box_id)]
             )
 
-        # Hash from pushers' and boxes' positions
-        self._layout_with_pushers_hash = \
-            self._initial_with_pushers_hash = \
-            self._layout_hash
         for pusher_position in self.pushers_positions.values():
-            self._layout_with_pushers_hash ^= (
-                self._pushers_factors[pusher_position]
-            )
+            self._state_hash ^= self._pushers_factors[pusher_position]
 
-        # Reset solution hashes
-        self._solutions_hashes = None
+    def _insert_wall_zeroes(self, lst):
+        src_index = 0
+
+        def choose(position):
+            nonlocal src_index
+            if position in self.walls_positions:
+                return None
+            else:
+                src_index += 1
+                return lst[src_index-1]
+
+        return [choose(pos) for pos in range(self.board.size)]
 
     @property
-    def boxes_layout_hash(self):
-        """Board hash.
-
-        Constructed from current boxes layout and current boxes' Sokoban+ IDs.
-        """
-        return self._layout_hash
+    def state_hash(self):
+        """Zobrist hash of current board state."""
+        if self._state_hash is None or self._initial_state_hash is None:
+            self._zobrist_rehash()
+        return self._state_hash
 
     @property
-    def boxes_and_pushers_layout_hash(self):
-        """Board hash.
-
-        Constructed from current boxes layout, current boxes' Sokoban+ IDs and
-        current pushers' layout
+    def initial_state_hash(self):
         """
-        return self._layout_with_pushers_hash
-
-    def external_position_hash(self, boxes_positions):
-        """Same as :attr:`.boxes_layout_hash` but calculated for arbitrarily
-        board layout.
-
-        Given dict of boxes positions, it calculates :attr:`.boxes_layout_hash`
-        that position would have if it was applied to this board.
-
-        Args:
-            boxes_positions(dict): map of boxes' ids and positions, ie::
-
-                {id1: position1, id2: position2}
-
-        Note:
-            Returns None in case len(boxes_positions) != self.boxes_count
+        Zobrist hash of initial board state (before any movement happened).
         """
-        if (len(boxes_positions) != self.boxes_count or
-                len(boxes_positions) != self.goals_count):
+        if self._state_hash is None or self._initial_state_hash is None:
+            self._zobrist_rehash()
+        return self._initial_state_hash
+
+    def external_state_hash(self, board_state):
+        """
+        Calculates Zobrist hash of given ``board_state`` as if that
+        ``board_state`` was applied to initial :attr:`.board`" (to board where
+        no movement happened).
+
+        ``board_state`` must meet following requirement:
+
+            len(board_state.boxes_positions) == self.boxes_count
+            and len(board_state.boxes_positions) == self.goals_count
+
+        Returns:
+            int or None: Value of hash or None if it can't be calculated
+        """
+        if (
+            len(board_state.boxes_positions) != self.boxes_count
+            or len(board_state.boxes_positions) != self.goals_count
+        ):
             return None
 
-        if self._initial_layout_hash is None:
-            self._zobrist_rehash()
+        retv = self.initial_state_hash
+        for index, box_position in enumerate(board_state.boxes_positions):
+            retv ^= self._boxes_factors[
+                self.box_plus_id(DEFAULT_PIECE_ID + index)
+            ][box_position]
 
-        retv = self._initial_layout_hash
-        for box_id, box_position in boxes_positions.items():
-            retv ^= self._boxes_factors[self.box_plus_id(box_id)][box_position]
+        for pusher_position in board_state.pushers_positions:
+            retv ^= self._pushers_factors[pusher_position]
+
+        board_state.zobrist_hash = retv
 
         return retv
 
     def _box_moved(self, old_position, to_new_position):
         if old_position != to_new_position:
             box_plus_id = self.box_plus_id(self.box_id_on(to_new_position))
-
-            self._layout_hash ^= self._boxes_factors[box_plus_id][old_position]
-            self._layout_hash ^= self._boxes_factors[box_plus_id
+            self._state_hash ^= self._boxes_factors[box_plus_id][old_position]
+            self._state_hash ^= self._boxes_factors[box_plus_id
                                                     ][to_new_position]
-            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
-                old_position
-            ]
-            self._layout_with_pushers_hash ^= self._boxes_factors[box_plus_id][
-                to_new_position
-            ]
 
     def _pusher_moved(self, old_position, to_new_position):
         if old_position != to_new_position:
-            self._layout_with_pushers_hash ^= self._pushers_factors[
-                old_position
-            ]
-            self._layout_with_pushers_hash ^= self._pushers_factors[
-                to_new_position
-            ]
+            self._state_hash ^= self._pushers_factors[old_position]
+            self._state_hash ^= self._pushers_factors[to_new_position]
 
     @BoardManager.boxorder.setter
     @copy_ancestor_docstring
@@ -216,32 +217,21 @@ class HashedBoardManager(
 
     @property
     def is_solved(self):
-        return self.boxes_layout_hash in self.solutions_hashes
+        return self.state_hash in self.solutions_hashes
 
     @property
     def solutions_hashes(self):
         if not self._solutions_hashes:
             self._solutions_hashes = set(
                 h for h in (
-                    self.external_position_hash({
-                        DEFAULT_PIECE_ID + box_id: box_position
-                        for box_id, box_position in enumerate(
-                            solution.boxes_positions
-                        )
-                    })
+                    self.external_state_hash(solution)
                     for solution in self.solutions()
                 ) if h
             )
         return self._solutions_hashes
 
-    @copy_ancestor_docstring
-    def switch_boxes_and_goals(self):
-        retv = super().switch_boxes_and_goals()
-        self._solutions_hashes = None
-        return retv
-
     @property
     def state(self):
         retv = super().state
-        retv.zobrist_hash = self.boxes_layout_hash
+        retv.zobrist_hash = self.state_hash
         return retv

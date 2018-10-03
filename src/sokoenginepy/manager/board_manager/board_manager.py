@@ -549,6 +549,27 @@ class BoardManager:
     # Other
     # --------------------------------------------------------------------------
 
+    @property
+    def is_solved(self):
+        if self.boxes_count != self.goals_count:
+            return False
+
+        retv = True
+        for box_id, box_position in self._boxes.items():
+            retv = (
+                retv
+                and self.has_goal_on(box_position)
+                and (
+                    self.box_plus_id(box_id)
+                    == self.goal_plus_id(self.goal_id_on(box_position))
+                )
+            )
+
+            if not retv:
+                break
+
+        return retv
+
     def solutions(self):
         """
         Generator for all configurations of boxes that result in solved board.
@@ -660,11 +681,11 @@ class BoardManager:
         boxes_positions = self.boxes_positions
         return BoardState(
             pushers_positions=[
-                pushers_positions[key]
-                for key in sorted(pushers_positions.keys())
+                pushers_positions[pusher_id]
+                for pusher_id in sorted(pushers_positions.keys())
             ],
             boxes_positions=[
-                boxes_positions[key]
-                for key in sorted(boxes_positions.keys())
+                boxes_positions[box_id]
+                for box_id in sorted(boxes_positions.keys())
             ]
         )

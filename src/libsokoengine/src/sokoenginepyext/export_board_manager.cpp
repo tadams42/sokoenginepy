@@ -282,22 +282,17 @@ void export_board_manager(py::module& m) {
     .def("__str__", &HashedBoardManager::str)
     .def("__repr__", &HashedBoardManager::repr)
 
-    .def_property_readonly(
-      "boxes_layout_hash", &HashedBoardManager::boxes_layout_hash
-    )
-
-    .def_property_readonly(
-      "boxes_and_pushers_layout_hash",
-      &HashedBoardManager::boxes_and_pushers_layout_hash
-    )
+    .def_property_readonly("state_hash", &HashedBoardManager::state_hash)
 
     .def(
-      "external_position_hash",
-      &HashedBoardManager::external_position_hash,
-      py::arg("boxes_positions")
+      "external_state_hash", &HashedBoardManager::external_state_hash,
+      py::arg("board_state")
     )
 
     .def_property_readonly("is_solved", &HashedBoardManager::is_solved)
+    .def_property_readonly(
+      "initial_state_hash", &HashedBoardManager::initial_state_hash
+    )
 
     .def_property_readonly(
       "solutions_hashes", [](const HashedBoardManager& self) {

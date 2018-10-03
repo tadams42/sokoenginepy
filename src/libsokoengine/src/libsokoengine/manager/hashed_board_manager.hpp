@@ -26,9 +26,9 @@ public:
   bool operator==(const HashedBoardManager& rv) const;
   bool operator!=(const HashedBoardManager& rv) const;
 
-  zobrist_key_t boxes_layout_hash() const;
-  zobrist_key_t boxes_and_pushers_layout_hash() const;
-  zobrist_key_t external_position_hash(const positions_by_id_t& boxes_positions) const;
+  zobrist_key_t state_hash() const;
+  zobrist_key_t initial_state_hash() const;
+  zobrist_key_t external_state_hash(BoardState& board_state) const;
 
   virtual void set_boxorder(const std::string& rv) override;
   virtual void set_goalorder(const std::string& rv) override;
@@ -36,7 +36,6 @@ public:
   virtual void enable_sokoban_plus() override;
   virtual void disable_sokoban_plus() override;
 
-  virtual void switch_boxes_and_goals() override;
   virtual BoardState state() const override;
 
   virtual bool is_solved() const override;

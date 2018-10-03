@@ -292,14 +292,14 @@ which is needed for effective solver implementations.
 
     >>> from sokoenginepy import Mover, Direction
     >>> mover = Mover(board)
-    >>> initial_hash = mover.board_manager.boxes_layout_hash
+    >>> initial_hash = mover.board_manager.state_hash
     >>> mover.move(Direction.DOWN)
-    >>> moved_hash = mover.board_manager.boxes_layout_hash
+    >>> moved_hash = mover.board_manager.state_hash
     >>> mover.undo_last_move()
-    >>> mover.board_manager.boxes_layout_hash == initial_hash
+    >>> mover.board_manager.state_hash == initial_hash
     True
     >>> mover.move(Direction.DOWN)
-    >>> mover.board_manager.boxes_layout_hash == moved_hash
+    >>> mover.board_manager.state_hash == moved_hash
     True
 
 Game snapshots and movement recording

@@ -20,11 +20,9 @@ using namespace implementation;
 class LIBSOKOENGINE_LOCAL HashedBoardManager::PIMPL
 {
 public:
-  bool          m_hash_invalidated          = true;
-  zobrist_key_t m_initial_layout_hash       = 0;
-  zobrist_key_t m_layout_hash               = 0;
-  zobrist_key_t m_initial_with_pushers_hash = 0;
-  zobrist_key_t m_layout_with_pushers_hash  = 0;
+  bool          m_hash_invalidated   = true;
+  zobrist_key_t m_initial_state_hash = 0;
+  zobrist_key_t m_state_hash         = 0;
 
   typedef vector<zobrist_key_t> hash_vector_t;
 
@@ -102,40 +100,48 @@ public:
       distinct_box_plus_ids.insert(parent.box_plus_id(box_id));
     }
 
+    size_t board_without_walls_size =
+      parent.board().size() - parent.walls_positions().size();
+
     size_t random_pool_size =
-        parent.board().size() +
-        distinct_box_plus_ids.size() * parent.board().size() + 1;
+        board_without_walls_size +
+        distinct_box_plus_ids.size() * board_without_walls_size + 1;
 
     hash_vector_t random_pool = unique_random_keys(random_pool_size);
 
-    size_t index          = 0;
-    m_initial_layout_hash = m_layout_hash = random_pool[index++];
+    size_t index         = 0;
+    m_initial_state_hash = m_state_hash = random_pool[index++];
 
     m_boxes_factors = map<piece_id_t, hash_vector_t>();
     for (auto box_plus_id : distinct_box_plus_ids) {
       m_boxes_factors[box_plus_id] = hash_vector_t();
       for (size_t i = 0; i < parent.board().size(); i++) {
-        m_boxes_factors[box_plus_id].push_back(random_pool[index++]);
+        if(std::find(
+          parent.walls_positions().begin(), parent.walls_positions().end(), i
+        ) != parent.walls_positions().end())
+          m_boxes_factors[box_plus_id].push_back(0);
+        else
+          m_boxes_factors[box_plus_id].push_back(random_pool[index++]);
       }
     }
     for (size_t i = 0; i < parent.board().size(); i++) {
-      m_pushers_factors.push_back(random_pool[index++]);
+      if(std::find(
+        parent.walls_positions().begin(), parent.walls_positions().end(), i
+      ) != parent.walls_positions().end())
+        m_pushers_factors.push_back(0);
+      else
+        m_pushers_factors.push_back(random_pool[index++]);
     }
 
     // Hash from boxes positions
     for (auto box_id : parent.boxes_ids()) {
-      m_layout_hash ^= m_boxes_factors[parent.box_plus_id(box_id)]
-                                      [parent.box_position(box_id)];
+      m_state_hash ^= m_boxes_factors[parent.box_plus_id(box_id)]
+                                     [parent.box_position(box_id)];
     }
-
-    m_layout_with_pushers_hash = m_initial_with_pushers_hash = m_layout_hash;
 
     for (auto pusher_id : parent.pushers_ids()) {
-      m_layout_with_pushers_hash ^=
-          m_pushers_factors[parent.pusher_position(pusher_id)];
+      m_state_hash ^= m_pushers_factors[parent.pusher_position(pusher_id)];
     }
-
-    m_solutions_hashes.clear();
   }
 
 protected:
@@ -157,37 +163,45 @@ HashedBoardManager &HashedBoardManager::operator=(HashedBoardManager &&) = defau
 HashedBoardManager::~HashedBoardManager() = default;
 
 bool HashedBoardManager::operator==(const HashedBoardManager &rv) const {
-  return m_impl->m_layout_hash == rv.m_impl->m_layout_hash;
+  return m_impl->m_state_hash == rv.m_impl->m_state_hash;
 }
 
 bool HashedBoardManager::operator!=(const HashedBoardManager &rv) const {
   return !(*this == rv);
 }
 
-zobrist_key_t HashedBoardManager::boxes_layout_hash() const {
+zobrist_key_t HashedBoardManager::state_hash() const {
   const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
-  return m_impl->m_layout_hash;
+  return m_impl->m_state_hash;
 }
 
-zobrist_key_t HashedBoardManager::boxes_and_pushers_layout_hash() const {
+zobrist_key_t HashedBoardManager::initial_state_hash() const {
   const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
-  return m_impl->m_layout_with_pushers_hash;
+  return m_impl->m_initial_state_hash;
 }
 
-zobrist_key_t HashedBoardManager::external_position_hash(
-  const positions_by_id_t& boxes_positions
+zobrist_key_t HashedBoardManager::external_state_hash(
+  BoardState& board_state
 ) const {
-  if (boxes_positions.size() != boxes_count() ||
-      boxes_positions.size() != goals_count()) {
+  if (board_state.boxes_positions().size() != boxes_count() ||
+      board_state.boxes_positions().size() != goals_count())
     return 0;
-  }
 
   const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
 
-  zobrist_key_t retv = m_impl->m_initial_layout_hash;
-  for (auto box : boxes_positions) {
-    retv ^= m_impl->m_boxes_factors[box_plus_id(box.first)][box.second];
-  }
+  zobrist_key_t retv = m_impl->m_initial_state_hash;
+
+  size_t index = 0;
+  for (auto box_position : board_state.boxes_positions())
+    retv ^= m_impl->m_boxes_factors[box_plus_id(DEFAULT_PIECE_ID+ index)][
+        box_position
+    ];
+    index++;
+
+  for (auto pusher_position : board_state.pushers_positions())
+    retv ^= m_impl->m_pushers_factors[pusher_position];
+
+  board_state.zobrist_hash() = retv;
 
   return retv;
 }
@@ -195,22 +209,17 @@ zobrist_key_t HashedBoardManager::external_position_hash(
 void HashedBoardManager::pusher_moved(position_t old_position, position_t to_new_position) {
   if (old_position != to_new_position) {
     const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
-    m_impl->m_layout_with_pushers_hash ^= m_impl->m_pushers_factors[old_position];
-    m_impl->m_layout_with_pushers_hash ^= m_impl->m_pushers_factors[to_new_position];
+    m_impl->m_state_hash ^= m_impl->m_pushers_factors[old_position];
+    m_impl->m_state_hash ^= m_impl->m_pushers_factors[to_new_position];
   }
 }
 
 void HashedBoardManager::box_moved(position_t old_position, position_t to_new_position) {
   if (old_position != to_new_position) {
     const_cast<HashedBoardManager*>(this)->m_impl->zobrist_rehash(*this);
-
     auto b_plus_id = box_plus_id(box_id_on(to_new_position));
-
-    m_impl->m_layout_hash ^= m_impl->m_boxes_factors[b_plus_id][old_position];
-    m_impl->m_layout_hash ^= m_impl->m_boxes_factors[b_plus_id][to_new_position];
-
-    m_impl->m_layout_with_pushers_hash ^= m_impl->m_boxes_factors[b_plus_id][old_position];
-    m_impl->m_layout_with_pushers_hash ^= m_impl->m_boxes_factors[b_plus_id][to_new_position];
+    m_impl->m_state_hash ^= m_impl->m_boxes_factors[b_plus_id][old_position];
+    m_impl->m_state_hash ^= m_impl->m_boxes_factors[b_plus_id][to_new_position];
   }
 }
 
@@ -248,13 +257,8 @@ void HashedBoardManager::disable_sokoban_plus() {
   }
 }
 
-void HashedBoardManager::switch_boxes_and_goals() {
-  BoardManager::switch_boxes_and_goals();
-  m_impl->m_solutions_hashes.clear();
-}
-
 bool HashedBoardManager::is_solved() const {
-  return solutions_hashes().count(boxes_layout_hash()) > 0;
+  return solutions_hashes().count(state_hash()) > 0;
 }
 
 const HashedBoardManager::solutions_hashes_t& HashedBoardManager::solutions_hashes() const {
@@ -262,15 +266,8 @@ const HashedBoardManager::solutions_hashes_t& HashedBoardManager::solutions_hash
     // regenerate hashes
     auto slns = solutions();
     for (auto solution : slns) {
-      positions_by_id_t boxes;
-      size_t i = DEFAULT_PIECE_ID;
-      for (auto box_pos: solution.boxes_positions()) {
-          boxes.insert(std::make_pair(i, box_pos));
-          i++;
-      }
-
       const_cast<HashedBoardManager*>(this)->m_impl->m_solutions_hashes.insert(
-        external_position_hash(boxes)
+        external_state_hash(solution)
       );
     }
   }
@@ -299,7 +296,7 @@ string HashedBoardManager::repr() const {
 
 BoardState HashedBoardManager::state() const {
   auto retv = BoardManager::state();
-  retv.zobrist_hash() = boxes_layout_hash();
+  retv.zobrist_hash() = state_hash();
   return retv;
 }
 
