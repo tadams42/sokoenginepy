@@ -11,9 +11,7 @@ class AtomicMoveFactory(factory.Factory):
         model = AtomicMove
 
     box_moved = factory.LazyAttribute(lambda x: fake.boolean())
-    direction = factory.LazyAttribute(
-        lambda x: fake.random_element(list(Direction))
-    )
+    direction = factory.LazyAttribute(lambda x: fake.random_element(list(Direction)))
 
 
 @pytest.fixture

@@ -92,16 +92,16 @@ class Tessellation(Enum):
     @classmethod
     def instance_from(cls, tessellation_or_description):
         if (
-            not tessellation_or_description or
-            'sokoban' in str(tessellation_or_description).lower() or
-            utilities.is_blank(str(tessellation_or_description))
+            not tessellation_or_description
+            or "sokoban" in str(tessellation_or_description).lower()
+            or utilities.is_blank(str(tessellation_or_description))
         ):
             return cls.SOKOBAN
-        elif 'trioban' in str(tessellation_or_description).lower():
+        elif "trioban" in str(tessellation_or_description).lower():
             return cls.TRIOBAN
-        elif 'hexoban' in str(tessellation_or_description).lower():
+        elif "hexoban" in str(tessellation_or_description).lower():
             return cls.HEXOBAN
-        elif 'octoban' in str(tessellation_or_description).lower():
+        elif "octoban" in str(tessellation_or_description).lower():
             return cls.OCTOBAN
         else:
             raise UnknownTessellationError(tessellation_or_description)

@@ -8,10 +8,7 @@ class BoardState:
         zobrist_hash(int): Zobrist hash of state (see `.HashedBoardManager`)
     """
 
-    def __init__(
-        self, pushers_positions=None, boxes_positions=None,
-        zobrist_hash=None
-    ):
+    def __init__(self, pushers_positions=None, boxes_positions=None, zobrist_hash=None):
         self._pushers_positions = pushers_positions
         self._boxes_positions = boxes_positions
         self._zobrist_hash = zobrist_hash
@@ -41,25 +38,23 @@ class BoardState:
         self._zobrist_hash = rv
 
     def __str__(self):
-        prefix = (len(self.__class__.__name__) + 2) * ' '
-        return '\n'.join([
-            '<{} pushers_positions: {},'.format(
-                self.__class__.__name__,
-                self.pushers_positions
-            ),
-            prefix + 'boxes_positions: {},'.format(self.boxes_positions),
-            prefix + 'zobrist_hash: {}'.format(self.zobrist_hash) + '>'
-        ])
+        prefix = (len(self.__class__.__name__) + 2) * " "
+        return "\n".join(
+            [
+                "<{} pushers_positions: {},".format(
+                    self.__class__.__name__, self.pushers_positions
+                ),
+                prefix + "boxes_positions: {},".format(self.boxes_positions),
+                prefix + "zobrist_hash: {}".format(self.zobrist_hash) + ">",
+            ]
+        )
 
     def __repr__(self):
-        return (
-            "{}(pushers_positions={}, boxes_positions={}, zobrist_hash={})".
-            format(
-                self.__class__.__name__,
-                repr(self.pushers_positions),
-                repr(self.boxes_positions),
-                repr(self.zobrist_hash)
-            )
+        return "{}(pushers_positions={}, boxes_positions={}, zobrist_hash={})".format(
+            self.__class__.__name__,
+            repr(self.pushers_positions),
+            repr(self.boxes_positions),
+            repr(self.zobrist_hash),
         )
 
     def __eq__(self, other):

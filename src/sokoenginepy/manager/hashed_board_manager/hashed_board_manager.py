@@ -5,42 +5,37 @@ from ..board_manager import BoardManager
 from ..piece import DEFAULT_PIECE_ID
 
 
-class HashedBoardManager(
-    BoardManager, metaclass=utilities.InheritableDocstrings
-):
+class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings):
     """:class:`.BoardManager` with Zobrist hashing
 
-    Adds Zobrist hashing on top of :class:`.BoardManager` and keeps it up to
-    date when pieces are moved.
+    Adds Zobrist hashing on top of :class:`.BoardManager` and keeps it up to date
+    when pieces are moved.
 
-    Zobrist hash is 64b integer hash derived from positions of all boxes and
-    pushers on board.
+    Zobrist hash is 64b integer hash derived from positions of all boxes and pushers
+    on board.
 
-    When initialized, :class:`.HashedBoardManager` hashes board using positions
-    and IDs of boxes and pushers and produces 64b integer hash. After that,
-    whenever position of piece changes, this hash is updated. The ``Zobrist``
-    part means hashing is deterministic which then means that undoing movement
-    will return hash value to previous one. All this allows for creation of
-    position tables that contain many board layouts and can be quickly compared
-    (since we are not comparing positions but only hashes of these positions).
-    Being able to quickly compare and find current board layout in some big
-    table, speeds up searching through game space which is needed for effective
-    solver implementations.
+    When initialized, :class:`.HashedBoardManager` hashes board using positions and
+    IDs of boxes and pushers and produces 64b integer hash. After that, whenever
+    position of piece changes, this hash is updated. The ``Zobrist`` part means
+    hashing is deterministic which then means that undoing movement will return hash
+    value to previous one. All this allows for creation of position tables that
+    contain many board layouts and can be quickly compared (since we are not
+    comparing positions but only hashes of these positions). Being able to quickly
+    compare and find current board layout in some big table, speeds up searching
+    through game space which is needed for effective solver implementations.
 
-    Boxes with same Sokoban+ ID are treated as equal meaning that if two of
-    these boxes switch position, hash will not change. This also means that
-    hash is different when Sokoban+ is enabled from the one when it is
-    disabled
+    Boxes with same Sokoban+ ID are treated as equal meaning that if two of these
+    boxes switch position, hash will not change. This also means that hash is
+    different when Sokoban+ is enabled from the one when it is disabled
 
-    Pushers are all treated equal, meaning that if two pushers switch
-    position, hash will not change
+    Pushers are all treated equal, meaning that if two pushers switch position, hash
+    will not change
 
     Notes:
         - enabling/disabling Sokoban+ rehashes the board state
-        - changing position of pieces only updates existing hash, it doesn't
-          rehash whole board. This means that for example undoing box push
-          would "undo" the hash value to the one that was before move was
-          preformed
+        - changing position of pieces only updates existing hash, it doesn't rehash
+          whole board. This means that for example undoing box push would "undo" the
+          hash value to the one that was before move was preformed
     """
 
     def __init__(self, variant_board, boxorder=None, goalorder=None):
@@ -99,10 +94,9 @@ class HashedBoardManager(
         )
 
         for box_id in self.boxes_ids:
-            self._state_hash ^= (
-                self._boxes_factors[self.box_plus_id(box_id)]
-                [self.box_position(box_id)]
-            )
+            self._state_hash ^= self._boxes_factors[self.box_plus_id(box_id)][
+                self.box_position(box_id)
+            ]
 
         for pusher_position in self.pushers_positions.values():
             self._state_hash ^= self._pushers_factors[pusher_position]
@@ -116,7 +110,7 @@ class HashedBoardManager(
                 return None
             else:
                 src_index += 1
-                return lst[src_index-1]
+                return lst[src_index - 1]
 
         return [choose(pos) for pos in range(self.board.size)]
 
@@ -138,9 +132,8 @@ class HashedBoardManager(
 
     def external_state_hash(self, board_state):
         """
-        Calculates Zobrist hash of given ``board_state`` as if that
-        ``board_state`` was applied to initial :attr:`.board`" (to board where
-        no movement happened).
+        Calculates Zobrist hash of given ``board_state`` as if that ``board_state``
+        was applied to initial :attr:`.board`" (to board where no movement happened).
 
         ``board_state`` must meet following requirement:
 
@@ -158,9 +151,9 @@ class HashedBoardManager(
 
         retv = self.initial_state_hash
         for index, box_position in enumerate(board_state.boxes_positions):
-            retv ^= self._boxes_factors[
-                self.box_plus_id(DEFAULT_PIECE_ID + index)
-            ][box_position]
+            retv ^= self._boxes_factors[self.box_plus_id(DEFAULT_PIECE_ID + index)][
+                box_position
+            ]
 
         for pusher_position in board_state.pushers_positions:
             retv ^= self._pushers_factors[pusher_position]
@@ -173,8 +166,7 @@ class HashedBoardManager(
         if old_position != to_new_position:
             box_plus_id = self.box_plus_id(self.box_id_on(to_new_position))
             self._state_hash ^= self._boxes_factors[box_plus_id][old_position]
-            self._state_hash ^= self._boxes_factors[box_plus_id
-                                                    ][to_new_position]
+            self._state_hash ^= self._boxes_factors[box_plus_id][to_new_position]
 
     def _pusher_moved(self, old_position, to_new_position):
         if old_position != to_new_position:
@@ -223,10 +215,11 @@ class HashedBoardManager(
     def solutions_hashes(self):
         if not self._solutions_hashes:
             self._solutions_hashes = set(
-                h for h in (
-                    self.external_state_hash(solution)
-                    for solution in self.solutions()
-                ) if h
+                h
+                for h in (
+                    self.external_state_hash(solution) for solution in self.solutions()
+                )
+                if h
             )
         return self._solutions_hashes
 

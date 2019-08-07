@@ -1,8 +1,7 @@
 from enum import IntEnum
 from itertools import groupby
 
-from ...manager import (DEFAULT_PIECE_ID, CellAlreadyOccupiedError,
-                        HashedBoardManager)
+from ...manager import DEFAULT_PIECE_ID, CellAlreadyOccupiedError, HashedBoardManager
 from ...snapshot import AtomicMove
 
 
@@ -45,10 +44,10 @@ class Mover:
 
     - pusher is allowed to pull single box at the time
 
-        - if position allows pull that pull is optional (pusher is allowed to
-          move without pull even if pull is possible).
-        - default behavior is to always pull boxes but that can be changed any
-          time through :attr:`.pulls_boxes`
+        - if position allows pull that pull is optional (pusher is allowed to move
+          without pull even if pull is possible).
+        - default behavior is to always pull boxes but that can be changed any time
+          through :attr:`.pulls_boxes`
 
     - pusher can't push boxes
 
@@ -69,8 +68,8 @@ class Mover:
         solving_mode (SolvingMode): start the game in this solving mode
 
     Warning:
-        :class:`.Mover` operates directly on referenced game board. Because of
-        that, this board should not be edited outside of :class:`.Mover` once
+        :class:`.Mover` operates directly on referenced game board. Because of that,
+        this board should not be edited outside of :class:`.Mover` once
         :class:`.Mover` instance had been attached to it: editing the board will
         corrupt :class:`.Mover` internal state. For the same reason, it is not
         allowed to attach two movers to same game board.
@@ -117,8 +116,8 @@ class Mover:
     @property
     def pulls_boxes(self):
         """
-        Select behavior in :attr:`.SolvingMode.REVERSE` mode when pusher is
-        moving away from box.
+        Select behavior in :attr:`.SolvingMode.REVERSE` mode when pusher is moving
+        away from box.
 
         See Also:
             :meth:`.move`
@@ -133,17 +132,17 @@ class Mover:
     def last_move(self):
         """Sequence of :class:`.AtomicMove` that contains most recent movement.
 
-        Whenever :class:`.Mover` performs any movemet or pusher selection, it
-        puts resulting :class:`.AtomicMove` into this sequence in order atomic
-        moves happened.
+        Whenever :class:`.Mover` performs any movemet or pusher selection, it puts
+        resulting :class:`.AtomicMove` into this sequence in order atomic moves
+        happened.
 
-        This is useful for movement animation in GUI. After Mover performs
-        movement, GUI has enough information to know what was performed and to
-        choose which animations to render for that.
+        This is useful for movement animation in GUI. After Mover performs movement,
+        GUI has enough information to know what was performed and to choose which
+        animations to render for that.
 
-        It is also possible to set this to some external sequence of moves. In
-        that case, calling :meth:`.undo_last_move` will cause Mover to try to
-        undo that external sequence of atomic moves.
+        It is also possible to set this to some external sequence of moves. In that
+        case, calling :meth:`.undo_last_move` will cause Mover to try to undo that
+        external sequence of atomic moves.
 
         Example:
 
@@ -182,9 +181,9 @@ class Mover:
             [AtomicMove(Direction.LEFT, box_moved=False), AtomicMove(Direction.DOWN, box_moved=False)]
 
         Warning:
-            Subsequent movement overwrites this meaning that Mover can unly undo
-            last move performed (it doesn't keep whole history of movement, only
-            the last move).
+            Subsequent movement overwrites this meaning that Mover can only undo last
+            move performed (it doesn't keep whole history of movement, only the last
+            move).
         """
         return self._last_move
 
@@ -197,9 +196,8 @@ class Mover:
         Selects pusher that will perform next move.
 
         Mover always selects :data:`.DEFAULT_PIECE_ID` before any movements is
-        performed. This means that for single-pusher boards, that single pusher
-        is always automatically selected and this method doesn't need to be
-        called.
+        performed. This means that for single-pusher boards, that single pusher is
+        always automatically selected and this method doesn't need to be called.
 
         Args:
             pusher_id (int): ID of pusher
@@ -211,13 +209,10 @@ class Mover:
         if pusher_id == self._selected_pusher:
             return
 
-        old_pusher_position = self._manager.pusher_position(
-            self._selected_pusher
-        )
+        old_pusher_position = self._manager.pusher_position(self._selected_pusher)
         new_pusher_position = self._manager.pusher_position(pusher_id)
         selection_path = self._manager.board.positions_path_to_directions_path(
-            self._manager.board.
-            find_jump_path(old_pusher_position, new_pusher_position)
+            self._manager.board.find_jump_path(old_pusher_position, new_pusher_position)
         )
 
         self._last_move = []
@@ -231,11 +226,11 @@ class Mover:
     def move(self, direction):
         """Moves currently selected pusher in ``direction``.
 
-        In :attr:`.SolvingMode.FORWARD` mode, pushes the box in front of pusher
-        (if there is one).
+        In :attr:`.SolvingMode.FORWARD` mode, pushes the box in front of pusher (if
+        there is one).
 
-        In :attr:`.SolvingMode.REVERSE` mode pulls box together with pusher (if
-        there is one and if ``self.pulls_boxes is True``).
+        In :attr:`.SolvingMode.REVERSE` mode pulls box together with pusher (if there
+        is one and if ``self.pulls_boxes is True``).
 
         Args:
             direction (Direction): direction of movement
@@ -265,12 +260,10 @@ class Mover:
             .IllegalMoveError: for illegal jumps
         """
         if self._pull_count != 0:
-            raise IllegalMoveError('Jumps not allowed after first pull')
+            raise IllegalMoveError("Jumps not allowed after first pull")
 
         if self._solving_mode != SolvingMode.REVERSE:
-            raise IllegalMoveError(
-                'Jumps allowed only in reverse solving mode'
-            )
+            raise IllegalMoveError("Jumps allowed only in reverse solving mode")
 
         old_position = self._manager.pusher_position(self._selected_pusher)
         if old_position == new_position:
@@ -294,7 +287,8 @@ class Mover:
         self._last_move = [jump_am(direction) for direction in path]
 
     def undo_last_move(self):
-        """ Takes sequence of moves stored in self.last_move and undoes it.
+        """
+        Takes sequence of moves stored in self.last_move and undoes it.
 
         See Also:
             :attr:`.Mover.last_move`
@@ -313,9 +307,7 @@ class Mover:
                 return pusher_change_key
             return move_key
 
-        for moves_type, moves_group in groupby(
-            reversed(old_last_moves), key_functor
-        ):
+        for moves_type, moves_group in groupby(reversed(old_last_moves), key_functor):
             if moves_type == move_key:
                 for atomic_move in moves_group:
                     self._undo_atomic_move(atomic_move)
@@ -335,14 +327,12 @@ class Mover:
             has_box_behind_pusher = self.board_manager.has_box_on(
                 self._manager.board.neighbor(
                     self.board_manager.pusher_position(self.selected_pusher),
-                    atomic_move.direction
+                    atomic_move.direction,
                 )
             )
 
             if not atomic_move.is_move and not has_box_behind_pusher:
-                raise IllegalMoveError(
-                    "Requested push undo, but no box behind pusher!"
-                )
+                raise IllegalMoveError("Requested push undo, but no box behind pusher!")
             options.force_pulls = not atomic_move.is_move
             options.increase_pull_count = False
             self._pull_or_move(atomic_move.direction.opposite, options)
@@ -363,21 +353,20 @@ class Mover:
         self.select_pusher(self._manager.pusher_id_on(new_position))
 
     def _push_or_move(self, direction, options):
-        """Perform movement of currently selected pusher in ``direction``.
+        """
+        Perform movement of currently selected pusher in ``direction``.
 
         In case there is a box in front of pusher, pushes it.
         """
-        initial_pusher_position = self._manager.pusher_position(
-            self._selected_pusher
-        )
+        initial_pusher_position = self._manager.pusher_position(self._selected_pusher)
         in_front_of_pusher = self._manager.board.neighbor(
             initial_pusher_position, direction
         )
 
         if not in_front_of_pusher:
             raise IllegalMoveError(
-                "Can't move pusher off board! (ID: " + "{0}, direction: {1})".
-                format(self._selected_pusher, str(direction))
+                "Can't move pusher off board! (ID: "
+                + "{0}, direction: {1})".format(self._selected_pusher, str(direction))
             )
 
         is_push = False
@@ -389,10 +378,9 @@ class Mover:
             )
             if not in_front_of_box:
                 raise IllegalMoveError(
-                    "Can't push box off board! (ID: " +
-                    "{0}, direction: {1})".format(
-                        self._manager.box_id_on(in_front_of_pusher),
-                        str(direction)
+                    "Can't push box off board! (ID: "
+                    + "{0}, direction: {1})".format(
+                        self._manager.box_id_on(in_front_of_pusher), str(direction)
                     )
                 )
 
@@ -402,9 +390,7 @@ class Mover:
                 raise IllegalMoveError(str(exc))
 
         try:
-            self._manager.move_pusher_from(
-                initial_pusher_position, in_front_of_pusher
-            )
+            self._manager.move_pusher_from(initial_pusher_position, in_front_of_pusher)
         except CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
@@ -417,27 +403,24 @@ class Mover:
         self._last_move = [atomic_move]
 
     def _pull_or_move(self, direction, options):
-        """Perform movement of currently selected pusher in ``direction``.
+        """
+        Perform movement of currently selected pusher in ``direction``.
 
         In case there is a box in behind of pusher, might pull it.
         """
-        initial_pusher_position = self._manager.pusher_position(
-            self._selected_pusher
-        )
+        initial_pusher_position = self._manager.pusher_position(self._selected_pusher)
         in_front_of_pusher = self._manager.board.neighbor(
             initial_pusher_position, direction
         )
 
         if not in_front_of_pusher:
             raise IllegalMoveError(
-                "Can't move pusher off board! (ID: " + "{0}, direction: {1})".
-                format(self._selected_pusher, str(direction))
+                "Can't move pusher off board! (ID: "
+                + "{0}, direction: {1})".format(self._selected_pusher, str(direction))
             )
 
         try:
-            self._manager.move_pusher_from(
-                initial_pusher_position, in_front_of_pusher
-            )
+            self._manager.move_pusher_from(initial_pusher_position, in_front_of_pusher)
         except CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
@@ -449,9 +432,7 @@ class Mover:
             if behind_pusher and self._manager.board[behind_pusher].has_box:
                 is_pull = True
                 try:
-                    self._manager.move_box_from(
-                        behind_pusher, initial_pusher_position
-                    )
+                    self._manager.move_box_from(behind_pusher, initial_pusher_position)
                 except CellAlreadyOccupiedError as exc:
                     raise IllegalMoveError(str(exc))
                 if options.increase_pull_count:
@@ -460,7 +441,5 @@ class Mover:
         atomic_move = AtomicMove(direction, is_pull)
         atomic_move.pusher_id = self._selected_pusher
         if is_pull:
-            atomic_move.moved_box_id = self._manager.box_id_on(
-                initial_pusher_position
-            )
+            atomic_move.moved_box_id = self._manager.box_id_on(initial_pusher_position)
         self._last_move = [atomic_move]

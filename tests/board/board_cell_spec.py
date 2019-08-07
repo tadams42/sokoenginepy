@@ -2,8 +2,7 @@ import copy
 
 import pytest
 
-from sokoenginepy import (BoardCell, BoardCellCharacters,
-                          IllegalBoardCharacterError)
+from sokoenginepy import BoardCell, BoardCellCharacters, IllegalBoardCharacterError
 
 from ..fixtures import BoardCellFactory
 
@@ -15,12 +14,8 @@ class DescribeBoardCell:
             assert BoardCell.is_pusher_chr(BoardCellCharacters.ALT_PUSHER1)
             assert BoardCell.is_pusher_chr(BoardCellCharacters.ALT_PUSHER2)
             assert BoardCell.is_pusher_chr(BoardCellCharacters.PUSHER_ON_GOAL)
-            assert BoardCell.is_pusher_chr(
-                BoardCellCharacters.ALT_PUSHER_ON_GOAL1
-            )
-            assert BoardCell.is_pusher_chr(
-                BoardCellCharacters.ALT_PUSHER_ON_GOAL2
-            )
+            assert BoardCell.is_pusher_chr(BoardCellCharacters.ALT_PUSHER_ON_GOAL1)
+            assert BoardCell.is_pusher_chr(BoardCellCharacters.ALT_PUSHER_ON_GOAL2)
 
     class Describe_is_box_chr:
         def it_correctly_categorizes(self):
@@ -34,24 +29,16 @@ class DescribeBoardCell:
             assert BoardCell.is_goal_chr(BoardCellCharacters.GOAL)
             assert BoardCell.is_goal_chr(BoardCellCharacters.ALT_GOAL1)
             assert BoardCell.is_goal_chr(BoardCellCharacters.PUSHER_ON_GOAL)
-            assert BoardCell.is_goal_chr(
-                BoardCellCharacters.ALT_PUSHER_ON_GOAL1
-            )
-            assert BoardCell.is_goal_chr(
-                BoardCellCharacters.ALT_PUSHER_ON_GOAL2
-            )
+            assert BoardCell.is_goal_chr(BoardCellCharacters.ALT_PUSHER_ON_GOAL1)
+            assert BoardCell.is_goal_chr(BoardCellCharacters.ALT_PUSHER_ON_GOAL2)
             assert BoardCell.is_goal_chr(BoardCellCharacters.BOX_ON_GOAL)
             assert BoardCell.is_goal_chr(BoardCellCharacters.ALT_BOX_ON_GOAL1)
 
     class Describe_is_empty_floor_chr:
         def it_correctly_categorizes(self):
             assert BoardCell.is_empty_floor_chr(BoardCellCharacters.FLOOR)
-            assert BoardCell.is_empty_floor_chr(
-                BoardCellCharacters.VISIBLE_FLOOR
-            )
-            assert BoardCell.is_empty_floor_chr(
-                BoardCellCharacters.ALT_VISIBLE_FLOOR1
-            )
+            assert BoardCell.is_empty_floor_chr(BoardCellCharacters.VISIBLE_FLOOR)
+            assert BoardCell.is_empty_floor_chr(BoardCellCharacters.ALT_VISIBLE_FLOOR1)
 
     class Describe_is_wall_chr:
         def it_correctly_categorizes(self):
@@ -99,9 +86,7 @@ class DescribeBoardCell:
             board_cell.has_pusher = True
             assert not board_cell.has_box
 
-        def test_setter_replaces_box_but_not_goal_if_setting_to_true(
-            self, board_cell
-        ):
+        def test_setter_replaces_box_but_not_goal_if_setting_to_true(self, board_cell):
             board_cell.has_goal = True
             board_cell.has_box = True
             board_cell.has_pusher = True
@@ -206,23 +191,17 @@ class DescribeBoardCell:
             board_cell.is_wall = False
             assert not board_cell.is_wall
 
-        def test_setter_replaces_box_with_wall_if_setting_to_true(
-            self, board_cell
-        ):
+        def test_setter_replaces_box_with_wall_if_setting_to_true(self, board_cell):
             board_cell.has_box = True
             board_cell.is_wall = True
             assert not board_cell.has_box
 
-        def test_setter_replaces_pusher_with_wall_if_setting_to_true(
-            self, board_cell
-        ):
+        def test_setter_replaces_pusher_with_wall_if_setting_to_true(self, board_cell):
             board_cell.has_pusher = True
             board_cell.is_wall = True
             assert not board_cell.has_pusher
 
-        def test_setter_replaces_goal_with_wall_if_setting_to_true(
-            self, board_cell
-        ):
+        def test_setter_replaces_goal_with_wall_if_setting_to_true(self, board_cell):
             board_cell.has_goal = True
             board_cell.is_wall = True
             assert not board_cell.has_goal
@@ -281,6 +260,7 @@ class DescribeBoardCell:
 
             assert str(board_cell) == BoardCellCharacters.FLOOR
 
-            assert board_cell.to_str(
-                use_visible_floor=True
-            ) == BoardCellCharacters.VISIBLE_FLOOR
+            assert (
+                board_cell.to_str(use_visible_floor=True)
+                == BoardCellCharacters.VISIBLE_FLOOR
+            )

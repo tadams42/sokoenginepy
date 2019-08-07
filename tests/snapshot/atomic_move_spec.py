@@ -1,7 +1,6 @@
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction,
-                          InvalidAtomicMoveError)
+from sokoenginepy import DEFAULT_PIECE_ID, AtomicMove, Direction, InvalidAtomicMoveError
 
 from ..fixtures import AtomicMoveFactory
 
@@ -9,9 +8,7 @@ from ..fixtures import AtomicMoveFactory
 class DescribeAtomicMove:
     class Describe_init:
         def it_sets_all_attributes(self):
-            atomic_move = AtomicMoveFactory(
-                direction=Direction.RIGHT, box_moved=True
-            )
+            atomic_move = AtomicMoveFactory(direction=Direction.RIGHT, box_moved=True)
 
             assert atomic_move.direction == Direction.RIGHT
             assert not atomic_move.is_move
@@ -22,13 +19,9 @@ class DescribeAtomicMove:
 
         def it_validates_parameters(self):
             with pytest.raises(InvalidAtomicMoveError):
-                AtomicMove(
-                    box_moved=True, is_pusher_selection=True, is_jump=True
-                )
+                AtomicMove(box_moved=True, is_pusher_selection=True, is_jump=True)
             with pytest.raises(InvalidAtomicMoveError):
-                AtomicMove(
-                    moved_box_id=42, is_pusher_selection=True, is_jump=True
-                )
+                AtomicMove(moved_box_id=42, is_pusher_selection=True, is_jump=True)
 
             with pytest.raises(InvalidAtomicMoveError):
                 AtomicMove(box_moved=True, is_jump=True)
@@ -44,16 +37,12 @@ class DescribeAtomicMove:
                 AtomicMove(is_jump=True, is_pusher_selection=True)
 
     class Describe_moved_box_id:
-        def test_get_returns_none_if_move_is_not_push_or_pull(
-            self, atomic_move
-        ):
+        def test_get_returns_none_if_move_is_not_push_or_pull(self, atomic_move):
             atomic_move.moved_box_id = DEFAULT_PIECE_ID
             atomic_move.is_push_or_pull = False
             assert atomic_move.moved_box_id is None
 
-        def test_get_returns_box_that_moved_if_move_is_push_or_pull(
-            self, atomic_move
-        ):
+        def test_get_returns_box_that_moved_if_move_is_push_or_pull(self, atomic_move):
             atomic_move.is_push_or_pull = True
             atomic_move.moved_box_id = DEFAULT_PIECE_ID + 42
             assert atomic_move.moved_box_id == DEFAULT_PIECE_ID + 42
@@ -113,9 +102,7 @@ class DescribeAtomicMove:
             atomic_move.is_move = True
             assert atomic_move.moved_box_id is None
 
-        def test_setter_resets_other_flags_when_setting_to_true(
-            self, atomic_move
-        ):
+        def test_setter_resets_other_flags_when_setting_to_true(self, atomic_move):
             atomic_move.is_push_or_pull = True
             atomic_move.is_move = True
             assert not atomic_move.is_push_or_pull
@@ -164,9 +151,7 @@ class DescribeAtomicMove:
             atomic_move.is_push_or_pull = False
             assert atomic_move.moved_box_id is None
 
-        def test_setter_resets_other_flags_when_setting_to_true(
-            self, atomic_move
-        ):
+        def test_setter_resets_other_flags_when_setting_to_true(self, atomic_move):
             atomic_move.is_move = True
             atomic_move.is_push_or_pull = True
             assert not atomic_move.is_move
@@ -214,9 +199,7 @@ class DescribeAtomicMove:
             atomic_move.is_push_or_pull = True
             assert not atomic_move.is_pusher_selection
 
-        def test_setter_sets_to_state_of_pusher_was_selected(
-            self, atomic_move
-        ):
+        def test_setter_sets_to_state_of_pusher_was_selected(self, atomic_move):
             atomic_move.is_pusher_selection = True
             assert atomic_move.is_pusher_selection
 
@@ -226,9 +209,7 @@ class DescribeAtomicMove:
             atomic_move.is_pusher_selection = True
             assert atomic_move.moved_box_id is None
 
-        def test_setter_resets_other_flags_when_setting_to_true(
-            self, atomic_move
-        ):
+        def test_setter_resets_other_flags_when_setting_to_true(self, atomic_move):
             atomic_move.is_move = True
             atomic_move.is_pusher_selection = True
             assert not atomic_move.is_move
@@ -261,9 +242,7 @@ class DescribeAtomicMove:
             atomic_move.is_jump = True
             assert atomic_move.is_jump
 
-        def it_returns_false_if_pusher_moved_insted_of_jumping(
-            self, atomic_move
-        ):
+        def it_returns_false_if_pusher_moved_insted_of_jumping(self, atomic_move):
             atomic_move.is_jump = True
             atomic_move.is_move = True
             assert not atomic_move.is_jump
@@ -288,9 +267,7 @@ class DescribeAtomicMove:
             atomic_move.is_jump = True
             assert atomic_move.moved_box_id is None
 
-        def test_setter_resets_other_flags_when_setting_to_true(
-            self, atomic_move
-        ):
+        def test_setter_resets_other_flags_when_setting_to_true(self, atomic_move):
             atomic_move.is_move = True
             atomic_move.is_jump = True
             assert not atomic_move.is_move

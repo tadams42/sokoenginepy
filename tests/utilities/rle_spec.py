@@ -6,14 +6,10 @@ class DescribeRle:
     class Describe_decode_rle_token:
         def it_decodes_rle_token(self):
             assert Rle.decode_rle_token("4a4b2cd3e") == "aaaabbbbccdeee"
-            assert Rle.decode_rle_token(
-                "4a4b2cd3efghij"
-            ) == "aaaabbbbccdeeefghij"
+            assert Rle.decode_rle_token("4a4b2cd3efghij") == "aaaabbbbccdeeefghij"
             assert Rle.decode_rle_token("4a4b2cd3ef") == "aaaabbbbccdeeef"
             assert Rle.decode_rle_token("4a2bf2b2cd3e") == "aaaabbfbbccdeee"
-            assert Rle.decode_rle_token(
-                "4a2bfghij2b2cd3e"
-            ) == "aaaabbfghijbbccdeee"
+            assert Rle.decode_rle_token("4a2bfghij2b2cd3e") == "aaaabbfghijbbccdeee"
             assert Rle.decode_rle_token(" 10a3 ") == " aaaaaaaaaa   "
             assert Rle.decode_rle_token("ccc") == "ccc"
 
@@ -44,18 +40,22 @@ class Describe_rle_decode:
         assert rle_decode("ccc") == "ccc"
 
     def it_decodes_grouped_rle_string(self):
-        assert rle_decode(
-            "2abc3def3(adfdf)2abc3def"
-        ) == "aabcdddefadfdfadfdfadfdfaabcdddef"
-        assert rle_decode(
-            "2abc3def3(2a3bc)2abc3def"
-        ) == "aabcdddefaabbbcaabbbcaabbbcaabcdddef"
-        assert rle_decode(
-            "2abc3def2(fdsfs2(dfgh)gtr)2abc3def"
-        ) == "aabcdddeffdsfsdfghdfghgtrfdsfsdfghdfghgtraabcdddef"
-        assert rle_decode(
-            "2abc3def2(2a2bc2(2a3b)2d)2abc3def"
-        ) == "aabcdddefaabbcaabbbaabbbddaabbcaabbbaabbbddaabcdddef"
+        assert (
+            rle_decode("2abc3def3(adfdf)2abc3def")
+            == "aabcdddefadfdfadfdfadfdfaabcdddef"
+        )
+        assert (
+            rle_decode("2abc3def3(2a3bc)2abc3def")
+            == "aabcdddefaabbbcaabbbcaabbbcaabcdddef"
+        )
+        assert (
+            rle_decode("2abc3def2(fdsfs2(dfgh)gtr)2abc3def")
+            == "aabcdddeffdsfsdfghdfghgtrfdsfsdfghdfghgtraabcdddef"
+        )
+        assert (
+            rle_decode("2abc3def2(2a2bc2(2a3b)2d)2abc3def")
+            == "aabcdddefaabbcaabbbaabbbddaabbcaabbbaabbbddaabcdddef"
+        )
         assert rle_decode("2(abcd)efgh") == "abcdabcdefgh"
         assert rle_decode("2(3abcd)efgh") == "aaabcdaaabcdefgh"
         assert rle_decode("2(abcd)3efgh") == "abcdabcdeeefgh"

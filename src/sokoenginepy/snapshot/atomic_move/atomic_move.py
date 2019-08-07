@@ -12,26 +12,26 @@ class AtomicMoveCharacters(str, Enum):
     """
     Characters used in textual representation of :class:`.Snapshot`.
 
-    Not all variants use all characters. Also, for different variants, same
-    character may have different meaning (represent different
-    :class:`.Direction`).
+    Not all variants use all characters. Also, for different variants, same character
+    may have different meaning (represent different :class:`.Direction`).
     """
-    l = 'l'
-    u = 'u'
-    r = 'r'
-    d = 'd'
-    L = 'L'
-    U = 'U'
-    R = 'R'
-    D = 'D'
-    w = 'w'
-    W = 'W'
-    e = 'e'
-    E = 'E'
-    n = 'n'
-    N = 'N'
-    s = 's'
-    S = 'S'
+
+    l = "l"
+    u = "u"
+    r = "r"
+    d = "d"
+    L = "L"
+    U = "U"
+    R = "R"
+    D = "D"
+    w = "w"
+    W = "W"
+    e = "e"
+    E = "E"
+    n = "n"
+    N = "N"
+    s = "s"
+    S = "S"
 
     @classmethod
     def values(cls):
@@ -43,8 +43,8 @@ class AtomicMove:
 
         - move - pusher moved without pushing box
         - push/pull - pusher moved and pushed a box in front of it (
-          :attr:`.SolvingMode.FORWARD`) or pusher moved and pulled a box behind
-          it (:attr:`.SolvingMode.REVERSE`)
+          :attr:`.SolvingMode.FORWARD`) or pusher moved and pulled a box behind it
+          (:attr:`.SolvingMode.REVERSE`)
         - jump - single step in pusher jump sequence (jumps are allowed only in
           :attr:`.SolvingMode.REVERSE`)
         - pusher selection - single step in sequence describing focus change of
@@ -52,8 +52,12 @@ class AtomicMove:
     """
 
     __slots__ = [
-        '_box_moved', '_pusher_selected', '_pusher_jumped', '_pusher_id',
-        '_moved_box_id', 'direction'
+        "_box_moved",
+        "_pusher_selected",
+        "_pusher_jumped",
+        "_pusher_id",
+        "_moved_box_id",
+        "direction",
     ]
 
     def __init__(
@@ -67,8 +71,7 @@ class AtomicMove:
     ):
         if (box_moved or moved_box_id) and is_pusher_selection and is_jump:
             raise InvalidAtomicMoveError(
-                "AtomicMove can't be all, a push, a jump and a pusher "
-                "selection!"
+                "AtomicMove can't be all, a push, a jump and a pusher " "selection!"
             )
 
         if is_jump and is_pusher_selection:
@@ -77,9 +80,7 @@ class AtomicMove:
             )
 
         if (box_moved or moved_box_id) and is_jump:
-            raise InvalidAtomicMoveError(
-                "AtomicMove can't be both, a push and a jump!"
-            )
+            raise InvalidAtomicMoveError("AtomicMove can't be both, a push and a jump!")
 
         if (box_moved or moved_box_id) and is_pusher_selection:
             raise InvalidAtomicMoveError(
@@ -93,7 +94,7 @@ class AtomicMove:
         self._moved_box_id = None
         self.direction = direction
 
-        #pylint: disable=simplifiable-if-statement
+        # pylint: disable=simplifiable-if-statement
         if box_moved:
             self.is_push_or_pull = True
         else:
@@ -144,8 +145,7 @@ class AtomicMove:
     @property
     def moved_box_id(self):
         """
-        ID of box that was moved or None, depending on type of
-        :class:`.AtomicMove`
+        ID of box that was moved or None, depending on type of :class:`.AtomicMove`
         """
         return self._moved_box_id if self.is_push_or_pull else None
 
@@ -180,7 +180,8 @@ class AtomicMove:
         True if pusher didn't move box, jump or changed focus to other pusher.
         """
         return (
-            not self._box_moved and not self._pusher_selected
+            not self._box_moved
+            and not self._pusher_selected
             and not self._pusher_jumped
         )
 
@@ -199,10 +200,7 @@ class AtomicMove:
     @property
     def is_push_or_pull(self):
         """True if pusher also moved a box."""
-        return (
-            self._box_moved and not self._pusher_selected
-            and not self._pusher_jumped
-        )
+        return self._box_moved and not self._pusher_selected and not self._pusher_jumped
 
     @is_push_or_pull.setter
     def is_push_or_pull(self, value):
@@ -217,13 +215,9 @@ class AtomicMove:
     @property
     def is_pusher_selection(self):
         """
-        True if this move is part of change active pusher sequence in Multiban
-        games.
+        True if this move is part of change active pusher sequence in Multiban games.
         """
-        return (
-            self._pusher_selected and not self._pusher_jumped
-            and not self._box_moved
-        )
+        return self._pusher_selected and not self._pusher_jumped and not self._box_moved
 
     @is_pusher_selection.setter
     def is_pusher_selection(self, value):
@@ -241,10 +235,7 @@ class AtomicMove:
         True if this move is part of pusher jump sequence in
         :attr:`.SolvingMode.REVERSE` games.
         """
-        return (
-            self._pusher_jumped and not self._box_moved
-            and not self._pusher_selected
-        )
+        return self._pusher_jumped and not self._box_moved and not self._pusher_selected
 
     @is_jump.setter
     def is_jump(self, value):

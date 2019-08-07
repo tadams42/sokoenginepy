@@ -5,7 +5,7 @@ from inspect import getsourcefile
 import pytz
 
 RESOURCES_ROOT = os.path.abspath(
-    os.path.join(getsourcefile(lambda: 0), '..', '..', 'res')
+    os.path.join(getsourcefile(lambda: 0), "..", "..", "res")
 )
 
 
@@ -14,8 +14,7 @@ def utcnow():
 
 
 def first_index_of(lst, predicate):
-    return next((index for index, elem in enumerate(lst)
-                 if predicate(elem)), None)
+    return next((index for index, elem in enumerate(lst) if predicate(elem)), None)
 
 
 def last_index_of(lst, predicate):

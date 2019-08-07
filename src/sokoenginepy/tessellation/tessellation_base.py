@@ -6,13 +6,16 @@ from .direction import UnknownDirectionError
 
 
 class TessellationBase(metaclass=ABCMeta):
-    """Base class for all tessellation implementations."""
-    #pylint: disable=unused-argument
+    """
+    Base class for all tessellation implementations."""
+
+    # pylint: disable=unused-argument
 
     @property
     @abstractmethod
     def legal_directions(self):
-        """Directions generally accepted by Tessellation.
+        """
+        Directions generally accepted by Tessellation.
 
         Returns:
             list: sequence of :class:`.Direction`
@@ -20,21 +23,19 @@ class TessellationBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def neighbor_position(
-        self, position, direction, board_width, board_height
-    ):
-        """Calculates neighbor position in given direction.
+    def neighbor_position(self, position, direction, board_width, board_height):
+        """
+        Calculates neighbor position in given direction.
 
-        Position is always expressed as 1D index of board graph vertex. To
-        convert 2D coordinates into vertex index, use :func:`.index_1d` method
+        Position is always expressed as 1D index of board graph vertex. To convert 2D
+        coordinates into vertex index, use :func:`.index_1d` method
 
         Returns:
-            int: If resulting position is off-board returns None, otherwise
-            position
+            int: If resulting position is off-board returns None, otherwise position
 
         Raises:
-            :exc:`.UnknownDirectionError`: in case direction is not one
-                of self.legal_directions
+            :exc:`.UnknownDirectionError`: in case direction is not one of
+                self.legal_directions
         """
         pass
 
@@ -47,7 +48,8 @@ class TessellationBase(metaclass=ABCMeta):
     @property
     @abstractmethod
     def graph_type(self):
-        """Type of graph used in given tessellation.
+        """
+        Type of graph used in given tessellation.
 
         Returns:
             GraphType: type of graph
@@ -55,7 +57,8 @@ class TessellationBase(metaclass=ABCMeta):
         pass
 
     def char_to_atomic_move(self, input_chr):
-        """Converts character to :class:`.AtomicMove`.
+        """
+        Converts character to :class:`.AtomicMove`.
 
         Returns:
            AtomicMove: resulting :class:`.AtomicMove`
@@ -83,7 +86,8 @@ class TessellationBase(metaclass=ABCMeta):
         pass
 
     def atomic_move_to_char(self, atomic_move):
-        """Converts :class:`.AtomicMove` to string
+        """
+        Converts :class:`.AtomicMove` to string
 
         Returns:
            str: resulting string representation of :class:`.AtomicMove`
@@ -101,12 +105,13 @@ class TessellationBase(metaclass=ABCMeta):
         return retv
 
     def cell_orientation(self, position, board_width, board_height):
-        """Calculates board cell orientation for given position.
+        """
+        Calculates board cell orientation for given position.
 
         Returns:
             CellOrientation: cell orientation for given ``position``
         """
-        #pylint: disable=no-self-use
+        # pylint: disable=no-self-use
         return CellOrientation.DEFAULT
 
     def __eq__(self, rv):

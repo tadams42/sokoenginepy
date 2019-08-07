@@ -12,22 +12,21 @@ _RE_SNAPSHOT_STRING = re.compile(
     r"^([0-9\s"
     + re.escape("".join(c for c in AtomicMoveCharacters))
     + re.escape("".join(c for c in Snapshot.NonMoveCharacters))
-    + re.escape("".join(c for c in utilities.RleCharacters)) + "])*$"
+    + re.escape("".join(c for c in utilities.RleCharacters))
+    + "])*$"
 )
 
 
 class SnapshotStringParser:
     """
-    Parses and validates game snapshot string into sequence of
-    :class:`AtomicMove`
+    Parses and validates game snapshot string into sequence of :class:`AtomicMove`
     """
 
-    atomic_moves = Regex(
-        "([" + "".join(c for c in AtomicMoveCharacters) + "])+"
-    )
+    atomic_moves = Regex("([" + "".join(c for c in AtomicMoveCharacters) + "])+")
     jump = Group(
         oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN)
-        + ZeroOrMore(atomic_moves) + oneOf(Snapshot.NonMoveCharacters.JUMP_END)
+        + ZeroOrMore(atomic_moves)
+        + oneOf(Snapshot.NonMoveCharacters.JUMP_END)
     )
     pusher_change = Group(
         oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN)
@@ -37,8 +36,7 @@ class SnapshotStringParser:
     grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
 
     _re_snapshot_string_cleanup = re.compile(
-        "([" + re.escape(Snapshot.NonMoveCharacters.CURRENT_POSITION_CH)
-        + r"\s])+"
+        "([" + re.escape(Snapshot.NonMoveCharacters.CURRENT_POSITION_CH) + r"\s])+"
     )
 
     def __init__(self):
@@ -50,16 +48,19 @@ class SnapshotStringParser:
     def is_snapshot_string(cls, line):
         return (
             not utilities.is_blank(line)
-            and not utilities.contains_only_digits_and_spaces(line) and reduce(
-                lambda x, y: x and y, [
+            and not utilities.contains_only_digits_and_spaces(line)
+            and reduce(
+                lambda x, y: x and y,
+                [
                     True if _RE_SNAPSHOT_STRING.match(l) else False
                     for l in line.splitlines()
-                ], True
+                ],
+                True,
             )
         )
 
     def convert_from_string(self, from_string, to_snapshot):
-        #pylint: disable=protected-access
+        # pylint: disable=protected-access
         if not self._parse(from_string, to_snapshot.tessellation):
             raise SnapshotConversionError(self._first_encountered_error)
         to_snapshot.clear()
@@ -99,18 +100,16 @@ class SnapshotStringParser:
             if jump_flag or pusher_selected_flag:
                 backup_flag = jump_flag
                 retv += (
-                    snapshot.NonMoveCharacters.JUMP_BEGIN if jump_flag else
-                    snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
+                    snapshot.NonMoveCharacters.JUMP_BEGIN
+                    if jump_flag
+                    else snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
                 )
 
                 while (
-                    i < iend and conversion_ok
-                    and (jump_flag or pusher_selected_flag)
+                    i < iend and conversion_ok and (jump_flag or pusher_selected_flag)
                 ):
                     try:
-                        retv += snapshot.tessellation.atomic_move_to_char(
-                            snapshot[i]
-                        )
+                        retv += snapshot.tessellation.atomic_move_to_char(snapshot[i])
                     except InvalidAtomicMoveError:
                         conversion_ok = False
                     i += 1
@@ -119,14 +118,13 @@ class SnapshotStringParser:
                         pusher_selected_flag = snapshot[i].is_pusher_selection
 
                 retv += (
-                    snapshot.NonMoveCharacters.JUMP_END if backup_flag else
-                    snapshot.NonMoveCharacters.PUSHER_CHANGE_END
+                    snapshot.NonMoveCharacters.JUMP_END
+                    if backup_flag
+                    else snapshot.NonMoveCharacters.PUSHER_CHANGE_END
                 )
             else:
                 try:
-                    retv += snapshot.tessellation.atomic_move_to_char(
-                        snapshot[i]
-                    )
+                    retv += snapshot.tessellation.atomic_move_to_char(snapshot[i])
                 except InvalidAtomicMoveError:
                     conversion_ok = False
                 i += 1
@@ -138,9 +136,7 @@ class SnapshotStringParser:
             tmp = ""
             for i, character in enumerate(retv):
                 tmp += character
-                if utilities.should_insert_line_break_at(
-                    i + 1, break_long_lines_at
-                ):
+                if utilities.should_insert_line_break_at(i + 1, break_long_lines_at):
                     tmp += "\n"
             retv = tmp
 
@@ -161,8 +157,7 @@ class SnapshotStringParser:
 
     def _parse(self, moves_string, tessellation):
         """
-        - Parses moves_string into sequence of AtomicMove using provided
-          tessellation
+        - Parses moves_string into sequence of AtomicMove using provided tessellation
         - Sets parser state detailing the first error encountered in parsing
         - returns boolean value signaling parsing success or failure
         """
@@ -217,8 +212,7 @@ class SnapshotStringParser:
                     tessellation=tessellation,
                     is_jump=token[0] == Snapshot.NonMoveCharacters.JUMP_BEGIN,
                     is_pusher_change=(
-                        token[0]
-                        == Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
+                        token[0] == Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
                     ),
                 )
             else:

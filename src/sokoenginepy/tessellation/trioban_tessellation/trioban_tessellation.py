@@ -1,16 +1,19 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from ..cell_orientation import CellOrientation
 from ..direction import Direction, UnknownDirectionError
-from ..tessellation_base import (TessellationBase,
-                                 TessellationBaseInheritableDocstrings)
+from ..tessellation_base import TessellationBase, TessellationBaseInheritableDocstrings
 
 
 class TriobanTessellation(
     TessellationBase, metaclass=TessellationBaseInheritableDocstrings
 ):
     _LEGAL_DIRECTIONS = (
-        Direction.LEFT, Direction.RIGHT, Direction.NORTH_EAST,
-        Direction.NORTH_WEST, Direction.SOUTH_EAST, Direction.SOUTH_WEST
+        Direction.LEFT,
+        Direction.RIGHT,
+        Direction.NORTH_EAST,
+        Direction.NORTH_WEST,
+        Direction.SOUTH_EAST,
+        Direction.SOUTH_WEST,
     )
 
     _CHR_TO_ATOMIC_MOVE = None
@@ -25,20 +28,19 @@ class TriobanTessellation(
     @copy_ancestor_docstring
     def graph_type(self):
         from ...graph import GraphType
+
         return GraphType.DIRECTED_MULTI
 
     @copy_ancestor_docstring
-    def neighbor_position(
-        self, position, direction, board_width, board_height
-    ):
+    def neighbor_position(self, position, direction, board_width, board_height):
         # if not is_on_board_1d(position, board_width, board_height):
         #     return None
 
         row = ROW(position, board_width)
         column = COLUMN(position, board_width)
         triangle_points_down = (
-            self.cell_orientation(position, board_width, board_height
-                                 ) == CellOrientation.TRIANGLE_DOWN
+            self.cell_orientation(position, board_width, board_height)
+            == CellOrientation.TRIANGLE_DOWN
         )
 
         dx, dy = 0, 0
@@ -91,6 +93,7 @@ class TriobanTessellation(
     def _char_to_atomic_move_dict(self):
         if not self.__class__._CHR_TO_ATOMIC_MOVE:
             from ...snapshot import AtomicMoveCharacters
+
             self.__class__._CHR_TO_ATOMIC_MOVE = {
                 AtomicMoveCharacters.l: (Direction.LEFT, False),
                 AtomicMoveCharacters.L: (Direction.LEFT, True),
@@ -121,7 +124,8 @@ class TriobanTessellation(
         column = COLUMN(position, board_width)
         return (
             CellOrientation.TRIANGLE_DOWN
-            if (column + (row % 2)) % 2 == 0 else CellOrientation.DEFAULT
+            if (column + (row % 2)) % 2 == 0
+            else CellOrientation.DEFAULT
         )
 
     def __str__(self):

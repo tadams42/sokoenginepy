@@ -17,15 +17,18 @@ def is_blank(line):
 
 def contains_only_digits_and_spaces(line):
     return reduce(
-        lambda x, y: x and y, [
+        lambda x, y: x and y,
+        [
             True if _RE_ONLY_DIGITS_AND_SPACES.match(l) else False
             for l in line.splitlines()
-        ], True
+        ],
+        True,
     )
 
 
-def normalize_width(string_list, fill_chr=' '):
-    """Normalizes length of strings in ``string_list``.
+def normalize_width(string_list, fill_chr=" "):
+    """
+    Normalizes length of strings in ``string_list``.
 
     All strings are modified to be as long as the longest one in list. Missing
     characters in string are appended using ``fill_chr``.
@@ -62,9 +65,7 @@ def drop_empty(string_list):
 
 
 def should_insert_line_break_at(position, line_length=80):
-    """
-    For given ``position`` in string, should we insert line break?
-    """
+    """For given ``position`` in string, should we insert line break?"""
     if line_length > 0 and position:
         return (position % line_length) == 0
     return False

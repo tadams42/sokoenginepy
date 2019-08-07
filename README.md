@@ -15,14 +15,15 @@
 
 [//]: # (end-badges)
 
-sokoenginepy is game engine for Sokoban and variants, written in Python and loaded with features:
+sokoenginepy is game engine for Sokoban and variants, written in Python and loaded
+with features:
 
-* implements game logic for `Sokoban`, `Hexoban`, `Trioban` and `Octoban` variants
-  + supports `Sokoban+` for all implemented variants
-  + supports `Multiban` (muliple pushers on board) for all variants
-* reading and writing level collections
-  + fully compatible with [SokobanYASC] .sok file format and variants (.xsb, .tsb, .hsb, .txt)
-* Optional C++ native bindings using [pybind11] and [Boost.Graph] for ultimate speed
+- implements game logic for `Sokoban`, `Hexoban`, `Trioban` and `Octoban` variants
+  - supports `Sokoban+` for all implemented variants
+  - supports `Multiban` (muliple pushers on board) for all variants
+- reading and writing level collections
+  - fully compatible with [SokobanYASC] .sok file format and variants (.xsb, .tsb, .hsb, .txt)
+- Optional C++ native bindings using [pybind11] and [Boost.Graph] for ultimate speed
 
 `sokoenginepy` was inspired by [SokobanYASC], [JSoko], and MazezaM
 
@@ -34,13 +35,16 @@ Installing `sokoenginepy` should be as simple as
 pip install sokoenginepy
 ~~~
 
-This will also compile and install native C++ extension that greatly improves speed of `sokoenginepy` but is available only on Linux for now. To make this happen, you also need this:
+This will also compile and install native C++ extension that greatly improves speed
+of `sokoenginepy` but is available only on Linux for now. To make this happen, you
+also need this:
 
 ~~~sh
 sudo apt install python3-dev libboost-graph-dev
 ~~~
 
-On non-Linux systems, only pure Python gets installed, which gives you exactly same API but with less speed in some of CPU hungry operations.
+On non-Linux systems, only pure Python gets installed, which gives you exactly same
+API but with less speed in some of CPU hungry operations.
 
 All other glory details are here: [INSTALL]
 

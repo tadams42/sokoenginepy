@@ -6,13 +6,17 @@ Installing sokoenginepy should be as simple as
 pip install sokoenginepy
 ~~~
 
-There is optional C++ native extension that is built automatically with `pip install` if all dependencies are met and OS is Linux. It relies on [Boost.Graph] and [pybind11]. [Boost.Graph] needs to be installed on system, everything else is pulled automatically:
+There is optional C++ native extension that is built automatically with `pip install`
+if all dependencies are met and OS is Linux. It relies on [Boost.Graph] and
+[pybind11]. [Boost.Graph] needs to be installed on system, everything else is pulled
+automatically:
 
 ~~~sh
 sudo apt install python3-dev libboost-graph-dev
 ~~~
 
-Following are all the glory details of individual build and install steps, running tests, debugging, profiling, etc...
+Following are all the glory details of individual build and install steps, running
+tests, debugging, profiling, etc...
 
 ## Preparing development environment
 
@@ -33,9 +37,13 @@ pip install -e .[dev]
 
 Notes:
 
-- `python setup.py develop` performs similar install but without additional development packages
-- `python setup.py develop` will fail when trying to build native extension with message that it is missing `pybind11` headers. This is most probably `setuptools` bug (see also https://github.com/pybind/python_example/issues/16)
-- `pip install -e .` will always work and is equivalent to calling `python setup.py development` but with some `pip` magic that makes `setuptools` problem go away
+- `python setup.py develop` performs similar install but without additional
+  development packages
+- `python setup.py develop` will fail when trying to build native extension with
+  message that it is missing `pybind11` headers. This is most probably `setuptools`
+  bug (see also https://github.com/pybind/python_example/issues/16)
+- `pip install -e .` will always work and is equivalent to calling `python setup.py
+  development` but with some `pip` magic that makes `setuptools` problem go away
 
 ## Running tests
 
@@ -46,7 +54,7 @@ py.test
 or to get more verbose output
 
 ~~~sh
-py.test -p no:sugar --spec
+py.test --spec
 ~~~
 
 or to generate tests coverage
@@ -148,15 +156,22 @@ twine upload -r pypitest dist/*
 
 ## Native extension
 
-If all dependencies are met and we are on Linux, `pip install sokoenginepy` will produce native C++ extension that is then used automatically (for example, running tests will actually use native code and effectively test native extension instead of Python code).
+If all dependencies are met and we are on Linux, `pip install sokoenginepy` will
+produce native C++ extension that is then used automatically (for example, running
+tests will actually use native code and effectively test native extension instead of
+Python code).
 
-In cases where native extension can't be built, `pip install` will fall back to installing only Python code. Currently this means that on both, MacOS and Windows no native code will be built.
+In cases where native extension can't be built, `pip install` will fall back to
+installing only Python code. Currently this means that on both, MacOS and Windows no
+native code will be built.
 
-No client's source code needs to be changed in any case. Only difference is that when we have native code built, stuff runs faster. A lot faster. (this can be checked by running `mover_benchmarks.py` with and without native extension built).
+No client's source code needs to be changed in any case. Only difference is that when
+we have native code built, stuff runs faster. A lot faster. (this can be checked by
+running `mover_benchmarks.py` with and without native extension built).
 
 ~~~sh
-$ sudo apt install git build-essential libboost-graph-dev cmake libdw-dev
-binutils-dev doxygen
+$ sudo apt install git build-essential libboost-graph-dev cmake libdw-dev \
+    binutils-dev doxygen
 ~~~
 
 To debug native code, use `gdb` like this:
@@ -182,11 +197,16 @@ profiling native extension from Python:
 ~~~sh
 rm -r build/
 SOKOENGINEPYEXT_DEBUG=True pip install -e .
-valgrind --dump-line=yes --dump-instr=yes --tool=callgrind --collect-jumps=yes --callgrind-out-file=mover_profiling.log python bin/mover_profiling.py
+valgrind --dump-line=yes --dump-instr=yes --tool=callgrind --collect-jumps=yes \
+    --callgrind-out-file=mover_profiling.log python bin/mover_profiling.py
 kcachegrind mover_profiling.log
 ~~~
 
-Since native extension is itself a C++ library (`libsokoengine`), it can be used as a part of separate, independent C++ projects. The only downside of this is that there are no native tests for the library - whole test suite is written in Python only. Beside that, everything works and is nicely integrated using [CMake]. For details see [libsokoengine docs].
+Since native extension is itself a C++ library (`libsokoengine`), it can be used as a
+part of separate, independent C++ projects. The only downside of this is that there
+are no native tests for the library - whole test suite is written in Python only.
+Beside that, everything works and is nicely integrated using [CMake]. For details see
+[libsokoengine docs].
 
 [PyPI]: https://pypi.python.org/pypi
 [tox]: https://tox.readthedocs.io/en/latest/

@@ -1,6 +1,12 @@
 try:
-    from sokoenginepyext import (BoardManager, BoxGoalSwitchError,
-                                 CellAlreadyOccupiedError)
+    from sokoenginepyext import (
+        BoardManager,
+        BoxGoalSwitchError,
+        CellAlreadyOccupiedError,
+    )
 except ImportError:
-    from .board_manager import (BoardManager, BoxGoalSwitchError,
-                                CellAlreadyOccupiedError)
+    from .board_manager import (
+        BoardManager,
+        BoxGoalSwitchError,
+        CellAlreadyOccupiedError,
+    )

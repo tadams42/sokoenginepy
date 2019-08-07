@@ -20,30 +20,28 @@ class BoxGoalSwitchError(RuntimeError):
 class BoardManager:
     """Memoizes, tracks and updates positions of all pieces.
 
-    - Provides efficient means to inspect positions of pushers, boxes and
-      goals. To understand how this works, we need to have a way of
-      identifying individual pushers, boxes and goals. :class:`.BoardManager`
-      does that by assigning numerical ID to each individual piece. This ID
-      can then be used to refer to that piece in various contexts.
+    - Provides efficient means to inspect positions of pushers, boxes and goals. To
+      understand how this works, we need to have a way of identifying individual
+      pushers, boxes and goals. :class:`.BoardManager` does that by assigning
+      numerical ID to each individual piece. This ID can then be used to refer to
+      that piece in various contexts.
 
-      IDs are assigned by simply counting from top left corner of board,
-      starting with :data:`.DEFAULT_PIECE_ID`
+      IDs are assigned by simply counting from top left corner of board, starting
+      with :data:`.DEFAULT_PIECE_ID`
 
       .. image:: /images/assigning_ids.png
           :alt: Assigning board elements' IDs
 
-    - Provides efficient means of pieces movemet. Ie. we can move pushers and
-      boxes and :class:`.BoardManager` will update internal state and board
-      cells.
+    - Provides efficient means of pieces movemet. Ie. we can move pushers and boxes
+      and :class:`.BoardManager` will update internal state and board cells.
 
       This movement preserves piece IDs in contex of board state changes. To
-      ilustrate, let's assume we create :class:`.BoardManager` from board
-      with two pushers one above the other. After then we edit the board,
-      placing pusher ID 2 in row above pusher ID 1. Finally, we create
-      another instance of :class:`.BoardManager`. If we now inspect pusher
-      IDs in first and second :class:`.BoardManager` instance, they will be
-      different. Have we used movement methods instead of board editing,
-      these IDs would be preserved:
+      ilustrate, let's assume we create :class:`.BoardManager` from board with two
+      pushers one above the other. After then we edit the board, placing pusher ID 2
+      in row above pusher ID 1. Finally, we create another instance of
+      :class:`.BoardManager`. If we now inspect pusher IDs in first and second
+      :class:`.BoardManager` instance, they will be different. Have we used movement
+      methods instead of board editing, these IDs would be preserved:
 
       .. |img1| image:: /images/movement_vs_transfer1.png
       .. |img2| image:: /images/movement_vs_transfer2.png
@@ -56,16 +54,16 @@ class BoardManager:
       +------------------+------------------+------------------+
 
     Note:
-        Movement methods here are just for state and board cell updates, they
-        don't implement full game logic. For game logic see :class:`.Mover`
+        Movement methods here are just for state and board cell updates, they don't
+        implement full game logic. For game logic see :class:`.Mover`
 
     Warning:
         Once we create instance of :class:`.BoardManager` from some
         :class:`.VariantBoard` instance, that board should not be edited.
-        :class:`.BoardManager` will update cells on board when pieces are
-        moved, and editing board cells directly (ie. adding/removing pushers
-        or boxes, changing board size, changing walls layout, etc...) will
-        not sync these edits back to our :class:`.BoardManager` instance.
+        :class:`.BoardManager` will update cells on board when pieces are moved, and
+        editing board cells directly (ie. adding/removing pushers or boxes, changing
+        board size, changing walls layout, etc...) will not sync these edits back to
+        our :class:`.BoardManager` instance.
 
     Args:
         variant_board (VariantBoard): board for which we want to manage state
@@ -99,37 +97,38 @@ class BoardManager:
                 self._walls.append(position)
 
         self._sokoban_plus = SokobanPlus(
-            pieces_count=len(self._boxes), boxorder=boxorder,
-            goalorder=goalorder
+            pieces_count=len(self._boxes), boxorder=boxorder, goalorder=goalorder
         )
 
     def __str__(self):
-        prefix = (len(self.__class__.__name__) + 2) * ' '
-        return '\n'.join([
-            '<{} pushers: {},'.format(
-                self.__class__.__name__,
-                self.pushers_positions
-            ),
-            prefix + 'boxes: {},'.format(self.boxes_positions),
-            prefix + 'goals: {},'.format(self.goals_positions),
-            prefix + 'walls: {},'.format(
-                self.walls_positions
-                if len(self.walls_positions) <= 10
-                else '[{}, ...]'.format(
-                    ', '.join(str(w) for w in self.walls_positions[:10])
-                )
-            ),
-            prefix + "boxorder: '{}',".format(self.boxorder or ''),
-            prefix + "goalorder: '{}',".format(self.goalorder or ''),
-            prefix + 'board:\n' + str(self.board) + '>',
-        ])
+        prefix = (len(self.__class__.__name__) + 2) * " "
+        return "\n".join(
+            [
+                "<{} pushers: {},".format(
+                    self.__class__.__name__, self.pushers_positions
+                ),
+                prefix + "boxes: {},".format(self.boxes_positions),
+                prefix + "goals: {},".format(self.goals_positions),
+                prefix
+                + "walls: {},".format(
+                    self.walls_positions
+                    if len(self.walls_positions) <= 10
+                    else "[{}, ...]".format(
+                        ", ".join(str(w) for w in self.walls_positions[:10])
+                    )
+                ),
+                prefix + "boxorder: '{}',".format(self.boxorder or ""),
+                prefix + "goalorder: '{}',".format(self.goalorder or ""),
+                prefix + "board:\n" + str(self.board) + ">",
+            ]
+        )
 
     def __repr__(self):
         return "{}(variant_board={}, boxorder='{}', goalorder='{}')".format(
             self.__class__.__name__,
             repr(self.board),
-            self.boxorder or '',
-            self.goalorder or ''
+            self.boxorder or "",
+            self.goalorder or "",
         )
 
     @property
@@ -150,7 +149,8 @@ class BoardManager:
 
     @cached_property
     def pushers_ids(self):
-        """IDs of all pushers on board.
+        """
+        IDs of all pushers on board.
 
         Returns:
             list: integer IDs of all pushers on board
@@ -159,7 +159,8 @@ class BoardManager:
 
     @property
     def pushers_positions(self):
-        """Positions of all pushers on board.
+        """
+        Positions of all pushers on board.
 
         Returns:
             dict: mapping pushers' IDs to the corresponding board positions::
@@ -185,7 +186,8 @@ class BoardManager:
             raise KeyError("No pusher with ID: {0}".format(pusher_id))
 
     def pusher_id_on(self, position):
-        """ID of pusher on position.
+        """
+        ID of pusher on position.
 
         Args:
             position (int): position to check
@@ -220,7 +222,8 @@ class BoardManager:
         pass
 
     def move_pusher_from(self, old_position, to_new_position):
-        """Updates board state and board cells with changed pusher position.
+        """
+        Updates board state and board cells with changed pusher position.
 
         Args:
             old_position (int): starting position
@@ -237,9 +240,10 @@ class BoardManager:
         dest_cell = self._board[to_new_position]
         if not dest_cell.can_put_pusher_or_box:
             raise CellAlreadyOccupiedError(
-                "Pusher ID: {0} ".format(self.pusher_id_on(old_position)) +
-                "can't be placed in position {0} occupied by '{1}'".
-                format(to_new_position, dest_cell)
+                "Pusher ID: {0} ".format(self.pusher_id_on(old_position))
+                + "can't be placed in position {0} occupied by '{1}'".format(
+                    to_new_position, dest_cell
+                )
             )
 
         self._pushers[self._pushers.flip[old_position]] = to_new_position
@@ -249,7 +253,8 @@ class BoardManager:
         self._pusher_moved(old_position, to_new_position)
 
     def move_pusher(self, pusher_id, to_new_position):
-        """Updates board state and board cells with changed pusher position.
+        """
+        Updates board state and board cells with changed pusher position.
 
         Args:
             pusher_id (int): pusher ID
@@ -261,11 +266,10 @@ class BoardManager:
                 ``to_new_position``
 
         Note:
-            Allows placing a pusher onto position occupied by box. This is for
-            cases when we switch box/goals positions in reverse solving mode.
-            In this situation it is legal for pusher to end up standing on top
-            of the box. Game rules say that for these situations, first move(s)
-            must be jumps.
+            Allows placing a pusher onto position occupied by box. This is for cases
+            when we switch box/goals positions in reverse solving mode. In this
+            situation it is legal for pusher to end up standing on top of the box.
+            Game rules say that for these situations, first move(s) must be jumps.
 
         Warning:
             It doesn't verify if ``to_new_position`` is valid on-board position.
@@ -282,7 +286,8 @@ class BoardManager:
 
     @cached_property
     def boxes_ids(self):
-        """IDs of all boxes on board.
+        """
+        IDs of all boxes on board.
 
         Returns:
             list: integer IDs of all boxes on board
@@ -291,7 +296,8 @@ class BoardManager:
 
     @property
     def boxes_positions(self):
-        """Positions of all boxes on board.
+        """
+        Positions of all boxes on board.
 
         Returns:
             dict: mapping boxes' IDs to the corresponding board positions::
@@ -317,7 +323,8 @@ class BoardManager:
             raise KeyError("No box with ID: {0}".format(box_id))
 
     def box_id_on(self, position):
-        """ID of box on position.
+        """
+        ID of box on position.
 
         Args:
             position (int): position to check
@@ -352,7 +359,8 @@ class BoardManager:
         pass
 
     def move_box_from(self, old_position, to_new_position):
-        """Updates board state and board cells with changed box position.
+        """
+        Updates board state and board cells with changed box position.
 
         Args:
             old_position (int): starting position
@@ -360,8 +368,8 @@ class BoardManager:
 
         Raises:
             :exc:`KeyError`: there is no box on ``old_position``
-            :exc:`.CellAlreadyOccupiedError`: there is an obstacle (
-                wall/box/pusher) on ``to_new_position``
+            :exc:`.CellAlreadyOccupiedError`: there is an obstacle ( wall/box/pusher)
+                on ``to_new_position``
         """
         if old_position == to_new_position:
             return
@@ -369,9 +377,10 @@ class BoardManager:
         dest_cell = self._board[to_new_position]
         if not dest_cell.can_put_pusher_or_box:
             raise CellAlreadyOccupiedError(
-                "Box ID: {0} ".format(self.box_id_on(old_position)) +
-                "can't be placed in position {0} occupied by '{1}'".
-                format(to_new_position, dest_cell)
+                "Box ID: {0} ".format(self.box_id_on(old_position))
+                + "can't be placed in position {0} occupied by '{1}'".format(
+                    to_new_position, dest_cell
+                )
             )
 
         self._boxes[self._boxes.flip[old_position]] = to_new_position
@@ -381,7 +390,8 @@ class BoardManager:
         self._box_moved(old_position, to_new_position)
 
     def move_box(self, box_id, to_new_position):
-        """Updates board state and board cells with changed box position.
+        """
+        Updates board state and board cells with changed box position.
 
         Args:
             old_position (int): starting position
@@ -389,8 +399,8 @@ class BoardManager:
 
         Raises:
             :exc:`KeyError`: there is no box on ``old_position``
-            :exc:`.CellAlreadyOccupiedError`: there is an obstacle (
-                wall/box/another pusher) on ``to_new_position``
+            :exc:`.CellAlreadyOccupiedError`: there is an obstacle ( wall/box/another
+                pusher) on ``to_new_position``
         """
         self.move_box_from(self._boxes[box_id], to_new_position)
 
@@ -404,7 +414,8 @@ class BoardManager:
 
     @cached_property
     def goals_ids(self):
-        """IDs of all goals on board.
+        """
+        IDs of all goals on board.
 
         Returns:
             list: integer IDs of all goals on board
@@ -413,7 +424,8 @@ class BoardManager:
 
     @property
     def goals_positions(self):
-        """Positions of all goals on board.
+        """
+        Positions of all goals on board.
 
         Returns:
             dict: mapping goals' IDs to the corresponding board positions::
@@ -439,7 +451,8 @@ class BoardManager:
             raise KeyError("No goal with ID: {0}".format(goal_id))
 
     def goal_id_on(self, position):
-        """ID of goal on position.
+        """
+        ID of goal on position.
 
         Args:
             position (int): position to check
@@ -599,15 +612,15 @@ class BoardManager:
         for boxes_positions in permutations(self._goals.values()):
             if is_valid_solution(boxes_positions):
                 yield BoardState(
-                    boxes_positions=list(boxes_positions),
-                    pushers_positions=[]
+                    boxes_positions=list(boxes_positions), pushers_positions=[]
                 )
 
     def _box_goal_pairs(self):
-        """Finds a list of paired (box_id, goal_id,) tuples.
+        """
+        Finds a list of paired (box_id, goal_id,) tuples.
 
-        If Sokoban+ is enabled, boxes and goals are paired by Sokoban+ IDs,
-        otherwise they are paired by regular IDs
+        If Sokoban+ is enabled, boxes and goals are paired by Sokoban+ IDs, otherwise
+        they are paired by regular IDs
 
         Yields:
             tuple: (box_id, goal_id)
@@ -624,9 +637,7 @@ class BoardManager:
         goals_ids = list(self.goals_ids)
         for goal_id in goals_ids:
             predicate = partial(is_box_goal_pair, goal_id=goal_id)
-            index, box_id = next(
-                filter(predicate, enumerate(boxes_todo)), None
-            )
+            index, box_id = next(filter(predicate, enumerate(boxes_todo)), None)
             yield box_id, goal_id
             del boxes_todo[index]
 
@@ -671,8 +682,10 @@ class BoardManager:
     @property
     def is_playable(self):
         return (
-            self.pushers_count > 0 and self.boxes_count == self.goals_count
-            and self.boxes_count > 0 and self.goals_count > 0
+            self.pushers_count > 0
+            and self.boxes_count == self.goals_count
+            and self.boxes_count > 0
+            and self.goals_count > 0
         )
 
     @property
@@ -685,7 +698,6 @@ class BoardManager:
                 for pusher_id in sorted(pushers_positions.keys())
             ],
             boxes_positions=[
-                boxes_positions[box_id]
-                for box_id in sorted(boxes_positions.keys())
-            ]
+                boxes_positions[box_id] for box_id in sorted(boxes_positions.keys())
+            ],
         )

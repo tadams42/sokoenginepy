@@ -7,6 +7,7 @@ class UnknownDirectionError(ValueError):
 
 class Direction(IntEnum):
     """Directions of movement."""
+
     UP = 0
     NORTH_EAST = 1
     RIGHT = 2
@@ -32,5 +33,5 @@ _OPPOSITE = {
     Direction.NORTH_WEST: Direction.SOUTH_EAST,
     Direction.SOUTH_EAST: Direction.NORTH_WEST,
     Direction.NORTH_EAST: Direction.SOUTH_WEST,
-    Direction.SOUTH_WEST: Direction.NORTH_EAST
+    Direction.SOUTH_WEST: Direction.NORTH_EAST,
 }

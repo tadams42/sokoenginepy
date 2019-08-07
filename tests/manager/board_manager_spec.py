@@ -2,8 +2,13 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, BoardManager,
-                          CellAlreadyOccupiedError, SokobanBoard, SokobanPlus)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID,
+    BoardManager,
+    CellAlreadyOccupiedError,
+    SokobanBoard,
+    SokobanPlus,
+)
 
 
 class DescribeBoardManager:
@@ -11,8 +16,7 @@ class DescribeBoardManager:
         self, board_manager, pushers_positions, invalid_pusher_position
     ):
         assert board_manager.pushers_count == 2
-        assert sorted(board_manager.pushers_ids
-                     ) == list(pushers_positions.keys())
+        assert sorted(board_manager.pushers_ids) == list(pushers_positions.keys())
         assert board_manager.pushers_positions == pushers_positions
 
         for pusher_id, pusher_position in pushers_positions.items():
@@ -28,9 +32,10 @@ class DescribeBoardManager:
         with pytest.raises(KeyError):
             board_manager.pusher_id_on(invalid_pusher_position)
 
-        assert board_manager.has_pusher(
-            DEFAULT_PIECE_ID + board_manager.pushers_count
-        ) is False
+        assert (
+            board_manager.has_pusher(DEFAULT_PIECE_ID + board_manager.pushers_count)
+            is False
+        )
         assert board_manager.has_pusher_on(invalid_pusher_position) is False
 
     def it_memoizes_boxes(
@@ -47,43 +52,43 @@ class DescribeBoardManager:
             assert board_manager.has_box_on(box_position) is True
 
         with pytest.raises(KeyError):
-            board_manager.box_position(
-                DEFAULT_PIECE_ID + board_manager.boxes_count
-            )
+            board_manager.box_position(DEFAULT_PIECE_ID + board_manager.boxes_count)
         with pytest.raises(KeyError):
             board_manager.box_id_on(invalid_box_position)
 
-        assert board_manager.has_box(
-            DEFAULT_PIECE_ID + board_manager.boxes_count
-        ) is False
+        assert (
+            board_manager.has_box(DEFAULT_PIECE_ID + board_manager.boxes_count) is False
+        )
         assert board_manager.has_box_on(invalid_box_position) is False
 
         for box_id, box_position in boxes_positions.items():
-            assert board_manager.box_plus_id(
-                box_id
-            ) == SokobanPlus.DEFAULT_PLUS_ID
+            assert board_manager.box_plus_id(box_id) == SokobanPlus.DEFAULT_PLUS_ID
 
         # Doesn't rise KeyError if plus is disabled...
-        assert board_manager.box_plus_id(
-            DEFAULT_PIECE_ID + board_manager.boxes_count
-        ) == SokobanPlus.DEFAULT_PLUS_ID
+        assert (
+            board_manager.box_plus_id(DEFAULT_PIECE_ID + board_manager.boxes_count)
+            == SokobanPlus.DEFAULT_PLUS_ID
+        )
 
-        board_manager.boxorder = '1 3 2'
-        board_manager.goalorder = '3 1 2'
+        board_manager.boxorder = "1 3 2"
+        board_manager.goalorder = "3 1 2"
         board_manager.enable_sokoban_plus()
 
         assert board_manager.box_plus_id(DEFAULT_PIECE_ID) == 1
         assert board_manager.box_plus_id(DEFAULT_PIECE_ID + 1) == 3
         assert board_manager.box_plus_id(DEFAULT_PIECE_ID + 2) == 2
-        assert board_manager.box_plus_id(
-            DEFAULT_PIECE_ID + 3
-        ) == SokobanPlus.DEFAULT_PLUS_ID
-        assert board_manager.box_plus_id(
-            DEFAULT_PIECE_ID + 4
-        ) == SokobanPlus.DEFAULT_PLUS_ID
-        assert board_manager.box_plus_id(
-            DEFAULT_PIECE_ID + 5
-        ) == SokobanPlus.DEFAULT_PLUS_ID
+        assert (
+            board_manager.box_plus_id(DEFAULT_PIECE_ID + 3)
+            == SokobanPlus.DEFAULT_PLUS_ID
+        )
+        assert (
+            board_manager.box_plus_id(DEFAULT_PIECE_ID + 4)
+            == SokobanPlus.DEFAULT_PLUS_ID
+        )
+        assert (
+            board_manager.box_plus_id(DEFAULT_PIECE_ID + 5)
+            == SokobanPlus.DEFAULT_PLUS_ID
+        )
 
         with pytest.raises(KeyError):
             assert board_manager.box_plus_id(
@@ -104,43 +109,44 @@ class DescribeBoardManager:
             assert board_manager.has_goal_on(goal_position) is True
 
         with pytest.raises(KeyError):
-            board_manager.goal_position(
-                DEFAULT_PIECE_ID + board_manager.goals_count
-            )
+            board_manager.goal_position(DEFAULT_PIECE_ID + board_manager.goals_count)
         with pytest.raises(KeyError):
             board_manager.goal_id_on(invalid_goal_position)
 
-        assert board_manager.has_goal(
-            DEFAULT_PIECE_ID + board_manager.goals_count
-        ) is False
+        assert (
+            board_manager.has_goal(DEFAULT_PIECE_ID + board_manager.goals_count)
+            is False
+        )
         assert board_manager.has_goal_on(invalid_goal_position) is False
 
         for goal_id, goal_position in goals_positions.items():
-            assert board_manager.goal_plus_id(
-                goal_id
-            ) == SokobanPlus.DEFAULT_PLUS_ID
+            assert board_manager.goal_plus_id(goal_id) == SokobanPlus.DEFAULT_PLUS_ID
 
         # Doesn't rise KeyError if plus is disabled...
-        assert board_manager.goal_plus_id(
-            DEFAULT_PIECE_ID + board_manager.goals_count
-        ) == SokobanPlus.DEFAULT_PLUS_ID
+        assert (
+            board_manager.goal_plus_id(DEFAULT_PIECE_ID + board_manager.goals_count)
+            == SokobanPlus.DEFAULT_PLUS_ID
+        )
 
-        board_manager.boxorder = '1 3 2'
-        board_manager.goalorder = '3 1 2'
+        board_manager.boxorder = "1 3 2"
+        board_manager.goalorder = "3 1 2"
         board_manager.enable_sokoban_plus()
 
         assert board_manager.goal_plus_id(DEFAULT_PIECE_ID) == 3
         assert board_manager.goal_plus_id(DEFAULT_PIECE_ID + 1) == 1
         assert board_manager.goal_plus_id(DEFAULT_PIECE_ID + 2) == 2
-        assert board_manager.goal_plus_id(
-            DEFAULT_PIECE_ID + 3
-        ) == SokobanPlus.DEFAULT_PLUS_ID
-        assert board_manager.goal_plus_id(
-            DEFAULT_PIECE_ID + 4
-        ) == SokobanPlus.DEFAULT_PLUS_ID
-        assert board_manager.goal_plus_id(
-            DEFAULT_PIECE_ID + 5
-        ) == SokobanPlus.DEFAULT_PLUS_ID
+        assert (
+            board_manager.goal_plus_id(DEFAULT_PIECE_ID + 3)
+            == SokobanPlus.DEFAULT_PLUS_ID
+        )
+        assert (
+            board_manager.goal_plus_id(DEFAULT_PIECE_ID + 4)
+            == SokobanPlus.DEFAULT_PLUS_ID
+        )
+        assert (
+            board_manager.goal_plus_id(DEFAULT_PIECE_ID + 5)
+            == SokobanPlus.DEFAULT_PLUS_ID
+        )
 
         with pytest.raises(KeyError):
             assert board_manager.goal_plus_id(
@@ -152,8 +158,8 @@ class DescribeBoardManager:
     ):
         assert list(board_manager.solutions()) == all_solutions
 
-        board_manager.boxorder = '1 3 2'
-        board_manager.goalorder = '3 2 1'
+        board_manager.boxorder = "1 3 2"
+        board_manager.goalorder = "3 2 1"
         board_manager.enable_sokoban_plus()
 
         assert list(board_manager.solutions()) == sokoban_plus_solutions
@@ -224,9 +230,7 @@ class DescribeBoardManager:
         pusher_position = board_manager.pusher_position(pusher_id)
 
         with pytest.raises(CellAlreadyOccupiedError):
-            board_manager.move_pusher(
-                pusher_id, boxes_positions[DEFAULT_PIECE_ID]
-            )
+            board_manager.move_pusher(pusher_id, boxes_positions[DEFAULT_PIECE_ID])
         with pytest.raises(CellAlreadyOccupiedError):
             board_manager.move_pusher_from(
                 pusher_position, boxes_positions[DEFAULT_PIECE_ID]
@@ -247,8 +251,14 @@ class DescribeBoardManager:
             board_manager.move_pusher_from(pusher_position, wall_position)
 
     def it_implements_switching_box_and_goal_positions(
-        self, board_manager, boxes_positions, switched_boxes, goals_positions,
-        switched_goals, board_str, switched_board_str
+        self,
+        board_manager,
+        boxes_positions,
+        switched_boxes,
+        goals_positions,
+        switched_goals,
+        board_str,
+        switched_board_str,
     ):
         board_manager.switch_boxes_and_goals()
         assert board_manager.boxes_positions == switched_boxes
@@ -261,11 +271,15 @@ class DescribeBoardManager:
         assert str(board_manager.board) == board_str
 
     def test_switching_respects_sokoban_plus_if_enabled(
-        self, board_manager, switched_boxes_plus, switched_goals_plus,
-        boxes_positions, goals_positions
+        self,
+        board_manager,
+        switched_boxes_plus,
+        switched_goals_plus,
+        boxes_positions,
+        goals_positions,
     ):
-        board_manager.boxorder = '1 3 2'
-        board_manager.goalorder = '3 2 1'
+        board_manager.boxorder = "1 3 2"
+        board_manager.goalorder = "3 2 1"
         board_manager.enable_sokoban_plus()
 
         board_manager.switch_boxes_and_goals()
@@ -277,20 +291,12 @@ class DescribeBoardManager:
         assert board_manager.goals_positions == goals_positions
 
     def test_switching_moves_pusher_out_of_the_way(self):
-        board_str = "\n".join([
-            "########",
-            "#      #",
-            "#  +   #",
-            "#    $ #",
-            "########",
-        ])
-        switched_board_str = "\n".join([
-            "########",
-            "#      #",
-            "#  $   #",
-            "#    + #",
-            "########",
-        ])
+        board_str = "\n".join(
+            ["########", "#      #", "#  +   #", "#    $ #", "########"]
+        )
+        switched_board_str = "\n".join(
+            ["########", "#      #", "#  $   #", "#    + #", "########"]
+        )
 
         b = SokobanBoard(board_str=board_str)
         board_manager = BoardManager(b)

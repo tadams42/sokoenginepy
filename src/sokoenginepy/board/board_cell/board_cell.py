@@ -3,26 +3,28 @@ from enum import Enum
 
 class BoardCellCharacters(str, Enum):
     """Characters used in textual representation of boards."""
-    WALL = '#'
-    PUSHER = '@'
-    PUSHER_ON_GOAL = '+'
-    BOX = '$'
-    BOX_ON_GOAL = '*'
-    GOAL = '.'
-    FLOOR = ' '
-    VISIBLE_FLOOR = '-'
-    ALT_PUSHER1 = 'p'
-    ALT_PUSHER2 = 'm'
-    ALT_PUSHER_ON_GOAL1 = 'P'
-    ALT_PUSHER_ON_GOAL2 = 'M'
-    ALT_BOX1 = 'b'
-    ALT_BOX_ON_GOAL1 = 'B'
-    ALT_GOAL1 = 'o'
-    ALT_VISIBLE_FLOOR1 = '_'
+
+    WALL = "#"
+    PUSHER = "@"
+    PUSHER_ON_GOAL = "+"
+    BOX = "$"
+    BOX_ON_GOAL = "*"
+    GOAL = "."
+    FLOOR = " "
+    VISIBLE_FLOOR = "-"
+    ALT_PUSHER1 = "p"
+    ALT_PUSHER2 = "m"
+    ALT_PUSHER_ON_GOAL1 = "P"
+    ALT_PUSHER_ON_GOAL2 = "M"
+    ALT_BOX1 = "b"
+    ALT_BOX_ON_GOAL1 = "B"
+    ALT_GOAL1 = "o"
+    ALT_VISIBLE_FLOOR1 = "_"
 
 
 class BoardConversionError(RuntimeError):
     """Exception risen when converting board to or from board strings."""
+
     pass
 
 
@@ -31,13 +33,13 @@ class IllegalBoardCharacterError(ValueError):
 
 
 class BoardCell:
-    """Stores properties of one cell in board layout.
+    """
+    Stores properties of one cell in board layout.
 
     Note:
-        There is no game logic encoded in this class. It is perfectly fine to
-        put pusher on wall cell (in which case wall will be replaced by pusher).
-        This is by design: :class:`.BoardCell` is value class, not game logic
-        class.
+        There is no game logic encoded in this class. It is perfectly fine to put
+        pusher on wall cell (in which case wall will be replaced by pusher). This is
+        by design: :class:`.BoardCell` is value class, not game logic class.
     """
 
     @classmethod
@@ -85,15 +87,19 @@ class BoardCell:
         return character == BoardCellCharacters.WALL
 
     __slots__ = [
-        '_has_box', '_has_pusher', '_has_goal', '_is_wall',
-        'is_in_playable_area', 'is_deadlock'
+        "_has_box",
+        "_has_pusher",
+        "_has_goal",
+        "_is_wall",
+        "is_in_playable_area",
+        "is_deadlock",
     ]
 
     def __init__(
         self,
         character=BoardCellCharacters.FLOOR,
         is_in_playable_area=False,
-        is_deadlock=False
+        is_deadlock=False,
     ):
         self._has_box = False
         self._has_pusher = False
@@ -126,8 +132,10 @@ class BoardCell:
 
     def __eq__(self, rv):
         return (
-            self.is_wall == rv.is_wall and self.has_pusher == rv.has_pusher
-            and self.has_box == rv.has_box and self.has_goal == rv.has_goal
+            self.is_wall == rv.is_wall
+            and self.has_pusher == rv.has_pusher
+            and self.has_box == rv.has_box
+            and self.has_goal == rv.has_goal
         )
 
     def __ne__(self, rv):
@@ -148,7 +156,8 @@ class BoardCell:
             else:
                 retv = (
                     BoardCellCharacters.VISIBLE_FLOOR
-                    if use_visible_floor else BoardCellCharacters.FLOOR
+                    if use_visible_floor
+                    else BoardCellCharacters.FLOOR
                 )
         elif not self.has_box and not self.has_goal and self.has_pusher:
             retv = BoardCellCharacters.PUSHER
@@ -165,8 +174,7 @@ class BoardCell:
 
     def clear(self):
         """Clears cell, converting it to empty floor."""
-        self._is_wall = self._has_box = self._has_goal = self._has_pusher = \
-            False
+        self._is_wall = self._has_box = self._has_goal = self._has_pusher = False
 
     @property
     def has_piece(self):
@@ -176,9 +184,7 @@ class BoardCell:
     @property
     def is_empty_floor(self):
         """True if there is no pieces and no wall on this cell."""
-        return not (
-            self.has_pusher or self.has_box or self.has_goal or self.is_wall
-        )
+        return not (self.has_pusher or self.has_box or self.has_goal or self.is_wall)
 
     @property
     def is_border_element(self):
@@ -187,13 +193,13 @@ class BoardCell:
 
     @property
     def can_put_pusher_or_box(self):
-        """True if this cell allows putting box or pusher on self.
+        """
+        True if this cell allows putting box or pusher on self.
 
         Note:
-            This method isn't used by others in class, thus nothing prevents
-            putting box on wall (which replaces that wall with box). This method
-            can be used by higher game logic classes to implement actual game
-            logic.
+            This method isn't used by others in class, thus nothing prevents putting
+            box on wall (which replaces that wall with box). This method can be used
+            by higher game logic classes to implement actual game logic.
         """
         return not (self.has_box or self.has_pusher or self.is_wall)
 

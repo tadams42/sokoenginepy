@@ -12,12 +12,12 @@ class Puzzle:
     """
     Textual representation of game board with all its meta data and snapshots.
 
-    No data validation is performed, to make parsing of Sokoban files as fast
-    as possible. Proper validation is triggered when Puzzle is converted into
-    game board.
+    No data validation is performed, to make parsing of Sokoban files as fast as
+    possible. Proper validation is triggered when Puzzle is converted into game
+    board.
     """
 
-    #pylint: disable=too-many-arguments,too-many-instance-attributes
+    # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
         self,
         board="",
@@ -29,7 +29,7 @@ class Puzzle:
         snapshots=None,
         created_at="",
         updated_at="",
-        tessellation_or_description=Tessellation.SOKOBAN
+        tessellation_or_description=Tessellation.SOKOBAN,
     ):
         self._tessellation = None
         self.tessellation = tessellation_or_description
@@ -44,7 +44,7 @@ class Puzzle:
         self.created_at = created_at
         self.updated_at = updated_at
 
-    #pylint: enable=too-many-arguments
+    # pylint: enable=too-many-arguments
 
     @property
     def tessellation(self):
@@ -52,9 +52,7 @@ class Puzzle:
 
     @tessellation.setter
     def tessellation(self, tessellation_or_description):
-        self._tessellation = Tessellation.instance_from(
-            tessellation_or_description
-        )
+        self._tessellation = Tessellation.instance_from(tessellation_or_description)
 
     @property
     def board(self):
@@ -63,12 +61,12 @@ class Puzzle:
     @board.setter
     def board(self, rv):
         self._board = rv
-        if 'pushers_count' in self.__dict__:
-            del self.__dict__['pushers_count']
-        if 'boxes_count' in self.__dict__:
-            del self.__dict__['boxes_count']
-        if 'goals_count' in self.__dict__:
-            del self.__dict__['goals_count']
+        if "pushers_count" in self.__dict__:
+            del self.__dict__["pushers_count"]
+        if "boxes_count" in self.__dict__:
+            del self.__dict__["boxes_count"]
+        if "goals_count" in self.__dict__:
+            del self.__dict__["goals_count"]
 
     def clear(self):
         self.board = ""
@@ -89,42 +87,39 @@ class Puzzle:
 
     def to_game_board(self):
         retv = VariantBoard.instance_from(
-            tessellation_or_description=self.tessellation,
-            board_str=self.board
+            tessellation_or_description=self.tessellation, board_str=self.board
         )
         return retv
 
     @cached_property
     def pushers_count(self):
         return reduce(
-            add,
-            [1 if BoardCell.is_pusher_chr(chr) else 0 for chr in self.board], 0
+            add, [1 if BoardCell.is_pusher_chr(chr) else 0 for chr in self.board], 0
         )
 
     @cached_property
     def boxes_count(self):
         return reduce(
-            add, [1 if BoardCell.is_box_chr(chr) else 0
-                  for chr in self.board], 0
+            add, [1 if BoardCell.is_box_chr(chr) else 0 for chr in self.board], 0
         )
 
     @cached_property
     def goals_count(self):
         return reduce(
-            add,
-            [1 if BoardCell.is_goal_chr(chr) else 0 for chr in self.board], 0
+            add, [1 if BoardCell.is_goal_chr(chr) else 0 for chr in self.board], 0
         )
 
 
 class PuzzleSnapshot:
-    """:class:`.Snapshot` with all its meta data.
+    """
+    :class:`.Snapshot` with all its meta data.
 
-    No data validation is performed, to make parsing of Sokoban files as fast
-    as possible. Proper validation is triggered when PuzzleSnapshot is
-    converted into :class:`.Snapshot`.
+    No data validation is performed, to make parsing of Sokoban files as fast as
+    possible. Proper validation is triggered when PuzzleSnapshot is converted into
+    :class:`.Snapshot`.
     """
 
-    #pylint: disable=too-many-arguments,too-many-instance-attributes
+    # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
         self,
         moves="",
@@ -134,7 +129,7 @@ class PuzzleSnapshot:
         notes="",
         created_at="",
         updated_at="",
-        tessellation_or_description=Tessellation.SOKOBAN
+        tessellation_or_description=Tessellation.SOKOBAN,
     ):
         self._tessellation = None
         self.tessellation = tessellation_or_description
@@ -147,7 +142,7 @@ class PuzzleSnapshot:
         self.created_at = created_at
         self.updated_at = updated_at
 
-    #pylint: enable=too-many-arguments
+    # pylint: enable=too-many-arguments
 
     @property
     def tessellation(self):
@@ -155,9 +150,7 @@ class PuzzleSnapshot:
 
     @tessellation.setter
     def tessellation(self, tessellation_or_description):
-        self._tessellation = Tessellation.instance_from(
-            tessellation_or_description
-        )
+        self._tessellation = Tessellation.instance_from(tessellation_or_description)
 
     @property
     def moves(self):
@@ -166,17 +159,16 @@ class PuzzleSnapshot:
     @moves.setter
     def moves(self, rv):
         self._moves = rv
-        if 'pushes_count' in self.__dict__:
-            del self.__dict__['pushes_count']
-        if 'moves_count' in self.__dict__:
-            del self.__dict__['moves_count']
-        if 'is_reverse' in self.__dict__:
-            del self.__dict__['is_reverse']
+        if "pushes_count" in self.__dict__:
+            del self.__dict__["pushes_count"]
+        if "moves_count" in self.__dict__:
+            del self.__dict__["moves_count"]
+        if "is_reverse" in self.__dict__:
+            del self.__dict__["is_reverse"]
 
     def to_game_snapshot(self):
         return Snapshot(
-            tessellation_or_description=self.tessellation,
-            moves_data=self.moves
+            tessellation_or_description=self.tessellation, moves_data=self.moves
         )
 
     def reformat(self):
@@ -185,32 +177,37 @@ class PuzzleSnapshot:
     @cached_property
     def pushes_count(self):
         return reduce(
-            add, [
-                1 if (AtomicMove.is_atomic_move_chr(chr) and chr.isupper())
-                else 0 for chr in self.moves
-            ], 0
+            add,
+            [
+                1 if (AtomicMove.is_atomic_move_chr(chr) and chr.isupper()) else 0
+                for chr in self.moves
+            ],
+            0,
         )
 
     @cached_property
     def moves_count(self):
         """
-        This is just informative number. Because snapshot is not fully parsed,
-        this method may also account moves that are part of jumps or pusher
-        selections.
+        This is just informative number. Because snapshot is not fully parsed, this
+        method may also account moves that are part of jumps or pusher selections.
         """
         return reduce(
-            add, [
-                1 if (AtomicMove.is_atomic_move_chr(chr) and chr.islower())
-                else 0 for chr in self.moves
-            ], 0
+            add,
+            [
+                1 if (AtomicMove.is_atomic_move_chr(chr) and chr.islower()) else 0
+                for chr in self.moves
+            ],
+            0,
         )
 
     @cached_property
     def is_reverse(self):
         return reduce(
-            or_, [
+            or_,
+            [
                 chr == Snapshot.NonMoveCharacters.JUMP_BEGIN
                 or chr == Snapshot.NonMoveCharacters.JUMP_END
                 for chr in self.moves
-            ], False
+            ],
+            False,
         )

@@ -2,8 +2,15 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy import (BoardCell, BoardCellCharacters, BoardGraph,
-                          Direction, GraphType, SokobanBoard, Tessellation)
+from sokoenginepy import (
+    BoardCell,
+    BoardCellCharacters,
+    BoardGraph,
+    Direction,
+    GraphType,
+    SokobanBoard,
+    Tessellation,
+)
 from sokoenginepy.utilities import index_1d
 
 
@@ -49,14 +56,10 @@ class DescribeBoardGraph:
             assert board_graph.edges_count == 776
 
     class describe_has_edge:
-        def it_returs_true_if_edge_in_given_direction_exists(
-            self, board_graph
-        ):
+        def it_returs_true_if_edge_in_given_direction_exists(self, board_graph):
             assert board_graph.has_edge(0, 1, Direction.RIGHT)
 
-        def it_returns_false_if_there_is_no_edge_in_given_direction(
-            self, board_graph
-        ):
+        def it_returns_false_if_there_is_no_edge_in_given_direction(self, board_graph):
             assert not board_graph.has_edge(0, 1, Direction.LEFT)
 
         def it_returns_false_if_any_of_parameter_vertices_are_off_board(
@@ -91,9 +94,7 @@ class DescribeBoardGraph:
             assert board_graph.edges_count == 1
             assert board_graph.has_edge(0, 1, Direction.LEFT)
 
-        def it_raises_IndexError_if_any_of_vertices_if_off_board(
-            self, board_graph
-        ):
+        def it_raises_IndexError_if_any_of_vertices_if_off_board(self, board_graph):
             board_graph.remove_all_edges()
 
             with pytest.raises(IndexError):
@@ -119,36 +120,24 @@ class DescribeBoardGraph:
     class describe_out_edge_weight:
         def it_returns_max_weigth_for_wall_cell_target(self, board_graph):
             board_graph[1].is_wall = True
-            if Direction.__module__.startswith('sokoenginepy.'):
-                assert board_graph.out_edge_weight(
-                    1
-                ) > len(Direction)
+            if Direction.__module__.startswith("sokoenginepy."):
+                assert board_graph.out_edge_weight(1) > len(Direction)
             else:
-                assert board_graph.out_edge_weight(
-                    1
-                ) > Direction.__len__()
+                assert board_graph.out_edge_weight(1) > Direction.__len__()
 
         def it_returns_max_weigth_for_pusher_cell_target(self, board_graph):
             board_graph[1].has_pusher = True
-            if Direction.__module__.startswith('sokoenginepy.'):
-                assert board_graph.out_edge_weight(
-                    1
-                ) > len(Direction)
+            if Direction.__module__.startswith("sokoenginepy."):
+                assert board_graph.out_edge_weight(1) > len(Direction)
             else:
-                assert board_graph.out_edge_weight(
-                    1
-                ) > Direction.__len__()
+                assert board_graph.out_edge_weight(1) > Direction.__len__()
 
         def it_returns_max_weigth_for_box_cell_target(self, board_graph):
             board_graph[1].has_box = True
-            if Direction.__module__.startswith('sokoenginepy.'):
-                assert board_graph.out_edge_weight(
-                    1
-                ) > len(Direction)
+            if Direction.__module__.startswith("sokoenginepy."):
+                assert board_graph.out_edge_weight(1) > len(Direction)
             else:
-                assert board_graph.out_edge_weight(
-                    1
-                ) > Direction.__len__()
+                assert board_graph.out_edge_weight(1) > Direction.__len__()
 
         def it_returns_one_for_other_cells(self, board_graph):
             board_graph[1].clear()
@@ -156,9 +145,7 @@ class DescribeBoardGraph:
             board_graph[1].has_goal = True
             assert board_graph.out_edge_weight(1) == 1
 
-        def it_raises_IndexError_for_off_board_target_positions(
-            self, board_graph
-        ):
+        def it_raises_IndexError_for_off_board_target_positions(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.out_edge_weight(42000)
 
@@ -169,28 +156,26 @@ class DescribeBoardGraph:
         def it_returns_none_for_off_board_direction(self, board_graph):
             assert board_graph.neighbor(0, Direction.UP) is None
 
-        def it_raises_IndexError_for_off_board_source_position(
-            self, board_graph
-        ):
+        def it_raises_IndexError_for_off_board_source_position(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.neighbor(42000, Direction.UP)
 
     class describe_wall_neighbors:
         def it_returns_positons_of_walls_for_given_vertice(self):
-            board_str = "\n".join([
-                # 123456
-                "#######",  # 0
-                "#.$# @#",  # 1
-                "#######",  # 2
-            ])
+            board_str = "\n".join(
+                [
+                    # 123456
+                    "#######",  # 0
+                    "#.$# @#",  # 1
+                    "#######",  # 2
+                ]
+            )
             board_graph = SokobanBoard(board_str=board_str).graph
             wall_neighbors = board_graph.wall_neighbors(0)
             assert index_1d(0, 1, 7) in wall_neighbors
             assert index_1d(1, 0, 7) in wall_neighbors
 
-        def it_raises_IndexError_for_off_board_source_position(
-            self, board_graph
-        ):
+        def it_raises_IndexError_for_off_board_source_position(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.wall_neighbors(42000)
 
@@ -203,9 +188,7 @@ class DescribeBoardGraph:
             assert index_1d(1, 1, board_width) not in all_neighbors
             assert index_1d(1, 0, board_width) in all_neighbors
 
-        def it_raises_IndexError_for_off_board_source_position(
-            self, board_graph
-        ):
+        def it_raises_IndexError_for_off_board_source_position(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.all_neighbors(42000)
 
@@ -237,14 +220,16 @@ class DescribeBoardGraph:
                 board_graph.find_jump_path(start_position, end_position)
             )
 
-            assert tuple(expected) in permutations([
-                Direction.UP,
-                Direction.UP,
-                Direction.UP,
-                Direction.LEFT,
-                Direction.LEFT,
-                Direction.LEFT,
-            ])
+            assert tuple(expected) in permutations(
+                [
+                    Direction.UP,
+                    Direction.UP,
+                    Direction.UP,
+                    Direction.LEFT,
+                    Direction.LEFT,
+                    Direction.LEFT,
+                ]
+            )
 
         def it_raises_IndexError_for_off_board_paramteres(self, board_graph):
             with pytest.raises(IndexError):
@@ -264,14 +249,16 @@ class DescribeBoardGraph:
                 board_graph.find_move_path(start_position, end_position)
             )
 
-            assert tuple(expected) in permutations([
-                Direction.LEFT,
-                Direction.LEFT,
-                Direction.LEFT,
-                Direction.UP,
-                Direction.UP,
-                Direction.UP,
-            ])
+            assert tuple(expected) in permutations(
+                [
+                    Direction.LEFT,
+                    Direction.LEFT,
+                    Direction.LEFT,
+                    Direction.UP,
+                    Direction.UP,
+                    Direction.UP,
+                ]
+            )
 
         def it_raises_IndexError_for_off_board_paramteres(self, board_graph):
             with pytest.raises(IndexError):
@@ -284,13 +271,10 @@ class DescribeBoardGraph:
         def it_returns_empty_sequence_if_movement_is_blocked(
             self, board_graph, board_width
         ):
-            assert board_graph.find_move_path(index_1d(11, 8, board_width),
-                                              0) == []
+            assert board_graph.find_move_path(index_1d(11, 8, board_width), 0) == []
 
     class describe_positions_path_to_directions_path:
-        def it_converts_path(
-            self, board_graph, positions_path, directions_path
-        ):
+        def it_converts_path(self, board_graph, positions_path, directions_path):
             calculated_directions_path = board_graph.positions_path_to_directions_path(
                 positions_path
             )
@@ -307,21 +291,21 @@ class DescribeBoardGraph:
             with pytest.raises(IndexError):
                 board_graph.positions_path_to_directions_path(path)
 
-        def it_returns_empty_path_if_source_path_is_to_short(
-            self, board_graph
-        ):
+        def it_returns_empty_path_if_source_path_is_to_short(self, board_graph):
             assert board_graph.positions_path_to_directions_path([]) == []
             assert board_graph.positions_path_to_directions_path([1]) == []
 
     class describe_mark_play_area:
-        board_str = "\n".join([
-            # 123456
-            "#######",  # 0
-            "#.$# @#",  # 1
-            "#######",  # 2
-            "#     #",  # 3
-            "#######",  # 4
-        ])
+        board_str = "\n".join(
+            [
+                # 123456
+                "#######",  # 0
+                "#.$# @#",  # 1
+                "#######",  # 2
+                "#     #",  # 3
+                "#######",  # 4
+            ]
+        )
         board_graph = SokobanBoard(board_str=board_str).graph
 
         expected_playable_cells = [
@@ -331,9 +315,7 @@ class DescribeBoardGraph:
             index_1d(5, 1, 7),
         ]
 
-        def it_calculates_playable_area_of_board_marking_all_playable_cells(
-            self
-        ):
+        def it_calculates_playable_area_of_board_marking_all_playable_cells(self):
             self.board_graph.mark_play_area()
             for pos in range(self.board_graph.vertices_count):
                 if pos in self.expected_playable_cells:
@@ -342,19 +324,19 @@ class DescribeBoardGraph:
                     assert not self.board_graph[pos].is_in_playable_area
 
     class describe_positions_reachable_by_pusher:
-        board_str = "\n".join([
-            # 123456
-            "#######",  # 0
-            "#.$  @#",  # 1
-            "# # ###",  # 2
-            "#   #  ",  # 3
-            "#####  ",  # 4
-        ])
+        board_str = "\n".join(
+            [
+                # 123456
+                "#######",  # 0
+                "#.$  @#",  # 1
+                "# # ###",  # 2
+                "#   #  ",  # 3
+                "#####  ",  # 4
+            ]
+        )
         board_graph = SokobanBoard(board_str=board_str).graph
 
-        def it_returns_list_of_positions_reachable_by_pusher_movement_only(
-            self
-        ):
+        def it_returns_list_of_positions_reachable_by_pusher_movement_only(self):
             expected = [
                 index_1d(5, 1, 7),
                 index_1d(4, 1, 7),
@@ -366,13 +348,14 @@ class DescribeBoardGraph:
                 index_1d(1, 2, 7),
                 index_1d(1, 1, 7),
             ]
-            assert self.board_graph.positions_reachable_by_pusher(
-                pusher_position=index_1d(5, 1, 7)
-            ) == expected
+            assert (
+                self.board_graph.positions_reachable_by_pusher(
+                    pusher_position=index_1d(5, 1, 7)
+                )
+                == expected
+            )
 
-        def it_doesnt_require_that_start_position_actually_contain_pusher(
-            self
-        ):
+        def it_doesnt_require_that_start_position_actually_contain_pusher(self):
             expected = [
                 index_1d(4, 1, 7),
                 index_1d(3, 1, 7),
@@ -383,9 +366,12 @@ class DescribeBoardGraph:
                 index_1d(1, 2, 7),
                 index_1d(1, 1, 7),
             ]
-            assert self.board_graph.positions_reachable_by_pusher(
-                pusher_position=index_1d(4, 1, 7)
-            ) == expected
+            assert (
+                self.board_graph.positions_reachable_by_pusher(
+                    pusher_position=index_1d(4, 1, 7)
+                )
+                == expected
+            )
 
         def it_can_exclude_some_positions(self):
             expected = [
@@ -401,23 +387,28 @@ class DescribeBoardGraph:
                 index_1d(1, 2, 7),
                 index_1d(1, 1, 7),
             ]
-            assert self.board_graph.positions_reachable_by_pusher(
-                pusher_position=index_1d(5, 1, 7), excluded_positions=excluded
-            ) == expected
+            assert (
+                self.board_graph.positions_reachable_by_pusher(
+                    pusher_position=index_1d(5, 1, 7), excluded_positions=excluded
+                )
+                == expected
+            )
 
         def it_raises_if_start_position_is_of_board(self):
             with pytest.raises(IndexError):
                 self.board_graph.positions_reachable_by_pusher(42000)
 
     class describe_normalized_pusher_position:
-        board_str = "\n".join([
-            # 123456
-            "#######",  # 0
-            "#.$  @#",  # 1
-            "# # ###",  # 2
-            "#   #  ",  # 3
-            "#####  ",  # 4
-        ])
+        board_str = "\n".join(
+            [
+                # 123456
+                "#######",  # 0
+                "#.$  @#",  # 1
+                "# # ###",  # 2
+                "#   #  ",  # 3
+                "#####  ",  # 4
+            ]
+        )
         board_graph = SokobanBoard(board_str=board_str).graph
 
         def it_returns_top_left_position_of_pusher_in_his_reachable_area(self):
@@ -425,9 +416,7 @@ class DescribeBoardGraph:
                 pusher_position=index_1d(5, 1, 7)
             ) == index_1d(1, 1, 7)
 
-        def it_doesnt_require_that_start_position_actually_contain_pusher(
-            self
-        ):
+        def it_doesnt_require_that_start_position_actually_contain_pusher(self):
             assert self.board_graph.normalized_pusher_position(
                 pusher_position=index_1d(4, 1, 7)
             ) == index_1d(1, 1, 7)
@@ -435,7 +424,7 @@ class DescribeBoardGraph:
         def it_can_exclude_some_positions(self):
             assert self.board_graph.normalized_pusher_position(
                 pusher_position=index_1d(4, 1, 7),
-                excluded_positions=[index_1d(1, 1, 7)]
+                excluded_positions=[index_1d(1, 1, 7)],
             ) == index_1d(3, 1, 7)
 
         def it_raises_if_start_position_is_of_board(self):
@@ -475,33 +464,33 @@ class DescribeBoardGraph:
                 board_graph.path_destination(42000, []),
 
     class describe__reachables:
-        board_str = "\n".join([
-            # 123456
-            "#######",  # 0
-            "#.$# @#",  # 1
-            "#######",  # 2
-            "#     #",  # 3
-            "#######",  # 4
-        ])
+        board_str = "\n".join(
+            [
+                # 123456
+                "#######",  # 0
+                "#.$# @#",  # 1
+                "#######",  # 2
+                "#     #",  # 3
+                "#######",  # 4
+            ]
+        )
         board_graph = SokobanBoard(board_str=board_str).graph
 
         def it_calculates_all_positions_reachable_from_root(self):
-            if not hasattr(self.board_graph, '_reachables'):
+            if not hasattr(self.board_graph, "_reachables"):
                 return
 
             root = index_1d(5, 1, 7)
-            assert self.board_graph._reachables(root) == [
-                root, index_1d(4, 1, 7)
-            ]
+            assert self.board_graph._reachables(root) == [root, index_1d(4, 1, 7)]
 
         def it_skips_explicitly_excluded_positions(self):
-            if not hasattr(self.board_graph, '_reachables'):
+            if not hasattr(self.board_graph, "_reachables"):
                 return
 
             root = index_1d(5, 1, 7)
-            assert self.board_graph._reachables(
-                root, excluded_positions=[root]
-            ) == [index_1d(4, 1, 7)]
+            assert self.board_graph._reachables(root, excluded_positions=[root]) == [
+                index_1d(4, 1, 7)
+            ]
             root = index_1d(5, 1, 7)
             assert self.board_graph._reachables(
                 root, excluded_positions=[index_1d(4, 1, 7)]

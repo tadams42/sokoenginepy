@@ -11,6 +11,7 @@ from __future__ import absolute_import, print_function
 import io
 import os
 import re
+import sys
 import tempfile
 from glob import glob
 from os.path import basename, dirname, join, splitext
@@ -22,15 +23,14 @@ from setuptools.command.build_ext import build_ext
 
 def read(*names, **kwargs):
     return io.open(
-        join(dirname(__file__), *names),
-        encoding=kwargs.get('encoding', 'utf8')
+        join(dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
     ).read()
 
 
 def _is_extension_source_dir(dir_path):
     return (
-        'libsokoengine/src/libsokoengine' in dir_path
-        or 'libsokoengine/src/sokoenginepyext' in dir_path
+        "libsokoengine/src/libsokoengine" in dir_path
+        or "libsokoengine/src/sokoenginepyext" in dir_path
     )
 
 
@@ -46,26 +46,20 @@ class SokoenginepyExtension(Extension):
     configured or built - only Python code will be installed by ``pip``.
     """
 
-    NAME = 'sokoenginepyext'
+    NAME = "sokoenginepyext"
 
-    IS_DEBUG = os.environ.get('SOKOENGINEPYEXT_DEBUG', 'false').lower() in [
-        'yes', 'true', 'y', '1'
+    IS_DEBUG = os.environ.get("SOKOENGINEPYEXT_DEBUG", "false").lower() in [
+        "yes",
+        "true",
+        "y",
+        "1",
     ]
 
-    CXXFLAGS = [
-        '-std=c++14',
-        '-Wno-sign-compare',
-        '-fvisibility=hidden'
-    ] + (
-        [
-            '-g3',
-            '-O0',
-            '-UNDEBUG',
-            '-DDEBUG'
-        ]
-        if IS_DEBUG else
-        [
-            '-O3',
+    CXXFLAGS = ["-std=c++14", "-Wno-sign-compare", "-fvisibility=hidden"] + (
+        ["-g3", "-O0", "-UNDEBUG", "-DDEBUG"]
+        if IS_DEBUG
+        else [
+            "-O3",
             # Link time optimization is cool, but wreaks havoc in my current
             # dev env (Ubuntu 17.10, gcc 7.2, Python 3.6.2)
             # '-flto'
@@ -74,23 +68,23 @@ class SokoenginepyExtension(Extension):
 
     LDFLAGS = [] + (
         []
-        if IS_DEBUG else
-        [
+        if IS_DEBUG
+        else [
             # Link time optimization is cool, but wreaks havoc in my current
             # dev env (Ubuntu 17.10, gcc 7.2, Python 3.6.2)
             # '-flto'
         ]
     )
 
-    SRC_DIR = 'src/libsokoengine/src'
-    LIB_DIR = 'src/libsokoengine/build/dependencies'
+    SRC_DIR = "src/libsokoengine/src"
+    LIB_DIR = "src/libsokoengine/build/dependencies"
 
     _SOURCES = [
         os.path.join(dir_path, file_name)
         for top_dir in [SRC_DIR]
         for dir_path, directories, files in os.walk(top_dir)
         for file_name in files
-        if file_name.endswith('.cpp') and _is_extension_source_dir(dir_path)
+        if file_name.endswith(".cpp") and _is_extension_source_dir(dir_path)
     ]
 
     def __init__(self):
@@ -102,39 +96,38 @@ class SokoenginepyExtension(Extension):
                     dir_path
                     for dir_path, directories, files in os.walk(self.SRC_DIR)
                     if _is_extension_source_dir(dir_path)
-                ] + [
+                ]
+                + [
                     self.LIB_DIR,
                     self._pybind11_include_dir(user=False),
-                    self._pybind11_include_dir(user=True)
+                    self._pybind11_include_dir(user=True),
                 ]
             ),
-            language='c++',
+            language="c++",
             optional=True,
             extra_compile_args=self.CXXFLAGS,
-            extra_link_args=self.LDFLAGS
+            extra_link_args=self.LDFLAGS,
         )
 
-    _BOOST_HEADERS = list({
-        line.strip()
-        for file_path in _SOURCES
-        for line in open(file_path, 'r')
-        if '#include <boost' in line
-    })
+    _BOOST_HEADERS = list(
+        {
+            line.strip()
+            for file_path in _SOURCES
+            for line in open(file_path, "r")
+            if "#include <boost" in line
+        }
+    )
 
     _SHOULD_TRY_BUILD = (
         # We support building only on Linux...
-        os.name == 'posix'
-
+        os.name == "posix"
         # ... and not on Read The Docs
-        and os.environ.get('READTHEDOCS', 'false').lower() not in [
-            'yes', 'true', 'y', '1'
-        ]
-
+        and os.environ.get("READTHEDOCS", "false").lower()
+        not in ["yes", "true", "y", "1"]
         # ... and allow build to be controlled by SOKOENGINEPYEXT_BUILD
         # environment variable
-        and os.environ.get('SOKOENGINEPYEXT_BUILD', 'true').lower() in [
-            'yes', 'true', 'y', '1'
-        ]
+        and os.environ.get("SOKOENGINEPYEXT_BUILD", "true").lower()
+        in ["yes", "true", "y", "1"]
     )
 
     @classmethod
@@ -160,9 +153,9 @@ class SokoenginepyExtension(Extension):
         print("configuring '{}' extension".format(cls.NAME))
 
         boost_ok = True
-        with tempfile.NamedTemporaryFile('w', suffix='.cpp') as f:
+        with tempfile.NamedTemporaryFile("w", suffix=".cpp") as f:
             f.write("\n".join(sorted(cls._BOOST_HEADERS)) + "\n")
-            f.write('int main (int argc, char **argv) { return 0; }')
+            f.write("int main (int argc, char **argv) { return 0; }")
             f.flush()
             try:
                 compiler.compile([f.name])
@@ -170,17 +163,17 @@ class SokoenginepyExtension(Extension):
                 boost_ok = False
 
         if not boost_ok:
-            print((
-                "'{}' extension build was requested but it will be skipped "
-                "because Boost headers are missing."
-            ).format(cls.NAME))
+            print(
+                (
+                    "'{}' extension build was requested but it will be skipped "
+                    "because Boost headers are missing."
+                ).format(cls.NAME)
+            )
             return False
 
-        cppitertools_dir = os.path.join(
-            os.path.abspath(cls.LIB_DIR), 'cppitertools'
-        )
+        cppitertools_dir = os.path.join(os.path.abspath(cls.LIB_DIR), "cppitertools")
         if not os.path.exists(cppitertools_dir):
-            print('Cloning cppitertools...')
+            print("Cloning cppitertools...")
             os.system(
                 'git clone --branch v1.0 https://github.com/ryanhaining/cppitertools.git "{}"'.format(
                     cppitertools_dir
@@ -205,113 +198,110 @@ class SokoenginepyExtension(Extension):
 
         def __str__(self):
             import pybind11
+
             return pybind11.get_include(self.user)
 
 
 class BuildExt(build_ext):
     def build_extensions(self):
-        if (
-            'sokoenginepyext' in [ext.name for ext in self.extensions]
-            and not SokoenginepyExtension.configure(self.compiler)
-        ):
+        if "sokoenginepyext" in [
+            ext.name for ext in self.extensions
+        ] and not SokoenginepyExtension.configure(self.compiler):
             self.extensions = [
-                ext for ext in self.extensions if ext.name != 'sokoenginepyext'
+                ext for ext in self.extensions if ext.name != "sokoenginepyext"
             ]
 
         return super().build_extensions()
 
 
 setup(
-    name='sokoenginepy',
-    version='0.5.3',
-    license='GPLv3',
-    description='Sokoban and variants game engine',
-    long_description='%s\n%s' % (
+    name="sokoenginepy",
+    version="0.5.3",
+    license="GPLv3",
+    description="Sokoban and variants game engine",
+    long_description="%s\n%s"
+    % (
         re.compile(
-            '^' + re.escape('[//]: # (start-badges)') + '.*^'
-            + re.escape('[//]: # (end-badges)'), re.M | re.S
-        ).sub('', read('README.md')),
+            "^"
+            + re.escape("[//]: # (start-badges)")
+            + ".*^"
+            + re.escape("[//]: # (end-badges)"),
+            re.M | re.S,
+        ).sub("", read("README.md")),
         # re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
-        ''
+        "",
     ),
     # In the future this will correctly render Markdown on PyPi:
     # long_description_content_type='text/markdown',
-    author='Tomislav Adamic',
-    author_email='tomislav.adamic@gmail.com',
-    url='https://github.com/tadams42/sokoenginepy',
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
-    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
+    author="Tomislav Adamic",
+    author_email="tomislav.adamic@gmail.com",
+    url="https://github.com/tadams42/sokoenginepy",
+    packages=find_packages("src"),
+    package_dir={"": "src"},
+    py_modules=[splitext(basename(path))[0] for path in glob("src/*.py")],
     include_package_data=True,
     zip_safe=False,
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Programming Language :: Python :: 3 :: Only',
-        'Operating System :: OS Independent',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Games/Entertainment :: Puzzle Games'
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
+        "Programming Language :: Python :: 3 :: Only",
+        "Operating System :: OS Independent",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Games/Entertainment :: Puzzle Games",
     ],
-    keywords=['game', 'sokoban', 'hexoban', 'octoban', 'trioban'],
+    keywords=["game", "sokoban", "hexoban", "octoban", "trioban"],
     # List run-time dependencies HERE.  These will be installed by pip when
     # your project is installed. For an analysis of 'install_requires' vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'pytz >=2016.6.1',
-        'pyparsing >=2.1.0',
-        'networkx <2.0.0',
-        'cached-property >=1.2.0',
-        'pybind11>=2.2.0'
+        "pytz >=2016.6.1",
+        "pyparsing >=2.1.0",
+        "networkx <2.0.0",
+        "cached-property >=1.2.0",
+        "pybind11>=2.2.0",
     ],
     # List additional groups of dependencies HERE (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev]
     extras_require={
-        'docs': [
-            'sphinx >= 1.4',
-            'sphinx_rtd_theme',
-            'm2r >= 0.1.14',
-        ],
-        'dev': [
-            'pycodestyle',
-            'pylint',
-            'yapf',
-            'bumpversion',
-            'isort',
-            'check-manifest',
-
+        "docs": ["sphinx >= 1.4", "sphinx_rtd_theme", "m2r >= 0.1.14"],
+        "dev": [
+            "pycodestyle",
+            "pylint",
+            "black" if sys.version_info >= (3, 6, 0) else "yapf",
+            "bumpversion",
+            "isort",
+            "check-manifest",
+            "pylint",
+            "flake8",
             # IPython stuff
-            'ipython',
-            'jupyter',
-            'ipdb',
-
+            "ipython",
+            "jupyter",
+            "ipdb",
             # Docs and viewers
-            'sphinx',
-            'sphinx_rtd_theme',
-            'm2r',
-
+            "sphinx",
+            "sphinx_rtd_theme",
+            "m2r",
             # py.test stuff
-            'pytest >= 3.0.0',
-            'colored-traceback',
-            'pytest-spec',
-            'pytest-sugar',
-            'pytest-cov',
-            'pytest-benchmark',
-            'pytest-mock',
-
-            'coverage',
-            'factory-boy',
-            'faker',
-        ]
+            "pytest >= 3.0.0",
+            "colored-traceback",
+            "pytest-spec",
+            "pytest-cov",
+            "pytest-benchmark",
+            "pytest-mock",
+            "coverage",
+            "factory-boy",
+            "faker",
+        ],
     },
     ext_modules=[SokoenginepyExtension()],
-    cmdclass={'build_ext': BuildExt}
+    cmdclass={"build_ext": BuildExt},
 )

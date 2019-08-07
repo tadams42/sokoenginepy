@@ -3,8 +3,14 @@ from itertools import permutations
 import factory
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction, Mover,
-                          SokobanBoard, SolvingMode)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID,
+    AtomicMove,
+    Direction,
+    Mover,
+    SokobanBoard,
+    SolvingMode,
+)
 from sokoenginepy.game import JumpCommand, MoveCommand, SelectPusherCommand
 from sokoenginepy.utilities import index_1d
 
@@ -52,18 +58,34 @@ def reverse_mover(forward_board):
 @pytest.fixture
 def forward_mover_moves_cycle():
     return [
-        Direction.LEFT, Direction.LEFT, Direction.LEFT, Direction.DOWN,
-        Direction.RIGHT, Direction.UP, Direction.RIGHT, Direction.RIGHT,
-        Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT
+        Direction.LEFT,
+        Direction.LEFT,
+        Direction.LEFT,
+        Direction.DOWN,
+        Direction.RIGHT,
+        Direction.UP,
+        Direction.RIGHT,
+        Direction.RIGHT,
+        Direction.DOWN,
+        Direction.LEFT,
+        Direction.UP,
+        Direction.RIGHT,
     ]
 
 
 @pytest.fixture
 def reverse_mover_moves_cycle():
     return [
-        Direction.LEFT, Direction.UP, Direction.LEFT, Direction.DOWN,
-        Direction.RIGHT, Direction.RIGHT, Direction.UP, Direction.RIGHT,
-        Direction.DOWN, Direction.LEFT
+        Direction.LEFT,
+        Direction.UP,
+        Direction.LEFT,
+        Direction.DOWN,
+        Direction.RIGHT,
+        Direction.RIGHT,
+        Direction.UP,
+        Direction.RIGHT,
+        Direction.DOWN,
+        Direction.LEFT,
     ]
 
 
@@ -80,25 +102,21 @@ def reverse_select_command(reverse_mover):
 @pytest.fixture
 def pusher_selections():
     return [
-        [
-            AtomicMove(direction, is_pusher_selection=True)
-            for direction in permutation
-        ]
-        for permutation in permutations([
-            Direction.DOWN, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT
-        ])
+        [AtomicMove(direction, is_pusher_selection=True) for direction in permutation]
+        for permutation in permutations(
+            [Direction.DOWN, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT]
+        )
     ]
 
 
 @pytest.fixture
 def undone_pusher_selections():
-    return [[
-        AtomicMove(direction, is_pusher_selection=True)
-        for direction in permutation
+    return [
+        [AtomicMove(direction, is_pusher_selection=True) for direction in permutation]
+        for permutation in permutations(
+            [Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT]
+        )
     ]
-            for permutation in permutations([
-                Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT
-            ])]
 
 
 @pytest.fixture
@@ -118,19 +136,21 @@ def off_board_position():
 
 @pytest.fixture
 def jumps():
-    return [[AtomicMove(direction, is_jump=True) for direction in permutation]
-            for permutation in permutations([
-                Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT
-            ])]
+    return [
+        [AtomicMove(direction, is_jump=True) for direction in permutation]
+        for permutation in permutations(
+            [Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT]
+        )
+    ]
 
 
 @pytest.fixture
 def undone_jumps():
     return [
         [AtomicMove(direction, is_jump=True) for direction in permutation]
-        for permutation in permutations([
-            Direction.DOWN, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT
-        ])
+        for permutation in permutations(
+            [Direction.DOWN, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT]
+        )
     ]
 
 

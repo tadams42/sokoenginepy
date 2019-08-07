@@ -1,7 +1,6 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from ..direction import Direction, UnknownDirectionError
-from ..tessellation_base import (TessellationBase,
-                                 TessellationBaseInheritableDocstrings)
+from ..tessellation_base import TessellationBase, TessellationBaseInheritableDocstrings
 
 
 class HexobanTessellation(
@@ -28,12 +27,11 @@ class HexobanTessellation(
     @copy_ancestor_docstring
     def graph_type(self):
         from ...graph import GraphType
+
         return GraphType.DIRECTED
 
     @copy_ancestor_docstring
-    def neighbor_position(
-        self, position, direction, board_width, board_height
-    ):
+    def neighbor_position(self, position, direction, board_width, board_height):
         # if not is_on_board_1d(position, board_width, board_height):
         #     return None
 
@@ -67,6 +65,7 @@ class HexobanTessellation(
     def _char_to_atomic_move_dict(self):
         if not self.__class__._CHR_TO_ATOMIC_MOVE:
             from ...snapshot import AtomicMoveCharacters
+
             self.__class__._CHR_TO_ATOMIC_MOVE = {
                 AtomicMoveCharacters.l: (Direction.LEFT, False),
                 AtomicMoveCharacters.L: (Direction.LEFT, True),

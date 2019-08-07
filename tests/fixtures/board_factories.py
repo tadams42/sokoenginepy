@@ -3,9 +3,16 @@ from itertools import permutations
 import factory
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, BoardManager, BoardState,
-                          Direction, HashedBoardManager, SokobanBoard,
-                          SokobanPlus, Tessellation)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID,
+    BoardManager,
+    BoardState,
+    Direction,
+    HashedBoardManager,
+    SokobanBoard,
+    SokobanPlus,
+    Tessellation,
+)
 from sokoenginepy.utilities import index_1d
 
 from ..test_helpers import fake
@@ -68,7 +75,6 @@ def solved_board_str():
         "    #######        ",  # 0
     ])
     # yapf: enable
-
 
 
 @pytest.fixture
@@ -192,8 +198,12 @@ def invalid_box_position():
 @pytest.fixture
 def boxes_ids():
     return [
-        DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1, DEFAULT_PIECE_ID + 2,
-        DEFAULT_PIECE_ID + 3, DEFAULT_PIECE_ID + 4, DEFAULT_PIECE_ID + 5
+        DEFAULT_PIECE_ID,
+        DEFAULT_PIECE_ID + 1,
+        DEFAULT_PIECE_ID + 2,
+        DEFAULT_PIECE_ID + 3,
+        DEFAULT_PIECE_ID + 4,
+        DEFAULT_PIECE_ID + 5,
     ]
 
 
@@ -217,8 +227,12 @@ def invalid_goal_position():
 @pytest.fixture
 def goals_ids():
     return [
-        DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1, DEFAULT_PIECE_ID + 2,
-        DEFAULT_PIECE_ID + 3, DEFAULT_PIECE_ID + 4, DEFAULT_PIECE_ID + 5
+        DEFAULT_PIECE_ID,
+        DEFAULT_PIECE_ID + 1,
+        DEFAULT_PIECE_ID + 2,
+        DEFAULT_PIECE_ID + 3,
+        DEFAULT_PIECE_ID + 4,
+        DEFAULT_PIECE_ID + 5,
     ]
 
 
@@ -281,8 +295,7 @@ def all_solutions(goals_positions):
     def calc():
         for boxes_positions in permutations(goals_positions.values()):
             yield BoardState(
-                boxes_positions=list(boxes_positions),
-                pushers_positions=[]
+                boxes_positions=list(boxes_positions), pushers_positions=[]
             )
 
     return list(calc())
@@ -291,12 +304,24 @@ def all_solutions(goals_positions):
 @pytest.fixture
 def sokoban_plus_solutions():
     return [
-        BoardState(boxes_positions=[149, 130, 131, 150, 168, 169], pushers_positions=[]),
-        BoardState(boxes_positions=[149, 130, 131, 150, 169, 168], pushers_positions=[]),
-        BoardState(boxes_positions=[149, 130, 131, 168, 150, 169], pushers_positions=[]),
-        BoardState(boxes_positions=[149, 130, 131, 168, 169, 150], pushers_positions=[]),
-        BoardState(boxes_positions=[149, 130, 131, 169, 150, 168], pushers_positions=[]),
-        BoardState(boxes_positions=[149, 130, 131, 169, 168, 150], pushers_positions=[])
+        BoardState(
+            boxes_positions=[149, 130, 131, 150, 168, 169], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 150, 169, 168], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 168, 150, 169], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 168, 169, 150], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 169, 150, 168], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 169, 168, 150], pushers_positions=[]
+        ),
     ]
 
 

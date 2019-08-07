@@ -5,15 +5,14 @@ from .sok_file_format import SOKFileFormat
 
 
 class PuzzlesCollection:
-    """Collection of :class:``.Puzzle``
+    """
+    Collection of :class:``.Puzzle``
 
     TODO: Convert to iterable and sequence
     """
 
-    #pylint: disable=too-many-arguments
-    def __init__(
-        self, title="", author="", created_at="", updated_at="", notes=""
-    ):
+    # pylint: disable=too-many-arguments
+    def __init__(self, title="", author="", created_at="", updated_at="", notes=""):
         self.title = title
         self.author = author
         self.created_at = created_at
@@ -21,7 +20,7 @@ class PuzzlesCollection:
         self.notes = notes
         self.puzzles = []
 
-    #pylint: enable=too-many-arguments
+    # pylint: enable=too-many-arguments
 
     def clear(self):
         self.title = ""
@@ -37,23 +36,23 @@ class PuzzlesCollection:
 
     @staticmethod
     def _extension_to_tessellation_hint(path):
-        #pylint: disable=unused-variable
+        # pylint: disable=unused-variable
         file_name, file_extension = os.path.splitext(path)
         if (
-            file_extension == '.sok' or
-            file_extension == '.txt' or
-            file_extension == '.xsb'
+            file_extension == ".sok"
+            or file_extension == ".txt"
+            or file_extension == ".xsb"
         ):
             return Tessellation.SOKOBAN
-        elif file_extension == '.tsb':
+        elif file_extension == ".tsb":
             return Tessellation.TRIOBAN
-        elif file_extension == '.hsb':
+        elif file_extension == ".hsb":
             return Tessellation.HEXOBAN
 
         return Tessellation.SOKOBAN
 
     def load(self, path):
-        with open(path, 'r') as src_file:
+        with open(path, "r") as src_file:
             SOKFileFormat.read(
                 src_file, self, self._extension_to_tessellation_hint(path)
             )
@@ -64,5 +63,5 @@ class PuzzlesCollection:
                 self.puzzles[i].snapshots[j].pid = j + 1
 
     def save(self, path):
-        with open(path, 'w') as dest_file:
+        with open(path, "w") as dest_file:
             SOKFileFormat.write(self, dest_file)
