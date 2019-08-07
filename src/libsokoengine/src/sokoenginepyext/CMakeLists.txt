@@ -5,19 +5,19 @@
 #..............................................................................
 #                                pybind11 library
 #..............................................................................
-if(NOT EXISTS "${EXTERNAL_DEPENDENCIES_DIR}/pybind11")
+set(SOURCE_LIBS "${CMAKE_SOURCE_DIR}/lib")
+file(MAKE_DIRECTORY "${SOURCE_LIBS}")
+
+if(NOT EXISTS "${SOURCE_LIBS}/pybind11")
   execute_process(
     COMMAND git clone --branch v2.2.0 https://github.com/pybind/pybind11.git
-    WORKING_DIRECTORY "${EXTERNAL_DEPENDENCIES_DIR}"
+    WORKING_DIRECTORY "${SOURCE_LIBS}"
   )
 endif()
 
-add_subdirectory("${EXTERNAL_DEPENDENCIES_DIR}/pybind11/"
-                 "${CMAKE_BINARY_DIR}/pybind11/")
+add_subdirectory("${SOURCE_LIBS}/pybind11/" "${CMAKE_BINARY_DIR}/pybind11/")
 
-pybind11_add_module(
-  sokoenginepyext
-  $<TARGET_OBJECTS:sokoengine_obj>
+pybind11_add_module(sokoenginepyext
   sokoenginepyext.cpp
   export_direction.cpp
   export_atomic_move.cpp
@@ -29,12 +29,7 @@ pybind11_add_module(
   export_mover.cpp
 )
 
-target_include_directories(
-  sokoenginepyext PUBLIC
-  $<BUILD_INTERFACE:$<TARGET_PROPERTY:sokoengine_obj,INCLUDE_DIRECTORIES>>
-)
-
-target_link_libraries(sokoenginepyext PRIVATE ${LIBBACKWARD_DEPENDENCIES})
+target_link_libraries(sokoenginepyext PRIVATE sokoengine_obj)
 
 set_target_properties(sokoenginepyext PROPERTIES
                                       EXCLUDE_FROM_ALL TRUE

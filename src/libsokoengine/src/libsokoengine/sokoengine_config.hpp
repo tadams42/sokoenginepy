@@ -23,14 +23,10 @@
   #endif
 #endif
 
-// Now we use the generic helper definitions above to define LIBSOKOENGINE_API and LIBSOKOENGINE_LOCAL.
-// LIBSOKOENGINE_API is used for the public API symbols. It either DLL imports or DLL exports (or does nothing for static build)
-// LIBSOKOENGINE_LOCAL is used for non-api symbols.
-
-#ifdef LIBSOKOENGINE_DLL
-  #undef LIBSOKOENGINE_DLL
-#endif
-#define LIBSOKOENGINE_DLL
+// Now we use the generic helper definitions above to define LIBSOKOENGINE_API and
+// LIBSOKOENGINE_LOCAL. LIBSOKOENGINE_API is used for the public API symbols. It either
+// DLL imports or DLL exports (or does nothing for static build) LIBSOKOENGINE_LOCAL is
+// used for non-api symbols.
 
 #ifdef LIBSOKOENGINE_DLL // defined if LIBSOKOENGINE is compiled as a DLL
   #ifdef LIBSOKOENGINE_DLL_EXPORTS // defined if we are building the LIBSOKOENGINE DLL (instead of using it)

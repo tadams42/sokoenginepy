@@ -42,6 +42,12 @@ Build and install:
 make && make install
 ~~~
 
+To later uninstall you can:
+
+~~~sh
+xargs rm < install_manifest.txt
+~~~
+
 ## Customizing build
 
 [CMake] accepts compile options in the form of:
@@ -60,6 +66,10 @@ For `libsokoengine`, these are probably most usable ones:
   - string, default: `Release`
   - allowed values: [`RelWithDebInfo`, `Debug`, `Release`, `MinSizeRel`]
 
+- `BUILD_SHARED_LIBS`
+  - boolean
+  - should we build shared library?
+
 Example:
 
 ~~~sh
@@ -76,12 +86,14 @@ cmake -DCMAKE_INSTALL_PREFIX="/tmp" \
 `libsokoengine` installs everything needed to be used in [CMake] projects including [CMake Config-Package]. Minimal project for [CMake] would look like this:
 
 ~~~cmake
-cmake_minimum_required (VERSION 2.8.12)
-project(test_libsokoengine)
+cmake_minimum_required (VERSION 3.15.1)
 
-find_package(sokoengine 0.4 REQUIRED)
-add_executable(tester main.cpp)
-target_link_libraries( tester sokoengine )
+project(test_installed_sokoengine VERSION 0.5.3 LANGUAGES CXX)
+
+find_package(libsokoengine 0.5.0 REQUIRED)
+
+add_executable(playground playground.cpp)
+target_link_libraries(playground PUBLIC libsokoengine::sokoengine)
 ~~~
 
 ## Python bindings
