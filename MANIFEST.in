@@ -5,6 +5,9 @@ prune docs
 prune res
 prune src/libsokoengine/build
 prune tests
+prune src/libsokoengine/lib
+prune .vscode
+prune src/libsokoengine/.vscode
 
 include LICENSE
 include README.md
