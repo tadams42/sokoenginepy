@@ -74,11 +74,11 @@ Example:
 
 ~~~sh
 cmake -DCMAKE_INSTALL_PREFIX="/tmp" \
-      -DCMAKE_BUILD_TYPE="Debug" \
-      -G Ninja \
-      -DCMAKE_C_COMPILER=clang \
+      -DCMAKE_BUILD_TYPE="RelWithDebInfo" \
       -DCMAKE_CXX_COMPILER="clang++" \
-      ..
+      -G Ninja \
+      -S ../../src/libsokoengine/ \
+      -B ./
 ~~~
 
 ## Integrating with other projects through [CMake]

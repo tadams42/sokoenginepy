@@ -41,7 +41,7 @@ Notes:
   development packages
 - `python setup.py develop` will fail when trying to build native extension with
   message that it is missing `pybind11` headers. This is most probably `setuptools`
-  bug (see also https://github.com/pybind/python_example/issues/16)
+  [bug](https://github.com/pybind/python_example/issues/16)
 - `pip install -e .` will always work and is equivalent to calling `python setup.py
   development` but with some `pip` magic that makes `setuptools` problem go away
 
@@ -118,42 +118,6 @@ kcachegrind moves_profile.prof.log
 kcachegrind single_move_profile.prof.log
 ~~~
 
-## Uploading to PyPI
-
-~~~sh
-pip install -U twine
-~~~
-
-Prepare `~/.pypirc`
-
-~~~ini
-[distutils]
-index-servers=
-    pypi
-    pypitest
-
-[pypitest]
-repository = https://test.pypi.org/legacy/
-username = <username>
-password = <password>
-
-[pypi]
-username = <username>
-password = <password>
-~~~
-
-Create dist
-
-~~~sh
-python setup.py sdist bdist_wheel
-~~~
-
-An upload it
-
-~~~sh
-twine upload -r pypitest dist/*
-~~~
-
 ## Native extension
 
 If all dependencies are met and we are on Linux, `pip install sokoenginepy` will
@@ -202,11 +166,23 @@ valgrind --dump-line=yes --dump-instr=yes --tool=callgrind --collect-jumps=yes \
 kcachegrind mover_profiling.log
 ~~~
 
+### Building only native extension
+
 Since native extension is itself a C++ library (`libsokoengine`), it can be used as a
 part of separate, independent C++ projects. The only downside of this is that there
 are no native tests for the library - whole test suite is written in Python only.
 Beside that, everything works and is nicely integrated using [CMake]. For details see
-[libsokoengine docs].
+[libsokoengine docs], but in short:
+
+~~~sh
+mkdir -p build/cmake_debug
+cd build/cmake_debug
+cmake -DCMAKE_BUILD_TYPE="RelWithDebInfo" \
+      -DCMAKE_CXX_COMPILER="clang++" \
+      -S ../../src/libsokoengine/ \
+      -B ./
+make sokoenginepyext
+~~~
 
 [PyPI]: https://pypi.python.org/pypi
 [tox]: https://tox.readthedocs.io/en/latest/

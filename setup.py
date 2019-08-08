@@ -11,7 +11,6 @@ from __future__ import absolute_import, print_function
 import io
 import os
 import re
-import sys
 import tempfile
 from glob import glob
 from os.path import basename, dirname, join, splitext
@@ -27,23 +26,33 @@ def read(*names, **kwargs):
     ).read()
 
 
-def _is_extension_source_dir(dir_path):
-    return (
-        "libsokoengine/src/libsokoengine" in dir_path
-        or "libsokoengine/src/sokoenginepyext" in dir_path
-    )
+class fix_pybind11_include_dir:
+    """
+    Hack to postpone importing and calling on ``pybind11`` until it
+    is actually installed.
+
+    https://github.com/pybind/python_example/blob/master/setup.py
+    https://github.com/pybind/python_example/issues/16
+    """
+
+    def __init__(self, user=False):
+        self.user = user
+
+    def __str__(self):
+        import pybind11
+
+        return pybind11.get_include(self.user)
 
 
 class SokoenginepyExtension(Extension):
     """
     Describes ``sokoenginepyext`` native C++ extension for ``sokoenginepy``.
 
-    On ``Linux``, ``pip install sokoenginepy`` will try to configure and
-    build native extension. If this fails, extension will not be installed
-    but package still will be.
+    On ``Linux``, ``pip install sokoenginepy`` will try to configure and build native
+    extension. If build fails, ``sokoenginepy`` will be installed without native
+    extension. To succeed, boost header have to be in system include path.
 
-    On all other systems, native extension is not supported and will not be
-    configured or built - only Python code will be installed by ``pip``.
+    On all other systems, native extension will not be installed.
     """
 
     NAME = "sokoenginepyext"
@@ -55,70 +64,7 @@ class SokoenginepyExtension(Extension):
         "1",
     ]
 
-    CXXFLAGS = ["-std=c++14", "-Wno-sign-compare", "-fvisibility=hidden"] + (
-        ["-g3", "-O0", "-UNDEBUG", "-DDEBUG"]
-        if IS_DEBUG
-        else [
-            "-O3",
-            # Link time optimization is cool, but wreaks havoc in my current
-            # dev env (Ubuntu 17.10, gcc 7.2, Python 3.6.2)
-            # '-flto'
-        ]
-    )
-
-    LDFLAGS = [] + (
-        []
-        if IS_DEBUG
-        else [
-            # Link time optimization is cool, but wreaks havoc in my current
-            # dev env (Ubuntu 17.10, gcc 7.2, Python 3.6.2)
-            # '-flto'
-        ]
-    )
-
-    SRC_DIR = "src/libsokoengine/src"
-    LIB_DIR = "src/libsokoengine/build/dependencies"
-
-    _SOURCES = [
-        os.path.join(dir_path, file_name)
-        for top_dir in [SRC_DIR]
-        for dir_path, directories, files in os.walk(top_dir)
-        for file_name in files
-        if file_name.endswith(".cpp") and _is_extension_source_dir(dir_path)
-    ]
-
-    def __init__(self):
-        super().__init__(
-            name=self.NAME,
-            sources=self._SOURCES,
-            include_dirs=(
-                [
-                    dir_path
-                    for dir_path, directories, files in os.walk(self.SRC_DIR)
-                    if _is_extension_source_dir(dir_path)
-                ]
-                + [
-                    self.LIB_DIR,
-                    self._pybind11_include_dir(user=False),
-                    self._pybind11_include_dir(user=True),
-                ]
-            ),
-            language="c++",
-            optional=True,
-            extra_compile_args=self.CXXFLAGS,
-            extra_link_args=self.LDFLAGS,
-        )
-
-    _BOOST_HEADERS = list(
-        {
-            line.strip()
-            for file_path in _SOURCES
-            for line in open(file_path, "r")
-            if "#include <boost" in line
-        }
-    )
-
-    _SHOULD_TRY_BUILD = (
+    SHOULD_TRY_BUILD = (
         # We support building only on Linux...
         os.name == "posix"
         # ... and not on Read The Docs
@@ -130,31 +76,102 @@ class SokoenginepyExtension(Extension):
         in ["yes", "true", "y", "1"]
     )
 
+    CXXFLAGS_RELEASE = ["-O3", "-flto", "-UDEBUG", "-DNDEBUG"]
+
+    CXXFLAGS_DEBUG = ["-g3", "-O0", "-UNDEBUG", "-DDEBUG"]
+
+    CXXFLAGS = [
+        "-std=c++14",
+        "-fvisibility=hidden",
+        "-fPIC",
+        "-DBOOST_BIND_NO_PLACEHOLDERS",
+        "-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION",
+    ] + (CXXFLAGS_DEBUG if IS_DEBUG else CXXFLAGS_RELEASE)
+
+    LDFLAGS = ["-flto"] if not IS_DEBUG else []
+
+    SOURCES = [
+        os.path.join(dir_path, file_name)
+        for _ in [
+            "src/libsokoengine/src/libsokoengine",
+            "src/libsokoengine/src/sokoenginepyext",
+        ]
+        for dir_path, directories, files in os.walk(_)
+        for file_name in files
+        if file_name.endswith(".cpp")
+    ]
+
+    def __init__(self):
+        super().__init__(
+            name=self.NAME,
+            sources=self.SOURCES,
+            include_dirs=[
+                "src/libsokoengine/lib",
+                fix_pybind11_include_dir(user=False),
+                fix_pybind11_include_dir(user=True),
+            ]
+            + [
+                dir_path
+                for _ in [
+                    "src/libsokoengine/src/libsokoengine",
+                    "src/libsokoengine/src/sokoenginepyext",
+                ]
+                for dir_path, directories, files in os.walk(_)
+            ],
+            language="c++",
+            optional=True,
+            extra_compile_args=self.CXXFLAGS,
+            extra_link_args=self.LDFLAGS,
+        )
+
+    CPPITERTOOLS_DIR = os.path.abspath("src/libsokoengine/lib/cppitertools")
+
     @classmethod
     def configure(cls, compiler):
         """
         Should be ran before trying to compile the extension.
 
         - Fetches some of the compile time dependencies (ie. header-only C++
-        libraries that we don't want to distribute as part of our library
-        since they are available from GitHub).
-        - Checks for system wide headers by compiling small snippets of code
-        against them
+          libraries that we don't want to distribute as part of our library since
+          they are available from GitHub).
+        - Checks for system wide headers by compiling small snippets of code against
+          them
 
         Returns:
-            bool: True if everything is OK and extension can be compiled. False
-                if extension was not selected for build or some of
-                configuration steps fail.
+            bool: True if everything is OK and extension can be compiled. False if
+                extension was not selected for build or some of configuration steps
+                fail.
         """
 
-        if not cls._SHOULD_TRY_BUILD:
+        if not cls.SHOULD_TRY_BUILD:
             return False
 
-        print("configuring '{}' extension".format(cls.NAME))
+        if not cls._does_boost_compile(compiler):
+            return False
 
+        if not cls._fetch_cppitertools():
+            return False
+
+        print("successfully configured '{}' native extension".format(cls.NAME))
+
+        return True
+
+    @classmethod
+    def _fetch_cppitertools(cls):
+        if not os.path.exists(cls.CPPITERTOOLS_DIR):
+            print("Cloning cppitertools...")
+            os.system(
+                'git clone --branch v1.0 https://github.com/ryanhaining/cppitertools.git "{}"'.format(
+                    cls.CPPITERTOOLS_DIR
+                )
+            )
+        return True
+
+    @classmethod
+    def _does_boost_compile(cls, compiler):
         boost_ok = True
         with tempfile.NamedTemporaryFile("w", suffix=".cpp") as f:
-            f.write("\n".join(sorted(cls._BOOST_HEADERS)) + "\n")
+            f.write("\n".join(sorted(cls._BOOST_INCLUDES)) + "\n")
             f.write("int main (int argc, char **argv) { return 0; }")
             f.flush()
             try:
@@ -171,39 +188,22 @@ class SokoenginepyExtension(Extension):
             )
             return False
 
-        cppitertools_dir = os.path.join(os.path.abspath(cls.LIB_DIR), "cppitertools")
-        if not os.path.exists(cppitertools_dir):
-            print("Cloning cppitertools...")
-            os.system(
-                'git clone --branch v1.0 https://github.com/ryanhaining/cppitertools.git "{}"'.format(
-                    cppitertools_dir
-                )
-            )
-
-        print("successfully configured '{}' native extension".format(cls.NAME))
-
-        return True
-
-    class _pybind11_include_dir:
-        """
-        Hack to postpone importing and calling on ``pybind11`` until it
-        is actually installed.
-
-        https://github.com/pybind/python_example/blob/master/setup.py
-        https://github.com/pybind/python_example/issues/16
-        """
-
-        def __init__(self, user=False):
-            self.user = user
-
-        def __str__(self):
-            import pybind11
-
-            return pybind11.get_include(self.user)
+    _BOOST_INCLUDES = list(
+        {
+            line.strip()
+            for file_path in SOURCES
+            for line in open(file_path, "r")
+            if "#include <boost" in line
+        }
+    )
 
 
 class BuildExt(build_ext):
     def build_extensions(self):
+        """
+        Removes sokoenginepyext from list of extensions if it can't or shouldn't be
+        built.
+        """
         if "sokoenginepyext" in [
             ext.name for ext in self.extensions
         ] and not SokoenginepyExtension.configure(self.compiler):
@@ -266,7 +266,7 @@ setup(
         "pyparsing >=2.1.0",
         "networkx <2.0.0",
         "cached-property >=1.2.0",
-        "pybind11>=2.2.0",
+        "pybind11>=2.2.0,<2.3.0",
     ],
     # List additional groups of dependencies HERE (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -277,7 +277,7 @@ setup(
         "dev": [
             "pycodestyle",
             "pylint",
-            "black" if sys.version_info >= (3, 6, 0) else "yapf",
+            "black",
             "bumpversion",
             "isort",
             "check-manifest",
