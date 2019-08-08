@@ -12,11 +12,11 @@ class LIBSOKOENGINE_API SokobanBoard : public VariantBoard {
 public:
   SokobanBoard();
   SokobanBoard(size_t width, size_t height);
-  explicit SokobanBoard(const std::string& src);
-  SokobanBoard(const SokobanBoard& rv);
-  SokobanBoard& operator=(const SokobanBoard& rv);
-  SokobanBoard(SokobanBoard&& rv);
-  SokobanBoard& operator=(SokobanBoard&& rv);
+  explicit SokobanBoard(const std::string &src);
+  SokobanBoard(const SokobanBoard &rv);
+  SokobanBoard &operator=(const SokobanBoard &rv);
+  SokobanBoard(SokobanBoard &&rv);
+  SokobanBoard &operator=(SokobanBoard &&rv);
   virtual ~SokobanBoard();
   virtual unique_ptr_t create_clone() const override;
 };

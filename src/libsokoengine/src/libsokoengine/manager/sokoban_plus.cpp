@@ -13,15 +13,12 @@ using namespace boost;
 
 namespace sokoengine {
 
-SokobanPlusDataError::SokobanPlusDataError(const string& mess):
-  invalid_argument(mess)
-{}
+SokobanPlusDataError::SokobanPlusDataError(const string &mess)
+    : invalid_argument(mess) {}
 
 SokobanPlusDataError::~SokobanPlusDataError() = default;
 
-KeyError::KeyError(const string& mess):
-  invalid_argument(mess)
-{}
+KeyError::KeyError(const string &mess) : invalid_argument(mess) {}
 
 KeyError::~KeyError() = default;
 
@@ -38,51 +35,42 @@ public:
   bool m_validated = false;
   vector<string> m_errors;
 
-  enum {
-    LEGACY_DEFAULT_PLUS_ID = 99
-  };
+  enum { LEGACY_DEFAULT_PLUS_ID = 99 };
 
-  piece_id_t get_plus_id(piece_id_t for_id, const IdsMap& from_where) const {
-    if(m_enabled) return from_where.at(for_id);
+  piece_id_t get_plus_id(piece_id_t for_id, const IdsMap &from_where) const {
+    if (m_enabled)
+      return from_where.at(for_id);
     return DEFAULT_PLUS_ID;
   }
 
-  string rstrip_default_plus_ids(const string& str) const {
+  string rstrip_default_plus_ids(const string &str) const {
     if (m_pieces_count < LEGACY_DEFAULT_PLUS_ID) {
       return trim_right_copy_if(
-        str,
-        boost::is_any_of(lexical_cast<string>(LEGACY_DEFAULT_PLUS_ID)) ||
-        boost::is_any_of(lexical_cast<string>(SokobanPlus::DEFAULT_PLUS_ID)) ||
-        boost::is_space()
-      );
+          str,
+          boost::is_any_of(lexical_cast<string>(LEGACY_DEFAULT_PLUS_ID)) ||
+              boost::is_any_of(lexical_cast<string>(SokobanPlus::DEFAULT_PLUS_ID)) ||
+              boost::is_space());
     }
     return trim_right_copy_if(
-      str,
-      boost::is_any_of(
-        lexical_cast<string>(SokobanPlus::DEFAULT_PLUS_ID)
-      ) || boost::is_space()
-    );
+        str, boost::is_any_of(lexical_cast<string>(SokobanPlus::DEFAULT_PLUS_ID)) ||
+                 boost::is_space());
   }
 
-  IdsMap parse_and_clean_ids_string(const string& ids_str) const {
+  IdsMap parse_and_clean_ids_string(const string &ids_str) const {
     vector<string> trimmed;
     string tmp = rstrip_default_plus_ids(ids_str);
-    boost::algorithm::split(
-      trimmed, tmp, is_space(),
-      boost::token_compress_on
-    );
+    boost::algorithm::split(trimmed, tmp, is_space(), boost::token_compress_on);
 
     vector<piece_id_t> cleaned;
-    for (const string& str_id : trimmed) {
+    for (const string &str_id : trimmed) {
       if (!TextUtils::is_blank(str_id)) {
         piece_id_t converted_id;
         try {
           converted_id = lexical_cast<piece_id_t>(str_id);
-        }
-        catch(const bad_lexical_cast&) {
+        } catch (const bad_lexical_cast &) {
           throw SokobanPlusDataError(
-            "Can't parse Sokoban+ string! Illegal characters found. Only digits and spaces allowed."
-          );
+              "Can't parse Sokoban+ string! Illegal characters found. Only "
+              "digits and spaces allowed.");
         }
 
         if (converted_id == LEGACY_DEFAULT_PLUS_ID &&
@@ -100,7 +88,7 @@ public:
 
     IdsMap retv;
     piece_id_t index = 0;
-    for (const auto& plus_id : cleaned) {
+    for (const auto &plus_id : cleaned) {
       retv[index + DEFAULT_PIECE_ID] = plus_id;
       index++;
     }
@@ -108,7 +96,7 @@ public:
     return retv;
   }
 
-  void validate_plus_ids(const IdsMap& ids) {
+  void validate_plus_ids(const IdsMap &ids) {
     for (auto id : ids) {
       if (!SokobanPlus::is_valid_plus_id(id.second)) {
         m_errors.push_back("Invalid Sokoban+ ID: " + std::to_string(id.second));
@@ -118,19 +106,16 @@ public:
 
   void validate_ids_counts() {
     if (!m_box_plus_ids.empty() && m_box_plus_ids.size() != m_pieces_count) {
-      m_errors.push_back(
-        string("Sokoban+ boxorder data doesn't contain same amount ") +
-        "of IDs as there are pieces on board!. (pieces_count: " +
-        std::to_string(m_pieces_count) + ")"
-      );
+      m_errors.push_back(string("Sokoban+ boxorder data doesn't contain same amount ") +
+                         "of IDs as there are pieces on board!. (pieces_count: " +
+                         std::to_string(m_pieces_count) + ")");
     }
 
     if (!m_goal_plus_ids.empty() && m_goal_plus_ids.size() != m_pieces_count) {
       m_errors.push_back(
-        string("Sokoban+ goalorder data doesn't contain same amount ") +
-        "of IDs as there are pieces on board!. (pieces_count: " +
-        std::to_string(m_pieces_count) + ")"
-      );
+          string("Sokoban+ goalorder data doesn't contain same amount ") +
+          "of IDs as there are pieces on board!. (pieces_count: " +
+          std::to_string(m_pieces_count) + ")");
     }
   }
 
@@ -149,55 +134,45 @@ public:
 
     if (boxes != goals) {
       m_errors.push_back(
-        "Sokoban+ data doesn't define equal sets of IDs for boxes and goals"
-      );
+          "Sokoban+ data doesn't define equal sets of IDs for boxes and goals");
     }
   }
 };
 
-SokobanPlus::SokobanPlus() :
-  m_impl(make_unique<PIMPL>())
-{}
+SokobanPlus::SokobanPlus() : m_impl(make_unique<PIMPL>()) {}
 
-SokobanPlus::SokobanPlus(size_t pieces_count, const string& boxorder,
-                        const string& goalorder) :
-  SokobanPlus()
-{
+SokobanPlus::SokobanPlus(size_t pieces_count, const string &boxorder,
+                         const string &goalorder)
+    : SokobanPlus() {
   m_impl->m_pieces_count = pieces_count;
   m_impl->m_boxorder = boxorder;
   m_impl->m_goalorder = goalorder;
 }
 
-SokobanPlus::SokobanPlus(const SokobanPlus& rv) :
-  m_impl(make_unique<PIMPL>(*rv.m_impl))
-{}
+SokobanPlus::SokobanPlus(const SokobanPlus &rv)
+    : m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
 
-SokobanPlus& SokobanPlus::operator=(const SokobanPlus& rv) {
+SokobanPlus &SokobanPlus::operator=(const SokobanPlus &rv) {
   if (this != &rv) {
-      m_impl = make_unique<PIMPL>(*rv.m_impl);
+    m_impl = make_unique<PIMPL>(*rv.m_impl);
   }
   return *this;
 }
 
 SokobanPlus::SokobanPlus(SokobanPlus &&) = default;
 
-SokobanPlus& SokobanPlus::operator=(SokobanPlus &&) = default;
+SokobanPlus &SokobanPlus::operator=(SokobanPlus &&) = default;
 
 SokobanPlus::~SokobanPlus() = default;
 
-bool SokobanPlus::operator== (const SokobanPlus& rv) const {
+bool SokobanPlus::operator==(const SokobanPlus &rv) const {
   return m_impl->m_pieces_count == rv.m_impl->m_pieces_count &&
-         boxorder() == rv.boxorder() &&
-         goalorder() == rv.goalorder();
+         boxorder() == rv.boxorder() && goalorder() == rv.goalorder();
 }
 
-bool SokobanPlus::operator!= (const SokobanPlus& rv) const {
-  return !(*this == rv);
-}
+bool SokobanPlus::operator!=(const SokobanPlus &rv) const { return !(*this == rv); }
 
-size_t SokobanPlus::pieces_count() const {
-  return m_impl->m_pieces_count;
-}
+size_t SokobanPlus::pieces_count() const { return m_impl->m_pieces_count; }
 
 void SokobanPlus::set_pieces_count(size_t rv) {
   if (rv != m_impl->m_pieces_count) {
@@ -210,7 +185,7 @@ void SokobanPlus::set_pieces_count(size_t rv) {
 string SokobanPlus::boxorder() const {
   if (is_enabled() && is_valid()) {
     vector<string> tmp;
-    for (const auto& id : m_impl->m_box_plus_ids) {
+    for (const auto &id : m_impl->m_box_plus_ids) {
       tmp.push_back(std::to_string(id.second));
     }
     string tmp2 = boost::algorithm::join(tmp, " ");
@@ -219,7 +194,7 @@ string SokobanPlus::boxorder() const {
   return m_impl->m_boxorder;
 }
 
-void SokobanPlus::set_boxorder(const string& rv) {
+void SokobanPlus::set_boxorder(const string &rv) {
   if (rv != m_impl->m_boxorder) {
     disable();
     m_impl->m_validated = false;
@@ -230,7 +205,7 @@ void SokobanPlus::set_boxorder(const string& rv) {
 string SokobanPlus::goalorder() const {
   if (is_enabled() and is_valid()) {
     vector<string> tmp;
-    for (const auto& id : m_impl->m_goal_plus_ids) {
+    for (const auto &id : m_impl->m_goal_plus_ids) {
       tmp.push_back(std::to_string(id.second));
     }
     string tmp2 = boost::algorithm::join(tmp, " ");
@@ -239,7 +214,7 @@ string SokobanPlus::goalorder() const {
   return m_impl->m_goalorder;
 }
 
-void SokobanPlus::set_goalorder(const string& rv) {
+void SokobanPlus::set_goalorder(const string &rv) {
   if (rv != m_impl->m_goalorder) {
     disable();
     m_impl->m_validated = false;
@@ -255,8 +230,7 @@ bool SokobanPlus::is_valid() const {
     try {
       m_impl->m_box_plus_ids = m_impl->parse_and_clean_ids_string(m_impl->m_boxorder);
       m_impl->m_goal_plus_ids = m_impl->parse_and_clean_ids_string(m_impl->m_goalorder);
-    }
-    catch (const std::exception& exc) {
+    } catch (const std::exception &exc) {
       m_impl->m_errors.push_back(exc.what());
     }
 
@@ -268,9 +242,7 @@ bool SokobanPlus::is_valid() const {
   return m_impl->m_errors.empty();
 }
 
-bool SokobanPlus::is_enabled() const {
-  return m_impl->m_enabled;
-}
+bool SokobanPlus::is_enabled() const { return m_impl->m_enabled; }
 
 void SokobanPlus::enable() {
   if (!is_valid()) {
@@ -279,15 +251,12 @@ void SokobanPlus::enable() {
   m_impl->m_enabled = true;
 }
 
-void SokobanPlus::disable() {
-  m_impl->m_enabled = false;
-}
+void SokobanPlus::disable() { m_impl->m_enabled = false; }
 
 piece_id_t SokobanPlus::box_plus_id(piece_id_t for_id) const {
   try {
     return m_impl->get_plus_id(for_id, m_impl->m_box_plus_ids);
-  }
-  catch (const out_of_range&) {
+  } catch (const out_of_range &) {
     throw KeyError("No box with ID: " + std::to_string(for_id));
   }
 }
@@ -295,8 +264,7 @@ piece_id_t SokobanPlus::box_plus_id(piece_id_t for_id) const {
 piece_id_t SokobanPlus::goal_plus_id(piece_id_t for_id) const {
   try {
     return m_impl->get_plus_id(for_id, m_impl->m_goal_plus_ids);
-  }
-  catch (const out_of_range&) {
+  } catch (const out_of_range &) {
     throw KeyError("No goal with ID: " + std::to_string(for_id));
   }
 }

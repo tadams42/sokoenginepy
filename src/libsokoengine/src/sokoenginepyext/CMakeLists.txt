@@ -10,7 +10,7 @@ file(MAKE_DIRECTORY "${SOURCE_LIBS}")
 
 if(NOT EXISTS "${SOURCE_LIBS}/pybind11")
   execute_process(
-    COMMAND git clone --branch v2.2.0 https://github.com/pybind/pybind11.git
+    COMMAND git clone --branch v2.3 https://github.com/pybind/pybind11.git
     WORKING_DIRECTORY "${SOURCE_LIBS}"
   )
 endif()

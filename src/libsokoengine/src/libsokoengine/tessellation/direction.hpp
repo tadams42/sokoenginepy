@@ -12,39 +12,46 @@ namespace sokoengine {
 ///
 class LIBSOKOENGINE_API Direction {
 public:
-  static const Direction& UP;
-  static const Direction& DOWN;
-  static const Direction& LEFT;
-  static const Direction& RIGHT;
-  static const Direction& NORTH_WEST;
-  static const Direction& NORTH_EAST;
-  static const Direction& SOUTH_WEST;
-  static const Direction& SOUTH_EAST;
+  static const Direction &UP;
+  static const Direction &DOWN;
+  static const Direction &LEFT;
+  static const Direction &RIGHT;
+  static const Direction &NORTH_WEST;
+  static const Direction &NORTH_EAST;
+  static const Direction &SOUTH_WEST;
+  static const Direction &SOUTH_EAST;
 
-  bool operator== (const Direction& rv) const;
-  bool operator!= (const Direction& rv) const;
-  bool operator< (const Direction& rv) const;
+  bool operator==(const Direction &rv) const;
+  bool operator!=(const Direction &rv) const;
+  bool operator<(const Direction &rv) const;
 
   static constexpr unsigned char len() { return 8; }
 
-  const Direction& opposite() const;
+  const Direction &opposite() const;
 
   ///
   /// Type for compact Direction representation
   ///
   typedef unsigned char packed_t;
 
-  static const Direction& unpack(packed_t c);
+  static const Direction &unpack(packed_t c);
   packed_t pack() const;
   std::string repr() const;
   std::string str() const;
 
 private:
   enum class LIBSOKOENGINE_API EDirection : unsigned char {
-    UP, NORTH_EAST, RIGHT, SOUTH_EAST, DOWN, SOUTH_WEST, LEFT, NORTH_WEST
+    UP,
+    NORTH_EAST,
+    RIGHT,
+    SOUTH_EAST,
+    DOWN,
+    SOUTH_WEST,
+    LEFT,
+    NORTH_WEST
   };
 
-  explicit Direction(const EDirection& value = EDirection::UP);
+  explicit Direction(const EDirection &value = EDirection::UP);
 
   EDirection m_direction;
 };

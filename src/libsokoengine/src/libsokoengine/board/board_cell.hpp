@@ -3,26 +3,26 @@
 
 #include "sokoengine_config.hpp"
 
-#include <string>
 #include <stdexcept>
+#include <string>
 
 namespace sokoengine {
 
 ///
 /// Exception.
 ///
-class LIBSOKOENGINE_API BoardConversionError: public std::runtime_error {
+class LIBSOKOENGINE_API BoardConversionError : public std::runtime_error {
 public:
-  explicit BoardConversionError(const std::string& mess);
+  explicit BoardConversionError(const std::string &mess);
   virtual ~BoardConversionError();
 };
 
 ///
 /// Exception.
 ///
-class LIBSOKOENGINE_API IllegalBoardCharacterError: public std::invalid_argument {
+class LIBSOKOENGINE_API IllegalBoardCharacterError : public std::invalid_argument {
 public:
-  explicit IllegalBoardCharacterError(const std::string& mess);
+  explicit IllegalBoardCharacterError(const std::string &mess);
   virtual ~IllegalBoardCharacterError();
 };
 
@@ -35,66 +35,51 @@ public:
   /// Characters used in textual representation of board cells.
   ///
   enum Characters {
-    WALL                = '#',
-    PUSHER              = '@',
-    PUSHER_ON_GOAL      = '+',
-    BOX                 = '$',
-    BOX_ON_GOAL         = '*',
-    GOAL                = '.',
-    FLOOR               = ' ',
-    VISIBLE_FLOOR       = '-',
-    ALT_PUSHER1         = 'p',
-    ALT_PUSHER2         = 'm',
+    WALL = '#',
+    PUSHER = '@',
+    PUSHER_ON_GOAL = '+',
+    BOX = '$',
+    BOX_ON_GOAL = '*',
+    GOAL = '.',
+    FLOOR = ' ',
+    VISIBLE_FLOOR = '-',
+    ALT_PUSHER1 = 'p',
+    ALT_PUSHER2 = 'm',
     ALT_PUSHER_ON_GOAL1 = 'P',
     ALT_PUSHER_ON_GOAL2 = 'M',
-    ALT_BOX1            = 'b',
-    ALT_BOX_ON_GOAL1    = 'B',
-    ALT_GOAL1           = 'o',
-    ALT_VISIBLE_FLOOR1  = '_',
+    ALT_BOX1 = 'b',
+    ALT_BOX_ON_GOAL1 = 'B',
+    ALT_GOAL1 = 'o',
+    ALT_VISIBLE_FLOOR1 = '_',
   };
 
   constexpr static bool is_pusher_chr(char ch) {
-    return ch == PUSHER ||
-           ch == ALT_PUSHER1 ||
-           ch == ALT_PUSHER2 ||
-           ch == PUSHER_ON_GOAL ||
-           ch == ALT_PUSHER_ON_GOAL1 ||
+    return ch == PUSHER || ch == ALT_PUSHER1 || ch == ALT_PUSHER2 ||
+           ch == PUSHER_ON_GOAL || ch == ALT_PUSHER_ON_GOAL1 ||
            ch == ALT_PUSHER_ON_GOAL2;
   }
 
   constexpr static bool is_box_chr(char ch) {
-    return ch == BOX ||
-           ch == ALT_BOX1 ||
-           ch == BOX_ON_GOAL ||
-           ch == ALT_BOX_ON_GOAL1;
+    return ch == BOX || ch == ALT_BOX1 || ch == BOX_ON_GOAL || ch == ALT_BOX_ON_GOAL1;
   }
 
   constexpr static bool is_goal_chr(char ch) {
-    return ch == GOAL ||
-           ch == ALT_GOAL1 ||
-           ch == BOX_ON_GOAL ||
-           ch == ALT_BOX_ON_GOAL1 ||
-           ch == PUSHER_ON_GOAL ||
-           ch == ALT_PUSHER_ON_GOAL1 ||
-           ch == ALT_PUSHER_ON_GOAL2;
+    return ch == GOAL || ch == ALT_GOAL1 || ch == BOX_ON_GOAL ||
+           ch == ALT_BOX_ON_GOAL1 || ch == PUSHER_ON_GOAL ||
+           ch == ALT_PUSHER_ON_GOAL1 || ch == ALT_PUSHER_ON_GOAL2;
   }
 
   constexpr static bool is_empty_floor_chr(char ch) {
-    return ch == FLOOR ||
-           ch == VISIBLE_FLOOR ||
-           ch == ALT_VISIBLE_FLOOR1;
+    return ch == FLOOR || ch == VISIBLE_FLOOR || ch == ALT_VISIBLE_FLOOR1;
   }
 
-  constexpr static bool is_wall_chr(char ch) {
-    return ch == WALL;
-  }
+  constexpr static bool is_wall_chr(char ch) { return ch == WALL; }
 
-  explicit BoardCell(
-    char rv = ' ', bool is_in_playable_area=false, bool is_deadlock=false
-  );
+  explicit BoardCell(char rv = ' ', bool is_in_playable_area = false,
+                     bool is_deadlock = false);
 
-  bool operator== (const BoardCell& rv) const;
-  bool operator!= (const BoardCell& rv) const;
+  bool operator==(const BoardCell &rv) const;
+  bool operator!=(const BoardCell &rv) const;
 
   char str() const;
   std::string repr() const;
@@ -125,10 +110,10 @@ public:
   void set_is_deadlock(bool rv);
 
 private:
-  bool m_box      : 1; // Does it contain box?
-  bool m_pusher   : 1; // Does it contain pusher?
-  bool m_goal     : 1; // Does it contain goal?
-  bool m_wall     : 1; // Does it contain wall?
+  bool m_box : 1;      // Does it contain box?
+  bool m_pusher : 1;   // Does it contain pusher?
+  bool m_goal : 1;     // Does it contain goal?
+  bool m_wall : 1;     // Does it contain wall?
   bool m_playable : 1; // Is in playable area?
   bool m_deadlock : 1; // Is movement deadlock?
 };

@@ -1,14 +1,14 @@
 #ifndef BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
 #include "board_graph.hpp"
 #include "board_state.hpp"
+#include "sokoengine_config.hpp"
 
-#include <stdexcept>
-#include <vector>
 #include <map>
 #include <memory>
+#include <stdexcept>
+#include <vector>
 
 namespace sokoengine {
 
@@ -17,18 +17,18 @@ class VariantBoard;
 ///
 /// Exception.
 ///
-class LIBSOKOENGINE_API CellAlreadyOccupiedError: public std::runtime_error {
+class LIBSOKOENGINE_API CellAlreadyOccupiedError : public std::runtime_error {
 public:
-  explicit CellAlreadyOccupiedError(const std::string& mess);
+  explicit CellAlreadyOccupiedError(const std::string &mess);
   virtual ~CellAlreadyOccupiedError();
 };
 
 ///
 /// Exception.
 ///
-class LIBSOKOENGINE_API BoxGoalSwitchError: public std::runtime_error {
+class LIBSOKOENGINE_API BoxGoalSwitchError : public std::runtime_error {
 public:
-  explicit BoxGoalSwitchError(const std::string& mess);
+  explicit BoxGoalSwitchError(const std::string &mess);
   virtual ~BoxGoalSwitchError();
 };
 
@@ -42,18 +42,16 @@ public:
     return pid >= DEFAULT_PIECE_ID;
   }
 
-  explicit BoardManager(
-    VariantBoard& board, const std::string& boxorder="",
-    const std::string& goalorder=""
-  );
-  BoardManager(const BoardManager&) = delete;
-  BoardManager(BoardManager&& rv);
-  BoardManager& operator=(const BoardManager&) = delete;
-  BoardManager& operator=(BoardManager&& rv);
+  explicit BoardManager(VariantBoard &board, const std::string &boxorder = "",
+                        const std::string &goalorder = "");
+  BoardManager(const BoardManager &) = delete;
+  BoardManager(BoardManager &&rv);
+  BoardManager &operator=(const BoardManager &) = delete;
+  BoardManager &operator=(BoardManager &&rv);
   virtual ~BoardManager();
 
-  bool operator== (const BoardManager& rv) const;
-  bool operator!= (const BoardManager& rv) const;
+  bool operator==(const BoardManager &rv) const;
+  bool operator!=(const BoardManager &rv) const;
 
   ///
   /// Collection of piece IDs
@@ -64,7 +62,7 @@ public:
   ///
   typedef std::map<piece_id_t, position_t> positions_by_id_t;
 
-  const VariantBoard& board() const;
+  const VariantBoard &board() const;
 
   size_t pushers_count() const;
   piece_ids_vector_t pushers_ids() const;
@@ -94,15 +92,15 @@ public:
   bool has_goal(piece_id_t goal_id) const;
   bool has_goal_on(position_t position) const;
 
-  const Positions& walls_positions() const;
+  const Positions &walls_positions() const;
 
   piece_id_t box_plus_id(piece_id_t box_id) const;
   piece_id_t goal_plus_id(piece_id_t goal_id) const;
 
   std::string boxorder() const;
   std::string goalorder() const;
-  virtual void set_boxorder(const std::string& rv);
-  virtual void set_goalorder(const std::string& rv);
+  virtual void set_boxorder(const std::string &rv);
+  virtual void set_goalorder(const std::string &rv);
 
   bool is_sokoban_plus_valid() const;
   bool is_sokoban_plus_enabled() const;
@@ -125,7 +123,7 @@ public:
   virtual BoardState state() const;
 
 protected:
-  static std::string to_str(const positions_by_id_t& m);
+  static std::string to_str(const positions_by_id_t &m);
   virtual void pusher_moved(position_t old_position, position_t to_new_position);
   virtual void box_moved(position_t old_position, position_t to_new_position);
 

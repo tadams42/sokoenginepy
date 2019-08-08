@@ -10,28 +10,25 @@ namespace sokoengine {
 ///
 /// Implements Zobrist hashing of BoardManager
 ///
-class LIBSOKOENGINE_API HashedBoardManager : public BoardManager
-{
+class LIBSOKOENGINE_API HashedBoardManager : public BoardManager {
 public:
-  explicit HashedBoardManager(
-    VariantBoard& board, const std::string& boxorder="",
-    const std::string& goalorder=""
-  );
-  HashedBoardManager(const HashedBoardManager&) = delete;
-  HashedBoardManager(HashedBoardManager&& rv);
-  HashedBoardManager& operator=(const HashedBoardManager&) = delete;
-  HashedBoardManager& operator=(HashedBoardManager&& rv);
+  explicit HashedBoardManager(VariantBoard &board, const std::string &boxorder = "",
+                              const std::string &goalorder = "");
+  HashedBoardManager(const HashedBoardManager &) = delete;
+  HashedBoardManager(HashedBoardManager &&rv);
+  HashedBoardManager &operator=(const HashedBoardManager &) = delete;
+  HashedBoardManager &operator=(HashedBoardManager &&rv);
   virtual ~HashedBoardManager();
 
-  bool operator==(const HashedBoardManager& rv) const;
-  bool operator!=(const HashedBoardManager& rv) const;
+  bool operator==(const HashedBoardManager &rv) const;
+  bool operator!=(const HashedBoardManager &rv) const;
 
   zobrist_key_t state_hash() const;
   zobrist_key_t initial_state_hash() const;
-  zobrist_key_t external_state_hash(BoardState& board_state) const;
+  zobrist_key_t external_state_hash(BoardState &board_state) const;
 
-  virtual void set_boxorder(const std::string& rv) override;
-  virtual void set_goalorder(const std::string& rv) override;
+  virtual void set_boxorder(const std::string &rv) override;
+  virtual void set_goalorder(const std::string &rv) override;
 
   virtual void enable_sokoban_plus() override;
   virtual void disable_sokoban_plus() override;
@@ -44,18 +41,19 @@ public:
   /// Hashes of all solution box configurations.
   ///
   typedef std::set<zobrist_key_t> solutions_hashes_t;
-  const solutions_hashes_t& solutions_hashes() const;
+  const solutions_hashes_t &solutions_hashes() const;
 
   virtual std::string str() const override;
   virtual std::string repr() const override;
 
 protected:
-  virtual void pusher_moved(position_t old_position, position_t to_new_position) override;
+  virtual void pusher_moved(position_t old_position,
+                            position_t to_new_position) override;
   virtual void box_moved(position_t old_position, position_t to_new_position) override;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;
-  std::unique_ptr<PIMPL>    m_impl;
+  std::unique_ptr<PIMPL> m_impl;
 };
 
 } // namespace sokoengine

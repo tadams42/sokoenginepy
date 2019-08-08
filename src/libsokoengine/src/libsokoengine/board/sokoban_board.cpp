@@ -5,32 +5,26 @@ using namespace std;
 
 namespace sokoengine {
 
-SokobanBoard::SokobanBoard() :
-  SokobanBoard(0, 0)
-{}
+SokobanBoard::SokobanBoard() : SokobanBoard(0, 0) {}
 
-SokobanBoard::SokobanBoard(size_t width, size_t height) :
-  VariantBoard(Tessellation::SOKOBAN, width, height)
-{}
+SokobanBoard::SokobanBoard(size_t width, size_t height)
+    : VariantBoard(Tessellation::SOKOBAN, width, height) {}
 
-SokobanBoard::SokobanBoard(const string& src) :
-  VariantBoard(Tessellation::SOKOBAN, src)
-{}
+SokobanBoard::SokobanBoard(const string &src)
+    : VariantBoard(Tessellation::SOKOBAN, src) {}
 
-SokobanBoard::SokobanBoard(const SokobanBoard& rv) :
-  VariantBoard(rv)
-{}
+SokobanBoard::SokobanBoard(const SokobanBoard &rv) : VariantBoard(rv) {}
 
-SokobanBoard& SokobanBoard::operator=(const SokobanBoard& rv) {
+SokobanBoard &SokobanBoard::operator=(const SokobanBoard &rv) {
   if (this != &rv) {
-      VariantBoard::operator=(rv);
+    VariantBoard::operator=(rv);
   }
   return *this;
 }
 
 SokobanBoard::SokobanBoard(SokobanBoard &&) = default;
 
-SokobanBoard& SokobanBoard::operator=(SokobanBoard &&) = default;
+SokobanBoard &SokobanBoard::operator=(SokobanBoard &&) = default;
 
 SokobanBoard::~SokobanBoard() = default;
 

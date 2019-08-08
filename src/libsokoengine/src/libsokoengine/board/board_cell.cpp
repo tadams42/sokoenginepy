@@ -4,53 +4,43 @@ using namespace std;
 
 namespace sokoengine {
 
-BoardConversionError::BoardConversionError(const string& mess):
-  runtime_error(mess)
-{}
+BoardConversionError::BoardConversionError(const string &mess) : runtime_error(mess) {}
 
 BoardConversionError::~BoardConversionError() = default;
 
-IllegalBoardCharacterError::IllegalBoardCharacterError(const string& mess):
-  invalid_argument(mess)
-{}
+IllegalBoardCharacterError::IllegalBoardCharacterError(const string &mess)
+    : invalid_argument(mess) {}
 
 IllegalBoardCharacterError::~IllegalBoardCharacterError() = default;
 
-BoardCell::BoardCell(char rv, bool is_in_playable_area, bool is_deadlock) :
-  m_box(false), m_pusher(false), m_goal(false), m_wall(false),
-  m_playable(is_in_playable_area), m_deadlock(is_deadlock)
-{
-  // of the board space consists of empty floors, thus a chance this
-  // test succeeds is larger than for other cases. This means that
-  // branches will not be executed most of the time, which means
-  // method runs faster
+BoardCell::BoardCell(char rv, bool is_in_playable_area, bool is_deadlock)
+    : m_box(false), m_pusher(false), m_goal(false), m_wall(false),
+      m_playable(is_in_playable_area), m_deadlock(is_deadlock) {
   if (!is_empty_floor_chr(rv)) {
     if (is_wall_chr(rv)) {
       set_is_wall(true);
     } else if (is_pusher_chr(rv)) {
       set_has_pusher(true);
-      if (is_goal_chr(rv)) set_has_goal(true);
+      if (is_goal_chr(rv))
+        set_has_goal(true);
     } else if (is_box_chr(rv)) {
       set_has_box(true);
-      if (is_goal_chr(rv)) set_has_goal(true);
+      if (is_goal_chr(rv))
+        set_has_goal(true);
     } else if (is_goal_chr(rv)) {
       set_has_goal(true);
     } else {
-      throw IllegalBoardCharacterError(
-        "Invalid character in BoardCell constructor!"
-      );
+      throw IllegalBoardCharacterError("Invalid character in BoardCell constructor!");
     }
   }
 }
 
-bool BoardCell::operator== (const BoardCell& rv) const {
-  return m_wall == rv.m_wall &&
-         m_pusher == rv.m_pusher &&
-         m_box == rv.m_box &&
+bool BoardCell::operator==(const BoardCell &rv) const {
+  return m_wall == rv.m_wall && m_pusher == rv.m_pusher && m_box == rv.m_box &&
          m_goal == rv.m_goal;
 }
 
-bool BoardCell::operator!= (const BoardCell& rv) const { return !(*this == rv); }
+bool BoardCell::operator!=(const BoardCell &rv) const { return !(*this == rv); }
 
 char BoardCell::to_str(bool use_visible_floor) const {
   char retv;
@@ -83,7 +73,7 @@ void BoardCell::clear() { m_wall = m_goal = m_pusher = m_box = false; }
 bool BoardCell::has_piece() const { return m_goal || m_box || m_pusher; }
 
 bool BoardCell::is_empty_floor() const {
-    return !(m_wall || m_pusher || m_box || m_goal);
+  return !(m_wall || m_pusher || m_box || m_goal);
 }
 
 bool BoardCell::is_border_element() const { return m_wall || (m_box && m_goal); }

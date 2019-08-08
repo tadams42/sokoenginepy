@@ -3,26 +3,26 @@
 
 #include "sokoengine_config.hpp"
 
-#include <stdexcept>
 #include <memory>
+#include <stdexcept>
 
 namespace sokoengine {
 
 ///
 /// Exception.
 ///
-class LIBSOKOENGINE_API SokobanPlusDataError: public std::invalid_argument {
+class LIBSOKOENGINE_API SokobanPlusDataError : public std::invalid_argument {
 public:
-  explicit SokobanPlusDataError(const std::string& mess);
+  explicit SokobanPlusDataError(const std::string &mess);
   virtual ~SokobanPlusDataError();
 };
 
 ///
 /// Exception.
 ///
-class LIBSOKOENGINE_API KeyError: public std::invalid_argument {
+class LIBSOKOENGINE_API KeyError : public std::invalid_argument {
 public:
-  explicit KeyError(const std::string& mess);
+  explicit KeyError(const std::string &mess);
   virtual ~KeyError();
 };
 
@@ -31,32 +31,30 @@ public:
 ///
 class LIBSOKOENGINE_API SokobanPlus {
 public:
-  enum {
-    DEFAULT_PLUS_ID = 0
-  };
+  enum { DEFAULT_PLUS_ID = 0 };
 
   constexpr static bool is_valid_plus_id(piece_id_t id) {
-      return id >= DEFAULT_PLUS_ID;
+    return id >= DEFAULT_PLUS_ID;
   }
 
   SokobanPlus();
-  SokobanPlus(size_t pieces_count, const std::string& boxorder="",
-              const std::string& goalorder="");
-  SokobanPlus(const SokobanPlus& rv);
-  SokobanPlus& operator=(const SokobanPlus& rv);
-  SokobanPlus(SokobanPlus&& rv);
-  SokobanPlus& operator=(SokobanPlus&& rv);
+  SokobanPlus(size_t pieces_count, const std::string &boxorder = "",
+              const std::string &goalorder = "");
+  SokobanPlus(const SokobanPlus &rv);
+  SokobanPlus &operator=(const SokobanPlus &rv);
+  SokobanPlus(SokobanPlus &&rv);
+  SokobanPlus &operator=(SokobanPlus &&rv);
   virtual ~SokobanPlus();
 
-  bool operator== (const SokobanPlus& rv) const;
-  bool operator!= (const SokobanPlus& rv) const;
+  bool operator==(const SokobanPlus &rv) const;
+  bool operator!=(const SokobanPlus &rv) const;
 
   size_t pieces_count() const;
   void set_pieces_count(size_t rv);
   std::string boxorder() const;
-  void set_boxorder(const std::string& rv);
+  void set_boxorder(const std::string &rv);
   std::string goalorder() const;
-  void set_goalorder(const std::string& rv);
+  void set_goalorder(const std::string &rv);
 
   bool is_valid() const;
   bool is_enabled() const;

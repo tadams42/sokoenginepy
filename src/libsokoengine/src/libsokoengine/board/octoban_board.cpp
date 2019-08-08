@@ -5,32 +5,26 @@ using namespace std;
 
 namespace sokoengine {
 
-OctobanBoard::OctobanBoard() :
-  OctobanBoard(0, 0)
-{}
+OctobanBoard::OctobanBoard() : OctobanBoard(0, 0) {}
 
-OctobanBoard::OctobanBoard(size_t width, size_t height) :
-  VariantBoard(Tessellation::OCTOBAN, width, height)
-{}
+OctobanBoard::OctobanBoard(size_t width, size_t height)
+    : VariantBoard(Tessellation::OCTOBAN, width, height) {}
 
-OctobanBoard::OctobanBoard(const string& src) :
-  VariantBoard(Tessellation::OCTOBAN, src)
-{}
+OctobanBoard::OctobanBoard(const string &src)
+    : VariantBoard(Tessellation::OCTOBAN, src) {}
 
-OctobanBoard::OctobanBoard(const OctobanBoard& rv) :
-  VariantBoard(rv)
-{}
+OctobanBoard::OctobanBoard(const OctobanBoard &rv) : VariantBoard(rv) {}
 
-OctobanBoard& OctobanBoard::operator=(const OctobanBoard& rv) {
+OctobanBoard &OctobanBoard::operator=(const OctobanBoard &rv) {
   if (this != &rv) {
-      VariantBoard::operator=(rv);
+    VariantBoard::operator=(rv);
   }
   return *this;
 }
 
 OctobanBoard::OctobanBoard(OctobanBoard &&) = default;
 
-OctobanBoard& OctobanBoard::operator=(OctobanBoard &&) = default;
+OctobanBoard &OctobanBoard::operator=(OctobanBoard &&) = default;
 
 OctobanBoard::~OctobanBoard() = default;
 

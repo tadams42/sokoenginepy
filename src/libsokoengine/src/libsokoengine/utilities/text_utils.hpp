@@ -3,8 +3,8 @@
 
 #include "sokoengine_config.hpp"
 
-#include <string>
 #include <deque>
+#include <string>
 
 namespace sokoengine {
 
@@ -23,20 +23,18 @@ public:
   ///
   ///
   enum RleCharacters {
-    GROUP_LEFT_DELIM  = '(',
+    GROUP_LEFT_DELIM = '(',
     GROUP_RIGHT_DELIM = ')',
     RLE_ROW_SEPARATOR = '|'
   };
 
-  static bool is_blank(const std::string& tlne);
-  static bool contains_only_digits_and_spaces (const std::string& line);
-  static bool rle_encode (std::string& str);
-  static bool rle_decode (std::string& str);
+  static bool is_blank(const std::string &tlne);
+  static bool contains_only_digits_and_spaces(const std::string &line);
+  static bool rle_encode(std::string &str);
+  static bool rle_decode(std::string &str);
 
-  static StringList normalize_width(
-    const StringList& string_list, char fill_chr=' '
-  );
-  static size_t calculate_width(const StringList& string_list);
+  static StringList normalize_width(const StringList &string_list, char fill_chr = ' ');
+  static size_t calculate_width(const StringList &string_list);
 };
 
 } // namespace sokoengine

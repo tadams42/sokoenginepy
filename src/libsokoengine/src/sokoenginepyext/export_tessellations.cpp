@@ -4,89 +4,62 @@
 using namespace std;
 using namespace sokoengine;
 
-void export_tessellations(py::module& m) {
+void export_tessellations(py::module &m) {
   py::enum_<CellOrientation>(m, "CellOrientation")
-    .value("DEFAULT", CellOrientation::DEFAULT)
-    .value("TRIANGLE_DOWN", CellOrientation::TRIANGLE_DOWN)
-    .value("OCTAGON", CellOrientation::OCTAGON)
-    // We don't want constants be available in module scope
-    // .export_values()
-  ;
+      .value("DEFAULT", CellOrientation::DEFAULT)
+      .value("TRIANGLE_DOWN", CellOrientation::TRIANGLE_DOWN)
+      .value("OCTAGON", CellOrientation::OCTAGON)
+      // We don't want constants be available in module scope
+      // .export_values()
+      ;
 
   py::class_<Tessellation>(m, "TessellationBase")
-    // protocols
-    .def("__eq__", &Tessellation::operator==)
-    .def("__ne__", &Tessellation::operator!=)
-    .def("__str__", &Tessellation::str)
-    .def("__repr__", &Tessellation::repr)
+      // protocols
+      .def("__eq__", &Tessellation::operator==)
+      .def("__ne__", &Tessellation::operator!=)
+      .def("__str__", &Tessellation::str)
+      .def("__repr__", &Tessellation::repr)
 
-    .def_property_readonly(
-      "legal_directions",
-      [](const Tessellation& self) -> py::list {
-        return py::copy_sequence_to_pylist(self.legal_directions());
-      }
-    )
+      .def_property_readonly("legal_directions",
+                             [](const Tessellation &self) -> py::list {
+                               return py::copy_sequence_to_pylist(
+                                   self.legal_directions());
+                             })
 
-    .def(
-      "neighbor_position", [](
-        const Tessellation& self, position_t position, const Direction& direction,
-        size_t board_width, size_t board_height
-      ) -> py::object {
-        return py::none_if_equal_to<position_t>(
-            self.neighbor_position(position, direction, board_width, board_height),
-            NULL_POSITION
-        );
-      },
-      py::arg("position"), py::arg("direction"), py::arg("board_width"),
-      py::arg("board_height")
-    )
+      .def("neighbor_position",
+           [](const Tessellation &self, position_t position, const Direction &direction,
+              size_t board_width, size_t board_height) -> py::object {
+             return py::none_if_equal_to<position_t>(
+                 self.neighbor_position(position, direction, board_width, board_height),
+                 NULL_POSITION);
+           },
+           py::arg("position"), py::arg("direction"), py::arg("board_width"),
+           py::arg("board_height"))
 
-    .def_property_readonly("graph_type", &Tessellation::graph_type)
+      .def_property_readonly("graph_type", &Tessellation::graph_type)
 
-    .def(
-      "char_to_atomic_move",
-      &Tessellation::char_to_atomic_move,
-      py::arg("input_chr")
-    )
+      .def("char_to_atomic_move", &Tessellation::char_to_atomic_move,
+           py::arg("input_chr"))
 
-    .def(
-      "atomic_move_to_char",
-      &Tessellation::atomic_move_to_char,
-      py::arg("atomic_move")
-    )
+      .def("atomic_move_to_char", &Tessellation::atomic_move_to_char,
+           py::arg("atomic_move"))
 
-    .def(
-      "cell_orientation",
-      &Tessellation::cell_orientation,
-      py::arg("position"), py::arg("board_width"), py::arg("board_height")
-    )
-  ;
+      .def("cell_orientation", &Tessellation::cell_orientation, py::arg("position"),
+           py::arg("board_width"), py::arg("board_height"));
 
   py::class_<SokobanTessellation, Tessellation>(m, "SokobanTessellation")
-    .def(
-      py::init([]() { return Tessellation::SOKOBAN; }),
-      py::return_value_policy::reference
-    )
-  ;
+      .def(py::init([]() { return Tessellation::SOKOBAN; }),
+           py::return_value_policy::reference);
 
   py::class_<HexobanTessellation, Tessellation>(m, "HexobanTessellation")
-    .def(
-      py::init([]() { return Tessellation::HEXOBAN; }),
-      py::return_value_policy::reference
-    )
-  ;
+      .def(py::init([]() { return Tessellation::HEXOBAN; }),
+           py::return_value_policy::reference);
 
   py::class_<OctobanTessellation, Tessellation>(m, "OctobanTessellation")
-    .def(
-      py::init([]() { return Tessellation::OCTOBAN; }),
-      py::return_value_policy::reference
-    )
-  ;
+      .def(py::init([]() { return Tessellation::OCTOBAN; }),
+           py::return_value_policy::reference);
 
   py::class_<TriobanTessellation, Tessellation>(m, "TriobanTessellation")
-    .def(
-      py::init([]() { return Tessellation::TRIOBAN; }),
-      py::return_value_policy::reference
-    )
-  ;
+      .def(py::init([]() { return Tessellation::TRIOBAN; }),
+           py::return_value_policy::reference);
 }

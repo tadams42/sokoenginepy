@@ -12,11 +12,11 @@ class LIBSOKOENGINE_API OctobanBoard : public VariantBoard {
 public:
   OctobanBoard();
   OctobanBoard(size_t width, size_t height);
-  explicit OctobanBoard(const std::string& src);
-  OctobanBoard(const OctobanBoard& rv);
-  OctobanBoard& operator=(const OctobanBoard& rv);
-  OctobanBoard(OctobanBoard&& rv);
-  OctobanBoard& operator=(OctobanBoard&& rv);
+  explicit OctobanBoard(const std::string &src);
+  OctobanBoard(const OctobanBoard &rv);
+  OctobanBoard &operator=(const OctobanBoard &rv);
+  OctobanBoard(OctobanBoard &&rv);
+  OctobanBoard &operator=(OctobanBoard &&rv);
   virtual ~OctobanBoard();
   virtual unique_ptr_t create_clone() const override;
 };
