@@ -43,147 +43,41 @@ void export_board_graph(py::module &m) {
 
       .def("has_edge", &BoardGraph::has_edge, py::arg("source_vertex"),
            py::arg("target_vertex"), py::arg("direction"))
-
       .def("out_edges_count", &BoardGraph::out_edges_count, py::arg("source_vertex"),
            py::arg("target_vertex"))
-
       .def("remove_all_edges", &BoardGraph::remove_all_edges)
-
       .def("add_edge", &BoardGraph::add_edge, py::arg("source_vertex"),
            py::arg("neighbor_vertex"), py::arg("direction"))
-
       .def("out_edge_weight", &BoardGraph::out_edge_weight, py::arg("target_position"))
 
       .def("neighbor",
            [](const BoardGraph &self, position_t from_position,
               const Direction &direction) -> py::object {
              position_t retv = self.neighbor_at(from_position, direction);
-             if (retv > MAX_POS)
-               return py::none();
+             if (retv > MAX_POS) return py::none();
              return py::cast(retv);
            },
            py::arg("from_position"), py::arg("direction"))
 
-      .def("wall_neighbors",
-           [](const BoardGraph &self, position_t from_position) {
-             auto native_retv = self.wall_neighbors(from_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("from_position"))
-
-      .def("all_neighbors",
-           [](const BoardGraph &self, position_t from_position) {
-             auto native_retv = self.all_neighbors(from_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("from_position"))
-
-      .def("shortest_path",
-           [](const BoardGraph &self, position_t start_position,
-              position_t end_position) {
-             auto native_retv = self.shortest_path(start_position, end_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("start_position"), py::arg("end_position"))
-
-      .def("dijkstra_path",
-           [](const BoardGraph &self, position_t start_position,
-              position_t end_position) {
-             auto native_retv = self.dijkstra_path(start_position, end_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("start_position"), py::arg("end_position"))
-
-      .def("find_move_path",
-           [](const BoardGraph &self, position_t start_position,
-              position_t end_position) {
-             auto native_retv = self.find_move_path(start_position, end_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("start_position"), py::arg("end_position"))
-
-      .def("find_jump_path",
-           [](const BoardGraph &self, position_t start_position,
-              position_t end_position) {
-             auto native_retv = self.find_jump_path(start_position, end_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("start_position"), py::arg("end_position"))
-
+      .def("wall_neighbors", &BoardGraph::wall_neighbors, py::arg("from_position"))
+      .def("all_neighbors", &BoardGraph::all_neighbors, py::arg("from_position"))
+      .def("shortest_path", &BoardGraph::shortest_path, py::arg("start_position"),
+           py::arg("end_position"))
+      .def("dijkstra_path", &BoardGraph::dijkstra_path, py::arg("start_position"),
+           py::arg("end_position"))
+      .def("find_move_path", &BoardGraph::find_move_path, py::arg("start_position"),
+           py::arg("end_position"))
+      .def("find_jump_path", &BoardGraph::find_jump_path, py::arg("start_position"),
+           py::arg("end_position"))
       .def("positions_path_to_directions_path",
-           [](const BoardGraph &self, const py::list &positions_path) {
-             Positions path;
-             for (auto val : positions_path)
-               path.push_back(val.cast<position_t>());
-             auto native_retv = self.positions_path_to_directions_path(path);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("positions_path"))
-
+           &BoardGraph::positions_path_to_directions_path, py::arg("positions_path"))
       .def("mark_play_area", &BoardGraph::mark_play_area)
-
-      .def("positions_reachable_by_pusher",
-           [](const BoardGraph &self, position_t pusher_position,
-              const py::object &excluded_positions) {
-             Positions excluded_positions_converted;
-             if (!excluded_positions.is_none())
-               for (auto pos : excluded_positions)
-                 excluded_positions_converted.push_back(pos.cast<position_t>());
-             Positions native_retv = self.positions_reachable_by_pusher(
-                 pusher_position, excluded_positions_converted);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("pusher_position"), py::arg("excluded_positions") = py::none())
-
-      .def("normalized_pusher_position",
-           [](const BoardGraph &self, position_t pusher_position,
-              const py::object &excluded_positions) -> position_t {
-             Positions excluded_positions_converted;
-             if (!excluded_positions.is_none())
-               for (auto pos : excluded_positions)
-                 excluded_positions_converted.push_back(pos.cast<position_t>());
-             return self.normalized_pusher_position(pusher_position,
-                                                    excluded_positions_converted);
-           },
-           py::arg("pusher_position"), py::arg("excluded_positions") = py::none())
-
-      .def("path_destination",
-           [](const BoardGraph &self, position_t start_position,
-              const py::object &directions_path) -> position_t {
-             Directions directions_path_converted;
-
-             if (!directions_path.is_none())
-               for (auto d : directions_path)
-                 directions_path_converted.push_back(d.cast<Direction>());
-
-             return self.path_destination(start_position, directions_path_converted);
-           },
-           py::arg("start_position"), py::arg("directions_path"))
-
+      .def("positions_reachable_by_pusher", &BoardGraph::positions_reachable_by_pusher,
+           py::arg("pusher_position"), py::arg("excluded_positions") = py::list())
+      .def("normalized_pusher_position", &BoardGraph::normalized_pusher_position,
+           py::arg("pusher_position"), py::arg("excluded_positions") = py::list())
+      .def("path_destination", &BoardGraph::path_destination, py::arg("start_position"),
+           py::arg("directions_path"))
       .def("reconfigure_edges", &BoardGraph::reconfigure_edges,
            py::arg("tessellation"));
 }

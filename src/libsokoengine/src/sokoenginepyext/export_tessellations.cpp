@@ -20,11 +20,7 @@ void export_tessellations(py::module &m) {
       .def("__str__", &Tessellation::str)
       .def("__repr__", &Tessellation::repr)
 
-      .def_property_readonly("legal_directions",
-                             [](const Tessellation &self) -> py::list {
-                               return py::copy_sequence_to_pylist(
-                                   self.legal_directions());
-                             })
+      .def_property_readonly("legal_directions", &Tessellation::legal_directions)
 
       .def("neighbor_position",
            [](const Tessellation &self, position_t position, const Direction &direction,

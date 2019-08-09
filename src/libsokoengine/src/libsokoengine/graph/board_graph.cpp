@@ -68,8 +68,10 @@ public:
 
   PIMPL(board_size_t board_width, board_size_t board_height,
         const GraphType &graph_type)
-      : m_graph(board_width * board_height), m_graph_type(graph_type),
-        m_board_width(board_width), m_board_height(board_height) {
+      : m_graph(board_width * board_height),
+        m_graph_type(graph_type),
+        m_board_width(board_width),
+        m_board_height(board_height) {
     if (board_width > MAX_WIDTH)
       throw BoardSizeExceededError("board_width id tool big!");
     if (board_height > MAX_HEIGHT)
@@ -86,8 +88,7 @@ public:
   }
 
   BoardCell &cell_at(position_t position) {
-    if (!contains(position))
-      throw out_of_range("Board index out of range!");
+    if (!contains(position)) throw out_of_range("Board index out of range!");
     return m_graph[position];
   }
 
@@ -112,8 +113,7 @@ public:
 
   Positions reachables(position_t root, const Positions &excluded,
                        IsObstacleFunctor is_obstacle) const {
-    if (!contains(root))
-      throw out_of_range("Starting position is off board!");
+    if (!contains(root)) throw out_of_range("Starting position is off board!");
 
     Positions reachables;
 
@@ -138,8 +138,7 @@ public:
       BOOST_FOREACH (const edge_descriptor &e, out_edges(current_position, m_graph)) {
         position_t neighbor = get(vertex_index, m_graph, boost::target(e, m_graph));
         if (visited[neighbor] == false) {
-          if (!is_obstacle(neighbor))
-            to_inspect.push_back(neighbor);
+          if (!is_obstacle(neighbor)) to_inspect.push_back(neighbor);
           visited[neighbor] = true;
         }
       }
@@ -156,8 +155,7 @@ BoardGraph::BoardGraph(const BoardGraph &rv)
     : m_impl(std::make_unique<PIMPL>(*rv.m_impl)) {}
 
 BoardGraph &BoardGraph::operator=(const BoardGraph &rv) {
-  if (this != &rv)
-    m_impl = std::make_unique<PIMPL>(*rv.m_impl);
+  if (this != &rv) m_impl = std::make_unique<PIMPL>(*rv.m_impl);
   return *this;
 }
 
@@ -203,8 +201,7 @@ board_size_t BoardGraph::board_height() const { return m_impl->m_board_height; }
 
 bool BoardGraph::has_edge(position_t source_vertex, position_t dest_vertex,
                           const Direction &direction) const {
-  if (!contains(source_vertex) || !contains(dest_vertex))
-    return false;
+  if (!contains(source_vertex) || !contains(dest_vertex)) return false;
 
   const auto edges = out_edges(source_vertex, m_impl->m_graph);
   char d = direction.pack();
@@ -216,12 +213,10 @@ bool BoardGraph::has_edge(position_t source_vertex, position_t dest_vertex,
 
 board_size_t BoardGraph::out_edges_count(position_t source_vertex,
                                          position_t target_vertex) const {
-  if (!contains(source_vertex) || !contains(target_vertex))
-    return 0;
+  if (!contains(source_vertex) || !contains(target_vertex)) return 0;
   board_size_t retv = 0;
   BOOST_FOREACH (const edge_descriptor &e, out_edges(source_vertex, m_impl->m_graph))
-    if (target(e, m_impl->m_graph) == target_vertex)
-      retv += 1;
+    if (target(e, m_impl->m_graph) == target_vertex) retv += 1;
   return retv;
 }
 
@@ -269,14 +264,12 @@ position_t BoardGraph::neighbor(position_t from_position,
 
 position_t BoardGraph::neighbor_at(position_t from_position,
                                    const Direction &direction) const {
-  if (!contains(from_position))
-    throw out_of_range("Board index out of range!");
+  if (!contains(from_position)) throw out_of_range("Board index out of range!");
   return neighbor(from_position, direction);
 }
 
 Positions BoardGraph::wall_neighbors(position_t from_position) const {
-  if (!contains(from_position))
-    throw out_of_range("Board index out of range!");
+  if (!contains(from_position)) throw out_of_range("Board index out of range!");
 
   Positions retv;
   BOOST_FOREACH (const edge_descriptor &edge, out_edges(from_position, m_impl->m_graph))
@@ -288,8 +281,7 @@ Positions BoardGraph::wall_neighbors(position_t from_position) const {
 }
 
 Positions BoardGraph::all_neighbors(position_t from_position) const {
-  if (!contains(from_position))
-    throw out_of_range("Board index out of range!");
+  if (!contains(from_position)) throw out_of_range("Board index out of range!");
 
   Positions retv;
   BOOST_FOREACH (const edge_descriptor &edge, out_edges(from_position, m_impl->m_graph))
@@ -398,8 +390,7 @@ Positions BoardGraph::find_move_path(position_t start_position,
       break;
   }
 
-  if (retv != path)
-    return Positions();
+  if (retv != path) return Positions();
   return path;
 }
 
@@ -417,8 +408,7 @@ BoardGraph::positions_path_to_directions_path(const Positions &positions_path) c
 
   Directions retv;
 
-  if (positions_path.size() <= 1)
-    return retv;
+  if (positions_path.size() <= 1) return retv;
 
   auto i = positions_path.begin();
   i++;
@@ -486,8 +476,7 @@ BoardGraph::normalized_pusher_position(position_t pusher_position,
 
 position_t BoardGraph::path_destination(position_t start_position,
                                         const Directions &directions_path) const {
-  if (!contains(start_position))
-    throw out_of_range("Starting position is off board!");
+  if (!contains(start_position)) throw out_of_range("Starting position is off board!");
 
   position_t retv = start_position, next_target;
   for (const Direction &direction : directions_path) {

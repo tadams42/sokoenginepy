@@ -107,113 +107,29 @@ void export_boards(py::module &m) {
            [](const VariantBoard &self, position_t from_position,
               const Direction &direction) -> py::object {
              auto retv = self.neighbor_at(from_position, direction);
-             if (retv > MAX_POS)
-               return py::none();
+             if (retv > MAX_POS) return py::none();
              return py::cast(retv);
            },
            py::arg("from_position"), py::arg("direction"))
 
-      .def("wall_neighbors",
-           [](const VariantBoard &self, position_t from_position) {
-             auto native_retv = self.wall_neighbors(from_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("from_position"))
-
-      .def("all_neighbors",
-           [](const VariantBoard &self, position_t from_position) {
-             auto native_retv = self.all_neighbors(from_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("from_position"))
-
+      .def("wall_neighbors", &VariantBoard::wall_neighbors, py::arg("from_position"))
+      .def("all_neighbors", &VariantBoard::all_neighbors, py::arg("from_position"))
       .def("clear", &VariantBoard::clear)
       .def("mark_play_area", &VariantBoard::mark_play_area)
-
       .def("positions_reachable_by_pusher",
-           [](const VariantBoard &self, position_t pusher_position,
-              const py::object &excluded_positions) {
-             Positions excluded_positions_converted;
-             if (!excluded_positions.is_none())
-               for (auto pos : excluded_positions)
-                 excluded_positions_converted.push_back(pos.cast<position_t>());
-             Positions native_retv = self.positions_reachable_by_pusher(
-                 pusher_position, excluded_positions_converted);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("pusher_position"), py::arg("excluded_positions") = py::none())
-
-      .def("normalized_pusher_position",
-           [](const VariantBoard &self, position_t pusher_position,
-              const py::object &excluded_positions) -> position_t {
-             Positions excluded_positions_converted;
-             if (!excluded_positions.is_none())
-               for (auto pos : excluded_positions)
-                 excluded_positions_converted.push_back(pos.cast<position_t>());
-             return self.normalized_pusher_position(pusher_position,
-                                                    excluded_positions_converted);
-           },
-           py::arg("pusher_position"), py::arg("excluded_positions") = py::none())
-
-      .def("path_destination",
-           [](const VariantBoard &self, position_t start_position,
-              const py::object &directions_path) -> position_t {
-             Directions directions_path_converted;
-
-             if (!directions_path.is_none())
-               for (auto d : directions_path)
-                 directions_path_converted.push_back(d.cast<Direction>());
-
-             return self.path_destination(start_position, directions_path_converted);
-           },
+           &VariantBoard::positions_reachable_by_pusher, py::arg("pusher_position"),
+           py::arg("excluded_positions") = py::list())
+      .def("normalized_pusher_position", &VariantBoard::normalized_pusher_position,
+           py::arg("pusher_position"), py::arg("excluded_positions") = py::list())
+      .def("path_destination", &VariantBoard::path_destination,
            py::arg("start_position"), py::arg("directions_path"))
-
-      .def("find_move_path",
-           [](const VariantBoard &self, position_t start_position,
-              position_t end_position) {
-             auto native_retv = self.find_move_path(start_position, end_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("start_position"), py::arg("end_position"))
-
-      .def("find_jump_path",
-           [](const VariantBoard &self, position_t start_position,
-              position_t end_position) {
-             auto native_retv = self.find_jump_path(start_position, end_position);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("start_position"), py::arg("end_position"))
-
+      .def("find_move_path", &VariantBoard::find_move_path, py::arg("start_position"),
+           py::arg("end_position"))
+      .def("find_jump_path", &VariantBoard::find_jump_path, py::arg("start_position"),
+           py::arg("end_position"))
       .def("positions_path_to_directions_path",
-           [](const VariantBoard &self, const py::list &positions_path) {
-             Positions path;
-             for (auto val : positions_path)
-               path.push_back(val.cast<position_t>());
-             auto native_retv = self.positions_path_to_directions_path(path);
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           },
-           py::arg("positions_path"))
-
+           &VariantBoard::positions_path_to_directions_path, py::arg("positions_path"))
       .def("cell_orientation", &VariantBoard::cell_orientation, py::arg("position"))
-
       .def("add_row_top", &VariantBoard::add_row_top)
       .def("add_row_bottom", &VariantBoard::add_row_bottom)
       .def("add_column_left", &VariantBoard::add_column_left)
@@ -228,12 +144,9 @@ void export_boards(py::module &m) {
       .def("trim_bottom", &VariantBoard::trim_bottom)
       .def("reverse_rows", &VariantBoard::reverse_rows)
       .def("reverse_columns", &VariantBoard::reverse_columns)
-
       .def("resize", &VariantBoard::resize, py::arg("new_width"), py::arg("new_height"))
-
       .def("resize_and_center", &VariantBoard::resize_and_center, py::arg("new_width"),
            py::arg("new_height"))
-
       .def("trim", &VariantBoard::trim);
 
   py::class_<SokobanBoard, VariantBoard, std::shared_ptr<SokobanBoard>>(m,

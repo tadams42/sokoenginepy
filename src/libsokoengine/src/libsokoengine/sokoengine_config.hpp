@@ -96,12 +96,6 @@ static_assert(MAX_POS < std::numeric_limits<position_t>::max(),
 typedef uint16_t piece_id_t;
 
 ///
-/// Max number of pushers, boxes and goals on board
-///
-
-constexpr static piece_id_t MAX_PIECES = 500;
-
-///
 /// Default ID of a piece (box, goal or pusher) - ID assigned to first pusher,
 /// box or goal on board.
 ///

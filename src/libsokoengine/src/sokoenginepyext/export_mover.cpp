@@ -29,7 +29,10 @@ void export_mover(py::module &m) {
 
       .def_property("last_move",
                     [](const Mover &self) {
-                      return py::copy_sequence_to_pylist(self.last_move());
+                      py::list retv;
+                      for (const auto &val : self.last_move())
+                        retv.append(val);
+                      return retv;
                     },
                     [](Mover &self, const py::object &value) {
                       if (value.is_none()) {

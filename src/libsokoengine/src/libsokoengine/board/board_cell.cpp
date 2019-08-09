@@ -14,19 +14,21 @@ IllegalBoardCharacterError::IllegalBoardCharacterError(const string &mess)
 IllegalBoardCharacterError::~IllegalBoardCharacterError() = default;
 
 BoardCell::BoardCell(char rv, bool is_in_playable_area, bool is_deadlock)
-    : m_box(false), m_pusher(false), m_goal(false), m_wall(false),
-      m_playable(is_in_playable_area), m_deadlock(is_deadlock) {
+    : m_box(false),
+      m_pusher(false),
+      m_goal(false),
+      m_wall(false),
+      m_playable(is_in_playable_area),
+      m_deadlock(is_deadlock) {
   if (!is_empty_floor_chr(rv)) {
     if (is_wall_chr(rv)) {
       set_is_wall(true);
     } else if (is_pusher_chr(rv)) {
       set_has_pusher(true);
-      if (is_goal_chr(rv))
-        set_has_goal(true);
+      if (is_goal_chr(rv)) set_has_goal(true);
     } else if (is_box_chr(rv)) {
       set_has_box(true);
-      if (is_goal_chr(rv))
-        set_has_goal(true);
+      if (is_goal_chr(rv)) set_has_goal(true);
     } else if (is_goal_chr(rv)) {
       set_has_goal(true);
     } else {

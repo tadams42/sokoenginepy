@@ -11,8 +11,6 @@
 
 using namespace std;
 using namespace boost;
-using placeholders::_1;
-using placeholders::_2;
 
 namespace sokoengine {
 
@@ -29,9 +27,7 @@ HexobanBoard::HexobanBoard(const string &src)
 HexobanBoard::HexobanBoard(const HexobanBoard &rv) : VariantBoard(rv) {}
 
 HexobanBoard &HexobanBoard::operator=(const HexobanBoard &rv) {
-  if (this != &rv) {
-    VariantBoard::operator=(rv);
-  }
+  if (this != &rv) VariantBoard::operator=(rv);
   return *this;
 }
 
@@ -48,15 +44,17 @@ HexobanBoard::unique_ptr_t HexobanBoard::create_clone() const {
 namespace implementation {
 
 class LIBSOKOENGINE_LOCAL HexobanTextConverter {
-  typedef tuple<StringList, board_size_t, board_size_t, int, int> preparse_results_t;
-  typedef tuple<char, board_size_t, board_size_t, int, int> text_cell_position_data_t;
+  typedef tuple<StringList, board_size_t, board_size_t, int8_t, int8_t>
+      preparse_results_t;
+  typedef tuple<char, board_size_t, board_size_t, int8_t, int8_t>
+      text_cell_position_data_t;
   typedef tuple<bool, bool> text_cell_position_status_t;
 
 public:
   pair<StringList, bool> convert_to_internal(const string &board_str) const {
     StringList parsed;
     board_size_t height, width;
-    int even_row_x_parity, odd_row_x_parity;
+    int8_t even_row_x_parity, odd_row_x_parity;
 
     tie(parsed, width, height, even_row_x_parity, odd_row_x_parity) =
         preparse_board(board_str);
@@ -83,15 +81,12 @@ public:
         tie(layout_ok, should_copy_cell) = analyze_text_cell_position(
             make_tuple(parsed[y][x], x, y, odd_row_x_parity, even_row_x_parity));
 
-        if (layout_ok && should_copy_cell)
-          internal_line += parsed[y][x];
+        if (layout_ok && should_copy_cell) internal_line += parsed[y][x];
       }
-      if (layout_ok)
-        internal_list.push_back(internal_line);
+      if (layout_ok) internal_list.push_back(internal_line);
     }
 
-    if (layout_ok)
-      TextUtils::normalize_width(internal_list);
+    if (layout_ok) TextUtils::normalize_width(internal_list);
 
     return make_pair(internal_list, layout_ok);
   }
@@ -114,13 +109,10 @@ public:
       retv_list.push_back(tmp);
     }
     retv_list = TextUtils::normalize_width(retv_list, floor_character);
-    if (is_type1(retv_list)) {
-      remove_column_right(retv_list);
-    }
+    if (is_type1(retv_list)) { remove_column_right(retv_list); }
 
     string retv = join(retv_list, "\n");
-    if (rle_encode)
-      TextUtils::rle_encode(retv);
+    if (rle_encode) TextUtils::rle_encode(retv);
 
     return retv;
   }
@@ -135,23 +127,22 @@ private:
   analyze_text_cell_position(text_cell_position_data_t position) const {
     char cell;
     board_size_t x, y;
-    int odd_row_x_parity, even_row_x_parity;
+    int8_t odd_row_x_parity, even_row_x_parity;
     tie(cell, x, y, odd_row_x_parity, even_row_x_parity) = position;
 
-    int y_parity = y % 2;
-    int x_parity = x % 2;
+    int8_t y_parity = y % 2;
+    int8_t x_parity = x % 2;
 
     bool layout_ok = true;
     bool is_cell_for_layout; // Is current cell part of board or only part of
                              // textual layout?
     bool should_copy_cell;
 
-    // Check if textual encoding (layout) is legal. Positions of all
-    // board elements in textual layout depend on position of first
-    // non floor element. If that element is (odd column, even row)
-    // than all other element in even rows must be in odd columns.
-    // Other cells in even rows must be empty cells and their purpose
-    // is to define board textual layout (they are not board elements).
+    // Check if textual encoding (layout) is legal. Positions of all board elements in
+    // textual layout depend on position of first non floor element. If that element is
+    // (odd column, even row) than all other elements in even rows must be in odd
+    // columns. Other cells in even rows must be empty cells and their purpose is to
+    // define board textual layout (they are not board elements).
     if (y_parity == 0) { // even rows
       if (x_parity == even_row_x_parity) {
         is_cell_for_layout = false;
@@ -192,7 +183,7 @@ private:
     parsed = TextUtils::normalize_width(VariantBoard::parse_board_string(board_string));
     height = parsed.size();
     width = height > 0 ? parsed.front().size() : 0;
-    int even_row_x_parity = -1, odd_row_x_parity = -1;
+    int8_t even_row_x_parity = -1, odd_row_x_parity = -1;
 
     if (height == 0 || width == 0)
       return make_tuple(parsed, width, height, even_row_x_parity, odd_row_x_parity);
@@ -212,8 +203,8 @@ private:
 
     position_t first_cell = find_first_non_floor(parsed);
     if (first_cell <= MAX_POS) {
-      int first_cell_x_parity = X(first_cell, width) % 2;
-      int first_cell_y_parity = Y(first_cell, width) % 2;
+      int8_t first_cell_x_parity = X(first_cell, width) % 2;
+      int8_t first_cell_y_parity = Y(first_cell, width) % 2;
 
       if (first_cell_y_parity == 0) {
         even_row_x_parity = first_cell_x_parity;
@@ -241,8 +232,7 @@ private:
     StringList normalized = TextUtils::normalize_width(list);
     board_size_t height = normalized.size();
     board_size_t width = height > 0 ? normalized.front().size() : 0;
-    if (height == 0 || width == 0)
-      return retv;
+    if (height == 0 || width == 0) return retv;
 
     position_t x = 0, y = 0;
     bool non_floor_found = false;
@@ -265,7 +255,8 @@ private:
   }
 
   position_t find_rightmost_non_floor(const StringList &list) const {
-    auto rightmost_finder = [](const StringList &list, int row_parity) -> position_t {
+    auto rightmost_finder = [](const StringList &list,
+                               int8_t row_parity) -> position_t {
       position_t retv = numeric_limits<position_t>::max();
       bool cell_found = false;
       board_size_t height = list.size();
@@ -282,18 +273,14 @@ private:
           }
         }
       }
-      if (cell_found) {
-        retv = index_1d(x, y, width);
-      }
+      if (cell_found) { retv = index_1d(x, y, width); }
       return retv;
     };
 
     StringList normalized = TextUtils::normalize_width(list);
     board_size_t height = normalized.size();
     board_size_t width = height > 0 ? normalized.front().size() : 0;
-    if (height == 0 || width == 0) {
-      return numeric_limits<position_t>::max();
-    }
+    if (height == 0 || width == 0) { return numeric_limits<position_t>::max(); }
 
     position_t rightmost_in_even_rows = rightmost_finder(normalized, 0);
     position_t rightmost_in_odd_rows = rightmost_finder(normalized, 1);
@@ -319,9 +306,9 @@ private:
   }
 
   bool is_type1(const StringList &list) const {
-    position_t rnfp = find_rightmost_non_floor(list);
-    if (rnfp <= MAX_POS) {
-      board_size_t y = Y(rnfp, TextUtils::calculate_width(list));
+    position_t rmnf = find_rightmost_non_floor(list);
+    if (rmnf <= MAX_POS) {
+      board_size_t y = Y(rmnf, TextUtils::calculate_width(list));
       return y % 2 == 0;
     }
     return false;
@@ -335,14 +322,14 @@ void HexobanBoardResizer::reverse_columns(VariantBoard &board,
   HexobanTextConverter converter;
   SokobanBoard tmp(converter.convert_to_string(board));
 
-  auto rszr = tmp.tessellation().resizer();
+  auto resizer = tmp.tessellation().resizer();
   if (converter.is_type1(board))
-    rszr.add_column_left(tmp, false);
+    resizer.add_column_left(tmp, false);
   else
-    rszr.add_column_right(tmp, false);
+    resizer.add_column_right(tmp, false);
 
-  rszr.reverse_columns(tmp, false);
-  rszr.remove_column_right(tmp, false);
+  resizer.reverse_columns(tmp, false);
+  resizer.remove_column_right(tmp, false);
 
   reinit(board, tmp.str(), reconfigure_edges);
 }
@@ -373,11 +360,10 @@ void HexobanBoardResizer::remove_row_bottom(VariantBoard &board,
 
 StringList HexobanBoardParser::parse(const string &board_str) const {
   auto result = HexobanTextConverter().convert_to_internal(board_str);
-  if (result.second)
-    return result.first;
+  if (result.second) return result.first;
   throw BoardConversionError(
-      string() + "Hexoban board string has invalid layout for tessellation " +
-      "with multiple characters per single board cell");
+      "String can't be converted to HexobanBoard. Probable cause is invalid text layout"
+      "meaning either missing or misaligned filler spaces.");
 }
 
 string HexobanBoardPrinter::print(const VariantBoard &board, bool use_visible_floor,

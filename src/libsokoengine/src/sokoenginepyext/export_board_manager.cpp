@@ -6,27 +6,24 @@ using namespace sokoengine;
 void export_board_manager(py::module &m) {
   py::class_<BoardState>(m, "BoardState")
       .def(
-          py::init([](const py::list &pushers_positions,
-                      const py::list &boxes_positions, const py::object &zobrist_hash) {
+          py::init([](const py::iterable &pushers_positions,
+                      const py::iterable &boxes_positions, zobrist_key_t zobrist_hash) {
             Positions pushers_positions_native;
-            for (auto val : pushers_positions)
+            for (auto val : pushers_positions) {
               pushers_positions_native.push_back(val.cast<position_t>());
+            }
 
             Positions boxes_positions_native;
-            for (auto val : boxes_positions)
+            for (auto val : boxes_positions) {
               boxes_positions_native.push_back(val.cast<position_t>());
-
-            zobrist_key_t zobrist_hash_native;
-            if (zobrist_hash.is_none())
-              zobrist_hash_native = 0;
-            else
-              zobrist_hash_native = zobrist_hash.cast<zobrist_key_t>();
+            }
 
             return make_unique<BoardState>(pushers_positions_native,
-                                           boxes_positions_native, zobrist_hash_native);
+                                           boxes_positions_native, zobrist_hash);
           }),
           py::arg("pushers_positions") = py::none(),
-          py::arg("boxes_positions") = py::none(), py::arg("zobrist_hash") = py::none())
+          py::arg("boxes_positions") = py::none(),
+          py::arg("zobrist_hash") = UNKNOWN_ZOBRIST_HASH)
 
       // protocols
       .def("__eq__", &BoardState::operator==)
@@ -35,45 +32,24 @@ void export_board_manager(py::module &m) {
       .def("__repr__", &BoardState::repr)
 
       .def_property("pushers_positions",
-                    [](BoardState &self) {
-                      auto native_retv = self.pushers_positions();
-                      py::list retv;
-                      for (auto val : native_retv)
-                        retv.append(val);
-                      return retv;
-                    },
-                    [](BoardState &self, const py::list &rv) {
-                      self.pushers_positions() = Positions();
-                      if (!rv.is_none()) {
-                        for (auto val : rv)
-                          self.pushers_positions().push_back(val.cast<position_t>());
+                    [](BoardState &self) { return self.pushers_positions(); },
+                    [](BoardState &self, const py::iterable &rv) {
+                      for (auto val : rv) {
+                        self.pushers_positions().push_back(val.cast<position_t>());
                       }
                     })
 
       .def_property("boxes_positions",
-                    [](BoardState &self) {
-                      auto native_retv = self.boxes_positions();
-                      py::list retv;
-                      for (auto val : native_retv)
-                        retv.append(val);
-                      return retv;
-                    },
-                    [](BoardState &self, const py::list &rv) {
-                      self.boxes_positions() = Positions();
-                      if (!rv.is_none()) {
-                        for (auto val : rv)
-                          self.boxes_positions().push_back(val.cast<position_t>());
+                    [](BoardState &self) { return self.boxes_positions(); },
+                    [](BoardState &self, const py::iterable &rv) {
+                      for (auto val : rv) {
+                        self.boxes_positions().push_back(val.cast<position_t>());
                       }
                     })
 
-      .def_property("zobrist_hash",
-                    [](BoardState &self) { return self.zobrist_hash(); },
-                    [](BoardState &self, const py::object &rv) {
-                      if (rv.is_none())
-                        self.zobrist_hash() = 0;
-                      else
-                        self.zobrist_hash() = rv.cast<zobrist_key_t>();
-                    });
+      .def_property(
+          "zobrist_hash", [](BoardState &self) { return self.zobrist_hash(); },
+          [](BoardState &self, zobrist_key_t rv) { self.zobrist_hash() = rv; });
 
   py::class_<BoardManager>(m, "BoardManager")
       .def(py::init<VariantBoard &, const string &, const string &>(),
@@ -90,107 +66,38 @@ void export_board_manager(py::module &m) {
                              py::return_value_policy::reference)
 
       .def_property_readonly("pushers_count", &BoardManager::pushers_count)
-
-      .def_property_readonly("pushers_ids",
-                             [](const BoardManager &self) {
-                               auto native_retv = self.pushers_ids();
-                               py::list retv;
-                               for (auto id : native_retv)
-                                 retv.append(id);
-                               return retv;
-                             })
-
-      .def_property_readonly("pushers_positions",
-                             [](const BoardManager &self) {
-                               auto native_retv = self.pushers_positions();
-                               py::dict retv;
-                               for (auto pusher : native_retv)
-                                 retv[py::int_(pusher.first)] = pusher.second;
-                               return retv;
-                             })
-
+      .def_property_readonly("pushers_ids", &BoardManager::pushers_ids)
+      .def_property_readonly("pushers_positions", &BoardManager::pushers_positions)
       .def("pusher_position", &BoardManager::pusher_position, py::arg("pusher_id"))
       .def("pusher_id_on", &BoardManager::pusher_id_on, py::arg("position"))
       .def("has_pusher", &BoardManager::has_pusher, py::arg("pusher_id"))
       .def("has_pusher_on", &BoardManager::has_pusher_on, py::arg("position"))
-
       .def("move_pusher_from", &BoardManager::move_pusher_from, py::arg("old_position"),
            py::arg("to_new_position"))
-
       .def("move_pusher", &BoardManager::move_pusher, py::arg("pushers_id"),
            py::arg("to_new_position"))
 
       .def_property_readonly("boxes_count", &BoardManager::boxes_count)
-
-      .def_property_readonly("boxes_ids",
-                             [](const BoardManager &self) {
-                               auto native_retv = self.boxes_ids();
-                               py::list retv;
-                               for (auto id : native_retv)
-                                 retv.append(id);
-                               return retv;
-                             })
-
-      .def_property_readonly("boxes_positions",
-                             [](const BoardManager &self) {
-                               auto native_retv = self.boxes_positions();
-                               py::dict retv;
-                               for (auto box : native_retv)
-                                 retv[py::int_(box.first)] = box.second;
-                               return retv;
-                             })
-
+      .def_property_readonly("boxes_ids", &BoardManager::boxes_ids)
+      .def_property_readonly("boxes_positions", &BoardManager::boxes_positions)
       .def("box_position", &BoardManager::box_position, py::arg("box_id"))
       .def("box_id_on", &BoardManager::box_id_on, py::arg("position"))
       .def("has_box", &BoardManager::has_box, py::arg("box_id"))
-
-      .def("has_box_on",
-           [](const BoardManager &self, const py::object &position) {
-             if (position.is_none())
-               return false;
-             return self.has_box_on(position.cast<position_t>());
-           },
-           py::arg("position"))
-
+      .def("has_box_on", &BoardManager::has_box_on, py::arg("position"))
       .def("move_box_from", &BoardManager::move_box_from, py::arg("old_position"),
            py::arg("to_new_position"))
-
       .def("move_box", &BoardManager::move_box, py::arg("boxes_id"),
            py::arg("to_new_position"))
 
       .def_property_readonly("goals_count", &BoardManager::goals_count)
-
-      .def_property_readonly("goals_ids",
-                             [](const BoardManager &self) {
-                               auto native_retv = self.goals_ids();
-                               py::list retv;
-                               for (auto id : native_retv)
-                                 retv.append(id);
-                               return retv;
-                             })
-
-      .def_property_readonly("goals_positions",
-                             [](const BoardManager &self) {
-                               auto native_retv = self.goals_positions();
-                               py::dict retv;
-                               for (auto goal : native_retv)
-                                 retv[py::int_(goal.first)] = goal.second;
-                               return retv;
-                             })
-
+      .def_property_readonly("goals_ids", &BoardManager::goals_ids)
+      .def_property_readonly("goals_positions", &BoardManager::goals_positions)
       .def("goal_position", &BoardManager::goal_position, py::arg("goal_id"))
       .def("goal_id_on", &BoardManager::goal_id_on, py::arg("position"))
       .def("has_goal", &BoardManager::has_goal, py::arg("goal_id"))
       .def("has_goal_on", &BoardManager::has_goal_on, py::arg("position"))
 
-      .def_property_readonly("walls_positions",
-                             [](const BoardManager &self) {
-                               auto native_retv = self.walls_positions();
-                               py::list retv;
-                               for (auto val : native_retv)
-                                 retv.append(py::cast(val));
-                               return retv;
-                             })
+      .def_property_readonly("walls_positions", &BoardManager::walls_positions)
 
       .def_property_readonly("state", &BoardManager::state)
 
@@ -226,14 +133,8 @@ void export_board_manager(py::module &m) {
       .def("enable_sokoban_plus", &BoardManager::enable_sokoban_plus)
       .def("disable_sokoban_plus", &BoardManager::disable_sokoban_plus)
 
-      .def("solutions",
-           [](const BoardManager &self) {
-             auto native_retv = self.solutions();
-             py::list retv;
-             for (auto val : native_retv)
-               retv.append(py::cast(val));
-             return retv;
-           })
+      .def("solutions", &BoardManager::solutions)
+
       .def_property_readonly("is_solved", &BoardManager::is_solved)
 
       .def("switch_boxes_and_goals", &BoardManager::switch_boxes_and_goals)
@@ -258,8 +159,5 @@ void export_board_manager(py::module &m) {
       .def_property_readonly("initial_state_hash",
                              &HashedBoardManager::initial_state_hash)
 
-      .def_property_readonly("solutions_hashes", [](const HashedBoardManager &self) {
-        return py::copy_sequence_to_pylist<HashedBoardManager::solutions_hashes_t>(
-            self.solutions_hashes());
-      });
+      .def_property_readonly("solutions_hashes", &HashedBoardManager::solutions_hashes);
 }

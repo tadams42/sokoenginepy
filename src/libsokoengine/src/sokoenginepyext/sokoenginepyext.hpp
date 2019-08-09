@@ -1,4 +1,6 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
 #include <sokoengine.hpp>
 
 namespace py = pybind11;
@@ -26,22 +28,5 @@ template <typename T> struct extract {
   T operator()() { return obj.cast<T>(); }
 };
 
-template <typename NativeVectorT>
-py::list copy_sequence_to_pylist(const NativeVectorT &rv) {
-  py::list retv;
-  for (auto val : rv)
-    retv.append(val);
-  return retv;
-}
-
-template <typename NativeVectorT>
-NativeVectorT copy_pylist_to_sequence(const py::list &rv) {
-  NativeVectorT retv;
-  if (!rv.is_none()) {
-    for (auto val : rv)
-      retv.push_back(val.cast<typename NativeVectorT::value_type>());
-  }
-  return retv;
-}
 
 } // namespace pybind11

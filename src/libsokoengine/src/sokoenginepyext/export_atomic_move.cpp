@@ -6,15 +6,18 @@ using namespace sokoengine;
 void export_atomic_move(py::module &m) {
   py::class_<AtomicMove>(m, "AtomicMove")
       .def(py::init([](const Direction &direction, bool box_moved, bool is_jump,
-                       bool is_pusher_selection, piece_id_t pusher_id,
+                       bool is_pusher_selection, const py::object &pusher_id,
                        const py::object &moved_box_id) {
              int moved_box_id_converted = NULL_ID;
-
              if (!moved_box_id.is_none())
                moved_box_id_converted = moved_box_id.cast<piece_id_t>();
 
+             int pusher_id_converted = DEFAULT_PIECE_ID;
+             if (!pusher_id.is_none())
+               pusher_id_converted = pusher_id.cast<piece_id_t>();
+
              return make_unique<AtomicMove>(direction, box_moved, is_jump,
-                                            is_pusher_selection, pusher_id,
+                                            is_pusher_selection, pusher_id_converted,
                                             moved_box_id_converted);
            }),
            py::arg("direction") = Direction::LEFT, py::arg("box_moved") = false,
@@ -39,8 +42,7 @@ void export_atomic_move(py::module &m) {
                                   self.pusher_id(), self.moved_box_id());
           },
           [](py::tuple t) { // __setstate__
-            if (t.size() != 6)
-              throw std::runtime_error("Invalid state!");
+            if (t.size() != 6) throw std::runtime_error("Invalid state!");
             // TODO: t[5].cast<piece_id_t>() - what if t[5] i s None?
             return make_unique<AtomicMove>(
                 t[0].cast<Direction>(), t[1].cast<bool>(), t[2].cast<bool>(),
@@ -50,8 +52,7 @@ void export_atomic_move(py::module &m) {
       // instance methods and properties
       .def_property("moved_box_id",
                     [](const AtomicMove &self) -> py::object {
-                      if (self.moved_box_id() == NULL_ID)
-                        return py::none();
+                      if (self.moved_box_id() == NULL_ID) return py::none();
                       return py::cast(self.moved_box_id());
                     },
                     [](AtomicMove &self, const py::object &val) {
@@ -64,8 +65,7 @@ void export_atomic_move(py::module &m) {
       // instance methods and properties
       .def_property("pusher_id",
                     [](const AtomicMove &self) -> py::object {
-                      if (self.pusher_id() == NULL_ID)
-                        return py::none(); // return None
+                      if (self.pusher_id() == NULL_ID) return py::none(); // return None
                       return py::cast(self.pusher_id());
                     },
                     [](AtomicMove &self, const py::object &val) {

@@ -12,8 +12,11 @@ InvalidAtomicMoveError::~InvalidAtomicMoveError() = default;
 AtomicMove::AtomicMove(const Direction &direction, bool box_moved, bool is_jump,
                        bool is_pusher_selection, piece_id_t pusher_id,
                        piece_id_t moved_box_id)
-    : m_box_moved(false), m_pusher_selected(false), m_pusher_jumped(false),
-      m_direction(Direction::LEFT.pack()), m_pusher_id(DEFAULT_PIECE_ID),
+    : m_box_moved(false),
+      m_pusher_selected(false),
+      m_pusher_jumped(false),
+      m_direction(Direction::LEFT.pack()),
+      m_pusher_id(DEFAULT_PIECE_ID),
       m_moved_box_id(NULL_ID) {
   if ((box_moved || moved_box_id != NULL_ID) && is_pusher_selection && is_jump)
     throw InvalidAtomicMoveError(
@@ -38,14 +41,11 @@ AtomicMove::AtomicMove(const Direction &direction, bool box_moved, bool is_jump,
   else
     set_is_move(true);
 
-  if (moved_box_id != NULL_ID)
-    set_moved_box_id(moved_box_id);
+  if (moved_box_id != NULL_ID) set_moved_box_id(moved_box_id);
 
-  if (is_jump)
-    set_is_jump(is_jump);
+  if (is_jump) set_is_jump(is_jump);
 
-  if (is_pusher_selection)
-    set_is_pusher_selection(is_pusher_selection);
+  if (is_pusher_selection) set_is_pusher_selection(is_pusher_selection);
 }
 
 bool AtomicMove::operator==(const AtomicMove &rv) const {
@@ -71,8 +71,7 @@ string AtomicMove::repr() const {
 }
 
 piece_id_t AtomicMove::moved_box_id() const {
-  if (is_push_or_pull())
-    return m_moved_box_id;
+  if (is_push_or_pull()) return m_moved_box_id;
   return NULL_ID;
 }
 

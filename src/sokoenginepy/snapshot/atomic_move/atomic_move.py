@@ -90,7 +90,7 @@ class AtomicMove:
         self._box_moved = False
         self._pusher_selected = False
         self._pusher_jumped = False
-        self._pusher_id = pusher_id
+        self.pusher_id = pusher_id
         self._moved_box_id = None
         self.direction = direction
 
