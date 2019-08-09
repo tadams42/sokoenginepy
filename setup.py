@@ -188,6 +188,8 @@ class SokoenginepyExtension(Extension):
             )
             return False
 
+        return boost_ok
+
     _BOOST_INCLUDES = list(
         {
             line.strip()
