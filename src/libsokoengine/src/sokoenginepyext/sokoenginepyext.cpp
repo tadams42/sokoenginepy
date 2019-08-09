@@ -52,6 +52,9 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   py::register_exception<sokoengine::UnknownTessellationError>(
       m, "UnknownTessellationError", PyExc_ValueError);
 
+  py::register_exception<sokoengine::BoardSizeExceededError>(
+      m, "BoardSizeExceededError", PyExc_RuntimeError);
+
   export_direction(m);
   export_atomic_move(m);
   export_board_cell(m);

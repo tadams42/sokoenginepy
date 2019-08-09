@@ -12,9 +12,9 @@ void export_board_graph(py::module &m) {
       ;
 
   py::class_<BoardGraph>(m, "BoardGraph")
-
-      .def(py::init<size_t, size_t, GraphType>(), py::arg("board_width") = 0,
-           py::arg("board_height") = 0, py::arg("graph_type") = GraphType::DIRECTED)
+      .def(py::init<board_size_t, board_size_t, GraphType>(),
+           py::arg("board_width") = 0, py::arg("board_height") = 0,
+           py::arg("graph_type") = GraphType::DIRECTED)
 
       .def("__getitem__",
            [](BoardGraph &self, position_t position) -> BoardCell & {
@@ -58,7 +58,7 @@ void export_board_graph(py::module &m) {
            [](const BoardGraph &self, position_t from_position,
               const Direction &direction) -> py::object {
              position_t retv = self.neighbor_at(from_position, direction);
-             if (retv == NULL_POSITION)
+             if (retv > MAX_POS)
                return py::none();
              return py::cast(retv);
            },

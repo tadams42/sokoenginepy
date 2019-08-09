@@ -22,8 +22,8 @@ const Directions &OctobanTessellation::legal_directions() const {
 
 position_t OctobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
-                                                  size_t board_width,
-                                                  size_t board_height) const {
+                                                  board_size_t board_width,
+                                                  board_size_t board_height) const {
   static const map<Direction, pair<char, char>> position_calc{
       {Direction::LEFT, make_pair(0, -1)},
       {Direction::RIGHT, make_pair(0, 1)},
@@ -39,7 +39,7 @@ position_t OctobanTessellation::neighbor_position(position_t position,
             CellOrientation::OCTAGON &&
         (direction == Direction::NORTH_EAST || direction == Direction::NORTH_WEST ||
          direction == Direction::SOUTH_EAST || direction == Direction::SOUTH_WEST)) {
-      return NULL_POSITION;
+      return numeric_limits<position_t>::max();
     }
     const pair<int, int> &shift = find_in_map_or_throw<UnknownDirectionError>(
         position_calc, direction,
@@ -50,7 +50,7 @@ position_t OctobanTessellation::neighbor_position(position_t position,
       return index_1d(column, row, board_width);
     }
   }
-  return NULL_POSITION;
+  return numeric_limits<position_t>::max();
 }
 
 AtomicMove OctobanTessellation::char_to_atomic_move(char rv) const {
@@ -99,8 +99,8 @@ char OctobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
 }
 
 CellOrientation OctobanTessellation::cell_orientation(position_t pos,
-                                                      size_t board_width,
-                                                      size_t board_height) const {
+                                                      board_size_t board_width,
+                                                      board_size_t board_height) const {
   position_t column = COLUMN(pos, board_width);
   position_t row = ROW(pos, board_width);
   return ((column + (row % 2)) % 2 == 0) ? CellOrientation::OCTAGON

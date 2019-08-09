@@ -11,7 +11,7 @@ namespace sokoengine {
 class LIBSOKOENGINE_API HexobanBoard : public VariantBoard {
 public:
   HexobanBoard();
-  HexobanBoard(size_t width, size_t height);
+  HexobanBoard(board_size_t width, board_size_t height);
   explicit HexobanBoard(const std::string &src);
   HexobanBoard(const HexobanBoard &rv);
   HexobanBoard &operator=(const HexobanBoard &rv);

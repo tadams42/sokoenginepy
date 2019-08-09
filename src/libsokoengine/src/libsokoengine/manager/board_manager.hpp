@@ -64,7 +64,7 @@ public:
 
   const VariantBoard &board() const;
 
-  size_t pushers_count() const;
+  board_size_t pushers_count() const;
   piece_ids_vector_t pushers_ids() const;
   positions_by_id_t pushers_positions() const;
   position_t pusher_position(piece_id_t pusher_id) const;
@@ -74,7 +74,7 @@ public:
   void move_pusher_from(position_t old_position, position_t to_new_position);
   void move_pusher(piece_id_t pusher_id, position_t to_new_position);
 
-  size_t boxes_count() const;
+  board_size_t boxes_count() const;
   piece_ids_vector_t boxes_ids() const;
   positions_by_id_t boxes_positions() const;
   position_t box_position(piece_id_t box_id) const;
@@ -84,7 +84,7 @@ public:
   void move_box_from(position_t old_position, position_t to_new_position);
   void move_box(piece_id_t box_id, position_t to_new_position);
 
-  size_t goals_count() const;
+  board_size_t goals_count() const;
   piece_ids_vector_t goals_ids() const;
   positions_by_id_t goals_positions() const;
   position_t goal_position(piece_id_t goal_id) const;

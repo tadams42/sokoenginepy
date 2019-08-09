@@ -11,7 +11,7 @@ namespace sokoengine {
 class LIBSOKOENGINE_API TriobanBoard : public VariantBoard {
 public:
   TriobanBoard();
-  TriobanBoard(size_t width, size_t height);
+  TriobanBoard(board_size_t width, board_size_t height);
   explicit TriobanBoard(const std::string &src);
   TriobanBoard(const TriobanBoard &rv);
   TriobanBoard &operator=(const TriobanBoard &rv);

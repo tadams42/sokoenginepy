@@ -67,14 +67,15 @@ public:
 
   virtual const Directions &legal_directions() const = 0;
   virtual position_t neighbor_position(position_t position, const Direction &direction,
-                                       size_t board_width,
-                                       size_t board_height) const = 0;
+                                       board_size_t board_width,
+                                       board_size_t board_height) const = 0;
   virtual AtomicMove char_to_atomic_move(char input_chr) const = 0;
   virtual char atomic_move_to_char(const AtomicMove &atomic_move) const = 0;
   virtual GraphType graph_type() const;
 
-  virtual CellOrientation cell_orientation(position_t position, size_t board_width,
-                                           size_t board_height) const;
+  virtual CellOrientation cell_orientation(position_t position,
+                                           board_size_t board_width,
+                                           board_size_t board_height) const;
   virtual const implementation::VariantBoardResizer &resizer() const;
   virtual const implementation::VariantBoardPrinter &printer() const;
   virtual const implementation::VariantBoardParser &parser() const;
@@ -89,52 +90,52 @@ protected:
 ///
 /// Converts 2D board position to 1D board position
 ///
-constexpr position_t index_1d(position_t x, position_t y, size_t board_width) {
+constexpr position_t index_1d(position_t x, position_t y, board_size_t board_width) {
   return y * board_width + x;
 }
 
 ///
 /// Calculates x-axis position from 1D board position
 ///
-constexpr position_t X(position_t index, size_t board_width) {
+constexpr position_t X(position_t index, board_size_t board_width) {
   return board_width == 0 ? 0 : index % board_width;
 }
 
 ///
 /// Calculates y-axis position from 1D board position
 ///
-constexpr position_t Y(position_t index, size_t board_width) {
+constexpr position_t Y(position_t index, board_size_t board_width) {
   return board_width == 0 ? 0 : index / board_width;
 }
 
 ///
 /// Alias for Y()
 ///
-constexpr position_t ROW(position_t index, size_t board_width) {
+constexpr position_t ROW(position_t index, board_size_t board_width) {
   return Y(index, board_width);
 }
 
 ///
 /// Alias for X()
 ///
-constexpr position_t COLUMN(position_t index, size_t board_width) {
+constexpr position_t COLUMN(position_t index, board_size_t board_width) {
   return X(index, board_width);
 }
 
 ///
 /// Is position on given board?
 ///
-constexpr bool ON_BOARD(position_t x, position_t y, size_t board_width,
-                        size_t board_height) {
-  return x >= 0 && y >= 0 && x < board_width && y < board_height;
+constexpr bool ON_BOARD(position_t x, position_t y, board_size_t board_width,
+                        board_size_t board_height) {
+  return x < board_width && y < board_height;
 }
 
 ///
 /// Is position on given board?
 ///
-constexpr bool ON_BOARD(position_t pos, size_t board_width, size_t board_height) {
-  return pos >= 0 &&
-         ON_BOARD(X(pos, board_width), Y(pos, board_width), board_width, board_height);
+constexpr bool ON_BOARD(position_t pos, board_size_t board_width,
+                        board_size_t board_height) {
+  return ON_BOARD(X(pos, board_width), Y(pos, board_width), board_width, board_height);
 }
 
 namespace implementation {

@@ -28,10 +28,13 @@ void export_tessellations(py::module &m) {
 
       .def("neighbor_position",
            [](const Tessellation &self, position_t position, const Direction &direction,
-              size_t board_width, size_t board_height) -> py::object {
-             return py::none_if_equal_to<position_t>(
-                 self.neighbor_position(position, direction, board_width, board_height),
-                 NULL_POSITION);
+              board_size_t board_width, board_size_t board_height) -> py::object {
+             auto retv =
+                 self.neighbor_position(position, direction, board_width, board_height);
+             if (retv > MAX_POS)
+               return py::none();
+             else
+               return py::cast(retv);
            },
            py::arg("position"), py::arg("direction"), py::arg("board_width"),
            py::arg("board_height"))

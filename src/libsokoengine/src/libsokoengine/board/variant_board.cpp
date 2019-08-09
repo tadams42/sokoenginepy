@@ -20,7 +20,8 @@ public:
   // non owned ptr
   const Tessellation *m_tessellation;
 
-  PIMPL(const Tessellation &tessellation, size_t board_width, size_t board_height)
+  PIMPL(const Tessellation &tessellation, board_size_t board_width,
+        board_size_t board_height)
       : m_graph(board_width, board_height, tessellation.graph_type()),
         m_tessellation(&tessellation) {
     m_graph.reconfigure_edges(*m_tessellation);
@@ -39,7 +40,7 @@ public:
   PIMPL(PIMPL &&rv) = default;
   PIMPL &operator=(PIMPL &&rv) = default;
 
-  void reinit(size_t board_width, size_t board_height, bool reconf_edges) {
+  void reinit(board_size_t board_width, board_size_t board_height, bool reconf_edges) {
     m_graph = BoardGraph(board_width, board_height, m_tessellation->graph_type());
     if (reconf_edges)
       m_graph.reconfigure_edges(*m_tessellation);
@@ -48,18 +49,18 @@ public:
   void reinit(const string &board_str, bool reconf_edges) {
     if (!TextUtils::is_blank(board_str)) {
       StringList board_rows = m_tessellation->parser().parse(board_str);
-      size_t height = board_rows.size();
-      size_t width = 0;
+      board_size_t height = board_rows.size();
+      board_size_t width = 0;
       if (height > 0) {
         width = board_rows.front().size();
       }
       reinit(width, height, reconf_edges);
       auto y_end = board_rows.end();
-      size_t y = 0;
+      board_size_t y = 0;
       auto row = board_rows.begin();
       for (; row != y_end; y++, row++) {
         auto x_end = (*row).end();
-        size_t x = 0;
+        board_size_t x = 0;
         auto character = (*row).begin();
         for (; character != x_end; x++, character++)
           m_graph.cell(index_1d(x, y, m_graph.board_width())) = BoardCell(*character);
@@ -69,14 +70,14 @@ public:
 };
 
 VariantBoard::unique_ptr_t VariantBoard::instance_from(const Tessellation &tessellation,
-                                                       size_t board_width,
-                                                       size_t board_height) {
+                                                       board_size_t board_width,
+                                                       board_size_t board_height) {
   return instance_from(tessellation.str(), board_width, board_height);
 }
 
 VariantBoard::unique_ptr_t VariantBoard::instance_from(const string &tessellation_name,
-                                                       size_t board_width,
-                                                       size_t board_height) {
+                                                       board_size_t board_width,
+                                                       board_size_t board_height) {
   if (tessellation_name == "sokoban")
     return make_unique<SokobanBoard>(board_width, board_height);
   else if (tessellation_name == "trioban")
@@ -138,8 +139,8 @@ StringList VariantBoard::parse_board_string(const string &source) {
   return retv;
 }
 
-VariantBoard::VariantBoard(const Tessellation &tessellation, size_t board_width,
-                           size_t board_height)
+VariantBoard::VariantBoard(const Tessellation &tessellation, board_size_t board_width,
+                           board_size_t board_height)
     : m_impl(make_unique<PIMPL>(tessellation, board_width, board_height)) {}
 
 VariantBoard::VariantBoard(const Tessellation &tessellation, const string &board_str)
@@ -164,7 +165,8 @@ const Tessellation &VariantBoard::tessellation() const {
   return *(m_impl->m_tessellation);
 }
 
-void VariantBoard::reinit(size_t board_width, size_t board_height, bool reconf_edges) {
+void VariantBoard::reinit(board_size_t board_width, board_size_t board_height,
+                          bool reconf_edges) {
   m_impl->reinit(board_width, board_height, reconf_edges);
 }
 
@@ -176,7 +178,7 @@ bool VariantBoard::operator==(const VariantBoard &rv) const {
   if (width() == rv.width() && height() == rv.height() && typeid(*this) == typeid(rv)) {
     bool non_equal_found = false;
     position_t position;
-    size_t s = size();
+    board_size_t s = size();
     for (position = 0; position < s && !non_equal_found; ++position)
       non_equal_found = (cell(position) != rv.cell(position));
     return !non_equal_found;
@@ -241,11 +243,11 @@ string VariantBoard::repr() const {
   return class_name + "(board_str='\\n'.join([\n" + join(board_lines, ",\n") + "\n]))";
 }
 
-size_t VariantBoard::width() const { return m_impl->m_graph.board_width(); }
+board_size_t VariantBoard::width() const { return m_impl->m_graph.board_width(); }
 
-size_t VariantBoard::height() const { return m_impl->m_graph.board_height(); }
+board_size_t VariantBoard::height() const { return m_impl->m_graph.board_height(); }
 
-size_t VariantBoard::size() const { return width() * height(); }
+board_size_t VariantBoard::size() const { return width() * height(); }
 
 position_t VariantBoard::neighbor(position_t from_position,
                                   const Direction &direction) const {
@@ -266,7 +268,7 @@ Positions VariantBoard::all_neighbors(position_t from_position) const {
 }
 
 void VariantBoard::clear() {
-  size_t s = size();
+  board_size_t s = size();
   for (position_t position = 0; position < s; ++position) {
     cell(position).clear();
   }
@@ -368,30 +370,30 @@ void VariantBoard::reverse_columns() {
   m_impl->m_tessellation->resizer().reverse_columns(*this, true);
 }
 
-void VariantBoard::resize(size_t new_width, size_t new_height) {
-  size_t old_width = width();
-  size_t old_height = height();
+void VariantBoard::resize(board_size_t new_width, board_size_t new_height) {
+  board_size_t old_width = width();
+  board_size_t old_height = height();
 
   if (new_height != old_height) {
     if (new_height > old_height) {
-      size_t amount = new_height - old_height;
-      for (size_t i = 0; i < amount; i++)
+      board_size_t amount = new_height - old_height;
+      for (board_size_t i = 0; i < amount; i++)
         m_impl->m_tessellation->resizer().add_row_bottom(*this, false);
     } else {
-      size_t amount = old_height - new_height;
-      for (size_t i = 0; i < amount; i++)
+      board_size_t amount = old_height - new_height;
+      for (board_size_t i = 0; i < amount; i++)
         m_impl->m_tessellation->resizer().remove_row_bottom(*this, false);
     }
   }
 
   if (new_width != old_width) {
     if (new_width > old_width) {
-      size_t amount = new_width - old_width;
-      for (size_t i = 0; i < amount; i++)
+      board_size_t amount = new_width - old_width;
+      for (board_size_t i = 0; i < amount; i++)
         m_impl->m_tessellation->resizer().add_column_right(*this, false);
     } else {
-      size_t amount = old_width - new_width;
-      for (size_t i = 0; i < amount; i++)
+      board_size_t amount = old_width - new_width;
+      for (board_size_t i = 0; i < amount; i++)
         m_impl->m_tessellation->resizer().remove_column_right(*this, false);
     }
   }
@@ -400,8 +402,8 @@ void VariantBoard::resize(size_t new_width, size_t new_height) {
     m_impl->m_graph.reconfigure_edges(tessellation());
 }
 
-void VariantBoard::resize_and_center(size_t new_width, size_t new_height) {
-  size_t left = 0, right = 0, top = 0, bottom = 0;
+void VariantBoard::resize_and_center(board_size_t new_width, board_size_t new_height) {
+  board_size_t left = 0, right = 0, top = 0, bottom = 0;
 
   if (new_width > width()) {
     left = (new_width - width()) / 2;
@@ -414,9 +416,9 @@ void VariantBoard::resize_and_center(size_t new_width, size_t new_height) {
   }
 
   if (left != 0 && right != 0 && top != 0 && bottom != 0) {
-    for (size_t i = 0; i < left; i++)
+    for (board_size_t i = 0; i < left; i++)
       m_impl->m_tessellation->resizer().add_column_left(*this, false);
-    for (size_t i = 0; i < top; i++)
+    for (board_size_t i = 0; i < top; i++)
       m_impl->m_tessellation->resizer().add_row_top(*this, false);
 
     if (right != 0 && bottom != 0)
@@ -427,8 +429,8 @@ void VariantBoard::resize_and_center(size_t new_width, size_t new_height) {
 }
 
 void VariantBoard::trim() {
-  size_t old_width = width();
-  size_t old_height = height();
+  board_size_t old_width = width();
+  board_size_t old_height = height();
 
   m_impl->m_tessellation->resizer().trim_top(*this, false);
   m_impl->m_tessellation->resizer().trim_bottom(*this, false);
@@ -443,8 +445,8 @@ const BoardGraph &VariantBoard::graph() const { return m_impl->m_graph; }
 
 namespace implementation {
 
-void VariantBoardResizer::reinit(VariantBoard &board, size_t board_width,
-                                 size_t board_height, bool reconf_edges) const {
+void VariantBoardResizer::reinit(VariantBoard &board, board_size_t board_width,
+                                 board_size_t board_height, bool reconf_edges) const {
   board.reinit(board_width, board_height, reconf_edges);
 }
 
@@ -459,48 +461,48 @@ void VariantBoardResizer::reconfigure_edges(VariantBoard &board) const {
 
 void VariantBoardResizer::add_row_top(VariantBoard &board, bool reconf_edges) const {
   BoardGraph old_body = board.graph();
-  size_t old_height = board.height();
+  board_size_t old_height = board.height();
 
   board.reinit(board.width(), board.height() + 1, reconf_edges);
 
-  for (size_t x = 0; x < board.width(); x++)
-    for (size_t y = 0; y < old_height; y++)
+  for (board_size_t x = 0; x < board.width(); x++)
+    for (board_size_t y = 0; y < old_height; y++)
       board[index_1d(x, y + 1, board.width())] =
           old_body[index_1d(x, y, board.width())];
 }
 
 void VariantBoardResizer::add_row_bottom(VariantBoard &board, bool reconf_edges) const {
   BoardGraph old_body = board.graph();
-  size_t old_height = board.height();
+  board_size_t old_height = board.height();
 
   board.reinit(board.width(), board.height() + 1, reconf_edges);
 
-  for (size_t x = 0; x < board.width(); x++)
-    for (size_t y = 0; y < old_height; y++)
+  for (board_size_t x = 0; x < board.width(); x++)
+    for (board_size_t y = 0; y < old_height; y++)
       board[index_1d(x, y, board.width())] = old_body[index_1d(x, y, board.width())];
 }
 
 void VariantBoardResizer::add_column_left(VariantBoard &board,
                                           bool reconf_edges) const {
   BoardGraph old_body = board.graph();
-  size_t old_width = board.width();
+  board_size_t old_width = board.width();
 
   board.reinit(board.width() + 1, board.height(), reconf_edges);
 
-  for (size_t x = 0; x < old_width; x++)
-    for (size_t y = 0; y < board.height(); y++)
+  for (board_size_t x = 0; x < old_width; x++)
+    for (board_size_t y = 0; y < board.height(); y++)
       board[index_1d(x + 1, y, board.width())] = old_body[index_1d(x, y, old_width)];
 }
 
 void VariantBoardResizer::add_column_right(VariantBoard &board,
                                            bool reconf_edges) const {
   BoardGraph old_body = board.graph();
-  size_t old_width = board.width();
+  board_size_t old_width = board.width();
 
   board.reinit(board.width() + 1, board.height(), reconf_edges);
 
-  for (size_t x = 0; x < old_width; x++)
-    for (size_t y = 0; y < board.height(); y++)
+  for (board_size_t x = 0; x < old_width; x++)
+    for (board_size_t y = 0; y < board.height(); y++)
       board[index_1d(x, y, board.width())] = old_body[index_1d(x, y, old_width)];
 }
 
@@ -509,8 +511,8 @@ void VariantBoardResizer::remove_row_top(VariantBoard &board, bool reconf_edges)
 
   board.reinit(board.width(), board.height() - 1, reconf_edges);
 
-  for (size_t x = 0; x < board.width(); x++)
-    for (size_t y = 0; y < board.height(); y++)
+  for (board_size_t x = 0; x < board.width(); x++)
+    for (board_size_t y = 0; y < board.height(); y++)
       board[index_1d(x, y, board.width())] =
           old_body[index_1d(x, y + 1, board.width())];
 }
@@ -521,39 +523,39 @@ void VariantBoardResizer::remove_row_bottom(VariantBoard &board,
 
   board.reinit(board.width(), board.height() - 1, reconf_edges);
 
-  for (size_t x = 0; x < board.width(); x++)
-    for (size_t y = 0; y < board.height(); y++)
+  for (board_size_t x = 0; x < board.width(); x++)
+    for (board_size_t y = 0; y < board.height(); y++)
       board[index_1d(x, y, board.width())] = old_body[index_1d(x, y, board.width())];
 }
 
 void VariantBoardResizer::remove_column_left(VariantBoard &board,
                                              bool reconf_edges) const {
   BoardGraph old_body = board.graph();
-  size_t old_width = board.width();
+  board_size_t old_width = board.width();
 
   board.reinit(board.width() - 1, board.height(), reconf_edges);
 
-  for (size_t x = 0; x < board.width(); x++)
-    for (size_t y = 0; y < board.height(); y++)
+  for (board_size_t x = 0; x < board.width(); x++)
+    for (board_size_t y = 0; y < board.height(); y++)
       board[index_1d(x, y, board.width())] = old_body[index_1d(x + 1, y, old_width)];
 }
 
 void VariantBoardResizer::remove_column_right(VariantBoard &board,
                                               bool reconf_edges) const {
   BoardGraph old_body = board.graph();
-  size_t old_width = board.width();
+  board_size_t old_width = board.width();
 
   board.reinit(board.width() - 1, board.height(), reconf_edges);
 
-  for (size_t x = 0; x < board.width(); x++)
-    for (size_t y = 0; y < board.height(); y++)
+  for (board_size_t x = 0; x < board.width(); x++)
+    for (board_size_t y = 0; y < board.height(); y++)
       board[index_1d(x, y, board.width())] = old_body[index_1d(x, y, old_width)];
 }
 
 void VariantBoardResizer::trim_left(VariantBoard &board, bool reconf_edges) const {
-  size_t amount = board.width();
-  for (size_t y = 0; y < board.height(); y++) {
-    for (size_t x = 0; x < board.width(); x++) {
+  board_size_t amount = board.width();
+  for (board_size_t y = 0; y < board.height(); y++) {
+    for (board_size_t x = 0; x < board.width(); x++) {
       bool border_found = board[index_1d(x, y, board.width())].is_border_element();
       if (border_found) {
         if (x < amount)
@@ -562,7 +564,7 @@ void VariantBoardResizer::trim_left(VariantBoard &board, bool reconf_edges) cons
       }
     }
   }
-  for (size_t i = 0; i < amount; i++)
+  for (board_size_t i = 0; i < amount; i++)
     remove_column_left(board, false);
   if (reconf_edges)
     reconfigure_edges(board);
@@ -577,16 +579,16 @@ void VariantBoardResizer::trim_right(VariantBoard &board, bool reconf_edges) con
 }
 
 void VariantBoardResizer::trim_top(VariantBoard &board, bool reconf_edges) const {
-  size_t amount = board.height();
-  for (size_t x = 0; x < board.width(); x++) {
+  board_size_t amount = board.height();
+  for (board_size_t x = 0; x < board.width(); x++) {
     bool border_found = false;
-    for (size_t y = 0; y < board.height() && !border_found; y++) {
+    for (board_size_t y = 0; y < board.height() && !border_found; y++) {
       border_found = board[index_1d(x, y, board.width())].is_border_element();
       if (border_found && y < amount)
         amount = y;
     }
   }
-  for (size_t i = 0; i < amount; i++)
+  for (board_size_t i = 0; i < amount; i++)
     remove_row_top(board, false);
   if (reconf_edges)
     reconfigure_edges(board);
@@ -605,8 +607,8 @@ void VariantBoardResizer::reverse_rows(VariantBoard &board, bool reconf_edges) c
 
   board.reinit(board.width(), board.height(), false);
 
-  for (size_t x = 0; x < board.width(); x++)
-    for (size_t y = 0; y < board.height(); y++)
+  for (board_size_t x = 0; x < board.width(); x++)
+    for (board_size_t y = 0; y < board.height(); y++)
       board[index_1d(x, y, board.width())] =
           old_body[index_1d(x, board.height() - y - 1, board.width())];
 
@@ -620,8 +622,8 @@ void VariantBoardResizer::reverse_columns(VariantBoard &board,
 
   board.reinit(board.width(), board.height(), false);
 
-  for (size_t x = 0; x < board.width(); x++)
-    for (size_t y = 0; y < board.height(); y++)
+  for (board_size_t x = 0; x < board.width(); x++)
+    for (board_size_t y = 0; y < board.height(); y++)
       board[index_1d(x, y, board.width())] =
           old_body[index_1d(board.width() - x - 1, y, board.width())];
 

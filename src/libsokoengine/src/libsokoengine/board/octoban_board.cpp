@@ -7,7 +7,7 @@ namespace sokoengine {
 
 OctobanBoard::OctobanBoard() : OctobanBoard(0, 0) {}
 
-OctobanBoard::OctobanBoard(size_t width, size_t height)
+OctobanBoard::OctobanBoard(board_size_t width, board_size_t height)
     : VariantBoard(Tessellation::OCTOBAN, width, height) {}
 
 OctobanBoard::OctobanBoard(const string &src)

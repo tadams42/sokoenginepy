@@ -30,7 +30,7 @@ public:
   IdsMap m_goal_plus_ids;
   string m_boxorder;
   string m_goalorder;
-  size_t m_pieces_count = 0;
+  piece_id_t m_pieces_count = 0;
   bool m_enabled = false;
   bool m_validated = false;
   vector<string> m_errors;
@@ -141,7 +141,7 @@ public:
 
 SokobanPlus::SokobanPlus() : m_impl(make_unique<PIMPL>()) {}
 
-SokobanPlus::SokobanPlus(size_t pieces_count, const string &boxorder,
+SokobanPlus::SokobanPlus(piece_id_t pieces_count, const string &boxorder,
                          const string &goalorder)
     : SokobanPlus() {
   m_impl->m_pieces_count = pieces_count;
@@ -172,9 +172,9 @@ bool SokobanPlus::operator==(const SokobanPlus &rv) const {
 
 bool SokobanPlus::operator!=(const SokobanPlus &rv) const { return !(*this == rv); }
 
-size_t SokobanPlus::pieces_count() const { return m_impl->m_pieces_count; }
+piece_id_t SokobanPlus::pieces_count() const { return m_impl->m_pieces_count; }
 
-void SokobanPlus::set_pieces_count(size_t rv) {
+void SokobanPlus::set_pieces_count(piece_id_t rv) {
   if (rv != m_impl->m_pieces_count) {
     disable();
     m_impl->m_validated = false;

@@ -14,6 +14,11 @@ using namespace boost::graph;
 
 namespace sokoengine {
 
+BoardSizeExceededError::BoardSizeExceededError(const string &mess)
+    : runtime_error(mess) {}
+
+BoardSizeExceededError::~BoardSizeExceededError() = default;
+
 namespace implementation {
 
 struct GraphEdgePropertyT {
@@ -58,12 +63,18 @@ public:
   typedef std::function<bool(position_t)> IsObstacleFunctor;
   GraphT m_graph;
   GraphType m_graph_type;
-  size_t m_board_width;
-  size_t m_board_height;
+  board_size_t m_board_width;
+  board_size_t m_board_height;
 
-  PIMPL(size_t board_width, size_t board_height, const GraphType &graph_type)
+  PIMPL(board_size_t board_width, board_size_t board_height,
+        const GraphType &graph_type)
       : m_graph(board_width * board_height), m_graph_type(graph_type),
-        m_board_width(board_width), m_board_height(board_height) {}
+        m_board_width(board_width), m_board_height(board_height) {
+    if (board_width > MAX_WIDTH)
+      throw BoardSizeExceededError("board_width id tool big!");
+    if (board_height > MAX_HEIGHT)
+      throw BoardSizeExceededError("board_height id tool big!");
+  }
 
   PIMPL(const PIMPL &rv) = default;
   PIMPL &operator=(const PIMPL &rv) = default;
@@ -82,7 +93,7 @@ public:
 
   bool contains(position_t position) const { return position < vertices_count(); }
 
-  size_t vertices_count() const { return m_board_width * m_board_height; }
+  board_size_t vertices_count() const { return m_board_width * m_board_height; }
 
   BoardGraph::weight_t out_edge_weight(position_t target_position) const {
     const BoardCell &target_cell = cell_at(target_position);
@@ -137,7 +148,7 @@ public:
   }
 };
 
-BoardGraph::BoardGraph(size_t board_width, size_t board_height,
+BoardGraph::BoardGraph(board_size_t board_width, board_size_t board_height,
                        const GraphType &graph_type)
     : m_impl(std::make_unique<PIMPL>(board_width, board_height, graph_type)) {}
 
@@ -182,13 +193,13 @@ bool BoardGraph::contains(position_t position) const {
   return m_impl->contains(position);
 }
 
-size_t BoardGraph::vertices_count() const { return m_impl->vertices_count(); }
+board_size_t BoardGraph::vertices_count() const { return m_impl->vertices_count(); }
 
-size_t BoardGraph::edges_count() const { return num_edges(m_impl->m_graph); }
+board_size_t BoardGraph::edges_count() const { return num_edges(m_impl->m_graph); }
 
-size_t BoardGraph::board_width() const { return m_impl->m_board_width; }
+board_size_t BoardGraph::board_width() const { return m_impl->m_board_width; }
 
-size_t BoardGraph::board_height() const { return m_impl->m_board_height; }
+board_size_t BoardGraph::board_height() const { return m_impl->m_board_height; }
 
 bool BoardGraph::has_edge(position_t source_vertex, position_t dest_vertex,
                           const Direction &direction) const {
@@ -203,11 +214,11 @@ bool BoardGraph::has_edge(position_t source_vertex, position_t dest_vertex,
          });
 }
 
-size_t BoardGraph::out_edges_count(position_t source_vertex,
-                                   position_t target_vertex) const {
+board_size_t BoardGraph::out_edges_count(position_t source_vertex,
+                                         position_t target_vertex) const {
   if (!contains(source_vertex) || !contains(target_vertex))
     return 0;
-  size_t retv = 0;
+  board_size_t retv = 0;
   BOOST_FOREACH (const edge_descriptor &e, out_edges(source_vertex, m_impl->m_graph))
     if (target(e, m_impl->m_graph) == target_vertex)
       retv += 1;
@@ -253,7 +264,7 @@ position_t BoardGraph::neighbor(position_t from_position,
   if (edge != edges.second)
     return get(boost::vertex_index, m_impl->m_graph,
                boost::target(*edge, m_impl->m_graph));
-  return NULL_POSITION;
+  return numeric_limits<position_t>::max();
 }
 
 position_t BoardGraph::neighbor_at(position_t from_position,
@@ -429,7 +440,7 @@ BoardGraph::positions_path_to_directions_path(const Positions &positions_path) c
 
 void BoardGraph::mark_play_area() {
   Positions piece_positions;
-  size_t vertice_count = vertices_count();
+  board_size_t vertice_count = vertices_count();
 
   for (position_t i = 0; i < vertice_count; ++i) {
     if (cell(i).has_box() || cell(i).has_pusher()) {
@@ -481,7 +492,7 @@ position_t BoardGraph::path_destination(position_t start_position,
   position_t retv = start_position, next_target;
   for (const Direction &direction : directions_path) {
     next_target = neighbor_at(retv, direction);
-    if (next_target == NULL_POSITION) {
+    if (next_target > MAX_POS) {
       break;
     } else {
       retv = next_target;
@@ -492,11 +503,12 @@ position_t BoardGraph::path_destination(position_t start_position,
 
 void BoardGraph::reconfigure_edges(const Tessellation &tessellation) {
   remove_all_edges();
-  for (size_t source_vertex = 0; source_vertex < vertices_count(); ++source_vertex) {
+  for (board_size_t source_vertex = 0; source_vertex < vertices_count();
+       ++source_vertex) {
     for (const Direction &direction : tessellation.legal_directions()) {
       auto neighbor_vertex = tessellation.neighbor_position(
           source_vertex, direction, m_impl->m_board_width, m_impl->m_board_height);
-      if (neighbor_vertex != NULL_POSITION)
+      if (neighbor_vertex <= MAX_POS)
         add_edge(source_vertex, neighbor_vertex, direction);
     }
   }

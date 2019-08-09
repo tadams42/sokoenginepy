@@ -21,10 +21,10 @@ const Directions &TriobanTessellation::legal_directions() const {
 
 position_t TriobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
-                                                  size_t board_width,
-                                                  size_t board_height) const {
+                                                  board_size_t board_width,
+                                                  board_size_t board_height) const {
   if (!ON_BOARD(position, board_width, board_height))
-    return NULL_POSITION;
+    return numeric_limits<position_t>::max();
   position_t row = Y(position, board_width), column = X(position, board_width);
   char dy, dx;
   bool tpd = cell_orientation(position, board_width, board_height) ==
@@ -77,7 +77,7 @@ position_t TriobanTessellation::neighbor_position(position_t position,
   if (ON_BOARD(column, row, board_width, board_height)) {
     return index_1d(column, row, board_width);
   }
-  return NULL_POSITION;
+  return numeric_limits<position_t>::max();
 }
 
 AtomicMove TriobanTessellation::char_to_atomic_move(char rv) const {
@@ -118,8 +118,8 @@ char TriobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
 }
 
 CellOrientation TriobanTessellation::cell_orientation(position_t pos,
-                                                      size_t board_width,
-                                                      size_t board_height) const {
+                                                      board_size_t board_width,
+                                                      board_size_t board_height) const {
   position_t column = COLUMN(pos, board_width);
   position_t row = ROW(pos, board_width);
   return (column + (row % 2)) % 2 == 0 ? CellOrientation::TRIANGLE_DOWN

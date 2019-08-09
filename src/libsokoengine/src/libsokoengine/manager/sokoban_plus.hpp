@@ -38,7 +38,7 @@ public:
   }
 
   SokobanPlus();
-  SokobanPlus(size_t pieces_count, const std::string &boxorder = "",
+  SokobanPlus(piece_id_t pieces_count, const std::string &boxorder = "",
               const std::string &goalorder = "");
   SokobanPlus(const SokobanPlus &rv);
   SokobanPlus &operator=(const SokobanPlus &rv);
@@ -49,8 +49,8 @@ public:
   bool operator==(const SokobanPlus &rv) const;
   bool operator!=(const SokobanPlus &rv) const;
 
-  size_t pieces_count() const;
-  void set_pieces_count(size_t rv);
+  piece_id_t pieces_count() const;
+  void set_pieces_count(piece_id_t rv);
   std::string boxorder() const;
   void set_boxorder(const std::string &rv);
   std::string goalorder() const;

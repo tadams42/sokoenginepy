@@ -7,7 +7,7 @@ namespace sokoengine {
 
 SokobanBoard::SokobanBoard() : SokobanBoard(0, 0) {}
 
-SokobanBoard::SokobanBoard(size_t width, size_t height)
+SokobanBoard::SokobanBoard(board_size_t width, board_size_t height)
     : VariantBoard(Tessellation::SOKOBAN, width, height) {}
 
 SokobanBoard::SokobanBoard(const string &src)

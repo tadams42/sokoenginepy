@@ -7,7 +7,7 @@ namespace sokoengine {
 
 TriobanBoard::TriobanBoard() : TriobanBoard(0, 0) {}
 
-TriobanBoard::TriobanBoard(size_t width, size_t height)
+TriobanBoard::TriobanBoard(board_size_t width, board_size_t height)
     : VariantBoard(Tessellation::TRIOBAN, width, height) {}
 
 TriobanBoard::TriobanBoard(const string &src)

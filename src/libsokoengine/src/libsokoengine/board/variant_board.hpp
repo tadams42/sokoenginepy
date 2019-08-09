@@ -28,9 +28,11 @@ public:
   typedef std::unique_ptr<VariantBoard> unique_ptr_t;
 
   static unique_ptr_t instance_from(const Tessellation &tessellation,
-                                    size_t board_width, size_t board_height);
+                                    board_size_t board_width,
+                                    board_size_t board_height);
   static unique_ptr_t instance_from(const std::string &tessellation_name,
-                                    size_t board_width, size_t board_height);
+                                    board_size_t board_width,
+                                    board_size_t board_height);
   static unique_ptr_t instance_from(const Tessellation &tessellation,
                                     const std::string &board_str);
   static unique_ptr_t instance_from(const std::string &tessellation_name,
@@ -39,8 +41,8 @@ public:
   static bool is_board_string(const std::string &the_line);
   static StringList parse_board_string(const std::string &the_line);
 
-  VariantBoard(const Tessellation &tessellation, size_t board_width = 0,
-               size_t board_height = 0);
+  VariantBoard(const Tessellation &tessellation, board_size_t board_width = 0,
+               board_size_t board_height = 0);
   VariantBoard(const Tessellation &tessellation, const std::string &board_str = "");
 
   virtual ~VariantBoard();
@@ -64,9 +66,9 @@ public:
   std::string str() const;
   std::string repr() const;
 
-  size_t width() const;
-  size_t height() const;
-  size_t size() const;
+  board_size_t width() const;
+  board_size_t height() const;
+  board_size_t size() const;
 
   position_t neighbor(position_t from_position, const Direction &direction) const;
   position_t neighbor_at(position_t from_position, const Direction &direction) const;
@@ -106,8 +108,8 @@ public:
   void reverse_rows();
   void reverse_columns();
 
-  void resize(size_t new_width, size_t new_height);
-  void resize_and_center(size_t new_width, size_t new_height);
+  void resize(board_size_t new_width, board_size_t new_height);
+  void resize_and_center(board_size_t new_width, board_size_t new_height);
   void trim();
 
   const BoardGraph &graph() const;
@@ -118,7 +120,7 @@ protected:
   VariantBoard(VariantBoard &&rv);
   VariantBoard &operator=(VariantBoard &&rv);
 
-  void reinit(size_t board_width, size_t board_height, bool reconf_edges);
+  void reinit(board_size_t board_width, board_size_t board_height, bool reconf_edges);
   void reinit(const std::string &src, bool reconf_edges);
 
 private:
@@ -153,8 +155,8 @@ public:
   virtual void reverse_columns(VariantBoard &board, bool reconfigure_edges) const;
 
 protected:
-  void reinit(VariantBoard &board, size_t board_width = 0, size_t board_height = 0,
-              bool reconf_edges = false) const;
+  void reinit(VariantBoard &board, board_size_t board_width = 0,
+              board_size_t board_height = 0, bool reconf_edges = false) const;
   void reinit(VariantBoard &board, const std::string &src = "",
               bool reconf_edges = true) const;
   void reconfigure_edges(VariantBoard &board) const;

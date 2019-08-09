@@ -13,6 +13,15 @@ class BoardCell;
 class Tessellation;
 
 ///
+/// Exception.
+///
+class LIBSOKOENGINE_API BoardSizeExceededError : public std::runtime_error {
+public:
+  BoardSizeExceededError(const std::string &mess);
+  virtual ~BoardSizeExceededError();
+};
+
+///
 /// Type of graph
 ///
 enum class LIBSOKOENGINE_API GraphType : int { DIRECTED = 0, DIRECTED_MULTI = 1 };
@@ -38,7 +47,7 @@ public:
   ///
   typedef unsigned char weight_t;
 
-  explicit BoardGraph(size_t board_width = 0, size_t board_height = 0,
+  explicit BoardGraph(board_size_t board_width = 0, board_size_t board_height = 0,
                       const GraphType &graph_type = GraphType::DIRECTED);
   BoardGraph(const BoardGraph &rv);
   BoardGraph &operator=(const BoardGraph &rv);
@@ -54,14 +63,15 @@ public:
   BoardCell &operator[](position_t position);
 
   bool contains(position_t position) const;
-  size_t vertices_count() const;
-  size_t edges_count() const;
-  size_t board_width() const;
-  size_t board_height() const;
+  board_size_t vertices_count() const;
+  board_size_t edges_count() const;
+  board_size_t board_width() const;
+  board_size_t board_height() const;
 
   bool has_edge(position_t source_vertex, position_t dest_vertex,
                 const Direction &direction) const;
-  size_t out_edges_count(position_t source_vertex, position_t target_vertex) const;
+  board_size_t out_edges_count(position_t source_vertex,
+                               position_t target_vertex) const;
   void remove_all_edges();
   void add_edge(position_t source_vertex, position_t neighbor_vertex,
                 const Direction &direction);

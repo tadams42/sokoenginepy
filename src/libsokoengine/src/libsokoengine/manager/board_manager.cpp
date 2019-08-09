@@ -254,7 +254,7 @@ bool BoardManager::operator!=(const BoardManager &rv) const { return !(*this == 
 
 const VariantBoard &BoardManager::board() const { return m_impl->m_board; }
 
-size_t BoardManager::pushers_count() const { return m_impl->m_pushers.size(); }
+board_size_t BoardManager::pushers_count() const { return m_impl->m_pushers.size(); }
 
 BoardManager::piece_ids_vector_t BoardManager::pushers_ids() const {
   return m_impl->pieces_ids(Selectors::PUSHERS);
@@ -305,7 +305,7 @@ void BoardManager::move_pusher(piece_id_t pusher_id, position_t to_new_position)
   move_pusher_from(pusher_position(pusher_id), to_new_position);
 }
 
-size_t BoardManager::boxes_count() const { return m_impl->m_boxes.size(); }
+board_size_t BoardManager::boxes_count() const { return m_impl->m_boxes.size(); }
 
 BoardManager::piece_ids_vector_t BoardManager::boxes_ids() const {
   return m_impl->pieces_ids(Selectors::BOXES);
@@ -355,7 +355,7 @@ void BoardManager::move_box(piece_id_t box_id, position_t to_new_position) {
   move_box_from(box_position(box_id), to_new_position);
 }
 
-size_t BoardManager::goals_count() const { return m_impl->m_goals.size(); }
+board_size_t BoardManager::goals_count() const { return m_impl->m_goals.size(); }
 
 BoardManager::piece_ids_vector_t BoardManager::goals_ids() const {
   return m_impl->pieces_ids(Selectors::GOALS);
@@ -422,7 +422,7 @@ BoardManager::solutions_vector_t BoardManager::solutions() const {
   typedef vector<position_t> positions_vector_t;
 
   auto is_valid_solution = [&](const positions_vector_t &b_positions) -> bool {
-    size_t index = 0;
+    piece_id_t index = 0;
     bool retv = true;
     for (auto box_position : b_positions) {
       auto b_id = index + DEFAULT_PIECE_ID;

@@ -72,8 +72,8 @@ const VariantBoardParser &Tessellation::parser() const {
 
 GraphType Tessellation::graph_type() const { return GraphType::DIRECTED; }
 
-CellOrientation Tessellation::cell_orientation(position_t position, size_t board_width,
-                                               size_t board_height) const {
+CellOrientation Tessellation::cell_orientation(position_t position, board_size_t board_width,
+                                               board_size_t board_height) const {
   return CellOrientation::DEFAULT;
 }
 

@@ -8,8 +8,8 @@ void export_boards(py::module &m) {
   py::class_<VariantBoard, std::shared_ptr<VariantBoard>>(m, "VariantBoard")
       .def_static(
           "instance_from",
-          [](const py::object &tessellation_or_description, size_t board_width,
-             size_t board_height, const py::object &board_str) -> py::object {
+          [](const py::object &tessellation_or_description, board_size_t board_width,
+             board_size_t board_height, const py::object &board_str) -> py::object {
             py::extract<string> string_obj(tessellation_or_description);
             py::extract<const Tessellation &> tessellation_obj(
                 tessellation_or_description);
@@ -107,7 +107,7 @@ void export_boards(py::module &m) {
            [](const VariantBoard &self, position_t from_position,
               const Direction &direction) -> py::object {
              auto retv = self.neighbor_at(from_position, direction);
-             if (retv == NULL_POSITION)
+             if (retv > MAX_POS)
                return py::none();
              return py::cast(retv);
            },
@@ -238,7 +238,7 @@ void export_boards(py::module &m) {
 
   py::class_<SokobanBoard, VariantBoard, std::shared_ptr<SokobanBoard>>(m,
                                                                         "SokobanBoard")
-      .def(py::init([](size_t board_width, size_t board_height,
+      .def(py::init([](board_size_t board_width, board_size_t board_height,
                        const py::object &board_str) {
              if (board_str.is_none())
                return make_unique<SokobanBoard>(board_width, board_height);
@@ -254,7 +254,7 @@ void export_boards(py::module &m) {
 
   py::class_<HexobanBoard, VariantBoard, std::shared_ptr<HexobanBoard>>(m,
                                                                         "HexobanBoard")
-      .def(py::init([](size_t board_width, size_t board_height,
+      .def(py::init([](board_size_t board_width, board_size_t board_height,
                        const py::object &board_str) {
              if (board_str.is_none())
                return make_unique<HexobanBoard>(board_width, board_height);
@@ -270,7 +270,7 @@ void export_boards(py::module &m) {
 
   py::class_<TriobanBoard, VariantBoard, std::shared_ptr<TriobanBoard>>(m,
                                                                         "TriobanBoard")
-      .def(py::init([](size_t board_width, size_t board_height,
+      .def(py::init([](board_size_t board_width, board_size_t board_height,
                        const py::object &board_str) {
              if (board_str.is_none())
                return make_unique<TriobanBoard>(board_width, board_height);
@@ -286,7 +286,7 @@ void export_boards(py::module &m) {
 
   py::class_<OctobanBoard, VariantBoard, std::shared_ptr<OctobanBoard>>(m,
                                                                         "OctobanBoard")
-      .def(py::init([](size_t board_width, size_t board_height,
+      .def(py::init([](board_size_t board_width, board_size_t board_height,
                        const py::object &board_str) {
              if (board_str.is_none())
                return make_unique<OctobanBoard>(board_width, board_height);

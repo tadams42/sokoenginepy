@@ -117,7 +117,6 @@ target_compile_options(sokoengine_obj
     PRIVATE
         $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
             -Wno-overloaded-virtual
-            -Wno-sign-compare
             -Wno-unused-parameter
             -Wno-attributes
             $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>

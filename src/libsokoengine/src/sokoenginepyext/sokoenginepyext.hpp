@@ -44,11 +44,4 @@ NativeVectorT copy_pylist_to_sequence(const py::list &rv) {
   return retv;
 }
 
-template <typename NativeT>
-py::object none_if_equal_to(const NativeT &to_cast, const NativeT &val) {
-  if (to_cast == val)
-    return py::none();
-  return py::cast(to_cast);
-}
-
 } // namespace pybind11

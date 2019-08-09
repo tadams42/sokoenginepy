@@ -20,7 +20,7 @@ using namespace implementation;
 
 HexobanBoard::HexobanBoard() : HexobanBoard(0, 0) {}
 
-HexobanBoard::HexobanBoard(size_t width, size_t height)
+HexobanBoard::HexobanBoard(board_size_t width, board_size_t height)
     : VariantBoard(Tessellation::HEXOBAN, width, height) {}
 
 HexobanBoard::HexobanBoard(const string &src)
@@ -48,14 +48,14 @@ HexobanBoard::unique_ptr_t HexobanBoard::create_clone() const {
 namespace implementation {
 
 class LIBSOKOENGINE_LOCAL HexobanTextConverter {
-  typedef tuple<StringList, size_t, size_t, int, int> preparse_results_t;
-  typedef tuple<char, size_t, size_t, int, int> text_cell_position_data_t;
+  typedef tuple<StringList, board_size_t, board_size_t, int, int> preparse_results_t;
+  typedef tuple<char, board_size_t, board_size_t, int, int> text_cell_position_data_t;
   typedef tuple<bool, bool> text_cell_position_status_t;
 
 public:
   pair<StringList, bool> convert_to_internal(const string &board_str) const {
     StringList parsed;
-    size_t height, width;
+    board_size_t height, width;
     int even_row_x_parity, odd_row_x_parity;
 
     tie(parsed, width, height, even_row_x_parity, odd_row_x_parity) =
@@ -67,7 +67,7 @@ public:
     if (width == 0 || height == 0) {
       return make_pair(StringList(), true);
     } else if (even_row_x_parity < 0 || odd_row_x_parity < 0) {
-      for (size_t i = 0; i < height; ++i) {
+      for (board_size_t i = 0; i < height; ++i) {
         internal_list.push_back(string(width / 2, BoardCell::VISIBLE_FLOOR));
       }
       return make_pair(internal_list, true);
@@ -75,9 +75,9 @@ public:
 
     bool layout_ok = true;
 
-    for (size_t y = 0; y < height && layout_ok; ++y) {
+    for (board_size_t y = 0; y < height && layout_ok; ++y) {
       string internal_line;
-      for (size_t x = 0; x < width && layout_ok; ++x) {
+      for (board_size_t x = 0; x < width && layout_ok; ++x) {
         bool should_copy_cell;
 
         tie(layout_ok, should_copy_cell) = analyze_text_cell_position(
@@ -100,8 +100,8 @@ public:
                            bool rle_encode = false) {
     char floor_character = BoardCell(BoardCell::FLOOR).to_str(use_visible_floor);
     StringList retv_list;
-    const size_t height = board.height();
-    const size_t width = board.width();
+    const board_size_t height = board.height();
+    const board_size_t width = board.width();
     for (position_t row = 0; row < height; ++row) {
       string tmp;
       if (row % 2 != 0) {
@@ -134,7 +134,7 @@ private:
   text_cell_position_status_t
   analyze_text_cell_position(text_cell_position_data_t position) const {
     char cell;
-    size_t x, y;
+    board_size_t x, y;
     int odd_row_x_parity, even_row_x_parity;
     tie(cell, x, y, odd_row_x_parity, even_row_x_parity) = position;
 
@@ -187,7 +187,7 @@ private:
 
   preparse_results_t preparse_board(const string &board_string) const {
     StringList parsed;
-    size_t height = 0, width = 0;
+    board_size_t height = 0, width = 0;
 
     parsed = TextUtils::normalize_width(VariantBoard::parse_board_string(board_string));
     height = parsed.size();
@@ -199,7 +199,7 @@ private:
 
     // Compensate for scheme2
     bool has_non_floor_left_in_odd_row = false;
-    for (size_t i = 0; i < height && !has_non_floor_left_in_odd_row; ++i) {
+    for (board_size_t i = 0; i < height && !has_non_floor_left_in_odd_row; ++i) {
       has_non_floor_left_in_odd_row =
           has_non_floor_left_in_odd_row ||
           (i % 2 == 1 && !BoardCell::is_empty_floor_chr(parsed[i][0]));
@@ -211,7 +211,7 @@ private:
     }
 
     position_t first_cell = find_first_non_floor(parsed);
-    if (first_cell != NULL_POSITION) {
+    if (first_cell <= MAX_POS) {
       int first_cell_x_parity = X(first_cell, width) % 2;
       int first_cell_y_parity = Y(first_cell, width) % 2;
 
@@ -237,14 +237,13 @@ private:
   }
 
   position_t find_first_non_floor(const StringList &list) const {
+    position_t retv = numeric_limits<position_t>::max();
     StringList normalized = TextUtils::normalize_width(list);
-    size_t height = normalized.size();
-    size_t width = height > 0 ? normalized.front().size() : 0;
-    if (height == 0 || width == 0) {
-      return NULL_POSITION;
-    }
+    board_size_t height = normalized.size();
+    board_size_t width = height > 0 ? normalized.front().size() : 0;
+    if (height == 0 || width == 0)
+      return retv;
 
-    position_t retv = NULL_POSITION;
     position_t x = 0, y = 0;
     bool non_floor_found = false;
     for (position_t row = 0; row < height && !non_floor_found; ++row) {
@@ -267,10 +266,10 @@ private:
 
   position_t find_rightmost_non_floor(const StringList &list) const {
     auto rightmost_finder = [](const StringList &list, int row_parity) -> position_t {
-      position_t retv = NULL_POSITION;
+      position_t retv = numeric_limits<position_t>::max();
       bool cell_found = false;
-      size_t height = list.size();
-      size_t width = list.front().size();
+      board_size_t height = list.size();
+      board_size_t width = list.front().size();
       position_t x = 0, y = 0;
       for (position_t row = row_parity % 2; row < height; row += 2) {
         for (position_t col = 0; col < width; ++col) {
@@ -290,10 +289,10 @@ private:
     };
 
     StringList normalized = TextUtils::normalize_width(list);
-    size_t height = normalized.size();
-    size_t width = height > 0 ? normalized.front().size() : 0;
+    board_size_t height = normalized.size();
+    board_size_t width = height > 0 ? normalized.front().size() : 0;
     if (height == 0 || width == 0) {
-      return NULL_POSITION;
+      return numeric_limits<position_t>::max();
     }
 
     position_t rightmost_in_even_rows = rightmost_finder(normalized, 0);
@@ -321,8 +320,8 @@ private:
 
   bool is_type1(const StringList &list) const {
     position_t rnfp = find_rightmost_non_floor(list);
-    if (rnfp != NULL_POSITION) {
-      size_t y = Y(rnfp, TextUtils::calculate_width(list));
+    if (rnfp <= MAX_POS) {
+      board_size_t y = Y(rnfp, TextUtils::calculate_width(list));
       return y % 2 == 0;
     }
     return false;

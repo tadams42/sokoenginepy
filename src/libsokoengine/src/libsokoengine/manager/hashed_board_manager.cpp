@@ -96,7 +96,7 @@ public:
       distinct_box_plus_ids.insert(parent.box_plus_id(box_id));
     }
 
-    size_t board_without_walls_size =
+    board_size_t board_without_walls_size =
         parent.board().size() - parent.walls_positions().size();
 
     size_t random_pool_size = board_without_walls_size +
@@ -111,7 +111,7 @@ public:
     m_boxes_factors = map<piece_id_t, hash_vector_t>();
     for (auto box_plus_id : distinct_box_plus_ids) {
       m_boxes_factors[box_plus_id] = hash_vector_t();
-      for (size_t i = 0; i < parent.board().size(); i++) {
+      for (board_size_t i = 0; i < parent.board().size(); i++) {
         if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
                       i) != parent.walls_positions().end())
           m_boxes_factors[box_plus_id].push_back(0);
@@ -119,7 +119,7 @@ public:
           m_boxes_factors[box_plus_id].push_back(random_pool[index++]);
       }
     }
-    for (size_t i = 0; i < parent.board().size(); i++) {
+    for (board_size_t i = 0; i < parent.board().size(); i++) {
       if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
                     i) != parent.walls_positions().end())
         m_pushers_factors.push_back(0);
@@ -180,7 +180,7 @@ zobrist_key_t HashedBoardManager::external_state_hash(BoardState &board_state) c
 
   zobrist_key_t retv = m_impl->m_initial_state_hash;
 
-  size_t index = 0;
+  piece_id_t index = 0;
   for (auto box_position : board_state.boxes_positions()) {
     retv ^=
         m_impl->m_boxes_factors[box_plus_id(DEFAULT_PIECE_ID + index)][box_position];

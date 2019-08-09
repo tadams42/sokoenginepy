@@ -22,8 +22,8 @@ const Directions &HexobanTessellation::legal_directions() const {
 
 position_t HexobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
-                                                  size_t board_width,
-                                                  size_t board_height) const {
+                                                  board_size_t board_width,
+                                                  board_size_t board_height) const {
   if (ON_BOARD(position, board_width, board_height)) {
     position_t row = Y(position, board_width), column = X(position, board_width);
     if (direction == Direction::LEFT) {
@@ -49,7 +49,7 @@ position_t HexobanTessellation::neighbor_position(position_t position,
       return index_1d(column, row, board_width);
     }
   }
-  return NULL_POSITION;
+  return numeric_limits<position_t>::max();
 }
 
 AtomicMove HexobanTessellation::char_to_atomic_move(char rv) const {

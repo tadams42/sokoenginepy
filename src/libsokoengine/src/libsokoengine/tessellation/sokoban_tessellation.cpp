@@ -20,8 +20,8 @@ const Directions &SokobanTessellation::legal_directions() const {
 
 position_t SokobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
-                                                  size_t board_width,
-                                                  size_t board_height) const {
+                                                  board_size_t board_width,
+                                                  board_size_t board_height) const {
   static const map<Direction, pair<char, char>> position_calc = {
       {Direction::LEFT, make_pair(0, -1)},
       {Direction::RIGHT, make_pair(0, 1)},
@@ -37,7 +37,7 @@ position_t SokobanTessellation::neighbor_position(position_t position,
     if (ON_BOARD(column, row, board_width, board_height))
       return index_1d(column, row, board_width);
   }
-  return NULL_POSITION;
+  return numeric_limits<position_t>::max();
 }
 
 char SokobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {

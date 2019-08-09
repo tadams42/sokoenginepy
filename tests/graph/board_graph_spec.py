@@ -283,11 +283,11 @@ class DescribeBoardGraph:
         def it_raises_IndexError_if_path_has_off_board_positions(
             self, board_graph, board_width
         ):
-            path = [index_1d(-1, -1, board_width)]
+            path = [board_graph.board_width * board_graph.board_height + 42]
             with pytest.raises(IndexError):
                 board_graph.positions_path_to_directions_path(path)
 
-            path = [index_1d(0, 0, board_width), index_1d(-1, -1, board_width)]
+            path = [index_1d(0, 0, board_width), path[0]]
             with pytest.raises(IndexError):
                 board_graph.positions_path_to_directions_path(path)
 

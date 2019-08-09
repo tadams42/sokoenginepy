@@ -46,6 +46,7 @@
 // #############################################################################
 
 #include <cstdint>
+#include <limits>
 
 ///
 /// Top namespace for libsokoengine
@@ -53,14 +54,52 @@
 namespace sokoengine {
 
 ///
+/// Board size type
+///
+typedef uint32_t board_size_t;
+
+///
 /// Board position type.
 ///
-typedef int position_t;
+typedef uint32_t position_t;
+
+///
+/// Max board width.
+///
+constexpr static board_size_t MAX_WIDTH = 4096;
+
+static_assert(MAX_WIDTH < std::numeric_limits<board_size_t>::max(),
+              "MAX_WIDTH must be < std::numeric_limits<board_size_t>::max()");
+
+///
+/// Max board height.
+///
+constexpr static board_size_t MAX_HEIGHT = 4096;
+
+static_assert(MAX_HEIGHT < std::numeric_limits<board_size_t>::max(),
+              "MAX_HEIGHT must be < std::numeric_limits<board_size_t>::max()");
+
+///
+/// Max board 1D positions
+///
+constexpr static position_t MAX_POS = (position_t)(MAX_HEIGHT * MAX_WIDTH - 1);
+
+static_assert(MAX_POS < MAX_HEIGHT * MAX_WIDTH,
+              "MAX_POS must be < MAX_HEIGHT * MAX_WIDTH");
+
+static_assert(MAX_POS < std::numeric_limits<position_t>::max(),
+              "MAX_POS must be < std::numeric_limits<position_t>::max()");
 
 ///
 /// Piece ID and Sokoban+ ID type.
 ///
-typedef int piece_id_t;
+typedef uint16_t piece_id_t;
+
+///
+/// Max number of pushers, boxes and goals on board
+///
+
+constexpr static piece_id_t MAX_PIECES = 500;
 
 ///
 /// Default ID of a piece (box, goal or pusher) - ID assigned to first pusher,
@@ -75,13 +114,9 @@ constexpr static const piece_id_t DEFAULT_PIECE_ID = 1;
 /// Value that represents piece ID in cases where one ID was requested but it
 /// can't be returned.
 ///
-constexpr static const piece_id_t NULL_ID = -2;
+constexpr static const piece_id_t NULL_ID = 0;
 
-///
-/// Value that represents board position in cases where position was requested
-/// but it can't be returned.
-///
-constexpr static const position_t NULL_POSITION = -1;
+static_assert(NULL_ID < DEFAULT_PIECE_ID, "NULL_ID must be < DEFAULT_PIECE_ID");
 
 ///
 /// Zobrist key storage.
