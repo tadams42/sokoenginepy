@@ -69,3 +69,4 @@ npm-debug.log*
 .directory
 
 cmake_build/
+compile_commands.json

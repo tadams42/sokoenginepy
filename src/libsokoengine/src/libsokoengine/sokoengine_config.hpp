@@ -73,13 +73,13 @@ constexpr static const piece_id_t DEFAULT_PIECE_ID = 1;
 
 ///
 /// Value that represents piece ID in cases where one ID was requested but it
-/// cant't be returned.
+/// can't be returned.
 ///
 constexpr static const piece_id_t NULL_ID = -2;
 
 ///
 /// Value that represents board position in cases where position was requested
-/// but it cant't be returned.
+/// but it can't be returned.
 ///
 constexpr static const position_t NULL_POSITION = -1;
 

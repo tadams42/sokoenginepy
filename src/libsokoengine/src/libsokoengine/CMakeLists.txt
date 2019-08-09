@@ -105,7 +105,7 @@ if(${BUILD_SHARED_LIBS})
     )
     target_compile_options(sokoengine_obj
         PUBLIC
-            $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:CLANG>>:
+            $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
                 -fvisibility=hidden
                 -fvisibility-inlines-hidden
             >
@@ -115,7 +115,7 @@ endif()
 
 target_compile_options(sokoengine_obj
     PRIVATE
-        $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:CLANG>>:
+        $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
             -Wno-overloaded-virtual
             -Wno-sign-compare
             -Wno-unused-parameter
