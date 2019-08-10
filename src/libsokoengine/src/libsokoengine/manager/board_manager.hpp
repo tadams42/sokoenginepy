@@ -38,10 +38,6 @@ public:
 ///
 class LIBSOKOENGINE_API BoardManager {
 public:
-  constexpr static bool is_valid_piece_id(piece_id_t pid) {
-    return pid >= DEFAULT_PIECE_ID;
-  }
-
   explicit BoardManager(VariantBoard &board, const std::string &boxorder = "",
                         const std::string &goalorder = "");
   BoardManager(const BoardManager &) = delete;

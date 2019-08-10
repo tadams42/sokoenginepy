@@ -24,8 +24,8 @@ class HexobanBoard(VariantBoard):
             return parsed
         else:
             raise BoardConversionError(
-                "Board string has invalid layout for tessellation with "
-                "multiple characters per single board cell"
+                "String can't be converted to HexobanBoard. Probable cause is invalid "
+                "text layout meaning either missing or misaligned filler spaces."
             )
 
     def to_str(self, use_visible_floor=False, rle_encode=False):

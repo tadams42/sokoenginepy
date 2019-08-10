@@ -15,7 +15,8 @@ sudo apt install git build-essential libboost-graph-dev cmake libdw-dev \
                  binutils-dev doxygen
 ~~~
 
-There are also few dependencies that [CMake] pulls automatically from GutHub during build:
+There are also few dependencies that [CMake] pulls automatically from GutHub during
+build:
 
 - [cppitertools]
 - [backward-cpp]
@@ -83,7 +84,8 @@ cmake -DCMAKE_INSTALL_PREFIX="/tmp" \
 
 ## Integrating with other projects through [CMake]
 
-`libsokoengine` installs everything needed to be used in [CMake] projects including [CMake Config-Package]. Minimal project for [CMake] would look like this:
+`libsokoengine` installs everything needed to be used in [CMake] projects including
+[CMake Config-Package]. Minimal project for [CMake] would look like this:
 
 ~~~cmake
 cmake_minimum_required (VERSION 3.15.1)

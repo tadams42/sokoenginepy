@@ -32,7 +32,7 @@ class MoverCommand(ABC):
         that, it shows different moves between undo and redo calls.
 
         See Also:
-            :attr:`.Mover.last_move`
+            `.Mover.last_move`
         """
         return self._rendered_moves
 

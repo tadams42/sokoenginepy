@@ -109,7 +109,6 @@ python bin/mover_benchmarks.py
 And useful `Mover` profiling script:
 
 ~~~sh
-python bin/mover_benchmarks.py
 pip install pyprof2calltree
 python bin/mover_profiling.py
 pyprof2calltree -i moves_profile.prof
@@ -124,6 +123,20 @@ If all dependencies are met and we are on Linux, `pip install sokoenginepy` will
 produce native C++ extension that is then used automatically (for example, running
 tests will actually use native code and effectively test native extension instead of
 Python code).
+
+To control process of building native extension, use following environment variables:
+
+- `SOKOENGINEPYEXT_BUILD`
+  - Default: True
+  - if `true`, `pip install` will try to build native C++ code
+  - note that even if `true` and native code build fails, `pip install` will silently
+    fallback to installing package without native extension
+  - to see if compilation actually succeeded run `pip install -v` which will display
+    all compile commands and their output
+
+- `SOKOENGINEPYEXT_DEBUG`
+  - Default: False
+  - Enables debug build of native code
 
 In cases where native extension can't be built, `pip install` will fall back to
 installing only Python code. Currently this means that on both, MacOS and Windows no

@@ -10,11 +10,3 @@
 #: Once assigned, id of a piece doesn't change by either moving piece or
 #: applying board view transformations.
 DEFAULT_PIECE_ID = 1
-
-
-class InvalidPieceIdError(ValueError):
-    pass
-
-
-def is_valid_piece_id(pid):
-    return isinstance(pid, int) and pid >= DEFAULT_PIECE_ID

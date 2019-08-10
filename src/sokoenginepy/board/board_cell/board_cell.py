@@ -108,10 +108,6 @@ class BoardCell:
         self.is_in_playable_area = is_in_playable_area
         self.is_deadlock = is_deadlock
 
-        # Most of the board space consists of empty floors, thus a chance this
-        # first test succeeds is larger than for other cases. This means that
-        # other branches will not be executed most of the time, which means
-        # whole method runs faster.
         if not self.is_empty_floor_chr(character):
             if self.is_wall_chr(character):
                 self.is_wall = True

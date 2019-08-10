@@ -1,6 +1,6 @@
 from enum import Enum
 
-from ...manager import DEFAULT_PIECE_ID, is_valid_piece_id
+from ...manager import DEFAULT_PIECE_ID
 from ...tessellation import Direction
 
 
@@ -155,7 +155,7 @@ class AtomicMove:
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
-        if is_valid_piece_id(value):
+        if isinstance(value, int) and value >= DEFAULT_PIECE_ID:
             self._moved_box_id = value
             self.is_push_or_pull = True
         else:
@@ -169,7 +169,11 @@ class AtomicMove:
 
     @pusher_id.setter
     def pusher_id(self, value):
-        if is_valid_piece_id(value):
+        """
+        Note:
+            Pusher ID can't be None, thus we always set it to DEFAULT_PIECE_ID
+        """
+        if isinstance(value, int) and value >= DEFAULT_PIECE_ID:
             self._pusher_id = value
         else:
             self._pusher_id = DEFAULT_PIECE_ID

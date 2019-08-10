@@ -133,7 +133,7 @@ class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings
     def external_state_hash(self, board_state):
         """
         Calculates Zobrist hash of given ``board_state`` as if that ``board_state``
-        was applied to initial :attr:`.board`" (to board where no movement happened).
+        was applied to initial ``board`` (to board where no movement happened).
 
         ``board_state`` must meet following requirement:
 

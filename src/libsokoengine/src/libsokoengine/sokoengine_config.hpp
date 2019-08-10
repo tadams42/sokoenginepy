@@ -105,8 +105,7 @@ typedef uint16_t piece_id_t;
 constexpr static const piece_id_t DEFAULT_PIECE_ID = 1;
 
 ///
-/// Value that represents piece ID in cases where one ID was requested but it
-/// can't be returned.
+/// Value that represents state where ID of a piece has not yet been assigned to it.
 ///
 constexpr static const piece_id_t NULL_ID = 0;
 
