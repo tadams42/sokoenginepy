@@ -11,23 +11,6 @@ env:
 
 matrix:
   include:
-    - python: '3.5'
-      os: linux
-      dist: xenial
-      env: TOXENV=3.5
-
-    - python: '3.5'
-      os: linux
-      dist: xenial
-      addons:
-        apt:
-          sources:
-            - sourceline: ppa:ubuntu-toolchain-r/test
-          packages:
-            - g++-6
-            - libboost-graph-dev
-      env: TOXENV=3.5_native_extension CC=gcc-6 CXX=g++-6
-
     - python: '3.6'
       os: linux
       dist: bionic
@@ -74,12 +57,13 @@ matrix:
       env:
         - TOXENV=codacy
 
-    # - python: pypy3.5
-    #   env:
-    #     - TOXENV=pypy3
+    - python: 'pypy3'
+      dist: xenial
+      env:
+        - TOXENV=pypy3
 
 install:
-  - pip install tox==2.7.0
+  - pip install tox
 
 script:
   - tox
