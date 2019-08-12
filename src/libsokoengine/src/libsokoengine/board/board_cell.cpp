@@ -8,11 +8,6 @@ BoardConversionError::BoardConversionError(const string &mess) : runtime_error(m
 
 BoardConversionError::~BoardConversionError() = default;
 
-IllegalBoardCharacterError::IllegalBoardCharacterError(const string &mess)
-    : invalid_argument(mess) {}
-
-IllegalBoardCharacterError::~IllegalBoardCharacterError() = default;
-
 BoardCell::BoardCell(char rv, bool is_in_playable_area, bool is_deadlock)
     : m_box(false),
       m_pusher(false),
@@ -32,7 +27,7 @@ BoardCell::BoardCell(char rv, bool is_in_playable_area, bool is_deadlock)
     } else if (is_goal_chr(rv)) {
       set_has_goal(true);
     } else {
-      throw IllegalBoardCharacterError("Invalid character in BoardCell constructor!");
+      throw invalid_argument("Invalid character in BoardCell constructor!");
     }
   }
 }

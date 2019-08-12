@@ -68,12 +68,12 @@ public:
   board_size_t board_width() const;
   board_size_t board_height() const;
 
-  bool has_edge(position_t source_vertex, position_t dest_vertex,
+  bool has_edge(position_t source_position, position_t dest_position,
                 const Direction &direction) const;
-  board_size_t out_edges_count(position_t source_vertex,
-                               position_t target_vertex) const;
+  board_size_t out_edges_count(position_t source_position,
+                               position_t target_position) const;
   void remove_all_edges();
-  void add_edge(position_t source_vertex, position_t neighbor_vertex,
+  void add_edge(position_t source_position, position_t neighbor_position,
                 const Direction &direction);
   weight_t out_edge_weight(position_t target_position) const;
 
@@ -88,8 +88,8 @@ public:
 
   Directions positions_path_to_directions_path(const Positions &positions_path) const;
   Positions positions_reachable_by_pusher(
-      position_t pusher_position,
-      const Positions &excluded_positions = Positions()) const;
+    position_t pusher_position,
+    const Positions &excluded_positions = Positions()) const;
   position_t
   normalized_pusher_position(position_t pusher_position,
                              const Positions &excluded_positions = Positions()) const;

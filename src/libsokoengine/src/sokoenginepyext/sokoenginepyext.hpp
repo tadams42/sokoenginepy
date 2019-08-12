@@ -28,5 +28,10 @@ template <typename T> struct extract {
   T operator()() { return obj.cast<T>(); }
 };
 
+typedef long long py_int_t;
+
+sokoengine::position_t receive_position(const py::object &board_position,
+                                        bool *converted = nullptr);
+sokoengine::position_t receive_position_throw(const py::object &board_position);
 
 } // namespace pybind11

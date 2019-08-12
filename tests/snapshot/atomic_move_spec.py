@@ -67,10 +67,59 @@ class DescribeAtomicMove:
             assert atomic_move.is_push_or_pull
             assert not atomic_move.is_move
 
+        def it_sets_it_to_none_if_illegal_value_provided(self, atomic_move):
+            atomic_move.moved_box_id = 4
+            assert atomic_move.moved_box_id == 4
+            atomic_move.moved_box_id = -42
+            assert atomic_move.moved_box_id is None
+
+            atomic_move.moved_box_id = 4
+            assert atomic_move.moved_box_id == 4
+            atomic_move.moved_box_id = None
+            assert atomic_move.moved_box_id is None
+
+            atomic_move.moved_box_id = 4
+            assert atomic_move.moved_box_id == 4
+            atomic_move.moved_box_id = "ZOMG!"
+            assert atomic_move.moved_box_id is None
+
+            atomic_move.moved_box_id = 4
+            assert atomic_move.moved_box_id == 4
+            atomic_move.moved_box_id = 0
+            assert atomic_move.moved_box_id is None
+
+            m = AtomicMove(moved_box_id=-42)
+            assert m.moved_box_id is None
+
+            m = AtomicMove(moved_box_id=None)
+            assert m.moved_box_id is None
+
+            m = AtomicMove(moved_box_id="ZOMG")
+            assert m.moved_box_id is None
+
+            m = AtomicMove(moved_box_id=0)
+            assert m.moved_box_id is None
+
     class Describe_pusher_id:
         def it_returns_id_of_pusher_that_performed_movement(self, atomic_move):
             atomic_move.pusher_id = DEFAULT_PIECE_ID + 42
             assert atomic_move.pusher_id == DEFAULT_PIECE_ID + 42
+
+        def it_sets_it_to_default_if_illegal_value_provided(self, atomic_move):
+            atomic_move.pusher_id = 4
+            assert atomic_move.pusher_id == 4
+            atomic_move.pusher_id = -42
+            assert atomic_move.pusher_id == DEFAULT_PIECE_ID
+
+            atomic_move.pusher_id = 4
+            assert atomic_move.pusher_id == 4
+            atomic_move.pusher_id = None
+            assert atomic_move.pusher_id == DEFAULT_PIECE_ID
+
+            atomic_move.pusher_id = 4
+            assert atomic_move.pusher_id == 4
+            atomic_move.pusher_id = "ZOMG!"
+            assert atomic_move.pusher_id == DEFAULT_PIECE_ID
 
     class Describe_is_move:
         def it_returns_true_if_box_was_not_moved(self, atomic_move):

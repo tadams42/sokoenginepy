@@ -1,7 +1,11 @@
 from collections import deque
 from enum import IntEnum
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 import networkx as nx
+
+# (1, 0, {'direction': Direction.LEFT})
+Edge = Tuple[int, int, Dict]
 
 
 class GraphType(IntEnum):
@@ -9,153 +13,118 @@ class GraphType(IntEnum):
     DIRECTED_MULTI = 1
 
 
+class EngineConfig(IntEnum):
+    MAX_BOARD_WIDTH = 4096
+    MAX_BOARD_HEIGHT = 4096
+
+
 class BoardGraph:
-    """
-    Board graph implementation using NetworkX.
-
-    NetworkX is pure Python graph library, doesn't depend on external binaries and is
-    easily installable via pip.
-
-    This is default and fall back graph implementation for sokoenginepy.
-    """
+    """Board graph implementation using NetworkX."""
 
     _KEY_CELL = "cell"
     _KEY_DIRECTION = "direction"
     _MAX_EDGE_WEIGHT = 100  # must be > len(Direction)
 
-    def __init__(self, board_width, board_height, graph_type):
+    def __init__(self, board_width: int, board_height: int, graph_type: "GraphType"):
         from ..board import BoardCell
+
+        if (
+            board_width < 0
+            or board_height < 0
+            or board_width > EngineConfig.MAX_BOARD_WIDTH
+            or board_height > EngineConfig.MAX_BOARD_HEIGHT
+        ):
+            raise ValueError(
+                "Board width and height must be >= 0 and <= MAX_BOARD_WIDTH, "
+                "MAX_BOARD_HEIGHT`!"
+            )
 
         self._board_width = board_width
         self._board_height = board_height
 
         if graph_type == GraphType.DIRECTED:
             self._graph = nx.DiGraph()
-        else:
+        elif graph_type == GraphType.DIRECTED_MULTI:
             self._graph = nx.MultiDiGraph()
+        else:
+            raise ValueError("Unknown graph_type: {}!".format(graph_type))
 
-        for vertex in range(0, self.board_width * self.board_height):
-            self._graph.add_node(vertex, **{self._KEY_CELL: BoardCell()})
+        for position in range(0, self.board_width * self.board_height):
+            self._graph.add_node(position, **{self._KEY_CELL: BoardCell()})
 
     @property
-    def board_width(self):
+    def board_width(self) -> int:
         return self._board_width
 
     @property
-    def board_height(self):
+    def board_height(self) -> int:
         return self._board_height
 
-    def __getitem__(self, position):
-        """
-        Get :class:`.BoardCell` on ``position``
-
-        Returns:
-            BoardCell: reference to :class:`.BoardCell`
-
-        Raises:
-            IndexError: if there is no vertex with index ``position``
-        """
+    def __getitem__(self, position: int) -> "BoardCell":
         try:
             return self._graph.node[position][self._KEY_CELL]
+
         except KeyError as e:
-            raise IndexError(str(e))
-        except nx.NetworkXError as e:
-            raise IndexError(str(e))
+            if isinstance(position, int) and position >= 0:
+                raise IndexError from e
+            else:
+                raise
 
-    def __setitem__(self, position, board_cell):
-        """
-        Set :class:`.BoardCell` on ``position``
+    def __setitem__(
+        self, position: int, board_cell: Union["BoardCell", "BoardCellCharacters"]
+    ):
+        from ..board import BoardCell
 
-        Raises:
-            IndexError: if there is no vertex with index ``position``
-        """
         try:
-            self._graph.node[position][self._KEY_CELL] = board_cell
+            self._graph.node[position][self._KEY_CELL] = BoardCell(board_cell)
+
         except KeyError as e:
-            raise IndexError(str(e))
-        except nx.NetworkXError as e:
-            raise IndexError(str(e))
+            if isinstance(position, int) and position >= 0:
+                raise IndexError from e
+            else:
+                raise
 
-    def __contains__(self, position):
-        """
-        Tests if vertex on ``position`` exists.
-
-        Returns:
-            bool: True if vertex exists
-        """
+    def __contains__(self, position: int) -> bool:
         return position in self._graph
 
     @property
-    def vertices_count(self):
-        """
-        Number of vertices in graph.
-
-        Returns:
-            int: number of vertices in graph
-        """
+    def vertices_count(self) -> int:
         return self._graph.number_of_nodes()
 
     @property
-    def edges_count(self):
-        """
-        Number of edges in graph.
-
-        Returns:
-            int: number of edges in graph
-        """
+    def edges_count(self) -> bool:
         return self._graph.number_of_edges()
 
-    def has_edge(self, source_vertex, target_vertex, direction):
-        """
-        Tests if edge between ``source_vertex`` and ``dest_vertex`` exists.
-
-        Args:
-            source_vertex (int): position of source vertex
-            dest_vertex (int): position of dest vertex
-            direction (Direction): direction from source to dest vertex
-
-        Returns:
-            bool: True if edge exists. False if edge doesn't exist or one or both
-                  vertices are off board.
-        """
+    def has_edge(
+        self, source_position: int, target_position: int, direction: "Direction"
+    ) -> bool:
         retv = False
-        for out_edge in self.out_edges(source_vertex):
-            retv = retv or (
-                out_edge[1] == target_vertex
-                and out_edge[2][self._KEY_DIRECTION] == direction
-            )
-            if retv:
-                break
-
-        return retv
-
-    def out_edges(self, source_vertex):
         try:
-            retv = tuple(
-                # edge: (source, target, data_dict)
-                # out_edge[2][self._KEY_DIRECTION]
-                out_edge
-                for out_edge in self._graph.out_edges_iter(source_vertex, data=True)
-            )
-        except nx.NetworkXError:
-            retv = tuple()
+            if source_position is not None:
+                for out_edge in self._graph.out_edges_iter(source_position, data=True):
+                    retv = retv or (
+                        out_edge[1] == target_position
+                        and out_edge[2][self._KEY_DIRECTION] == direction
+                    )
+                    if retv:
+                        break
+
+        except (KeyError, IndexError, nx.NetworkXError):
+            pass
 
         return retv
 
-    def out_edges_count(self, source_vertex, target_vertex):
+    def out_edges_count(self, source_position: int, target_position: int) -> int:
         """
-        Number of out-edges from ``source_vertex`` to ``dest_vertex``
-
-        Args:
-            source_vertex (int): position of source vertex
-            dest_vertex (int): position of dest vertex
+        Number of out-edges from ``source_position`` to ``dest_position``
 
         Returns:
-            int: Number of out-edges
+            Zero when no out edges exist or or any of positions is illegal type or out
+            of bound board index.
         """
         try:
-            retv = len(self._graph[source_vertex][target_vertex])
-        except KeyError:
+            retv = len(self._graph[source_position][target_position])
+        except (KeyError, IndexError, nx.NetworkXError):
             retv = 0
 
         return retv
@@ -163,21 +132,28 @@ class BoardGraph:
     def remove_all_edges(self):
         self._graph.remove_edges_from(self._graph.edges())
 
-    def add_edge(self, source_vertex, neighbor_vertex, direction):
-        if source_vertex not in self or neighbor_vertex not in self:
-            raise IndexError("Board index out of range!")
-
-        self._graph.add_edge(source_vertex, neighbor_vertex, direction=direction)
-
-    def out_edge_weight(self, target_position):
+    def add_edge(
+        self, source_position: int, neighbor_position: int, direction: "Direction"
+    ):
         """
-        Calculates weight of single edge depending on contents of its target vertex.
-
-        Args:
-            target_position (int): target vertex index
+        Adds edges between to existing positions.
 
         Raises:
-            IndexError: if ``target_position`` is off board.
+            IndexError: ``source_position`` or ``neighbor_position`` off board
+            KeyError: ``source_position`` or ``neighbor_position`` illegal values
+        """
+        if self[source_position] and self[neighbor_position]:
+            self._graph.add_edge(
+                source_position, neighbor_position, direction=direction
+            )
+
+    def out_edge_weight(self, target_position: int) -> int:
+        """
+        Calculates edge weight based on BoardCell on ``target_position``.
+
+        Raises:
+            IndexError: ``target_position`` off board
+            KeyError: ``target_position`` illegal values
         """
         target_cell = self[target_position]
 
@@ -189,201 +165,114 @@ class BoardGraph:
 
         return weight
 
-    def _reachables(
-        self,
-        root,
-        excluded_positions=None,
-        is_obstacle_callable=None,
-        add_animation_frame_hook=None,
-    ):
+    def neighbor(self, from_position: int, direction: "Direction") -> int:
         """
-        Calculates all positions reachable from ``root``.
-
-        Args:
-            root (int): initial position for search
-            excluded_positions (list): these positions will be marked as unreachable
-                without calculating their status
-            is_obstacle_callable (bool): callable that checks if given position on
-                graph is obstacle
-            add_animation_frame_hook (callable): if not None, this callable will be
-                called after each step of search. Useful for visualization of
-                algorithm and debugging
+        Calculates neighbor position in ``direction``
 
         Returns:
-            list: board positions reachable from ``root``
+            int: target position or None
 
         Raises:
-            IndexError: if there is no vertex with index of ``root``
+            IndexError: ``from_position`` off board
+            KeyError: ``from_position`` illegal values
         """
-        if root not in self:
-            raise IndexError("Starting position is off board!")
-
-        visited = self.vertices_count * [False]
-        visited[root] = True
-        reachables = deque()
-        to_inspect = deque([root])
-        if not excluded_positions:
-            excluded_positions = []
-
-        if is_obstacle_callable is None:
-            is_obstacle_callable = lambda x: not self[x].can_put_pusher_or_box
-
-        while len(to_inspect) > 0:
-            current_position = to_inspect.popleft()
-
-            if current_position == root or current_position not in excluded_positions:
-                reachables.append(current_position)
-
-            for neighbor in self.all_neighbors(current_position):
-                if not visited[neighbor]:
-                    if not is_obstacle_callable(neighbor):
-                        to_inspect.append(neighbor)
-                    visited[neighbor] = True
-
-            if add_animation_frame_hook is not None:
-                add_animation_frame_hook(
-                    current_position=current_position,
-                    reachables=reachables,
-                    to_inspect=to_inspect,
-                    excluded=excluded_positions,
-                )
-
-        if root in excluded_positions:
-            return [pos for pos in reachables if pos != root]
-        else:
-            return list(reachables)
-
-    def neighbor(self, from_position, direction):
-        """
-        Calculates neighbor vertex index in ``direction``
-
-        Args:
-            from_position (int): source vertex index
-            direction (Direction): target vertex direction
-
-        Returns:
-            int: target vertex index or None
-
-        Raises:
-            IndexError: if there is no vertex with index of ``from_position``
-        """
-        try:
+        if self[from_position]:
             for out_edge in self._graph.out_edges_iter(from_position, data=True):
-                # edge: (source, target, data_dict)
                 if out_edge[2][self._KEY_DIRECTION] == direction:
                     return out_edge[1]
-        except nx.NetworkXError as e:
-            raise IndexError(str(e))
 
         return None
 
-    def wall_neighbors(self, from_position):
+    def wall_neighbors(self, from_position: int) -> List[int]:
         """
-        Calculates indexes of all neighbor wall vertices.
-
-        Args:
-            from_position (int): source vertex index
-
-        Returns:
-            list: indexes of all neighboring vertices that have wall on them.
+        Gets a list of all neighboring walls.
 
         Raises:
-            IndexError: if there is no vertex with index of ``from_position``
+            IndexError: ``from_position`` off board
+            KeyError: ``from_position`` illegal values
         """
-        try:
+        if self[from_position]:
             return [
                 n for n in self._graph.neighbors_iter(from_position) if self[n].is_wall
             ]
-        except nx.NetworkXError as e:
-            raise IndexError(str(e))
 
-    def all_neighbors(self, from_position):
+        return []
+
+    def all_neighbors(self, from_position: int) -> List[int]:
         """
-        Calculates indexes of all neighboring vertices.
-
-        Args:
-            from_position (int): source vertex index.
-
-        Returns:
-            list: indexes of all neighboring vertices.
+        Gets a list of all neighbors.
 
         Raises:
-            IndexError: if there is no vertex with index of ``from_position``
+            IndexError: ``from_position`` off board
+            KeyError: ``from_position`` illegal values
         """
-        try:
-            return self._graph.neighbors(from_position)
-        except nx.NetworkXError as e:
-            raise IndexError(str(e))
 
-    def shortest_path(self, start_position, end_position):
+        if self[from_position]:
+            return self._graph.neighbors(from_position)
+
+        return []
+
+    def shortest_path(self, start_position: int, end_position: int) -> List[int]:
         """
-        Calculates shortest path between two vertices with all vertices having equal
+        Calculates shortest path between two positions with all positions having equal
         weight.
 
-        Args:
-            start_position (int): source vertex index
-            end_position (int): target vertex index
+        Raises:
+            IndexError: ``start_position`` or ``end_position`` off board
+            KeyError: ``start_position`` or ``end_position`` illegal values
+        """
 
-        Returns:
-            list: indexes of all vertices in calculated path.
+        if self[start_position] and self[end_position]:
+            for edge in self._graph.edges_iter(data=True):
+                edge[2]["weight"] = 1
+
+            try:
+                return nx.shortest_path(self._graph, start_position, end_position, 1)
+            except nx.NetworkXNoPath:
+                return []
+
+        return []
+
+    def dijkstra_path(self, start_position: int, end_position: int) -> List[int]:
+        """
+        Calculates shortest path between two positions not passing through board
+        obstacles (walls, other pushers, etc...).
 
         Raises:
-            IndexError: if any of indexes are off board
+            IndexError: ``start_position`` or ``end_position`` off board
+            KeyError: ``start_position`` or ``end_position`` illegal values
         """
-        if start_position not in self or end_position not in self:
-            raise IndexError("Board index out of range!")
+        if self[start_position] and self[end_position]:
+            for edge in self._graph.edges_iter(data=True):
+                edge[2]["weight"] = self.out_edge_weight(edge[1])
 
-        for edge in self._graph.edges_iter(data=True):
-            edge[2]["weight"] = 1
+            try:
+                return nx.dijkstra_path(self._graph, start_position, end_position)
+            except nx.NetworkXNoPath:
+                return []
 
-        try:
-            return nx.shortest_path(self._graph, start_position, end_position, 1)
-        except nx.NetworkXNoPath:
-            return []
+        return []
 
-    def dijkstra_path(self, start_position, end_position):
-        """
-        Calculates shortest path between two vertices not passing through obstacles.
-
-        Args:
-            start_position (int): source vertex index
-            end_position (int): target vertex index
-
-        Returns:
-            list: indexes of all vertices in calculated path.
-
-        Raises:
-            IndexError: if any of indexes are off board
-        """
-        if start_position not in self or end_position not in self:
-            raise IndexError("Board index out of range!")
-
-        for edge in self._graph.edges_iter(data=True):
-            edge[2]["weight"] = self.out_edge_weight(edge[1])
-
-        try:
-            return nx.dijkstra_path(self._graph, start_position, end_position)
-        except nx.NetworkXNoPath:
-            return []
-
-    def find_jump_path(self, start_position, end_position):
+    def find_jump_path(self, start_position: int, end_position: int) -> List[int]:
         """
         Returns:
-            list: of positions through which pusher must pass when jumping
+            List of positions through which pusher must pass when jumping
 
         Raises:
-            IndexError: if any of indexes are off board
+            IndexError: ``start_position`` or ``end_position`` off board
+            KeyError: ``start_position`` or ``end_position`` illegal values
         """
         return self.shortest_path(start_position, end_position)
 
-    def find_move_path(self, start_position, end_position):
+    def find_move_path(self, start_position: int, end_position: int) -> List[int]:
         """
         Returns:
-            list: of positions through which pusher must pass when moving without
+            List of positions through which pusher must pass when moving without
             pushing boxes
 
         Raises:
-            IndexError: if any of indexes are off board
+            IndexError: ``start_position`` or ``end_position`` off board
+            KeyError: ``start_position`` or ``end_position`` illegal values
         """
         path = self.dijkstra_path(start_position, end_position)
 
@@ -397,80 +286,76 @@ class BoardGraph:
             return []
         return path
 
-    def positions_path_to_directions_path(self, positions_path):
+    def positions_path_to_directions_path(
+        self, positions_path: Sequence[int]
+    ) -> List["Direction"]:
         """
-        Converts path expressed as vertices' indexes to one expressed as
-        :class:`.Direction`
+        Converts path expressed as positions to one expressed as :class:`.Direction`.
 
-        Args:
-            positions_path (list): list of integer positions
-
-        Returns:
-            list: of :class:`.Direction` instances
+        Raises:
+            IndexError: Any of positions in ``positions_path`` off board
+            KeyError: Any of positions in ``positions_path`` are illegal values
         """
-        src_vertex_index = 0
 
-        if positions_path and positions_path[src_vertex_index] not in self:
-            raise IndexError("Board index out of range!")
+        if positions_path:
+            self[positions_path[0]]
+        else:
+            return []
 
         retv = []
 
-        for target_vertex in positions_path[1:]:
-            src_vertex = positions_path[src_vertex_index]
-            src_vertex_index += 1
+        src_position_index = 0
+        for target_position in positions_path[1:]:
+            src_position = positions_path[src_position_index]
+            src_position_index += 1
 
-            if src_vertex not in self or target_vertex not in self:
-                raise IndexError("Board index out of range!")
-
-            for out_edge in self._graph.out_edges_iter(src_vertex, data=True):
-                if out_edge[1] == target_vertex:
-                    retv.append(out_edge[2][self._KEY_DIRECTION])
+            if self[src_position] and self[target_position]:
+                for out_edge in self._graph.out_edges_iter(src_position, data=True):
+                    if out_edge[1] == target_position:
+                        retv.append(out_edge[2][self._KEY_DIRECTION])
 
         return retv
 
     def mark_play_area(self):
         """
-        Marks all vertices (BoardCells) that are playable (reachable by any box or
+        Marks all positions (BoardCells) that are playable (reachable by any box or
         pusher).
         """
         piece_positions = []
-        for vertex in range(0, self.vertices_count):
-            if self[vertex].has_box or self[vertex].has_pusher:
-                self[vertex].is_in_playable_area = True
-                piece_positions.append(vertex)
+        for position in range(0, self.vertices_count):
+            if self[position].has_box or self[position].has_pusher:
+                self[position].is_in_playable_area = True
+                piece_positions.append(position)
             else:
-                self[vertex].is_in_playable_area = False
-
-        def is_obstacle(vertex):
-            return self[vertex].is_wall
+                self[position].is_in_playable_area = False
 
         for piece_position in piece_positions:
             reachables = self._reachables(
-                root=piece_position, is_obstacle_callable=is_obstacle
+                root=piece_position, is_obstacle_cb=lambda x: self[x].is_wall
             )
 
-            for reachable_vertex in reachables:
-                self[reachable_vertex].is_in_playable_area = True
+            for reachable_position in reachables:
+                self[reachable_position].is_in_playable_area = True
 
-    def positions_reachable_by_pusher(self, pusher_position, excluded_positions=None):
+    def positions_reachable_by_pusher(
+        self, pusher_position: int, excluded_positions: Optional[Sequence[int]] = None
+    ) -> List[int]:
         """
         Returns:
-            list: of positions that are reachable by pusher standing on ``position``
+            List of positions that are reachable by pusher standing on ``position``
         """
-
-        def is_obstacle(position):
-            return not self[position].can_put_pusher_or_box
-
         return self._reachables(
             root=pusher_position,
-            is_obstacle_callable=is_obstacle,
+            is_obstacle_cb=lambda x: not self[x].can_put_pusher_or_box,
             excluded_positions=excluded_positions,
         )
 
-    def normalized_pusher_position(self, pusher_position, excluded_positions=None):
+    def normalized_pusher_position(
+        self, pusher_position: int, excluded_positions: Optional[Sequence[int]] = None
+    ) -> int:
         """
         Returns:
-            int: Top-left position reachable by pusher
+            Top-left position reachable by pusher
         """
         reachables = self.positions_reachable_by_pusher(
             pusher_position=pusher_position, excluded_positions=excluded_positions
@@ -480,9 +365,11 @@ class BoardGraph:
         else:
             return pusher_position
 
-    def path_destination(self, start_position, directions_path):
-        if start_position not in self:
-            raise IndexError("Board index out of range")
+    def path_destination(
+        self, start_position: int, directions_path: Sequence["Direction"]
+    ) -> int:
+        if not directions_path:
+            self[start_position]
 
         retv = start_position
         for direction in directions_path:
@@ -493,20 +380,77 @@ class BoardGraph:
                 break
         return retv
 
-    def reconfigure_edges(self, tessellation):
-        """Recreate all edges using ``tessellation``.
+    def reconfigure_edges(self, tessellation: "Tessellation"):
+        """Recreate all edges using ``tessellation``."""
+        self.remove_all_edges()
+        for source_position in range(self.vertices_count):
+            for direction in tessellation.legal_directions:
+                neighbor_position = tessellation.neighbor_position(
+                    source_position, direction, self.board_width, self.board_height
+                )
+                if neighbor_position is not None:
+                    self.add_edge(source_position, neighbor_position, direction)
+
+    _CurrentReachables = Sequence[int]
+    _ToInspectVertices = Sequence[int]
+    _ExcludedVertices = Optional[Sequence[int]]
+    _AnimationFrameCallback = Callable[
+        [int, _CurrentReachables, _ToInspectVertices, _ExcludedVertices], None
+    ]
+
+    def _reachables(
+        self,
+        root: int,
+        excluded_positions: Optional[Sequence[int]] = None,
+        is_obstacle_cb: Callable[[int], bool] = None,
+        add_animation_frame_cb: _AnimationFrameCallback = None,
+    ) -> List[int]:
+        """
+        Calculates all positions reachable from ``root``.
 
         Args:
-            width (int): board width
-            height (int): board height
-            tessellation (TessellationBase): tessellation instance to use for edges
-                calculation
+            root: initial position for search
+            excluded_positions: these positions will be marked as unreachable without
+                calculating their status
+            is_obstacle_cb: callable that checks if given position on graph is obstacle
+            add_animation_frame_cb: if not None, this callable will be called after
+                each step of search. Useful for visualization of algorithm and debugging
         """
-        self.remove_all_edges()
-        for source_vertex in range(self.vertices_count):
-            for direction in tessellation.legal_directions:
-                neighbor_vertex = tessellation.neighbor_position(
-                    source_vertex, direction, self.board_width, self.board_height
-                )
-                if neighbor_vertex is not None:
-                    self.add_edge(source_vertex, neighbor_vertex, direction)
+        excluded_positions = (
+            set(excluded_positions) if excluded_positions is not None else set()
+        )
+
+        if is_obstacle_cb is None:
+            is_obstacle_cb = lambda x: not self[x].can_put_pusher_or_box
+
+        reachables = deque()
+
+        if self[root]:
+            visited = self.vertices_count * [False]
+            visited[root] = True
+            to_inspect = deque([root])
+
+            while len(to_inspect) > 0:
+                current_position = to_inspect.popleft()
+
+                if (
+                    current_position == root
+                    or current_position not in excluded_positions
+                ):
+                    reachables.append(current_position)
+
+                for neighbor in self.all_neighbors(current_position):
+                    if not visited[neighbor]:
+                        if not is_obstacle_cb(neighbor):
+                            to_inspect.append(neighbor)
+                        visited[neighbor] = True
+
+                if add_animation_frame_cb is not None:
+                    add_animation_frame_cb(
+                        current_position, reachables, to_inspect, excluded_positions
+                    )
+
+        if root in excluded_positions:
+            return [pos for pos in reachables if pos != root]
+        else:
+            return list(reachables)

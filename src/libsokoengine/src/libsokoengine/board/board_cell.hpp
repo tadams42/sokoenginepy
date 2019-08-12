@@ -18,15 +18,6 @@ public:
 };
 
 ///
-/// Exception.
-///
-class LIBSOKOENGINE_API IllegalBoardCharacterError : public std::invalid_argument {
-public:
-  explicit IllegalBoardCharacterError(const std::string &mess);
-  virtual ~IllegalBoardCharacterError();
-};
-
-///
 /// Stores properties of one cell in board layout.
 ///
 class LIBSOKOENGINE_API BoardCell {

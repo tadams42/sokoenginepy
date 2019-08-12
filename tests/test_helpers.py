@@ -13,6 +13,10 @@ TEST_RESOURCES_ROOT = os.path.abspath(
 fake = Faker()
 
 
+def is_using_native_extension():
+    return AtomicMove.__module__ == "sokoenginepyext"
+
+
 class TessellationSpecMixin:
     def test_converts_legal_atomic_moves_to_characters(self):
         for index, atomic_move in enumerate(self.legal_moves):

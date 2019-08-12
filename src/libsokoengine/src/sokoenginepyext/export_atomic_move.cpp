@@ -7,9 +7,9 @@ piece_id_t receive_pusher_id(const py::object &pusher_id) {
   // Pusher ID setter in Python accepts any object
   //  - anything not integer or < DEFAULT_ID is treated as DEFAULT_IDD
   piece_id_t retv = DEFAULT_PIECE_ID;
-  py::extract<long long> maybe_number(pusher_id);
+  py::extract<py::py_int_t> maybe_number(pusher_id);
   if (maybe_number.check()) {
-    long long tmp = maybe_number();
+    py::py_int_t tmp = maybe_number();
     if (tmp > DEFAULT_PIECE_ID && tmp < numeric_limits<piece_id_t>::max()) {
       retv = (piece_id_t)tmp;
     }
@@ -22,9 +22,9 @@ piece_id_t receive_box_id(const py::object &box_id) {
   //  - anything not integer or < DEFAULT_ID is treated as NULL_ID
   piece_id_t retv = NULL_ID;
 
-  py::extract<long long> maybe_number(box_id);
+  py::extract<py::py_int_t> maybe_number(box_id);
   if (maybe_number.check()) {
-    long long tmp = maybe_number();
+    py::py_int_t tmp = maybe_number();
     if (tmp > DEFAULT_PIECE_ID && tmp < numeric_limits<piece_id_t>::max()) {
       retv = (piece_id_t)tmp;
     }

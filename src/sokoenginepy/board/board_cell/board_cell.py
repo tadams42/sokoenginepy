@@ -28,10 +28,6 @@ class BoardConversionError(RuntimeError):
     pass
 
 
-class IllegalBoardCharacterError(ValueError):
-    pass
-
-
 class BoardCell:
     """
     Stores properties of one cell in board layout.
@@ -122,16 +118,21 @@ class BoardCell:
             elif self.is_goal_chr(character):
                 self.has_goal = True
             else:
-                raise IllegalBoardCharacterError(
-                    "Illegal characters found in board string"
-                )
+                raise ValueError("Illegal characters found in board string")
 
     def __eq__(self, rv):
         return (
-            self.is_wall == rv.is_wall
+            isinstance(rv, self.__class__)
+            and self.is_wall == rv.is_wall
             and self.has_pusher == rv.has_pusher
             and self.has_box == rv.has_box
             and self.has_goal == rv.has_goal
+        ) or (
+            isinstance(rv, (BoardCellCharacters, str))
+            and self.is_wall == self.is_wall_chr(rv)
+            and self.has_pusher == self.is_pusher_chr(rv)
+            and self.has_box == self.is_box_chr(rv)
+            and self.has_goal == self.is_goal_chr(rv)
         )
 
     def __ne__(self, rv):
