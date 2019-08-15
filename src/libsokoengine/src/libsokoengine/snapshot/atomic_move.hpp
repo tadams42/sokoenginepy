@@ -10,15 +10,6 @@
 namespace sokoengine {
 
 ///
-/// Exception.
-///
-class LIBSOKOENGINE_API InvalidAtomicMoveError : public std::invalid_argument {
-public:
-  explicit InvalidAtomicMoveError(const std::string &mess);
-  virtual ~InvalidAtomicMoveError();
-};
-
-///
 /// Single step of single pusher.
 ///
 class LIBSOKOENGINE_API AtomicMove {

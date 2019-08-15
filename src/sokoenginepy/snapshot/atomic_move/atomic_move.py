@@ -4,10 +4,6 @@ from ...manager import DEFAULT_PIECE_ID
 from ...tessellation import Direction
 
 
-class InvalidAtomicMoveError(ValueError):
-    pass
-
-
 class AtomicMove:
     """Represents single step of pusher movement.
 
@@ -63,22 +59,18 @@ class AtomicMove:
         moved_box_id: Optional[int] = None,
     ):
         if (box_moved or moved_box_id) and is_pusher_selection and is_jump:
-            raise InvalidAtomicMoveError(
+            raise ValueError(
                 "AtomicMove can't be all, a push, a jump and a pusher selection!"
             )
 
         if is_jump and is_pusher_selection:
-            raise InvalidAtomicMoveError(
-                "AtomicMove can't be both, a jump and a pusher selection!"
-            )
+            raise ValueError("AtomicMove can't be both, a jump and a pusher selection!")
 
         if (box_moved or moved_box_id) and is_jump:
-            raise InvalidAtomicMoveError("AtomicMove can't be both, a push and a jump!")
+            raise ValueError("AtomicMove can't be both, a push and a jump!")
 
         if (box_moved or moved_box_id) and is_pusher_selection:
-            raise InvalidAtomicMoveError(
-                "AtomicMove can't be both, a push and a pusher selection!"
-            )
+            raise ValueError("AtomicMove can't be both, a push and a pusher selection!")
 
         self._box_moved: bool = False
         self._pusher_selected: bool = False

@@ -21,34 +21,29 @@ constexpr char AtomicMove::N;
 constexpr char AtomicMove::s;
 constexpr char AtomicMove::S;
 
-InvalidAtomicMoveError::InvalidAtomicMoveError(const string &mess)
-    : invalid_argument(mess) {}
-
-InvalidAtomicMoveError::~InvalidAtomicMoveError() = default;
-
 AtomicMove::AtomicMove(const Direction &direction, bool box_moved, bool is_jump,
                        bool is_pusher_selection, piece_id_t pusher_id,
                        piece_id_t moved_box_id)
-    : m_box_moved(false),
-      m_pusher_selected(false),
-      m_pusher_jumped(false),
-      m_direction(Direction::LEFT.pack()),
-      m_pusher_id(DEFAULT_PIECE_ID),
-      m_moved_box_id(NULL_ID) {
+  : m_box_moved(false),
+    m_pusher_selected(false),
+    m_pusher_jumped(false),
+    m_direction(Direction::LEFT.pack()),
+    m_pusher_id(DEFAULT_PIECE_ID),
+    m_moved_box_id(NULL_ID) {
   if ((box_moved || moved_box_id != NULL_ID) && is_pusher_selection && is_jump)
-    throw InvalidAtomicMoveError(
-        "AtomicMove can't be all, a push, a jump and a pusher selection!");
+    throw invalid_argument(
+      "AtomicMove can't be all, a push, a jump and a pusher selection!");
 
   if (is_jump && is_pusher_selection)
-    throw InvalidAtomicMoveError(
-        "AtomicMove can't be both, a jump and a pusher selection!");
+    throw invalid_argument(
+      "AtomicMove can't be both, a jump and a pusher selection!");
 
   if ((box_moved || moved_box_id != NULL_ID) && is_jump)
-    throw InvalidAtomicMoveError("AtomicMove can't be both, a push and a jump!");
+    throw invalid_argument("AtomicMove can't be both, a push and a jump!");
 
   if ((box_moved || moved_box_id != NULL_ID) && is_pusher_selection)
-    throw InvalidAtomicMoveError(
-        "AtomicMove can't be both, a push and a pusher selection!");
+    throw invalid_argument(
+      "AtomicMove can't be both, a push and a pusher selection!");
 
   set_pusher_id(pusher_id);
 

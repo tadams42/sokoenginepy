@@ -5,7 +5,7 @@ from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
 from .. import utilities
 from ..tessellation import UnknownDirectionError
-from .atomic_move import AtomicMove, InvalidAtomicMoveError
+from .atomic_move import AtomicMove
 from .snapshot import Snapshot, SnapshotConversionError
 
 _RE_SNAPSHOT_STRING = re.compile(
@@ -106,7 +106,7 @@ class SnapshotStringParser:
                 ):
                     try:
                         retv += snapshot.tessellation.atomic_move_to_char(snapshot[i])
-                    except InvalidAtomicMoveError:
+                    except ValueError:
                         conversion_ok = False
                     i += 1
                     if i < iend:
@@ -117,7 +117,7 @@ class SnapshotStringParser:
             else:
                 try:
                     retv += snapshot.tessellation.atomic_move_to_char(snapshot[i])
-                except InvalidAtomicMoveError:
+                except ValueError:
                     conversion_ok = False
                 i += 1
 
