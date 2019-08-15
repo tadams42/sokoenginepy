@@ -1,6 +1,6 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from ..cell_orientation import CellOrientation
-from ..direction import Direction, UnknownDirectionError
+from ..direction import Direction
 from ..tessellation_base import TessellationBase, TessellationBaseInheritableDocstrings
 
 
@@ -79,7 +79,7 @@ class TriobanTessellation(
                 dy = 1
                 dx = 0
         else:
-            raise UnknownDirectionError(direction)
+            raise ValueError(direction)
 
         row += dy
         column += dx

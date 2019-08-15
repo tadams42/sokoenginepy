@@ -2,7 +2,6 @@ from abc import ABCMeta, abstractmethod
 
 from .. import utilities
 from .cell_orientation import CellOrientation
-from .direction import UnknownDirectionError
 
 
 class TessellationBase(metaclass=ABCMeta):
@@ -34,7 +33,7 @@ class TessellationBase(metaclass=ABCMeta):
             int: If resulting position is off-board returns None, otherwise position
 
         Raises:
-            :exc:`.UnknownDirectionError`: in case direction is not one of
+            :exc:`.ValueError`: in case direction is not one of
                 self.legal_directions
         """
         pass
@@ -64,7 +63,7 @@ class TessellationBase(metaclass=ABCMeta):
            AtomicMove: resulting :class:`.AtomicMove`
 
         Raises:
-            :exc:`.UnknownDirectionError` if conversion not possible.
+            :exc:`.ValueError` if conversion not possible.
         """
         from ..snapshot import AtomicMove
 
@@ -73,7 +72,7 @@ class TessellationBase(metaclass=ABCMeta):
         )
 
         if direction is None:
-            raise UnknownDirectionError(input_chr)
+            raise ValueError(input_chr)
 
         return AtomicMove(direction=direction, box_moved=box_moved)
 
@@ -93,14 +92,14 @@ class TessellationBase(metaclass=ABCMeta):
            str: resulting string representation of :class:`.AtomicMove`
 
         Raises:
-            :exc:`.UnknownDirectionError` if conversion not possible.
+            :exc:`.ValueError` if conversion not possible.
         """
         retv = self._atomic_move_to_char_dict.get(
             (atomic_move.direction, atomic_move.is_push_or_pull), None
         )
 
         if retv is None:
-            raise UnknownDirectionError(atomic_move)
+            raise ValueError(atomic_move)
 
         return retv
 

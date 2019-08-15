@@ -74,7 +74,7 @@ class SpecGenerator:
 
             from sokoenginepy import (CellOrientation, Direction, HexobanBoard,
                                       OctobanBoard, SokobanBoard, Tessellation,
-                                      TriobanBoard, UnknownDirectionError)
+                                      TriobanBoard)
             from sokoenginepy.utilities import index_1d, is_on_board_1d
 
 
@@ -183,7 +183,7 @@ class SpecGenerator:
 
                 elif self.is_result_illegal_direction(test_case, direction):
                     s = """
-                        with pytest.raises(UnknownDirectionError):
+                        with pytest.raises(ValueError):
                             t.neighbor_position(index, {0}, width, height)
                     """.format(
                         self.DIRECTIONS_HASH[direction]

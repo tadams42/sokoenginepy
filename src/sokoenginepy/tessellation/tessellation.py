@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 
 from .. import utilities
 from .hexoban_tessellation import HexobanTessellation
@@ -90,7 +91,16 @@ class Tessellation(Enum):
         return "Tessellation." + self.name
 
     @classmethod
-    def instance_from(cls, tessellation_or_description):
+    def instance_from(
+        cls,
+        tessellation_or_description: Union[
+            SokobanTessellation,
+            TriobanTessellation,
+            HexobanTessellation,
+            OctobanTessellation,
+            str,
+        ],
+    ):
         if (
             not tessellation_or_description
             or "sokoban" in str(tessellation_or_description).lower()

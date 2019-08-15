@@ -17,11 +17,6 @@ namespace sokoengine {
 
 using namespace implementation;
 
-UnknownDirectionError::UnknownDirectionError(const string &mess)
-    : invalid_argument(mess) {}
-
-UnknownDirectionError::~UnknownDirectionError() = default;
-
 UnknownTessellationError::UnknownTessellationError(const string &mess)
     : invalid_argument(mess) {}
 

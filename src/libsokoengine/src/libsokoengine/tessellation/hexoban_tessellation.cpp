@@ -43,8 +43,8 @@ position_t HexobanTessellation::neighbor_position(position_t position,
       column -= (row + 1) % 2;
       row += 1;
     } else
-      throw UnknownDirectionError("Unsupported Direction received in "
-                                  "HexobanTessellation neighbor_position!");
+      throw invalid_argument("Unsupported Direction received in "
+                             "HexobanTessellation neighbor_position!");
     if (ON_BOARD(column, row, board_width, board_height)) {
       return index_1d(column, row, board_width);
     }
@@ -54,39 +54,39 @@ position_t HexobanTessellation::neighbor_position(position_t position,
 
 AtomicMove HexobanTessellation::char_to_atomic_move(char rv) const {
   static const map<char, AtomicMove> moves = {
-      {AtomicMove::l, AtomicMove(Direction::LEFT, false)},
-      {AtomicMove::L, AtomicMove(Direction::LEFT, true)},
-      {AtomicMove::r, AtomicMove(Direction::RIGHT, false)},
-      {AtomicMove::R, AtomicMove(Direction::RIGHT, true)},
-      {AtomicMove::u, AtomicMove(Direction::NORTH_WEST, false)},
-      {AtomicMove::U, AtomicMove(Direction::NORTH_WEST, true)},
-      {AtomicMove::d, AtomicMove(Direction::SOUTH_EAST, false)},
-      {AtomicMove::D, AtomicMove(Direction::SOUTH_EAST, true)},
-      {AtomicMove::n, AtomicMove(Direction::NORTH_EAST, false)},
-      {AtomicMove::N, AtomicMove(Direction::NORTH_EAST, true)},
-      {AtomicMove::s, AtomicMove(Direction::SOUTH_WEST, false)},
-      {AtomicMove::S, AtomicMove(Direction::SOUTH_WEST, true)}};
-  return find_in_map_or_throw<UnknownDirectionError>(
-      moves, rv, "Illegal AtomicMove character in HexobanTessellation!");
+    {AtomicMove::l, AtomicMove(Direction::LEFT, false)},
+    {AtomicMove::L, AtomicMove(Direction::LEFT, true)},
+    {AtomicMove::r, AtomicMove(Direction::RIGHT, false)},
+    {AtomicMove::R, AtomicMove(Direction::RIGHT, true)},
+    {AtomicMove::u, AtomicMove(Direction::NORTH_WEST, false)},
+    {AtomicMove::U, AtomicMove(Direction::NORTH_WEST, true)},
+    {AtomicMove::d, AtomicMove(Direction::SOUTH_EAST, false)},
+    {AtomicMove::D, AtomicMove(Direction::SOUTH_EAST, true)},
+    {AtomicMove::n, AtomicMove(Direction::NORTH_EAST, false)},
+    {AtomicMove::N, AtomicMove(Direction::NORTH_EAST, true)},
+    {AtomicMove::s, AtomicMove(Direction::SOUTH_WEST, false)},
+    {AtomicMove::S, AtomicMove(Direction::SOUTH_WEST, true)}};
+  return find_in_map_or_throw<invalid_argument>(
+    moves, rv, "Illegal AtomicMove character in HexobanTessellation!");
 }
 
 char HexobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
   static const map<pair<Direction, bool>, char> moves = {
-      {make_pair(Direction::LEFT, false), AtomicMove::l},
-      {make_pair(Direction::LEFT, true), AtomicMove::L},
-      {make_pair(Direction::RIGHT, false), AtomicMove::r},
-      {make_pair(Direction::RIGHT, true), AtomicMove::R},
-      {make_pair(Direction::NORTH_WEST, false), AtomicMove::u},
-      {make_pair(Direction::NORTH_WEST, true), AtomicMove::U},
-      {make_pair(Direction::SOUTH_EAST, false), AtomicMove::d},
-      {make_pair(Direction::SOUTH_EAST, true), AtomicMove::D},
-      {make_pair(Direction::NORTH_EAST, false), AtomicMove::n},
-      {make_pair(Direction::NORTH_EAST, true), AtomicMove::N},
-      {make_pair(Direction::SOUTH_WEST, false), AtomicMove::s},
-      {make_pair(Direction::SOUTH_WEST, true), AtomicMove::S}};
-  return find_in_map_or_throw<UnknownDirectionError>(
-      moves, make_pair(rv.direction(), rv.is_push_or_pull()),
-      "Illegal AtomicMove direction in HexobanTessellation!");
+    {make_pair(Direction::LEFT, false), AtomicMove::l},
+    {make_pair(Direction::LEFT, true), AtomicMove::L},
+    {make_pair(Direction::RIGHT, false), AtomicMove::r},
+    {make_pair(Direction::RIGHT, true), AtomicMove::R},
+    {make_pair(Direction::NORTH_WEST, false), AtomicMove::u},
+    {make_pair(Direction::NORTH_WEST, true), AtomicMove::U},
+    {make_pair(Direction::SOUTH_EAST, false), AtomicMove::d},
+    {make_pair(Direction::SOUTH_EAST, true), AtomicMove::D},
+    {make_pair(Direction::NORTH_EAST, false), AtomicMove::n},
+    {make_pair(Direction::NORTH_EAST, true), AtomicMove::N},
+    {make_pair(Direction::SOUTH_WEST, false), AtomicMove::s},
+    {make_pair(Direction::SOUTH_WEST, true), AtomicMove::S}};
+  return find_in_map_or_throw<invalid_argument>(
+    moves, make_pair(rv.direction(), rv.is_push_or_pull()),
+    "Illegal AtomicMove direction in HexobanTessellation!");
 }
 
 string HexobanTessellation::repr() const { return "HexobanTessellation()"; }

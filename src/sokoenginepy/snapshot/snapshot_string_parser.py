@@ -1,39 +1,40 @@
 import re
-from functools import reduce
 
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
 from .. import utilities
-from ..tessellation import UnknownDirectionError
+from ..tessellation import Tessellation
 from .atomic_move import AtomicMove
-from .snapshot import Snapshot, SnapshotConversionError
-
-_RE_SNAPSHOT_STRING = re.compile(
-    r"^([0-9\s"
-    + re.escape("".join(AtomicMove.CHARACTERS))
-    + re.escape("".join(Snapshot.NON_MOVE_CHARACTERS))
-    + re.escape("".join(utilities.rle.DELIMITERS))
-    + "])*$"
-)
+from .snapshot import Snapshot
 
 
 class SnapshotStringParser:
     """
-    Parses and validates game snapshot string into sequence of :class:`AtomicMove`
+    Parses and validates game snapshot string into sequence of :class:`AtomicMove`.
     """
 
-    atomic_moves = Regex("([" + "".join(c for c in AtomicMove.CHARACTERS) + "])+")
-    jump = Group(
-        oneOf(Snapshot.JUMP_BEGIN) + ZeroOrMore(atomic_moves) + oneOf(Snapshot.JUMP_END)
+    _ATOMIC_MOVES = Regex("([" + "".join(c for c in AtomicMove.CHARACTERS) + "])+")
+    _JUMP = Group(
+        oneOf(Snapshot.JUMP_BEGIN)
+        + ZeroOrMore(_ATOMIC_MOVES)
+        + oneOf(Snapshot.JUMP_END)
     )
-    pusher_change = Group(
+    _PUSHER_CHANGE = Group(
         oneOf(Snapshot.PUSHER_CHANGE_BEGIN)
-        + ZeroOrMore(atomic_moves)
+        + ZeroOrMore(_ATOMIC_MOVES)
         + oneOf(Snapshot.PUSHER_CHANGE_END)
     )
-    grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
+    _GRAMMAR = ZeroOrMore(_ATOMIC_MOVES | _PUSHER_CHANGE | _JUMP)
 
-    _re_snapshot_string_cleanup = re.compile(
+    _RE_SNAPSHOT_STRING = re.compile(
+        r"^([0-9\s"
+        + re.escape("".join(AtomicMove.CHARACTERS))
+        + re.escape("".join(Snapshot.NON_MOVE_CHARACTERS))
+        + re.escape("".join(utilities.rle.DELIMITERS))
+        + "])*$"
+    )
+
+    _RE_SNAPSHOT_STRING_CLEANUP = re.compile(
         "([" + re.escape(Snapshot.CURRENT_POSITION_CH) + r"\s])+"
     )
 
@@ -43,31 +44,29 @@ class SnapshotStringParser:
         self._resulting_moves = None
 
     @classmethod
-    def is_snapshot_string(cls, line):
+    def is_snapshot_string(cls, line: str) -> bool:
         return (
             not utilities.is_blank(line)
             and not utilities.contains_only_digits_and_spaces(line)
-            and reduce(
-                lambda x, y: x and y,
-                [
-                    True if _RE_SNAPSHOT_STRING.match(l) else False
-                    for l in line.splitlines()
-                ],
-                True,
+            and all(
+                True if cls._RE_SNAPSHOT_STRING.match(l) else False
+                for l in line.splitlines()
             )
         )
 
-    def convert_from_string(self, from_string, to_snapshot):
+    def convert_from_string(self, from_string: str, to_snapshot: Snapshot):
         # pylint: disable=protected-access
         if not self._parse(from_string, to_snapshot.tessellation):
-            raise SnapshotConversionError(self._first_encountered_error)
+            raise ValueError(self._first_encountered_error)
         to_snapshot.clear()
         to_snapshot._solving_mode = self._resulting_solving_mode
         for atomic_move in self._resulting_moves:
             to_snapshot.append(atomic_move)
 
     @classmethod
-    def convert_to_string(cls, snapshot, rle_encode, break_long_lines_at=80):
+    def convert_to_string(
+        cls, snapshot: Snapshot, rle_encode: bool, break_long_lines_at: int = 80
+    ) -> str:
         from .. import game
 
         retv = ""
@@ -133,21 +132,21 @@ class SnapshotStringParser:
             retv = tmp
 
         if not conversion_ok:
-            raise SnapshotConversionError(
-                "Snapshot string contains directions not supported by "
-                "requested tessellation"
+            raise ValueError(
+                "Snapshot string contains directions not supported by requested "
+                "tessellation"
             )
         return retv
 
-    def _tokenize_moves_data(self, line):
-        retv = []
+    def _tokenize_moves_data(self, line: str):
+        retv = None
         try:
-            retv = self.grammar.parseString(line).asList()
+            retv = self._GRAMMAR.parseString(line).asList()
         except ParseBaseException:
             retv = []
         return retv
 
-    def _parse(self, moves_string, tessellation):
+    def _parse(self, moves_string: str, tessellation: Tessellation):
         """
         - Parses moves_string into sequence of AtomicMove using provided tessellation
         - Sets parser state detailing the first error encountered in parsing
@@ -159,7 +158,7 @@ class SnapshotStringParser:
         self._resulting_solving_mode = None
         self._resulting_moves = None
 
-        moves_string = self._re_snapshot_string_cleanup.sub("", moves_string)
+        moves_string = self._RE_SNAPSHOT_STRING_CLEANUP.sub("", moves_string)
         if utilities.is_blank(moves_string):
             self._resulting_solving_mode = game.SolvingMode.FORWARD
             self._resulting_moves = []
@@ -212,13 +211,17 @@ class SnapshotStringParser:
         return True
 
     def _convert_token(
-        self, token, tessellation, is_jump=False, is_pusher_change=False
-    ):
+        self,
+        token: str,
+        tessellation: Tessellation,
+        is_jump: bool = False,
+        is_pusher_change: bool = False,
+    ) -> AtomicMove:
         for character in token:
             atomic_move = None
             try:
                 atomic_move = tessellation.char_to_atomic_move(character)
-            except UnknownDirectionError:
+            except ValueError:
                 atomic_move = None
 
             if atomic_move is None:

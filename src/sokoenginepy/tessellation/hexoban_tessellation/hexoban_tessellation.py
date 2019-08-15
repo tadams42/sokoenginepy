@@ -1,5 +1,5 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
-from ..direction import Direction, UnknownDirectionError
+from ..direction import Direction
 from ..tessellation_base import TessellationBase, TessellationBaseInheritableDocstrings
 
 
@@ -55,7 +55,7 @@ class HexobanTessellation(
             column -= (row + 1) % 2
             row += 1
         else:
-            raise UnknownDirectionError(direction)
+            raise ValueError(direction)
 
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)

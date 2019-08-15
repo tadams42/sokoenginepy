@@ -2,14 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from sokoenginepy import (
-    AtomicMove,
-    Direction,
-    Snapshot,
-    SolvingMode,
-    Tessellation,
-    UnknownDirectionError,
-)
+from sokoenginepy import AtomicMove, Direction, Snapshot, SolvingMode, Tessellation
 
 from ..fixtures import SnapshotFactory
 
@@ -233,7 +226,7 @@ class DescribeGameSnapshot:
         def it_rises_on_move_direction_not_supported_by_snapshot_tessellation(
             self, sokoban_snapshot
         ):
-            with pytest.raises(UnknownDirectionError):
+            with pytest.raises(ValueError):
                 sokoban_snapshot._before_inserting_move(
                     AtomicMove(Direction.NORTH_WEST)
                 )

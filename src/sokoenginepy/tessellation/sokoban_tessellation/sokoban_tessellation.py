@@ -1,5 +1,5 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
-from ..direction import Direction, UnknownDirectionError
+from ..direction import Direction
 from ..tessellation_base import TessellationBase, TessellationBaseInheritableDocstrings
 
 
@@ -40,7 +40,7 @@ class SokobanTessellation(
         row_shift, column_shift = self._NEIGHBOR_SHIFT.get(direction, (None, None))
 
         if row_shift is None:
-            raise UnknownDirectionError(direction)
+            raise ValueError(direction)
 
         row += row_shift
         column += column_shift

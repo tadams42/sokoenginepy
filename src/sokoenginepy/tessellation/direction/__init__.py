@@ -1,4 +1,4 @@
 try:
-    from sokoenginepyext import Direction, UnknownDirectionError
+    from sokoenginepyext import Direction
 except ImportError:
-    from .direction import Direction, UnknownDirectionError
+    from .direction import Direction

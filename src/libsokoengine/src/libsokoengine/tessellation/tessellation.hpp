@@ -21,15 +21,6 @@ enum class LIBSOKOENGINE_API CellOrientation : int {
 ///
 /// Exception.
 ///
-class LIBSOKOENGINE_API UnknownDirectionError : public std::invalid_argument {
-public:
-  explicit UnknownDirectionError(const std::string &mess);
-  virtual ~UnknownDirectionError();
-};
-
-///
-/// Exception.
-///
 class LIBSOKOENGINE_API UnknownTessellationError : public std::invalid_argument {
 public:
   explicit UnknownTessellationError(const std::string &mess);

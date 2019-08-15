@@ -37,13 +37,6 @@ PYBIND11_MODULE(sokoenginepyext, m) {
 
   py::register_exception<sokoengine::KeyError>(m, "ExtKeyError", PyExc_KeyError);
 
-  // py::register_exception<sokoengine::SnapshotConversionError>(
-  //   m, "SnapshotConversionError", PyExc_ValueError
-  // );
-
-  py::register_exception<sokoengine::UnknownDirectionError>(m, "UnknownDirectionError",
-                                                            PyExc_ValueError);
-
   py::register_exception<sokoengine::UnknownTessellationError>(
     m, "UnknownTessellationError", PyExc_ValueError);
 

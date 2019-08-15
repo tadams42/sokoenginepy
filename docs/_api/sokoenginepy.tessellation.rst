@@ -4,8 +4,6 @@ Tessellation
 Direction
 ---------
 
-.. autoexception:: sokoenginepy.tessellation.UnknownDirectionError
-
 .. autoclass:: sokoenginepy.tessellation.Direction
     :members:
     :undoc-members:
