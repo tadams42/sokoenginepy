@@ -92,21 +92,21 @@ class TriobanTessellation(
     @property
     def _char_to_atomic_move_dict(self):
         if not self.__class__._CHR_TO_ATOMIC_MOVE:
-            from ...snapshot import AtomicMoveCharacters
+            from ...snapshot import AtomicMove
 
             self.__class__._CHR_TO_ATOMIC_MOVE = {
-                AtomicMoveCharacters.l: (Direction.LEFT, False),
-                AtomicMoveCharacters.L: (Direction.LEFT, True),
-                AtomicMoveCharacters.r: (Direction.RIGHT, False),
-                AtomicMoveCharacters.R: (Direction.RIGHT, True),
-                AtomicMoveCharacters.n: (Direction.NORTH_EAST, False),
-                AtomicMoveCharacters.N: (Direction.NORTH_EAST, True),
-                AtomicMoveCharacters.u: (Direction.NORTH_WEST, False),
-                AtomicMoveCharacters.U: (Direction.NORTH_WEST, True),
-                AtomicMoveCharacters.d: (Direction.SOUTH_EAST, False),
-                AtomicMoveCharacters.D: (Direction.SOUTH_EAST, True),
-                AtomicMoveCharacters.s: (Direction.SOUTH_WEST, False),
-                AtomicMoveCharacters.S: (Direction.SOUTH_WEST, True),
+                AtomicMove.l: (Direction.LEFT, False),
+                AtomicMove.L: (Direction.LEFT, True),
+                AtomicMove.r: (Direction.RIGHT, False),
+                AtomicMove.R: (Direction.RIGHT, True),
+                AtomicMove.n: (Direction.NORTH_EAST, False),
+                AtomicMove.N: (Direction.NORTH_EAST, True),
+                AtomicMove.u: (Direction.NORTH_WEST, False),
+                AtomicMove.U: (Direction.NORTH_WEST, True),
+                AtomicMove.d: (Direction.SOUTH_EAST, False),
+                AtomicMove.D: (Direction.SOUTH_EAST, True),
+                AtomicMove.s: (Direction.SOUTH_WEST, False),
+                AtomicMove.S: (Direction.SOUTH_WEST, True),
             }
         return self._CHR_TO_ATOMIC_MOVE
 

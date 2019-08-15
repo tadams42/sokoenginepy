@@ -99,7 +99,7 @@ AtomicMove TriobanTessellation::char_to_atomic_move(char rv) const {
 }
 
 char TriobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
-  static const map<pair<Direction, bool>, AtomicMove::Characters> moves{
+  static const map<pair<Direction, bool>, char> moves{
       {make_pair(Direction::LEFT, false), AtomicMove::l},
       {make_pair(Direction::LEFT, true), AtomicMove::L},
       {make_pair(Direction::RIGHT, false), AtomicMove::r},

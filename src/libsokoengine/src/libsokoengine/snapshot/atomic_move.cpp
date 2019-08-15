@@ -4,6 +4,23 @@ using namespace std;
 
 namespace sokoengine {
 
+constexpr char AtomicMove::l;
+constexpr char AtomicMove::u;
+constexpr char AtomicMove::r;
+constexpr char AtomicMove::d;
+constexpr char AtomicMove::L;
+constexpr char AtomicMove::U;
+constexpr char AtomicMove::R;
+constexpr char AtomicMove::D;
+constexpr char AtomicMove::w;
+constexpr char AtomicMove::W;
+constexpr char AtomicMove::e;
+constexpr char AtomicMove::E;
+constexpr char AtomicMove::n;
+constexpr char AtomicMove::N;
+constexpr char AtomicMove::s;
+constexpr char AtomicMove::S;
+
 InvalidAtomicMoveError::InvalidAtomicMoveError(const string &mess)
     : invalid_argument(mess) {}
 

@@ -1,24 +1,20 @@
 import re
-from enum import Enum
 from itertools import groupby
 
 from pyparsing import CharsNotIn, ParseBaseException, ZeroOrMore, nestedExpr
 
 from .text_utils import ending_digits
 
-
-class RleCharacters(str, Enum):
-    """Separators used in RLE encoded board and snapshot texts."""
-
-    GROUP_LEFT_DELIM = "("
-    GROUP_RIGHT_DELIM = ")"
-    RLE_ROW_SEPARATOR = "|"
-
-
+#: Group start
+GROUP_START = "("
+#: Group enf
+GROUP_END = ")"
+#: Rle row separator
+ROW_SEPARATOR = "|"
+#: Rle delimiters
+DELIMITERS = {GROUP_START, GROUP_END, ROW_SEPARATOR}
 _RE_RLE_REPLACER = re.compile(r"(\d+)(\D)")
-_RE_RLE_SPLITTER = re.compile(
-    "|".join(map(re.escape, [RleCharacters.RLE_ROW_SEPARATOR, "\n"]))
-)
+_RE_RLE_SPLITTER = re.compile("|".join(map(re.escape, [ROW_SEPARATOR, "\n"])))
 
 
 class Rle:
@@ -40,12 +36,8 @@ class Rle:
         """
         return _RE_RLE_REPLACER.sub(lambda m: m.group(2) * int(m.group(1)), rle_token)
 
-    rle_token = CharsNotIn(
-        RleCharacters.GROUP_LEFT_DELIM + RleCharacters.GROUP_RIGHT_DELIM
-    )
-    grouped_rle = nestedExpr(
-        RleCharacters.GROUP_LEFT_DELIM, RleCharacters.GROUP_RIGHT_DELIM
-    )
+    rle_token = CharsNotIn(GROUP_START + GROUP_END)
+    grouped_rle = nestedExpr(GROUP_START, GROUP_END)
     token_or_group = rle_token | grouped_rle
     grammar = ZeroOrMore(token_or_group)
 

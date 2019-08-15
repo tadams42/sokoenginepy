@@ -22,27 +22,22 @@ public:
 ///
 class LIBSOKOENGINE_API BoardCell {
 public:
-  ///
-  /// Characters used in textual representation of board cells.
-  ///
-  enum Characters {
-    WALL = '#',
-    PUSHER = '@',
-    PUSHER_ON_GOAL = '+',
-    BOX = '$',
-    BOX_ON_GOAL = '*',
-    GOAL = '.',
-    FLOOR = ' ',
-    VISIBLE_FLOOR = '-',
-    ALT_PUSHER1 = 'p',
-    ALT_PUSHER2 = 'm',
-    ALT_PUSHER_ON_GOAL1 = 'P',
-    ALT_PUSHER_ON_GOAL2 = 'M',
-    ALT_BOX1 = 'b',
-    ALT_BOX_ON_GOAL1 = 'B',
-    ALT_GOAL1 = 'o',
-    ALT_VISIBLE_FLOOR1 = '_',
-  };
+  static constexpr char WALL = '#';
+  static constexpr char PUSHER = '@';
+  static constexpr char PUSHER_ON_GOAL = '+';
+  static constexpr char BOX = '$';
+  static constexpr char BOX_ON_GOAL = '*';
+  static constexpr char GOAL = '.';
+  static constexpr char FLOOR = ' ';
+  static constexpr char VISIBLE_FLOOR = '-';
+  static constexpr char ALT_PUSHER1 = 'p';
+  static constexpr char ALT_PUSHER2 = 'm';
+  static constexpr char ALT_PUSHER_ON_GOAL1 = 'P';
+  static constexpr char ALT_PUSHER_ON_GOAL2 = 'M';
+  static constexpr char ALT_BOX1 = 'b';
+  static constexpr char ALT_BOX_ON_GOAL1 = 'B';
+  static constexpr char ALT_GOAL1 = 'o';
+  static constexpr char ALT_VISIBLE_FLOOR1 = '_';
 
   constexpr static bool is_pusher_chr(char ch) {
     return ch == PUSHER || ch == ALT_PUSHER1 || ch == ALT_PUSHER2 ||
@@ -71,6 +66,8 @@ public:
 
   bool operator==(const BoardCell &rv) const;
   bool operator!=(const BoardCell &rv) const;
+  bool operator==(char rv) const;
+  bool operator!=(char rv) const;
 
   char str() const;
   std::string repr() const;

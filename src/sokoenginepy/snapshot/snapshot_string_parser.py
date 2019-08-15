@@ -5,14 +5,14 @@ from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
 from .. import utilities
 from ..tessellation import UnknownDirectionError
-from .atomic_move import AtomicMoveCharacters, InvalidAtomicMoveError
+from .atomic_move import AtomicMove, InvalidAtomicMoveError
 from .snapshot import Snapshot, SnapshotConversionError
 
 _RE_SNAPSHOT_STRING = re.compile(
     r"^([0-9\s"
-    + re.escape("".join(c for c in AtomicMoveCharacters))
-    + re.escape("".join(c for c in Snapshot.NonMoveCharacters))
-    + re.escape("".join(c for c in utilities.RleCharacters))
+    + re.escape("".join(AtomicMove.CHARACTERS))
+    + re.escape("".join(Snapshot.NON_MOVE_CHARACTERS))
+    + re.escape("".join(utilities.rle.DELIMITERS))
     + "])*$"
 )
 
@@ -22,21 +22,19 @@ class SnapshotStringParser:
     Parses and validates game snapshot string into sequence of :class:`AtomicMove`
     """
 
-    atomic_moves = Regex("([" + "".join(c for c in AtomicMoveCharacters) + "])+")
+    atomic_moves = Regex("([" + "".join(c for c in AtomicMove.CHARACTERS) + "])+")
     jump = Group(
-        oneOf(Snapshot.NonMoveCharacters.JUMP_BEGIN)
-        + ZeroOrMore(atomic_moves)
-        + oneOf(Snapshot.NonMoveCharacters.JUMP_END)
+        oneOf(Snapshot.JUMP_BEGIN) + ZeroOrMore(atomic_moves) + oneOf(Snapshot.JUMP_END)
     )
     pusher_change = Group(
-        oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN)
+        oneOf(Snapshot.PUSHER_CHANGE_BEGIN)
         + ZeroOrMore(atomic_moves)
-        + oneOf(Snapshot.NonMoveCharacters.PUSHER_CHANGE_END)
+        + oneOf(Snapshot.PUSHER_CHANGE_END)
     )
     grammar = ZeroOrMore(atomic_moves | pusher_change | jump)
 
     _re_snapshot_string_cleanup = re.compile(
-        "([" + re.escape(Snapshot.NonMoveCharacters.CURRENT_POSITION_CH) + r"\s])+"
+        "([" + re.escape(Snapshot.CURRENT_POSITION_CH) + r"\s])+"
     )
 
     def __init__(self):
@@ -85,11 +83,11 @@ class SnapshotStringParser:
             #  (3) Non-empty, not beginning with jump
             # Number (2) is handled gracefully later
             if len(snapshot) == 0:
-                retv += snapshot.NonMoveCharacters.JUMP_BEGIN
-                retv += snapshot.NonMoveCharacters.JUMP_END
+                retv += snapshot.JUMP_BEGIN
+                retv += snapshot.JUMP_END
             elif not snapshot[0].is_jump:
-                retv += snapshot.NonMoveCharacters.JUMP_BEGIN
-                retv += snapshot.NonMoveCharacters.JUMP_END
+                retv += snapshot.JUMP_BEGIN
+                retv += snapshot.JUMP_END
 
         i = 0
         iend = len(snapshot)
@@ -100,9 +98,7 @@ class SnapshotStringParser:
             if jump_flag or pusher_selected_flag:
                 backup_flag = jump_flag
                 retv += (
-                    snapshot.NonMoveCharacters.JUMP_BEGIN
-                    if jump_flag
-                    else snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
+                    snapshot.JUMP_BEGIN if jump_flag else snapshot.PUSHER_CHANGE_BEGIN
                 )
 
                 while (
@@ -117,11 +113,7 @@ class SnapshotStringParser:
                         jump_flag = snapshot[i].is_jump
                         pusher_selected_flag = snapshot[i].is_pusher_selection
 
-                retv += (
-                    snapshot.NonMoveCharacters.JUMP_END
-                    if backup_flag
-                    else snapshot.NonMoveCharacters.PUSHER_CHANGE_END
-                )
+                retv += snapshot.JUMP_END if backup_flag else snapshot.PUSHER_CHANGE_END
             else:
                 try:
                     retv += snapshot.tessellation.atomic_move_to_char(snapshot[i])
@@ -179,10 +171,7 @@ class SnapshotStringParser:
             )
             return False
 
-        if (
-            Snapshot.NonMoveCharacters.JUMP_BEGIN in moves_string
-            or Snapshot.NonMoveCharacters.JUMP_END in moves_string
-        ):
+        if Snapshot.JUMP_BEGIN in moves_string or Snapshot.JUMP_END in moves_string:
 
             self._resulting_solving_mode = game.SolvingMode.REVERSE
         else:
@@ -210,10 +199,8 @@ class SnapshotStringParser:
                 convert_success = self._convert_token(
                     token=token[1],
                     tessellation=tessellation,
-                    is_jump=token[0] == Snapshot.NonMoveCharacters.JUMP_BEGIN,
-                    is_pusher_change=(
-                        token[0] == Snapshot.NonMoveCharacters.PUSHER_CHANGE_BEGIN
-                    ),
+                    is_jump=token[0] == Snapshot.JUMP_BEGIN,
+                    is_pusher_change=(token[0] == Snapshot.PUSHER_CHANGE_BEGIN),
                 )
             else:
                 convert_success = self._convert_token(

@@ -88,7 +88,7 @@ which can be retrieved fro 2D coordinates using :func:`.index_1d`
 
 .. code-block:: python
 
-    >>> from sokoenginepy import BoardCell, BoardCellCharacters, Direction
+    >>> from sokoenginepy import BoardCell, Direction
     >>> from sokoenginepy.utilities import index_1d
     >>> position = index_1d(11, 8, board.width)
     >>>
@@ -96,7 +96,7 @@ which can be retrieved fro 2D coordinates using :func:`.index_1d`
     BoardCell('@')
     >>> print(board[position])
     @
-    >>> board[position] = BoardCellCharacters.BOX
+    >>> board[position] = BoardCell.BOX
     >>> board[position]
     BoardCell('$')
     >>> board[position].has_pusher

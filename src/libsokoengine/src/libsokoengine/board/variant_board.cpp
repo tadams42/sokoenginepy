@@ -116,7 +116,7 @@ bool VariantBoard::is_board_string(const string &line) {
            return isspace(c) || isdigit(c) || BoardCell::is_pusher_chr(c) ||
                   BoardCell::is_box_chr(c) || BoardCell::is_goal_chr(c) ||
                   BoardCell::is_empty_floor_chr(c) || BoardCell::is_wall_chr(c) ||
-                  c == TextUtils::RLE_ROW_SEPARATOR;
+                  c == TextUtils::ROW_SEPARATOR;
          });
 }
 

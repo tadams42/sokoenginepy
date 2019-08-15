@@ -19,10 +19,10 @@ using namespace implementation;
 HexobanBoard::HexobanBoard() : HexobanBoard(0, 0) {}
 
 HexobanBoard::HexobanBoard(board_size_t width, board_size_t height)
-    : VariantBoard(Tessellation::HEXOBAN, width, height) {}
+  : VariantBoard(Tessellation::HEXOBAN, width, height) {}
 
 HexobanBoard::HexobanBoard(const string &src)
-    : VariantBoard(Tessellation::HEXOBAN, src) {}
+  : VariantBoard(Tessellation::HEXOBAN, src) {}
 
 HexobanBoard::HexobanBoard(const HexobanBoard &rv) : VariantBoard(rv) {}
 
@@ -45,9 +45,9 @@ namespace implementation {
 
 class LIBSOKOENGINE_LOCAL HexobanTextConverter {
   typedef tuple<StringList, board_size_t, board_size_t, int8_t, int8_t>
-      preparse_results_t;
+    preparse_results_t;
   typedef tuple<char, board_size_t, board_size_t, int8_t, int8_t>
-      text_cell_position_data_t;
+    text_cell_position_data_t;
   typedef tuple<bool, bool> text_cell_position_status_t;
 
 public:
@@ -57,7 +57,7 @@ public:
     int8_t even_row_x_parity, odd_row_x_parity;
 
     tie(parsed, width, height, even_row_x_parity, odd_row_x_parity) =
-        preparse_board(board_str);
+      preparse_board(board_str);
 
     StringList internal_list;
 
@@ -79,7 +79,7 @@ public:
         bool should_copy_cell;
 
         tie(layout_ok, should_copy_cell) = analyze_text_cell_position(
-            make_tuple(parsed[y][x], x, y, odd_row_x_parity, even_row_x_parity));
+          make_tuple(parsed[y][x], x, y, odd_row_x_parity, even_row_x_parity));
 
         if (layout_ok && should_copy_cell) internal_line += parsed[y][x];
       }
@@ -192,8 +192,8 @@ private:
     bool has_non_floor_left_in_odd_row = false;
     for (board_size_t i = 0; i < height && !has_non_floor_left_in_odd_row; ++i) {
       has_non_floor_left_in_odd_row =
-          has_non_floor_left_in_odd_row ||
-          (i % 2 == 1 && !BoardCell::is_empty_floor_chr(parsed[i][0]));
+        has_non_floor_left_in_odd_row ||
+        (i % 2 == 1 && !BoardCell::is_empty_floor_chr(parsed[i][0]));
     }
     if (has_non_floor_left_in_odd_row) {
       for (string &line : parsed)
@@ -362,8 +362,8 @@ StringList HexobanBoardParser::parse(const string &board_str) const {
   auto result = HexobanTextConverter().convert_to_internal(board_str);
   if (result.second) return result.first;
   throw BoardConversionError(
-      "String can't be converted to HexobanBoard. Probable cause is invalid text layout"
-      "meaning either missing or misaligned filler spaces.");
+    "String can't be converted to HexobanBoard. Probable cause is invalid text layout"
+    "meaning either missing or misaligned filler spaces.");
 }
 
 string HexobanBoardPrinter::print(const VariantBoard &board, bool use_visible_floor,

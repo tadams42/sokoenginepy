@@ -22,6 +22,9 @@ KeyError::KeyError(const string &mess) : invalid_argument(mess) {}
 
 KeyError::~KeyError() = default;
 
+constexpr static u_int8_t LEGACY_DEFAULT_PLUS_ID = 99;
+constexpr u_int8_t SokobanPlus::DEFAULT_PLUS_ID;
+
 class LIBSOKOENGINE_LOCAL SokobanPlus::PIMPL {
 public:
   typedef map<piece_id_t, piece_id_t> IdsMap;
@@ -34,8 +37,6 @@ public:
   bool m_enabled = false;
   bool m_validated = false;
   vector<string> m_errors;
-
-  enum { LEGACY_DEFAULT_PLUS_ID = 99 };
 
   piece_id_t get_plus_id(piece_id_t for_id, const IdsMap &from_where) const {
     if (m_enabled)

@@ -2,15 +2,8 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy import (
-    BoardCell,
-    BoardCellCharacters,
-    BoardGraph,
-    Direction,
-    GraphType,
-    SokobanBoard,
-    Tessellation,
-)
+from sokoenginepy import (BoardCell, BoardGraph, Direction, GraphType,
+                          SokobanBoard, Tessellation)
 from sokoenginepy.utilities import index_1d
 
 from ..test_helpers import is_using_native_extension
@@ -46,7 +39,7 @@ class DescribeBoardGraph:
             board_graph[0].is_deadlock = True
             board_graph[0].is_wall = True
 
-            bc = BoardCell(BoardCellCharacters.PUSHER)
+            bc = BoardCell(BoardCell.PUSHER)
             bc.is_in_playable_area = False
             bc.is_deadlock = False
 
@@ -57,7 +50,7 @@ class DescribeBoardGraph:
             assert not board_graph[0].is_in_playable_area
             assert not board_graph[0].is_deadlock
 
-            board_graph[0] = BoardCellCharacters.PUSHER
+            board_graph[0] = BoardCell.PUSHER
 
             assert not board_graph[0].is_wall
             assert board_graph[0].has_pusher

@@ -10,6 +10,10 @@ using std::placeholders::_1;
 
 namespace sokoengine {
 
+constexpr char TextUtils::GROUP_START;
+constexpr char TextUtils::GROUP_END;
+constexpr char TextUtils::ROW_SEPARATOR;
+
 StringList TextUtils::normalize_width(const StringList &string_list, char fill_chr) {
   size_t width = calculate_width(string_list);
   StringList retv = string_list;
@@ -283,8 +287,8 @@ public:
   //
   // In case of failure input is not modified.
   bool decode(string &input) {
-    m_left_delimiter = TextUtils::GROUP_LEFT_DELIM;
-    m_right_delimiter = TextUtils::GROUP_RIGHT_DELIM;
+    m_left_delimiter = TextUtils::GROUP_START;
+    m_right_delimiter = TextUtils::GROUP_END;
 
     bool retv = false;
     if (check_groups(input)) {
@@ -294,12 +298,12 @@ public:
     if (retv) {
       input.erase(remove_if(input.begin(), input.end(),
                             [](char c) {
-                              return c == TextUtils::GROUP_LEFT_DELIM ||
-                                     c == TextUtils::GROUP_RIGHT_DELIM;
+                              return c == TextUtils::GROUP_START ||
+                                     c == TextUtils::GROUP_END;
                             }),
                   input.end());
       replace(input.begin(), input.end(),
-              static_cast<char>(TextUtils::RLE_ROW_SEPARATOR), '\n');
+              static_cast<char>(TextUtils::ROW_SEPARATOR), '\n');
     }
     return retv;
   }
@@ -317,7 +321,7 @@ bool TextUtils::is_blank(const string &line) {
 bool TextUtils::rle_encode(string &str) {
   RLE rle;
   replace(str.begin(), str.end(), '\n',
-          static_cast<char>(TextUtils::RLE_ROW_SEPARATOR));
+          static_cast<char>(TextUtils::ROW_SEPARATOR));
   return rle.encode(str);
 }
 

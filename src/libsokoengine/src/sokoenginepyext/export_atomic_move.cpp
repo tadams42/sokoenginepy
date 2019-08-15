@@ -5,7 +5,7 @@ using namespace sokoengine;
 
 piece_id_t receive_pusher_id(const py::object &pusher_id) {
   // Pusher ID setter in Python accepts any object
-  //  - anything not integer or < DEFAULT_ID is treated as DEFAULT_IDD
+  //  - anything not integer or < DEFAULT_ID is treated as DEFAULT_ID
   piece_id_t retv = DEFAULT_PIECE_ID;
   py::extract<py::py_int_t> maybe_number(pusher_id);
   if (maybe_number.check()) {
@@ -70,7 +70,6 @@ void export_atomic_move(py::module &m) {
           t[3].cast<bool>(), t[4].cast<piece_id_t>(), t[5].cast<piece_id_t>());
       }))
 
-    // instance methods and properties
     .def_property("moved_box_id",
                   [](const AtomicMove &self) -> py::object {
                     if (self.moved_box_id() == NULL_ID) return py::none();
@@ -80,7 +79,6 @@ void export_atomic_move(py::module &m) {
                     self.set_moved_box_id(receive_box_id(val));
                   })
 
-    // instance methods and properties
     .def_property("pusher_id",
                   [](const AtomicMove &self) -> py::object {
                     if (self.pusher_id() == NULL_ID) return py::none();
@@ -97,5 +95,45 @@ void export_atomic_move(py::module &m) {
                   &AtomicMove::set_is_pusher_selection)
     .def_property("is_jump", &AtomicMove::is_jump, &AtomicMove::set_is_jump)
     .def_property("direction", &AtomicMove::direction, &AtomicMove::set_direction,
-                  py::return_value_policy::reference);
+                  py::return_value_policy::reference)
+
+    .def_property_readonly_static("l", [](py::object) { return AtomicMove::l; })
+    .def_property_readonly_static("u", [](py::object) { return AtomicMove::u; })
+    .def_property_readonly_static("r", [](py::object) { return AtomicMove::r; })
+    .def_property_readonly_static("d", [](py::object) { return AtomicMove::d; })
+    .def_property_readonly_static("L", [](py::object) { return AtomicMove::L; })
+    .def_property_readonly_static("U", [](py::object) { return AtomicMove::U; })
+    .def_property_readonly_static("R", [](py::object) { return AtomicMove::R; })
+    .def_property_readonly_static("D", [](py::object) { return AtomicMove::D; })
+    .def_property_readonly_static("w", [](py::object) { return AtomicMove::w; })
+    .def_property_readonly_static("W", [](py::object) { return AtomicMove::W; })
+    .def_property_readonly_static("e", [](py::object) { return AtomicMove::e; })
+    .def_property_readonly_static("E", [](py::object) { return AtomicMove::E; })
+    .def_property_readonly_static("n", [](py::object) { return AtomicMove::n; })
+    .def_property_readonly_static("N", [](py::object) { return AtomicMove::N; })
+    .def_property_readonly_static("s", [](py::object) { return AtomicMove::s; })
+    .def_property_readonly_static("S", [](py::object) { return AtomicMove::S; })
+
+    .def_property_readonly_static("CHARACTERS", [](py::object) {
+      static const std::set<char> retv({
+        AtomicMove::l,
+        AtomicMove::u,
+        AtomicMove::r,
+        AtomicMove::d,
+        AtomicMove::L,
+        AtomicMove::U,
+        AtomicMove::R,
+        AtomicMove::D,
+        AtomicMove::w,
+        AtomicMove::W,
+        AtomicMove::e,
+        AtomicMove::E,
+        AtomicMove::n,
+        AtomicMove::N,
+        AtomicMove::s,
+        AtomicMove::S,
+      });
+
+      return retv;
+    });
 }

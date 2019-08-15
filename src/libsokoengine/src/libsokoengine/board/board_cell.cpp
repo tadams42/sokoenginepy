@@ -4,17 +4,34 @@ using namespace std;
 
 namespace sokoengine {
 
+constexpr char BoardCell::WALL;
+constexpr char BoardCell::PUSHER;
+constexpr char BoardCell::PUSHER_ON_GOAL;
+constexpr char BoardCell::BOX;
+constexpr char BoardCell::BOX_ON_GOAL;
+constexpr char BoardCell::GOAL;
+constexpr char BoardCell::FLOOR;
+constexpr char BoardCell::VISIBLE_FLOOR;
+constexpr char BoardCell::ALT_PUSHER1;
+constexpr char BoardCell::ALT_PUSHER2;
+constexpr char BoardCell::ALT_PUSHER_ON_GOAL1;
+constexpr char BoardCell::ALT_PUSHER_ON_GOAL2;
+constexpr char BoardCell::ALT_BOX1;
+constexpr char BoardCell::ALT_BOX_ON_GOAL1;
+constexpr char BoardCell::ALT_GOAL1;
+constexpr char BoardCell::ALT_VISIBLE_FLOOR1;
+
 BoardConversionError::BoardConversionError(const string &mess) : runtime_error(mess) {}
 
 BoardConversionError::~BoardConversionError() = default;
 
 BoardCell::BoardCell(char rv, bool is_in_playable_area, bool is_deadlock)
-    : m_box(false),
-      m_pusher(false),
-      m_goal(false),
-      m_wall(false),
-      m_playable(is_in_playable_area),
-      m_deadlock(is_deadlock) {
+  : m_box(false),
+    m_pusher(false),
+    m_goal(false),
+    m_wall(false),
+    m_playable(is_in_playable_area),
+    m_deadlock(is_deadlock) {
   if (!is_empty_floor_chr(rv)) {
     if (is_wall_chr(rv)) {
       set_is_wall(true);
@@ -38,6 +55,13 @@ bool BoardCell::operator==(const BoardCell &rv) const {
 }
 
 bool BoardCell::operator!=(const BoardCell &rv) const { return !(*this == rv); }
+
+bool BoardCell::operator==(char rv) const {
+  return m_wall == is_wall_chr(rv) && m_pusher == is_pusher_chr(rv) &&
+         m_box == is_box_chr(rv) && m_goal == is_goal_chr(rv);
+}
+
+bool BoardCell::operator!=(char rv) const { return !(*this == rv); }
 
 char BoardCell::to_str(bool use_visible_floor) const {
   char retv;

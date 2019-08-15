@@ -1,5 +1,5 @@
 from ... import utilities
-from ..board_cell import BoardCell, BoardCellCharacters, BoardConversionError
+from ..board_cell import BoardCell, BoardConversionError
 from ..sokoban_board import SokobanBoard
 from ..variant_board import VariantBoard, VariantBoardResizer
 
@@ -84,9 +84,7 @@ class HexobanTextConverter:
         if width == 0 or height == 0:
             return [], True
         elif even_row_x_parity < 0 or odd_row_x_parity < 0:
-            internal = height * [
-                int(width / 2) * BoardCellCharacters.VISIBLE_FLOOR + "\n"
-            ]
+            internal = height * [int(width / 2) * BoardCell.VISIBLE_FLOOR + "\n"]
             return internal, True
 
         layout_ok = True
@@ -118,7 +116,7 @@ class HexobanTextConverter:
     def convert_to_string(
         self, hexoban_board, use_visible_floor=False, rle_encode=False
     ):
-        floor_character = BoardCell(BoardCellCharacters.FLOOR).to_str(use_visible_floor)
+        floor_character = BoardCell(BoardCell.FLOOR).to_str(use_visible_floor)
 
         retv = []
         for row in range(0, hexoban_board.height):
@@ -142,7 +140,7 @@ class HexobanTextConverter:
             retv = self._remove_column_right(retv)
 
         if rle_encode:
-            return utilities.RleCharacters.RLE_ROW_SEPARATOR.join(
+            return utilities.rle.ROW_SEPARATOR.join(
                 utilities.rle_encode(line) for line in retv
             )
         else:
@@ -242,10 +240,10 @@ class HexobanTextConverter:
         return parsed, width, height, even_row_x_parity, odd_row_x_parity
 
     def _add_column_left(self, string_list):
-        return [BoardCellCharacters.FLOOR + line for line in string_list]
+        return [BoardCell.FLOOR + line for line in string_list]
 
     def _add_column_right(self, string_list):
-        return [line + BoardCellCharacters.FLOOR for line in string_list]
+        return [line + BoardCell.FLOOR for line in string_list]
 
     @staticmethod
     def _remove_column_right(string_list):

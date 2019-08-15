@@ -205,8 +205,7 @@ class PuzzleSnapshot:
         return reduce(
             or_,
             [
-                chr == Snapshot.NonMoveCharacters.JUMP_BEGIN
-                or chr == Snapshot.NonMoveCharacters.JUMP_END
+                chr == Snapshot.JUMP_BEGIN or chr == Snapshot.JUMP_END
                 for chr in self.moves
             ],
             False,

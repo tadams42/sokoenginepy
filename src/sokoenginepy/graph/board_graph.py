@@ -70,9 +70,7 @@ class BoardGraph:
             else:
                 raise
 
-    def __setitem__(
-        self, position: int, board_cell: Union["BoardCell", "BoardCellCharacters"]
-    ):
+    def __setitem__(self, position: int, board_cell: Union["BoardCell", str]):
         from ..board import BoardCell
 
         try:

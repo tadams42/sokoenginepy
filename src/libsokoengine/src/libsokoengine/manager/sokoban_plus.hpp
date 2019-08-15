@@ -31,7 +31,7 @@ public:
 ///
 class LIBSOKOENGINE_API SokobanPlus {
 public:
-  enum { DEFAULT_PLUS_ID = 0 };
+  constexpr static u_int8_t DEFAULT_PLUS_ID = 0;
 
   constexpr static bool is_valid_plus_id(piece_id_t id) {
     return id >= DEFAULT_PLUS_ID;

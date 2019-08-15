@@ -1,5 +1,4 @@
 from collections.abc import Iterable, MutableSequence
-from enum import Enum
 
 from .. import utilities
 from ..tessellation import Tessellation, UnknownDirectionError
@@ -27,17 +26,22 @@ class Snapshot(MutableSequence):
             argument will be ignored
     """
 
-    class NonMoveCharacters(str, Enum):
-        """
-        Some characters that can be found in textual representation of snapshots that
-        do not represent :class:`.AtomicMove`.
-        """
+    # Some characters that can be found in textual representation of snapshots that do
+    # not represent :class:`.AtomicMove`.
 
-        JUMP_BEGIN = "["
-        JUMP_END = "]"
-        PUSHER_CHANGE_BEGIN = "{"
-        PUSHER_CHANGE_END = "}"
-        CURRENT_POSITION_CH = "*"
+    JUMP_BEGIN = "["
+    JUMP_END = "]"
+    PUSHER_CHANGE_BEGIN = "{"
+    PUSHER_CHANGE_END = "}"
+    CURRENT_POSITION_CH = "*"
+
+    NON_MOVE_CHARACTERS = {
+        JUMP_BEGIN,
+        JUMP_END,
+        PUSHER_CHANGE_BEGIN,
+        PUSHER_CHANGE_END,
+        CURRENT_POSITION_CH,
+    }
 
     def __init__(self, tessellation_or_description, solving_mode=None, moves_data=""):
         super().__init__()

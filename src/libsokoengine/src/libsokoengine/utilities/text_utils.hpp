@@ -18,15 +18,13 @@ typedef std::deque<std::string> StringList;
 ///
 class LIBSOKOENGINE_API TextUtils {
 public:
-  ///
-  /// Separators used in RLE encoded board and snapshot texts
-  ///
-  ///
-  enum RleCharacters {
-    GROUP_LEFT_DELIM = '(',
-    GROUP_RIGHT_DELIM = ')',
-    RLE_ROW_SEPARATOR = '|'
-  };
+  //
+  // Separators used in RLE encoded board and snapshot texts
+  //
+
+  static constexpr char GROUP_START = '(';
+  static constexpr char GROUP_END = ')';
+  static constexpr char ROW_SEPARATOR = '|';
 
   static bool is_blank(const std::string &tlne);
   static bool contains_only_digits_and_spaces(const std::string &line);

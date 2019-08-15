@@ -7,12 +7,12 @@ from functools import reduce
 from ... import utilities
 from ...graph import BoardGraph
 from ...tessellation import Tessellation, UnknownTessellationError
-from ..board_cell import BoardCell, BoardCellCharacters, BoardConversionError
+from ..board_cell import BoardCell, BoardConversionError
 
 _RE_BOARD_STRING = re.compile(
     r"^([0-9\s"
-    + re.escape("".join(c for c in BoardCellCharacters))
-    + re.escape("".join(c for c in utilities.RleCharacters))
+    + re.escape("".join(BoardCell.CHARACTERS))
+    + re.escape("".join(utilities.rle.DELIMITERS))
     + "])*$"
 )
 
@@ -202,7 +202,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             rows.append(row)
 
         if rle_encode:
-            return utilities.RleCharacters.RLE_ROW_SEPARATOR.join(rows)
+            return utilities.rle.ROW_SEPARATOR.join(rows)
         else:
             return "\n".join(rows)
 

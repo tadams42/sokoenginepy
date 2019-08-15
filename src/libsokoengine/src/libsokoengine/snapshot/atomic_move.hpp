@@ -23,27 +23,24 @@ public:
 ///
 class LIBSOKOENGINE_API AtomicMove {
 public:
-  ///
-  /// Characters representing AtomicMove in game snapshot strings.
-  ///
-  enum Characters {
-    l = 'l',
-    u = 'u',
-    r = 'r',
-    d = 'd',
-    L = 'L',
-    U = 'U',
-    R = 'R',
-    D = 'D',
-    w = 'w',
-    W = 'W',
-    e = 'e',
-    E = 'E',
-    n = 'n',
-    N = 'N',
-    s = 's',
-    S = 'S'
-  };
+  // Characters representing AtomicMove in game snapshot strings.
+
+  static constexpr char l = 'l';
+  static constexpr char u = 'u';
+  static constexpr char r = 'r';
+  static constexpr char d = 'd';
+  static constexpr char L = 'L';
+  static constexpr char U = 'U';
+  static constexpr char R = 'R';
+  static constexpr char D = 'D';
+  static constexpr char w = 'w';
+  static constexpr char W = 'W';
+  static constexpr char e = 'e';
+  static constexpr char E = 'E';
+  static constexpr char n = 'n';
+  static constexpr char N = 'N';
+  static constexpr char s = 's';
+  static constexpr char S = 'S';
 
   constexpr static bool is_atomic_move_chr(char ch) {
     return ch == l || ch == u || ch == r || ch == d || ch == w || ch == e || ch == n ||

@@ -41,7 +41,7 @@ position_t SokobanTessellation::neighbor_position(position_t position,
 }
 
 char SokobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
-  static const map<pair<Direction, bool>, AtomicMove::Characters> moves = {
+  static const map<pair<Direction, bool>, char> moves = {
       {make_pair(Direction::LEFT, true), AtomicMove::L},
       {make_pair(Direction::LEFT, false), AtomicMove::l},
       {make_pair(Direction::RIGHT, true), AtomicMove::R},
