@@ -18,15 +18,6 @@ enum class LIBSOKOENGINE_API CellOrientation : int {
   OCTAGON = 2
 };
 
-///
-/// Exception.
-///
-class LIBSOKOENGINE_API UnknownTessellationError : public std::invalid_argument {
-public:
-  explicit UnknownTessellationError(const std::string &mess);
-  virtual ~UnknownTessellationError();
-};
-
 namespace implementation {
 class LIBSOKOENGINE_LOCAL VariantBoardResizer;
 class LIBSOKOENGINE_LOCAL VariantBoardParser;
@@ -136,9 +127,7 @@ const typename MapT::mapped_type &
 find_in_map_or_throw(const MapT &map, const typename MapT::key_type &key,
                      const std::string &exception_message = "") {
   auto map_iter = map.find(key);
-  if (map_iter == map.end()) {
-    throw ExceptionT(exception_message);
-  }
+  if (map_iter == map.end()) { throw ExceptionT(exception_message); }
   return map_iter->second;
 }
 

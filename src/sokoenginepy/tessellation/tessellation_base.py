@@ -1,7 +1,9 @@
 from abc import ABCMeta, abstractmethod
+from typing import List, Mapping, Tuple
 
 from .. import utilities
 from .cell_orientation import CellOrientation
+from .direction import Direction
 
 
 class TessellationBase(metaclass=ABCMeta):
@@ -12,7 +14,7 @@ class TessellationBase(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def legal_directions(self):
+    def legal_directions(self) -> List[Direction]:
         """
         Directions generally accepted by Tessellation.
 
@@ -22,7 +24,9 @@ class TessellationBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def neighbor_position(self, position, direction, board_width, board_height):
+    def neighbor_position(
+        self, position: int, direction: Direction, board_width: int, board_height: int
+    ) -> int:
         """
         Calculates neighbor position in given direction.
 
@@ -40,13 +44,13 @@ class TessellationBase(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def _char_to_atomic_move_dict(self):
+    def _char_to_atomic_move_dict(self) -> Mapping[str, Tuple[Direction, bool]]:
         """Dict mapping string to :class:`.AtomicMove` parameters,"""
         pass
 
     @property
     @abstractmethod
-    def graph_type(self):
+    def graph_type(self) -> "GraphType":
         """
         Type of graph used in given tessellation.
 
@@ -55,7 +59,7 @@ class TessellationBase(metaclass=ABCMeta):
         """
         pass
 
-    def char_to_atomic_move(self, input_chr):
+    def char_to_atomic_move(self, input_chr: str) -> "AtomicMove":
         """
         Converts character to :class:`.AtomicMove`.
 
@@ -78,13 +82,13 @@ class TessellationBase(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def _atomic_move_to_char_dict(self):
+    def _atomic_move_to_char_dict(self) -> Mapping[Tuple[Direction, bool], str]:
         """
         Dict mapping :class:`.AtomicMove` parameters to string representation.
         """
         pass
 
-    def atomic_move_to_char(self, atomic_move):
+    def atomic_move_to_char(self, atomic_move: "AtomicMove") -> str:
         """
         Converts :class:`.AtomicMove` to string
 
@@ -103,7 +107,9 @@ class TessellationBase(metaclass=ABCMeta):
 
         return retv
 
-    def cell_orientation(self, position, board_width, board_height):
+    def cell_orientation(
+        self, position: int, board_width: int, board_height: int
+    ) -> CellOrientation:
         """
         Calculates board cell orientation for given position.
 

@@ -17,11 +17,6 @@ namespace sokoengine {
 
 using namespace implementation;
 
-UnknownTessellationError::UnknownTessellationError(const string &mess)
-    : invalid_argument(mess) {}
-
-UnknownTessellationError::~UnknownTessellationError() = default;
-
 const SokobanTessellation &Tessellation::SOKOBAN = SokobanTessellation();
 const HexobanTessellation &Tessellation::HEXOBAN = HexobanTessellation();
 const TriobanTessellation &Tessellation::TRIOBAN = TriobanTessellation();
@@ -40,7 +35,7 @@ const Tessellation &Tessellation::instance_from(const string &name) {
   if (check_name == "octoban")
     return OCTOBAN;
 
-  throw UnknownTessellationError(name);
+  throw invalid_argument(name);
 }
 
 Tessellation::~Tessellation() = default;

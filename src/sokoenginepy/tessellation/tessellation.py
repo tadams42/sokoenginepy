@@ -8,10 +8,6 @@ from .sokoban_tessellation import SokobanTessellation
 from .trioban_tessellation import TriobanTessellation
 
 
-class UnknownTessellationError(ValueError):
-    pass
-
-
 class Tessellation(Enum):
     """Implemented tessellation types."""
 
@@ -100,7 +96,7 @@ class Tessellation(Enum):
             OctobanTessellation,
             str,
         ],
-    ):
+    ) -> "Tessellation":
         if (
             not tessellation_or_description
             or "sokoban" in str(tessellation_or_description).lower()
@@ -114,4 +110,4 @@ class Tessellation(Enum):
         elif "octoban" in str(tessellation_or_description).lower():
             return cls.OCTOBAN
         else:
-            raise UnknownTessellationError(tessellation_or_description)
+            raise ValueError(tessellation_or_description)

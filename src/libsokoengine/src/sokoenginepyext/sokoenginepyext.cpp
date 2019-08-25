@@ -37,9 +37,6 @@ PYBIND11_MODULE(sokoenginepyext, m) {
 
   py::register_exception<sokoengine::KeyError>(m, "ExtKeyError", PyExc_KeyError);
 
-  py::register_exception<sokoengine::UnknownTessellationError>(
-    m, "UnknownTessellationError", PyExc_ValueError);
-
   py::register_exception<sokoengine::BoardSizeExceededError>(
     m, "BoardSizeExceededError", PyExc_RuntimeError);
 

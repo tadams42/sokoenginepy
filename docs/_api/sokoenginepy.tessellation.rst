@@ -24,8 +24,6 @@ CellOrientation
 Tessellation
 ------------
 
-.. autoexception:: sokoenginepy.tessellation.tessellation.UnknownTessellationError
-
 .. autoclass:: sokoenginepy.tessellation.Tessellation
     :members:
     :undoc-members:

@@ -6,7 +6,7 @@ from functools import reduce
 
 from ... import utilities
 from ...graph import BoardGraph
-from ...tessellation import Tessellation, UnknownTessellationError
+from ...tessellation import Tessellation
 from ..board_cell import BoardCell, BoardConversionError
 
 _RE_BOARD_STRING = re.compile(
@@ -64,7 +64,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
                     board_str=board_str,
                 )
 
-        raise UnknownTessellationError(tessellation_or_description)
+        raise ValueError(tessellation_or_description)
 
     @classmethod
     def is_board_string(cls, line):
