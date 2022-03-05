@@ -2,8 +2,6 @@ import glob
 import os
 from inspect import getsourcefile
 
-import sokoenginepy
-
 from .test_helpers import is_using_native_extension
 
 
@@ -11,15 +9,14 @@ def it_is_correctly_using_native_extension():
     building_on_travis = os.environ.get("TRAVIS", None)
 
     if building_on_travis:
-        tox_env = os.environ.get("TOXENV", None)
-        assert tox_env is not None
+        job_name = os.environ.get("TRAVIS_JOB_NAME", None)
 
-        if "native_extension" in tox_env:
-            assert os.environ.get("SOKOENGINEPYEXT_BUILD", None) == "yes"
+        if job_name and "native extension" in job_name:
+            assert os.environ.get("SOKOENGINEPYEXT_BUILD", None) == "true"
             assert is_using_native_extension()
 
         else:
-            assert os.environ.get("SOKOENGINEPYEXT_BUILD", None) == "no"
+            assert os.environ.get("SOKOENGINEPYEXT_BUILD", None) == "false"
             assert not is_using_native_extension()
 
     else:

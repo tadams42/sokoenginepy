@@ -202,6 +202,20 @@ class BuildExt(build_ext):
         return super().build_extensions()
 
 
+_DOCS_REQUIRES = [
+    "m2r2",
+    "sphinx >= 1.4",
+    "sphinx_rtd_theme",
+]
+_TESTS_REQUIRES = [
+    "check-manifest",
+    "coverage",
+    "factory-boy",
+    "faker",
+    "pytest >= 3.0.0",
+    "pytest-mock",
+]
+
 setup(
     name="sokoenginepy",
     version="0.5.3",
@@ -239,31 +253,22 @@ setup(
         "pybind11>=2.9",
     ],
     extras_require={
-        "docs": ["sphinx >= 1.4", "sphinx_rtd_theme", "m2r2"],
+        "docs": _DOCS_REQUIRES,
+        "tests": _TESTS_REQUIRES,
         "dev": [
             "black",
-            "bumpversion",
-            "isort",
-            "check-manifest",
-            # IPython stuff
-            "ipython",
-            # "jupyter",
-            # "ipdb",
-            # Docs and viewers
-            "sphinx >= 1.4",
-            "sphinx_rtd_theme",
-            "m2r2",
-            # py.test stuff
-            "pytest >= 3.0.0",
+            "bump2version",
             "colored-traceback",
-            "pytest-spec",
-            "pytest-cov",
+            # "ipdb",
+            "ipython",
+            "isort",
+            # "jupyter",
             "pytest-benchmark",
-            "pytest-mock",
-            "coverage",
-            "factory-boy",
-            "faker",
-        ],
+            "pytest-spec",
+            "twine",
+        ]
+        + _DOCS_REQUIRES
+        + _TESTS_REQUIRES,
     },
     ext_modules=[SokoenginepyExtension()],
     cmdclass={"build_ext": BuildExt},

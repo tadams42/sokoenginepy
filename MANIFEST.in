@@ -1,18 +1,23 @@
+prune build
+graft cmake
+graft docs
+prune docs/_build
+prune scratchpad
 graft src
+graft tests
+prune tmp
+prune src/sokoenginepy.egg-info
 
-prune bin
-prune docs
-prune res
-prune src/libsokoengine/build
-prune tests
-prune src/libsokoengine/lib
+include .bumpversion.cfg .gitignore .readthedocs.yml .travis.yaml
+include CMakeLists.txt CMakePresets.json
+include CHANGELOG.md INSTALL.md LICENSE MANIFEST.in README.md setup.cfg setup.py
+
 prune .vscode
-prune src/libsokoengine/.vscode
-
-include LICENSE
-include README.md
+prune .benchmarks
+prune .venv
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4 .directory
-global-exclude .ipynb_checkpoints/* .editorconfig .readthedocs.yml
+global-exclude .ipynb_checkpoints/*
 global-exclude .pytest_cache .pytest_cache/*
-global-exclude CHANGELOG.md TODO.md INSTALL.md tox.ini
+exclude .coverage*
+exclude *.code-workspace

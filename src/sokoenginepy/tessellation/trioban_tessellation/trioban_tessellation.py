@@ -4,9 +4,7 @@ from ..direction import Direction
 from ..tessellation_base import TessellationBase
 
 
-class TriobanTessellation(
-    TessellationBase, metaclass=TessellationBaseInheritableDocstrings
-):
+class TriobanTessellation(TessellationBase):
     _LEGAL_DIRECTIONS = (
         Direction.LEFT,
         Direction.RIGHT,

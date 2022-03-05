@@ -1,8 +1,6 @@
 import os
-from datetime import datetime
 from inspect import getsourcefile
 
-import pytz
 
 RESOURCES_ROOT = os.path.abspath(
     os.path.join(getsourcefile(lambda: 0), "..", "..", "res")
