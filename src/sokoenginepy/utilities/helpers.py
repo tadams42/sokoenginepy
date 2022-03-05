@@ -9,10 +9,6 @@ RESOURCES_ROOT = os.path.abspath(
 )
 
 
-def utcnow():
-    return pytz.utc.localize(datetime.utcnow())
-
-
 def first_index_of(lst, predicate):
     return next((index for index, elem in enumerate(lst) if predicate(elem)), None)
 

@@ -48,7 +48,6 @@ class VariantBoard(Container, metaclass=ABCMeta):
         board_height=0,
         board_str=None,
     ):
-        # pylint: disable=unused-variable
         from ..hexoban_board import HexobanBoard
         from ..octoban_board import OctobanBoard
         from ..sokoban_board import SokobanBoard
@@ -433,7 +432,6 @@ class VariantBoardResizer(metaclass=ABCMeta):
     columns.
     """
 
-    # pylint: disable=protected-access
     def __init__(self, variant_board):
         self.board = variant_board
 

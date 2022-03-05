@@ -164,7 +164,6 @@ class Snapshot(MutableSequence):
         )
 
     def __eq__(self, rv):
-        # pylint: disable=protected-access
         return (
             self.tessellation == rv.tessellation
             and len(self._moves) == len(rv._moves)

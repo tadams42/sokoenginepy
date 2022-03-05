@@ -55,7 +55,6 @@ class SnapshotStringParser:
         )
 
     def convert_from_string(self, from_string: str, to_snapshot: Snapshot):
-        # pylint: disable=protected-access
         if not self._parse(from_string, to_snapshot.tessellation):
             raise ValueError(self._first_encountered_error)
         to_snapshot.clear()

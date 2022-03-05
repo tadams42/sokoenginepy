@@ -1,23 +1,19 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from ..direction import Direction
-from ..tessellation_base import TessellationBase, TessellationBaseInheritableDocstrings
+from ..tessellation_base import TessellationBase
 
 
-class SokobanTessellation(
-    TessellationBase, metaclass=TessellationBaseInheritableDocstrings
-):
+class SokobanTessellation(TessellationBase):
     _LEGAL_DIRECTIONS = (Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN)
 
     _CHR_TO_ATOMIC_MOVE = None
     _ATOMIC_MOVE_TO_CHR = None
 
     @property
-    @copy_ancestor_docstring
     def legal_directions(self):
         return self._LEGAL_DIRECTIONS
 
     @property
-    @copy_ancestor_docstring
     def graph_type(self):
         from ...graph import GraphType
 
@@ -30,7 +26,6 @@ class SokobanTessellation(
         Direction.DOWN: (1, 0),
     }
 
-    @copy_ancestor_docstring
     def neighbor_position(self, position, direction, board_width, board_height):
         # if not is_on_board_1d(position, board_width, board_height):
         #     return None

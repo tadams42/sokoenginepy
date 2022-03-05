@@ -1,8 +1,0 @@
-build/
-docs/_build/
-dist/
-tmp/
-src/libsokoengine/build/
-src/libsokoengine/lib/
-src/sokoenginepy.egg-info
-src/libsokoengine/vscode_build

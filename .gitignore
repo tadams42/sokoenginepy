@@ -51,3 +51,4 @@ docs/_build
 *.kdev4
 
 /scratchpad
+/tmp

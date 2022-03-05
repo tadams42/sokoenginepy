@@ -5,7 +5,7 @@ from ..board_manager import BoardManager
 from ..piece import DEFAULT_PIECE_ID
 
 
-class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings):
+class HashedBoardManager(BoardManager):
     """:class:`.BoardManager` with Zobrist hashing
 
     Adds Zobrist hashing on top of :class:`.BoardManager` and keeps it up to date
@@ -174,7 +174,6 @@ class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings
             self._state_hash ^= self._pushers_factors[to_new_position]
 
     @BoardManager.boxorder.setter
-    @copy_ancestor_docstring
     def boxorder(self, rv):
         old_plus_enabled = self.is_sokoban_plus_enabled
         BoardManager.boxorder.fset(self, rv)
@@ -183,7 +182,6 @@ class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings
             self._zobrist_rehash()
 
     @BoardManager.goalorder.setter
-    @copy_ancestor_docstring
     def goalorder(self, rv):
         old_plus_enabled = self.is_sokoban_plus_enabled
         BoardManager.goalorder.fset(self, rv)
@@ -191,7 +189,6 @@ class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings
             self._solutions_hashes = None
             self._zobrist_rehash()
 
-    @copy_ancestor_docstring
     def enable_sokoban_plus(self):
         old_plus_enabled = self.is_sokoban_plus_enabled
         super().enable_sokoban_plus()
@@ -199,7 +196,6 @@ class HashedBoardManager(BoardManager, metaclass=utilities.InheritableDocstrings
             self._solutions_hashes = None
             self._zobrist_rehash()
 
-    @copy_ancestor_docstring
     def disable_sokoban_plus(self):
         old_plus_enabled = self.is_sokoban_plus_enabled
         super().disable_sokoban_plus()

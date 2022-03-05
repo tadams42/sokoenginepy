@@ -1,12 +1,10 @@
 from ...utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
 from ..cell_orientation import CellOrientation
 from ..direction import Direction
-from ..tessellation_base import TessellationBase, TessellationBaseInheritableDocstrings
+from ..tessellation_base import TessellationBase
 
 
-class OctobanTessellation(
-    TessellationBase, metaclass=TessellationBaseInheritableDocstrings
-):
+class OctobanTessellation(TessellationBase):
     _LEGAL_DIRECTIONS = (
         Direction.LEFT,
         Direction.RIGHT,
@@ -22,12 +20,10 @@ class OctobanTessellation(
     _ATOMIC_MOVE_TO_CHR = None
 
     @property
-    @copy_ancestor_docstring
     def legal_directions(self):
         return self._LEGAL_DIRECTIONS
 
     @property
-    @copy_ancestor_docstring
     def graph_type(self):
         from ...graph import GraphType
 
@@ -44,7 +40,6 @@ class OctobanTessellation(
         Direction.SOUTH_EAST: (1, 1),
     }
 
-    @copy_ancestor_docstring
     def neighbor_position(self, position, direction, board_width, board_height):
         # if not is_on_board_1d(position, board_width, board_height):
         #     return None
@@ -107,7 +102,6 @@ class OctobanTessellation(
             )
         return self._ATOMIC_MOVE_TO_CHR
 
-    @copy_ancestor_docstring
     def cell_orientation(self, position, board_width, board_height):
         row = ROW(position, board_width)
         column = COLUMN(position, board_width)

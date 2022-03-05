@@ -1,4 +1,0 @@
-src/
-tests/
-setup.py
-bin/

@@ -1,7 +1,5 @@
-from functools import partial
+from functools import cached_property, partial
 from itertools import permutations
-
-from cached_property import cached_property
 
 from ... import utilities
 from ..board_state import BoardState

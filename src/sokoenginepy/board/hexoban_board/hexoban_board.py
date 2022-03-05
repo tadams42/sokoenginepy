@@ -35,7 +35,6 @@ class HexobanBoard(VariantBoard):
 
 
 class HexobanBoardResizer(VariantBoardResizer):
-    # pylint: disable=protected-access
     def __init__(self, hexoban_board):
         super().__init__(hexoban_board)
 

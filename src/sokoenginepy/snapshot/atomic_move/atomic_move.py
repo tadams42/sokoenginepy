@@ -79,7 +79,6 @@ class AtomicMove:
         self._moved_box_id: Optional[int] = None
         self.direction: Direction = direction
 
-        # pylint: disable=simplifiable-if-statement
         if box_moved:
             self.is_push_or_pull = True
         else:

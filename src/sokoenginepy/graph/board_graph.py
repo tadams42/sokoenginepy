@@ -62,7 +62,7 @@ class BoardGraph:
 
     def __getitem__(self, position: int) -> "BoardCell":
         try:
-            return self._graph.node[position][self._KEY_CELL]
+            return self._graph.nodes[position][self._KEY_CELL]
 
         except KeyError as e:
             if isinstance(position, int) and position >= 0:
@@ -74,7 +74,7 @@ class BoardGraph:
         from ..board import BoardCell
 
         try:
-            self._graph.node[position][self._KEY_CELL] = BoardCell(board_cell)
+            self._graph.nodes[position][self._KEY_CELL] = BoardCell(board_cell)
 
         except KeyError as e:
             if isinstance(position, int) and position >= 0:
@@ -99,7 +99,7 @@ class BoardGraph:
         retv = False
         try:
             if source_position is not None:
-                for out_edge in self._graph.out_edges_iter(source_position, data=True):
+                for out_edge in self._graph.edges(source_position, data=True):
                     retv = retv or (
                         out_edge[1] == target_position
                         and out_edge[2][self._KEY_DIRECTION] == direction
@@ -128,7 +128,7 @@ class BoardGraph:
         return retv
 
     def remove_all_edges(self):
-        self._graph.remove_edges_from(self._graph.edges())
+        self._graph.remove_edges_from(list(self._graph.edges.keys()))
 
     def add_edge(
         self, source_position: int, neighbor_position: int, direction: "Direction"
@@ -175,7 +175,7 @@ class BoardGraph:
             KeyError: ``from_position`` illegal values
         """
         if self[from_position]:
-            for out_edge in self._graph.out_edges_iter(from_position, data=True):
+            for out_edge in self._graph.edges(from_position, data=True):
                 if out_edge[2][self._KEY_DIRECTION] == direction:
                     return out_edge[1]
 
@@ -190,9 +190,7 @@ class BoardGraph:
             KeyError: ``from_position`` illegal values
         """
         if self[from_position]:
-            return [
-                n for n in self._graph.neighbors_iter(from_position) if self[n].is_wall
-            ]
+            return [n for n in self._graph.neighbors(from_position) if self[n].is_wall]
 
         return []
 
@@ -206,7 +204,7 @@ class BoardGraph:
         """
 
         if self[from_position]:
-            return self._graph.neighbors(from_position)
+            return list(self._graph.neighbors(from_position))
 
         return []
 
@@ -221,7 +219,7 @@ class BoardGraph:
         """
 
         if self[start_position] and self[end_position]:
-            for edge in self._graph.edges_iter(data=True):
+            for edge in self._graph.edges(data=True):
                 edge[2]["weight"] = 1
 
             try:
@@ -241,7 +239,7 @@ class BoardGraph:
             KeyError: ``start_position`` or ``end_position`` illegal values
         """
         if self[start_position] and self[end_position]:
-            for edge in self._graph.edges_iter(data=True):
+            for edge in self._graph.edges(data=True):
                 edge[2]["weight"] = self.out_edge_weight(edge[1])
 
             try:
@@ -308,7 +306,7 @@ class BoardGraph:
             src_position_index += 1
 
             if self[src_position] and self[target_position]:
-                for out_edge in self._graph.out_edges_iter(src_position, data=True):
+                for out_edge in self._graph.edges(src_position, data=True):
                     if out_edge[1] == target_position:
                         retv.append(out_edge[2][self._KEY_DIRECTION])
 

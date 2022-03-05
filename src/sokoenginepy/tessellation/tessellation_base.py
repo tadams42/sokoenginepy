@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from typing import List, Mapping, Tuple
 
-from .. import utilities
 from .cell_orientation import CellOrientation
 from .direction import Direction
 
@@ -9,8 +8,6 @@ from .direction import Direction
 class TessellationBase(metaclass=ABCMeta):
     """
     Base class for all tessellation implementations."""
-
-    # pylint: disable=unused-argument
 
     @property
     @abstractmethod
@@ -116,7 +113,6 @@ class TessellationBase(metaclass=ABCMeta):
         Returns:
             CellOrientation: cell orientation for given ``position``
         """
-        # pylint: disable=no-self-use
         return CellOrientation.DEFAULT
 
     def __eq__(self, rv):
@@ -124,9 +120,3 @@ class TessellationBase(metaclass=ABCMeta):
 
     def __ne__(self, other):
         return not self == other
-
-
-class TessellationBaseInheritableDocstrings(
-    type(TessellationBase), utilities.InheritableDocstrings
-):
-    pass
