@@ -84,4 +84,3 @@ branches:
   only:
     - development
     - master
-    - build_cleanup
