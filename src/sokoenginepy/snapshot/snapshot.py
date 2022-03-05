@@ -1,16 +1,8 @@
 from collections.abc import Iterable, MutableSequence
-from enum import Enum
+from typing import ClassVar, List, Optional, Set, Union
 
 from .. import utilities
-from ..tessellation import Tessellation, UnknownDirectionError
-
-
-class SnapshotConversionError(ValueError):
-    """
-    Exception risen when converting game snapshot to or from snapshot strings.
-    """
-
-    pass
+from ..tessellation import Tessellation
 
 
 class Snapshot(MutableSequence):
@@ -18,28 +10,37 @@ class Snapshot(MutableSequence):
     Sequence of AtomicMove representing snapshot of game.
 
     Args:
-        tessellation_or_description (Tessellation): game tessellation as string or
+        tessellation_or_description: game tessellation as string or
             :class:`.Tessellation` instance
-        solving_mode (SolvingMode): game solving mode
-        moves_data (str): Strings consisting of characters representing
+        solving_mode: game solving mode
+        moves_data: Strings consisting of characters representing
             :class:`.AtomicMove`. If not empty it will be parsed. Also, if not empty,
             solving mode will be parsed from it, and the value of ``solving_mode``
             argument will be ignored
     """
 
-    class NonMoveCharacters(str, Enum):
-        """
-        Some characters that can be found in textual representation of snapshots that
-        do not represent :class:`.AtomicMove`.
-        """
+    JUMP_BEGIN: ClassVar[str] = "["
+    JUMP_END: ClassVar[str] = "]"
+    PUSHER_CHANGE_BEGIN: ClassVar[str] = "{"
+    PUSHER_CHANGE_END: ClassVar[str] = "}"
+    CURRENT_POSITION_CH: ClassVar[str] = "*"
 
-        JUMP_BEGIN = "["
-        JUMP_END = "]"
-        PUSHER_CHANGE_BEGIN = "{"
-        PUSHER_CHANGE_END = "}"
-        CURRENT_POSITION_CH = "*"
+    #: Some characters that can be found in textual representation of snapshots that do
+    #: not represent :class:`.AtomicMove`.
+    NON_MOVE_CHARACTERS: ClassVar[Set[str]] = {
+        JUMP_BEGIN,
+        JUMP_END,
+        PUSHER_CHANGE_BEGIN,
+        PUSHER_CHANGE_END,
+        CURRENT_POSITION_CH,
+    }
 
-    def __init__(self, tessellation_or_description, solving_mode=None, moves_data=""):
+    def __init__(
+        self,
+        tessellation_or_description: Union[Tessellation, str],
+        solving_mode: Optional["SolvingMode"] = None,
+        moves_data: str = "",
+    ):
         super().__init__()
         self._tessellation_instance = Tessellation.instance_from(
             tessellation_or_description
@@ -49,7 +50,7 @@ class Snapshot(MutableSequence):
         self._pushes_count = 0
         self._jumps_count = 0
         self._jumps_count_invalidated = False
-        self._moves = []
+        self._moves: List["AtomicMove"] = []
 
         if not utilities.is_blank(moves_data):
             from .snapshot_string_parser import SnapshotStringParser
@@ -59,17 +60,16 @@ class Snapshot(MutableSequence):
             self._solving_mode = solving_mode
 
         if self._solving_mode is None:
-            raise SnapshotConversionError(
-                "Snapshot not correctly initialized! Missing solving_mode. "
-                + "Either provide it explicitly or provide moves_data."
-                + "tessellation_or_description: '{0}', solving_mode: {1},".format(
-                    tessellation_or_description, solving_mode
-                )
-                + " moves_data: {0}".format(moves_data)
+            raise ValueError(
+                "Snapshot not correctly initialized! Missing solving_mode. Either "
+                "provide it explicitly or provide moves_data. "
+                f"tessellation_or_description: '{tessellation_or_description}', "
+                f"solving_mode: {solving_mode}, "
+                f" moves_data: {moves_data}"
             )
 
     @classmethod
-    def is_snapshot_string(cls, line):
+    def is_snapshot_string(cls, line: str) -> bool:
         """
         Checks if ``line`` is snapshot string.
 
@@ -89,7 +89,14 @@ class Snapshot(MutableSequence):
         return SnapshotStringParser.is_snapshot_string(line)
 
     @property
-    def tessellation(self):
+    def tessellation(
+        self
+    ) -> Union[
+        "SokobanTessellation",
+        "TriobanTessellation",
+        "HexobanTessellation",
+        "OctobanTessellation",
+    ]:
         return self._tessellation_instance.value
 
     # Iterable
@@ -157,7 +164,6 @@ class Snapshot(MutableSequence):
         )
 
     def __eq__(self, rv):
-        # pylint: disable=protected-access
         return (
             self.tessellation == rv.tessellation
             and len(self._moves) == len(rv._moves)
@@ -172,11 +178,11 @@ class Snapshot(MutableSequence):
         return not self == rv
 
     @property
-    def solving_mode(self):
+    def solving_mode(self) -> "SolvingMode":
         return self._solving_mode
 
     @property
-    def moves_count(self):
+    def moves_count(self) -> int:
         """
         Count of atomic moves in self that are not pushes, not jumps and are not
         pusher selections.
@@ -184,11 +190,11 @@ class Snapshot(MutableSequence):
         return self._moves_count
 
     @property
-    def pushes_count(self):
+    def pushes_count(self) -> int:
         return self._pushes_count
 
     @property
-    def jumps_count(self):
+    def jumps_count(self) -> int:
         self._recalculate_jumps_count()
         return self._jumps_count
 
@@ -199,7 +205,7 @@ class Snapshot(MutableSequence):
         self._jumps_count_invalidated = False
         self._moves = []
 
-    def to_str(self, break_long_lines_at=80, rle_encode=False):
+    def to_str(self, break_long_lines_at: int = 80, rle_encode: bool = False) -> str:
         from .snapshot_string_parser import SnapshotStringParser
 
         return SnapshotStringParser.convert_to_string(
@@ -222,12 +228,10 @@ class Snapshot(MutableSequence):
         from .. import game
 
         if self._solving_mode == game.SolvingMode.FORWARD and atomic_move.is_jump:
-            raise SnapshotConversionError(
-                "Forward mode snapshots are not allowed to contain jumps!"
-            )
+            raise ValueError("Forward mode snapshots are not allowed to contain jumps!")
 
         if atomic_move.direction not in self.tessellation.legal_directions:
-            raise UnknownDirectionError(
+            raise ValueError(
                 "Invalid direction for tessellation '{0}'".format(self.tessellation)
             )
 

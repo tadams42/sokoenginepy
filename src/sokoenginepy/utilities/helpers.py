@@ -1,16 +1,10 @@
 import os
-from datetime import datetime
 from inspect import getsourcefile
 
-import pytz
 
 RESOURCES_ROOT = os.path.abspath(
     os.path.join(getsourcefile(lambda: 0), "..", "..", "res")
 )
-
-
-def utcnow():
-    return pytz.utc.localize(datetime.utcnow())
 
 
 def first_index_of(lst, predicate):

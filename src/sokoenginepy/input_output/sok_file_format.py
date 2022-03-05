@@ -2,6 +2,8 @@ import os
 import re
 from enum import Enum
 
+import arrow
+
 from .. import utilities
 from ..board import VariantBoard
 from ..snapshot import Snapshot
@@ -434,11 +436,11 @@ class SOKWriter:
 
         self._write_tagged(
             SOKTags.CREATED_AT,
-            puzzle_collection.created_at.strip() or utilities.utcnow().isoformat(),
+            puzzle_collection.created_at.strip() or arrow.utcnow().isoformat(),
         )
         self._write_tagged(
             SOKTags.UPDATED_AT,
-            puzzle_collection.updated_at.strip() or utilities.utcnow().isoformat(),
+            puzzle_collection.updated_at.strip() or arrow.utcnow().isoformat(),
         )
 
         self.dest_stream.write(

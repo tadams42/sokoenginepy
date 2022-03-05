@@ -1,3 +1,3 @@
 from .cell_orientation import CellOrientation
-from .direction import Direction, UnknownDirectionError
-from .tessellation import Tessellation, UnknownTessellationError
+from .direction import Direction
+from .tessellation import Tessellation

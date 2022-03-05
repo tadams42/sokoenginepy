@@ -10,7 +10,6 @@ from __future__ import absolute_import, print_function
 
 import io
 import os
-import re
 import tempfile
 from glob import glob
 from os.path import basename, dirname, join, splitext
@@ -35,13 +34,10 @@ class fix_pybind11_include_dir:
     https://github.com/pybind/python_example/issues/16
     """
 
-    def __init__(self, user=False):
-        self.user = user
-
     def __str__(self):
         import pybind11
 
-        return pybind11.get_include(self.user)
+        return pybind11.get_include()
 
 
 class SokoenginepyExtension(Extension):
@@ -92,10 +88,7 @@ class SokoenginepyExtension(Extension):
 
     SOURCES = [
         os.path.join(dir_path, file_name)
-        for _ in [
-            "src/libsokoengine/src/libsokoengine",
-            "src/libsokoengine/src/sokoenginepyext",
-        ]
+        for _ in ["src/libsokoengine", "src/sokoenginepyext"]
         for dir_path, directories, files in os.walk(_)
         for file_name in files
         if file_name.endswith(".cpp")
@@ -105,17 +98,10 @@ class SokoenginepyExtension(Extension):
         super().__init__(
             name=self.NAME,
             sources=self.SOURCES,
-            include_dirs=[
-                "src/libsokoengine/lib",
-                fix_pybind11_include_dir(user=False),
-                fix_pybind11_include_dir(user=True),
-            ]
+            include_dirs=["/tmp/cmake_cache", fix_pybind11_include_dir()]
             + [
                 dir_path
-                for _ in [
-                    "src/libsokoengine/src/libsokoengine",
-                    "src/libsokoengine/src/sokoenginepyext",
-                ]
+                for _ in ["src/libsokoengine", "src/sokoenginepyext"]
                 for dir_path, directories, files in os.walk(_)
             ],
             language="c++",
@@ -124,7 +110,7 @@ class SokoenginepyExtension(Extension):
             extra_link_args=self.LDFLAGS,
         )
 
-    CPPITERTOOLS_DIR = os.path.abspath("src/libsokoengine/lib/cppitertools")
+    CPPITERTOOLS_DIR = os.path.abspath("/tmp/cmake_cache/cppitertools")
 
     @classmethod
     def configure(cls, compiler):
@@ -188,6 +174,8 @@ class SokoenginepyExtension(Extension):
             )
             return False
 
+        return boost_ok
+
     _BOOST_INCLUDES = list(
         {
             line.strip()
@@ -214,25 +202,27 @@ class BuildExt(build_ext):
         return super().build_extensions()
 
 
+_DOCS_REQUIRES = [
+    "m2r2",
+    "sphinx >= 1.4",
+    "sphinx_rtd_theme",
+]
+_TESTS_REQUIRES = [
+    "check-manifest",
+    "coverage",
+    "factory-boy",
+    "faker",
+    "pytest >= 3.0.0",
+    "pytest-mock",
+]
+
 setup(
     name="sokoenginepy",
     version="0.5.3",
     license="GPLv3",
     description="Sokoban and variants game engine",
-    long_description="%s\n%s"
-    % (
-        re.compile(
-            "^"
-            + re.escape("[//]: # (start-badges)")
-            + ".*^"
-            + re.escape("[//]: # (end-badges)"),
-            re.M | re.S,
-        ).sub("", read("README.md")),
-        # re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
-        "",
-    ),
-    # In the future this will correctly render Markdown on PyPi:
-    # long_description_content_type='text/markdown',
+    long_description=read("README.md"),
+    long_description_content_type="text/markdown",
     author="Tomislav Adamic",
     author_email="tomislav.adamic@gmail.com",
     url="https://github.com/tadams42/sokoenginepy",
@@ -241,14 +231,13 @@ setup(
     py_modules=[splitext(basename(path))[0] for path in glob("src/*.py")],
     include_package_data=True,
     zip_safe=False,
+    python_requires=">= 3.9",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Programming Language :: Python :: 3 :: Only",
@@ -257,51 +246,29 @@ setup(
         "Topic :: Games/Entertainment :: Puzzle Games",
     ],
     keywords=["game", "sokoban", "hexoban", "octoban", "trioban"],
-    # List run-time dependencies HERE.  These will be installed by pip when
-    # your project is installed. For an analysis of 'install_requires' vs pip's
-    # requirements files see:
-    # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        "pytz >=2016.6.1",
+        "arrow",
         "pyparsing >=2.1.0",
-        "networkx <2.0.0",
-        "cached-property >=1.2.0",
-        "pybind11>=2.2.0,<2.3.0",
+        "networkx >2.5",
+        "pybind11>=2.9",
     ],
-    # List additional groups of dependencies HERE (e.g. development
-    # dependencies). You can install these using the following syntax,
-    # for example:
-    # $ pip install -e .[dev]
     extras_require={
-        "docs": ["sphinx >= 1.4", "sphinx_rtd_theme", "m2r >= 0.1.14"],
+        "docs": _DOCS_REQUIRES,
+        "tests": _TESTS_REQUIRES,
         "dev": [
-            "pycodestyle",
-            "pylint",
             "black",
-            "bumpversion",
-            "isort",
-            "check-manifest",
-            "pylint",
-            "flake8",
-            # IPython stuff
-            "ipython",
-            "jupyter",
-            "ipdb",
-            # Docs and viewers
-            "sphinx",
-            "sphinx_rtd_theme",
-            "m2r",
-            # py.test stuff
-            "pytest >= 3.0.0",
+            "bump2version",
             "colored-traceback",
-            "pytest-spec",
-            "pytest-cov",
+            # "ipdb",
+            "ipython",
+            "isort",
+            # "jupyter",
             "pytest-benchmark",
-            "pytest-mock",
-            "coverage",
-            "factory-boy",
-            "faker",
-        ],
+            "pytest-spec",
+            "twine",
+        ]
+        + _DOCS_REQUIRES
+        + _TESTS_REQUIRES,
     },
     ext_modules=[SokoenginepyExtension()],
     cmdclass={"build_ext": BuildExt},

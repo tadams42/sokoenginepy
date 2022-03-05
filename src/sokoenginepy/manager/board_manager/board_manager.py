@@ -1,7 +1,5 @@
-from functools import partial
+from functools import cached_property, partial
 from itertools import permutations
-
-from cached_property import cached_property
 
 from ... import utilities
 from ..board_state import BoardState
@@ -504,7 +502,7 @@ class BoardManager:
     def boxorder(self):
         """
         See Also:
-            :attr:`.SokobanPlus.boxorder`
+            `.SokobanPlus.boxorder`
         """
         return self._sokoban_plus.boxorder
 
@@ -516,7 +514,7 @@ class BoardManager:
     def goalorder(self):
         """
         See Also:
-            :attr:`.SokobanPlus.goalorder`
+            `.SokobanPlus.goalorder`
         """
         return self._sokoban_plus.goalorder
 
@@ -588,7 +586,7 @@ class BoardManager:
         Generator for all configurations of boxes that result in solved board.
 
         Note:
-            Resultset depends on :attr:`.BoardManager.is_sokoban_plus_enabled`.
+            Resultset depends on `.BoardManager.is_sokoban_plus_enabled`.
 
         Yields:
             `.BoardState`

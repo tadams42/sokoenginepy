@@ -1,0 +1,75 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 19,
+    "patch": 8
+  },
+  "configurePresets": [
+    {
+      "name": "_debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_SHARED_LIBS": "ON",
+        "ENABLE_PYTHON_EXTENSION": "ON",
+        "SOKOENGINEPYEXT_DEBUG": "1"
+      }
+    },
+    {
+      "name": "_release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "BUILD_SHARED_LIBS": "ON",
+        "ENABLE_PYTHON_EXTENSION": "OFF"
+      }
+    },
+    {
+      "name": "_gcc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "/usr/bin/gcc",
+        "CMAKE_CXX_COMPILER": "/usr/bin/g++"
+      }
+    },
+    {
+      "name": "_clang",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "/usr/bin/clang",
+        "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+      }
+    },
+    {
+      "name": "_make",
+      "hidden": true,
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/dev_installs/${presetName}"
+      }
+    },
+    {
+      "name": "_ninja",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/dev_installs/${presetName}"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": ["_clang", "_debug", "_make"]
+    },
+    {
+      "name": "release",
+      "inherits": ["_clang", "_release", "_ninja"]
+    },
+    {
+      "name": "vscode",
+      "inherits": ["_clang", "_debug", "_ninja"]
+    }
+  ]
+}

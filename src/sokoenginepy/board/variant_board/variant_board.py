@@ -6,13 +6,13 @@ from functools import reduce
 
 from ... import utilities
 from ...graph import BoardGraph
-from ...tessellation import Tessellation, UnknownTessellationError
-from ..board_cell import BoardCell, BoardCellCharacters, BoardConversionError
+from ...tessellation import Tessellation
+from ..board_cell import BoardCell, BoardConversionError
 
 _RE_BOARD_STRING = re.compile(
     r"^([0-9\s"
-    + re.escape("".join(c for c in BoardCellCharacters))
-    + re.escape("".join(c for c in utilities.RleCharacters))
+    + re.escape("".join(BoardCell.CHARACTERS))
+    + re.escape("".join(utilities.rle.DELIMITERS))
     + "])*$"
 )
 
@@ -48,7 +48,6 @@ class VariantBoard(Container, metaclass=ABCMeta):
         board_height=0,
         board_str=None,
     ):
-        # pylint: disable=unused-variable
         from ..hexoban_board import HexobanBoard
         from ..octoban_board import OctobanBoard
         from ..sokoban_board import SokobanBoard
@@ -64,7 +63,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
                     board_str=board_str,
                 )
 
-        raise UnknownTessellationError(tessellation_or_description)
+        raise ValueError(tessellation_or_description)
 
     @classmethod
     def is_board_string(cls, line):
@@ -202,7 +201,7 @@ class VariantBoard(Container, metaclass=ABCMeta):
             rows.append(row)
 
         if rle_encode:
-            return utilities.RleCharacters.RLE_ROW_SEPARATOR.join(rows)
+            return utilities.rle.ROW_SEPARATOR.join(rows)
         else:
             return "\n".join(rows)
 
@@ -433,7 +432,6 @@ class VariantBoardResizer(metaclass=ABCMeta):
     columns.
     """
 
-    # pylint: disable=protected-access
     def __init__(self, variant_board):
         self.board = variant_board
 

@@ -47,7 +47,7 @@ class Mover:
         - if position allows pull that pull is optional (pusher is allowed to move
           without pull even if pull is possible).
         - default behavior is to always pull boxes but that can be changed any time
-          through :attr:`.pulls_boxes`
+          through `.pulls_boxes`
 
     - pusher can't push boxes
 
@@ -116,8 +116,8 @@ class Mover:
     @property
     def pulls_boxes(self):
         """
-        Select behavior in :attr:`.SolvingMode.REVERSE` mode when pusher is moving
-        away from box.
+        Select behavior in `.SolvingMode.REVERSE` mode when pusher is moving away
+        from box.
 
         See Also:
             :meth:`.move`
@@ -203,7 +203,7 @@ class Mover:
             pusher_id (int): ID of pusher
 
         See Also:
-            :attr:`.BoardManager.pushers_ids`
+            `.BoardManager.pushers_ids`
         """
 
         if pusher_id == self._selected_pusher:
@@ -226,11 +226,11 @@ class Mover:
     def move(self, direction):
         """Moves currently selected pusher in ``direction``.
 
-        In :attr:`.SolvingMode.FORWARD` mode, pushes the box in front of pusher (if
-        there is one).
+        In `.SolvingMode.FORWARD` mode, pushes the box in front of pusher (if there
+        is one).
 
-        In :attr:`.SolvingMode.REVERSE` mode pulls box together with pusher (if there
-        is one and if ``self.pulls_boxes is True``).
+        In `.SolvingMode.REVERSE` mode pulls box together with pusher (if there is
+        one and if ``self.pulls_boxes is True``).
 
         Args:
             direction (Direction): direction of movement
@@ -252,7 +252,7 @@ class Mover:
 
         Fails if
 
-            - :class:`.Mover` is in :attr:`.SolvingMode.FORWARD` mode
+            - :class:`.Mover` is in `.SolvingMode.FORWARD` mode
             - pusher can't be dropped on ``new_position``
             - first pull had been made
 
@@ -291,7 +291,7 @@ class Mover:
         Takes sequence of moves stored in self.last_move and undoes it.
 
         See Also:
-            :attr:`.Mover.last_move`
+            `.Mover.last_move`
         """
         new_last_moves = []
         old_last_moves = self._last_move

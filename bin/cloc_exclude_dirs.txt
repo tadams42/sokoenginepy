@@ -1,4 +1,0 @@
-build/
-docs/_build/
-dist/
-src/libsokoengine/build/

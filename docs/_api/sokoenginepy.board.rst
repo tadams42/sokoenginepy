@@ -6,8 +6,6 @@ BoardCell
 
 .. autoexception:: sokoenginepy.board.BoardConversionError
 
-.. autoexception:: sokoenginepy.board.IllegalBoardCharacterError
-
 .. autoclass:: sokoenginepy.board.BoardCell
     :members:
     :undoc-members:

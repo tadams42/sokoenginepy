@@ -1,19 +1,17 @@
 from abc import ABCMeta, abstractmethod
+from typing import List, Mapping, Tuple
 
-from .. import utilities
 from .cell_orientation import CellOrientation
-from .direction import UnknownDirectionError
+from .direction import Direction
 
 
 class TessellationBase(metaclass=ABCMeta):
     """
     Base class for all tessellation implementations."""
 
-    # pylint: disable=unused-argument
-
     @property
     @abstractmethod
-    def legal_directions(self):
+    def legal_directions(self) -> List[Direction]:
         """
         Directions generally accepted by Tessellation.
 
@@ -23,7 +21,9 @@ class TessellationBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def neighbor_position(self, position, direction, board_width, board_height):
+    def neighbor_position(
+        self, position: int, direction: Direction, board_width: int, board_height: int
+    ) -> int:
         """
         Calculates neighbor position in given direction.
 
@@ -34,20 +34,20 @@ class TessellationBase(metaclass=ABCMeta):
             int: If resulting position is off-board returns None, otherwise position
 
         Raises:
-            :exc:`.UnknownDirectionError`: in case direction is not one of
+            :exc:`.ValueError`: in case direction is not one of
                 self.legal_directions
         """
         pass
 
     @property
     @abstractmethod
-    def _char_to_atomic_move_dict(self):
+    def _char_to_atomic_move_dict(self) -> Mapping[str, Tuple[Direction, bool]]:
         """Dict mapping string to :class:`.AtomicMove` parameters,"""
         pass
 
     @property
     @abstractmethod
-    def graph_type(self):
+    def graph_type(self) -> "GraphType":
         """
         Type of graph used in given tessellation.
 
@@ -56,7 +56,7 @@ class TessellationBase(metaclass=ABCMeta):
         """
         pass
 
-    def char_to_atomic_move(self, input_chr):
+    def char_to_atomic_move(self, input_chr: str) -> "AtomicMove":
         """
         Converts character to :class:`.AtomicMove`.
 
@@ -64,7 +64,7 @@ class TessellationBase(metaclass=ABCMeta):
            AtomicMove: resulting :class:`.AtomicMove`
 
         Raises:
-            :exc:`.UnknownDirectionError` if conversion not possible.
+            :exc:`.ValueError` if conversion not possible.
         """
         from ..snapshot import AtomicMove
 
@@ -73,19 +73,19 @@ class TessellationBase(metaclass=ABCMeta):
         )
 
         if direction is None:
-            raise UnknownDirectionError(input_chr)
+            raise ValueError(input_chr)
 
         return AtomicMove(direction=direction, box_moved=box_moved)
 
     @property
     @abstractmethod
-    def _atomic_move_to_char_dict(self):
+    def _atomic_move_to_char_dict(self) -> Mapping[Tuple[Direction, bool], str]:
         """
         Dict mapping :class:`.AtomicMove` parameters to string representation.
         """
         pass
 
-    def atomic_move_to_char(self, atomic_move):
+    def atomic_move_to_char(self, atomic_move: "AtomicMove") -> str:
         """
         Converts :class:`.AtomicMove` to string
 
@@ -93,25 +93,26 @@ class TessellationBase(metaclass=ABCMeta):
            str: resulting string representation of :class:`.AtomicMove`
 
         Raises:
-            :exc:`.UnknownDirectionError` if conversion not possible.
+            :exc:`.ValueError` if conversion not possible.
         """
         retv = self._atomic_move_to_char_dict.get(
             (atomic_move.direction, atomic_move.is_push_or_pull), None
         )
 
         if retv is None:
-            raise UnknownDirectionError(atomic_move)
+            raise ValueError(atomic_move)
 
         return retv
 
-    def cell_orientation(self, position, board_width, board_height):
+    def cell_orientation(
+        self, position: int, board_width: int, board_height: int
+    ) -> CellOrientation:
         """
         Calculates board cell orientation for given position.
 
         Returns:
             CellOrientation: cell orientation for given ``position``
         """
-        # pylint: disable=no-self-use
         return CellOrientation.DEFAULT
 
     def __eq__(self, rv):
@@ -119,9 +120,3 @@ class TessellationBase(metaclass=ABCMeta):
 
     def __ne__(self, other):
         return not self == other
-
-
-class TessellationBaseInheritableDocstrings(
-    type(TessellationBase), utilities.InheritableDocstrings
-):
-    pass

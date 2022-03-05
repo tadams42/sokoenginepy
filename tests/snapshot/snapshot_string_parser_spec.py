@@ -1,12 +1,6 @@
 import pytest
 
-from sokoenginepy import (
-    AtomicMove,
-    Direction,
-    SnapshotConversionError,
-    SolvingMode,
-    Tessellation,
-)
+from sokoenginepy import AtomicMove, Direction, SolvingMode, Tessellation
 from sokoenginepy.snapshot.snapshot_string_parser import SnapshotStringParser
 
 from ..fixtures import SnapshotFactory
@@ -148,5 +142,5 @@ class DescribeSnapshotStringParser:
             assert sokoban_snapshot[3] == AtomicMove(Direction.DOWN, box_moved=True)
 
         def it_raises_on_parsing_errors(self, parser, sokoban_snapshot):
-            with pytest.raises(SnapshotConversionError):
+            with pytest.raises(ValueError):
                 parser.convert_from_string("42", sokoban_snapshot)

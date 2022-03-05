@@ -1,67 +1,60 @@
-# sokoenginepy - Sokoban and variants game engine
-
-[//]: # (start-badges)
+# sokoenginepy - Sokoban and variants
 
 [![version](https://img.shields.io/pypi/v/sokoenginepy.svg)](https://pypi.org/project/sokoenginepy/)
 [![license](https://img.shields.io/pypi/l/sokoenginepy.svg)](https://opensource.org/licenses/GPL-3.0)
-[![wheel](https://img.shields.io/pypi/wheel/sokoenginepy.svg)](https://pypi.org/project/sokoenginepy/)
 [![python_versions](https://img.shields.io/pypi/pyversions/sokoenginepy.svg)](https://pypi.org/project/sokoenginepy/)
 [![python_implementations](https://img.shields.io/pypi/implementation/sokoenginepy.svg)](https://pypi.org/project/sokoenginepy/)
-[![travis](https://api.travis-ci.org/tadams42/sokoenginepy.svg)](https://travis-ci.org/tadams42/sokoenginepy)
+[![travis](https://app.travis-ci.com/tadams42/sokoenginepy.svg)](https://app.travis-ci.com/tadams42/sokoenginepy)
 [![docs](https://readthedocs.org/projects/sokoenginepy/badge/?style=flat)](http://sokoenginepy.readthedocs.io/en/latest/)
-[![requirements](https://requires.io/github/tadams42/sokoenginepy/requirements.svg?branch=master)](https://requires.io/github/tadams42/sokoenginepy/requirements/?branch=master)
-[![codacy_grade](https://api.codacy.com/project/badge/Grade/492a7c08b97e4dbe991b0190dd3abf02)](https://app.codacy.com/app/tadams42/sokoenginepy/dashboard)
-[![codecov](https://codecov.io/gh/tadams42/sokoenginepy/branch/development/graph/badge.svg)](https://codecov.io/gh/tadams42/sokoenginepy)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/3dd265ede6bd4c38a2cd1250738a1bfa)](https://app.codacy.com/gh/tadams42/sokoenginepy/dashboard)
+[![codecov](https://codecov.io/gh/tadams42/sokoenginepy/branch/development/graph/badge.svg?token=nnJAZHQyz9)](https://codecov.io/gh/tadams42/sokoenginepy)
 
-[//]: # (end-badges)
+This project implements various utilities for Sokoban:
 
-sokoenginepy is game engine for Sokoban and variants, written in Python and loaded
-with features:
+- board representation for Sokoban, Hexoban, Trioban and Octoban variants with support
+  for Sokoban+ and Multiban for all four variants
+- movement implementation
+- reading and writing of level collections in `.sok`, `.xsb`, `.tsb`, `.hsb` and `.txt`
+  file formats
 
-- implements game logic for `Sokoban`, `Hexoban`, `Trioban` and `Octoban` variants
-  - supports `Sokoban+` for all implemented variants
-  - supports `Multiban` (muliple pushers on board) for all variants
-- reading and writing level collections
-  - fully compatible with [SokobanYASC] .sok file format and variants (.xsb, .tsb, .hsb, .txt)
-- Optional C++ native bindings using [pybind11] and [Boost.Graph] for ultimate speed
+It provides two almost identical implementations:
 
-`sokoenginepy` was inspired by [SokobanYASC], [JSoko], and MazezaM
+- `sokoneginepy` - Python implementation and package
+- `libsokoengine` - C++ library with API that is 99.99% identical to Python
 
-## Installing
+On Linux, Python package can also be optionally built with native extensions so that it
+utilizes `libsokoengine` for raw speed.
 
-Installing `sokoenginepy` should be as simple as
+`libsokoengine` can be built completely independently, and consumed by native C++
+clients.
 
-~~~sh
+## Why?
+
+- experimenting with [Boost.Graph] in C++ and [NetworkX] in Python
+- experimenting with [pybind11]
+- playing with Sokoban file formats; conversion and validation, especially for Hexoban
+  variant
+- ...
+
+## Install
+
+`sokoenginepy` package from [PyPi]:
+
+```sh
 pip install sokoenginepy
-~~~
+```
 
-This will also compile and install native C++ extension that greatly improves speed
-of `sokoenginepy` but is available only on Linux for now. To make this happen, you
-also need this:
+- `libsokoengine` can be built from source code, details are in `README.cpp.md`
+- `sokoenginepy` can be optionally built with native C++ extensions, details are in
+  `INSTALL.md`
 
-~~~sh
-sudo apt install python3-dev libboost-graph-dev
-~~~
+## Documentation
 
-On non-Linux systems, only pure Python gets installed, which gives you exactly same
-API but with less speed in some of CPU hungry operations.
+- [Python usage tutorial](https://sokoenginepy.readthedocs.io/en/latest/tutorial.html)
+- [Python docs](http://sokoenginepy.readthedocs.io/en/latest/)
+- [C++ docs](http://tadams42.github.io/sokoenginepy/)
 
-All other glory details are here: [INSTALL]
-
-## Using
-
-* For quick glance of features and usage check the [Tutorial].
-* For in-depth docs of whole package see [API Reference]
-* For C++ library API docs see [C++ API Reference]
-
-[pybind11]: http://pybind11.readthedocs.io/en/stable/index.html
-[NetworkX]: https://networkx.github.io/
-[Boost.Graph]: https://www.boost.org/doc/libs/1_61_0/libs/graph/doc/index.html
 [SokobanYASC]: https://sourceforge.net/projects/sokobanyasc/
-[JSoko]: https://www.sokoban-online.de/
-[Sokobano]: http://sokobano.de/en/index.php
-[Sokoban for Windows]: http://www.sourcecode.se/sokoban/
-[Tutorial]: https://sokoenginepy.readthedocs.io/en/latest/tutorial.html
-[API reference]: https://sokoenginepy.readthedocs.io/en/latest/api.html
-[INSTALL]: http://sokoenginepy.readthedocs.io/en/latest/install.html
-[C++ API Reference]: http://tadams42.github.io/sokoenginepy/
+[Boost.Graph]: https://www.boost.org/doc/libs/1_78_0/libs/graph/doc/index.html
+[NetworkX]: https://networkx.org/
+[pybind11]: http://pybind11.readthedocs.io/en/stable/index.html

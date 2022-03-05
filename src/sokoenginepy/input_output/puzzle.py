@@ -1,7 +1,5 @@
-from functools import reduce
+from functools import cached_property, reduce
 from operator import add, or_
-
-from cached_property import cached_property
 
 from ..board import BoardCell, VariantBoard
 from ..snapshot import AtomicMove, Snapshot
@@ -17,7 +15,6 @@ class Puzzle:
     board.
     """
 
-    # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
         self,
         board="",
@@ -43,8 +40,6 @@ class Puzzle:
         self.snapshots = snapshots or []
         self.created_at = created_at
         self.updated_at = updated_at
-
-    # pylint: enable=too-many-arguments
 
     @property
     def tessellation(self):
@@ -119,7 +114,6 @@ class PuzzleSnapshot:
     :class:`.Snapshot`.
     """
 
-    # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
         self,
         moves="",
@@ -141,8 +135,6 @@ class PuzzleSnapshot:
         self.notes = notes
         self.created_at = created_at
         self.updated_at = updated_at
-
-    # pylint: enable=too-many-arguments
 
     @property
     def tessellation(self):
@@ -205,8 +197,7 @@ class PuzzleSnapshot:
         return reduce(
             or_,
             [
-                chr == Snapshot.NonMoveCharacters.JUMP_BEGIN
-                or chr == Snapshot.NonMoveCharacters.JUMP_END
+                chr == Snapshot.JUMP_BEGIN or chr == Snapshot.JUMP_END
                 for chr in self.moves
             ],
             False,
