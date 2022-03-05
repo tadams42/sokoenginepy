@@ -29,16 +29,16 @@
 // used for non-api symbols.
 
 #ifdef LIBSOKOENGINE_DLL         // defined if LIBSOKOENGINE is compiled as a DLL
-#ifdef LIBSOKOENGINE_DLL_EXPORTS // defined if we are building the LIBSOKOENGINE DLL
-                                 // (instead of using it)
-#define LIBSOKOENGINE_API LIBSOKOENGINE_HELPER_DLL_EXPORT
-#else
-#define LIBSOKOENGINE_API LIBSOKOENGINE_HELPER_DLL_IMPORT
-#endif // LIBSOKOENGINE_DLL_EXPORTS
-#define LIBSOKOENGINE_LOCAL LIBSOKOENGINE_HELPER_DLL_LOCAL
+    #ifdef LIBSOKOENGINE_DLL_EXPORTS // defined if we are building the LIBSOKOENGINE DLL
+                                    // (instead of using it)
+        #define LIBSOKOENGINE_API LIBSOKOENGINE_HELPER_DLL_EXPORT
+    #else
+        #define LIBSOKOENGINE_API LIBSOKOENGINE_HELPER_DLL_IMPORT
+    #endif // LIBSOKOENGINE_DLL_EXPORTS
+    #define LIBSOKOENGINE_LOCAL LIBSOKOENGINE_HELPER_DLL_LOCAL
 #else // LIBSOKOENGINE_DLL is not defined: this means LIBSOKOENGINE is a static lib.
-#define LIBSOKOENGINE_API
-#define LIBSOKOENGINE_LOCAL
+    #define LIBSOKOENGINE_API
+    #define LIBSOKOENGINE_LOCAL
 #endif // LIBSOKOENGINE_DLL
 
 // #############################################################################

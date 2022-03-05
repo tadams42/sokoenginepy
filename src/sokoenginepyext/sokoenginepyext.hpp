@@ -13,9 +13,7 @@ template <typename T> bool CheckCast(py::handle obj) {
   try {
     obj.cast<T>();
     return true;
-  } catch (py::cast_error &e) {
-    return false;
-  } catch (py::error_already_set &e) {
+  } catch (py::cast_error &e) { return false; } catch (py::error_already_set &e) {
     return false;
   }
 }
@@ -30,8 +28,10 @@ template <typename T> struct extract {
 
 typedef long long py_int_t;
 
-sokoengine::position_t receive_position(const py::object &board_position,
+sokoengine::position_t receive_position(const py::handle &board_position,
                                         bool *converted = nullptr);
-sokoengine::position_t receive_position_throw(const py::object &board_position);
+sokoengine::position_t receive_position_throw(const py::handle &board_position);
+
+sokoengine::Positions receive_positions_throw(const py::iterable &pushers_positions);
 
 } // namespace pybind11

@@ -37,37 +37,17 @@ htmlcov
 # Sphinx
 docs/_build
 
-# web apps
-log/*
-tmp/*
-public/*
-uploads/*
-config/production.conf
-.cache/
-
-# Logs
-log/
-*.log
-pip-log.txt
-npm-debug.log*
-
-# Translations
-*.mo
-*.pot
-
-# Pycharm
-# We ignore whole project dir and then 'git add -f`
-# pieces that are meant to be shared (run configurations etc...)
-.idea/
-
 # VS Code
-.vscode
+.vscode/
+*.code-workspace
 
 # Benchmarks and profiling
 *.prof
 .benchmarks
 
+# KDE
 .directory
+.kdev4/
+*.kdev4
 
-cmake_build/
-compile_commands.json
+/scratchpad

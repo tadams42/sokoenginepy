@@ -78,8 +78,8 @@ public:
   void clear();
   void mark_play_area();
   Positions positions_reachable_by_pusher(
-      position_t pusher_position,
-      const Positions &excluded_positions = Positions()) const;
+    position_t pusher_position,
+    const Positions &excluded_positions = Positions()) const;
   position_t
   normalized_pusher_position(position_t pusher_position,
                              const Positions &excluded_positions = Positions()) const;

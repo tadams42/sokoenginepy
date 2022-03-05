@@ -39,7 +39,7 @@ class Snapshot(MutableSequence):
         self,
         tessellation_or_description: Union[Tessellation, str],
         solving_mode: Optional["SolvingMode"] = None,
-        moves_data="",
+        moves_data: str = "",
     ):
         super().__init__()
         self._tessellation_instance = Tessellation.instance_from(

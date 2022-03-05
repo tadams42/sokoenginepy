@@ -52,7 +52,7 @@ PYBIND11_MODULE(sokoenginepyext, m) {
 
 namespace pybind11 {
 
-position_t receive_position(const object &board_position, bool *converted) {
+position_t receive_position(const handle &board_position, bool *converted) {
   py_int_t maybe_number;
 
   if (converted != nullptr) *converted = true;
@@ -71,7 +71,7 @@ position_t receive_position(const object &board_position, bool *converted) {
   return retv;
 }
 
-position_t receive_position_throw(const object &board_position) {
+position_t receive_position_throw(const handle &board_position) {
   bool converted;
   position_t retv = receive_position(board_position, &converted);
 
@@ -81,6 +81,16 @@ position_t receive_position_throw(const object &board_position) {
     throw index_error("Board position must be integer!");
   else
     return retv;
+}
+
+Positions receive_positions_throw(const py::iterable &positions) {
+  Positions retv;
+  if (!positions.is_none()) {
+    for (auto val : positions) {
+      retv.push_back(receive_position_throw(val));
+    }
+  }
+  return retv;
 }
 
 } // namespace pybind11

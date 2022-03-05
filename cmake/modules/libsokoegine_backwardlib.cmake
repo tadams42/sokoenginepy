@@ -18,14 +18,13 @@
 #
 # Author: Tomislav Adamic - tomislav.adamic@gmail.com
 
-set(SOURCE_LIBS "${CMAKE_SOURCE_DIR}/lib")
-file(MAKE_DIRECTORY "${SOURCE_LIBS}")
+include(libsokoengine_local_cache_dir)
 
-if(NOT EXISTS "${SOURCE_LIBS}/backward-cpp/")
+if(NOT EXISTS "${LOCAL_CACHE_DIR}/backward-cpp/")
     execute_process(
         COMMAND git clone https://github.com/bombela/backward-cpp.git
-        WORKING_DIRECTORY "${SOURCE_LIBS}"
+        WORKING_DIRECTORY "${LOCAL_CACHE_DIR}"
     )
 endif()
 
-add_subdirectory("${SOURCE_LIBS}/backward-cpp")
+add_subdirectory("${LOCAL_CACHE_DIR}/backward-cpp" "${CMAKE_BINARY_DIR}/backward-cpp")
