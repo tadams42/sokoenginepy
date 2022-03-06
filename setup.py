@@ -3,9 +3,7 @@ import os
 import setuptools
 
 # Available at setup time due to pyproject.toml
-from pybind11.setup_helpers import Pybind11Extension
-
-from pybind11.setup_helpers import ParallelCompile, naive_recompile
+from pybind11.setup_helpers import ParallelCompile, Pybind11Extension, naive_recompile
 
 
 class SokoenginepyextOptions:

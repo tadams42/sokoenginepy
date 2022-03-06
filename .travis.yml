@@ -17,7 +17,7 @@ jobs:
       language: python
       python: 3.9
       before_install:
-        - python -m pip install --upgrade pip wheel
+        - pip install --upgrade pip wheel
       install:
         - bash <(curl -Ls https://coverage.codacy.com/get.sh) download
         - curl -Os https://uploader.codecov.io/latest/linux/codecov
@@ -36,15 +36,15 @@ jobs:
       python: 3.9
       env:
         - SOKOENGINEPYEXT_BUILD=true
+        - SOKOENGINEPYEXT_DEBUG=true
       addons:
         apt:
           packages:
             - libboost-graph-dev
       before_install:
-        - python -m pip install --upgrade pip wheel
+        - pip install --upgrade pip wheel
       install:
-        - pip install pybind11
-        - pip install .[tests]
+        - pip -vv install .[tests]
       script:
         - pytest
 
@@ -62,7 +62,7 @@ jobs:
       language: python
       python: 3.9
       before_install:
-        - python -m pip install --upgrade pip wheel
+        - pip install --upgrade pip wheel
       install:
         - pip install .[docs]
       script:
@@ -72,7 +72,7 @@ jobs:
       language: python
       python: 3.9
       before_install:
-        - python -m pip install --upgrade pip wheel
+        - pip install --upgrade pip wheel
       install:
         - pip install .[tests]
       script:
