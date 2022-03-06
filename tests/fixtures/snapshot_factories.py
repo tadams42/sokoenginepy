@@ -3,7 +3,7 @@ import pytest
 
 from sokoenginepy import Snapshot, SolvingMode, Tessellation
 
-from ..test_helpers import fake
+from .misc import fake
 
 
 class SnapshotFactory(factory.Factory):

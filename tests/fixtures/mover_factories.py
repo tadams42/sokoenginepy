@@ -1,6 +1,5 @@
 from itertools import permutations
 
-import factory
 import pytest
 
 from sokoenginepy import (
@@ -11,10 +10,10 @@ from sokoenginepy import (
     SokobanBoard,
     SolvingMode,
 )
-from sokoenginepy.game import JumpCommand, MoveCommand, SelectPusherCommand
+from sokoenginepy.game import JumpCommand, SelectPusherCommand
 from sokoenginepy.utilities import index_1d
 
-from ..test_helpers import fake
+from .misc import fake
 
 
 @pytest.fixture

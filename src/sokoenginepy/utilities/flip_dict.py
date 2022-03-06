@@ -70,7 +70,7 @@ class Flipdict(dict):
         """
         return self._flip
 
-    #{ Non-mutating methods that are NOT delegated to the dict superclass.
+    # { Non-mutating methods that are NOT delegated to the dict superclass.
 
     def __repr__(self):
         return "%s(%r)" % (self.__class__.__name__, dict(self))
@@ -88,9 +88,9 @@ class Flipdict(dict):
         """
         return cls(dict.fromkeys(keys, value))
 
-    #}
+    # }
 
-    #{ Mutating methods.  These must keep the inverse mapping in sync!
+    # { Mutating methods.  These must keep the inverse mapping in sync!
 
     def __setitem__(self, key, val):
         """self[key] = val (and self.flip[val] = key)
@@ -99,7 +99,7 @@ class Flipdict(dict):
             >>> fd = Flipdict(one=1, two=2)
             >>> fd['two'] = 22
             >>> fd
-            Flipdict({'two': 22, 'one': 1})
+            Flipdict({'one': 1, 'two': 22})
             >>> fd.flip
             Flipdict({1: 'one', 22: 'two'})
 
@@ -120,7 +120,7 @@ class Flipdict(dict):
         """
         k = self._flip.get(val, _NOTFOUND)
         if not (k is _NOTFOUND or k == key):
-            raise KeyError('(key,val) would erase mapping for value %r' % val)
+            raise KeyError("(key,val) would erase mapping for value %r" % val)
 
         v = self.get(key, _NOTFOUND)
         if v is not _NOTFOUND:
@@ -142,10 +142,10 @@ class Flipdict(dict):
         # Make progressively weaker assumptions about "other"
         if other is None:
             pass
-        elif hasattr(other, 'iteritems'):  # iteritems saves memory and lookups
+        elif hasattr(other, "iteritems"):  # iteritems saves memory and lookups
             for k, v in other.items():
                 self[k] = v
-        elif hasattr(other, 'keys'):
+        elif hasattr(other, "keys"):
             for k in list(other.keys()):
                 self[k] = other[k]
         else:
@@ -179,13 +179,14 @@ def makepair(*args, **kw):
     Example::
         >>> chr2num, num2chr = makepair({'a':1, 'b':2, 'c':3})
         >>> chr2num['z'] = 26
-        >>> num2chr.items()
+        >>> list(num2chr.items())
         [(1, 'a'), (2, 'b'), (3, 'c'), (26, 'z')]
     """
     fd = Flipdict(*args, **kw)
     return fd, fd.flip
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod(optionflags=doctest.ELLIPSIS)

@@ -3,7 +3,7 @@ import pytest
 
 from sokoenginepy import AtomicMove, Direction
 
-from ..test_helpers import fake
+from .misc import fake
 
 
 class AtomicMoveFactory(factory.Factory):

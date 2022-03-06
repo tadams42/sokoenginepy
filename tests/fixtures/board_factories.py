@@ -15,7 +15,7 @@ from sokoenginepy import (
 )
 from sokoenginepy.utilities import index_1d
 
-from ..test_helpers import fake
+from .misc import fake
 
 
 @pytest.fixture
