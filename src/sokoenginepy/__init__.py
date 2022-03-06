@@ -7,4 +7,4 @@ from .manager import *
 from .snapshot import *
 from .tessellation import *
 
-__version__ = "0.5.3"
+__version__ = "0.5.4"
