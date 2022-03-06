@@ -29,10 +29,9 @@
 // used for non-api symbols.
 
 #ifdef LIBSOKOENGINE_DLL         // defined if LIBSOKOENGINE is compiled as a DLL
-    #ifdef LIBSOKOENGINE_DLL_EXPORTS // defined if we are building the LIBSOKOENGINE DLL
-                                    // (instead of using it)
+    #ifdef LIBSOKOENGINE_DLL_EXPORTS // libsokoengine shared library is being built
         #define LIBSOKOENGINE_API LIBSOKOENGINE_HELPER_DLL_EXPORT
-    #else
+    #else                            // libsokoengine shared library is being used
         #define LIBSOKOENGINE_API LIBSOKOENGINE_HELPER_DLL_IMPORT
     #endif // LIBSOKOENGINE_DLL_EXPORTS
     #define LIBSOKOENGINE_LOCAL LIBSOKOENGINE_HELPER_DLL_LOCAL

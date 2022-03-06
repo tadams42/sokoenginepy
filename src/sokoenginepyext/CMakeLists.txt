@@ -6,7 +6,6 @@ if(ENABLE_PYTHON_EXTENSION)
     include(libsokoengine_pybind11)
 
     pybind11_add_module(sokoenginepyext
-        # $<TARGET_OBJECTS:sokoengine_obj>
         sokoenginepyext.cpp
         export_direction.cpp
         export_atomic_move.cpp
