@@ -2,9 +2,16 @@ from unittest.mock import patch
 
 import pytest
 
-from sokoenginepy import (BoardConversionError, BoardGraph, Direction,
-                          GraphType, SokobanBoard, Tessellation, TriobanBoard,
-                          VariantBoard)
+from sokoenginepy import (
+    BoardConversionError,
+    BoardGraph,
+    Direction,
+    GraphType,
+    SokobanBoard,
+    Tessellation,
+    TriobanBoard,
+    VariantBoard,
+)
 from sokoenginepy.utilities import index_1d
 
 
@@ -28,11 +35,13 @@ class DescribeVariantBoard:
 
     class describe_parse_board_string:
         def it_parses_regular_board(self):
-            src = " ##########\n    \n" +\
-                  " ## @ *   #\n" +\
-                  "##  $ ####\n" +\
-                  "# $.+ #\n" +\
-                  "#######\n"
+            src = (
+                " ##########\n    \n"
+                + " ## @ *   #\n"
+                + "##  $ ####\n"
+                + "# $.+ #\n"
+                + "#######\n"
+            )
             result = [
                 " ##########",
                 "           ",
@@ -46,11 +55,13 @@ class DescribeVariantBoard:
             assert parsed == result
 
         def it_parses_RLE_board(self):
-            src = " ##########   |" +\
-                  " ## @ *   #|" +\
-                  "##  $ ####|" +\
-                  "# $.+ #|||" +\
-                  "#######   |"
+            src = (
+                " ##########   |"
+                + " ## @ *   #|"
+                + "##  $ ####|"
+                + "# $.+ #|||"
+                + "#######   |"
+            )
             result = [
                 " ##########   ",
                 " ## @ *   #   ",
@@ -65,20 +76,24 @@ class DescribeVariantBoard:
             assert parsed == result
 
         def it_raises_on_illegal_characters(self):
-            src = " ##########\n\n" +\
-                  " ##       #\n" +\
-                  "##   z####\n" +\
-                  "#   a #\n" +\
-                  "#######\n"
+            src = (
+                " ##########\n\n"
+                + " ##       #\n"
+                + "##   z####\n"
+                + "#   a #\n"
+                + "#######\n"
+            )
             with pytest.raises(BoardConversionError):
                 VariantBoard.parse_board_string(src)
 
         def it_discards_empty_but_not_blank_lines(self):
-            src = " ##########\n    \n\n" +\
-                  " ## @ *   #\n\n" +\
-                  "##  $ ####\n\n" +\
-                  "# $.+ #\n\n" +\
-                  "#######\n\n"
+            src = (
+                " ##########\n    \n\n"
+                + " ## @ *   #\n\n"
+                + "##  $ ####\n\n"
+                + "# $.+ #\n\n"
+                + "#######\n\n"
+            )
             result = [
                 " ##########",
                 "           ",
@@ -139,7 +154,7 @@ class DescribeVariantBoard:
             assert board.graph.out_edges_count(0, 1) == 2
             assert board.graph.out_edges_count(1, 0) == 2
 
-    if hasattr(VariantBoard, '_reinit'):
+    if hasattr(VariantBoard, "_reinit"):
 
         class describe__reinit:
             def it_reinitializes_graph_vertices(self, variant_board):
@@ -155,9 +170,7 @@ class DescribeVariantBoard:
                 assert variant_board.height == 5
 
             def it_optionally_recreates_all_adges(self, variant_board):
-                variant_board._reinit(
-                    width=4, height=5, reconfigure_edges=False
-                )
+                variant_board._reinit(width=4, height=5, reconfigure_edges=False)
                 assert variant_board.graph.edges_count == 0
                 variant_board._reinit(width=4, height=5)
                 assert variant_board.graph.edges_count > 0
@@ -176,24 +189,24 @@ class DescribeVariantBoard:
             assert variant_board.height == old_height
 
     class describe_resize:
-        def test_adds_right_columns_and_bottom_rows_when_enlarging(
-            self, variant_board
-        ):
-            output = "\n".join([
-                "----#####------------",
-                "----#--@#------------",
-                "----#$--#------------",
-                "--###--$##-----------",
-                "--#--$-$-#-----------",
-                "###-#-##-#---######--",
-                "#---#-##-#####--..#--",
-                "#-$--$----------..#--",
-                "#####-###-#@##--..#--",
-                "----#-----#########--",
-                "----#######----------",
-                "---------------------",
-                "---------------------",
-            ])
+        def test_adds_right_columns_and_bottom_rows_when_enlarging(self, variant_board):
+            output = "\n".join(
+                [
+                    "----#####------------",
+                    "----#--@#------------",
+                    "----#$--#------------",
+                    "--###--$##-----------",
+                    "--#--$-$-#-----------",
+                    "###-#-##-#---######--",
+                    "#---#-##-#####--..#--",
+                    "#-$--$----------..#--",
+                    "#####-###-#@##--..#--",
+                    "----#-----#########--",
+                    "----#######----------",
+                    "---------------------",
+                    "---------------------",
+                ]
+            )
             old_width = variant_board.width
             old_height = variant_board.height
             variant_board.resize(old_width + 2, old_height + 2)
@@ -204,17 +217,19 @@ class DescribeVariantBoard:
         def test_removes_right_columns_and_bottom_rows_when_compacting(
             self, variant_board
         ):
-            output = "\n".join([
-                "----#####--------",
-                "----#--@#--------",
-                "----#$--#--------",
-                "--###--$##-------",
-                "--#--$-$-#-------",
-                "###-#-##-#---####",
-                "#---#-##-#####--.",
-                "#-$--$----------.",
-                "#####-###-#@##--.",
-            ])
+            output = "\n".join(
+                [
+                    "----#####--------",
+                    "----#--@#--------",
+                    "----#$--#--------",
+                    "--###--$##-------",
+                    "--#--$-$-#-------",
+                    "###-#-##-#---####",
+                    "#---#-##-#####--.",
+                    "#-$--$----------.",
+                    "#####-###-#@##--.",
+                ]
+            )
             old_width = variant_board.width
             old_height = variant_board.height
             variant_board.resize(old_width - 2, old_height - 2)
@@ -223,34 +238,35 @@ class DescribeVariantBoard:
             assert variant_board.to_str(use_visible_floor=True) == output
 
         def test_reconfigures_graph_edges_only_once(self, variant_board, mocker):
-            if VariantBoard.__module__.startswith('sokoenginepy.'):
+            if VariantBoard.__module__.startswith("sokoenginepy."):
                 with mocker.patch(
-                    'sokoenginepy.BoardGraph.reconfigure_edges',
-                    return_value=None
+                    "sokoenginepy.BoardGraph.reconfigure_edges", return_value=None
                 ):
                     variant_board.resize(2, 2)
                     assert variant_board.graph.reconfigure_edges.call_count == 1
 
     class describe_resize_and_center:
         def test_adds_columns_and_rows_when_enlarging(self, variant_board):
-            output = "\n".join([
-                "------------------------",
-                "------------------------",
-                "------#####-------------",
-                "------#--@#-------------",
-                "------#$--#-------------",
-                "----###--$##------------",
-                "----#--$-$-#------------",
-                "--###-#-##-#---######---",
-                "--#---#-##-#####--..#---",
-                "--#-$--$----------..#---",
-                "--#####-###-#@##--..#---",
-                "------#-----#########---",
-                "------#######-----------",
-                "------------------------",
-                "------------------------",
-                "------------------------",
-            ])
+            output = "\n".join(
+                [
+                    "------------------------",
+                    "------------------------",
+                    "------#####-------------",
+                    "------#--@#-------------",
+                    "------#$--#-------------",
+                    "----###--$##------------",
+                    "----#--$-$-#------------",
+                    "--###-#-##-#---######---",
+                    "--#---#-##-#####--..#---",
+                    "--#-$--$----------..#---",
+                    "--#####-###-#@##--..#---",
+                    "------#-----#########---",
+                    "------#######-----------",
+                    "------------------------",
+                    "------------------------",
+                    "------------------------",
+                ]
+            )
             old_width = variant_board.width
             old_height = variant_board.height
             variant_board.resize_and_center(old_width + 5, old_height + 5)
@@ -261,17 +277,19 @@ class DescribeVariantBoard:
         def test_removes_right_columns_and_bottom_rows_when_compacting(
             self, variant_board
         ):
-            output = "\n".join([
-                "----#####--------",
-                "----#--@#--------",
-                "----#$--#--------",
-                "--###--$##-------",
-                "--#--$-$-#-------",
-                "###-#-##-#---####",
-                "#---#-##-#####--.",
-                "#-$--$----------.",
-                "#####-###-#@##--.",
-            ])
+            output = "\n".join(
+                [
+                    "----#####--------",
+                    "----#--@#--------",
+                    "----#$--#--------",
+                    "--###--$##-------",
+                    "--#--$-$-#-------",
+                    "###-#-##-#---####",
+                    "#---#-##-#####--.",
+                    "#-$--$----------.",
+                    "#####-###-#@##--.",
+                ]
+            )
             old_width = variant_board.width
             old_height = variant_board.height
             variant_board.resize(old_width - 2, old_height - 2)
@@ -280,10 +298,9 @@ class DescribeVariantBoard:
             assert variant_board.to_str(use_visible_floor=True) == output
 
         def test_reconfigures_graph_edges_only_once(self, variant_board, mocker):
-            if VariantBoard.__module__.startswith('sokoenginepy.'):
+            if VariantBoard.__module__.startswith("sokoenginepy."):
                 with mocker.patch(
-                    'sokoenginepy.BoardGraph.reconfigure_edges',
-                    return_value=None
+                    "sokoenginepy.BoardGraph.reconfigure_edges", return_value=None
                 ):
                     variant_board.resize_and_center(42, 42)
                     assert variant_board.graph.reconfigure_edges.call_count == 1
@@ -302,46 +319,49 @@ class DescribeVariantBoard:
             assert str(variant_board) == output
 
         def test_reconfigures_graph_edges_only_once(self, variant_board, mocker):
-            if VariantBoard.__module__.startswith('sokoenginepy.'):
+            if VariantBoard.__module__.startswith("sokoenginepy."):
                 with mocker.patch(
-                    'sokoenginepy.BoardGraph.reconfigure_edges',
-                    return_value=None
+                    "sokoenginepy.BoardGraph.reconfigure_edges", return_value=None
                 ):
                     variant_board.resize(2, 2)
                     assert variant_board.graph.reconfigure_edges.call_count == 1
 
     class describe_reverse_rows:
         def test_mirrors_board_up_down(self, variant_board):
-            output = "\n".join([
-                "----#######--------",
-                "----#-----#########",
-                "#####-###-#@##--..#",
-                "#-$--$----------..#",
-                "#---#-##-#####--..#",
-                "###-#-##-#---######",
-                "--#--$-$-#---------",
-                "--###--$##---------",
-                "----#$--#----------",
-                "----#--@#----------",
-                "----#####----------",
-            ])
+            output = "\n".join(
+                [
+                    "----#######--------",
+                    "----#-----#########",
+                    "#####-###-#@##--..#",
+                    "#-$--$----------..#",
+                    "#---#-##-#####--..#",
+                    "###-#-##-#---######",
+                    "--#--$-$-#---------",
+                    "--###--$##---------",
+                    "----#$--#----------",
+                    "----#--@#----------",
+                    "----#####----------",
+                ]
+            )
             variant_board.reverse_rows()
             assert variant_board.to_str(use_visible_floor=True) == output
 
     class describe_reverse_columns:
         def test_mirrors_board_left_rightt(self, variant_board):
-            output = "\n".join([
-                "----------#####----",
-                "----------#@--#----",
-                "----------#--$#----",
-                "---------##$--###--",
-                "---------#-$-$--#--",
-                "######---#-##-#-###",
-                "#..--#####-##-#---#",
-                "#..----------$--$-#",
-                "#..--##@#-###-#####",
-                "#########-----#----",
-                "--------#######----",
-            ])
+            output = "\n".join(
+                [
+                    "----------#####----",
+                    "----------#@--#----",
+                    "----------#--$#----",
+                    "---------##$--###--",
+                    "---------#-$-$--#--",
+                    "######---#-##-#-###",
+                    "#..--#####-##-#---#",
+                    "#..----------$--$-#",
+                    "#..--##@#-###-#####",
+                    "#########-----#----",
+                    "--------#######----",
+                ]
+            )
             variant_board.reverse_columns()
             assert variant_board.to_str(use_visible_floor=True) == output

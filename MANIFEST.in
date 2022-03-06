@@ -1,31 +1,24 @@
+prune build
+graft cmake
 graft docs
+prune docs/_build
+prune scratchpad
 graft src
 graft tests
-graft bin
-graft lib
+prune tmp
+prune src/sokoenginepy.egg-info
 
-include .coveragerc
-include .editorconfig
-include .style.yapf
+include .bumpversion.cfg .gitignore .readthedocs.yml .travis.yaml
+include CMakeLists.txt CMakePresets.json
+include CHANGELOG.md INSTALL.md LICENSE MANIFEST.in README.md setup.cfg setup.py README.libsokoengine.md
+include bin/mover_benchmarks.py bin/mover_profiling.py
 
-include CHANGELOG.rst
-include LICENSE
-include README.rst
-include INSTALL.rst
-include TODO.rst
+prune .vscode
+prune .benchmarks
+prune .venv
 
-include tox.ini .travis.yml setup_ext.py
-
-global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4
-
+global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4 .directory
 global-exclude .ipynb_checkpoints/*
-
-prune docs/_build
-prune lib/libsokoengine/docs/_build
-prune lib/libsokoengine/build
-prune lib/libsokoengine/lib/cppitertools
-prune lib/libsokoengine/lib/backward-cpp
-prune lib/libsokoengine/lib/pybind11
-
-recursive-include res *.ipynb
-recursive-include res *.py
+global-exclude .pytest_cache .pytest_cache/*
+exclude .coverage*
+exclude *.code-workspace

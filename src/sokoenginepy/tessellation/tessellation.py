@@ -1,14 +1,11 @@
 from enum import Enum
+from typing import Union
 
 from .. import utilities
 from .hexoban_tessellation import HexobanTessellation
 from .octoban_tessellation import OctobanTessellation
 from .sokoban_tessellation import SokobanTessellation
 from .trioban_tessellation import TriobanTessellation
-
-
-class UnknownTessellationError(ValueError):
-    pass
 
 
 class Tessellation(Enum):
@@ -90,18 +87,27 @@ class Tessellation(Enum):
         return "Tessellation." + self.name
 
     @classmethod
-    def instance_from(cls, tessellation_or_description):
+    def instance_from(
+        cls,
+        tessellation_or_description: Union[
+            SokobanTessellation,
+            TriobanTessellation,
+            HexobanTessellation,
+            OctobanTessellation,
+            str,
+        ],
+    ) -> "Tessellation":
         if (
-            not tessellation_or_description or
-            'sokoban' in str(tessellation_or_description).lower() or
-            utilities.is_blank(str(tessellation_or_description))
+            not tessellation_or_description
+            or "sokoban" in str(tessellation_or_description).lower()
+            or utilities.is_blank(str(tessellation_or_description))
         ):
             return cls.SOKOBAN
-        elif 'trioban' in str(tessellation_or_description).lower():
+        elif "trioban" in str(tessellation_or_description).lower():
             return cls.TRIOBAN
-        elif 'hexoban' in str(tessellation_or_description).lower():
+        elif "hexoban" in str(tessellation_or_description).lower():
             return cls.HEXOBAN
-        elif 'octoban' in str(tessellation_or_description).lower():
+        elif "octoban" in str(tessellation_or_description).lower():
             return cls.OCTOBAN
         else:
-            raise UnknownTessellationError(tessellation_or_description)
+            raise ValueError(tessellation_or_description)

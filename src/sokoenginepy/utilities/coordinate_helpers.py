@@ -28,6 +28,10 @@ def is_on_board_2d(x, y, board_width, board_height):
 
 
 def is_on_board_1d(index, board_width, board_height):
-    return index is not None and index >= 0 and is_on_board_2d(
-        X(index, board_width), Y(index, board_width), board_width, board_height
+    return (
+        index is not None
+        and index >= 0
+        and is_on_board_2d(
+            X(index, board_width), Y(index, board_width), board_width, board_height
+        )
     )

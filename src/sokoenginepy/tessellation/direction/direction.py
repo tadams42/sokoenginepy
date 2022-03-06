@@ -1,12 +1,10 @@
 from enum import IntEnum
-
-
-class UnknownDirectionError(ValueError):
-    pass
+from typing import Mapping
 
 
 class Direction(IntEnum):
     """Directions of movement."""
+
     UP = 0
     NORTH_EAST = 1
     RIGHT = 2
@@ -20,11 +18,11 @@ class Direction(IntEnum):
         return "Direction." + self.name
 
     @property
-    def opposite(self):
-        return _OPPOSITE.get(self, None)
+    def opposite(self) -> "Direction":
+        return _OPPOSITE[self]
 
 
-_OPPOSITE = {
+_OPPOSITE: Mapping[Direction, Direction] = {
     Direction.UP: Direction.DOWN,
     Direction.DOWN: Direction.UP,
     Direction.LEFT: Direction.RIGHT,
@@ -32,5 +30,5 @@ _OPPOSITE = {
     Direction.NORTH_WEST: Direction.SOUTH_EAST,
     Direction.SOUTH_EAST: Direction.NORTH_WEST,
     Direction.NORTH_EAST: Direction.SOUTH_WEST,
-    Direction.SOUTH_WEST: Direction.NORTH_EAST
+    Direction.SOUTH_WEST: Direction.NORTH_EAST,
 }

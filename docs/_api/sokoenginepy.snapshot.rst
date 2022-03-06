@@ -13,8 +13,6 @@ AtomicMove
 Snapshot
 --------
 
-.. autoexception:: sokoenginepy.snapshot.SnapshotConversionError
-
 .. autoclass:: sokoenginepy.snapshot.Snapshot
     :members:
     :undoc-members:

@@ -1,12 +1,18 @@
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction, JumpCommand,
-                          MoveCommand, SelectPusherCommand)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID,
+    AtomicMove,
+    Direction,
+    JumpCommand,
+    MoveCommand,
+    SelectPusherCommand,
+)
 
 
 class DescribeSelectPusherCommand:
     def it_executes_pusher_selection(
         self, forward_mover, pusher_selections, undone_pusher_selections
     ):
-        command = SelectPusherCommand(forward_mover, DEFAULT_PIECE_ID+1)
+        command = SelectPusherCommand(forward_mover, DEFAULT_PIECE_ID + 1)
 
         assert command.old_pusher_id == forward_mover.selected_pusher
         assert command.new_pusher_id == DEFAULT_PIECE_ID + 1
@@ -36,7 +42,7 @@ class DescribeJumpCommand:
     def it_executes_jump(self, reverse_mover, jumps, undone_jumps, jump_dest):
         command = JumpCommand(reverse_mover, jump_dest)
 
-        assert command.initial_position == reverse_mover.state.pusher_position(
+        assert command.initial_position == reverse_mover.board_manager.pusher_position(
             DEFAULT_PIECE_ID
         )
         assert command.final_position == jump_dest
@@ -44,22 +50,32 @@ class DescribeJumpCommand:
         command.redo()
         assert command.moves in jumps
         assert command.rendered in jumps
-        assert reverse_mover.state.pusher_position(DEFAULT_PIECE_ID) == jump_dest
+        assert (
+            reverse_mover.board_manager.pusher_position(DEFAULT_PIECE_ID) == jump_dest
+        )
 
         command.undo()
         assert command.moves in jumps
         assert command.rendered in undone_jumps
-        assert reverse_mover.state.pusher_position(DEFAULT_PIECE_ID) == command.initial_position
+        assert (
+            reverse_mover.board_manager.pusher_position(DEFAULT_PIECE_ID)
+            == command.initial_position
+        )
 
         command.redo()
         assert command.moves in jumps
         assert command.rendered in jumps
-        assert reverse_mover.state.pusher_position(DEFAULT_PIECE_ID) == jump_dest
+        assert (
+            reverse_mover.board_manager.pusher_position(DEFAULT_PIECE_ID) == jump_dest
+        )
 
         command.undo()
         assert command.moves in jumps
         assert command.rendered in undone_jumps
-        assert reverse_mover.state.pusher_position(DEFAULT_PIECE_ID) == command.initial_position
+        assert (
+            reverse_mover.board_manager.pusher_position(DEFAULT_PIECE_ID)
+            == command.initial_position
+        )
 
 
 class DescribeMoveCommand:

@@ -1,23 +1,20 @@
 import re
-from enum import Enum
 from itertools import groupby
 
 from pyparsing import CharsNotIn, ParseBaseException, ZeroOrMore, nestedExpr
 
 from .text_utils import ending_digits
 
-
-class RleCharacters(str, Enum):
-    """Separators used in RLE encoded board and snapshot texts."""
-    GROUP_LEFT_DELIM = '('
-    GROUP_RIGHT_DELIM = ')'
-    RLE_ROW_SEPARATOR = '|'
-
-
+#: Group start
+GROUP_START = "("
+#: Group enf
+GROUP_END = ")"
+#: Rle row separator
+ROW_SEPARATOR = "|"
+#: Rle delimiters
+DELIMITERS = {GROUP_START, GROUP_END, ROW_SEPARATOR}
 _RE_RLE_REPLACER = re.compile(r"(\d+)(\D)")
-_RE_RLE_SPLITTER = re.compile(
-    '|'.join(map(re.escape, [RleCharacters.RLE_ROW_SEPARATOR, '\n']))
-)
+_RE_RLE_SPLITTER = re.compile("|".join(map(re.escape, [ROW_SEPARATOR, "\n"])))
 
 
 class Rle:
@@ -27,12 +24,7 @@ class Rle:
             return line
 
         encoded = [(len(list(g)), k) for k, g in groupby(line)]
-        return "".join(
-            "".join((
-                str(c) if c > 1 else "",
-                v,
-            )) for c, v in encoded
-        )
+        return "".join("".join((str(c) if c > 1 else "", v)) for c, v in encoded)
 
     @classmethod
     def decode_rle_token(cls, rle_token):
@@ -42,16 +34,10 @@ class Rle:
         decode('3(a2b)4b') == "abbabbabbbbbb"
         decode('3a4b44') == "aaabbb44"
         """
-        return _RE_RLE_REPLACER.sub(
-            lambda m: m.group(2) * int(m.group(1)), rle_token
-        )
+        return _RE_RLE_REPLACER.sub(lambda m: m.group(2) * int(m.group(1)), rle_token)
 
-    rle_token = CharsNotIn(
-        RleCharacters.GROUP_LEFT_DELIM + RleCharacters.GROUP_RIGHT_DELIM
-    )
-    grouped_rle = nestedExpr(
-        RleCharacters.GROUP_LEFT_DELIM, RleCharacters.GROUP_RIGHT_DELIM
-    )
+    rle_token = CharsNotIn(GROUP_START + GROUP_END)
+    grouped_rle = nestedExpr(GROUP_START, GROUP_END)
     token_or_group = rle_token | grouped_rle
     grammar = ZeroOrMore(token_or_group)
 
@@ -65,26 +51,24 @@ class Rle:
         return retv
 
     @classmethod
-    def proces_group_tokens(cls, tokens):
+    def process_group_tokens(cls, tokens):
         retv = ""
         ending_digits_num = 1
         for token in tokens:
             if isinstance(token, list):
                 retv += ending_digits_num * cls.decode_rle_token(
-                    cls.proces_group_tokens(token)
+                    cls.process_group_tokens(token)
                 )
                 ending_digits_num = 1
             else:
                 token_contents, ending_digits_str = ending_digits(token)
                 retv += cls.decode_rle_token(token_contents)
-                ending_digits_num = (
-                    int(ending_digits_str) if ending_digits_str else 1
-                )
+                ending_digits_num = int(ending_digits_str) if ending_digits_str else 1
         return retv
 
     @classmethod
     def decode(cls, line):
-        return cls.proces_group_tokens(cls.tokenize_grouped_rle(line))
+        return cls.process_group_tokens(cls.tokenize_grouped_rle(line))
 
 
 def rle_encode(line):
@@ -92,4 +76,4 @@ def rle_encode(line):
 
 
 def rle_decode(line):
-    return _RE_RLE_SPLITTER.sub('\n', Rle.decode(line))
+    return _RE_RLE_SPLITTER.sub("\n", Rle.decode(line))

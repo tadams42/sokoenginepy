@@ -1,122 +1,98 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-"""A setuptools based setup module.
-See:
-https://packaging.python.org/en/latest/distributing.html
-https://github.com/pypa/sampleproject
-"""
+import os
 
-from __future__ import absolute_import, print_function
+import setuptools
 
-import io
-import re
-from glob import glob
-from os.path import basename, dirname, join, splitext
-
-import setup_ext
-from setuptools import find_packages, setup
+# Available at setup time due to pyproject.toml
+from pybind11.setup_helpers import ParallelCompile, Pybind11Extension, naive_recompile
 
 
-def read(*names, **kwargs):
-    return io.open(
-        join(dirname(__file__), *names),
-        encoding=kwargs.get('encoding', 'utf8')
-    ).read()
+class SokoenginepyextOptions:
+    """
+    Describes ``sokoenginepyext`` native C++ extension for ``sokoenginepy``.
 
+    On ``Linux``, ``pip install sokoenginepy`` will try to configure and build native
+    extension. If build fails, ``sokoenginepy`` will be installed without native
+    extension. To succeed, boost header have to be in system include path.
 
-setup(
-    name='sokoenginepy',
-    version='0.5.3',
-    license='GPLv3',
-    description='Sokoban and variants game engine',
-    long_description='%s\n%s' % (
-        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
-        re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
-    ),
-    author='Tomislav Adamic',
-    author_email='tomislav.adamic@gmail.com',
-    url='https://github.com/tadams42/sokoenginepy',
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
-    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
-    include_package_data=True,
-    zip_safe=False,
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Programming Language :: Python :: 3 :: Only',
-        'Operating System :: OS Independent',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Games/Entertainment :: Puzzle Games',
-    ],
-    keywords=[
-        'game', 'sokoban', 'hexoban', 'octoban', 'trioban'
-    ],
-    # List run-time dependencies HERE.  These will be installed by pip when
-    # your project is installed. For an analysis of 'install_requires' vs pip's
-    # requirements files see:
-    # https://packaging.python.org/en/latest/requirements.html
-    install_requires=[
-        'pytz >=2016.6.1',
-        'pyparsing >=2.1.0',
-        'networkx <2.0.0',
-        'cached-property >=1.2.0',
-        'pybind11>=2.2.0'
-    ],
-    # List additional groups of dependencies HERE (e.g. development
-    # dependencies). You can install these using the following syntax,
-    # for example:
-    # $ pip install -e .[dev]
-    extras_require={
-        'dev': [
-            'pycodestyle',
-            # 'mccabe',
-            # 'pylint',
-            'yapf',
-            'bumpversion',
-            'isort',
-            'check-manifest',
+    On all other systems, native extension will not be installed.
+    """
 
-            # Cool linters
-            'pylama',
-            'pylint',
-            'radon',
+    NAME = "sokoenginepyext"
 
-            # IPython stuff
-            'ipython',
-            'jupyter',
-            'ipdb',
+    SHOULD_TRY_BUILD = (
+        # We support building only on Linux...
+        os.name == "posix"
+        # ... and not on Read The Docs
+        and os.environ.get("READTHEDOCS", "false").lower()
+        not in ["yes", "true", "y", "1"]
+        # ... and allow build to be controlled by SOKOENGINEPYEXT_BUILD
+        # environment variable
+        and os.environ.get("SOKOENGINEPYEXT_BUILD", "true").lower()
+        in ["yes", "true", "y", "1"]
+    )
 
-            # Docs and viewers
-            'sphinx',
-            'sphinx_rtd_theme',
+    IS_DEBUG = os.environ.get("SOKOENGINEPYEXT_DEBUG", "false").lower() in [
+        "yes",
+        "true",
+        "y",
+        "1",
+    ]
 
-            # py.test stuff
-            'pytest >= 3.0.0',
-            'pytest-pythonpath',
-            'colored-traceback',
-            # 'pytest-colordots',
-            'pytest-spec',
-            'pytest-sugar',
-            'pytest-cov',
-            'pytest-benchmark',
-            'pytest-mock',
+    CXXFLAGS_RELEASE = ["-O3", "-flto", "-UDEBUG", "-DNDEBUG"]
+    CXXFLAGS_DEBUG = ["-g3", "-O0", "-UNDEBUG", "-DDEBUG"]
+    CXXFLAGS = [
+        "-fPIC",
+        "-DBOOST_BIND_NO_PLACEHOLDERS",
+        "-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION",
+    ] + (CXXFLAGS_DEBUG if IS_DEBUG else CXXFLAGS_RELEASE)
 
-            'coverage',
-            'factory-boy',
-            'faker',
+    LDFLAGS = ["-flto"] if not IS_DEBUG else []
+
+    SOURCES = sorted(
+        [
+            os.path.join(dir_path, file_name)
+            for _ in ["src/libsokoengine", "src/sokoenginepyext"]
+            for dir_path, directories, files in os.walk(_)
+            for file_name in files
+            if file_name.endswith(".cpp")
         ]
-    },
-    # If there are data files included in your packages that need to be
-    # installed, specify them HERE.  If using Python 2.6 or less, then these
-    # have to be included in MANIFEST.in as well.
-    package_data={'sokoenginepy': ['res/*'],},
-    ext_modules=[setup_ext.SokoenginepyExtension()],
-    cmdclass={'build_ext': setup_ext.BuildExt}
-)
+    )
+
+    INCLUDE_DIRS = ["/tmp/cmake_cache"] + [
+        dir_path
+        for _ in ["src/libsokoengine", "src/sokoenginepyext"]
+        for dir_path, directories, files in os.walk(_)
+    ]
+
+    CPPITERTOOLS_DIR = os.path.abspath("/tmp/cmake_cache/cppitertools")
+
+    @classmethod
+    def fetch_cppitertools(cls):
+        if not os.path.exists(cls.CPPITERTOOLS_DIR):
+            print("Cloning cppitertools...")
+            os.system(
+                'git clone --branch v1.0 https://github.com/ryanhaining/cppitertools.git "{}"'.format(
+                    cls.CPPITERTOOLS_DIR
+                )
+            )
+        return True
+
+
+if SokoenginepyextOptions.SHOULD_TRY_BUILD:
+    SokoenginepyextOptions.fetch_cppitertools()
+    ParallelCompile("NPY_NUM_BUILD_JOBS", needs_recompile=naive_recompile).install()
+    ext = Pybind11Extension(
+        name=SokoenginepyextOptions.NAME,
+        sources=SokoenginepyextOptions.SOURCES,
+        include_dirs=SokoenginepyextOptions.INCLUDE_DIRS,
+        optional=True,
+        cxx_std=14,
+        extra_compile_args=SokoenginepyextOptions.CXXFLAGS,
+        extra_link_args=SokoenginepyextOptions.LDFLAGS,
+        # Example: passing in the version to the compiled code
+        # define_macros=[("VERSION_INFO", __version__)],
+    )
+    setuptools.setup(ext_modules=[ext])
+
+else:
+    setuptools.setup()

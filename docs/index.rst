@@ -1,4 +1,4 @@
-.. include:: ../README.rst
+.. mdinclude:: ../README.md
 
 
 Tables of contents and indices
@@ -11,6 +11,7 @@ Tables of contents and indices
     tutorial
     api
     license
+    changelog
 
 * :ref:`genindex`
 * :ref:`modindex`

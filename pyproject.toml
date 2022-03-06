@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=42", "wheel", "pybind11>=2.8.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+norecursedirs = [".git", "tmp*", ".hg", ".venv", ".tox", ".eggs"]
+# Enabling doctest modules on src/ rises all kinds of import errors
+# on "pip install -e ." repo and in tox
+# Part of the problem is here:
+# https://github.com/pytest-dev/pytest/issues/2042
+# Untill there is a better way to run doctests over installed package code
+# we disable them
+addopts = [
+	"-rxEfsw",
+	"--strict-markers",
+	"--tb=short",
+	"--doctest-modules",
+	"--doctest-glob=*.rst",
+	"--doctest-glob=*.py",
+	"--ignore=bin",
+	"--ignore=tests/fixtures/test_cases",
+	"--ignore=build",
+	"--ignore=scratchpad",
+	"--ignore=docs/conf.py",
+	"--ignore=src",
+]
+python_classes = ["Describe*", "When_*", "describe_*"]
+python_functions = ["it_*", "test_*", "then_*", "when_*"]
+python_files = ["test_*", "*_spec.py", "*_test.py"]
+spec_header_format = "{test_case}"
+
+[tool.coverage.paths]
+source = ["src"]
+
+[tool.coverage.run]
+branch = true
+source = ["src", "tests"]
+
+[tool.coverage.report]
+show_missing = true
+precision = 2

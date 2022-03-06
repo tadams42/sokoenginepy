@@ -3,12 +3,19 @@ from itertools import permutations
 import factory
 import pytest
 
-from sokoenginepy import (DEFAULT_PIECE_ID, BoardState, Direction,
-                          HashedBoardState, SokobanBoard, SokobanPlus,
-                          Tessellation)
+from sokoenginepy import (
+    DEFAULT_PIECE_ID,
+    BoardManager,
+    BoardState,
+    Direction,
+    HashedBoardManager,
+    SokobanBoard,
+    SokobanPlus,
+    Tessellation,
+)
 from sokoenginepy.utilities import index_1d
 
-from ..test_helpers import fake
+from .misc import fake
 
 
 @pytest.fixture
@@ -51,6 +58,26 @@ def switched_board_str():
 
 
 @pytest.fixture
+def solved_board_str():
+    # yapf: disable
+    return "\n".join([
+        # 123456789012345678
+        "    #####          ",  # 0
+        "    #  @#          ",  # 1
+        "    #   #          ",  # 2
+        "  ###   ##         ",  # 3
+        "  #      #         ",  # 4
+        "### # ## #   ######",  # 5
+        "#   # ## #####  **#",  # 6
+        "#               **#",  # 7
+        "##### ### #@##  **#",  # 8
+        "    #     #########",  # 9
+        "    #######        ",  # 0
+    ])
+    # yapf: enable
+
+
+@pytest.fixture
 def positions_path(board_width):
     return [
         index_1d(7, 1, board_width),
@@ -85,9 +112,14 @@ def board_height():
 
 @pytest.fixture
 def variant_board(board_str):
-    # We could use mock here, but it is not neccessary as long as we test only
+    # We could use mock here, but it is not necessary as long as we test only
     # common behavior."
     return SokobanBoard(board_str=board_str)
+
+
+@pytest.fixture
+def solved_board(solved_board_str):
+    return SokobanBoard(board_str=solved_board_str)
 
 
 @pytest.fixture
@@ -106,13 +138,13 @@ def trioban_tessellation():
 
 
 @pytest.fixture
-def board_state(variant_board):
-    return BoardState(variant_board)
+def board_manager(variant_board):
+    return BoardManager(variant_board)
 
 
 @pytest.fixture
-def hashed_board_state(variant_board):
-    return HashedBoardState(variant_board)
+def hashed_board_manager(variant_board):
+    return HashedBoardManager(variant_board)
 
 
 @pytest.fixture
@@ -166,8 +198,12 @@ def invalid_box_position():
 @pytest.fixture
 def boxes_ids():
     return [
-        DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1, DEFAULT_PIECE_ID + 2,
-        DEFAULT_PIECE_ID + 3, DEFAULT_PIECE_ID + 4, DEFAULT_PIECE_ID + 5
+        DEFAULT_PIECE_ID,
+        DEFAULT_PIECE_ID + 1,
+        DEFAULT_PIECE_ID + 2,
+        DEFAULT_PIECE_ID + 3,
+        DEFAULT_PIECE_ID + 4,
+        DEFAULT_PIECE_ID + 5,
     ]
 
 
@@ -191,8 +227,12 @@ def invalid_goal_position():
 @pytest.fixture
 def goals_ids():
     return [
-        DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1, DEFAULT_PIECE_ID + 2,
-        DEFAULT_PIECE_ID + 3, DEFAULT_PIECE_ID + 4, DEFAULT_PIECE_ID + 5
+        DEFAULT_PIECE_ID,
+        DEFAULT_PIECE_ID + 1,
+        DEFAULT_PIECE_ID + 2,
+        DEFAULT_PIECE_ID + 3,
+        DEFAULT_PIECE_ID + 4,
+        DEFAULT_PIECE_ID + 5,
     ]
 
 
@@ -254,57 +294,35 @@ def switched_boxes_plus(goals_positions):
 def all_solutions(goals_positions):
     def calc():
         for boxes_positions in permutations(goals_positions.values()):
-            yield dict((index + DEFAULT_PIECE_ID, box_position)
-                       for index, box_position in enumerate(boxes_positions))
+            yield BoardState(
+                boxes_positions=list(boxes_positions), pushers_positions=[]
+            )
 
     return list(calc())
 
 
 @pytest.fixture
 def sokoban_plus_solutions():
-    return [{
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 150,
-        5: 168,
-        6: 169
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 150,
-        5: 169,
-        6: 168
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 168,
-        5: 150,
-        6: 169
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 168,
-        5: 169,
-        6: 150
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 169,
-        5: 150,
-        6: 168
-    }, {
-        1: 149,
-        2: 130,
-        3: 131,
-        4: 169,
-        5: 168,
-        6: 150
-    }]
+    return [
+        BoardState(
+            boxes_positions=[149, 130, 131, 150, 168, 169], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 150, 169, 168], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 168, 150, 169], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 168, 169, 150], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 169, 150, 168], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 169, 168, 150], pushers_positions=[]
+        ),
+    ]
 
 
 @pytest.fixture
