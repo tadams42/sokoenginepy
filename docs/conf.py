@@ -38,7 +38,7 @@ copyright = (
 )
 author = "Tomislav Adamic"
 # The full version, including alpha/beta/rc tags
-version = release = "0.5.3"
+version = release = "0.5.4"
 
 
 # -- General configuration ---------------------------------------------------
