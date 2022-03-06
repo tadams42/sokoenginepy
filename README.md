@@ -44,7 +44,7 @@ clients.
 pip install sokoenginepy
 ```
 
-- `libsokoengine` can be built from source code, details are in `README.cpp.md`
+- `libsokoengine` can be built from source code, details are in `README.libsokoengine.md`
 - `sokoenginepy` can be optionally built with native C++ extensions, details are in
   `INSTALL.md`
 

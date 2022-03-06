@@ -246,6 +246,7 @@ setup(
         "Topic :: Games/Entertainment :: Puzzle Games",
     ],
     keywords=["game", "sokoban", "hexoban", "octoban", "trioban"],
+    setup_requires=["pybind11>=2.9"],
     install_requires=[
         "arrow",
         "pyparsing >=2.1.0",
