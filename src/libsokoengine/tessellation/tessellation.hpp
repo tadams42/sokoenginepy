@@ -1,6 +1,7 @@
 #ifndef TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TESSELLATION_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
+#include "atomic_move.hpp"
 #include "board_graph.hpp"
 #include "sokoengine_config.hpp"
 
@@ -24,7 +25,6 @@ class LIBSOKOENGINE_LOCAL VariantBoardParser;
 class LIBSOKOENGINE_LOCAL VariantBoardPrinter;
 } // namespace implementation
 
-class LIBSOKOENGINE_API AtomicMove;
 class LIBSOKOENGINE_API SokobanTessellation;
 class LIBSOKOENGINE_API HexobanTessellation;
 class LIBSOKOENGINE_API TriobanTessellation;
@@ -47,11 +47,26 @@ public:
   bool operator==(const Tessellation &rv) const;
   bool operator!=(const Tessellation &rv) const;
 
+  ///
+  /// All Direction supported by this Tesselation
+  ///
   virtual const Directions &legal_directions() const = 0;
+  ///
+  /// Calculate new position in given direction.
+  ///
+  /// Returns either new position or invalid number (> MAX_POS) if movement in given
+  /// direction would've resulted with off-board position.
+  ///
   virtual position_t neighbor_position(position_t position, const Direction &direction,
                                        board_size_t board_width,
                                        board_size_t board_height) const = 0;
+  ///
+  /// Converts charater into instance of AtomicMove in context of Tessellation.
+  ///
   virtual AtomicMove char_to_atomic_move(char input_chr) const = 0;
+  ///
+  /// Converts AtomicMove into character representation in context of Tessellation.
+  ///
   virtual char atomic_move_to_char(const AtomicMove &atomic_move) const = 0;
   virtual GraphType graph_type() const;
 

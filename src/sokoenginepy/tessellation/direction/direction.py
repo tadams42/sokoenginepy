@@ -1,5 +1,5 @@
 from enum import IntEnum
-from typing import Mapping
+from typing import List
 
 
 class Direction(IntEnum):
@@ -19,16 +19,16 @@ class Direction(IntEnum):
 
     @property
     def opposite(self) -> "Direction":
-        return _OPPOSITE[self]
+        return _OPPOSITE[self.value]
 
 
-_OPPOSITE: Mapping[Direction, Direction] = {
-    Direction.UP: Direction.DOWN,
-    Direction.DOWN: Direction.UP,
-    Direction.LEFT: Direction.RIGHT,
-    Direction.RIGHT: Direction.LEFT,
-    Direction.NORTH_WEST: Direction.SOUTH_EAST,
-    Direction.SOUTH_EAST: Direction.NORTH_WEST,
-    Direction.NORTH_EAST: Direction.SOUTH_WEST,
-    Direction.SOUTH_WEST: Direction.NORTH_EAST,
-}
+_OPPOSITE: List[Direction] = [
+    Direction.DOWN,
+    Direction.SOUTH_WEST,
+    Direction.LEFT,
+    Direction.NORTH_WEST,
+    Direction.UP,
+    Direction.NORTH_EAST,
+    Direction.RIGHT,
+    Direction.SOUTH_EAST,
+]

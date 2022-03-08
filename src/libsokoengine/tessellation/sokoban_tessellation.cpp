@@ -22,51 +22,67 @@ position_t SokobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
                                                   board_size_t board_width,
                                                   board_size_t board_height) const {
-  static const map<Direction, pair<char, char>> position_calc = {
-    {Direction::LEFT, make_pair(0, -1)},
-    {Direction::RIGHT, make_pair(0, 1)},
-    {Direction::UP, make_pair(-1, 0)},
-    {Direction::DOWN, make_pair(1, 0)}};
-  if (ON_BOARD(position, board_width, board_height)) {
-    position_t row = Y(position, board_width), column = X(position, board_width);
-    const pair<int, int> &shift = find_in_map_or_throw<invalid_argument>(
-      position_calc, direction,
+  position_t row = Y(position, board_width), column = X(position, board_width);
+  switch (direction) {
+  case Direction::LEFT:
+    column += -1;
+    break;
+  case Direction::UP:
+    row += -1;
+    break;
+  case Direction::RIGHT:
+    column += 1;
+    break;
+  case Direction::DOWN:
+    row += 1;
+    break;
+  default:
+    throw invalid_argument(
       "Unsupported Direction received in SokobanTessellation neighbor_position!");
-    row += shift.first;
-    column += shift.second;
-    if (ON_BOARD(column, row, board_width, board_height))
-      return index_1d(column, row, board_width);
   }
-  return numeric_limits<position_t>::max();
+
+  if (ON_BOARD(column, row, board_width, board_height))
+    return index_1d(column, row, board_width);
+  else
+    return MAX_POS + 1;
 }
 
 char SokobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
-  static const map<pair<Direction, bool>, char> moves = {
-    {make_pair(Direction::LEFT, true), AtomicMove::L},
-    {make_pair(Direction::LEFT, false), AtomicMove::l},
-    {make_pair(Direction::RIGHT, true), AtomicMove::R},
-    {make_pair(Direction::RIGHT, false), AtomicMove::r},
-    {make_pair(Direction::UP, true), AtomicMove::U},
-    {make_pair(Direction::UP, false), AtomicMove::u},
-    {make_pair(Direction::DOWN, true), AtomicMove::D},
-    {make_pair(Direction::DOWN, false), AtomicMove::d}};
-  return find_in_map_or_throw<invalid_argument>(
-    moves, make_pair(rv.direction(), rv.is_push_or_pull()),
-    "Illegal AtomicMove character in SokobanTessellation!");
+  switch (rv.direction()) {
+  case Direction::LEFT:
+    return rv.is_push_or_pull() ? AtomicMove::L : AtomicMove::l;
+  case Direction::UP:
+    return rv.is_push_or_pull() ? AtomicMove::U : AtomicMove::u;
+  case Direction::RIGHT:
+    return rv.is_push_or_pull() ? AtomicMove::R : AtomicMove::r;
+  case Direction::DOWN:
+    return rv.is_push_or_pull() ? AtomicMove::D : AtomicMove::d;
+  default:
+    throw invalid_argument("Illegal AtomicMove character in SokobanTessellation!");
+  }
 }
 
 AtomicMove SokobanTessellation::char_to_atomic_move(char rv) const {
-  static const map<char, AtomicMove> moves = {
-    {AtomicMove::l, AtomicMove(Direction::LEFT, false)},
-    {AtomicMove::L, AtomicMove(Direction::LEFT, true)},
-    {AtomicMove::r, AtomicMove(Direction::RIGHT, false)},
-    {AtomicMove::R, AtomicMove(Direction::RIGHT, true)},
-    {AtomicMove::u, AtomicMove(Direction::UP, false)},
-    {AtomicMove::U, AtomicMove(Direction::UP, true)},
-    {AtomicMove::d, AtomicMove(Direction::DOWN, false)},
-    {AtomicMove::D, AtomicMove(Direction::DOWN, true)}};
-  return find_in_map_or_throw<invalid_argument>(
-    moves, rv, "Illegal AtomicMove direction in SokobanTessellation!");
+  switch (rv) {
+  case AtomicMove::l:
+    return AtomicMove(Direction::LEFT, false);
+  case AtomicMove::L:
+    return AtomicMove(Direction::LEFT, true);
+  case AtomicMove::u:
+    return AtomicMove(Direction::UP, false);
+  case AtomicMove::U:
+    return AtomicMove(Direction::UP, true);
+  case AtomicMove::r:
+    return AtomicMove(Direction::RIGHT, false);
+  case AtomicMove::R:
+    return AtomicMove(Direction::RIGHT, true);
+  case AtomicMove::d:
+    return AtomicMove(Direction::DOWN, false);
+  case AtomicMove::D:
+    return AtomicMove(Direction::DOWN, true);
+  default:
+    throw invalid_argument("Illegal AtomicMove direction in SokobanTessellation!");
+  }
 }
 
 string SokobanTessellation::repr() const { return "SokobanTessellation()"; }

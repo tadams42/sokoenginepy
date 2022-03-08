@@ -3,9 +3,6 @@
 #include "board_cell.hpp"
 #include "direction.hpp"
 
-#include <map>
-#include <memory>
-
 using namespace std;
 
 namespace sokoengine {
@@ -23,20 +20,22 @@ position_t TriobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
                                                   board_size_t board_width,
                                                   board_size_t board_height) const {
-  if (!ON_BOARD(position, board_width, board_height))
-    return numeric_limits<position_t>::max();
+  if (!ON_BOARD(position, board_width, board_height)) return MAX_POS + 1;
   position_t row = Y(position, board_width), column = X(position, board_width);
-  char dy, dx;
+  int8_t dy, dx;
   bool tpd = cell_orientation(position, board_width, board_height) ==
              CellOrientation::TRIANGLE_DOWN;
 
-  if (direction == Direction::LEFT) {
+  switch (direction) {
+  case Direction::LEFT:
     dy = 0;
     dx = -1;
-  } else if (direction == Direction::RIGHT) {
+    break;
+  case Direction::RIGHT:
     dy = 0;
     dx = 1;
-  } else if (direction == Direction::NORTH_EAST) {
+    break;
+  case Direction::NORTH_EAST:
     if (tpd) {
       dy = -1;
       dx = 0;
@@ -44,7 +43,8 @@ position_t TriobanTessellation::neighbor_position(position_t position,
       dy = 0;
       dx = 1;
     }
-  } else if (direction == Direction::NORTH_WEST) {
+    break;
+  case Direction::NORTH_WEST:
     if (tpd) {
       dy = -1;
       dx = 0;
@@ -52,7 +52,8 @@ position_t TriobanTessellation::neighbor_position(position_t position,
       dy = 0;
       dx = -1;
     }
-  } else if (direction == Direction::SOUTH_EAST) {
+    break;
+  case Direction::SOUTH_EAST:
     if (tpd) {
       dy = 0;
       dx = 1;
@@ -60,7 +61,8 @@ position_t TriobanTessellation::neighbor_position(position_t position,
       dy = 1;
       dx = 0;
     }
-  } else if (direction == Direction::SOUTH_WEST) {
+    break;
+  case Direction::SOUTH_WEST:
     if (tpd) {
       dy = 0;
       dx = -1;
@@ -68,53 +70,74 @@ position_t TriobanTessellation::neighbor_position(position_t position,
       dy = 1;
       dx = 0;
     }
-  } else
+    break;
+  default:
     throw invalid_argument(
       "Unsupported Direction received in TriobanTessellation neighbor_position!");
+  }
 
   row += dy;
   column += dx;
-  if (ON_BOARD(column, row, board_width, board_height)) {
+  if (ON_BOARD(column, row, board_width, board_height))
     return index_1d(column, row, board_width);
-  }
-  return numeric_limits<position_t>::max();
+  else
+    return MAX_POS + 1;
 }
 
 AtomicMove TriobanTessellation::char_to_atomic_move(char rv) const {
-  static const map<char, AtomicMove> moves{
-    {AtomicMove::l, AtomicMove(Direction::LEFT, false)},
-    {AtomicMove::L, AtomicMove(Direction::LEFT, true)},
-    {AtomicMove::r, AtomicMove(Direction::RIGHT, false)},
-    {AtomicMove::R, AtomicMove(Direction::RIGHT, true)},
-    {AtomicMove::n, AtomicMove(Direction::NORTH_EAST, false)},
-    {AtomicMove::N, AtomicMove(Direction::NORTH_EAST, true)},
-    {AtomicMove::u, AtomicMove(Direction::NORTH_WEST, false)},
-    {AtomicMove::U, AtomicMove(Direction::NORTH_WEST, true)},
-    {AtomicMove::d, AtomicMove(Direction::SOUTH_EAST, false)},
-    {AtomicMove::D, AtomicMove(Direction::SOUTH_EAST, true)},
-    {AtomicMove::s, AtomicMove(Direction::SOUTH_WEST, false)},
-    {AtomicMove::S, AtomicMove(Direction::SOUTH_WEST, true)}};
-  return find_in_map_or_throw<invalid_argument>(
-    moves, rv, "Illegal AtomicMove character in TriobanTessellation!");
+  switch (rv) {
+  case AtomicMove::l:
+    return AtomicMove(Direction::LEFT, false);
+  case AtomicMove::L:
+    return AtomicMove(Direction::LEFT, true);
+
+  case AtomicMove::r:
+    return AtomicMove(Direction::RIGHT, false);
+  case AtomicMove::R:
+    return AtomicMove(Direction::RIGHT, true);
+
+  case AtomicMove::n:
+    return AtomicMove(Direction::NORTH_EAST, false);
+  case AtomicMove::N:
+    return AtomicMove(Direction::NORTH_EAST, true);
+
+  case AtomicMove::u:
+    return AtomicMove(Direction::NORTH_WEST, false);
+  case AtomicMove::U:
+    return AtomicMove(Direction::NORTH_WEST, true);
+
+  case AtomicMove::d:
+    return AtomicMove(Direction::SOUTH_EAST, false);
+  case AtomicMove::D:
+    return AtomicMove(Direction::SOUTH_EAST, true);
+
+  case AtomicMove::s:
+    return AtomicMove(Direction::SOUTH_WEST, false);
+  case AtomicMove::S:
+    return AtomicMove(Direction::SOUTH_WEST, true);
+
+  default:
+    throw invalid_argument("Illegal AtomicMove character in TriobanTessellation!");
+  }
 }
 
 char TriobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
-  static const map<pair<Direction, bool>, char> moves{
-    {make_pair(Direction::LEFT, false), AtomicMove::l},
-    {make_pair(Direction::LEFT, true), AtomicMove::L},
-    {make_pair(Direction::RIGHT, false), AtomicMove::r},
-    {make_pair(Direction::RIGHT, true), AtomicMove::R},
-    {make_pair(Direction::NORTH_EAST, false), AtomicMove::n},
-    {make_pair(Direction::NORTH_EAST, true), AtomicMove::N},
-    {make_pair(Direction::NORTH_WEST, false), AtomicMove::u},
-    {make_pair(Direction::NORTH_WEST, true), AtomicMove::U},
-    {make_pair(Direction::SOUTH_EAST, false), AtomicMove::d},
-    {make_pair(Direction::SOUTH_EAST, true), AtomicMove::D},
-    {make_pair(Direction::SOUTH_WEST, false), AtomicMove::s},
-    {make_pair(Direction::SOUTH_WEST, true), AtomicMove::S}};
-  return find_in_map_or_throw<invalid_argument>(
-    moves, make_pair(rv.direction(), rv.is_push_or_pull()),
-    "Illegal AtomicMove direction in TriobanTessellation!");
+  switch (rv.direction()) {
+  case Direction::LEFT:
+    return rv.is_push_or_pull() ? AtomicMove::L : AtomicMove::l;
+  case Direction::RIGHT:
+    return rv.is_push_or_pull() ? AtomicMove::R : AtomicMove::r;
+  case Direction::NORTH_EAST:
+    return rv.is_push_or_pull() ? AtomicMove::N : AtomicMove::n;
+  case Direction::NORTH_WEST:
+    return rv.is_push_or_pull() ? AtomicMove::U : AtomicMove::u;
+  case Direction::SOUTH_EAST:
+    return rv.is_push_or_pull() ? AtomicMove::D : AtomicMove::d;
+  case Direction::SOUTH_WEST:
+    return rv.is_push_or_pull() ? AtomicMove::S : AtomicMove::s;
+  default:
+    throw invalid_argument("Illegal AtomicMove direction in TriobanTessellation!");
+  }
 }
 
 CellOrientation TriobanTessellation::cell_orientation(position_t pos,

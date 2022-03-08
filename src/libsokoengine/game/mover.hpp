@@ -11,7 +11,6 @@
 namespace sokoengine {
 
 class VariantBoard;
-class Direction;
 class HashedBoardManager;
 
 ///

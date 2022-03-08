@@ -42,9 +42,12 @@ void export_atomic_move(py::module &m) {
              direction, box_moved, is_jump, is_pusher_selection,
              receive_pusher_id(pusher_id), receive_box_id(moved_box_id));
          }),
-         py::arg("direction") = Direction::LEFT, py::arg("box_moved") = false,
-         py::arg("is_jump") = false, py::arg("is_pusher_selection") = false,
-         py::arg("pusher_id") = DEFAULT_PIECE_ID, py::arg("moved_box_id") = py::none())
+         py::arg("direction") = Direction::LEFT,
+         py::arg("box_moved") = false,
+         py::arg("is_jump") = false,
+         py::arg("is_pusher_selection") = false,
+         py::arg("pusher_id") = DEFAULT_PIECE_ID,
+         py::arg("moved_box_id") = py::none())
 
     // @classmethod
     .def_static("is_atomic_move_chr", &AtomicMove::is_atomic_move_chr,

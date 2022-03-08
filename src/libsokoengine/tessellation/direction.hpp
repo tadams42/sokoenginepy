@@ -8,53 +8,47 @@
 namespace sokoengine {
 
 ///
-/// Movement directions.
+/// Enumeration of possible movement directions.
 ///
-class LIBSOKOENGINE_API Direction {
-public:
-  static const Direction &UP;
-  static const Direction &DOWN;
-  static const Direction &LEFT;
-  static const Direction &RIGHT;
-  static const Direction &NORTH_WEST;
-  static const Direction &NORTH_EAST;
-  static const Direction &SOUTH_WEST;
-  static const Direction &SOUTH_EAST;
-
-  bool operator==(const Direction &rv) const;
-  bool operator!=(const Direction &rv) const;
-  bool operator<(const Direction &rv) const;
-
-  static constexpr unsigned char len() { return 8; }
-
-  const Direction &opposite() const;
-
-  ///
-  /// Type for compact Direction representation
-  ///
-  typedef unsigned char packed_t;
-
-  static const Direction &unpack(packed_t c);
-  packed_t pack() const;
-  std::string repr() const;
-  std::string str() const;
-
-private:
-  enum class LIBSOKOENGINE_API EDirection : unsigned char {
-    UP,
-    NORTH_EAST,
-    RIGHT,
-    SOUTH_EAST,
-    DOWN,
-    SOUTH_WEST,
-    LEFT,
-    NORTH_WEST
-  };
-
-  explicit Direction(const EDirection &value = EDirection::UP);
-
-  EDirection m_direction;
+enum class LIBSOKOENGINE_API Direction : uint8_t {
+  UP = 0,
+  NORTH_EAST,
+  RIGHT,
+  SOUTH_EAST,
+  DOWN,
+  SOUTH_WEST,
+  LEFT,
+  NORTH_WEST
 };
+
+///
+/// Count of existing movement directions.
+///
+constexpr uint8_t DIRECTIONS_COUNT = 8;
+
+///
+/// Mapping of opposite movement directions.
+///
+constexpr Direction OPPOSITE_DIRECTIONS[DIRECTIONS_COUNT] = {
+  Direction::DOWN,
+  Direction::SOUTH_WEST,
+  Direction::LEFT,
+  Direction::NORTH_WEST,
+  Direction::UP,
+  Direction::NORTH_EAST,
+  Direction::RIGHT,
+  Direction::SOUTH_EAST
+};
+
+///
+/// Opposite movement direction lookup.
+///
+LIBSOKOENGINE_API constexpr Direction opposite(const Direction d) {
+  return OPPOSITE_DIRECTIONS[static_cast<uint8_t>(d)];
+}
+
+LIBSOKOENGINE_API const std::string& repr_direction(Direction d);
+LIBSOKOENGINE_API const std::string& str_direction(Direction d);
 
 } // namespace sokoengine
 

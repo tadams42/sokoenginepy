@@ -22,9 +22,9 @@ BoardSizeExceededError::~BoardSizeExceededError() = default;
 namespace implementation {
 
 struct GraphEdgePropertyT {
-  GraphEdgePropertyT() : weight(1), direction(Direction::LEFT.pack()) {}
+  GraphEdgePropertyT() : weight(1), direction(Direction::LEFT) {}
   BoardGraph::weight_t weight;
-  Direction::packed_t direction;
+  Direction direction;
 };
 
 //
@@ -204,10 +204,9 @@ bool BoardGraph::has_edge(position_t source_position, position_t dest_position,
   if (!contains(source_position) || !contains(dest_position)) return false;
 
   const auto edges = out_edges(source_position, m_impl->m_graph);
-  char d = direction.pack();
   return edges.second !=
          find_if(edges.first, edges.second, [&](const edge_descriptor &e) {
-           return m_impl->m_graph[e].direction == d;
+           return m_impl->m_graph[e].direction == direction;
          });
 }
 
@@ -239,7 +238,7 @@ void BoardGraph::add_edge(position_t source_position, position_t neighbor_positi
 
   if (should_add) {
     GraphEdgePropertyT e;
-    e.direction = direction.pack();
+    e.direction = direction;
     boost::add_edge(source_position, neighbor_position, e, m_impl->m_graph);
   }
 }
@@ -252,9 +251,8 @@ position_t BoardGraph::neighbor(position_t from_position,
                                 const Direction &direction) const {
   vertex_descriptor v = vertex(from_position, m_impl->m_graph);
   const auto edges = out_edges(v, m_impl->m_graph);
-  char d = direction.pack();
   auto edge = find_if(edges.first, edges.second, [&](const edge_descriptor &e) {
-    return m_impl->m_graph[e].direction == d;
+    return m_impl->m_graph[e].direction == direction;
   });
   if (edge != edges.second)
     return get(boost::vertex_index, m_impl->m_graph,
@@ -423,7 +421,7 @@ BoardGraph::positions_path_to_directions_path(const Positions &positions_path) c
     BOOST_FOREACH (const edge_descriptor &edge,
                    out_edges(src_position, m_impl->m_graph))
       if (boost::target(edge, m_impl->m_graph) == target_position)
-        retv.push_back(Direction::unpack(m_impl->m_graph[edge].direction));
+        retv.push_back(m_impl->m_graph[edge].direction);
   }
 
   return retv;

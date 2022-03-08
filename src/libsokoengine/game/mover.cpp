@@ -111,7 +111,7 @@ public:
     if (in_front_of_pusher > MAX_POS) {
       throw IllegalMoveError(
           "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-          ", direction: " + direction.str() + ")");
+          ", direction: " + str_direction(direction) + ")");
     }
 
     bool is_push = false;
@@ -123,7 +123,7 @@ public:
       if (in_front_of_box > MAX_POS) {
         throw IllegalMoveError("Can't push box off board (ID: " +
                                std::to_string(m_manager.box_id_on(in_front_of_pusher)) +
-                               ", direction: " + direction.str() + ")");
+                               ", direction: " + str_direction(direction) + ")");
       }
 
       try {
@@ -159,7 +159,7 @@ public:
     if (in_front_of_pusher > MAX_POS) {
       throw IllegalMoveError(
           "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-          ", direction: " + direction.str() + ")");
+          ", direction: " + str_direction(direction) + ")");
     }
 
     try {
@@ -172,7 +172,7 @@ public:
 
     if (options.force_pulls) {
       position_t behind_pusher =
-          m_manager.board().neighbor(initial_pusher_position, direction.opposite());
+          m_manager.board().neighbor(initial_pusher_position, opposite(direction));
 
       if (behind_pusher <= MAX_POS &&
           m_manager.board().cell(behind_pusher).has_box()) {
@@ -252,17 +252,17 @@ public:
 
       options.force_pulls = !atomic_move.is_move();
       options.increase_pull_count = false;
-      pull_or_move(atomic_move.direction().opposite(), options);
+      pull_or_move(opposite(atomic_move.direction()), options);
     } else {
       options.decrease_pull_count = true;
-      push_or_move(atomic_move.direction().opposite(), options);
+      push_or_move(opposite(atomic_move.direction()), options);
     }
   }
 
   void undo_jump(const Mover::Moves &jump_moves) {
     Directions path;
     for (const AtomicMove &am : jump_moves)
-      path.push_back(am.direction().opposite());
+      path.push_back(opposite(am.direction()));
     position_t old_position = m_manager.pusher_position(m_selected_pusher);
     position_t new_position = m_manager.board().path_destination(old_position, path);
     jump(new_position);
@@ -271,7 +271,7 @@ public:
   void undo_pusher_selection(const Mover::Moves &selection_moves) {
     Directions path;
     for (const AtomicMove &am : selection_moves)
-      path.push_back(am.direction().opposite());
+      path.push_back(opposite(am.direction()));
     position_t old_position = m_manager.pusher_position(m_selected_pusher);
     position_t new_position = m_manager.board().path_destination(old_position, path);
     select_pusher(m_manager.pusher_id_on(new_position));

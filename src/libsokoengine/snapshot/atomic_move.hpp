@@ -69,7 +69,7 @@ private:
   bool m_box_moved : 1;
   bool m_pusher_selected : 1;
   bool m_pusher_jumped : 1;
-  Direction::packed_t m_direction : 5;
+  Direction m_direction;
   piece_id_t m_pusher_id;
   piece_id_t m_moved_box_id;
 };

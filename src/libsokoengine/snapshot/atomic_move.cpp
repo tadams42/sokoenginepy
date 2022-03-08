@@ -27,7 +27,7 @@ AtomicMove::AtomicMove(const Direction &direction, bool box_moved, bool is_jump,
   : m_box_moved(false),
     m_pusher_selected(false),
     m_pusher_jumped(false),
-    m_direction(Direction::LEFT.pack()),
+    m_direction(Direction::LEFT),
     m_pusher_id(DEFAULT_PIECE_ID),
     m_moved_box_id(NULL_ID) {
   if ((box_moved || moved_box_id != NULL_ID) && is_pusher_selection && is_jump)
@@ -68,7 +68,7 @@ bool AtomicMove::operator==(const AtomicMove &rv) const {
 bool AtomicMove::operator!=(const AtomicMove &rv) const { return !(*this == rv); }
 
 string AtomicMove::str() const {
-  return string() + "AtomicMove(" + direction().str() +
+  return string() + "AtomicMove(" + repr_direction(m_direction) +
          ", box_moved=" + (is_push_or_pull() ? "True" : "False") +
          ", is_jump=" + (is_jump() ? "True" : "False") +
          ", is_pusher_selection=" + (is_pusher_selection() ? "True" : "False") +
@@ -78,7 +78,7 @@ string AtomicMove::str() const {
 }
 
 string AtomicMove::repr() const {
-  return string() + "AtomicMove(" + direction().str() +
+  return string() + "AtomicMove(" + repr_direction(m_direction) +
          ", box_moved=" + (is_push_or_pull() ? "True" : "False") + ")";
 }
 
@@ -169,11 +169,11 @@ void AtomicMove::set_is_jump(bool flag) {
 }
 
 const Direction &AtomicMove::direction() const {
-  return Direction::unpack(m_direction);
+  return m_direction;
 }
 
 void AtomicMove::set_direction(const Direction &direction) {
-  m_direction = direction.pack();
+  m_direction = direction;
 }
 
 } // namespace sokoengine
