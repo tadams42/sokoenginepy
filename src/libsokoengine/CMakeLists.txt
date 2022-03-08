@@ -90,10 +90,7 @@ target_link_libraries(sokoengine_obj
         "$<BUILD_INTERFACE:CPPITERTOOLS::cppitertools>"
 )
 
-target_compile_features(sokoengine_obj
-    PUBLIC
-        cxx_std_14
-)
+target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
 
 if(${BUILD_SHARED_LIBS})
     target_compile_definitions(sokoengine_obj
@@ -115,13 +112,19 @@ endif()
 target_compile_options(sokoengine_obj
     PRIVATE
         $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
+            $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>
             -Wno-overloaded-virtual
             -Wno-unused-parameter
-            -Wno-attributes
-            $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>
+            # -Wno-attributes
         >
         # $<$<CXX_COMPILER_ID:MSVC>: ...>
 )
+
+# include(CMakePrintHelpers)
+# cmake_print_properties(
+#     TARGETS sokoengine_obj
+#     PROPERTIES COMPILE_FEATURES COMPILE_FLAGS COMPILE_OPTIONS
+# )
 
 set_target_properties(sokoengine_obj
     PROPERTIES
@@ -145,12 +148,6 @@ set_target_properties(sokoengine
         INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
         INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON
 )
-
-# include(CMakePrintHelpers)
-# cmake_print_properties(
-#     TARGETS sokoengine_obj
-#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-# )
 
 if(${BUILD_SHARED_LIBS})
     # generate_export_header(sokoengine)

@@ -8,19 +8,19 @@
 
 // Generic helper definitions for shared library support
 #if defined _WIN32 || defined __CYGWIN__
-#define LIBSOKOENGINE_HELPER_DLL_IMPORT __declspec(dllimport)
-#define LIBSOKOENGINE_HELPER_DLL_EXPORT __declspec(dllexport)
-#define LIBSOKOENGINE_HELPER_DLL_LOCAL
+    #define LIBSOKOENGINE_HELPER_DLL_IMPORT __declspec(dllimport)
+    #define LIBSOKOENGINE_HELPER_DLL_EXPORT __declspec(dllexport)
+    #define LIBSOKOENGINE_HELPER_DLL_LOCAL
 #else
-#if __GNUC__ >= 4 || defined __clang__
-#define LIBSOKOENGINE_HELPER_DLL_IMPORT __attribute__((visibility("default")))
-#define LIBSOKOENGINE_HELPER_DLL_EXPORT __attribute__((visibility("default")))
-#define LIBSOKOENGINE_HELPER_DLL_LOCAL __attribute__((visibility("hidden")))
-#else
-#define LIBSOKOENGINE_HELPER_DLL_IMPORT
-#define LIBSOKOENGINE_HELPER_DLL_EXPORT
-#define LIBSOKOENGINE_HELPER_DLL_LOCAL
-#endif
+    #if __GNUC__ >= 4 || defined __clang__
+        #define LIBSOKOENGINE_HELPER_DLL_IMPORT __attribute__((visibility("default")))
+        #define LIBSOKOENGINE_HELPER_DLL_EXPORT __attribute__((visibility("default")))
+        #define LIBSOKOENGINE_HELPER_DLL_LOCAL __attribute__((visibility("hidden")))
+    #else
+        #define LIBSOKOENGINE_HELPER_DLL_IMPORT
+        #define LIBSOKOENGINE_HELPER_DLL_EXPORT
+        #define LIBSOKOENGINE_HELPER_DLL_LOCAL
+    #endif
 #endif
 
 // Now we use the generic helper definitions above to define LIBSOKOENGINE_API and

@@ -44,6 +44,7 @@ class SokoenginepyextOptions:
         "-fPIC",
         "-DBOOST_BIND_NO_PLACEHOLDERS",
         "-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION",
+        "-DLIBSOKOENGINE_DLL",
     ] + (CXXFLAGS_DEBUG if IS_DEBUG else CXXFLAGS_RELEASE)
 
     LDFLAGS = ["-flto"] if not IS_DEBUG else []
@@ -80,13 +81,15 @@ class SokoenginepyextOptions:
 
 if SokoenginepyextOptions.SHOULD_TRY_BUILD:
     SokoenginepyextOptions.fetch_cppitertools()
-    ParallelCompile("NPY_NUM_BUILD_JOBS", needs_recompile=naive_recompile).install()
+    ParallelCompile(
+        "SOKOENGINEPYEXT_NUM_BUILD_JOBS", needs_recompile=naive_recompile
+    ).install()
     ext = Pybind11Extension(
         name=SokoenginepyextOptions.NAME,
         sources=SokoenginepyextOptions.SOURCES,
         include_dirs=SokoenginepyextOptions.INCLUDE_DIRS,
         optional=True,
-        cxx_std=14,
+        cxx_std=17,
         extra_compile_args=SokoenginepyextOptions.CXXFLAGS,
         extra_link_args=SokoenginepyextOptions.LDFLAGS,
         # Example: passing in the version to the compiled code

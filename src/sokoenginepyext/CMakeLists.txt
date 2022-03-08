@@ -20,6 +20,8 @@ if(ENABLE_PYTHON_EXTENSION)
 
     target_link_libraries(sokoenginepyext PRIVATE sokoengine_obj)
 
+    target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
+
     set_target_properties(sokoenginepyext PROPERTIES
                                           EXCLUDE_FROM_ALL TRUE
                                           EXCLUDE_FROM_DEFAULT_BUILD TRUE)
