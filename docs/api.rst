@@ -10,5 +10,5 @@ API reference
     _api/sokoenginepy.manager
     _api/sokoenginepy.snapshot
     _api/sokoenginepy.game
-    _api/sokoenginepy.input_output
+    _api/sokoenginepy.io
     _api/sokoenginepy.utilities

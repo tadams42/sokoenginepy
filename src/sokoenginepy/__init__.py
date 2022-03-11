@@ -2,7 +2,7 @@ from . import utilities
 from .board import *
 from .game import *
 from .graph import *
-from .input_output import *
+from .io import *
 from .manager import *
 from .snapshot import *
 from .tessellation import *
