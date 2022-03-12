@@ -1,8 +1,15 @@
-import random
+from __future__ import annotations
 
-from ... import utilities
+import random
+from typing import TYPE_CHECKING, List, Optional, Set
+
+from sokoenginepy.manager.board_state.board_state import BoardState
+
 from ..board_manager import BoardManager
 from ..piece import DEFAULT_PIECE_ID
+
+if TYPE_CHECKING:
+    from ...board import VariantBoard
 
 
 class HashedBoardManager(BoardManager):
@@ -38,7 +45,12 @@ class HashedBoardManager(BoardManager):
           hash value to the one that was before move was preformed
     """
 
-    def __init__(self, variant_board, boxorder=None, goalorder=None):
+    def __init__(
+        self,
+        variant_board: VariantBoard,
+        boxorder: Optional[str] = None,
+        goalorder: Optional[str] = None,
+    ):
         super().__init__(variant_board, boxorder, goalorder)
         self._initial_state_hash = None
         self._state_hash = None
@@ -70,10 +82,10 @@ class HashedBoardManager(BoardManager):
         # Seeding to constant always produces same sequence which then ensures
         # that equal board layouts always produce equal hash
         # random.seed(42)
-        random_pool = set()
+        random_pool: Set[int] = set()
         while len(random_pool) < random_pool_size:
             random_pool.add(random.getrandbits(64))
-        random_pool = list(random_pool)
+        random_pool: List[int] = list(random_pool)
         # random.setstate(state_backup)
 
         self._initial_state_hash = self._state_hash = random_pool[0]
@@ -115,14 +127,14 @@ class HashedBoardManager(BoardManager):
         return [choose(pos) for pos in range(self.board.size)]
 
     @property
-    def state_hash(self):
+    def state_hash(self) -> int:
         """Zobrist hash of current board state."""
         if self._state_hash is None or self._initial_state_hash is None:
             self._zobrist_rehash()
         return self._state_hash
 
     @property
-    def initial_state_hash(self):
+    def initial_state_hash(self) -> int:
         """
         Zobrist hash of initial board state (before any movement happened).
         """
@@ -130,7 +142,7 @@ class HashedBoardManager(BoardManager):
             self._zobrist_rehash()
         return self._initial_state_hash
 
-    def external_state_hash(self, board_state):
+    def external_state_hash(self, board_state) -> Optional[int]:
         """
         Calculates Zobrist hash of given ``board_state`` as if that ``board_state``
         was applied to initial ``board`` (to board where no movement happened).
@@ -141,7 +153,7 @@ class HashedBoardManager(BoardManager):
             and len(board_state.boxes_positions) == self.goals_count
 
         Returns:
-            int or None: Value of hash or None if it can't be calculated
+            Value of hash or None if it can't be calculated
         """
         if (
             len(board_state.boxes_positions) != self.boxes_count
@@ -162,13 +174,13 @@ class HashedBoardManager(BoardManager):
 
         return retv
 
-    def _box_moved(self, old_position, to_new_position):
+    def _box_moved(self, old_position: int, to_new_position: int):
         if old_position != to_new_position:
             box_plus_id = self.box_plus_id(self.box_id_on(to_new_position))
             self._state_hash ^= self._boxes_factors[box_plus_id][old_position]
             self._state_hash ^= self._boxes_factors[box_plus_id][to_new_position]
 
-    def _pusher_moved(self, old_position, to_new_position):
+    def _pusher_moved(self, old_position: int, to_new_position: int):
         if old_position != to_new_position:
             self._state_hash ^= self._pushers_factors[old_position]
             self._state_hash ^= self._pushers_factors[to_new_position]
@@ -204,11 +216,11 @@ class HashedBoardManager(BoardManager):
             self._zobrist_rehash()
 
     @property
-    def is_solved(self):
+    def is_solved(self) -> bool:
         return self.state_hash in self.solutions_hashes
 
     @property
-    def solutions_hashes(self):
+    def solutions_hashes(self) -> Set[int]:
         if not self._solutions_hashes:
             self._solutions_hashes = set(
                 h
@@ -220,7 +232,7 @@ class HashedBoardManager(BoardManager):
         return self._solutions_hashes
 
     @property
-    def state(self):
+    def state(self) -> BoardState:
         retv = super().state
         retv.zobrist_hash = self.state_hash
         return retv

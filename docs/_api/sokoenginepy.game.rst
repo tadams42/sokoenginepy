@@ -4,39 +4,23 @@ Game
 SolvingMode
 -----------
 
-.. autoclass:: sokoenginepy.game.SolvingMode
+.. autoclass:: sokoenginepy.SolvingMode
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+
 
 Mover
 -----
 
-.. autoexception:: sokoenginepy.game.IllegalMoveError
+.. autoexception:: sokoenginepy.IllegalMoveError
 
-.. autoexception:: sokoenginepy.game.NonPlayableBoardError
+.. autoexception:: sokoenginepy.NonPlayableBoardError
 
-.. autoclass:: sokoenginepy.game.Mover
+.. autoclass:: sokoenginepy.Mover
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-
-Mover commands
---------------
-
-.. autoclass:: sokoenginepy.game.SelectPusherCommand
-    :members:
-    :undoc-members:
-    :inherited-members:
-
-.. autoclass:: sokoenginepy.game.JumpCommand
-    :members:
-    :undoc-members:
-    :inherited-members:
-
-.. autoclass:: sokoenginepy.game.MoveCommand
-    :members:
-    :undoc-members:
-    :inherited-members:
+    :member-order: bysource

@@ -59,4 +59,4 @@ class DescribeOctobanTessellation(
         "E",
     ]
 
-    tessellation = Tessellation.instance_from("Octoban").value
+    tessellation = Tessellation.instance_from("Octoban")

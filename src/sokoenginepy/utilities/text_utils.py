@@ -4,18 +4,19 @@ Helpers for working with strings and lists of strings.
 
 import re
 from functools import reduce
+from typing import List, Optional, Tuple
 
 _RE_ONLY_DIGITS_AND_SPACES = re.compile(r"^([0-9\s])*$")
 _RE_ENDING_DIGITS = re.compile(r"(\d+)$")
 _RE_CONTAINS_ANY_DIGIT = re.compile(r"([0-9])+")
 
 
-def is_blank(line):
+def is_blank(line: Optional[str]) -> bool:
     """True if ``line`` is empty or it contains only spaces."""
     return line is None or line.strip() == ""
 
 
-def contains_only_digits_and_spaces(line):
+def contains_only_digits_and_spaces(line: Optional[str]) -> bool:
     return reduce(
         lambda x, y: x and y,
         [
@@ -26,7 +27,7 @@ def contains_only_digits_and_spaces(line):
     )
 
 
-def normalize_width(string_list, fill_chr=" "):
+def normalize_width(string_list: List[str], fill_chr: str = " "):
     """
     Normalizes length of strings in ``string_list``.
 
@@ -37,7 +38,7 @@ def normalize_width(string_list, fill_chr=" "):
     return [l + (fill_chr * (width - len(l))) for l in string_list]
 
 
-def calculate_width(string_list):
+def calculate_width(string_list: List[str]) -> int:
     """Width of list of strings as length of longest string in that list."""
     width = 0
     for line in string_list:
@@ -46,7 +47,7 @@ def calculate_width(string_list):
     return width
 
 
-def ending_digits(line):
+def ending_digits(line: str) -> Tuple[str, Optional[str]]:
     """Extracts ending digits of string."""
     retv = _RE_ENDING_DIGITS.findall(line)
     if retv:
@@ -54,17 +55,17 @@ def ending_digits(line):
     return line, None
 
 
-def drop_blank(string_list):
+def drop_blank(string_list: List[str]) -> List[str]:
     """Removes blank strings from list."""
     return [l for l in string_list if len(l.strip()) > 0]
 
 
-def drop_empty(string_list):
+def drop_empty(string_list: List[str]) -> List[str]:
     """Removes empty strings from list."""
     return [l for l in string_list if len(l) > 0]
 
 
-def should_insert_line_break_at(position, line_length=80):
+def should_insert_line_break_at(position: int, line_length=80) -> bool:
     """For given ``position`` in string, should we insert line break?"""
     if line_length > 0 and position:
         return (position % line_length) == 0

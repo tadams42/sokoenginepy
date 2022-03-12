@@ -1,8 +1,10 @@
 from functools import cached_property, reduce
 from operator import add, or_
 
-from ..board import BoardCell, VariantBoard
-from ..snapshot import AtomicMove, Snapshot
+from ..atomic_move import AtomicMove
+from ..board import VariantBoard
+from ..board_cell import BoardCell
+from ..snapshot import Snapshot
 from ..tessellation import Tessellation
 
 
@@ -43,7 +45,7 @@ class Puzzle:
 
     @property
     def tessellation(self):
-        return self._tessellation.value
+        return self._tessellation
 
     @tessellation.setter
     def tessellation(self, tessellation_or_description):
@@ -138,7 +140,7 @@ class PuzzleSnapshot:
 
     @property
     def tessellation(self):
-        return self._tessellation.value
+        return self._tessellation
 
     @tessellation.setter
     def tessellation(self, tessellation_or_description):

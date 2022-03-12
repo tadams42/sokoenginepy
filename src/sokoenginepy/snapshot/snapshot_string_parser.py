@@ -3,8 +3,9 @@ import re
 from pyparsing import Group, ParseBaseException, Regex, ZeroOrMore, oneOf
 
 from .. import utilities
+from ..atomic_move import AtomicMove
+from ..solving_mode import SolvingMode
 from ..tessellation import Tessellation
-from .atomic_move import AtomicMove
 from .snapshot import Snapshot
 
 
@@ -66,15 +67,13 @@ class SnapshotStringParser:
     def convert_to_string(
         cls, snapshot: Snapshot, rle_encode: bool, break_long_lines_at: int = 80
     ) -> str:
-        from .. import game
-
         retv = ""
         conversion_ok = True
 
         # Handling beginning jump in reverse snapshots.
         # It is required that in textual form reverse snapshots begin with
         # jump even if empty one.
-        if snapshot.solving_mode == game.SolvingMode.REVERSE:
+        if snapshot.solving_mode == SolvingMode.REVERSE:
             # If is reverse, snapshot can be either
             #  (1) Empty
             #  (2) Non-empty, beginning with jump
@@ -151,15 +150,13 @@ class SnapshotStringParser:
         - Sets parser state detailing the first error encountered in parsing
         - returns boolean value signaling parsing success or failure
         """
-        from .. import game
-
         self._first_encountered_error = None
         self._resulting_solving_mode = None
         self._resulting_moves = None
 
         moves_string = self._RE_SNAPSHOT_STRING_CLEANUP.sub("", moves_string)
         if utilities.is_blank(moves_string):
-            self._resulting_solving_mode = game.SolvingMode.FORWARD
+            self._resulting_solving_mode = SolvingMode.FORWARD
             self._resulting_moves = []
             return True
 
@@ -171,9 +168,9 @@ class SnapshotStringParser:
 
         if Snapshot.JUMP_BEGIN in moves_string or Snapshot.JUMP_END in moves_string:
 
-            self._resulting_solving_mode = game.SolvingMode.REVERSE
+            self._resulting_solving_mode = SolvingMode.REVERSE
         else:
-            self._resulting_solving_mode = game.SolvingMode.FORWARD
+            self._resulting_solving_mode = SolvingMode.FORWARD
 
         moves_string = utilities.rle_decode(moves_string)
         if utilities.is_blank(moves_string):

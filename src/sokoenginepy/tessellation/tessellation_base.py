@@ -1,117 +1,95 @@
-from abc import ABCMeta, abstractmethod
-from typing import List, Mapping, Tuple
+from __future__ import annotations
 
+from abc import ABCMeta, abstractmethod
+from typing import ClassVar, Mapping, Optional, Tuple
+
+from ..atomic_move import AtomicMove
+from ..direction import Direction
+from ..graph_type import GraphType
 from .cell_orientation import CellOrientation
-from .direction import Direction
 
 
 class TessellationBase(metaclass=ABCMeta):
     """
-    Base class for all tessellation implementations."""
+    Base class for all tessellation implementations.
+    """
+
+    _LEGAL_DIRECTIONS: ClassVar[Tuple[Direction, ...]] = tuple()
+    _CHR_TO_ATOMIC_MOVE: ClassVar[Mapping[str, Tuple[Direction, bool]]] = {}
+    _ATOMIC_MOVE_TO_CHR: ClassVar[Mapping[Tuple[Direction, bool], str]] = {}
 
     @property
-    @abstractmethod
-    def legal_directions(self) -> List[Direction]:
+    def legal_directions(self) -> Tuple[Direction, ...]:
         """
-        Directions generally accepted by Tessellation.
-
-        Returns:
-            list: sequence of :class:`.Direction`
+        Directions that are valid in context of this tessellation.
         """
-        pass
+        return self._LEGAL_DIRECTIONS
 
     @abstractmethod
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> int:
+    ) -> Optional[int]:
         """
         Calculates neighbor position in given direction.
 
-        Position is always expressed as 1D index of board graph vertex. To convert 2D
-        coordinates into vertex index, use :func:`.index_1d` method
+        Position is always expressed as 1D index of board graph vertex.
+
+        To convert 2D coordinates into vertex index, use :func:`.index_1d` method.
+
+        To convert 1D vertex index into 2D coordinates, use combinations of :func:`.ROW`
+        and :func:`.COLUMN` functions.
 
         Returns:
-            int: If resulting position is off-board returns None, otherwise position
+            int: New position or `None` when new position would be off-board.
 
         Raises:
-            :exc:`.ValueError`: in case direction is not one of
-                self.legal_directions
+            :exc:`ValueError`: ``direction`` is not one of :attr:`legal_directions`
         """
         pass
 
     @property
-    @abstractmethod
-    def _char_to_atomic_move_dict(self) -> Mapping[str, Tuple[Direction, bool]]:
-        """Dict mapping string to :class:`.AtomicMove` parameters,"""
-        pass
-
-    @property
-    @abstractmethod
-    def graph_type(self) -> "GraphType":
+    def graph_type(self) -> GraphType:
         """
-        Type of graph used in given tessellation.
-
-        Returns:
-            GraphType: type of graph
+        Type of board graph used in context of this tessellation.
         """
-        pass
+        return GraphType.DIRECTED
 
-    def char_to_atomic_move(self, input_chr: str) -> "AtomicMove":
+    def atomic_move_to_char(self, atomic_move: AtomicMove) -> str:
         """
-        Converts character to :class:`.AtomicMove`.
-
-        Returns:
-           AtomicMove: resulting :class:`.AtomicMove`
+        Converts :class:`.AtomicMove` to movement character.
 
         Raises:
-            :exc:`.ValueError` if conversion not possible.
+            :exc:`ValueError`: conversion not possible in context of this tessellation
         """
-        from ..snapshot import AtomicMove
-
-        direction, box_moved = self._char_to_atomic_move_dict.get(
-            input_chr, (None, None)
-        )
-
-        if direction is None:
-            raise ValueError(input_chr)
-
-        return AtomicMove(direction=direction, box_moved=box_moved)
-
-    @property
-    @abstractmethod
-    def _atomic_move_to_char_dict(self) -> Mapping[Tuple[Direction, bool], str]:
-        """
-        Dict mapping :class:`.AtomicMove` parameters to string representation.
-        """
-        pass
-
-    def atomic_move_to_char(self, atomic_move: "AtomicMove") -> str:
-        """
-        Converts :class:`.AtomicMove` to string
-
-        Returns:
-           str: resulting string representation of :class:`.AtomicMove`
-
-        Raises:
-            :exc:`.ValueError` if conversion not possible.
-        """
-        retv = self._atomic_move_to_char_dict.get(
-            (atomic_move.direction, atomic_move.is_push_or_pull), None
-        )
-
-        if retv is None:
+        try:
+            retv = self._ATOMIC_MOVE_TO_CHR[
+                (atomic_move.direction, atomic_move.is_push_or_pull)
+            ]
+        except KeyError:
             raise ValueError(atomic_move)
 
         return retv
+
+    def char_to_atomic_move(self, input_chr: str) -> AtomicMove:
+        """
+        Converts movement character to :class:`.AtomicMove`.
+
+        Raises:
+            :exc:`ValueError`: conversion is not possible in context of this
+                               tessellation
+        """
+        try:
+            direction, box_moved = self._CHR_TO_ATOMIC_MOVE[input_chr]
+        except KeyError:
+            raise ValueError(input_chr)
+
+        return AtomicMove(direction=direction, box_moved=box_moved)
 
     def cell_orientation(
         self, position: int, board_width: int, board_height: int
     ) -> CellOrientation:
         """
-        Calculates board cell orientation for given position.
-
-        Returns:
-            CellOrientation: cell orientation for given ``position``
+        Calculates board cell orientation for given coordinate.
         """
         return CellOrientation.DEFAULT
 

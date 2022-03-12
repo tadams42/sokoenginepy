@@ -1,33 +1,28 @@
+from __future__ import annotations
+
 from collections.abc import Iterable, MutableSequence
-from typing import ClassVar, List, Optional, Set, Union
+from typing import Final, List, Optional, Set
 
 from .. import utilities
-from ..tessellation import Tessellation
+from ..atomic_move import AtomicMove
+from ..solving_mode import SolvingMode
+from ..tessellation import AnyTessellation, Tessellation, TessellationOrDescription
 
 
 class Snapshot(MutableSequence):
     """
-    Sequence of AtomicMove representing snapshot of game.
-
-    Args:
-        tessellation_or_description: game tessellation as string or
-            :class:`.Tessellation` instance
-        solving_mode: game solving mode
-        moves_data: Strings consisting of characters representing
-            :class:`.AtomicMove`. If not empty it will be parsed. Also, if not empty,
-            solving mode will be parsed from it, and the value of ``solving_mode``
-            argument will be ignored
+    Sequence of AtomicMove representing a game snapshot.
     """
 
-    JUMP_BEGIN: ClassVar[str] = "["
-    JUMP_END: ClassVar[str] = "]"
-    PUSHER_CHANGE_BEGIN: ClassVar[str] = "{"
-    PUSHER_CHANGE_END: ClassVar[str] = "}"
-    CURRENT_POSITION_CH: ClassVar[str] = "*"
+    JUMP_BEGIN: Final[str] = "["
+    JUMP_END: Final[str] = "]"
+    PUSHER_CHANGE_BEGIN: Final[str] = "{"
+    PUSHER_CHANGE_END: Final[str] = "}"
+    CURRENT_POSITION_CH: Final[str] = "*"
 
     #: Some characters that can be found in textual representation of snapshots that do
     #: not represent :class:`.AtomicMove`.
-    NON_MOVE_CHARACTERS: ClassVar[Set[str]] = {
+    NON_MOVE_CHARACTERS: Final[Set[str]] = {
         JUMP_BEGIN,
         JUMP_END,
         PUSHER_CHANGE_BEGIN,
@@ -37,10 +32,17 @@ class Snapshot(MutableSequence):
 
     def __init__(
         self,
-        tessellation_or_description: Union[Tessellation, str],
-        solving_mode: Optional["SolvingMode"] = None,
+        tessellation_or_description: TessellationOrDescription,
+        solving_mode: Optional[SolvingMode] = None,
         moves_data: str = "",
     ):
+        """
+        Args:
+            moves_data: Strings consisting of characters representing
+                :class:`.AtomicMove`. If not empty it will be parsed. Also, if not
+                empty, solving mode will be parsed from it, and the value of
+                ``solving_mode`` argument will be ignored
+        """
         super().__init__()
         self._tessellation_instance = Tessellation.instance_from(
             tessellation_or_description
@@ -89,15 +91,8 @@ class Snapshot(MutableSequence):
         return SnapshotStringParser.is_snapshot_string(line)
 
     @property
-    def tessellation(
-        self
-    ) -> Union[
-        "SokobanTessellation",
-        "TriobanTessellation",
-        "HexobanTessellation",
-        "OctobanTessellation",
-    ]:
-        return self._tessellation_instance.value
+    def tessellation(self) -> AnyTessellation:
+        return self._tessellation_instance
 
     # Iterable
     def __iter__(self):
@@ -108,7 +103,7 @@ class Snapshot(MutableSequence):
         return self._moves.__len__()
 
     # Container
-    def __contains__(self, atomic_move):
+    def __contains__(self, atomic_move: AtomicMove):
         return self._moves.__contains__(atomic_move)
 
     # Sequence
@@ -178,7 +173,7 @@ class Snapshot(MutableSequence):
         return not self == rv
 
     @property
-    def solving_mode(self) -> "SolvingMode":
+    def solving_mode(self) -> SolvingMode:
         return self._solving_mode
 
     @property
@@ -199,6 +194,9 @@ class Snapshot(MutableSequence):
         return self._jumps_count
 
     def clear(self):
+        """
+        Removes all recorded moves from this Snapshot.
+        """
         self._moves_count = 0
         self._pushes_count = 0
         self._jumps_count = 0
@@ -215,7 +213,7 @@ class Snapshot(MutableSequence):
     def __str__(self):
         return self.to_str()
 
-    def _before_removing_move(self, atomic_move):
+    def _before_removing_move(self, atomic_move: AtomicMove):
         if not atomic_move.is_pusher_selection:
             if atomic_move.is_jump:
                 self._jumps_count_invalidated = True
@@ -224,10 +222,8 @@ class Snapshot(MutableSequence):
             elif atomic_move.is_push_or_pull:
                 self._pushes_count -= 1
 
-    def _before_inserting_move(self, atomic_move):
-        from .. import game
-
-        if self._solving_mode == game.SolvingMode.FORWARD and atomic_move.is_jump:
+    def _before_inserting_move(self, atomic_move: AtomicMove):
+        if self._solving_mode == SolvingMode.FORWARD and atomic_move.is_jump:
             raise ValueError("Forward mode snapshots are not allowed to contain jumps!")
 
         if atomic_move.direction not in self.tessellation.legal_directions:

@@ -1,4 +1,4 @@
-from typing import ClassVar, Optional, Set, Union
+from typing import Final, Set
 
 
 class BoardConversionError(RuntimeError):
@@ -17,25 +17,25 @@ class BoardCell:
         by design: :class:`.BoardCell` is value class, not game logic class.
     """
 
-    WALL: ClassVar[str] = "#"
-    PUSHER: ClassVar[str] = "@"
-    PUSHER_ON_GOAL: ClassVar[str] = "+"
-    BOX: ClassVar[str] = "$"
-    BOX_ON_GOAL: ClassVar[str] = "*"
-    GOAL: ClassVar[str] = "."
-    FLOOR: ClassVar[str] = " "
-    VISIBLE_FLOOR: ClassVar[str] = "-"
-    ALT_PUSHER1: ClassVar[str] = "p"
-    ALT_PUSHER2: ClassVar[str] = "m"
-    ALT_PUSHER_ON_GOAL1: ClassVar[str] = "P"
-    ALT_PUSHER_ON_GOAL2: ClassVar[str] = "M"
-    ALT_BOX1: ClassVar[str] = "b"
-    ALT_BOX_ON_GOAL1: ClassVar[str] = "B"
-    ALT_GOAL1: ClassVar[str] = "o"
-    ALT_VISIBLE_FLOOR1: ClassVar[str] = "_"
+    WALL: Final[str] = "#"
+    PUSHER: Final[str] = "@"
+    PUSHER_ON_GOAL: Final[str] = "+"
+    BOX: Final[str] = "$"
+    BOX_ON_GOAL: Final[str] = "*"
+    GOAL: Final[str] = "."
+    FLOOR: Final[str] = " "
+    VISIBLE_FLOOR: Final[str] = "-"
+    ALT_PUSHER1: Final[str] = "p"
+    ALT_PUSHER2: Final[str] = "m"
+    ALT_PUSHER_ON_GOAL1: Final[str] = "P"
+    ALT_PUSHER_ON_GOAL2: Final[str] = "M"
+    ALT_BOX1: Final[str] = "b"
+    ALT_BOX_ON_GOAL1: Final[str] = "B"
+    ALT_GOAL1: Final[str] = "o"
+    ALT_VISIBLE_FLOOR1: Final[str] = "_"
 
     #: Characters used in textual representation of boards and BoardCell
-    CHARACTERS: ClassVar[Set[str]] = {
+    CHARACTERS: Final[Set[str]] = {
         WALL,
         PUSHER,
         PUSHER_ON_GOAL,

@@ -1,11 +1,20 @@
+from __future__ import annotations
+
+from typing import List, Optional, Tuple, Type
+
 from ... import utilities
-from ..board_cell import BoardCell, BoardConversionError
+from ...board_cell import BoardCell, BoardConversionError
 from ..sokoban_board import SokobanBoard
 from ..variant_board import VariantBoard, VariantBoardResizer
 
 
 class HexobanBoard(VariantBoard):
-    def __init__(self, board_width=0, board_height=0, board_str=None):
+    def __init__(
+        self,
+        board_width: int = 0,
+        board_height: int = 0,
+        board_str: Optional[str] = None,
+    ):
         super().__init__(
             tessellation_or_description="hexoban",
             board_width=board_width,
@@ -14,10 +23,10 @@ class HexobanBoard(VariantBoard):
         )
 
     @property
-    def _resizer_class(self):
+    def _resizer_class(self) -> Type[HexobanBoardResizer]:
         return HexobanBoardResizer
 
-    def _parse_string(self, board_str):
+    def _parse_string(self, board_str: str) -> List[str]:
         parsed, layout_ok = HexobanTextConverter().convert_to_internal(board_str)
 
         if layout_ok:
@@ -28,17 +37,17 @@ class HexobanBoard(VariantBoard):
                 "text layout meaning either missing or misaligned filler spaces."
             )
 
-    def to_str(self, use_visible_floor=False, rle_encode=False):
+    def to_str(self, use_visible_floor: bool = False, rle_encode: bool = False) -> str:
         return HexobanTextConverter().convert_to_string(
             self, use_visible_floor, rle_encode
         )
 
 
 class HexobanBoardResizer(VariantBoardResizer):
-    def __init__(self, hexoban_board):
+    def __init__(self, hexoban_board: HexobanBoard):
         super().__init__(hexoban_board)
 
-    def reverse_columns(self, reconfigure_edges):
+    def reverse_columns(self, reconfigure_edges: bool):
         converter = HexobanTextConverter()
         tmp = SokobanBoard(board_str=converter.convert_to_string(self.board))
 
@@ -52,19 +61,19 @@ class HexobanBoardResizer(VariantBoardResizer):
 
         self.board._reinit_with_string(str(tmp), reconfigure_edges)
 
-    def add_row_top(self, reconfigure_edges):
+    def add_row_top(self, reconfigure_edges: bool):
         converter = HexobanTextConverter()
         tmp = SokobanBoard(board_str=converter.convert_to_string(self.board))
         tmp._resizer.add_row_top(reconfigure_edges=False)
         self.board._reinit_with_string(str(tmp), reconfigure_edges)
 
-    def remove_row_top(self, reconfigure_edges):
+    def remove_row_top(self, reconfigure_edges: bool):
         converter = HexobanTextConverter()
         tmp = SokobanBoard(board_str=converter.convert_to_string(self.board))
         tmp._resizer.remove_row_top(reconfigure_edges=False)
         self.board._reinit_with_string(str(tmp), reconfigure_edges)
 
-    def remove_row_bottom(self, reconfigure_edges):
+    def remove_row_bottom(self, reconfigure_edges: bool):
         converter = HexobanTextConverter()
         tmp = SokobanBoard(board_str=converter.convert_to_string(self.board))
         tmp._resizer.remove_row_bottom(reconfigure_edges=False)
@@ -72,12 +81,15 @@ class HexobanBoardResizer(VariantBoardResizer):
 
 
 class HexobanTextConverter:
-    def convert_to_internal(self, src_str):
+    def convert_to_internal(self, src_str: str) -> Tuple[List[str], bool]:
         # Converts textual Hexoban into 2D array and validates textual layout
-
-        parsed, width, height, even_row_x_parity, odd_row_x_parity = self._preparse_board(
-            src_str
-        )
+        (
+            parsed,
+            width,
+            height,
+            even_row_x_parity,
+            odd_row_x_parity,
+        ) = self._preparse_board(src_str)
 
         # Handle empty board
         if width == 0 or height == 0:
@@ -87,7 +99,7 @@ class HexobanTextConverter:
             return internal, True
 
         layout_ok = True
-        internal = []
+        internal: List[str] = []
 
         for y in range(0, height):
             if not layout_ok:
@@ -113,8 +125,11 @@ class HexobanTextConverter:
         return internal, layout_ok
 
     def convert_to_string(
-        self, hexoban_board, use_visible_floor=False, rle_encode=False
-    ):
+        self,
+        hexoban_board: HexobanBoard,
+        use_visible_floor: bool = False,
+        rle_encode: bool = False,
+    ) -> str:
         floor_character = BoardCell(BoardCell.FLOOR).to_str(use_visible_floor)
 
         retv = []
@@ -145,23 +160,27 @@ class HexobanTextConverter:
         else:
             return "\n".join(retv)
 
-    def is_type1(self, hexoban_board):
+    def is_type1(self, hexoban_board: HexobanBoard) -> bool:
         return self._is_type1(VariantBoard.parse_board_string(str(hexoban_board)))
 
-    def _is_type1(self, string_list):
+    def _is_type1(self, string_list: List[str]) -> bool:
         rnfp = self._find_rightmost_non_floor(string_list)
-        if rnfp > 0:
+
+        if rnfp is None:
+            return False
+        elif rnfp > 0:
             y = utilities.Y(rnfp, utilities.calculate_width(string_list))
             return y % 2 == 0
-        elif rnfp == 0:
+        else:  # rnfp == 0
             return True
-        return False
 
-    def _is_type2(self, string_list):
+    def _is_type2(self, string_list: List[str]) -> bool:
         return not self._is_type1(string_list)
 
     @staticmethod
-    def _analyze_text_cell_position(cell, x, y, odd_row_x_parity, even_row_x_parity):
+    def _analyze_text_cell_position(
+        cell: str, x: int, y: int, odd_row_x_parity: int, even_row_x_parity: int
+    ) -> Tuple[bool, bool]:
         y_parity = y % 2
         x_parity = x % 2
 
@@ -197,8 +216,10 @@ class HexobanTextConverter:
 
         return layout_ok, should_copy_cell
 
-    def _preparse_board(self, board_string):
-        parsed = []
+    def _preparse_board(
+        self, board_string: str
+    ) -> Tuple[List[str], int, int, int, int]:
+        parsed: List[str] = []
 
         parsed = utilities.normalize_width(
             VariantBoard.parse_board_string(board_string)
@@ -238,18 +259,18 @@ class HexobanTextConverter:
 
         return parsed, width, height, even_row_x_parity, odd_row_x_parity
 
-    def _add_column_left(self, string_list):
+    def _add_column_left(self, string_list: List[str]) -> List[str]:
         return [BoardCell.FLOOR + line for line in string_list]
 
-    def _add_column_right(self, string_list):
+    def _add_column_right(self, string_list: List[str]) -> List[str]:
         return [line + BoardCell.FLOOR for line in string_list]
 
     @staticmethod
-    def _remove_column_right(string_list):
+    def _remove_column_right(string_list: List[str]) -> List[str]:
         return [line[:-1] for line in string_list]
 
     @staticmethod
-    def _find_first_non_floor(string_list):
+    def _find_first_non_floor(string_list: List[str]):
         normalized = utilities.normalize_width(string_list)
         width = len(normalized[0]) if len(normalized) > 0 else 0
         height = len(normalized)
@@ -281,8 +302,8 @@ class HexobanTextConverter:
         return utilities.index_1d(1, 0, width)
 
     @staticmethod
-    def _find_rightmost_non_floor(string_list):
-        def rightmost_finder(string_list, row_parity):
+    def _find_rightmost_non_floor(string_list: List[str]) -> Optional[int]:
+        def rightmost_finder(string_list: List[str], row_parity: int):
             cell_found = False
             height = len(string_list)
             width = len(string_list[0])

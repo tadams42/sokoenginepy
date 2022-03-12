@@ -101,30 +101,27 @@ void export_boards(py::module &m) {
     .def_property_readonly("size", &VariantBoard::size)
 
     .def("neighbor",
-         [](const VariantBoard &self, position_t from_position,
+         [](const VariantBoard &self, position_t src,
             const Direction &direction) -> py::object {
-           auto retv = self.neighbor_at(from_position, direction);
+           auto retv = self.neighbor_at(src, direction);
            if (retv > MAX_POS) return py::none();
            return py::cast(retv);
          },
-         py::arg("from_position"), py::arg("direction"))
+         py::arg("src"), py::arg("direction"))
 
-    .def("wall_neighbors", &VariantBoard::wall_neighbors, py::arg("from_position"))
-    .def("all_neighbors", &VariantBoard::all_neighbors, py::arg("from_position"))
+    .def("wall_neighbors", &VariantBoard::wall_neighbors, py::arg("src"))
+    .def("all_neighbors", &VariantBoard::all_neighbors, py::arg("src"))
     .def("clear", &VariantBoard::clear)
     .def("mark_play_area", &VariantBoard::mark_play_area)
     .def("positions_reachable_by_pusher", &VariantBoard::positions_reachable_by_pusher,
          py::arg("pusher_position"), py::arg("excluded_positions") = py::list())
     .def("normalized_pusher_position", &VariantBoard::normalized_pusher_position,
          py::arg("pusher_position"), py::arg("excluded_positions") = py::list())
-    .def("path_destination", &VariantBoard::path_destination, py::arg("start_position"),
-         py::arg("directions_path"))
-    .def("find_move_path", &VariantBoard::find_move_path, py::arg("start_position"),
-         py::arg("end_position"))
-    .def("find_jump_path", &VariantBoard::find_jump_path, py::arg("start_position"),
-         py::arg("end_position"))
+    .def("path_destination", &VariantBoard::path_destination, py::arg("src"), py::arg("directions"))
+    .def("find_move_path", &VariantBoard::find_move_path, py::arg("src"), py::arg("dst"))
+    .def("find_jump_path", &VariantBoard::find_jump_path, py::arg("src"), py::arg("dst"))
     .def("positions_path_to_directions_path",
-         &VariantBoard::positions_path_to_directions_path, py::arg("positions_path"))
+         &VariantBoard::positions_path_to_directions_path, py::arg("positions"))
     .def("cell_orientation", &VariantBoard::cell_orientation, py::arg("position"))
     .def("add_row_top", &VariantBoard::add_row_top)
     .def("add_row_bottom", &VariantBoard::add_row_bottom)
@@ -141,8 +138,7 @@ void export_boards(py::module &m) {
     .def("reverse_rows", &VariantBoard::reverse_rows)
     .def("reverse_columns", &VariantBoard::reverse_columns)
     .def("resize", &VariantBoard::resize, py::arg("new_width"), py::arg("new_height"))
-    .def("resize_and_center", &VariantBoard::resize_and_center, py::arg("new_width"),
-         py::arg("new_height"))
+    .def("resize_and_center", &VariantBoard::resize_and_center, py::arg("new_width"), py::arg("new_height"))
     .def("trim", &VariantBoard::trim);
 
   py::class_<SokobanBoard, VariantBoard, std::shared_ptr<SokobanBoard>>(m,

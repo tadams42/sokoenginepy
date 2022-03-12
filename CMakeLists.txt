@@ -8,4 +8,3 @@ include(libsokoengine_configure)
 
 add_subdirectory (src/libsokoengine)
 add_subdirectory (src/sokoenginepyext)
-add_subdirectory (src/utilities)

@@ -1,21 +1,45 @@
-from typing import ClassVar, Optional, Set
+from typing import Final, Optional, Set
 
-from ...manager import DEFAULT_PIECE_ID
-from ...tessellation import Direction
+from ..direction import Direction
+from ..manager import DEFAULT_PIECE_ID
 
 
 class AtomicMove:
-    """Represents single step of pusher movement.
-
-        - move - pusher moved without pushing box
-        - push/pull - pusher moved and pushed a box in front of it (
-          :attr:`.SolvingMode.FORWARD`) or pusher moved and pulled a box behind it
-          (:attr:`.SolvingMode.REVERSE`)
-        - jump - single step in pusher jump sequence (jumps are allowed only in
-          :attr:`.SolvingMode.REVERSE`)
-        - pusher selection - single step in sequence describing focus change of
-          active pusher in Multiban games
     """
+    Represents single step of pusher movement.
+
+    - ``move`` - pusher moved without pushing box
+    - ``push/pull`` - pusher moved and pushed a box in front of it (
+      :attr:`.SolvingMode.FORWARD`) or pusher moved and pulled a box behind it
+      (:attr:`.SolvingMode.REVERSE`)
+    - ``jump`` - single step in pusher jump sequence (jumps are allowed only in
+      :attr:`.SolvingMode.REVERSE`)
+    - ``pusher selection`` - single step in sequence describing focus change of active
+      pusher in Multiban games
+    """
+
+    l: Final[str] = "l"
+    u: Final[str] = "u"
+    r: Final[str] = "r"
+    d: Final[str] = "d"
+    L: Final[str] = "L"
+    U: Final[str] = "U"
+    R: Final[str] = "R"
+    D: Final[str] = "D"
+    w: Final[str] = "w"
+    W: Final[str] = "W"
+    e: Final[str] = "e"
+    E: Final[str] = "E"
+    n: Final[str] = "n"
+    N: Final[str] = "N"
+    s: Final[str] = "s"
+    S: Final[str] = "S"
+
+    #: Characters used in textual representation of :class:`.Snapshot`.
+    #:
+    #: Not all variants use all characters. Also, for different variants, same character
+    #: may have different meaning (represent different :class:`.Direction`).
+    CHARACTERS: Final[Set[str]] = {l, u, r, d, L, U, R, D, W, W, e, E, n, N, s, S}
 
     __slots__ = [
         "_box_moved",
@@ -25,29 +49,6 @@ class AtomicMove:
         "_moved_box_id",
         "direction",
     ]
-
-    l: ClassVar[str] = "l"
-    u: ClassVar[str] = "u"
-    r: ClassVar[str] = "r"
-    d: ClassVar[str] = "d"
-    L: ClassVar[str] = "L"
-    U: ClassVar[str] = "U"
-    R: ClassVar[str] = "R"
-    D: ClassVar[str] = "D"
-    w: ClassVar[str] = "w"
-    W: ClassVar[str] = "W"
-    e: ClassVar[str] = "e"
-    E: ClassVar[str] = "E"
-    n: ClassVar[str] = "n"
-    N: ClassVar[str] = "N"
-    s: ClassVar[str] = "s"
-    S: ClassVar[str] = "S"
-
-    #: Characters used in textual representation of :class:`.Snapshot`.
-    #:
-    #: Not all variants use all characters. Also, for different variants, same character
-    #: may have different meaning (represent different :class:`.Direction`).
-    CHARACTERS: ClassVar[Set[str]] = {l, u, r, d, L, U, R, D, W, W, e, E, n, N, s, S}
 
     def __init__(
         self,
@@ -75,7 +76,8 @@ class AtomicMove:
         self._box_moved: bool = False
         self._pusher_selected: bool = False
         self._pusher_jumped: bool = False
-        self.pusher_id: int = pusher_id
+        self._pusher_id = pusher_id
+        self.pusher_id = pusher_id
         self._moved_box_id: Optional[int] = None
         self.direction: Direction = direction
 

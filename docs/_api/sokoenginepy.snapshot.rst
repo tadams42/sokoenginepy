@@ -4,17 +4,17 @@ Snapshot
 AtomicMove
 ----------
 
-.. autoclass:: sokoenginepy.snapshot.AtomicMove
+.. autoclass:: sokoenginepy.AtomicMove
     :members:
     :undoc-members:
-    :inherited-members:
-    :show-inheritance:
+
 
 Snapshot
 --------
 
-.. autoclass:: sokoenginepy.snapshot.Snapshot
+.. autoclass:: sokoenginepy.Snapshot
     :members:
     :undoc-members:
-    :inherited-members:
     :show-inheritance:
+    :special-members: __init__, __iter__, __len__, __contains__, __getitem__, __setitem__, __delitem__, __eq__, __ne__
+    :member-order: bysource

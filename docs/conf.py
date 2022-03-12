@@ -28,16 +28,11 @@ on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 # -- Project information -----------------------------------------------------
 
 project = "sokoenginepy"
-copyright = "2022, Tomislav Adamic"
-author = "Tomislav Adamic"
-# General information about the project.
-project = "sokoenginepy"
 copyright = (
     ", ".join(str(y) for y in range(2017, datetime.now().year + 1))
     + ", Tomislav Adamic"
 )
 author = "Tomislav Adamic"
-# The full version, including alpha/beta/rc tags
 version = release = "0.5.4"
 
 
@@ -50,17 +45,25 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.ifconfig",
-    "sphinx.ext.viewcode",
+    # "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "m2r2",
 ]
 
+needs_sphinx = "4.4"
+
+# autodoc_type_aliases = {
+#     "AnyTessellation": "sokoenginepy.AnyTessellation",
+#     "TessellationOrDescription": "sokoenginepy.TessellationOrDescription",
+# }
+autodoc_typehints_format = "short"
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
-source_suffix = [".rst", ".md"]
+source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

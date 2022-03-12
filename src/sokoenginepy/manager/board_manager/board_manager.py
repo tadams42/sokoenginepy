@@ -1,10 +1,16 @@
+from __future__ import annotations
+
 from functools import cached_property, partial
 from itertools import permutations
+from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Tuple
 
 from ... import utilities
 from ..board_state import BoardState
 from ..piece import DEFAULT_PIECE_ID
 from ..sokoban_plus import SokobanPlus
+
+if TYPE_CHECKING:
+    from ...board import VariantBoard
 
 
 class CellAlreadyOccupiedError(RuntimeError):
@@ -33,13 +39,13 @@ class BoardManager:
     - Provides efficient means of pieces movemet. Ie. we can move pushers and boxes
       and :class:`.BoardManager` will update internal state and board cells.
 
-      This movement preserves piece IDs in contex of board state changes. To
-      ilustrate, let's assume we create :class:`.BoardManager` from board with two
-      pushers one above the other. After then we edit the board, placing pusher ID 2
-      in row above pusher ID 1. Finally, we create another instance of
-      :class:`.BoardManager`. If we now inspect pusher IDs in first and second
-      :class:`.BoardManager` instance, they will be different. Have we used movement
-      methods instead of board editing, these IDs would be preserved:
+      This movement preserves piece IDs in contex of board state changes. To illustrate,
+      let's assume we create :class:`.BoardManager` from board with two pushers one
+      above the other. After then we edit the board, placing pusher ID 2 in row above
+      pusher ID 1. Finally, we create another instance of :class:`.BoardManager`. If we
+      now inspect pusher IDs in first and second :class:`.BoardManager` instance, they
+      will be different. Have we used movement methods instead of board editing, these
+      IDs would be preserved:
 
       .. |img1| image:: /images/movement_vs_transfer1.png
       .. |img2| image:: /images/movement_vs_transfer2.png
@@ -62,17 +68,19 @@ class BoardManager:
         editing board cells directly (ie. adding/removing pushers or boxes, changing
         board size, changing walls layout, etc...) will not sync these edits back to
         our :class:`.BoardManager` instance.
-
-    Args:
-        variant_board (VariantBoard): board for which we want to manage state
     """
 
-    def __init__(self, variant_board, boxorder=None, goalorder=None):
+    def __init__(
+        self,
+        variant_board: VariantBoard,
+        boxorder: Optional[str] = None,
+        goalorder: Optional[str] = None,
+    ):
         self._board = variant_board
         self._boxes = utilities.Flipdict()
         self._goals = utilities.Flipdict()
         self._pushers = utilities.Flipdict()
-        self._walls = []
+        self._walls: List[int] = []
 
         pusher_id = box_id = goal_id = DEFAULT_PIECE_ID
 
@@ -130,11 +138,11 @@ class BoardManager:
         )
 
     @property
-    def board(self):
+    def board(self) -> VariantBoard:
         return self._board
 
     @property
-    def walls_positions(self):
+    def walls_positions(self) -> List[int]:
         return self._walls
 
     # --------------------------------------------------------------------------
@@ -142,39 +150,27 @@ class BoardManager:
     # --------------------------------------------------------------------------
 
     @cached_property
-    def pushers_count(self):
+    def pushers_count(self) -> int:
         return len(self._pushers)
 
     @cached_property
-    def pushers_ids(self):
+    def pushers_ids(self) -> List[int]:
         """
         IDs of all pushers on board.
-
-        Returns:
-            list: integer IDs of all pushers on board
         """
         return list(self._pushers.keys())
 
     @property
-    def pushers_positions(self):
+    def pushers_positions(self) -> Dict[int, int]:
         """
-        Positions of all pushers on board.
+        Mapping of pushers' IDs to the corresponding board positions, ie. ::
 
-        Returns:
-            dict: mapping pushers' IDs to the corresponding board positions::
-
-                {1: 42, 2: 24}
+            {1: 42, 2: 24}
         """
         return dict(self._pushers)
 
-    def pusher_position(self, pusher_id):
+    def pusher_position(self, pusher_id: int) -> int:
         """
-        Args:
-            pusher_id (int): pusher ID
-
-        Returns:
-            int: pusher position
-
         Raises:
             :exc:`KeyError`: No pusher with ID ``pusher_id``
         """
@@ -183,16 +179,8 @@ class BoardManager:
         except KeyError:
             raise KeyError("No pusher with ID: {0}".format(pusher_id))
 
-    def pusher_id_on(self, position):
+    def pusher_id_on(self, position: int) -> int:
         """
-        ID of pusher on position.
-
-        Args:
-            position (int): position to check
-
-        Returns:
-            int: pusher ID
-
         Raises:
             :exc:`KeyError`: No pusher on ``position``
         """
@@ -201,35 +189,23 @@ class BoardManager:
         except KeyError:
             raise KeyError("No pusher on position: {0}".format(position))
 
-    def has_pusher(self, pusher_id):
-        """
-        Args:
-            pusher_id (int): pusher ID
-        """
+    def has_pusher(self, pusher_id: int) -> bool:
         return pusher_id in self._pushers
 
-    def has_pusher_on(self, position):
-        """
-        Args:
-            position (int): position to check
-        """
+    def has_pusher_on(self, position: int) -> bool:
         return position in self._pushers.flip
 
-    def _pusher_moved(self, old_position, to_new_position):
+    def _pusher_moved(self, old_position: int, to_new_position: int):
         """Subclass hook used to notify it that we modified pusher position."""
         pass
 
-    def move_pusher_from(self, old_position, to_new_position):
+    def move_pusher_from(self, old_position: int, to_new_position: int):
         """
         Updates board state and board cells with changed pusher position.
 
-        Args:
-            old_position (int): starting position
-            to_new_position (int): ending position
-
         Raises:
             :exc:`KeyError`: there is no pusher on ``old_position``
-            :exc:`.CellAlreadyOccupiedError`: there is an obstacle (
+            :exc:`CellAlreadyOccupiedError`: there is an obstacle (
                 wall/box/another pusher) on ``to_new_position``
         """
         if old_position == to_new_position:
@@ -250,17 +226,13 @@ class BoardManager:
 
         self._pusher_moved(old_position, to_new_position)
 
-    def move_pusher(self, pusher_id, to_new_position):
+    def move_pusher(self, pusher_id: int, to_new_position: int):
         """
         Updates board state and board cells with changed pusher position.
 
-        Args:
-            pusher_id (int): pusher ID
-            to_new_position (int): ending position
-
         Raises:
             :exc:`KeyError`: there is no pusher with ID ``pusher_id``
-            :exc:`.CellAlreadyOccupiedError`: there is a pusher already on
+            :exc:`CellAlreadyOccupiedError`: there is a pusher already on
                 ``to_new_position``
 
         Note:
@@ -279,39 +251,27 @@ class BoardManager:
     # --------------------------------------------------------------------------
 
     @cached_property
-    def boxes_count(self):
+    def boxes_count(self) -> int:
         return len(self._boxes)
 
     @cached_property
-    def boxes_ids(self):
+    def boxes_ids(self) -> List[int]:
         """
         IDs of all boxes on board.
-
-        Returns:
-            list: integer IDs of all boxes on board
         """
         return list(self._boxes.keys())
 
     @property
-    def boxes_positions(self):
+    def boxes_positions(self) -> Dict[int, int]:
         """
-        Positions of all boxes on board.
+        Mapping of boxes' IDs to the corresponding board positions, ie. ::
 
-        Returns:
-            dict: mapping boxes' IDs to the corresponding board positions::
-
-                {1: 42, 2: 24}
+            {1: 42, 2: 24}
         """
         return dict(self._boxes)
 
-    def box_position(self, box_id):
+    def box_position(self, box_id: int) -> int:
         """
-        Args:
-            box_id (int): box ID
-
-        Returns:
-            int: box position
-
         Raises:
             :exc:`KeyError`: No box with ID ``box_id``
         """
@@ -320,16 +280,8 @@ class BoardManager:
         except KeyError:
             raise KeyError("No box with ID: {0}".format(box_id))
 
-    def box_id_on(self, position):
+    def box_id_on(self, position: int) -> int:
         """
-        ID of box on position.
-
-        Args:
-            position (int): position to check
-
-        Returns:
-            int: box ID
-
         Raises:
             :exc:`KeyError`: No box on ``position``
         """
@@ -338,35 +290,23 @@ class BoardManager:
         except KeyError:
             raise KeyError("No box on position: {0}".format(position))
 
-    def has_box(self, box_id):
-        """
-        Args:
-            box_id (int): box ID
-        """
+    def has_box(self, box_id: int) -> bool:
         return box_id in self._boxes
 
-    def has_box_on(self, position):
-        """
-        Args:
-            position (int): position to check
-        """
+    def has_box_on(self, position: int) -> bool:
         return position in self._boxes.flip
 
-    def _box_moved(self, old_position, to_new_position):
+    def _box_moved(self, old_position: int, to_new_position: int):
         """Subclass hook used to notify it that we modified box position."""
         pass
 
-    def move_box_from(self, old_position, to_new_position):
+    def move_box_from(self, old_position: int, to_new_position: int):
         """
         Updates board state and board cells with changed box position.
 
-        Args:
-            old_position (int): starting position
-            to_new_position (int): ending position
-
         Raises:
             :exc:`KeyError`: there is no box on ``old_position``
-            :exc:`.CellAlreadyOccupiedError`: there is an obstacle ( wall/box/pusher)
+            :exc:`CellAlreadyOccupiedError`: there is an obstacle ( wall/box/pusher)
                 on ``to_new_position``
         """
         if old_position == to_new_position:
@@ -387,17 +327,13 @@ class BoardManager:
 
         self._box_moved(old_position, to_new_position)
 
-    def move_box(self, box_id, to_new_position):
+    def move_box(self, box_id: int, to_new_position: int):
         """
         Updates board state and board cells with changed box position.
 
-        Args:
-            old_position (int): starting position
-            to_new_position (int): ending position
-
         Raises:
             :exc:`KeyError`: there is no box on ``old_position``
-            :exc:`.CellAlreadyOccupiedError`: there is an obstacle ( wall/box/another
+            :exc:`CellAlreadyOccupiedError`: there is an obstacle ( wall/box/another
                 pusher) on ``to_new_position``
         """
         self.move_box_from(self._boxes[box_id], to_new_position)
@@ -407,39 +343,27 @@ class BoardManager:
     # --------------------------------------------------------------------------
 
     @cached_property
-    def goals_count(self):
+    def goals_count(self) -> int:
         return len(self._goals)
 
     @cached_property
-    def goals_ids(self):
+    def goals_ids(self) -> List[int]:
         """
         IDs of all goals on board.
-
-        Returns:
-            list: integer IDs of all goals on board
         """
         return list(self._goals.keys())
 
     @property
-    def goals_positions(self):
+    def goals_positions(self) -> Dict[int, int]:
         """
-        Positions of all goals on board.
+        Mapping of boxes' IDs to the corresponding board positions, ie. ::
 
-        Returns:
-            dict: mapping goals' IDs to the corresponding board positions::
-
-                {1: 42, 2: 24}
+            {1: 42, 2: 24}
         """
         return dict(self._goals)
 
-    def goal_position(self, goal_id):
+    def goal_position(self, goal_id: int) -> int:
         """
-        Args:
-            goal_id (int): goal ID
-
-        Returns:
-            int: goal position
-
         Raises:
             :exc:`KeyError`: No goal with ID ``goal_id``
         """
@@ -448,15 +372,9 @@ class BoardManager:
         except KeyError:
             raise KeyError("No goal with ID: {0}".format(goal_id))
 
-    def goal_id_on(self, position):
+    def goal_id_on(self, position: int) -> int:
         """
         ID of goal on position.
-
-        Args:
-            position (int): position to check
-
-        Returns:
-            int: goal ID
 
         Raises:
             :exc:`KeyError`: No goal on ``position``
@@ -466,32 +384,24 @@ class BoardManager:
         except KeyError:
             raise KeyError("No goal on position: {0}".format(position))
 
-    def has_goal(self, goal_id):
-        """
-        Args:
-            goal_id (int): goal ID
-        """
+    def has_goal(self, goal_id: int) -> bool:
         return goal_id in self._goals
 
-    def has_goal_on(self, position):
-        """
-        Args:
-            position (int): position to check
-        """
+    def has_goal_on(self, position: int) -> bool:
         return position in self._goals.flip
 
     # --------------------------------------------------------------------------
     # Sokoban+
     # --------------------------------------------------------------------------
 
-    def box_plus_id(self, box_id):
+    def box_plus_id(self, box_id: int) -> int:
         """
         See Also:
             :meth:`.SokobanPlus.box_plus_id`
         """
         return self._sokoban_plus.box_plus_id(box_id)
 
-    def goal_plus_id(self, goal_id):
+    def goal_plus_id(self, goal_id: int) -> int:
         """
         See Also:
             :meth:`.SokobanPlus.goal_plus_id`
@@ -499,7 +409,7 @@ class BoardManager:
         return self._sokoban_plus.goal_plus_id(goal_id)
 
     @property
-    def boxorder(self):
+    def boxorder(self) -> str:
         """
         See Also:
             `.SokobanPlus.boxorder`
@@ -511,7 +421,7 @@ class BoardManager:
         self._sokoban_plus.boxorder = rv
 
     @property
-    def goalorder(self):
+    def goalorder(self) -> str:
         """
         See Also:
             `.SokobanPlus.goalorder`
@@ -523,7 +433,7 @@ class BoardManager:
         self._sokoban_plus.goalorder = rv
 
     @property
-    def is_sokoban_plus_enabled(self):
+    def is_sokoban_plus_enabled(self) -> bool:
         return self._sokoban_plus.is_enabled
 
     def enable_sokoban_plus(self):
@@ -547,7 +457,7 @@ class BoardManager:
         self._sokoban_plus.is_enabled = False
 
     @property
-    def is_sokoban_plus_valid(self):
+    def is_sokoban_plus_valid(self) -> bool:
         """
         Validates current set of Sokoban+ rules.
 
@@ -561,7 +471,7 @@ class BoardManager:
     # --------------------------------------------------------------------------
 
     @property
-    def is_solved(self):
+    def is_solved(self) -> bool:
         if self.boxes_count != self.goals_count:
             return False
 
@@ -581,15 +491,12 @@ class BoardManager:
 
         return retv
 
-    def solutions(self):
+    def solutions(self) -> Iterable[BoardState]:
         """
         Generator for all configurations of boxes that result in solved board.
 
         Note:
             Resultset depends on `.BoardManager.is_sokoban_plus_enabled`.
-
-        Yields:
-            `.BoardState`
         """
         if self.boxes_count != self.goals_count:
             return []
@@ -613,15 +520,12 @@ class BoardManager:
                     boxes_positions=list(boxes_positions), pushers_positions=[]
                 )
 
-    def _box_goal_pairs(self):
+    def _box_goal_pairs(self) -> Iterable[Tuple[int, int]]:
         """
-        Finds a list of paired (box_id, goal_id,) tuples.
+        Finds a list of paired (box_id, goal_id) tuples.
 
         If Sokoban+ is enabled, boxes and goals are paired by Sokoban+ IDs, otherwise
         they are paired by regular IDs
-
-        Yields:
-            tuple: (box_id, goal_id)
         """
         if self.boxes_count != self.goals_count:
             return []
@@ -635,7 +539,7 @@ class BoardManager:
         goals_ids = list(self.goals_ids)
         for goal_id in goals_ids:
             predicate = partial(is_box_goal_pair, goal_id=goal_id)
-            index, box_id = next(filter(predicate, enumerate(boxes_todo)), None)
+            index, box_id = next(filter(predicate, enumerate(boxes_todo)))
             yield box_id, goal_id
             del boxes_todo[index]
 
@@ -678,7 +582,7 @@ class BoardManager:
                     self._pusher_moved(old_goal_position, old_box_position)
 
     @property
-    def is_playable(self):
+    def is_playable(self) -> bool:
         return (
             self.pushers_count > 0
             and self.boxes_count == self.goals_count
@@ -687,7 +591,7 @@ class BoardManager:
         )
 
     @property
-    def state(self):
+    def state(self) -> BoardState:
         pushers_positions = self.pushers_positions
         boxes_positions = self.boxes_positions
         return BoardState(

@@ -4,45 +4,43 @@ Manager
 BoardState
 ----------
 
-.. autoclass:: sokoenginepy.manager.board_state.board_state.BoardState
+.. autoclass:: sokoenginepy.BoardState
     :members:
     :undoc-members:
-    :inherited-members:
-    :show-inheritance:
+
 
 BoardManager
 ------------
 
-.. autoexception:: sokoenginepy.manager.BoxGoalSwitchError
+.. autoexception:: sokoenginepy.BoxGoalSwitchError
 
-.. autoexception:: sokoenginepy.manager.CellAlreadyOccupiedError
+.. autoexception:: sokoenginepy.CellAlreadyOccupiedError
 
 .. automodule:: sokoenginepy.manager.piece
     :members:
     :undoc-members:
-    :show-inheritance:
 
-.. autoclass:: sokoenginepy.manager.board_manager.board_manager.BoardManager
+.. autoclass:: sokoenginepy.BoardManager
     :members:
     :undoc-members:
     :inherited-members:
-    :show-inheritance:
+
 
 HashedBoardManager
 ------------------
 
-.. autoclass:: sokoenginepy.manager.hashed_board_manager.hashed_board_manager.HashedBoardManager
+.. autoclass:: sokoenginepy.HashedBoardManager
     :members:
     :undoc-members:
     :show-inheritance:
+
 
 SokobanPlus
 -----------
 
-.. autoexception:: sokoenginepy.manager.SokobanPlusDataError
+.. autoexception:: sokoenginepy.SokobanPlusDataError
 
-.. autoclass:: sokoenginepy.manager.SokobanPlus
+.. autoclass:: sokoenginepy.SokobanPlus
     :members:
     :undoc-members:
     :inherited-members:
-    :show-inheritance:

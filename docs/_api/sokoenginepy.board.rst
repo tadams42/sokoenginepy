@@ -4,51 +4,51 @@ Board
 BoardCell
 ---------
 
-.. autoexception:: sokoenginepy.board.BoardConversionError
-
-.. autoclass:: sokoenginepy.board.BoardCell
+.. autoclass:: sokoenginepy.BoardCell
     :members:
     :undoc-members:
     :inherited-members:
-    :show-inheritance:
 
-VariantBoard
-------------
+.. autoexception:: sokoenginepy.BoardConversionError
 
-.. autoclass:: sokoenginepy.board.variant_board.variant_board.VariantBoard
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
 
 SokobanBoard
 ------------
 
-.. autoclass:: sokoenginepy.board.SokobanBoard
-    :members:
-    :undoc-members:
+.. autoclass:: sokoenginepy.SokobanBoard
     :show-inheritance:
+    :special-members: __init__
+
 
 HexobanBoard
 ------------
 
-.. autoclass:: sokoenginepy.board.HexobanBoard
-    :members:
-    :undoc-members:
+.. autoclass:: sokoenginepy.HexobanBoard
     :show-inheritance:
+    :special-members: __init__
+
 
 TriobanBoard
 ------------
 
-.. autoclass:: sokoenginepy.board.TriobanBoard
-    :members:
-    :undoc-members:
+.. autoclass:: sokoenginepy.TriobanBoard
     :show-inheritance:
+    :special-members: __init__
+
 
 OctobanBoard
 ------------
 
-.. autoclass:: sokoenginepy.board.OctobanBoard
+.. autoclass:: sokoenginepy.OctobanBoard
+    :show-inheritance:
+    :special-members: __init__
+
+
+VariantBoard
+------------
+
+.. autoclass:: sokoenginepy.VariantBoard
     :members:
     :undoc-members:
-    :show-inheritance:
+    :special-members: __init__, __eq__, __ne__, __getitem__, __setitem__, __contains__
+    :member-order: bysource

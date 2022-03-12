@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import IntEnum
 from typing import List
 
@@ -18,7 +20,7 @@ class Direction(IntEnum):
         return "Direction." + self.name
 
     @property
-    def opposite(self) -> "Direction":
+    def opposite(self) -> Direction:
         return _OPPOSITE[self.value]
 
 

@@ -146,7 +146,7 @@ class SpecGenerator:
 
         if test_case["test_type"] == "tessellation":
             self.output.append(
-                '            t = Tessellation.instance_from("{0}").value'.format(
+                '            t = Tessellation.instance_from("{0}")'.format(
                     test_case["variant"]
                 )
             )

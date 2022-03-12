@@ -4,7 +4,7 @@ I/O
 Puzzle
 ------
 
-.. autoclass:: sokoenginepy.io.Puzzle
+.. autoclass:: sokoenginepy.Puzzle
     :members:
     :undoc-members:
     :inherited-members:
@@ -13,7 +13,7 @@ Puzzle
 PuzzleSnapshot
 --------------
 
-.. autoclass:: sokoenginepy.io.PuzzleSnapshot
+.. autoclass:: sokoenginepy.PuzzleSnapshot
     :members:
     :undoc-members:
     :inherited-members:
@@ -22,7 +22,7 @@ PuzzleSnapshot
 PuzzlesCollection
 -----------------
 
-.. autoclass:: sokoenginepy.io.PuzzlesCollection
+.. autoclass:: sokoenginepy.PuzzlesCollection
     :members:
     :undoc-members:
     :inherited-members:
@@ -31,7 +31,7 @@ PuzzlesCollection
 SOKFileFormat
 -------------
 
-.. autoclass:: sokoenginepy.io.SOKFileFormat
+.. autoclass:: sokoenginepy.SOKFileFormat
     :members:
     :undoc-members:
     :inherited-members:
@@ -40,7 +40,7 @@ SOKFileFormat
 SOKTags
 -------
 
-.. autoclass:: sokoenginepy.io.SOKTags
+.. autoclass:: sokoenginepy.SOKTags
     :members:
     :undoc-members:
     :inherited-members:

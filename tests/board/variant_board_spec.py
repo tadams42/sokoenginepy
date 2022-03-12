@@ -239,11 +239,11 @@ class DescribeVariantBoard:
 
         def test_reconfigures_graph_edges_only_once(self, variant_board, mocker):
             if VariantBoard.__module__.startswith("sokoenginepy."):
-                with mocker.patch(
+                mocker.patch(
                     "sokoenginepy.BoardGraph.reconfigure_edges", return_value=None
-                ):
-                    variant_board.resize(2, 2)
-                    assert variant_board.graph.reconfigure_edges.call_count == 1
+                )
+                variant_board.resize(2, 2)
+                assert variant_board.graph.reconfigure_edges.call_count == 1
 
     class describe_resize_and_center:
         def test_adds_columns_and_rows_when_enlarging(self, variant_board):
@@ -299,11 +299,11 @@ class DescribeVariantBoard:
 
         def test_reconfigures_graph_edges_only_once(self, variant_board, mocker):
             if VariantBoard.__module__.startswith("sokoenginepy."):
-                with mocker.patch(
+                mocker.patch(
                     "sokoenginepy.BoardGraph.reconfigure_edges", return_value=None
-                ):
-                    variant_board.resize_and_center(42, 42)
-                    assert variant_board.graph.reconfigure_edges.call_count == 1
+                )
+                variant_board.resize_and_center(42, 42)
+                assert variant_board.graph.reconfigure_edges.call_count == 1
 
     class describe_trim:
         def test_removes_empty_outer_rows_and_columns(self, variant_board):
@@ -320,11 +320,11 @@ class DescribeVariantBoard:
 
         def test_reconfigures_graph_edges_only_once(self, variant_board, mocker):
             if VariantBoard.__module__.startswith("sokoenginepy."):
-                with mocker.patch(
+                mocker.patch(
                     "sokoenginepy.BoardGraph.reconfigure_edges", return_value=None
-                ):
-                    variant_board.resize(2, 2)
-                    assert variant_board.graph.reconfigure_edges.call_count == 1
+                )
+                variant_board.resize(2, 2)
+                assert variant_board.graph.reconfigure_edges.call_count == 1
 
     class describe_reverse_rows:
         def test_mirrors_board_up_down(self, variant_board):

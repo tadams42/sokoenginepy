@@ -55,7 +55,10 @@ class SokoenginepyextOptions:
             for _ in ["src/libsokoengine", "src/sokoenginepyext"]
             for dir_path, directories, files in os.walk(_)
             for file_name in files
-            if file_name.endswith(".cpp")
+            if (
+                file_name.endswith(".cpp")
+                and file_name not in {"playground.cpp", "benchmarks.cpp"}
+            )
         ]
     )
 

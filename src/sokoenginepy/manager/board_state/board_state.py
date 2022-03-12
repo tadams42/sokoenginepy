@@ -1,22 +1,17 @@
-from typing import Optional, Sequence
+from typing import List, Optional
 
 
 class BoardState:
     """
     Sample of board state.
-
-    Attributes:
-        pushers_positions: Positions of pushers sorted by pusher ID
-        boxes_positions: Positions of boxes sorted by box ID
-        zobrist_hash: Zobrist hash of state (see `.HashedBoardManager`)
     """
 
     UNKNOWN_ZOBRIST_HASH = 0
 
     def __init__(
         self,
-        pushers_positions: Optional[Sequence[int]] = None,
-        boxes_positions: Optional[Sequence[int]] = None,
+        pushers_positions: Optional[List[int]] = None,
+        boxes_positions: Optional[List[int]] = None,
         zobrist_hash: int = UNKNOWN_ZOBRIST_HASH,
     ):
         self.pushers_positions = pushers_positions or []
@@ -24,23 +19,32 @@ class BoardState:
         self.zobrist_hash = zobrist_hash or self.UNKNOWN_ZOBRIST_HASH
 
     @property
-    def pushers_positions(self) -> Sequence[int]:
+    def pushers_positions(self) -> List[int]:
+        """
+        Positions of pushers sorted by pusher ID.
+        """
         return self._pushers_positions
 
     @pushers_positions.setter
-    def pushers_positions(self, rv: Sequence[int]):
+    def pushers_positions(self, rv: List[int]):
         self._pushers_positions = rv or []
 
     @property
-    def boxes_positions(self) -> Sequence[int]:
+    def boxes_positions(self) -> List[int]:
+        """
+        Positions of boxes sorted by box ID.
+        """
         return self._boxes_positions
 
     @boxes_positions.setter
-    def boxes_positions(self, rv: Sequence[int]):
+    def boxes_positions(self, rv: List[int]):
         self._boxes_positions = rv or []
 
     @property
     def zobrist_hash(self) -> int:
+        """
+        Zobrist hash of state (see `.HashedBoardManager`)
+        """
         return self._zobrist_hash
 
     @zobrist_hash.setter

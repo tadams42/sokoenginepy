@@ -42,7 +42,7 @@ class SOKReader:
         self.src_stream = src_stream
         self.dest_collection = dest_collection
         self.supplied_tessellation_hint = str(
-            Tessellation.instance_from(tessellation_hint).value
+            Tessellation.instance_from(tessellation_hint)
         ).lower()
 
     def read(self):

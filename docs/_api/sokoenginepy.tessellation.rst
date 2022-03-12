@@ -4,34 +4,60 @@ Tessellation
 Direction
 ---------
 
-.. autoclass:: sokoenginepy.tessellation.Direction
+.. autoclass:: sokoenginepy.Direction
     :members:
     :undoc-members:
-    :show-inheritance:
     :inherited-members:
 
 
 CellOrientation
 ---------------
 
-.. autoclass:: sokoenginepy.tessellation.CellOrientation
+.. autoclass:: sokoenginepy.CellOrientation
     :members:
     :undoc-members:
-    :show-inheritance:
     :inherited-members:
 
 
 Tessellation
 ------------
 
-.. autoclass:: sokoenginepy.tessellation.Tessellation
+.. autoclass:: sokoenginepy.Tessellation
     :members:
     :undoc-members:
-    :show-inheritance:
+
+
+SokobanTessellation
+-------------------
+
+.. autoclass:: sokoenginepy.SokobanTessellation
+    :members:
+    :undoc-members:
     :inherited-members:
 
-.. autoclass:: sokoenginepy.tessellation.tessellation_base.TessellationBase
+
+HexobanTessellation
+-------------------
+
+.. autoclass:: sokoenginepy.HexobanTessellation
     :members:
     :undoc-members:
-    :show-inheritance:
+    :inherited-members:
+
+
+TriobanTessellation
+-------------------
+
+.. autoclass:: sokoenginepy.TriobanTessellation
+    :members:
+    :undoc-members:
+    :inherited-members:
+
+
+OctobanTessellation
+-------------------
+
+.. autoclass:: sokoenginepy.OctobanTessellation
+    :members:
+    :undoc-members:
     :inherited-members:

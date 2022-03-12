@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Dict, Final, List, Optional
+
 from .. import utilities
 from .piece import DEFAULT_PIECE_ID
 
@@ -32,52 +36,53 @@ class SokobanPlus:
     must also contain number 42 twice.
 
     Sokoban+ data parser accepts any positive integer as plus id.
-
-    Attributes:
-        DEFAULT_PLUS_ID: Sokoban+ ID for pieces that don't have one or when
-            Sokoban+ is disabled.
-
-            Original Sokoban+ implementation used number 99 for default plus ID. As
-            there can be more than 99 boxes on board, sokoenginepy changes this
-            detail and uses :const:`DEFAULT_PLUS_ID` as default plus ID. When loading
-            older puzzles with Sokoban+, legacy default value is converted
-            transparently.
-
-    Args:
-        boxorder (str): Space separated integers describing Sokoban+ IDs for boxes
-        goalorder (str): Space separated integers describing Sokoban+ IDs for goals
-        pieces_count (int): Total count of boxes/goals on board
     """
 
-    _LEGACY_DEFAULT_PLUS_ID = 99
-    DEFAULT_PLUS_ID = 0
+    _LEGACY_DEFAULT_PLUS_ID: Final[int] = 99
 
-    def __init__(self, pieces_count, boxorder=None, goalorder=None):
+    #: Sokoban+ ID for pieces that don't have one or when Sokoban+ is disabled.
+    #:
+    #: Original Sokoban+ implementation used number 99 for default plus ID. As
+    #: there can be more than 99 boxes on board, sokoenginepy changes this
+    #: detail and uses :const:`DEFAULT_PLUS_ID` as default plus ID. When loading
+    #: older puzzles with Sokoban+, legacy default value is converted
+    #: transparently.
+    DEFAULT_PLUS_ID: Final[int] = 0
+
+    def __init__(
+        self,
+        pieces_count: int,
+        boxorder: Optional[str] = None,
+        goalorder: Optional[str] = None,
+    ):
+        """
+        Args:
+            boxorder: Space separated integers describing Sokoban+ IDs for boxes
+            goalorder: Space separated integers describing Sokoban+ IDs for goals
+            pieces_count: Total count of boxes/goals on board
+        """
         self._is_enabled = False
         self._is_validated = False
-        self.errors = []
+        self.errors: List[str] = []
 
         self._pieces_count = pieces_count
-        self._box_plus_ids = None
-        self._goal_plus_ids = None
-        self._boxorder = None
-        self._goalorder = None
-
-        self.boxorder = boxorder or ""
-        self.goalorder = goalorder or ""
+        self._box_plus_ids: Dict[int, int] = {}
+        self._goal_plus_ids: Dict[int, int] = {}
+        self._boxorder: str = boxorder or ""
+        self._goalorder: str = goalorder or ""
 
     @classmethod
-    def is_sokoban_plus_string(cls, line):
+    def is_sokoban_plus_string(cls, line: str) -> bool:
         return utilities.contains_only_digits_and_spaces(
             line
         ) and not utilities.is_blank(line)
 
     @classmethod
-    def is_valid_plus_id(cls, plus_id):
+    def is_valid_plus_id(cls, plus_id: int) -> bool:
         return isinstance(plus_id, int) and plus_id >= cls.DEFAULT_PLUS_ID
 
     @property
-    def pieces_count(self):
+    def pieces_count(self) -> int:
         return self._pieces_count
 
     @pieces_count.setter
@@ -88,7 +93,7 @@ class SokobanPlus:
             self._pieces_count = int(rv)
 
     @property
-    def boxorder(self):
+    def boxorder(self) -> str:
         if self.is_enabled and self.is_valid:
             return self._rstrip_default_plus_ids(
                 " ".join(str(i) for i in self._box_plus_ids.values())
@@ -104,7 +109,7 @@ class SokobanPlus:
             self._boxorder = rv or ""
 
     @property
-    def goalorder(self):
+    def goalorder(self) -> str:
         if self.is_enabled and self.is_valid:
             return self._rstrip_default_plus_ids(
                 " ".join(str(i) for i in self._goal_plus_ids.values())
@@ -120,7 +125,7 @@ class SokobanPlus:
             self._goalorder = rv or ""
 
     @property
-    def is_valid(self):
+    def is_valid(self) -> bool:
         if self._is_validated:
             return not self.errors
 
@@ -141,7 +146,7 @@ class SokobanPlus:
         return not self.errors
 
     @property
-    def is_enabled(self):
+    def is_enabled(self) -> bool:
         return self._is_enabled
 
     @is_enabled.setter
@@ -155,15 +160,12 @@ class SokobanPlus:
                 raise SokobanPlusDataError(self.errors)
         self._is_enabled = value
 
-    def box_plus_id(self, for_box_id):
+    def box_plus_id(self, for_box_id: int) -> int:
         """
         Get Sokoban+ ID for box.
 
-        Args:
-            for_box_id (int): box ID
-
         Returns:
-            int: If Sokoban+ is enabled returns Sokoban+ ID of a box. If not, returns
+            If Sokoban+ is enabled returns Sokoban+ ID of a box. If not, returns
             :const:`DEFAULT_PLUS_ID`
 
         Raises:
@@ -175,15 +177,12 @@ class SokobanPlus:
         except KeyError:
             raise KeyError("No box with ID: {0}".format(for_box_id))
 
-    def goal_plus_id(self, for_goal_id):
+    def goal_plus_id(self, for_goal_id: int) -> int:
         """
         Get Sokoban+ ID for goal.
 
-        Args:
-            for_goal_id (int): goal ID
-
         Returns:
-            int: If Sokoban+ is enabled returns Sokoban+ ID of a goal. If not,
+            If Sokoban+ is enabled returns Sokoban+ ID of a goal. If not,
             returns :const:`DEFAULT_PLUS_ID`
 
         Raises:
@@ -204,13 +203,13 @@ class SokobanPlus:
         else:
             return plus_ids_str.rstrip(str(self.DEFAULT_PLUS_ID) + " ")
 
-    def _get_plus_id(self, for_id, from_where):
+    def _get_plus_id(self, for_id: int, from_where: Dict[int, int]):
         if not self.is_enabled:
             return self.DEFAULT_PLUS_ID
         else:
             return from_where[for_id]
 
-    def _parse_and_clean_ids_string(self, plus_ids_str):
+    def _parse_and_clean_ids_string(self, plus_ids_str) -> Dict[int, int]:
         """
         Safely replaces legacy default plus ids with default ones.
 
@@ -250,7 +249,7 @@ class SokobanPlus:
 
         return retv
 
-    def _validate_plus_ids(self, ids):
+    def _validate_plus_ids(self, ids: Dict[int, int]):
         if ids:
             for i in ids.values():
                 if not self.is_valid_plus_id(i):

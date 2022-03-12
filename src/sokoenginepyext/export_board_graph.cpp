@@ -50,16 +50,16 @@ void export_board_graph(py::module &m) {
            return self.has_edge(py::receive_position(src), py::receive_position(dst),
                                 direction);
          },
-         py::arg("source_position"), py::arg("target_position"), py::arg("direction"))
+         py::arg("src"), py::arg("dst"), py::arg("direction"))
     .def("out_edges_count",
          [](BoardGraph &self, const py::object &src, const py::object &dst) {
            return self.out_edges_count(py::receive_position(src),
                                        py::receive_position(dst));
          },
-         py::arg("source_position"), py::arg("target_position"))
+         py::arg("src"), py::arg("dst"))
     .def("remove_all_edges", &BoardGraph::remove_all_edges)
-    .def("add_edge", &BoardGraph::add_edge, py::arg("source_position"),
-         py::arg("neighbor_position"), py::arg("direction"))
+    .def("add_edge", &BoardGraph::add_edge, py::arg("src"),
+         py::arg("neighbor"), py::arg("direction"))
     .def("out_edge_weight", &BoardGraph::out_edge_weight, py::arg("target_position"))
 
     .def("neighbor",
@@ -69,26 +69,26 @@ void export_board_graph(py::module &m) {
            if (retv > MAX_POS) return py::none();
            return py::cast(retv);
          },
-         py::arg("from_position"), py::arg("direction"))
+         py::arg("src"), py::arg("direction"))
 
-    .def("wall_neighbors", &BoardGraph::wall_neighbors, py::arg("from_position"))
-    .def("all_neighbors", &BoardGraph::all_neighbors, py::arg("from_position"))
-    .def("shortest_path", &BoardGraph::shortest_path, py::arg("start_position"),
-         py::arg("end_position"))
-    .def("dijkstra_path", &BoardGraph::dijkstra_path, py::arg("start_position"),
-         py::arg("end_position"))
-    .def("find_move_path", &BoardGraph::find_move_path, py::arg("start_position"),
-         py::arg("end_position"))
-    .def("find_jump_path", &BoardGraph::find_jump_path, py::arg("start_position"),
-         py::arg("end_position"))
+    .def("wall_neighbors", &BoardGraph::wall_neighbors, py::arg("src"))
+    .def("all_neighbors", &BoardGraph::all_neighbors, py::arg("src"))
+    .def("shortest_path", &BoardGraph::shortest_path, py::arg("src"),
+         py::arg("dst"))
+    .def("dijkstra_path", &BoardGraph::dijkstra_path, py::arg("src"),
+         py::arg("dst"))
+    .def("find_move_path", &BoardGraph::find_move_path, py::arg("src"),
+         py::arg("dst"))
+    .def("find_jump_path", &BoardGraph::find_jump_path, py::arg("src"),
+         py::arg("dst"))
     .def("positions_path_to_directions_path",
-         &BoardGraph::positions_path_to_directions_path, py::arg("positions_path"))
+         &BoardGraph::positions_path_to_directions_path, py::arg("positions"))
     .def("mark_play_area", &BoardGraph::mark_play_area)
     .def("positions_reachable_by_pusher", &BoardGraph::positions_reachable_by_pusher,
          py::arg("pusher_position"), py::arg("excluded_positions") = py::list())
     .def("normalized_pusher_position", &BoardGraph::normalized_pusher_position,
          py::arg("pusher_position"), py::arg("excluded_positions") = py::list())
-    .def("path_destination", &BoardGraph::path_destination, py::arg("start_position"),
-         py::arg("directions_path"))
+    .def("path_destination", &BoardGraph::path_destination, py::arg("src"),
+         py::arg("directions"))
     .def("reconfigure_edges", &BoardGraph::reconfigure_edges, py::arg("tessellation"));
 }

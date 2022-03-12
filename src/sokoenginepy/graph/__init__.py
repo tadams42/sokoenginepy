@@ -1,4 +1,4 @@
 try:
-    from sokoenginepyext import BoardGraph, GraphType
+    from sokoenginepyext import BoardGraph
 except ImportError:
-    from .board_graph import BoardGraph, GraphType
+    from .board_graph import BoardCellOrStr, BoardGraph, Directions, Positions

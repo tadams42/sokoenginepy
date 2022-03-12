@@ -1,16 +1,14 @@
-from enum import IntEnum
+from __future__ import annotations
+
+from dataclasses import dataclass
 from itertools import groupby
+from typing import Iterable, List, Optional
 
-from ...manager import DEFAULT_PIECE_ID, CellAlreadyOccupiedError, HashedBoardManager
-from ...snapshot import AtomicMove
-
-
-class SolvingMode(IntEnum):
-    FORWARD = 0
-    REVERSE = 1
-
-    def __repr__(self):
-        return "SolvingMode." + self.name
+from ..atomic_move import AtomicMove
+from ..board import VariantBoard
+from ..direction import Direction
+from ..manager import DEFAULT_PIECE_ID, CellAlreadyOccupiedError, HashedBoardManager
+from ..solving_mode import SolvingMode
 
 
 class NonPlayableBoardError(RuntimeError):
@@ -22,11 +20,11 @@ class IllegalMoveError(RuntimeError):
     pass
 
 
+@dataclass
 class MoveWorkerOptions:
-    def __init__(self):
-        self.decrease_pull_count = None
-        self.increase_pull_count = None
-        self.force_pulls = None
+    decrease_pull_count: Optional[int] = None
+    increase_pull_count: Optional[int] = None
+    force_pulls: Optional[bool] = None
 
 
 class Mover:
@@ -63,10 +61,6 @@ class Mover:
     Failed moves, undo and non-moves (ie. selecting already selected pusher or
     jumping on same position pusher is already standing on) clear undo history.
 
-    Args:
-        board (VariantBoard): Instance of :class:`.VariantBoard` subclasses
-        solving_mode (SolvingMode): start the game in this solving mode
-
     Warning:
         :class:`.Mover` operates directly on referenced game board. Because of that,
         this board should not be edited outside of :class:`.Mover` once
@@ -75,13 +69,20 @@ class Mover:
         allowed to attach two movers to same game board.
     """
 
-    def __init__(self, board, solving_mode=SolvingMode.FORWARD):
+    def __init__(
+        self, board: VariantBoard, solving_mode: SolvingMode = SolvingMode.FORWARD
+    ):
+        """
+        Args:
+            board: Instance of :class:`.VariantBoard` subclasses
+            solving_mode: start the game in this solving mode
+        """
         self._manager = HashedBoardManager(board)
         self._solving_mode = solving_mode
         self._pulls_boxes = True
-        self._selected_pusher = DEFAULT_PIECE_ID
-        self._pull_count = 0
-        self._last_move = []
+        self._selected_pusher: int = DEFAULT_PIECE_ID
+        self._pull_count: int = 0
+        self._last_move: List[AtomicMove] = []
 
         if not self._manager.is_playable:
             raise NonPlayableBoardError
@@ -90,22 +91,22 @@ class Mover:
             self._manager.switch_boxes_and_goals()
 
     @property
-    def board(self):
+    def board(self) -> VariantBoard:
         """Board on which :class:`.Mover` is operating on"""
         return self._manager.board
 
     @property
-    def solving_mode(self):
+    def solving_mode(self) -> SolvingMode:
         """:class:`.Mover` operation mode (:class:`.SolvingMode`)."""
         return self._solving_mode
 
     @property
-    def board_manager(self):
+    def board_manager(self) -> HashedBoardManager:
         """Current board manager (:class:`.HashedBoardManager`)."""
         return self._manager
 
     @property
-    def selected_pusher(self):
+    def selected_pusher(self) -> int:
         """ID of pusher that will perform next move.
 
         See Also:
@@ -114,7 +115,7 @@ class Mover:
         return self._selected_pusher
 
     @property
-    def pulls_boxes(self):
+    def pulls_boxes(self) -> bool:
         """
         Select behavior in `.SolvingMode.REVERSE` mode when pusher is moving away
         from box.
@@ -125,11 +126,11 @@ class Mover:
         return self._pulls_boxes
 
     @pulls_boxes.setter
-    def pulls_boxes(self, rv):
+    def pulls_boxes(self, rv: bool):
         self._pulls_boxes = rv
 
     @property
-    def last_move(self):
+    def last_move(self) -> List[AtomicMove]:
         """Sequence of :class:`.AtomicMove` that contains most recent movement.
 
         Whenever :class:`.Mover` performs any movemet or pusher selection, it puts
@@ -188,10 +189,10 @@ class Mover:
         return self._last_move
 
     @last_move.setter
-    def last_move(self, rv):
+    def last_move(self, rv: List[AtomicMove]):
         self._last_move = rv
 
-    def select_pusher(self, pusher_id):
+    def select_pusher(self, pusher_id: int):
         """
         Selects pusher that will perform next move.
 
@@ -200,7 +201,7 @@ class Mover:
         always automatically selected and this method doesn't need to be called.
 
         Args:
-            pusher_id (int): ID of pusher
+            pusher_id: ID of pusher
 
         See Also:
             `.BoardManager.pushers_ids`
@@ -223,7 +224,7 @@ class Mover:
 
         self._selected_pusher = pusher_id
 
-    def move(self, direction):
+    def move(self, direction: Direction):
         """Moves currently selected pusher in ``direction``.
 
         In `.SolvingMode.FORWARD` mode, pushes the box in front of pusher (if there
@@ -233,10 +234,10 @@ class Mover:
         one and if ``self.pulls_boxes is True``).
 
         Args:
-            direction (Direction): direction of movement
+            direction: direction of movement
 
         Raises:
-            .IllegalMoveError: for illegal moves
+            IllegalMoveError: for illegal moves
         """
         options = MoveWorkerOptions()
         if self._solving_mode == SolvingMode.FORWARD:
@@ -247,7 +248,7 @@ class Mover:
             options.increase_pull_count = True
             self._pull_or_move(direction, options)
 
-    def jump(self, new_position):
+    def jump(self, new_position: int):
         """Currently selected pusher jumps to ``new_position``.
 
         Fails if
@@ -257,7 +258,7 @@ class Mover:
             - first pull had been made
 
         Raises:
-            .IllegalMoveError: for illegal jumps
+            IllegalMoveError: for illegal jumps
         """
         if self._pull_count != 0:
             raise IllegalMoveError("Jumps not allowed after first pull")
@@ -321,7 +322,7 @@ class Mover:
 
         self._last_move = new_last_moves
 
-    def _undo_atomic_move(self, atomic_move):
+    def _undo_atomic_move(self, atomic_move: AtomicMove):
         options = MoveWorkerOptions()
         if self._solving_mode == SolvingMode.FORWARD:
             has_box_behind_pusher = self.board_manager.has_box_on(
@@ -340,19 +341,19 @@ class Mover:
             options.decrease_pull_count = True
             self._push_or_move(atomic_move.direction.opposite, options)
 
-    def _undo_jump(self, jump_moves):
+    def _undo_jump(self, jump_moves: Iterable[AtomicMove]):
         path = [atomic_move.direction.opposite for atomic_move in jump_moves]
         old_position = self._manager.pusher_position(self._selected_pusher)
         new_position = self._manager.board.path_destination(old_position, path)
         self.jump(new_position)
 
-    def _undo_pusher_selection(self, selection_moves):
+    def _undo_pusher_selection(self, selection_moves: Iterable[AtomicMove]):
         path = [atomic_move.direction.opposite for atomic_move in selection_moves]
         old_position = self._manager.pusher_position(self._selected_pusher)
         new_position = self._manager.board.path_destination(old_position, path)
         self.select_pusher(self._manager.pusher_id_on(new_position))
 
-    def _push_or_move(self, direction, options):
+    def _push_or_move(self, direction: Direction, options: MoveWorkerOptions):
         """
         Perform movement of currently selected pusher in ``direction``.
 
@@ -402,7 +403,7 @@ class Mover:
                 self._pull_count -= 1
         self._last_move = [atomic_move]
 
-    def _pull_or_move(self, direction, options):
+    def _pull_or_move(self, direction: Direction, options: MoveWorkerOptions):
         """
         Perform movement of currently selected pusher in ``direction``.
 
