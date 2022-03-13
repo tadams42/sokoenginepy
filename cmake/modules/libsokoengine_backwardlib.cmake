@@ -27,4 +27,5 @@ if(NOT EXISTS "${LOCAL_CACHE_DIR}/backward-cpp/")
     )
 endif()
 
-add_subdirectory("${LOCAL_CACHE_DIR}/backward-cpp" "${CMAKE_BINARY_DIR}/backward-cpp")
+list(APPEND CMAKE_PREFIX_PATH "${LOCAL_CACHE_DIR}/backward-cpp/")
+find_package(Backward)

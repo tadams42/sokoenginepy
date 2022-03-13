@@ -60,17 +60,10 @@ set(SELF_INCLUDE_DIRS
 #..............................................................................
 #                       sokoengine OBJECT library
 #..............................................................................
+add_library(sokoengine_obj OBJECT ${SELF_HEADERS} ${SELF_SOURCES})
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND CMAKE_BUILD_TYPE MATCHES Debug)
-    add_library(sokoengine_obj
-        OBJECT
-            ${SELF_HEADERS} ${SELF_SOURCES} ${BACKWARD_ENABLE}
-    )
-    add_backward(sokoengine_obj)
-else()
-    add_library(sokoengine_obj
-        OBJECT
-            ${SELF_HEADERS} ${SELF_SOURCES}
-    )
+    target_link_libraries(sokoengine_obj PRIVATE Backward::Backward)
 endif()
 
 target_include_directories(sokoengine_obj
