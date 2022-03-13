@@ -45,7 +45,7 @@ Other make targets
 
 ```sh
 make benchmarks
-./src/utilities/benchmarks
+./benchmarks
 ```
 
 - `valgrind_profile_playground` - a profiling data generator

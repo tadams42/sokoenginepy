@@ -22,7 +22,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "BUILD_SHARED_LIBS": "ON",
-        "ENABLE_PYTHON_EXTENSION": "OFF"
+        "ENABLE_PYTHON_EXTENSION": "ON",
+        "SOKOENGINEPYEXT_DEBUG": "0"
       }
     },
     {
@@ -61,11 +62,11 @@
     },
     {
       "name": "debug",
-      "inherits": ["_clang", "_debug", "_make"]
+      "inherits": ["_gcc", "_debug", "_make"]
     },
     {
       "name": "release",
-      "inherits": ["_clang", "_release", "_ninja"]
+      "inherits": ["_gcc", "_release", "_ninja"]
     },
     {
       "name": "vscode",

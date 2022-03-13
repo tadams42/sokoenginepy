@@ -4,8 +4,6 @@ from enum import IntEnum
 from functools import reduce
 from textwrap import dedent
 
-from sokoenginepy import Direction, Mover, SokobanBoard, SolvingMode
-
 
 class BoardType(IntEnum):
     SMALL = 1
@@ -13,6 +11,8 @@ class BoardType(IntEnum):
 
     @property
     def board(self):
+        from ..board import SokobanBoard
+
         if self == self.SMALL:
             return SokobanBoard(
                 board_str=dedent(
@@ -78,6 +78,8 @@ class BenchmarkType(IntEnum):
 
     @property
     def direction(self):
+        from ..direction import Direction
+
         if self == self.FORWARD_MOVER:
             return Direction.LEFT
         else:
@@ -86,6 +88,9 @@ class BenchmarkType(IntEnum):
 
 class MovementBenchmark:
     def __init__(self, board_type, benchmark_type, moves_count):
+        from ..mover import Mover
+        from ..solving_mode import SolvingMode
+
         self.milliseconds_used = 0
         self.board_type = board_type
         self.benchmark_type = benchmark_type
@@ -209,5 +214,5 @@ class MovementBenchmarkPrinter:
         )
 
 
-if __name__ == "__main__":
-    MovementBenchmarkPrinter.run_all()
+def run_benchmarks():
+    return MovementBenchmarkPrinter.run_all()

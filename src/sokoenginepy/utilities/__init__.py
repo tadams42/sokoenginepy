@@ -10,6 +10,7 @@ from .coordinate_helpers import (
 from .dict_helpers import except_keys, inverted
 from .flip_dict import Flipdict
 from .helpers import RESOURCES_ROOT, first_index_of, last_index_of
+from .mover_benchmarks import run_benchmarks
 from .rle import rle_decode, rle_encode
 from .text_utils import (
     calculate_width,

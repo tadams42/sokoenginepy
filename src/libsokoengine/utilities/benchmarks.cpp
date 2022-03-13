@@ -1,4 +1,4 @@
-#include <sokoengine.hpp>
+#include "sokoengine.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -186,14 +186,17 @@ public:
     return mean_speed;
   }
 
-  static void run_all() {
+  static void run_all(double pivot_speed) {
     cout << "--------------------------------------------------" << endl;
     cout << "--              MOVER BENCHMARKS                --" << endl;
     cout << "--------------------------------------------------" << endl << endl;
     size_t runs = 5;
     size_t moves_per_run = 3e6;
 
-    double pivot_speed = 3e6;
+    if (pivot_speed == 0) {
+      // value from my local setup
+      pivot_speed = 5e6;
+    }
 
     MovementBenchmarkPrinter printer(runs, moves_per_run);
 
@@ -210,13 +213,13 @@ public:
 };
 
 } // namespace benchmarks
-} // namespace sokoengine
 
-int main() {
-  using namespace sokoengine;
+int run_benchmarks(double pivot_speed) {
   using namespace sokoengine::benchmarks;
 
-  MovementBenchmarkPrinter::run_all();
+  MovementBenchmarkPrinter::run_all(pivot_speed);
 
   return 0;
 }
+
+} // namespace sokoengine

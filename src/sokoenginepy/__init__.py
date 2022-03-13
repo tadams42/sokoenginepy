@@ -7,7 +7,6 @@ from .game import JumpCommand, MoveCommand, SelectPusherCommand
 from .graph import BoardGraph
 from .graph_type import GraphType
 from .io import Puzzle, PuzzlesCollection, PuzzleSnapshot, SOKFileFormat, SOKTags
-from .solving_mode import SolvingMode
 from .manager import (
     DEFAULT_PIECE_ID,
     BoardManager,
@@ -20,6 +19,7 @@ from .manager import (
 )
 from .mover import IllegalMoveError, Mover, NonPlayableBoardError
 from .snapshot import Snapshot
+from .solving_mode import SolvingMode
 from .tessellation import (
     AnyTessellation,
     CellOrientation,

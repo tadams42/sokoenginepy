@@ -25,4 +25,6 @@
 
 #include "mover.hpp"
 
+#include "benchmarks.hpp"
+
 #endif // HEADER_GUARD

@@ -20,6 +20,7 @@ set(SELF_HEADERS
     tessellation/sokoban_tessellation.hpp
     tessellation/tessellation.hpp
     tessellation/trioban_tessellation.hpp
+    utilities/benchmarks.hpp
     utilities/text_utils.hpp
 )
 
@@ -43,6 +44,7 @@ set(SELF_SOURCES
     tessellation/sokoban_tessellation.cpp
     tessellation/tessellation.cpp
     tessellation/trioban_tessellation.cpp
+    utilities/benchmarks.cpp
     utilities/text_utils.cpp
 )
 

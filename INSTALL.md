@@ -115,6 +115,12 @@ or to get more verbose output
 py.test --spec
 ```
 
+We can also tun some built-in, rudimentary benchmarks:
+
+```sh
+python -m sokoenginepy
+```
+
 ## Running under PyPy3
 
 ```sh
