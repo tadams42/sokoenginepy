@@ -11,7 +11,14 @@ class SnapshotFactory(factory.Factory):
         model = Snapshot
 
     tessellation_or_description = factory.LazyAttribute(
-        lambda x: fake.random_element(list(Tessellation))
+        lambda x: fake.random_element(
+            [
+                Tessellation.SOKOBAN,
+                Tessellation.TRIOBAN,
+                Tessellation.OCTOBAN,
+                Tessellation.HEXOBAN,
+            ]
+        )
     )
     solving_mode = factory.LazyAttribute(
         lambda x: fake.random_element([SolvingMode.FORWARD, SolvingMode.REVERSE])

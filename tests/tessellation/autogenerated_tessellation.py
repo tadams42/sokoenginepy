@@ -8,13 +8,13 @@ from sokoenginepy.utilities import index_1d, is_on_board_1d
 
 
 def triangle_points_down(position, board_width, board_height):
-    return Tessellation.TRIOBAN.value.cell_orientation(
+    return Tessellation.TRIOBAN.cell_orientation(
         position, board_width, board_height
     ) == CellOrientation.TRIANGLE_DOWN
 
 
 def is_octagon(position, board_width, board_height):
-    return Tessellation.OCTOBAN.value.cell_orientation(
+    return Tessellation.OCTOBAN.cell_orientation(
         position, board_width, board_height
     ) == CellOrientation.OCTAGON
 

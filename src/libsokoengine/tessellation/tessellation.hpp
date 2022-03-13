@@ -135,19 +135,6 @@ constexpr bool ON_BOARD(position_t pos, board_size_t board_width,
   return ON_BOARD(X(pos, board_width), Y(pos, board_width), board_width, board_height);
 }
 
-namespace implementation {
-
-template <class ExceptionT, class MapT>
-const typename MapT::mapped_type &
-find_in_map_or_throw(const MapT &map, const typename MapT::key_type &key,
-                     const std::string &exception_message = "") {
-  auto map_iter = map.find(key);
-  if (map_iter == map.end()) { throw ExceptionT(exception_message); }
-  return map_iter->second;
-}
-
-} // namespace implementation
-
 } // namespace sokoengine
 
 #endif // HEADER_GUARD

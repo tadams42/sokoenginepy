@@ -69,7 +69,7 @@ class DescribeSOKReader:
                 SOKFileFormat.read(t, collection, None)
 
             for puzzle in collection.puzzles:
-                assert puzzle.tessellation == Tessellation.SOKOBAN.value
+                assert puzzle.tessellation == Tessellation.SOKOBAN
 
         def it_uses_value_from_colection_notes_even_if_hint_given(
             self, input_files_root
@@ -83,7 +83,7 @@ class DescribeSOKReader:
                 SOKFileFormat.read(t, collection, Tessellation.OCTOBAN)
 
             for puzzle in collection.puzzles:
-                assert puzzle.tessellation == Tessellation.TRIOBAN.value
+                assert puzzle.tessellation == Tessellation.TRIOBAN
 
         def it_snapshots_get_the_same_value_as_their_puzzle(self, input_files_root):
             collection = PuzzlesCollection()
@@ -109,8 +109,8 @@ class DescribeSOKReader:
             ) as t:
                 SOKFileFormat.read(t, collection, Tessellation.OCTOBAN)
 
-            assert collection.puzzles[0].tessellation == Tessellation.SOKOBAN.value
-            assert collection.puzzles[1].tessellation == Tessellation.HEXOBAN.value
+            assert collection.puzzles[0].tessellation == Tessellation.SOKOBAN
+            assert collection.puzzles[1].tessellation == Tessellation.HEXOBAN
 
         def it_uses_value_from_hint_when_nothing_is_specified_in_file(
             self, input_files_root
@@ -123,5 +123,5 @@ class DescribeSOKReader:
             ) as t:
                 SOKFileFormat.read(t, collection, Tessellation.TRIOBAN)
 
-            assert collection.puzzles[0].tessellation == Tessellation.TRIOBAN.value
-            assert collection.puzzles[1].tessellation == Tessellation.HEXOBAN.value
+            assert collection.puzzles[0].tessellation == Tessellation.TRIOBAN
+            assert collection.puzzles[1].tessellation == Tessellation.HEXOBAN

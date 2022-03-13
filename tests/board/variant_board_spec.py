@@ -121,7 +121,7 @@ class DescribeVariantBoard:
             b = TriobanBoard(4, 2)
             assert b.width == 4
             assert b.height == 2
-            assert b.tessellation == Tessellation.TRIOBAN.value
+            assert b.tessellation == Tessellation.TRIOBAN
 
         def it_ignores_specified_size_if_string_given_and_parses_string_instead(
             self, board_str, board_width, board_height

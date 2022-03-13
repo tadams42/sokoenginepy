@@ -22,19 +22,19 @@ def sokoban_snapshot():
 class DescribeSnapshotStringParser:
     class Describe_convert:
         def it_ignores_spaces_and_current_position_character(self, parser):
-            success = parser._parse("  \n **  \t l ", Tessellation.SOKOBAN.value)
+            success = parser._parse("  \n **  \t l ", Tessellation.SOKOBAN)
             assert success
             assert parser._resulting_solving_mode == SolvingMode.FORWARD
             assert parser._resulting_moves == [AtomicMove(Direction.LEFT)]
 
         def it_accepts_blank_input_as_empty_forward_snapshot(self, parser):
-            success = parser._parse("  \n   \t  ", Tessellation.SOKOBAN.value)
+            success = parser._parse("  \n   \t  ", Tessellation.SOKOBAN)
             assert success
             assert parser._resulting_solving_mode == SolvingMode.FORWARD
             assert parser._resulting_moves == []
 
         def it_fails_on_non_snapshot_characters(self, parser):
-            success = parser._parse("ZOMG! ", Tessellation.SOKOBAN.value)
+            success = parser._parse("ZOMG! ", Tessellation.SOKOBAN)
             assert not success
             assert (
                 parser._first_encountered_error
@@ -42,28 +42,28 @@ class DescribeSnapshotStringParser:
             )
 
         def it_sets_mode_to_reverse_if_jumps_are_found(self, parser):
-            success = parser._parse("[lurd] ", Tessellation.SOKOBAN.value)
+            success = parser._parse("[lurd] ", Tessellation.SOKOBAN)
             assert success
             for atomic_move in parser._resulting_moves:
                 assert atomic_move.is_jump
 
         def it_ignores_empty_jump_and_pusher_selection_sequences(self, parser):
-            success = parser._parse("[]lurd", Tessellation.SOKOBAN.value)
+            success = parser._parse("[]lurd", Tessellation.SOKOBAN)
             assert success
             assert len(parser._resulting_moves) == 4
 
         def it_detects_reverse_snapshot_while_ignoring_empty_jumps(self, parser):
-            success = parser._parse("[]lurd", Tessellation.SOKOBAN.value)
+            success = parser._parse("[]lurd", Tessellation.SOKOBAN)
             assert success
             assert parser._resulting_solving_mode == SolvingMode.REVERSE
 
         def it_fails_on_rle_errors(self, parser):
-            success = parser._parse("((4l)", Tessellation.SOKOBAN.value)
+            success = parser._parse("((4l)", Tessellation.SOKOBAN)
             assert not success
             assert parser._first_encountered_error == "Rle decoding board string failed"
 
         def it_fails_on_non_matched_sequence_separators(self, parser):
-            success = parser._parse("[lurd", Tessellation.SOKOBAN.value)
+            success = parser._parse("[lurd", Tessellation.SOKOBAN)
             assert not success
             assert (
                 parser._first_encountered_error
@@ -73,7 +73,7 @@ class DescribeSnapshotStringParser:
         def it_fails_on_moves_illegal_in_context_of_requested_tessellation(
             self, parser
         ):
-            success = parser._parse("Nlurd", Tessellation.SOKOBAN.value)
+            success = parser._parse("Nlurd", Tessellation.SOKOBAN)
             assert not success
             assert (
                 parser._first_encountered_error
@@ -81,13 +81,13 @@ class DescribeSnapshotStringParser:
             )
 
         def it_correctly_detects_jumps(self, parser):
-            success = parser._parse("[lurd] ", Tessellation.SOKOBAN.value)
+            success = parser._parse("[lurd] ", Tessellation.SOKOBAN)
             assert success
             for atomic_move in parser._resulting_moves:
                 assert atomic_move.is_jump
 
         def it_correctly_detects_pusher_selections(self, parser):
-            success = parser._parse("{lurd} ", Tessellation.SOKOBAN.value)
+            success = parser._parse("{lurd} ", Tessellation.SOKOBAN)
             assert success
             for atomic_move in parser._resulting_moves:
                 assert atomic_move.is_pusher_selection
@@ -96,7 +96,7 @@ class DescribeSnapshotStringParser:
         def it_fails_on_moves_illegal_in_context_of_requested_tessellation(
             self, parser
         ):
-            parser._convert_token("Nlurd", Tessellation.SOKOBAN.value)
+            parser._convert_token("Nlurd", Tessellation.SOKOBAN)
             assert (
                 parser._first_encountered_error
                 == "Snapshot string contains directions not supported by requested tessellation"
@@ -104,7 +104,7 @@ class DescribeSnapshotStringParser:
 
         def it_fails_on_jumps_that_contain_pushes(self, parser):
             parser._resulting_moves = []
-            parser._convert_token("lurD", Tessellation.SOKOBAN.value, is_jump=True)
+            parser._convert_token("lurD", Tessellation.SOKOBAN, is_jump=True)
             assert (
                 parser._first_encountered_error
                 == "Jump sequence in snapshot string contains atomic pushes. This is not allowed"
@@ -112,9 +112,7 @@ class DescribeSnapshotStringParser:
 
         def it_fails_on_pusher_selections_that_contain_pushes(self, parser):
             parser._resulting_moves = []
-            parser._convert_token(
-                "lurD", Tessellation.SOKOBAN.value, is_pusher_change=True
-            )
+            parser._convert_token("lurD", Tessellation.SOKOBAN, is_pusher_change=True)
             assert (
                 parser._first_encountered_error
                 == "Pusher change sequence in snapshot string contains atomic pushes. This is not allowed"
@@ -122,7 +120,7 @@ class DescribeSnapshotStringParser:
 
         def it_appends_converted_moves_to_parser_resulting_moves(self, parser):
             parser._resulting_moves = []
-            parser._convert_token("lurD", Tessellation.SOKOBAN.value)
+            parser._convert_token("lurD", Tessellation.SOKOBAN)
             assert parser._resulting_moves == [
                 AtomicMove(Direction.LEFT),
                 AtomicMove(Direction.UP),

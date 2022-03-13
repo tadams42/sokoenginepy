@@ -614,7 +614,7 @@ class DescribeBoardGraph:
     class describe_reconfigure_edges:
         def it_reconfigures_all_edges_in_board(self):
             graph = BoardGraph(2, 2, GraphType.DIRECTED)
-            graph.reconfigure_edges(Tessellation.SOKOBAN.value)
+            graph.reconfigure_edges(Tessellation.SOKOBAN)
 
             assert graph.edges_count == 8
             assert graph.has_edge(0, 1, Direction.RIGHT)
@@ -628,6 +628,6 @@ class DescribeBoardGraph:
 
         def it_doesnt_create_duplicate_direction_edges_in_multidigraph(self):
             graph = BoardGraph(2, 2, GraphType.DIRECTED_MULTI)
-            graph.reconfigure_edges(Tessellation.TRIOBAN.value)
+            graph.reconfigure_edges(Tessellation.TRIOBAN)
             assert graph.out_edges_count(0, 1) == 2
             assert graph.out_edges_count(1, 0) == 2

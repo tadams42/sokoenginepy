@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from enum import Enum
 from typing import Union
 
 from .. import utilities
@@ -22,7 +21,7 @@ AnyTessellation = Union[
 ]
 
 
-class Tessellation(Enum):
+class Tessellation:
     """
     Enumerates all supported tessellations and provides factory method for them.
     """
@@ -31,12 +30,6 @@ class Tessellation(Enum):
     TRIOBAN = TriobanTessellation()
     HEXOBAN = HexobanTessellation()
     OCTOBAN = OctobanTessellation()
-
-    def __str__(self):
-        return self.name.title()
-
-    def __repr__(self):
-        return "Tessellation." + self.name
 
     @classmethod
     def instance_from(
@@ -52,12 +45,12 @@ class Tessellation(Enum):
             or "sokoban" in str(tessellation_or_description).lower()
             or utilities.is_blank(str(tessellation_or_description))
         ):
-            return cls.SOKOBAN.value
+            return cls.SOKOBAN
         elif "trioban" in str(tessellation_or_description).lower():
-            return cls.TRIOBAN.value
+            return cls.TRIOBAN
         elif "hexoban" in str(tessellation_or_description).lower():
-            return cls.HEXOBAN.value
+            return cls.HEXOBAN
         elif "octoban" in str(tessellation_or_description).lower():
-            return cls.OCTOBAN.value
+            return cls.OCTOBAN
         else:
             raise ValueError(tessellation_or_description)
