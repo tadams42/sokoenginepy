@@ -33,7 +33,56 @@ piece_id_t receive_box_id(const py::object &box_id) {
   return retv;
 }
 
+constexpr const char* NAMES[DIRECTIONS_COUNT] = {
+  "UP", "NORTH_EAST", "RIGHT", "SOUTH_EAST", "DOWN", "SOUTH_WEST", "LEFT",
+  "NORTH_WEST"
+};
+
+constexpr const char* OPPOSITE_NAMES[DIRECTIONS_COUNT] = {
+  "DOWN", "SOUTH_WEST", "LEFT",  "NORTH_WEST",
+  "UP",   "NORTH_EAST", "RIGHT", "SOUTH_EAST"
+};
+
 void export_atomic_move(py::module &m) {
+  auto direction_enm = py::enum_<Direction>(m, "Direction")
+    .value("UP", Direction::UP)
+    .value("DOWN", Direction::DOWN)
+    .value("LEFT", Direction::LEFT)
+    .value("RIGHT", Direction::RIGHT)
+    .value("SOUTH_EAST", Direction::SOUTH_EAST)
+    .value("SOUTH_WEST", Direction::SOUTH_WEST)
+    .value("NORTH_EAST", Direction::NORTH_EAST)
+    .value("NORTH_WEST", Direction::NORTH_WEST)
+    .def_static("__len__", []() { return DIRECTIONS_COUNT; })
+  ;
+
+  direction_enm.def_property_readonly(
+    "opposite", [direction_enm](const Direction &self) {
+      return direction_enm.attr(OPPOSITE_NAMES[static_cast<uint8_t>(self)]);
+    }
+  );
+
+  direction_enm.def_property_readonly(
+    "opposite_copy", [](const Direction &self) {
+      return OPPOSITE_DIRECTIONS[static_cast<uint8_t>(self)];
+    }
+  );
+  // python -m timeit -r10 -s "import sokoenginepyext" "sokoenginepyext.Direction.DOWN.opposite_copy"
+  // python -m timeit -r10 -s "import sokoenginepyext" "sokoenginepyext.Direction.DOWN.opposite"
+
+  // direction_enm.def(
+  //   py::pickle(
+  //     [](const Direction &self) { // __getstate__
+  //       return py::make_tuple(direction_pack(self));
+  //     },
+  //     [](py::tuple t) { // __setstate__
+  //       if (t.size() != 1) throw std::runtime_error("Invalid state!");
+  //       return direction_unpack(t[0].cast<int8_t>());
+  //     }
+  //   ),
+  //   py::return_value_policy::reference
+  // );
+
   py::class_<AtomicMove>(m, "AtomicMove")
     .def(py::init([](const Direction &direction, bool box_moved, bool is_jump,
                      bool is_pusher_selection, const py::object &pusher_id,
@@ -73,6 +122,20 @@ void export_atomic_move(py::module &m) {
           t[3].cast<bool>(), t[4].cast<piece_id_t>(), t[5].cast<piece_id_t>());
       }))
 
+    .def_property(
+      "direction",
+      [direction_enm](const AtomicMove &self) {
+        return direction_enm.attr(NAMES[static_cast<uint8_t>(self.direction())]);
+      },
+      &AtomicMove::set_direction
+    )
+
+    .def_property( "direction_copy", &AtomicMove::direction, &AtomicMove::set_direction)
+    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.AtomicMove()" "a.direction"
+    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.AtomicMove()" "a.direction_copy"
+    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.AtomicMove()" "a.direction.opposite"
+    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.AtomicMove()" "a.direction_copy.opposite_copy"
+
     .def_property("moved_box_id",
                   [](const AtomicMove &self) -> py::object {
                     if (self.moved_box_id() == NULL_ID) return py::none();
@@ -97,8 +160,6 @@ void export_atomic_move(py::module &m) {
     .def_property("is_pusher_selection", &AtomicMove::is_pusher_selection,
                   &AtomicMove::set_is_pusher_selection)
     .def_property("is_jump", &AtomicMove::is_jump, &AtomicMove::set_is_jump)
-    .def_property("direction", &AtomicMove::direction, &AtomicMove::set_direction,
-                  py::return_value_policy::reference)
 
     .def_property_readonly_static("l", [](py::object) { return AtomicMove::l; })
     .def_property_readonly_static("u", [](py::object) { return AtomicMove::u; })

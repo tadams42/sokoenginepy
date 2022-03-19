@@ -111,7 +111,7 @@ public:
     if (in_front_of_pusher > MAX_POS) {
       throw IllegalMoveError(
           "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-          ", direction: " + str_direction(direction) + ")");
+          ", direction: " + direction_str(direction) + ")");
     }
 
     bool is_push = false;
@@ -123,7 +123,7 @@ public:
       if (in_front_of_box > MAX_POS) {
         throw IllegalMoveError("Can't push box off board (ID: " +
                                std::to_string(m_manager.box_id_on(in_front_of_pusher)) +
-                               ", direction: " + str_direction(direction) + ")");
+                               ", direction: " + direction_str(direction) + ")");
       }
 
       try {
@@ -159,7 +159,7 @@ public:
     if (in_front_of_pusher > MAX_POS) {
       throw IllegalMoveError(
           "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-          ", direction: " + str_direction(direction) + ")");
+          ", direction: " + direction_str(direction) + ")");
     }
 
     try {

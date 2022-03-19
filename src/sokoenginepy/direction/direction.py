@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from enum import IntEnum
+import enum
 from typing import List
 
 
-class Direction(IntEnum):
+class Direction(enum.Enum):
     """Directions of movement."""
 
     UP = 0

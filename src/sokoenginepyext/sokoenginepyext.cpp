@@ -3,7 +3,6 @@
 using namespace sokoengine;
 using namespace std;
 
-void export_direction(py::module &);
 void export_atomic_move(py::module &);
 void export_board_cell(py::module &);
 void export_board_graph(py::module &);
@@ -40,7 +39,6 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   py::register_exception<sokoengine::BoardSizeExceededError>(
     m, "BoardSizeExceededError", PyExc_RuntimeError);
 
-  export_direction(m);
   export_atomic_move(m);
   export_board_cell(m);
   export_board_graph(m);

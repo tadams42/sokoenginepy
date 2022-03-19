@@ -7,7 +7,6 @@ if(ENABLE_PYTHON_EXTENSION)
 
     pybind11_add_module(sokoenginepyext
         sokoenginepyext.cpp
-        export_direction.cpp
         export_atomic_move.cpp
         export_board_cell.cpp
         export_board_graph.cpp
@@ -20,7 +19,7 @@ if(ENABLE_PYTHON_EXTENSION)
 
     target_link_libraries(sokoenginepyext PRIVATE sokoengine_obj)
 
-    target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
+    target_compile_features(sokoenginepyext PUBLIC cxx_std_17)
 
     set_target_properties(sokoenginepyext PROPERTIES
                                           EXCLUDE_FROM_ALL TRUE
