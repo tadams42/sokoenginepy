@@ -38,8 +38,8 @@ public:
   }
 
   SokobanPlus();
-  SokobanPlus(piece_id_t pieces_count, const std::string &boxorder = "",
-              const std::string &goalorder = "");
+  explicit SokobanPlus(piece_id_t pieces_count, const std::string &boxorder = "",
+                       const std::string &goalorder = "");
   SokobanPlus(const SokobanPlus &rv);
   SokobanPlus &operator=(const SokobanPlus &rv);
   SokobanPlus(SokobanPlus &&rv);

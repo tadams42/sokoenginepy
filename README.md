@@ -17,16 +17,28 @@ This project implements various utilities for Sokoban:
 - reading and writing of level collections in `.sok`, `.xsb`, `.tsb`, `.hsb` and `.txt`
   file formats
 
-It provides two almost identical implementations:
+It provides two implementations:
 
-- `sokoneginepy` - Python implementation and package
-- `libsokoengine` - C++ library with API that is 99.99% identical to Python
+- `sokoenginepy` - pure Python implementation
+- `libsokoengine` - C++ library that re-implements most of the Python stuff in C++
 
-On Linux, Python package can also be optionally built with native extensions so that it
-utilizes `libsokoengine` for raw speed.
+## Install
 
-`libsokoengine` can be built completely independently, and consumed by native C++
-clients.
+- `sokoenginepy` package from [PyPi]:
+
+   ```sh
+   pip install sokoenginepy
+   ```
+
+- `libsokoengine` library (completely optional):
+
+   ```sh
+   pip install sokoenginepy
+   ```
+
+C++ library is completely optional. On Linux, Python package may utilize it for raw
+speed. It can also be built independently and consumed by other C++ projects via
+[cmake]. For more elaborate details, see [INSTALL.md](./INSTALL.md)
 
 ## Why?
 
@@ -36,25 +48,15 @@ clients.
   variant
 - ...
 
-## Install
-
-`sokoenginepy` package from [PyPi]:
-
-```sh
-pip install sokoenginepy
-```
-
-- `libsokoengine` can be built from source code, details are in `README.libsokoengine.md`
-- `sokoenginepy` can be optionally built with native C++ extensions, details are in
-  `INSTALL.md`
-
 ## Documentation
 
-- [Python usage tutorial](https://sokoenginepy.readthedocs.io/en/latest/tutorial.html)
+- [Tutorial - Python](./docs/tutorial_python.md)
+- [Tutorial - C++](./docs/tutorial_cpp.md)
 - [Python docs](http://sokoenginepy.readthedocs.io/en/latest/)
 - [C++ docs](http://tadams42.github.io/sokoenginepy/)
 
-[SokobanYASC]: https://sourceforge.net/projects/sokobanyasc/
 [Boost.Graph]: https://www.boost.org/doc/libs/1_78_0/libs/graph/doc/index.html
 [NetworkX]: https://networkx.org/
 [pybind11]: http://pybind11.readthedocs.io/en/stable/index.html
+[PyPi]: https://pypi.org/
+[cmake]: https://cmake.org/

@@ -70,8 +70,7 @@ endif()
 
 target_include_directories(sokoengine_obj
     PUBLIC
-        "$<BUILD_INTERFACE:${SELF_INCLUDE_DIRS}>"
-        "$<INSTALL_INTERFACE:include/sokoengine>"
+        ${SELF_INCLUDE_DIRS}
     PRIVATE
         $<TARGET_PROPERTY:CPPITERTOOLS::cppitertools,INTERFACE_INCLUDE_DIRECTORIES>
 )
@@ -79,8 +78,9 @@ target_include_directories(sokoengine_obj
 target_link_libraries(sokoengine_obj
     PRIVATE
         # We don't actually link agains any of objects in following libraries Thus we
-        # hide this dependency once we are installed As a consequence, consumers of
-        # libsokoengine don't need to link against boost if they don't want to
+        # hide this dependency once we are installed. As a consequence, consumers of
+        # libsokoengine don't need to link against boost - they don't even need to have
+        # boost installed
         "$<BUILD_INTERFACE:Boost::boost>"
         "$<BUILD_INTERFACE:CPPITERTOOLS::cppitertools>"
 )
@@ -133,7 +133,13 @@ set_target_properties(sokoengine_obj
 #..............................................................................
 add_library(sokoengine sokoengine.hpp)
 
-target_link_libraries(sokoengine PUBLIC sokoengine_obj)
+target_link_libraries(sokoengine PRIVATE sokoengine_obj)
+
+target_include_directories(sokoengine
+    PUBLIC
+        "$<BUILD_INTERFACE:${SELF_INCLUDE_DIRS}>"
+        "$<INSTALL_INTERFACE:include/sokoengine>"
+)
 
 set_target_properties(sokoengine
     PROPERTIES
@@ -154,60 +160,89 @@ endif()
 
 #..............................................................................
 #                                   install
+# 1. Install targets and export them unto common namespace:
+#   - INSTALL(TARGETS target1 EXPORT fooTargets ...)
+#   - INSTALL(TARGETS target2 EXPORT fooTargets ...)
+# 2. Install additional files (ie. library headers):
+#   - INSTALL(FILES ...)
+# 3. Install generated config for all exported targets:
+#   - INSTALL(EXPORT FooTargets ...)
+# 4. Generate CMake package so that it can be found via find_package:
+#   - configure_package_config_file
+#   - write_basic_package_version_file
+# 5. Install CMake package configs:
+#   - INSTALL(FILES ...)
+# 6. Export targets for consuming from within build dir
 #..............................................................................
 
-# Note that although object files are not installed, we need to export sokoengine_obj
-# because sokoengine depends on it
-#   https://gitlab.kitware.com/cmake/cmake/issues/18935
+# Here, the EXPORT option tells CMake to create an export called libsokoengineTargets.
+# Note, we have not asked CMake to install the export yet.
 install(
-    TARGETS
-        sokoengine sokoengine_obj
-    EXPORT
-        ${PROJECT_NAME}_Targets
+    TARGETS sokoengine
+    EXPORT libsokoengineTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    # Might be that following is not needed since we define it on target
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sokoengine
 )
 
-write_basic_package_version_file(
-    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    VERSION
-        ${PROJECT_VERSION}
-    COMPATIBILITY
-        SameMajorVersion
+# Install header files
+install(
+    FILES ${SELF_HEADERS}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sokoengine
+)
+
+# This command generates the libsokoengineTargets.cmake file and arranges to install it
+# to lib/cmake. The file contains code suitable for use by downstreams to import all
+# targets listed in the install command from the installation tree.
+#
+# Any number of target installations may be associated with the same export name. The
+# install(EXPORT) command only needs to be called once to install a file that references
+# all targets.
+install(
+    EXPORT libsokoengineTargets
+    FILE libsokoengineTargets.cmake
+    NAMESPACE libsokoengine::
+    # was: DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/libsokoengine/cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libsokoengine
 )
 
 configure_package_config_file(
-    ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
-    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    INSTALL_DESTINATION
-        ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake
+    ${PROJECT_SOURCE_DIR}/cmake/libsokoengineConfig.cmake.in
+    ${PROJECT_BINARY_DIR}/libsokoengineConfig.cmake
+    # was INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/libsokoengine/cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libsokoengine
+)
+
+write_basic_package_version_file(
+    ${PROJECT_BINARY_DIR}/libsokoengineConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
 )
 
 install(
-    EXPORT
-        ${PROJECT_NAME}_Targets
-    FILE
-        ${PROJECT_NAME}Targets.cmake
-    NAMESPACE
-        ${PROJECT_NAME}::
-    DESTINATION
-        ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake
+    FILES ${PROJECT_BINARY_DIR}/libsokoengineConfig.cmake
+          ${PROJECT_BINARY_DIR}/libsokoengineConfigVersion.cmake
+    # was DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/libsokoengine/cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libsokoengine
 )
 
-install(
-    FILES
-        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    DESTINATION
-        ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake
-)
-
-install(
-    FILES
-        ${SELF_HEADERS}
-    DESTINATION
-        ${CMAKE_INSTALL_INCLUDEDIR}/sokoengine
+# Exports libsokoengineTargets into current binary dir.
+# This allows clients to consume libsokoengine from local build. Ie. if we build
+# libosokengine in
+#
+#     /tmp/builds/libsokoengine/debug
+#     /tmp/builds/libsokoengine/release
+#
+# then other package can consume it via:
+#
+#   find_package(
+#       libsokoengine 0.5.0 REQUIRED
+#       CONFIG
+#       PATHS "/tmp/builds/libsokoengine/debug" "/tmp/builds/libsokoengine/release"
+#   )
+export(
+    EXPORT libsokoengineTargets
+    FILE "${PROJECT_BINARY_DIR}/libsokoengineTargets.cmake"
+    NAMESPACE libsokoengine::
 )

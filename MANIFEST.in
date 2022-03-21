@@ -10,7 +10,7 @@ prune src/sokoenginepy.egg-info
 
 include .bumpversion.cfg .gitignore .readthedocs.yml .travis.yaml .clang-format
 include CMakeLists.txt CMakePresets.json
-include CHANGELOG.md INSTALL.md LICENSE MANIFEST.in README.md setup.cfg setup.py README.libsokoengine.md
+include CHANGELOG.md INSTALL.md LICENSE MANIFEST.in README.md setup.cfg setup.py
 include bin/mover_benchmarks.py bin/mover_profiling.py
 
 prune .vscode

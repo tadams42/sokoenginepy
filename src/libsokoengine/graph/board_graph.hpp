@@ -17,7 +17,7 @@ class Tessellation;
 ///
 class LIBSOKOENGINE_API BoardSizeExceededError : public std::runtime_error {
 public:
-  BoardSizeExceededError(const std::string &mess);
+  explicit BoardSizeExceededError(const std::string &mess);
   virtual ~BoardSizeExceededError();
 };
 

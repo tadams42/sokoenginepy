@@ -1,133 +1,38 @@
-# libsokoengine
+# Tutorial
 
-C++ Sokoban utilities:
-
-- portable, using C++14 and [Boost.Graph]
-- supports Sokoban, Hexoban, Trioban and Octoban variants
-  - Sokoban+ for all supported variants
-  - multiple pushers (Multiban) for all variants
-- fast game engine implementation with single step undo/redo
-- ...
-
-## Build and install from source
-
-Compile time dependencies:
-
-```sh
-sudo apt install git build-essential libboost-graph-dev cmake libdw-dev \
-                 binutils-dev doxygen
-```
-
-Runtime dependencies:
-
-```sh
-sudo apt install libboost-graph
-```
-
-Build:
-
-```sh
-git clone https://github.com/tadams42/sokoenginepy.git
-cmake --preset "debug"
-cd build/debug
-make && make install
-```
-
-Uninstall:
-
-```sh
-xargs rm < install_manifest.txt
-```
-
-Other make targets
-
-- `benchmarks` - a suite of benchmarks for `Mover`
-
-```sh
-make benchmarks
-./benchmarks
-```
-
-- `valgrind_profile_playground` - a profiling data generator
-
-```sh
-sudo apt install kcachegrind valgrind
-make valgrind_profile_playground
-kcachegrind playground_dump.pid
-```
-
-## Usage & Documentation
-
-Full docs can be generated from source using `make docs` target ([Doxygen] required)
-and are also available online at
-[http://tadams42.github.io/sokoenginepy/](http://tadams42.github.io/sokoenginepy/).
-Note that online docs are generated from `master` branch.
-
-Minimal example `main.cpp` is:
-
-```cpp
-#include <sokoengine.hpp>
-
-using namespace sokoengine;
-
-int main() {
-  HexobanBoard b;
-  return 0;
-}
-```
-
-To integrate `libsokoengine` with other `cmake` projects:
-
-```cmake
-cmake_minimum_required (VERSION 3.15.1)
-
-project(test_installed_sokoengine VERSION 0.5.3 LANGUAGES CXX)
-
-find_package(libsokoengine 0.5.0 REQUIRED)
-
-add_executable(playground playground.cpp)
-target_link_libraries(playground PUBLIC libsokoengine::sokoengine)
-```
-
-There are few key concepts implemented by library and explained by following sections.
-
-### Game variant
-
-We implement four game variants: Sokoban, Hexoban, Trioban and Octoban. These differ
-by plane tessellation on which game board is laid out:
+We implement four game variants: Sokoban, Hexoban, Trioban and Octoban. These differ by
+plane tessellation on which game board is laid out:
 
 - Sokoban boards consist of adjacent squares
 - Hexoban boards consist of adjacent hexagons
 - Trioban boards consist of adjacent triangles
 - Octoban boards consist of interchanging, adjacent octagons and squares
 
-Tessellation of game board determines available moves for game pieces. In general
-there are 8 supported movement directions: left, right, up, down, north west, north
-east, south west and south east. Of course, not all tessellations support all
-directions. Also, one set of directions may have different meaning in different
-tessellations.
+Tessellation of game board determines available moves for game pieces. In general there
+are 8 supported movement directions: left, right, up, down, north west, north east,
+south west and south east. Of course, not all tessellations support all directions.
+Also, one set of directions may have different meaning in different tessellations.
 
-To abstract all these differences, we implement `Tessellation` class, with subclass
-for each of supported variants. Instances of `Tessellation` are then used by other
-classes to parameterize game variant.
+To abstract all these differences, we implement `Tessellation` class, with subclass for
+each of supported variants. Instances of `Tessellation` are then used by other classes
+to parameterize game variant.
 
-Note that `Tessellation` is low level implementation detail, and although it helps to
-be aware of its existence, client code doesn't usually need to interact with it
-directly.
+Note that `Tessellation` is low level implementation detail, and although it helps to be
+aware of its existence, client code doesn't usually need to interact with it directly.
 
-### Game boards
+## Game boards
 
 Game board consists of 2D grid of cells. Each cell has a state describing its board
 element (ie. wall, pusher, box, goal...) and can have some additional flags added to
 that state. These flags are not displayed but are used internally by board editors,
 movement logic, etc.. Board elements (cells) are implemented by `BoardCell` class.
 
-Game board is implemented using `VariantBoard` base class with concrete
-implementations for each variant (ie. `SokobanBoard`, `HexobanBoard`, etc...). For
-speed efficiency, board's 2D grid can be thought of as a 1D array of `BoardCell`.
-This means that most methods in `VariantBoard` and in other places in library, use 1D
-indexes to reference individual cells. Utility functions are provided that convert 2D
-coordinates to 1D indexes and vice versa (ie. `index1d`).
+Game board is implemented using `VariantBoard` base class with concrete implementations
+for each variant (ie. `SokobanBoard`, `HexobanBoard`, etc...). For speed efficiency,
+board's 2D grid can be thought of as a 1D array of `BoardCell`.  This means that most
+methods in `VariantBoard` and in other places in library, use 1D indexes to reference
+individual cells. Utility functions are provided that convert 2D coordinates to 1D
+indexes and vice versa (ie. `index1d`).
 
 `VariantBoard` has following responsibilities:
 
@@ -139,7 +44,7 @@ coordinates to 1D indexes and vice versa (ie. `index1d`).
   tessellation and appropriate `Tessellation` are used)
 - implements `std::string` (de)serialization. Traditional format for these strings is
   extended to support RLE compression of them, following specification of
-  `SokobanYASC` `.sok` format.
+  `SokobanYASC` .sok file format.
 
 Following is some example code for `VariantBoard` usage:
 
@@ -171,7 +76,7 @@ Positions jump_path = board.find_jump_path(42, 24);
 string output = board.to_str();
 ```
 
-### Game logic and movement
+## Game logic and movement
 
 All game variants follow exactly same game rules. From [Wikipedia-Sokoban rules],
 classic rules of Sokoban are:
@@ -262,7 +167,7 @@ mover.undo_last_move();
 edited outside of its `Mover`. For the same reason, it is not allowed to attach two
 movers to same game board.
 
-### Piece tracking, position hashing and victory conditions
+## Piece tracking, position hashing and victory conditions
 
 To allow fast pusher and box positions retrieval and tracking, we implement cache
 class - `BoardManager`. This class stores positions of board pieces, and allows fast
@@ -291,27 +196,14 @@ conditions are activated. For example, having board with five boxes, we could as
 these sequences: `1 1 2 2 3` and `2 1 3 1 2`. After that, board is considered solved
 only when boxes with ID 1 are a pushed onto goals with ID 1 etc...
 
-### Game snapshots and movement recording
+## Game snapshots and movement recording
 
 Each step of each pusher is recorded by instance of `AtomicMove`. Sequence of
 `AtomicMove` is implemented in `Snapshot`. Just like `VariantBoard`, `Snapshot` is
 serializable to `std::string`. Traditional snapshots string format is extended to
 support recording of jumps and selecting of different pushers in `Multiban` boards,
-again following `SokobanYASC` `.sok` format specification.
+again following [SokobanYASC] .sok file format specification.
 
 
-[backward-cpp]:https://github.com/bombela/backward-cpp
-[bandit]:http://banditcpp.org/
-[boost]:http://www.boost.org/
-[C++ symbols wrapup]:http://www.eyrie.org/~eagle/journal/2012-02/001.html
-[CMake Config-Package]:https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html#using-packages
-[CMake]:http://www.cmake.org
-[cppitertools]:https://github.com/ryanhaining/cppitertools
-[Doxygen]:http://www.doxygen.org/
-[Graphviz]:http://www.graphviz.org
-[JSoko]:https://www.sokoban-online.de/
-[MazezaM]:http://webpages.dcu.ie/~tyrrelma/MazezaM/
-[pybind11]: https://github.com/pybind/pybind11
 [SokobanYASC]:https://sourceforge.net/projects/sokobanyasc/
 [Wikipedia-Sokoban rules]: https://en.wikipedia.org/wiki/Sokoban#Rules
-[Boost.Graph]: https://www.boost.org/doc/libs/1_78_0/libs/graph/doc/index.html

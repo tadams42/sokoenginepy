@@ -9,25 +9,27 @@ skip_gitignore = true
 [tool.pytest.ini_options]
 minversion = "6.0"
 norecursedirs = [".git", "tmp*", ".hg", ".venv", ".tox", ".eggs"]
-# Enabling doctest modules on src/ rises all kinds of import errors
-# on "pip install -e ." repo and in tox
-# Part of the problem is here:
-# https://github.com/pytest-dev/pytest/issues/2042
-# Untill there is a better way to run doctests over installed package code
-# we disable them
 addopts = [
 	"-rxEfsw",
 	"--strict-markers",
 	"--tb=short",
-	"--doctest-modules",
+	# Enabling --doctest-modules on src/ runs into problems when there is native
+	# extension built. In that case, pytest will still try to import .py files (ie.
+	# hexoban_board.py) to collect tests from them. But, this will fail to import
+	# because that file works only in environments where native extension is NOT
+	# built. We can't use --doctest-modules.
+	# "--doctest-modules",
 	"--doctest-glob=*.rst",
-	"--doctest-glob=*.py",
+	"--doctest-glob=tutorial_python.md",
 	"--ignore=bin",
-	"--ignore=tests/fixtures/test_cases",
 	"--ignore=build",
-	"--ignore=scratchpad",
+	"--ignore=cmake",
 	"--ignore=docs/conf.py",
-	"--ignore=src",
+	"--ignore=scratchpad",
+	"--ignore=src/libsokoengine",
+	"--ignore=src/sokoenginepyext",
+	"--ignore=tests/fixtures/test_cases",
+	"--ignore=tmp",
 ]
 python_classes = ["Describe*", "When_*", "describe_*"]
 python_functions = ["it_*", "test_*", "then_*", "when_*"]

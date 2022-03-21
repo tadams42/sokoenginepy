@@ -46,23 +46,20 @@
       "name": "_make",
       "hidden": true,
       "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build/${presetName}",
-      "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/dev_installs/${presetName}"
-      }
+      "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
       "name": "_ninja",
       "hidden": true,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}",
-      "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/dev_installs/${presetName}"
-      }
+      "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
       "name": "debug",
-      "inherits": ["_gcc", "_debug", "_make"]
+      "inherits": ["_gcc", "_debug", "_make"],
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/dev_installs/${presetName}"
+      }
     },
     {
       "name": "release",

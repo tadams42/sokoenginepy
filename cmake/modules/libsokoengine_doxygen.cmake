@@ -84,6 +84,6 @@ if(DOXYGEN_FOUND)
     doxygen_add_docs(
         docs
         ${CMAKE_SOURCE_DIR}/src/libsokoengine
-        ${CMAKE_SOURCE_DIR}/README.libsokoengine.md
+        ${CMAKE_SOURCE_DIR}/docs/tutorial_cpp.md
     )
 endif(DOXYGEN_FOUND)
