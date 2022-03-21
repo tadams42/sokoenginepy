@@ -33,7 +33,13 @@ It provides two implementations:
 - `libsokoengine` library (completely optional):
 
    ```sh
-   pip install sokoenginepy
+   sudo apt install git build-essential libboost-graph-dev cmake libdw-dev \
+     binutils-dev doxygen
+   git clone https://github.com/tadams42/sokoenginepy.git
+   cd sokoenginepy/
+   cmake --preset "debug"
+   cd build/debug/
+   make && make install
    ```
 
 C++ library is completely optional. On Linux, Python package may utilize it for raw
