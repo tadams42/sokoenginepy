@@ -10,6 +10,7 @@ using namespace std;
 using namespace iter;
 
 namespace sokoengine {
+namespace game {
 
 using namespace implementation;
 
@@ -327,4 +328,5 @@ void Mover::set_pulls_boxes(bool value) { m_impl->m_pulls_boxes = value; }
 
 const VariantBoard &Mover::initial_board() const { return *(m_impl->m_initial_board); }
 
+} // namespace game
 } // namespace sokoengine

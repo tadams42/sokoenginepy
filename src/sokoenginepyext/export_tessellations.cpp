@@ -2,7 +2,7 @@
 #include <map>
 
 using namespace std;
-using namespace sokoengine;
+using namespace sokoengine::game;
 
 void export_tessellations(py::module &m) {
   py::enum_<CellOrientation>(m, "CellOrientation")
@@ -13,7 +13,7 @@ void export_tessellations(py::module &m) {
       // .export_values()
       ;
 
-  py::class_<Tessellation>(m, "TessellationBase")
+  py::class_<Tessellation>(m, "CTessellationBase")
       // protocols
       .def("__eq__", &Tessellation::operator==)
       .def("__ne__", &Tessellation::operator!=)

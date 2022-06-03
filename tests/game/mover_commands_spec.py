@@ -1,4 +1,4 @@
-from sokoenginepy import (
+from sokoenginepy.game import (
     DEFAULT_PIECE_ID,
     AtomicMove,
     Direction,

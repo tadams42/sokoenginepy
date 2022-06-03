@@ -1,206 +1,213 @@
-from functools import cached_property, reduce
-from operator import add, or_
+from __future__ import annotations
 
-from ..atomic_move import AtomicMove
-from ..board import VariantBoard
-from ..board_cell import BoardCell
-from ..snapshot import Snapshot
-from ..tessellation import Tessellation
+import re
+from functools import reduce
+from operator import add
+from typing import Final, List, Optional, Set
+
+from .puzzle_types import PuzzleTypes
+from .rle import Rle
+from .snapshot import Snapshot
+from .utilities import contains_only_digits_and_spaces, is_blank
 
 
 class Puzzle:
     """
     Textual representation of game board with all its meta data and snapshots.
-
-    No data validation is performed, to make parsing of Sokoban files as fast as
-    possible. Proper validation is triggered when Puzzle is converted into game
-    board.
     """
+
+    WALL: Final[str] = "#"
+    PUSHER: Final[str] = "@"
+    PUSHER_ON_GOAL: Final[str] = "+"
+    BOX: Final[str] = "$"
+    BOX_ON_GOAL: Final[str] = "*"
+    GOAL: Final[str] = "."
+    FLOOR: Final[str] = " "
+    VISIBLE_FLOOR: Final[str] = "-"
+    ALT_PUSHER1: Final[str] = "p"
+    ALT_PUSHER2: Final[str] = "m"
+    ALT_PUSHER_ON_GOAL1: Final[str] = "P"
+    ALT_PUSHER_ON_GOAL2: Final[str] = "M"
+    ALT_BOX1: Final[str] = "b"
+    ALT_BOX_ON_GOAL1: Final[str] = "B"
+    ALT_GOAL1: Final[str] = "o"
+    ALT_VISIBLE_FLOOR1: Final[str] = "_"
 
     def __init__(
         self,
-        board="",
-        title="",
-        author="",
-        boxorder="",
-        goalorder="",
-        notes="",
-        snapshots=None,
-        created_at="",
-        updated_at="",
-        tessellation_or_description=Tessellation.SOKOBAN,
+        id: int = 0,
+        board: str = "",
+        puzzle_type: Optional[PuzzleTypes] = PuzzleTypes.SOKOBAN,
+        title: str = "",
+        author: str = "",
+        boxorder: str = "",
+        goalorder: str = "",
+        notes: Optional[List[str]] = None,
+        snapshots: Optional[List[Snapshot]] = None,
+        created_at: str = "",
+        updated_at: str = "",
     ):
-        self._tessellation = None
-        self.tessellation = tessellation_or_description
-        self.pid = 1
-        self._board = board
+        self.id: int = id
+        self._board: str = board
         self.title = title
         self.author = author
         self.boxorder = boxorder
         self.goalorder = goalorder
-        self.notes = notes
-        self.snapshots = snapshots or []
+        self.notes: List[str] = notes or []
+        self.snapshots: List[Snapshot] = snapshots or []
         self.created_at = created_at
         self.updated_at = updated_at
+        self.puzzle_type: PuzzleTypes = puzzle_type or PuzzleTypes.SOKOBAN
+
+        self._pushers_count: Optional[int] = None
+        self._boxes_count: Optional[int] = None
+        self._goals_count: Optional[int] = None
+
+    @classmethod
+    def is_pusher(cls, character: str) -> bool:
+        return (
+            character == cls.PUSHER
+            or character == cls.ALT_PUSHER1
+            or character == cls.ALT_PUSHER2
+            or character == cls.PUSHER_ON_GOAL
+            or character == cls.ALT_PUSHER_ON_GOAL1
+            or character == cls.ALT_PUSHER_ON_GOAL2
+        )
+
+    @classmethod
+    def is_box(cls, character: str) -> bool:
+        return (
+            character == cls.BOX
+            or character == cls.ALT_BOX1
+            or character == cls.BOX_ON_GOAL
+            or character == cls.ALT_BOX_ON_GOAL1
+        )
+
+    @classmethod
+    def is_goal(cls, character: str) -> bool:
+        return (
+            character == cls.GOAL
+            or character == cls.ALT_GOAL1
+            or character == cls.BOX_ON_GOAL
+            or character == cls.ALT_BOX_ON_GOAL1
+            or character == cls.PUSHER_ON_GOAL
+            or character == cls.ALT_PUSHER_ON_GOAL1
+            or character == cls.ALT_PUSHER_ON_GOAL2
+        )
+
+    @classmethod
+    def is_empty_floor(cls, character: str) -> bool:
+        return (
+            character == cls.FLOOR
+            or character == cls.VISIBLE_FLOOR
+            or character == cls.ALT_VISIBLE_FLOOR1
+        )
+
+    @classmethod
+    def is_wall(cls, character: str) -> bool:
+        return character == cls.WALL
+
+    @classmethod
+    def is_board(cls, line: Optional[str]) -> bool:
+        """
+        Checks if line contains only characters legal in textual representation of
+        boards.
+
+        Note:
+            Doesn't check if it actually contains legal board, it only checks that
+            there are no illegal characters.
+        """
+        return not contains_only_digits_and_spaces(line) and reduce(
+            lambda x, y: x and y,
+            [True if _RE_BOARD_STRING.match(l) else False for l in line.splitlines()],
+            True,
+        )
+
+    @classmethod
+    def is_sokoban_plus(cls, line: str) -> bool:
+        return contains_only_digits_and_spaces(line) and not is_blank(line)
 
     @property
-    def tessellation(self):
-        return self._tessellation
-
-    @tessellation.setter
-    def tessellation(self, tessellation_or_description):
-        self._tessellation = Tessellation.instance_from(tessellation_or_description)
-
-    @property
-    def board(self):
+    def board(self) -> str:
         return self._board
 
     @board.setter
-    def board(self, rv):
+    def board(self, rv: str):
         self._board = rv
-        if "pushers_count" in self.__dict__:
-            del self.__dict__["pushers_count"]
-        if "boxes_count" in self.__dict__:
-            del self.__dict__["boxes_count"]
-        if "goals_count" in self.__dict__:
-            del self.__dict__["goals_count"]
+        self._pushers_count = None
+        self._boxes_count = None
+        self._goals_count = None
 
     def clear(self):
         self.board = ""
-        self.tessellation = Tessellation.SOKOBAN
         self.title = ""
         self.author = ""
         self.boxorder = ""
         self.goalorder = ""
-        self.notes = ""
+        self.notes = []
         self.snapshots = []
         self.created_at = ""
         self.updated_at = ""
 
-    def reformat(self):
-        self.board = str(self.to_game_board())
-        for snap in self.snapshots:
-            snap.reformat()
+        self._pushers_count: Optional[int] = None
+        self._boxes_count: Optional[int] = None
+        self._goals_count: Optional[int] = None
 
-    def to_game_board(self):
-        retv = VariantBoard.instance_from(
-            tessellation_or_description=self.tessellation, board_str=self.board
-        )
-        return retv
+    @property
+    def pushers_count(self) -> int:
+        if self._pushers_count is None:
+            self._pushers_count = reduce(
+                add, [1 if self.is_pusher(chr) else 0 for chr in self.board], 0
+            )
+        return self._pushers_count
 
-    @cached_property
-    def pushers_count(self):
-        return reduce(
-            add, [1 if BoardCell.is_pusher_chr(chr) else 0 for chr in self.board], 0
-        )
+    @property
+    def boxes_count(self) -> int:
+        if self._boxes_count is None:
+            self._boxes_count = reduce(
+                add, [1 if self.is_box(chr) else 0 for chr in self.board], 0
+            )
 
-    @cached_property
-    def boxes_count(self):
-        return reduce(
-            add, [1 if BoardCell.is_box_chr(chr) else 0 for chr in self.board], 0
-        )
+        return self._boxes_count
 
-    @cached_property
-    def goals_count(self):
-        return reduce(
-            add, [1 if BoardCell.is_goal_chr(chr) else 0 for chr in self.board], 0
-        )
+    @property
+    def goals_count(self) -> int:
+        if self._goals_count is None:
+            self._goals_count = reduce(
+                add, [1 if self.is_goal(chr) else 0 for chr in self.board], 0
+            )
+        return self._goals_count
 
-
-class PuzzleSnapshot:
-    """
-    :class:`.Snapshot` with all its meta data.
-
-    No data validation is performed, to make parsing of Sokoban files as fast as
-    possible. Proper validation is triggered when PuzzleSnapshot is converted into
-    :class:`.Snapshot`.
-    """
-
-    def __init__(
+    def reformatted(
         self,
-        moves="",
-        title="",
-        duration=None,
-        solver="",
-        notes="",
-        created_at="",
-        updated_at="",
-        tessellation_or_description=Tessellation.SOKOBAN,
-    ):
-        self._tessellation = None
-        self.tessellation = tessellation_or_description
-        self.pid = 1
-        self._moves = moves
-        self.title = title
-        self.duration = duration
-        self.solver = solver
-        self.notes = notes
-        self.created_at = created_at
-        self.updated_at = updated_at
+        use_visible_floor: bool = False,
+        break_long_lines_at: int = 80,
+        rle_encode: bool = False,
+    ) -> str:
+        return self.board
 
-    @property
-    def tessellation(self):
-        return self._tessellation
 
-    @tessellation.setter
-    def tessellation(self, tessellation_or_description):
-        self._tessellation = Tessellation.instance_from(tessellation_or_description)
-
-    @property
-    def moves(self):
-        return self._moves
-
-    @moves.setter
-    def moves(self, rv):
-        self._moves = rv
-        if "pushes_count" in self.__dict__:
-            del self.__dict__["pushes_count"]
-        if "moves_count" in self.__dict__:
-            del self.__dict__["moves_count"]
-        if "is_reverse" in self.__dict__:
-            del self.__dict__["is_reverse"]
-
-    def to_game_snapshot(self):
-        return Snapshot(
-            tessellation_or_description=self.tessellation, moves_data=self.moves
-        )
-
-    def reformat(self):
-        self.moves = str(self.to_game_snapshot())
-
-    @cached_property
-    def pushes_count(self):
-        return reduce(
-            add,
-            [
-                1 if (AtomicMove.is_atomic_move_chr(chr) and chr.isupper()) else 0
-                for chr in self.moves
-            ],
-            0,
-        )
-
-    @cached_property
-    def moves_count(self):
-        """
-        This is just informative number. Because snapshot is not fully parsed, this
-        method may also account moves that are part of jumps or pusher selections.
-        """
-        return reduce(
-            add,
-            [
-                1 if (AtomicMove.is_atomic_move_chr(chr) and chr.islower()) else 0
-                for chr in self.moves
-            ],
-            0,
-        )
-
-    @cached_property
-    def is_reverse(self):
-        return reduce(
-            or_,
-            [
-                chr == Snapshot.JUMP_BEGIN or chr == Snapshot.JUMP_END
-                for chr in self.moves
-            ],
-            False,
-        )
+_CHARACTERS: Set[str] = {
+    Puzzle.WALL,
+    Puzzle.PUSHER,
+    Puzzle.PUSHER_ON_GOAL,
+    Puzzle.BOX,
+    Puzzle.BOX_ON_GOAL,
+    Puzzle.GOAL,
+    Puzzle.FLOOR,
+    Puzzle.VISIBLE_FLOOR,
+    Puzzle.ALT_PUSHER1,
+    Puzzle.ALT_PUSHER2,
+    Puzzle.ALT_PUSHER_ON_GOAL1,
+    Puzzle.ALT_PUSHER_ON_GOAL2,
+    Puzzle.ALT_BOX1,
+    Puzzle.ALT_BOX_ON_GOAL1,
+    Puzzle.ALT_GOAL1,
+    Puzzle.ALT_VISIBLE_FLOOR1,
+}
+_RE_BOARD_STRING = re.compile(
+    r"^([0-9\s"
+    + re.escape("".join(_CHARACTERS))
+    + re.escape("".join(Rle.DELIMITERS))
+    + "])*$"
+)

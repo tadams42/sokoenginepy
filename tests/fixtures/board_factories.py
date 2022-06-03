@@ -3,7 +3,7 @@ from itertools import permutations
 import factory
 import pytest
 
-from sokoenginepy import (
+from sokoenginepy.game import (
     DEFAULT_PIECE_ID,
     BoardManager,
     BoardState,
@@ -12,69 +12,69 @@ from sokoenginepy import (
     SokobanBoard,
     SokobanPlus,
     Tessellation,
+    index_1d,
 )
-from sokoenginepy.utilities import index_1d
 
 from .misc import fake
 
 
 @pytest.fixture
 def board_str():
-    # yapf: disable
-    return "\n".join([
-        # 123456789012345678
-        "    #####          ",  # 0
-        "    #  @#          ",  # 1
-        "    #$  #          ",  # 2
-        "  ###  $##         ",  # 3
-        "  #  $ $ #         ",  # 4
-        "### # ## #   ######",  # 5
-        "#   # ## #####  ..#",  # 6
-        "# $  $          ..#",  # 7
-        "##### ### #@##  ..#",  # 8
-        "    #     #########",  # 9
-        "    #######        ",  # 0
-    ])
-    # yapf: enable
+    return "\n".join(
+        [
+            # 123456789012345678
+            "    #####          ",  # 0
+            "    #  @#          ",  # 1
+            "    #$  #          ",  # 2
+            "  ###  $##         ",  # 3
+            "  #  $ $ #         ",  # 4
+            "### # ## #   ######",  # 5
+            "#   # ## #####  ..#",  # 6
+            "# $  $          ..#",  # 7
+            "##### ### #@##  ..#",  # 8
+            "    #     #########",  # 9
+            "    #######        ",  # 0
+        ]
+    )
 
 
 @pytest.fixture
 def switched_board_str():
-    # yapf: disable
-    return "\n".join([
-        "    #####          ",
-        "    #  @#          ",
-        "    #.  #          ",
-        "  ###  .##         ",
-        "  #  . . #         ",
-        "### # ## #   ######",
-        "#   # ## #####  $$#",
-        "# .  .          $$#",
-        "##### ### #@##  $$#",
-        "    #     #########",
-        "    #######        ",
-    ])
-    # yapf: enable
+    return "\n".join(
+        [
+            "    #####          ",
+            "    #  @#          ",
+            "    #.  #          ",
+            "  ###  .##         ",
+            "  #  . . #         ",
+            "### # ## #   ######",
+            "#   # ## #####  $$#",
+            "# .  .          $$#",
+            "##### ### #@##  $$#",
+            "    #     #########",
+            "    #######        ",
+        ]
+    )
 
 
 @pytest.fixture
 def solved_board_str():
-    # yapf: disable
-    return "\n".join([
-        # 123456789012345678
-        "    #####          ",  # 0
-        "    #  @#          ",  # 1
-        "    #   #          ",  # 2
-        "  ###   ##         ",  # 3
-        "  #      #         ",  # 4
-        "### # ## #   ######",  # 5
-        "#   # ## #####  **#",  # 6
-        "#               **#",  # 7
-        "##### ### #@##  **#",  # 8
-        "    #     #########",  # 9
-        "    #######        ",  # 0
-    ])
-    # yapf: enable
+    return "\n".join(
+        [
+            # 123456789012345678
+            "    #####          ",  # 0
+            "    #  @#          ",  # 1
+            "    #   #          ",  # 2
+            "  ###   ##         ",  # 3
+            "  #      #         ",  # 4
+            "### # ## #   ######",  # 5
+            "#   # ## #####  **#",  # 6
+            "#               **#",  # 7
+            "##### ### #@##  **#",  # 8
+            "    #     #########",  # 9
+            "    #######        ",  # 0
+        ]
+    )
 
 
 @pytest.fixture

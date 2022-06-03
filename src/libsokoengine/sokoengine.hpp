@@ -1,5 +1,5 @@
-#ifndef SOKOENGINE_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
-#define SOKOENGINE_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#ifndef SOKOENGINE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#define SOKOENGINE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include "atomic_move.hpp"
 #include "board_cell.hpp"
@@ -26,5 +26,12 @@
 #include "mover.hpp"
 
 #include "benchmarks.hpp"
+
+#include "collection.hpp"
+#include "puzzle_types.hpp"
+#include "puzzle.hpp"
+#include "snapshot.hpp"
+#include "utilities.hpp"
+#include "rle.hpp"
 
 #endif // HEADER_GUARD

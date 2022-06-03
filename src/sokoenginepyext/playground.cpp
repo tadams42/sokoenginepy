@@ -1,7 +1,7 @@
 #include <sokoengine.hpp>
 
 using namespace std;
-using namespace sokoengine;
+using namespace sokoengine::game;
 
 int main() {
   SokobanBoard board(string() + "###########\n" + "#       **#\n" + "#       **#\n" +

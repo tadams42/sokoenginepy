@@ -1,6 +1,0 @@
-from .cell_orientation import CellOrientation
-from .hexoban_tessellation import HexobanTessellation
-from .octoban_tessellation import OctobanTessellation
-from .sokoban_tessellation import SokobanTessellation
-from .tessellation import AnyTessellation, Tessellation, TessellationOrDescription
-from .trioban_tessellation import TriobanTessellation

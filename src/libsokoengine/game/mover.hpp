@@ -1,5 +1,5 @@
-#ifndef MOVER_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
-#define MOVER_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#ifndef MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#define MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include "atomic_move.hpp"
 #include "sokoengine_config.hpp"
@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 namespace sokoengine {
+namespace game {
 
 class VariantBoard;
 class HashedBoardManager;
@@ -16,7 +17,7 @@ class HashedBoardManager;
 ///
 /// Movement mode of operation.
 ///
-enum class LIBSOKOENGINE_API SolvingMode : char {
+enum class LIBSOKOENGINE_API SolvingMode : uint8_t {
   FORWARD,
   REVERSE,
 };
@@ -81,6 +82,7 @@ private:
   std::unique_ptr<PIMPL> m_impl;
 };
 
+} // namespace game
 } // namespace sokoengine
 
 #endif // HEADER_GUARD

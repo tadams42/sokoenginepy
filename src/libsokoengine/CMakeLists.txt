@@ -1,72 +1,85 @@
 set(SELF_HEADERS
-    board/board_cell.hpp
-    board/hexoban_board.hpp
-    board/octoban_board.hpp
-    board/sokoban_board.hpp
-    board/trioban_board.hpp
-    board/variant_board.hpp
+    game/board_cell.hpp
+    game/board_graph.hpp
+    game/hexoban_board.hpp
+    game/octoban_board.hpp
+    game/sokoban_board.hpp
+    game/trioban_board.hpp
+    game/variant_board.hpp
+
+    game/atomic_move.hpp
     game/mover.hpp
-    graph/board_graph.hpp
-    manager/board_manager.hpp
-    manager/board_state.hpp
-    manager/hashed_board_manager.hpp
-    manager/sokoban_plus.hpp
-    snapshot/atomic_move.hpp
+
+    game/board_manager.hpp
+    game/board_state.hpp
+    game/hashed_board_manager.hpp
+    game/sokoban_plus.hpp
+
+    game/direction.hpp
+    game/hexoban_tessellation.hpp
+    game/octoban_tessellation.hpp
+    game/sokoban_tessellation.hpp
+    game/tessellation.hpp
+    game/trioban_tessellation.hpp
+
     sokoengine_config.hpp
     sokoengine.hpp
-    tessellation/direction.hpp
-    tessellation/hexoban_tessellation.hpp
-    tessellation/octoban_tessellation.hpp
-    tessellation/sokoban_tessellation.hpp
-    tessellation/tessellation.hpp
-    tessellation/trioban_tessellation.hpp
-    utilities/benchmarks.hpp
-    utilities/text_utils.hpp
+    benchmarks.hpp
+
+    io/collection.hpp
+    io/puzzle_types.hpp
+    io/puzzle.hpp
+    io/rle.hpp
+    io/snapshot.hpp
+    io/sok_file_format.hpp
+    io/SOK_format_specification.h
+    io/utilities.hpp
 )
 
 set(SELF_SOURCES
-    board/board_cell.cpp
-    board/hexoban_board.cpp
-    board/octoban_board.cpp
-    board/sokoban_board.cpp
-    board/trioban_board.cpp
-    board/variant_board.cpp
+    game/board_cell.cpp
+    game/board_graph.cpp
+    game/hexoban_board.cpp
+    game/octoban_board.cpp
+    game/sokoban_board.cpp
+    game/trioban_board.cpp
+    game/variant_board.cpp
+
+    game/atomic_move.cpp
     game/mover.cpp
-    graph/board_graph.cpp
-    manager/board_manager.cpp
-    manager/board_state.cpp
-    manager/hashed_board_manager.cpp
-    manager/sokoban_plus.cpp
-    snapshot/atomic_move.cpp
-    tessellation/direction.cpp
-    tessellation/hexoban_tessellation.cpp
-    tessellation/octoban_tessellation.cpp
-    tessellation/sokoban_tessellation.cpp
-    tessellation/tessellation.cpp
-    tessellation/trioban_tessellation.cpp
-    utilities/benchmarks.cpp
-    utilities/text_utils.cpp
+
+    game/board_manager.cpp
+    game/board_state.cpp
+    game/hashed_board_manager.cpp
+    game/sokoban_plus.cpp
+
+    game/direction.cpp
+    game/hexoban_tessellation.cpp
+    game/octoban_tessellation.cpp
+    game/sokoban_tessellation.cpp
+    game/tessellation.cpp
+    game/trioban_tessellation.cpp
+
+    benchmarks.cpp
+
+    io/collection.cpp
+    io/puzzle.cpp
+    io/rle.cpp
+    io/snapshot.cpp
+    io/sok_file_format.cpp
+    io/utilities.cpp
 )
 
 set(SELF_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/board
     ${CMAKE_CURRENT_SOURCE_DIR}/game
-    ${CMAKE_CURRENT_SOURCE_DIR}/graph
-    ${CMAKE_CURRENT_SOURCE_DIR}/manager
-    ${CMAKE_CURRENT_SOURCE_DIR}/snapshot
-    ${CMAKE_CURRENT_SOURCE_DIR}/tessellation
-    ${CMAKE_CURRENT_SOURCE_DIR}/utilities
+    ${CMAKE_CURRENT_SOURCE_DIR}/io
 )
 
 #..............................................................................
 #                       sokoengine OBJECT library
 #..............................................................................
 add_library(sokoengine_obj OBJECT ${SELF_HEADERS} ${SELF_SOURCES})
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND CMAKE_BUILD_TYPE MATCHES Debug)
-    target_link_libraries(sokoengine_obj PRIVATE Backward::Backward)
-endif()
 
 target_include_directories(sokoengine_obj
     PUBLIC

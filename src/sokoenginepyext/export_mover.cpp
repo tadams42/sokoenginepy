@@ -1,7 +1,7 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using namespace sokoengine;
+using namespace sokoengine::game;
 
 void export_mover(py::module &m) {
   py::enum_<SolvingMode>(m, "SolvingMode")

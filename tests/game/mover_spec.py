@@ -2,12 +2,18 @@ from copy import deepcopy
 from itertools import permutations
 
 import pytest
-from pytest_mock import mocker
 
-from sokoenginepy import (DEFAULT_PIECE_ID, AtomicMove, Direction,
-                          IllegalMoveError, Mover, NonPlayableBoardError,
-                          SokobanBoard, SolvingMode)
-from sokoenginepy.utilities import index_1d
+from sokoenginepy.game import (
+    DEFAULT_PIECE_ID,
+    AtomicMove,
+    Direction,
+    IllegalMoveError,
+    Mover,
+    NonPlayableBoardError,
+    SokobanBoard,
+    SolvingMode,
+    index_1d,
+)
 
 from .. import fixtures
 
@@ -32,18 +38,14 @@ class DescribeMover:
             mover = Mover(forward_board)
             assert mover.selected_pusher == DEFAULT_PIECE_ID
 
-        def it_can_select_pusher_that_will_perform_next_move(
-            self, forward_mover
-        ):
+        def it_can_select_pusher_that_will_perform_next_move(self, forward_mover):
             forward_mover.select_pusher(DEFAULT_PIECE_ID + 1)
             assert forward_mover.selected_pusher == DEFAULT_PIECE_ID + 1
             for am in forward_mover.last_move:
                 assert am.pusher_id == DEFAULT_PIECE_ID
                 assert am.moved_box_id == None
 
-        def it_raises_if_trying_to_select_non_existent_pusher(
-            self, forward_mover
-        ):
+        def it_raises_if_trying_to_select_non_existent_pusher(self, forward_mover):
             with pytest.raises(KeyError):
                 forward_mover.select_pusher(DEFAULT_PIECE_ID + 42)
 
@@ -62,9 +64,7 @@ class DescribeMover:
             forward_mover.select_pusher(DEFAULT_PIECE_ID + 1)
             assert forward_mover.last_move == last_move
 
-        def it_doesnt_update_last_move_for_failed_pusher_selection(
-            self, forward_mover
-        ):
+        def it_doesnt_update_last_move_for_failed_pusher_selection(self, forward_mover):
             last_move = deepcopy(forward_mover.last_move)
             with pytest.raises(KeyError):
                 forward_mover.select_pusher(DEFAULT_PIECE_ID + 2)
@@ -94,23 +94,19 @@ class DescribeMover:
         def it_performs_jumps(self, reverse_mover, jump_dest):
             reverse_mover.jump(jump_dest)
             assert (
-                reverse_mover.board_manager.pusher_position(DEFAULT_PIECE_ID) ==
-                jump_dest
+                reverse_mover.board_manager.pusher_position(DEFAULT_PIECE_ID)
+                == jump_dest
             )
             for am in reverse_mover.last_move:
                 assert am.pusher_id == DEFAULT_PIECE_ID
                 assert am.moved_box_id == None
 
-        def it_refuses_to_jump_in_forward_solving_mode(
-            self, forward_mover, jump_dest
-        ):
+        def it_refuses_to_jump_in_forward_solving_mode(self, forward_mover, jump_dest):
             with pytest.raises(IllegalMoveError):
                 forward_mover.jump(jump_dest)
             assert not forward_mover.last_move
 
-        def it_refuses_to_jump_after_first_pull(
-            self, reverse_mover, jump_dest
-        ):
+        def it_refuses_to_jump_after_first_pull(self, reverse_mover, jump_dest):
             reverse_mover.pulls_boxes = True
             reverse_mover.move(Direction.DOWN)
             reverse_mover.last_move = None
@@ -118,9 +114,7 @@ class DescribeMover:
                 reverse_mover.jump(jump_dest)
             assert not reverse_mover.last_move
 
-        def it_allows_jumps_after_first_pull_is_undone(
-            self, reverse_mover, jump_dest
-        ):
+        def it_allows_jumps_after_first_pull_is_undone(self, reverse_mover, jump_dest):
             reverse_mover.pulls_boxes = True
             reverse_mover.move(Direction.DOWN)
             assert reverse_mover.last_move[0].is_push_or_pull
@@ -138,9 +132,7 @@ class DescribeMover:
                 reverse_mover.jump(jump_obstacle_position)
             assert not reverse_mover.last_move
 
-        def it_refuses_to_jump_off_the_board(
-            self, reverse_mover, off_board_position
-        ):
+        def it_refuses_to_jump_off_the_board(self, reverse_mover, off_board_position):
             with pytest.raises(IndexError):
                 reverse_mover.jump(off_board_position)
             assert not reverse_mover.last_move
@@ -171,9 +163,7 @@ class DescribeMover:
                 reverse_mover.jump(jump_obstacle_position)
             assert reverse_mover.last_move == last_move
 
-        def it_raises_when_undoing_jump_for_forward_mover(
-            self, forward_mover, jumps
-        ):
+        def it_raises_when_undoing_jump_for_forward_mover(self, forward_mover, jumps):
             forward_mover.last_move = jumps[0]
             with pytest.raises(IllegalMoveError):
                 forward_mover.undo_last_move()
@@ -243,9 +233,7 @@ class DescribeMover:
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == None
 
-        def it_refuses_to_forward_move_pusher_into_obstacles_or_off_board(
-            self
-        ):
+        def it_refuses_to_forward_move_pusher_into_obstacles_or_off_board(self):
             # yapf: disable
             board = SokobanBoard(board_str="\n".join([
                 # 12345678
@@ -323,7 +311,7 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
         def it_refuses_to_undo_forward_move_by_moving_pusher_into_obstacles_or_off_board(
-            self
+            self,
         ):
             # yapf: disable
             board = SokobanBoard(board_str="\n".join([
@@ -341,7 +329,10 @@ class DescribeMover:
             mover.select_pusher(selected_pusher)
 
             for direction in [
-                Direction.DOWN, Direction.UP, Direction.LEFT, Direction.RIGHT
+                Direction.DOWN,
+                Direction.UP,
+                Direction.LEFT,
+                Direction.RIGHT,
             ]:
                 mover.last_move = [AtomicMove(direction)]
                 with pytest.raises(IllegalMoveError):
@@ -380,9 +371,7 @@ class DescribeMover:
             assert not mover.board[pusher_src].has_pusher
             assert mover.board[box_dest].has_box
             assert mover.board[pusher_dest].has_pusher
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID
 
@@ -414,9 +403,7 @@ class DescribeMover:
             assert mover.board[box_dest].has_box
             assert mover.board[pusher_dest].has_pusher
             assert not mover.board[pusher_src].has_box
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID + 1
 
@@ -438,18 +425,20 @@ class DescribeMover:
             last_move = mover.last_move
 
             for direction in [
-                Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT
+                Direction.UP,
+                Direction.DOWN,
+                Direction.LEFT,
+                Direction.RIGHT,
             ]:
                 with pytest.raises(IllegalMoveError):
                     mover.move(direction)
 
-                assert mover.board_manager.pusher_position(
-                    selected_pusher
-                ) == pusher_src
+                assert (
+                    mover.board_manager.pusher_position(selected_pusher) == pusher_src
+                )
                 assert board[pusher_src].has_pusher
                 assert board[board.neighbor(pusher_src, direction)].has_box
-                assert board[board.neighbor(pusher_src, direction.opposite)
-                            ].has_box
+                assert board[board.neighbor(pusher_src, direction.opposite)].has_box
                 assert mover.last_move == last_move
 
         def it_undoes_push(self):
@@ -480,15 +469,11 @@ class DescribeMover:
             assert not mover.board[pusher_src].has_pusher
             assert mover.board[box_dest].has_box
             assert mover.board[pusher_dest].has_pusher
-            assert mover.last_move == [
-                AtomicMove(Direction.LEFT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.LEFT, box_moved=True)]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID
 
-        def it_refuses_to_undo_push_moving_pusher_into_obstacles_or_off_board(
-            self
-        ):
+        def it_refuses_to_undo_push_moving_pusher_into_obstacles_or_off_board(self):
             # yapf: disable
             board = SokobanBoard(board_str="\n".join([
                 # 12345678
@@ -511,9 +496,7 @@ class DescribeMover:
             assert mover.board_manager.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
             assert board[board.neighbor(pusher_src, Direction.RIGHT)].has_box
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
             assert mover.last_move[0].moved_box_id == None
 
@@ -524,9 +507,7 @@ class DescribeMover:
             assert mover.board_manager.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
             assert board[board.neighbor(pusher_src, Direction.DOWN)].has_box
-            assert mover.last_move == [
-                AtomicMove(Direction.DOWN, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.DOWN, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
             assert mover.last_move[0].moved_box_id == None
 
@@ -541,9 +522,7 @@ class DescribeMover:
             assert mover.board_manager.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
             assert board[board.neighbor(pusher_src, Direction.RIGHT)].has_box
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
             assert mover.last_move[0].moved_box_id == None
 
@@ -554,9 +533,7 @@ class DescribeMover:
             assert mover.board_manager.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
             assert board[board.neighbor(pusher_src, Direction.DOWN)].has_box
-            assert mover.last_move == [
-                AtomicMove(Direction.DOWN, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.DOWN, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
             assert mover.last_move[0].moved_box_id == None
 
@@ -578,9 +555,7 @@ class DescribeMover:
             mover.last_move = [AtomicMove(Direction.RIGHT, box_moved=True)]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
 
     class DescribeReverseMovement:
         def it_moves_pusher_in_requested_direction(self):
@@ -634,9 +609,7 @@ class DescribeMover:
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == None
 
-        def it_refuses_to_reverse_move_pusher_into_obstacles_or_off_board(
-            self
-        ):
+        def it_refuses_to_reverse_move_pusher_into_obstacles_or_off_board(self):
             # yapf: disable
             board = SokobanBoard(board_str="\n".join([
                 # 12345678
@@ -654,7 +627,10 @@ class DescribeMover:
             last_move = mover.last_move
 
             for direction in [
-                Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT
+                Direction.UP,
+                Direction.DOWN,
+                Direction.LEFT,
+                Direction.RIGHT,
             ]:
                 with pytest.raises(IllegalMoveError):
                     mover.move(direction)
@@ -768,24 +744,24 @@ class DescribeMover:
             assert not board[pusher_src].has_pusher
             assert board[box_dest].has_box
             assert not board[box_src].has_box
-            assert mover.last_move == [
-                AtomicMove(Direction.LEFT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.LEFT, box_moved=True)]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID
 
         def it_refuses_to_pull_box_if_pusher_would_move_into_obstacle_or_off_board(
-            self
+            self,
         ):
             board = SokobanBoard(
-                board_str="\n".join([
-                    # 12345678
-                    "#########",  # 0
-                    "#@ $  .$#",  # 1
-                    "@. $ @@.#",  # 2
-                    ".  $  .$#",  # 3
-                    "#########",  # 4
-                ])
+                board_str="\n".join(
+                    [
+                        # 12345678
+                        "#########",  # 0
+                        "#@ $  .$#",  # 1
+                        "@. $ @@.#",  # 2
+                        ".  $  .$#",  # 3
+                        "#########",  # 4
+                    ]
+                )
             )
             # yapf: enable
             pusher_src = index_1d(3, 2, board.width)
@@ -841,9 +817,7 @@ class DescribeMover:
             assert not board[pusher_src].has_pusher
             assert board[box_dest].has_box
             assert not board[box_src].has_box
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID
 
@@ -882,9 +856,7 @@ class DescribeMover:
             assert not board[box_src].has_box
             assert board[behind_pusher].has_box
             assert not board[pusher_src].has_box
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID + 1
 
@@ -911,9 +883,7 @@ class DescribeMover:
             assert not board[box_src].has_box
             assert board[behind_pusher].has_box
             assert not board[pusher_src].has_box
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID + 1
 
@@ -935,9 +905,7 @@ class DescribeMover:
             mover.last_move = [AtomicMove(Direction.RIGHT, box_moved=True)]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
             assert mover.last_move[0].moved_box_id == None
 
@@ -945,9 +913,7 @@ class DescribeMover:
             mover.last_move = [AtomicMove(Direction.DOWN, box_moved=True)]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [
-                AtomicMove(Direction.DOWN, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.DOWN, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
             assert mover.last_move[0].moved_box_id == None
 
@@ -957,9 +923,7 @@ class DescribeMover:
             mover.last_move = [AtomicMove(Direction.RIGHT, box_moved=True)]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [
-                AtomicMove(Direction.RIGHT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.RIGHT, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
             assert mover.last_move[0].moved_box_id == None
 
@@ -967,9 +931,7 @@ class DescribeMover:
             mover.last_move = [AtomicMove(Direction.LEFT, box_moved=True)]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [
-                AtomicMove(Direction.LEFT, box_moved=True)
-            ]
+            assert mover.last_move == [AtomicMove(Direction.LEFT, box_moved=True)]
             assert mover.last_move[0].pusher_id == DEFAULT_PIECE_ID
             assert mover.last_move[0].moved_box_id == None
 
@@ -986,13 +948,15 @@ class DescribeMover:
             reverse_mover.select_pusher(DEFAULT_PIECE_ID + 1)
             moves += reverse_mover.last_move
             selection = deepcopy(reverse_mover.last_move)
-            undone_selections = [[
-                AtomicMove(
-                    direction=am.direction.opposite,
-                    is_pusher_selection=True
-                )
-                for am in permutation
-            ] for permutation in permutations(selection)]
+            undone_selections = [
+                [
+                    AtomicMove(
+                        direction=am.direction.opposite, is_pusher_selection=True
+                    )
+                    for am in permutation
+                ]
+                for permutation in permutations(selection)
+            ]
 
             reverse_mover.move(Direction.UP)
             moves += reverse_mover.last_move
@@ -1012,13 +976,8 @@ class DescribeMover:
                 Direction.UP, box_moved=True
             )
             assert reverse_mover.last_move[2] == AtomicMove(Direction.DOWN)
-            assert (
-                reverse_mover.last_move[3:3 + len(selection)] in
-                undone_selections
-            )
-            assert (
-                reverse_mover.last_move[3 + len(selection):] in undone_jumps
-            )
+            assert reverse_mover.last_move[3 : 3 + len(selection)] in undone_selections
+            assert reverse_mover.last_move[3 + len(selection) :] in undone_jumps
 
             assert str(reverse_mover.board) == initial_board
 

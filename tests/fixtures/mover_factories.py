@@ -2,16 +2,17 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy import (
+from sokoenginepy.game import (
     DEFAULT_PIECE_ID,
     AtomicMove,
     Direction,
+    JumpCommand,
     Mover,
+    SelectPusherCommand,
     SokobanBoard,
     SolvingMode,
+    index_1d,
 )
-from sokoenginepy.game import JumpCommand, SelectPusherCommand
-from sokoenginepy.utilities import index_1d
 
 from .misc import fake
 

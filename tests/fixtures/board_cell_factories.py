@@ -1,14 +1,15 @@
 import factory
 import pytest
 
-from sokoenginepy import BoardCell
+from sokoenginepy.game import BoardCell
+from sokoenginepy.io import Puzzle
 
 
 class BoardCellFactory(factory.Factory):
     class Meta:
         model = BoardCell
 
-    character = factory.LazyAttribute(lambda x: BoardCell.FLOOR)
+    character = factory.LazyAttribute(lambda x: Puzzle.FLOOR)
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 import factory
 import pytest
 
-from sokoenginepy import AtomicMove, Direction
+from sokoenginepy.game import AtomicMove, Direction
 
 from .misc import fake
 

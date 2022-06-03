@@ -1,7 +1,7 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using namespace sokoengine;
+using namespace sokoengine::game;
 
 piece_id_t receive_pusher_id(const py::object &pusher_id) {
   // Pusher ID setter in Python accepts any object
@@ -98,10 +98,6 @@ void export_atomic_move(py::module &m) {
          py::arg("pusher_id") = DEFAULT_PIECE_ID,
          py::arg("moved_box_id") = py::none())
 
-    // @classmethod
-    .def_static("is_atomic_move_chr", &AtomicMove::is_atomic_move_chr,
-                py::arg("character"))
-
     // protocols
     .def("__eq__", &AtomicMove::operator==)
     .def("__ne__", &AtomicMove::operator!=)
@@ -159,45 +155,5 @@ void export_atomic_move(py::module &m) {
                   &AtomicMove::set_is_push_or_pull)
     .def_property("is_pusher_selection", &AtomicMove::is_pusher_selection,
                   &AtomicMove::set_is_pusher_selection)
-    .def_property("is_jump", &AtomicMove::is_jump, &AtomicMove::set_is_jump)
-
-    .def_property_readonly_static("l", [](py::object) { return AtomicMove::l; })
-    .def_property_readonly_static("u", [](py::object) { return AtomicMove::u; })
-    .def_property_readonly_static("r", [](py::object) { return AtomicMove::r; })
-    .def_property_readonly_static("d", [](py::object) { return AtomicMove::d; })
-    .def_property_readonly_static("L", [](py::object) { return AtomicMove::L; })
-    .def_property_readonly_static("U", [](py::object) { return AtomicMove::U; })
-    .def_property_readonly_static("R", [](py::object) { return AtomicMove::R; })
-    .def_property_readonly_static("D", [](py::object) { return AtomicMove::D; })
-    .def_property_readonly_static("w", [](py::object) { return AtomicMove::w; })
-    .def_property_readonly_static("W", [](py::object) { return AtomicMove::W; })
-    .def_property_readonly_static("e", [](py::object) { return AtomicMove::e; })
-    .def_property_readonly_static("E", [](py::object) { return AtomicMove::E; })
-    .def_property_readonly_static("n", [](py::object) { return AtomicMove::n; })
-    .def_property_readonly_static("N", [](py::object) { return AtomicMove::N; })
-    .def_property_readonly_static("s", [](py::object) { return AtomicMove::s; })
-    .def_property_readonly_static("S", [](py::object) { return AtomicMove::S; })
-
-    .def_property_readonly_static("CHARACTERS", [](py::object) {
-      static const std::set<char> retv({
-        AtomicMove::l,
-        AtomicMove::u,
-        AtomicMove::r,
-        AtomicMove::d,
-        AtomicMove::L,
-        AtomicMove::U,
-        AtomicMove::R,
-        AtomicMove::D,
-        AtomicMove::w,
-        AtomicMove::W,
-        AtomicMove::e,
-        AtomicMove::E,
-        AtomicMove::n,
-        AtomicMove::N,
-        AtomicMove::s,
-        AtomicMove::S,
-      });
-
-      return retv;
-    });
+    .def_property("is_jump", &AtomicMove::is_jump, &AtomicMove::set_is_jump);
 }

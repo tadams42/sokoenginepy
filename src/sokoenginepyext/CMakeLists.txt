@@ -14,6 +14,12 @@ if(ENABLE_PYTHON_EXTENSION)
         export_boards.cpp
         export_board_manager.cpp
         export_mover.cpp
+
+        export_io_puzzle.cpp
+        export_io_snapshot.cpp
+        export_io_collection.cpp
+        export_io_rle.cpp
+
         sokoenginepyext.hpp
     )
 

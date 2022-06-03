@@ -2,7 +2,7 @@
 #include <memory>
 
 using namespace std;
-using namespace sokoengine;
+using namespace sokoengine::game;
 
 void export_boards(py::module &m) {
   py::class_<VariantBoard, std::shared_ptr<VariantBoard>>(m, "VariantBoard")
@@ -51,18 +51,6 @@ void export_boards(py::module &m) {
       py::arg("board_width") = 0, py::arg("board_height") = 0,
       py::arg("board_str") = py::none())
 
-    .def_static("is_board_string", &VariantBoard::is_board_string, py::arg("line"))
-
-    .def_static("parse_board_string",
-                [](const string &line) {
-                  auto native_retv = VariantBoard::parse_board_string(line);
-                  py::list retv;
-                  for (auto str : native_retv)
-                    retv.append(str);
-                  return retv;
-                },
-                py::arg("line"))
-
     .def_property_readonly("graph", &VariantBoard::graph,
                            py::return_value_policy::reference_internal)
 
@@ -93,8 +81,7 @@ void export_boards(py::module &m) {
     .def("__str__", &VariantBoard::str)
     .def("__repr__", &VariantBoard::repr)
 
-    .def("to_str", &SokobanBoard::to_str, py::arg("use_visible_floor") = false,
-         py::arg("rle_encode") = false)
+    .def("to_str", &SokobanBoard::to_str, py::arg("use_visible_floor") = false)
 
     .def_property_readonly("width", &VariantBoard::width)
     .def_property_readonly("height", &VariantBoard::height)

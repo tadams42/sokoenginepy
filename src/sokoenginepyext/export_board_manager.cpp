@@ -1,7 +1,7 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using namespace sokoengine;
+using namespace sokoengine::game;
 
 void export_board_manager(py::module &m) {
   py::class_<BoardState>(m, "BoardState")
