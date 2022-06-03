@@ -8,6 +8,9 @@ import os
 import shlex
 import sys
 from datetime import datetime
+from pathlib import Path
+
+_SELF_DIR = Path(__file__).parent.absolute().resolve()
 
 # -- Path setup --------------------------------------------------------------
 
@@ -49,6 +52,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "m2r2",
+    "breathe",
 ]
 
 needs_sphinx = "4.4"
@@ -94,11 +98,6 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
     html_theme = "sphinx_rtd_theme"
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
-
 
 # -- Extension configuration -------------------------------------------------
 
@@ -111,3 +110,8 @@ intersphinx_mapping = {
 
 # autodoc_member_order = 'bysource'
 autodoc_member_order = "groupwise"
+
+# -- Options for Doxygen C++ input -------------------------------------------
+
+breathe_projects = {"libsokofile": str(_SELF_DIR / "_doxygen" / "xml")}
+breathe_default_project = "libsokofile"

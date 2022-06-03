@@ -51,7 +51,7 @@ indexes and vice versa (ie. `index_1d`).
 Constructing an instance of board is as easy as:
 
 ```python
->>> from sokoenginepy import SokobanBoard
+>>> from sokoenginepy.game import SokobanBoard
 >>> board = SokobanBoard(board_str='\n'.join([
 ...     '    #####',
 ...     '    #  @#',
@@ -85,15 +85,15 @@ and exploring neighboring positions. Positions are expressed as 1D array indexes
 which can be retrieved from 2D coordinates using `index_1d`.
 
 ```python
->>> from sokoenginepy import BoardCell, Direction
->>> from sokoenginepy.utilities import index_1d
+>>> from sokoenginepy.io import Puzzle
+>>> from sokoenginepy.game import BoardCell, Direction, index_1d
 >>> position = index_1d(11, 8, board.width)
 >>>
 >>> board[position]
 BoardCell('@')
 >>> print(board[position])
 @
->>> board[position] = BoardCell.BOX
+>>> board[position] = Puzzle.BOX
 >>> board[position]
 BoardCell('$')
 >>> board[position].has_pusher
@@ -161,7 +161,7 @@ undo/redo, tracking and exporting movement history, etc.). It is intended to be 
 future full game implementations and solver implementations. Example usage of `Mover`:
 
 ```python
->>> from sokoenginepy import Mover, SolvingMode, IllegalMoveError, DEFAULT_PIECE_ID
+>>> from sokoenginepy.game import Mover, SolvingMode, IllegalMoveError, DEFAULT_PIECE_ID
 >>>
 >>> # regular, forward solving mode
 >>> forward_mover = Mover(board)
@@ -252,7 +252,7 @@ activated. For example, having board with five boxes, we could assign these sequ
 ID 1 are a pushed onto goals with ID 1 etc... Example of `HashedBoardManager` usage:
 
 ```python
->>> from sokoenginepy import HashedBoardManager
+>>> from sokoenginepy.game import HashedBoardManager
 >>> board = SokobanBoard(board_str="""
 ...     #####
 ...     #  @#
@@ -288,7 +288,7 @@ This class memoizes positions of pushers and boxes and assigns numerical IDs to 
 they can be referred to in different contexts.
 
 ```python
->>> from sokoenginepy import DEFAULT_PIECE_ID
+>>> from sokoenginepy.game import DEFAULT_PIECE_ID
 >>> manager.pushers_ids
 [1, 2]
 >>> manager.pushers_positions
@@ -341,7 +341,7 @@ and find current board layout in some big table, speeds up searching through gam
 which is needed for effective solver implementations.
 
 ```python
->>> from sokoenginepy import Mover, Direction
+>>> from sokoenginepy.game import Mover, Direction
 >>> mover = Mover(board)
 >>> initial_hash = mover.board_manager.state_hash
 >>> mover.move(Direction.DOWN)
@@ -372,12 +372,12 @@ parsing Sokoban files.
 This intermediary data is faster to manipulate and less memory hungry than full game
 board and game snapshot. That way it is possible to efficiently and quickly load, store
 and manipulate whole puzzle collections in memory. On the other hand, `Puzzle` and
-`PuzzleSnapshot` can be easily converted to `VariantBoard` and `Snapshot` when needed.
+`Snapshot` can be easily converted to `VariantBoard` and `Snapshot` when needed.
 
 ```python
-from sokoenginepy import PuzzlesCollection
+from sokoenginepy.io import Collection
 
-collection = PuzzlesCollection()
+collection = Collection()
 collection.load("~/sokoban/collections/fabulous_sokoban_problems.sok")
 
 board = collection[0].to_game_board()

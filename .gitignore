@@ -36,6 +36,7 @@ htmlcov
 
 # Sphinx
 docs/_build
+docs/_doxygen
 
 # VS Code
 .vscode/

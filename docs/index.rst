@@ -8,8 +8,8 @@ Tables of contents and indices
     :maxdepth: 2
 
     install
-    tutorial
-    api
+    api_py
+    api_cpp
     license
     changelog
 

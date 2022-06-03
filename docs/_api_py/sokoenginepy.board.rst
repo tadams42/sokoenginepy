@@ -9,8 +9,6 @@ BoardCell
     :undoc-members:
     :inherited-members:
 
-.. autoexception:: sokoenginepy.BoardConversionError
-
 
 SokobanBoard
 ------------

@@ -57,8 +57,7 @@ If built, native extension is used automatically - Python code calling stuff fro
 ## 2. libsokoengine C++ library
 
 ```sh
-sudo apt install git build-essential libboost-graph-dev cmake libdw-dev \
-  binutils-dev doxygen
+sudo apt install git build-essential libboost-graph-dev cmake doxygen
 ```
 
 ### 2.1. Build and install from source
@@ -92,11 +91,15 @@ It is also possible to use `libsokoengine` directly from built sources. In this 
 in other project like this:
 
 ```cmake
+set(DEV_PATH_HINT1 "../sokoenginepy/build/debug")
+set(DEV_PATH_HINT2 "../sokoenginepy/build/release")
+cmake_path(ABSOLUTE_PATH DEV_PATH_HINT1 BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
+cmake_path(ABSOLUTE_PATH DEV_PATH_HINT2 BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
 find_package(
     libsokoengine 0.5.0 REQUIRED
     CONFIG
-    PATHS "/home/foo/development/sokoenginepy/build/debug"
-          "/home/foo/development/sokoenginepy/build/release"
+    PATHS ${DEV_PATH_HINT1}
+          ${DEV_PATH_HINT2}
 )
 ```
 
