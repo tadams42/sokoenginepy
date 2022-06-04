@@ -29,11 +29,20 @@ set(SELF_HEADERS
     io/collection.hpp
     io/puzzle_types.hpp
     io/puzzle.hpp
-    io/rle.hpp
     io/snapshot.hpp
     io/sok_file_format.hpp
     io/SOK_format_specification.h
     io/utilities.hpp
+
+    io/rle/rle.hpp
+    io/rle/rle_ast.hpp
+    io/rle/rle_ast_adapted.hpp
+    io/rle/rle_config.hpp
+    io/rle/rle_error_handler.hpp
+    io/rle/rle_evaluator.hpp
+    io/rle/rle_grammar.hpp
+    io/rle/rle_json_printer.hpp
+    io/rle/rle.hpp
 )
 
 set(SELF_SOURCES
@@ -64,16 +73,18 @@ set(SELF_SOURCES
 
     io/collection.cpp
     io/puzzle.cpp
-    io/rle.cpp
     io/snapshot.cpp
     io/sok_file_format.cpp
     io/utilities.cpp
+
+    io/rle/rle.cpp
 )
 
 set(SELF_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/game
     ${CMAKE_CURRENT_SOURCE_DIR}/io
+    ${CMAKE_CURRENT_SOURCE_DIR}/io/rle
 )
 
 #..............................................................................
