@@ -14,6 +14,7 @@ if(ENABLE_PYTHON_EXTENSION)
         export_boards.cpp
         export_board_manager.cpp
         export_mover.cpp
+        export_sokoban_plus.cpp
 
         export_io_puzzle.cpp
         export_io_snapshot.cpp

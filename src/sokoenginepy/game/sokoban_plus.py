@@ -37,7 +37,7 @@ class SokobanPlus:
     Sokoban+ data parser accepts any positive integer as plus id.
     """
 
-    _LEGACY_DEFAULT_PLUS_ID: Final[int] = 99
+    LEGACY_DEFAULT_PLUS_ID: Final[int] = 99
 
     #: Sokoban+ ID for pieces that don't have one or when Sokoban+ is disabled.
     #:
@@ -62,7 +62,7 @@ class SokobanPlus:
         """
         self._is_enabled = False
         self._is_validated = False
-        self.errors: List[str] = []
+        self._errors: List[str] = []
 
         self._pieces_count = pieces_count
         self._box_plus_ids: Dict[int, int] = {}
@@ -120,14 +120,14 @@ class SokobanPlus:
     @property
     def is_valid(self) -> bool:
         if self._is_validated:
-            return not self.errors
+            return not self._errors
 
-        self.errors = []
+        self._errors = []
         try:
             self._box_plus_ids = self._parse_and_clean_ids_string(self._boxorder)
             self._goal_plus_ids = self._parse_and_clean_ids_string(self._goalorder)
         except ValueError as exc:
-            self.errors.append(str(exc))
+            self._errors.append(str(exc))
 
         self._validate_plus_ids(self._box_plus_ids)
         self._validate_plus_ids(self._goal_plus_ids)
@@ -136,11 +136,15 @@ class SokobanPlus:
         self._validate_id_sets_equality()
         self._is_validated = True
 
-        return not self.errors
+        return not self._errors
 
     @property
     def is_enabled(self) -> bool:
         return self._is_enabled
+
+    @property
+    def errors(self) -> List[str]:
+        return self._errors
 
     @is_enabled.setter
     def is_enabled(self, value):
@@ -150,8 +154,12 @@ class SokobanPlus:
         """
         if value:
             if not self.is_valid:
-                raise SokobanPlusDataError(self.errors)
+                raise SokobanPlusDataError(self._errors)
         self._is_enabled = value
+
+    @property
+    def is_validated(self):
+        return self._is_validated
 
     def box_plus_id(self, for_box_id: int) -> int:
         """
@@ -189,9 +197,9 @@ class SokobanPlus:
 
     def _rstrip_default_plus_ids(self, plus_ids_str):
         # TODO: Might not work correctly for "3 5 4 6 2 19" or "3 5 4 6 2 10"
-        if self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID:
+        if self.pieces_count < self.LEGACY_DEFAULT_PLUS_ID:
             return plus_ids_str.rstrip(
-                str(self.DEFAULT_PLUS_ID) + " " + str(self._LEGACY_DEFAULT_PLUS_ID)
+                str(self.DEFAULT_PLUS_ID) + " " + str(self.LEGACY_DEFAULT_PLUS_ID)
             )
         else:
             return plus_ids_str.rstrip(str(self.DEFAULT_PLUS_ID) + " ")
@@ -227,8 +235,8 @@ class SokobanPlus:
         cleaned = [
             self.DEFAULT_PLUS_ID
             if (
-                i == self._LEGACY_DEFAULT_PLUS_ID
-                and self.pieces_count < self._LEGACY_DEFAULT_PLUS_ID
+                i == self.LEGACY_DEFAULT_PLUS_ID
+                and self.pieces_count < self.LEGACY_DEFAULT_PLUS_ID
             )
             else i
             for i in trimmed
@@ -246,15 +254,15 @@ class SokobanPlus:
         if ids:
             for i in ids.values():
                 if not self.is_valid_plus_id(i):
-                    self.errors.append("Invalid Sokoban+ ID: {0}".format(i))
+                    self._errors.append(f"Invalid Sokoban+ ID: {i}")
 
     def _validate_piece_count(self):
         if self.pieces_count < 0:
-            self.errors.append("Sokoban+ can't be applied to zero pieces count.")
+            self._errors.append("Sokoban+ can't be applied to zero pieces count.")
 
     def _validate_ids_counts(self):
         if self._box_plus_ids and len(self._box_plus_ids) != self.pieces_count:
-            self.errors.append(
+            self._errors.append(
                 "Sokoban+ boxorder data doesn't contain same amount of IDs "
                 + "as there are pieces on board! (pieces_count: {0})".format(
                     self.pieces_count
@@ -262,7 +270,7 @@ class SokobanPlus:
             )
 
         if self._goal_plus_ids and len(self._goal_plus_ids) != self.pieces_count:
-            self.errors.append(
+            self._errors.append(
                 "Sokoban+ goalorder data doesn't contain same amount of IDs "
                 + "as there are pieces on board! (pieces_count: {0})".format(
                     self.pieces_count
@@ -289,7 +297,7 @@ class SokobanPlus:
             goals = set()
 
         if boxes != goals:
-            self.errors.append(
+            self._errors.append(
                 "Sokoban+ data doesn't define equal sets of IDs for "
                 + "boxes and goals"
             )

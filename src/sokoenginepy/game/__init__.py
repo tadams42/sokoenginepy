@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from .octoban_board import OctobanBoard
     from .octoban_tessellation import OctobanTessellation
     from .sokoban_board import SokobanBoard
-    from .sokoban_plus import SokobanPlusDataError
+    from .sokoban_plus import SokobanPlus, SokobanPlusDataError
     from .sokoban_tessellation import SokobanTessellation
     from .solving_mode import SolvingMode
     from .trioban_board import TriobanBoard
@@ -50,6 +50,7 @@ else:
             OctobanBoard,
             OctobanTessellation,
             SokobanBoard,
+            SokobanPlus,
             SokobanPlusDataError,
             SokobanTessellation,
             SolvingMode,
@@ -78,7 +79,7 @@ else:
         from .octoban_board import OctobanBoard
         from .octoban_tessellation import OctobanTessellation
         from .sokoban_board import SokobanBoard
-        from .sokoban_plus import SokobanPlusDataError
+        from .sokoban_plus import SokobanPlusDataError, SokobanPlus
         from .sokoban_tessellation import SokobanTessellation
         from .solving_mode import SolvingMode
         from .trioban_board import TriobanBoard
@@ -88,6 +89,5 @@ else:
 from .mover_commands import JumpCommand, MoveCommand, SelectPusherCommand
 from .piece import DEFAULT_PIECE_ID
 from .snapshot import Snapshot
-from .sokoban_plus import SokobanPlus
 from .tessellation import AnyTessellation, Tessellation, TessellationOrDescription
 from .utilities import COLUMN, ROW, X, Y, index_1d, is_on_board_1d, is_on_board_2d

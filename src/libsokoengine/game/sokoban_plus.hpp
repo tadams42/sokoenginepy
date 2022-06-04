@@ -33,13 +33,13 @@ public:
 class LIBSOKOENGINE_API SokobanPlus {
 public:
   constexpr static u_int8_t DEFAULT_PLUS_ID = 0;
+  constexpr static u_int8_t LEGACY_DEFAULT_PLUS_ID = 99;
 
   constexpr static bool is_valid_plus_id(piece_id_t id) {
     return id >= DEFAULT_PLUS_ID;
   }
 
-  SokobanPlus();
-  explicit SokobanPlus(piece_id_t pieces_count, const std::string &boxorder = "",
+  explicit SokobanPlus(piece_id_t pieces_count = 0, const std::string &boxorder = "",
                        const std::string &goalorder = "");
   SokobanPlus(const SokobanPlus &rv);
   SokobanPlus &operator=(const SokobanPlus &rv);
@@ -59,6 +59,8 @@ public:
 
   bool is_valid() const;
   bool is_enabled() const;
+  bool is_validated() const;
+  Strings errors() const;
 
   void enable();
   void disable();
