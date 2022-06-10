@@ -1,6 +1,5 @@
 #include "sokoban_tessellation.hpp"
 #include "atomic_move.hpp"
-#include "board_cell.hpp"
 #include "direction.hpp"
 #include "snapshot.hpp"
 
@@ -12,8 +11,6 @@ using namespace std;
 namespace sokoengine {
 namespace game {
 
-using namespace implementation;
-
 const Directions &SokobanTessellation::legal_directions() const {
   static const Directions retv = {Direction::LEFT, Direction::RIGHT, Direction::UP,
                                   Direction::DOWN};
@@ -22,9 +19,9 @@ const Directions &SokobanTessellation::legal_directions() const {
 
 position_t SokobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
-                                                  board_size_t board_width,
-                                                  board_size_t board_height) const {
-  position_t row = Y(position, board_width), column = X(position, board_width);
+                                                  board_size_t width,
+                                                  board_size_t height) const {
+  position_t row = Y(position, width), column = X(position, width);
   switch (direction) {
   case Direction::LEFT:
     column += -1;
@@ -43,8 +40,8 @@ position_t SokobanTessellation::neighbor_position(position_t position,
       "Unsupported Direction received in SokobanTessellation neighbor_position!");
   }
 
-  if (ON_BOARD(column, row, board_width, board_height))
-    return index_1d(column, row, board_width);
+  if (ON_BOARD(column, row, width, height))
+    return index_1d(column, row, width);
   else
     return MAX_POS + 1;
 }

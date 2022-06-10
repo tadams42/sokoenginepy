@@ -1,18 +1,244 @@
+import textwrap
+from itertools import permutations
+
 import pytest
 
 from sokoenginepy.game import (
     DEFAULT_PIECE_ID,
+    BoardGraph,
     BoardManager,
+    BoardState,
     CellAlreadyOccupiedError,
-    SokobanBoard,
     SokobanPlus,
+    index_1d,
 )
+from sokoenginepy.io import SokobanPuzzle
+
+
+@pytest.fixture
+def puzzle():
+    #   0123456789012345678
+    data = """
+        ----#####----------
+        ----#--@#----------
+        ----#$--#----------
+        --###--$##---------
+        --#--$-$-#---------
+        ###-#-##-#---######
+        #---#-##-#####--..#
+        #-$--$----------..#
+        #####-###-#@##--..#
+        ----#-----#########
+        ----#######--------
+    """
+    data = textwrap.dedent(data.lstrip("\n").rstrip())
+    return SokobanPuzzle(board=data)
+
+
+@pytest.fixture
+def board_graph(puzzle):
+    return BoardGraph(puzzle)
+
+
+@pytest.fixture
+def switched_puzzle():
+    #   0123456789012345678
+    data = """
+        ----#####----------
+        ----#--@#----------
+        ----#.--#----------
+        --###--.##---------
+        --#--.-.-#---------
+        ###-#-##-#---######
+        #---#-##-#####--$$#
+        #-.--.----------$$#
+        #####-###-#@##--$$#
+        ----#-----#########
+        ----#######--------
+    """
+    data = textwrap.dedent(data.lstrip("\n").rstrip())
+    return SokobanPuzzle(board=data)
+
+
+@pytest.fixture
+def pushers_positions(puzzle):
+    return {
+        DEFAULT_PIECE_ID: index_1d(7, 1, puzzle.width),
+        DEFAULT_PIECE_ID + 1: index_1d(11, 8, puzzle.width),
+    }
+
+
+@pytest.fixture
+def invalid_pusher_position():
+    return index_1d(11, 8, 42)
+
+
+@pytest.fixture
+def boxes_positions(puzzle):
+    return {
+        DEFAULT_PIECE_ID: index_1d(5, 2, puzzle.width),
+        DEFAULT_PIECE_ID + 1: index_1d(7, 3, puzzle.width),
+        DEFAULT_PIECE_ID + 2: index_1d(5, 4, puzzle.width),
+        DEFAULT_PIECE_ID + 3: index_1d(7, 4, puzzle.width),
+        DEFAULT_PIECE_ID + 4: index_1d(2, 7, puzzle.width),
+        DEFAULT_PIECE_ID + 5: index_1d(5, 7, puzzle.width),
+    }
+
+
+@pytest.fixture
+def invalid_box_position():
+    return index_1d(5, 7, 42)
+
+
+@pytest.fixture
+def goals_positions(puzzle):
+    return {
+        DEFAULT_PIECE_ID: index_1d(16, 6, puzzle.width),
+        DEFAULT_PIECE_ID + 1: index_1d(17, 6, puzzle.width),
+        DEFAULT_PIECE_ID + 2: index_1d(16, 7, puzzle.width),
+        DEFAULT_PIECE_ID + 3: index_1d(17, 7, puzzle.width),
+        DEFAULT_PIECE_ID + 4: index_1d(16, 8, puzzle.width),
+        DEFAULT_PIECE_ID + 5: index_1d(17, 8, puzzle.width),
+    }
+
+
+@pytest.fixture
+def invalid_goal_position():
+    return index_1d(17, 8, 42)
+
+
+@pytest.fixture
+def all_solutions(goals_positions):
+    def calc():
+        for boxes_positions in permutations(goals_positions.values()):
+            yield BoardState(
+                boxes_positions=list(boxes_positions), pushers_positions=[]
+            )
+
+    return list(calc())
+
+
+@pytest.fixture
+def sokoban_plus_solutions():
+    return [
+        BoardState(
+            boxes_positions=[149, 130, 131, 150, 168, 169], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 150, 169, 168], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 168, 150, 169], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 168, 169, 150], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 169, 150, 168], pushers_positions=[]
+        ),
+        BoardState(
+            boxes_positions=[149, 130, 131, 169, 168, 150], pushers_positions=[]
+        ),
+    ]
+
+
+@pytest.fixture
+def switched_boxes(goals_positions):
+    return {
+        DEFAULT_PIECE_ID: goals_positions[DEFAULT_PIECE_ID],
+        DEFAULT_PIECE_ID + 1: goals_positions[DEFAULT_PIECE_ID + 1],
+        DEFAULT_PIECE_ID + 2: goals_positions[DEFAULT_PIECE_ID + 2],
+        DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
+        DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
+        DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
+    }
+
+
+@pytest.fixture
+def switched_goals(boxes_positions):
+    return {
+        DEFAULT_PIECE_ID: boxes_positions[DEFAULT_PIECE_ID],
+        DEFAULT_PIECE_ID + 1: boxes_positions[DEFAULT_PIECE_ID + 1],
+        DEFAULT_PIECE_ID + 2: boxes_positions[DEFAULT_PIECE_ID + 2],
+        DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
+        DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
+        DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
+    }
+
+
+@pytest.fixture
+def switched_goals_plus(boxes_positions):
+    # boxorder 1 3 2
+    # goalorder 3 2 1
+    # (box, goal) id pairs [(2, 1), (3, 2), (1, 3), (4, 4), (5, 5), (6, 6)]
+    return {
+        DEFAULT_PIECE_ID: boxes_positions[DEFAULT_PIECE_ID + 1],
+        DEFAULT_PIECE_ID + 1: boxes_positions[DEFAULT_PIECE_ID + 2],
+        DEFAULT_PIECE_ID + 2: boxes_positions[DEFAULT_PIECE_ID],
+        DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
+        DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
+        DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
+    }
+
+
+@pytest.fixture
+def switched_boxes_plus(goals_positions):
+    # boxorder 1 3 2
+    # goalorder 3 2 1
+    # (box, goal) id pairs [(2, 1), (3, 2), (1, 3), (4, 4), (5, 5), (6, 6)]
+    return {
+        DEFAULT_PIECE_ID: goals_positions[DEFAULT_PIECE_ID + 2],
+        DEFAULT_PIECE_ID + 1: goals_positions[DEFAULT_PIECE_ID],
+        DEFAULT_PIECE_ID + 2: goals_positions[DEFAULT_PIECE_ID + 1],
+        DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
+        DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
+        DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
+    }
+
+
+@pytest.fixture
+def boxes_ids():
+    return [
+        DEFAULT_PIECE_ID,
+        DEFAULT_PIECE_ID + 1,
+        DEFAULT_PIECE_ID + 2,
+        DEFAULT_PIECE_ID + 3,
+        DEFAULT_PIECE_ID + 4,
+        DEFAULT_PIECE_ID + 5,
+    ]
+
+
+@pytest.fixture
+def goals_ids():
+    return [
+        DEFAULT_PIECE_ID,
+        DEFAULT_PIECE_ID + 1,
+        DEFAULT_PIECE_ID + 2,
+        DEFAULT_PIECE_ID + 3,
+        DEFAULT_PIECE_ID + 4,
+        DEFAULT_PIECE_ID + 5,
+    ]
+
+
+@pytest.fixture
+def pusher_ids():
+    return [DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1]
+
+
+@pytest.fixture
+def normalized_pushers_positions(board_width):
+    return {
+        DEFAULT_PIECE_ID: index_1d(5, 1, board_width),
+        DEFAULT_PIECE_ID + 1: index_1d(8, 4, board_width),
+    }
 
 
 class DescribeBoardManager:
     def it_memoizes_pushers(
-        self, board_manager, pushers_positions, invalid_pusher_position
+        self, board_graph, pushers_positions, invalid_pusher_position
     ):
+        board_manager = BoardManager(board_graph)
+
         assert board_manager.pushers_count == 2
         assert sorted(board_manager.pushers_ids) == list(pushers_positions.keys())
         assert board_manager.pushers_positions == pushers_positions
@@ -37,8 +263,10 @@ class DescribeBoardManager:
         assert board_manager.has_pusher_on(invalid_pusher_position) is False
 
     def it_memoizes_boxes(
-        self, board_manager, boxes_positions, boxes_ids, invalid_box_position
+        self, board_graph, boxes_positions, boxes_ids, invalid_box_position
     ):
+        board_manager = BoardManager(board_graph)
+
         assert board_manager.boxes_count == 6
         assert sorted(board_manager.boxes_ids) == boxes_ids
         assert board_manager.boxes_positions == boxes_positions
@@ -94,8 +322,10 @@ class DescribeBoardManager:
             )
 
     def it_memoizes_goals(
-        self, board_manager, goals_positions, goals_ids, invalid_goal_position
+        self, board_graph, goals_positions, goals_ids, invalid_goal_position
     ):
+        board_manager = BoardManager(board_graph)
+
         assert board_manager.goals_count == 6
         assert sorted(board_manager.goals_ids) == goals_ids
         assert board_manager.goals_positions == goals_positions
@@ -152,8 +382,10 @@ class DescribeBoardManager:
             )
 
     def it_calculates_all_valid_board_solutions(
-        self, board_manager, all_solutions, sokoban_plus_solutions
+        self, board_graph, all_solutions, sokoban_plus_solutions
     ):
+        board_manager = BoardManager(board_graph)
+
         assert list(board_manager.solutions()) == all_solutions
 
         board_manager.boxorder = "1 3 2"
@@ -162,7 +394,9 @@ class DescribeBoardManager:
 
         assert list(board_manager.solutions()) == sokoban_plus_solutions
 
-    def it_moves_boxes(self, board_manager):
+    def it_moves_boxes(self, board_graph):
+        board_manager = BoardManager(board_graph)
+
         old_box_position = board_manager.box_position(DEFAULT_PIECE_ID)
         board_manager.move_box(DEFAULT_PIECE_ID, 0)
         assert board_manager.box_position(DEFAULT_PIECE_ID) == 0
@@ -179,7 +413,9 @@ class DescribeBoardManager:
         assert board_manager.board[0].has_box
         assert not board_manager.board[old_box_position].has_box
 
-    def it_moves_pushers(self, board_manager):
+    def it_moves_pushers(self, board_graph):
+        board_manager = BoardManager(board_graph)
+
         old_pusher_position = board_manager.pusher_position(DEFAULT_PIECE_ID)
         board_manager.move_pusher(DEFAULT_PIECE_ID, 0)
         assert board_manager.pusher_position(DEFAULT_PIECE_ID) == 0
@@ -197,8 +433,10 @@ class DescribeBoardManager:
         assert not board_manager.board[old_pusher_position].has_pusher
 
     def test_moving_box_onto_obstacle_raises_exception(
-        self, board_manager, wall_position, pushers_positions, boxes_positions
+        self, board_graph, pushers_positions, boxes_positions
     ):
+        wall_position = index_1d(4, 0, board_graph.board_width)
+        board_manager = BoardManager(board_graph)
         box_id = DEFAULT_PIECE_ID
         box_position = board_manager.box_position(box_id)
 
@@ -222,8 +460,10 @@ class DescribeBoardManager:
             board_manager.move_box_from(box_position, wall_position)
 
     def test_moving_pusher_onto_obstacle_raises_exception(
-        self, board_manager, wall_position, boxes_positions, pushers_positions
+        self, board_graph, boxes_positions, pushers_positions
     ):
+        wall_position = index_1d(4, 0, board_graph.board_width)
+        board_manager = BoardManager(board_graph)
         pusher_id = DEFAULT_PIECE_ID
         pusher_position = board_manager.pusher_position(pusher_id)
 
@@ -250,56 +490,71 @@ class DescribeBoardManager:
 
     def it_implements_switching_box_and_goal_positions(
         self,
-        board_manager,
+        board_graph,
         boxes_positions,
         switched_boxes,
         goals_positions,
         switched_goals,
-        board_str,
-        switched_board_str,
+        puzzle,
+        switched_puzzle,
     ):
+        board_manager = BoardManager(board_graph)
+
         board_manager.switch_boxes_and_goals()
         assert board_manager.boxes_positions == switched_boxes
         assert board_manager.goals_positions == switched_goals
-        assert str(board_manager.board) == switched_board_str
+        assert str(board_manager.board) == str(switched_puzzle)
 
         board_manager.switch_boxes_and_goals()
         assert board_manager.boxes_positions == boxes_positions
         assert board_manager.goals_positions == goals_positions
-        assert str(board_manager.board) == board_str
+        assert str(board_manager.board) == str(puzzle)
 
     def test_switching_respects_sokoban_plus_if_enabled(
         self,
-        board_manager,
+        board_graph,
         switched_boxes_plus,
         switched_goals_plus,
         boxes_positions,
         goals_positions,
     ):
-        board_manager.boxorder = "1 3 2"
-        board_manager.goalorder = "3 2 1"
+        board_manager = BoardManager(board_graph, boxorder="1 3 2", goalorder="3 2 1")
+
         board_manager.enable_sokoban_plus()
 
         board_manager.switch_boxes_and_goals()
         assert board_manager.boxes_positions == switched_boxes_plus
         assert board_manager.goals_positions == switched_goals_plus
 
-        result = board_manager.switch_boxes_and_goals()
+        board_manager.switch_boxes_and_goals()
         assert board_manager.boxes_positions == boxes_positions
         assert board_manager.goals_positions == goals_positions
 
     def test_switching_moves_pusher_out_of_the_way(self):
-        board_str = "\n".join(
-            ["########", "#      #", "#  +   #", "#    $ #", "########"]
+        board = "\n".join(
+            [
+                "########",
+                "#------#",
+                "#--+---#",
+                "#----$-#",
+                "########",
+            ]
         )
-        switched_board_str = "\n".join(
-            ["########", "#      #", "#  $   #", "#    + #", "########"]
+        switched_board = "\n".join(
+            [
+                "########",
+                "#------#",
+                "#--$---#",
+                "#----+-#",
+                "########",
+            ]
         )
 
-        b = SokobanBoard(board_str=board_str)
-        board_manager = BoardManager(b)
+        puzzle = SokobanPuzzle(board=board)
+        graph = BoardGraph(puzzle)
+        board_manager = BoardManager(graph)
 
         board_manager.switch_boxes_and_goals()
-        assert str(board_manager.board) == switched_board_str
+        assert str(board_manager.board) == switched_board
         board_manager.switch_boxes_and_goals()
-        assert str(board_manager.board) == board_str
+        assert str(board_manager.board) == board

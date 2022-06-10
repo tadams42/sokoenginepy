@@ -12,26 +12,23 @@
 #include "tessellation.hpp"
 #include "trioban_tessellation.hpp"
 
-#include "hexoban_board.hpp"
-#include "octoban_board.hpp"
-#include "sokoban_board.hpp"
-#include "trioban_board.hpp"
-#include "variant_board.hpp"
-
 #include "board_manager.hpp"
 #include "board_state.hpp"
 #include "hashed_board_manager.hpp"
 #include "sokoban_plus.hpp"
-
+#include "board_graph.hpp"
 #include "mover.hpp"
 
 #include "benchmarks.hpp"
 
 #include "collection.hpp"
-#include "puzzle_types.hpp"
+#include "hexoban_puzzle.hpp"
+#include "octoban_puzzle.hpp"
 #include "puzzle.hpp"
-#include "snapshot.hpp"
-#include "utilities.hpp"
 #include "rle.hpp"
+#include "snapshot.hpp"
+#include "sokoban_puzzle.hpp"
+#include "trioban_puzzle.hpp"
+#include "utilities.hpp"
 
 #endif // HEADER_GUARD

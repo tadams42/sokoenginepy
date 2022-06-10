@@ -1,7 +1,9 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
+using namespace sokoengine;
 using namespace sokoengine::game;
+using namespace sokoengine::io;
 
 void export_board_graph(py::module &m) {
   py::enum_<GraphType>(m, "GraphType")
@@ -12,75 +14,80 @@ void export_board_graph(py::module &m) {
     ;
 
   py::class_<BoardGraph>(m, "BoardGraph")
-    .def(py::init<board_size_t, board_size_t, GraphType>(), py::arg("board_width") = 0,
-         py::arg("board_height") = 0, py::arg("graph_type") = GraphType::DIRECTED)
+    .def(py::init<const Puzzle &>(), py::arg("puzzle"))
 
-    .def("__getitem__",
-         [](BoardGraph &self, position_t position) -> BoardCell & {
-           return self.cell_at(position);
-         },
-         py::return_value_policy::reference_internal, py::arg("position"))
+    .def(
+      "__getitem__",
+      [](BoardGraph &self, position_t position) -> BoardCell & {
+        return self.cell_at(position);
+      },
+      py::return_value_policy::reference_internal, py::arg("position"))
 
-    .def("__setitem__",
-         [](BoardGraph &self, position_t position, const BoardCell &board_cell) {
-           self.cell_at(position) = board_cell;
-         },
-         py::arg("position"), py::arg("board_cell"))
+    .def(
+      "__setitem__",
+      [](BoardGraph &self, position_t position, const BoardCell &board_cell) {
+        self.cell_at(position) = board_cell;
+      },
+      py::arg("position"), py::arg("board_cell"))
 
-    .def("__setitem__",
-         [](BoardGraph &self, position_t position, char board_cell) {
-           self.cell_at(position) = BoardCell(board_cell);
-         },
-         py::arg("position"), py::arg("board_cell"))
+    .def(
+      "__setitem__",
+      [](BoardGraph &self, position_t position, char board_cell) {
+        self.cell_at(position) = BoardCell(board_cell);
+      },
+      py::arg("position"), py::arg("board_cell"))
 
-    .def("__contains__",
-         [](BoardGraph &self, const py::object &position) -> bool {
-           return self.contains(py::receive_position(position));
-         },
-         py::arg("position"))
+    .def(
+      "__contains__",
+      [](BoardGraph &self, const py::object &position) -> bool {
+        return self.contains(py::receive_position(position));
+      },
+      py::arg("position"))
+
+    .def("__str__", &BoardGraph::str)
 
     .def_property_readonly("vertices_count", &BoardGraph::vertices_count)
+    .def_property_readonly("size", &BoardGraph::size)
     .def_property_readonly("edges_count", &BoardGraph::edges_count)
     .def_property_readonly("board_width", &BoardGraph::board_width)
     .def_property_readonly("board_height", &BoardGraph::board_height)
 
-    .def("has_edge",
-         [](BoardGraph &self, const py::object &src, const py::object &dst,
-            const Direction &direction) {
-           return self.has_edge(py::receive_position(src), py::receive_position(dst),
-                                direction);
-         },
-         py::arg("src"), py::arg("dst"), py::arg("direction"))
-    .def("out_edges_count",
-         [](BoardGraph &self, const py::object &src, const py::object &dst) {
-           return self.out_edges_count(py::receive_position(src),
-                                       py::receive_position(dst));
-         },
-         py::arg("src"), py::arg("dst"))
+    .def(
+      "has_edge",
+      [](BoardGraph &self, const py::object &src, const py::object &dst,
+         const Direction &direction) {
+        return self.has_edge(py::receive_position(src), py::receive_position(dst),
+                             direction);
+      },
+      py::arg("src"), py::arg("dst"), py::arg("direction"))
+    .def(
+      "out_edges_count",
+      [](BoardGraph &self, const py::object &src, const py::object &dst) {
+        return self.out_edges_count(py::receive_position(src),
+                                    py::receive_position(dst));
+      },
+      py::arg("src"), py::arg("dst"))
     .def("remove_all_edges", &BoardGraph::remove_all_edges)
-    .def("add_edge", &BoardGraph::add_edge, py::arg("src"),
-         py::arg("neighbor"), py::arg("direction"))
+    .def("add_edge", &BoardGraph::add_edge, py::arg("src"), py::arg("neighbor"),
+         py::arg("direction"))
     .def("out_edge_weight", &BoardGraph::out_edge_weight, py::arg("target_position"))
 
-    .def("neighbor",
-         [](const BoardGraph &self, position_t from_position,
-            const Direction &direction) -> py::object {
-           position_t retv = self.neighbor_at(from_position, direction);
-           if (retv > MAX_POS) return py::none();
-           return py::cast(retv);
-         },
-         py::arg("src"), py::arg("direction"))
+    .def(
+      "neighbor",
+      [](const BoardGraph &self, position_t from_position,
+         const Direction &direction) -> py::object {
+        position_t retv = self.neighbor_at(from_position, direction);
+        if (retv > MAX_POS) return py::none();
+        return py::cast(retv);
+      },
+      py::arg("src"), py::arg("direction"))
 
     .def("wall_neighbors", &BoardGraph::wall_neighbors, py::arg("src"))
     .def("all_neighbors", &BoardGraph::all_neighbors, py::arg("src"))
-    .def("shortest_path", &BoardGraph::shortest_path, py::arg("src"),
-         py::arg("dst"))
-    .def("dijkstra_path", &BoardGraph::dijkstra_path, py::arg("src"),
-         py::arg("dst"))
-    .def("find_move_path", &BoardGraph::find_move_path, py::arg("src"),
-         py::arg("dst"))
-    .def("find_jump_path", &BoardGraph::find_jump_path, py::arg("src"),
-         py::arg("dst"))
+    .def("shortest_path", &BoardGraph::shortest_path, py::arg("src"), py::arg("dst"))
+    .def("dijkstra_path", &BoardGraph::dijkstra_path, py::arg("src"), py::arg("dst"))
+    .def("find_move_path", &BoardGraph::find_move_path, py::arg("src"), py::arg("dst"))
+    .def("find_jump_path", &BoardGraph::find_jump_path, py::arg("src"), py::arg("dst"))
     .def("positions_path_to_directions_path",
          &BoardGraph::positions_path_to_directions_path, py::arg("positions"))
     .def("mark_play_area", &BoardGraph::mark_play_area)
@@ -90,5 +97,5 @@ void export_board_graph(py::module &m) {
          py::arg("pusher_position"), py::arg("excluded_positions") = py::list())
     .def("path_destination", &BoardGraph::path_destination, py::arg("src"),
          py::arg("directions"))
-    .def("reconfigure_edges", &BoardGraph::reconfigure_edges, py::arg("tessellation"));
+    .def("reconfigure_edges", &BoardGraph::reconfigure_edges);
 }

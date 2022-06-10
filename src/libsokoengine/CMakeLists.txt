@@ -1,11 +1,8 @@
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
+
 set(SELF_HEADERS
     game/board_cell.hpp
     game/board_graph.hpp
-    game/hexoban_board.hpp
-    game/octoban_board.hpp
-    game/sokoban_board.hpp
-    game/trioban_board.hpp
-    game/variant_board.hpp
 
     game/atomic_move.hpp
     game/mover.hpp
@@ -26,14 +23,17 @@ set(SELF_HEADERS
     sokoengine.hpp
     benchmarks.hpp
 
-    io/collection.hpp
-    io/puzzle_types.hpp
     io/puzzle.hpp
+    io/hexoban_puzzle.hpp
+    io/octoban_puzzle.hpp
+    io/sokoban_puzzle.hpp
+    io/trioban_puzzle.hpp
     io/snapshot.hpp
+    io/collection.hpp
     io/sok_file_format.hpp
     io/SOK_format_specification.h
     io/utilities.hpp
-
+    io/rle/rle.hpp
     io/rle/rle.hpp
     io/rle/rle_ast.hpp
     io/rle/rle_ast_adapted.hpp
@@ -42,17 +42,11 @@ set(SELF_HEADERS
     io/rle/rle_evaluator.hpp
     io/rle/rle_grammar.hpp
     io/rle/rle_json_printer.hpp
-    io/rle/rle.hpp
 )
 
 set(SELF_SOURCES
     game/board_cell.cpp
     game/board_graph.cpp
-    game/hexoban_board.cpp
-    game/octoban_board.cpp
-    game/sokoban_board.cpp
-    game/trioban_board.cpp
-    game/variant_board.cpp
 
     game/atomic_move.cpp
     game/mover.cpp
@@ -66,17 +60,20 @@ set(SELF_SOURCES
     game/hexoban_tessellation.cpp
     game/octoban_tessellation.cpp
     game/sokoban_tessellation.cpp
-    game/tessellation.cpp
     game/trioban_tessellation.cpp
+    game/tessellation.cpp
 
     benchmarks.cpp
 
-    io/collection.cpp
     io/puzzle.cpp
+    io/sokoban_puzzle.cpp
+    io/octoban_puzzle.cpp
+    io/trioban_puzzle.cpp
+    io/hexoban_puzzle.cpp
     io/snapshot.cpp
+    io/collection.cpp
     io/sok_file_format.cpp
     io/utilities.cpp
-
     io/rle/rle.cpp
 )
 

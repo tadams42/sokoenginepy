@@ -4,14 +4,27 @@ from sokoenginepy.game import (
     Direction,
     JumpCommand,
     MoveCommand,
+    Mover,
     SelectPusherCommand,
+    SolvingMode,
+)
+
+from .mover_spec import (
+    forward_board,
+    jump_dest,
+    jumps,
+    pusher_selections,
+    undone_jumps,
+    undone_pusher_selections,
+    reverse_board,
 )
 
 
 class DescribeSelectPusherCommand:
     def it_executes_pusher_selection(
-        self, forward_mover, pusher_selections, undone_pusher_selections
+        self, forward_board, pusher_selections, undone_pusher_selections
     ):
+        forward_mover = Mover(forward_board)
         command = SelectPusherCommand(forward_mover, DEFAULT_PIECE_ID + 1)
 
         assert command.old_pusher_id == forward_mover.selected_pusher
@@ -39,7 +52,8 @@ class DescribeSelectPusherCommand:
 
 
 class DescribeJumpCommand:
-    def it_executes_jump(self, reverse_mover, jumps, undone_jumps, jump_dest):
+    def it_executes_jump(self, forward_board, jumps, undone_jumps, jump_dest):
+        reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
         command = JumpCommand(reverse_mover, jump_dest)
 
         assert command.initial_position == reverse_mover.board_manager.pusher_position(
@@ -79,7 +93,8 @@ class DescribeJumpCommand:
 
 
 class DescribeMoveCommand:
-    def it_executes_movement(self, forward_mover):
+    def it_executes_movement(self, forward_board):
+        forward_mover = Mover(forward_board)
         command = MoveCommand(forward_mover, Direction.UP)
 
         command.redo()

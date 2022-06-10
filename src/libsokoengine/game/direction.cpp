@@ -5,7 +5,8 @@ using namespace std;
 namespace sokoengine {
 namespace game {
 
-LIBSOKOENGINE_LOCAL static const string strs[DIRECTIONS_COUNT] = {
+LIBSOKOENGINE_LOCAL
+static const string strs[DIRECTIONS_COUNT] = {
   string("Direction.UP"),
   string("Direction.DOWN"),
   string("Direction.LEFT"),

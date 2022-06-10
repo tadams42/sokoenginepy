@@ -1,8 +1,9 @@
 #include "mover.hpp"
+
 #include "board_cell.hpp"
 #include "cppitertools/groupby.hpp"
 #include "hashed_board_manager.hpp"
-#include "variant_board.hpp"
+#include "puzzle.hpp"
 
 #include <algorithm>
 
@@ -12,7 +13,7 @@ using namespace iter;
 namespace sokoengine {
 namespace game {
 
-using namespace implementation;
+using io::Puzzle;
 
 NonPlayableBoardError::NonPlayableBoardError()
     : runtime_error("Board is not playable!") {}
@@ -25,7 +26,7 @@ IllegalMoveError::~IllegalMoveError() = default;
 
 class LIBSOKOENGINE_LOCAL Mover::PIMPL {
 public:
-  VariantBoard::unique_ptr_t m_initial_board;
+  BoardGraph m_initial_board;
   HashedBoardManager m_manager;
   SolvingMode m_solving_mode;
   bool m_pulls_boxes = true;
@@ -33,8 +34,8 @@ public:
   size_t m_pull_count = 0;
   Mover::Moves m_last_move;
 
-  PIMPL(VariantBoard &board, SolvingMode mode)
-      : m_initial_board(board.create_clone()), m_manager(board), m_solving_mode(mode) {
+  PIMPL(BoardGraph &board, SolvingMode mode)
+      : m_initial_board(board), m_manager(board), m_solving_mode(mode) {
     if (!m_manager.is_playable()) {
       throw NonPlayableBoardError();
     }
@@ -283,7 +284,7 @@ protected:
   PIMPL &operator=(const PIMPL &) = delete;
 };
 
-Mover::Mover(VariantBoard &board, const SolvingMode &mode)
+Mover::Mover(BoardGraph &board, const SolvingMode &mode)
     : m_impl(std::make_unique<PIMPL>(board, mode)) {}
 
 Mover::Mover(Mover &&) = default;
@@ -292,7 +293,7 @@ Mover &Mover::operator=(Mover &&) = default;
 
 Mover::~Mover() = default;
 
-const VariantBoard &Mover::board() const { return m_impl->m_manager.board(); }
+const BoardGraph &Mover::board() const { return m_impl->m_manager.board(); }
 
 SolvingMode Mover::solving_mode() const { return m_impl->m_solving_mode; }
 
@@ -326,7 +327,7 @@ bool Mover::pulls_boxes() const { return m_impl->m_pulls_boxes; }
 
 void Mover::set_pulls_boxes(bool value) { m_impl->m_pulls_boxes = value; }
 
-const VariantBoard &Mover::initial_board() const { return *(m_impl->m_initial_board); }
+const BoardGraph &Mover::initial_board() const { return m_impl->m_initial_board; }
 
 } // namespace game
 } // namespace sokoengine

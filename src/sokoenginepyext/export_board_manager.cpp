@@ -1,6 +1,7 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
+using sokoengine::zobrist_key_t;
 using namespace sokoengine::game;
 
 void export_board_manager(py::module &m) {
@@ -37,14 +38,11 @@ void export_board_manager(py::module &m) {
                   [](BoardState &self, zobrist_key_t rv) { self.zobrist_hash() = rv; });
 
   py::class_<BoardManager>(m, "BoardManager")
-    .def(py::init<VariantBoard &, const string &, const string &>(),
-         py::arg("variant_board"), py::arg("boxorder") = "", py::arg("goalorder") = "")
+    .def(py::init<BoardGraph &, const string &, const string &>(),
+         py::arg("board"), py::arg("boxorder") = "", py::arg("goalorder") = "")
 
     // protocols
-    .def("__eq__", &BoardManager::operator==)
-    .def("__ne__", &BoardManager::operator!=)
     .def("__str__", &BoardManager::str)
-    .def("__repr__", &BoardManager::repr)
 
     .def_property_readonly("board", &BoardManager::board,
                            py::return_value_policy::reference)
@@ -125,13 +123,10 @@ void export_board_manager(py::module &m) {
     .def_property_readonly("is_playable", &BoardManager::is_playable);
 
   py::class_<HashedBoardManager, BoardManager>(m, "HashedBoardManager")
-    .def(py::init<VariantBoard &, const string &, const string &>(),
-         py::arg("variant_board"), py::arg("boxorder") = "", py::arg("goalorder") = "")
+    .def(py::init<BoardGraph &, const string &, const string &>(),
+         py::arg("board"), py::arg("boxorder") = "", py::arg("goalorder") = "")
 
-    .def("__eq__", &HashedBoardManager::operator==)
-    .def("__ne__", &HashedBoardManager::operator!=)
     .def("__str__", &HashedBoardManager::str)
-    .def("__repr__", &HashedBoardManager::repr)
 
     .def_property_readonly("state_hash", &HashedBoardManager::state_hash)
 

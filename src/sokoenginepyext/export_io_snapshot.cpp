@@ -1,27 +1,18 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
+using namespace sokoengine;
 using namespace sokoengine::io;
+using sokoengine::Strings;
 
 void export_io_snapshot(py::module &m) {
-  py::enum_<PuzzleTypes>(m, "PuzzleTypes")
-    .value("SOKOBAN", PuzzleTypes::SOKOBAN)
-    .value("HEXOBAN", PuzzleTypes::HEXOBAN)
-    .value("TRIOBAN", PuzzleTypes::TRIOBAN)
-    .value("OCTOBAN", PuzzleTypes::OCTOBAN)
-    // We don't want constants be available in module scope
-    // .export_values()
-    ;
-
   auto pySnapshot = py::class_<Snapshot>(m, "Snapshot");
 
-  pySnapshot.def(py::init<size_t, string, string, string, string, string, string,
-                          string, PuzzleTypes>(),
-                 py::arg("id") = 0, py::arg("moves") = "", py::arg("title") = "",
-                 py::arg("duration") = "", py::arg("solver") = "",
-                 py::arg("notes") = "", py::arg("created_at") = "",
-                 py::arg("updated_at") = "",
-                 py::arg("puzzle_type") = PuzzleTypes::SOKOBAN);
+  pySnapshot.def(
+    py::init<size_t, string, string, string, string, string, string, Strings>(),
+    py::arg("id") = 0, py::arg("moves") = "", py::arg("title") = "",
+    py::arg("duration") = "", py::arg("solver") = "", py::arg("created_at") = "",
+    py::arg("updated_at") = "", py::arg("notes") = Strings());
 
   pySnapshot.def_readonly_static("l", &Snapshot::l);
   pySnapshot.def_readonly_static("u", &Snapshot::u);
@@ -50,15 +41,9 @@ void export_io_snapshot(py::module &m) {
   pySnapshot.def_static("is_snapshot", &Snapshot::is_snapshot);
   pySnapshot.def_static("cleaned_moves", &Snapshot::cleaned_moves);
 
-  pySnapshot.def("clear", &Snapshot::clear);
-
   pySnapshot.def_property(
     "id", [](const Snapshot &self) { return self.id(); },
     [](Snapshot &self, size_t rv) { self.id() = rv; });
-
-  pySnapshot.def_property(
-    "puzzle_type", [](const Snapshot &self) { return self.puzzle_type(); },
-    [](Snapshot &self, PuzzleTypes rv) { self.puzzle_type() = rv; });
 
   pySnapshot.def_property(
     "moves", [](const Snapshot &self) { return self.moves(); },
@@ -78,7 +63,7 @@ void export_io_snapshot(py::module &m) {
 
   pySnapshot.def_property(
     "notes", [](const Snapshot &self) { return self.notes(); },
-    [](Snapshot &self, const string &rv) { self.notes() = rv; });
+    [](Snapshot &self, const Strings &rv) { self.notes() = rv; });
 
   pySnapshot.def_property(
     "created_at", [](const Snapshot &self) { return self.created_at(); },
@@ -91,7 +76,4 @@ void export_io_snapshot(py::module &m) {
   pySnapshot.def_property_readonly("pushes_count", &Snapshot::pushes_count);
   pySnapshot.def_property_readonly("moves_count", &Snapshot::moves_count);
   pySnapshot.def_property_readonly("is_reverse", &Snapshot::is_reverse);
-
-  pySnapshot.def("reformatted", &Snapshot::reformatted,
-                 py::arg("break_long_lines_at") = 80, py::arg("rle_encode") = false);
 }

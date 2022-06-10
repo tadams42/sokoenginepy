@@ -4,10 +4,11 @@ from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import networkx as nx
 
+from ..io import Puzzle
 from .board_cell import BoardCell
 from .direction import Direction
 from .graph_type import GraphType
-from .tessellation import AnyTessellation
+from .tessellation import AnyTessellation, Tessellation
 
 # (1, 0, {'direction': Direction.LEFT})
 Edge = Tuple[int, int, Dict[str, Union[Direction, int]]]
@@ -23,7 +24,7 @@ class EngineConfig(IntEnum):
 
 class BoardGraph:
     """
-    Board graph implementation using.
+    Board graph.
 
     Depending on how ``sokoenginepy`` was installed, it is using either ``NetworkX`` or
     ``Boost.Graph`` under the hood.
@@ -33,38 +34,34 @@ class BoardGraph:
     _KEY_DIRECTION = "direction"
     _MAX_EDGE_WEIGHT = 100  # must be > len(Direction)
 
-    def __init__(self, board_width: int, board_height: int, graph_type: GraphType):
+    def __init__(self, puzzle: Puzzle):
         if (
-            board_width < 0
-            or board_height < 0
-            or board_width > EngineConfig.MAX_BOARD_WIDTH
-            or board_height > EngineConfig.MAX_BOARD_HEIGHT
+            puzzle.width > EngineConfig.MAX_BOARD_HEIGHT
+            or puzzle.height > EngineConfig.MAX_BOARD_HEIGHT
         ):
             raise ValueError(
                 "Board width and height must be >= 0 and <= MAX_BOARD_WIDTH, "
                 "MAX_BOARD_HEIGHT`!"
             )
 
-        self._board_width = board_width
-        self._board_height = board_height
+        self._board_width = puzzle.width
+        self._board_height = puzzle.height
+        self._tessellation = Tessellation.instance_from(puzzle.tessellation)
 
-        if graph_type == GraphType.DIRECTED:
+        if self._tessellation.graph_type == GraphType.DIRECTED:
             self._graph = nx.DiGraph()
-        elif graph_type == GraphType.DIRECTED_MULTI:
+        elif self._tessellation.graph_type == GraphType.DIRECTED_MULTI:
             self._graph = nx.MultiDiGraph()
         else:
-            raise ValueError("Unknown graph_type: {}!".format(graph_type))
+            raise ValueError(
+                f"Unknown graph_type: {self._tessellation.graph_type.name}!"
+            )
 
         for position in range(0, self.board_width * self.board_height):
-            self._graph.add_node(position, **{self._KEY_CELL: BoardCell()})
-
-    @property
-    def board_width(self) -> int:
-        return self._board_width
-
-    @property
-    def board_height(self) -> int:
-        return self._board_height
+            self._graph.add_node(
+                position, **{self._KEY_CELL: BoardCell(puzzle[position])}
+            )
+        self.reconfigure_edges()
 
     def __getitem__(self, position: int) -> BoardCell:
         try:
@@ -93,12 +90,41 @@ class BoardGraph:
         return position in self._graph
 
     @property
+    def tessellation(self) -> AnyTessellation:
+        return self._tessellation
+
+    def to_board_str(self, use_visible_floor=False, rle_encode=False) -> str:
+        puzzle = Puzzle.instance_from(
+            self._tessellation, self._board_width, self._board_height
+        )
+
+        for pos in range(self.vertices_count):
+            puzzle[pos] = self[pos].to_str()
+
+        return puzzle.to_board_str(use_visible_floor, rle_encode)
+
+    def __str__(self) -> str:
+        return self.to_board_str(True)
+
+    @property
     def vertices_count(self) -> int:
         return self._graph.number_of_nodes()
 
     @property
+    def size(self) -> int:
+        return self._board_width * self._board_height
+
+    @property
     def edges_count(self) -> int:
         return self._graph.number_of_edges()
+
+    @property
+    def board_width(self) -> int:
+        return self._board_width
+
+    @property
+    def board_height(self) -> int:
+        return self._board_height
 
     def has_edge(self, src: int, dst: int, direction: Direction) -> bool:
         retv = False
@@ -380,12 +406,11 @@ class BoardGraph:
                 break
         return retv
 
-    def reconfigure_edges(self, tessellation: AnyTessellation):
-        """Recreate all edges using ``tessellation``."""
+    def reconfigure_edges(self):
         self.remove_all_edges()
         for src in range(self.vertices_count):
-            for direction in tessellation.legal_directions:
-                neighbor_position = tessellation.neighbor_position(
+            for direction in self._tessellation.legal_directions:
+                neighbor_position = self._tessellation.neighbor_position(
                     src, direction, self.board_width, self.board_height
                 )
                 if neighbor_position is not None:

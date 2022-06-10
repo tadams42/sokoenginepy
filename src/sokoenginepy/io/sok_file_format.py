@@ -1,20 +1,60 @@
 from __future__ import annotations
 
+import enum
 import re
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import List, Optional
 
 import arrow
 
-from .puzzle import Puzzle
-from .puzzle_types import PuzzleTypes
-from .snapshot import Snapshot
-from .utilities import is_blank
 from .collection import Collection
+from .hexoban_puzzle import HexobanPuzzle
+from .octoban_puzzle import OctobanPuzzle
+from .puzzle import Puzzle
+from .snapshot import Snapshot
+from .sokoban_puzzle import SokobanPuzzle
+from .trioban_puzzle import TriobanPuzzle
+from .utilities import is_blank
 
 _SELF_DIR = Path(__file__).absolute().resolve().parent
 _SOK_FORMAT_SPEC_PATH = _SELF_DIR / "SOK_format_specification.txt"
+
+
+class PuzzleTypeHints(enum.Enum):
+    SOKOBAN = "sokoban"
+    TRIOBAN = "trioban"
+    HEXOBAN = "hexoban"
+    OCTOBAN = "octoban"
+    BLANK = ""
+
+
+@dataclass
+class PuzzleData:
+    id: Optional[int] = 0
+    title: Optional[str] = None
+    board: Optional[str] = None
+    author: Optional[str] = None
+    boxorder: Optional[str] = None
+    goalorder: Optional[str] = None
+    notes: List[str] = field(default_factory=list)
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+    puzzle_type: Optional[PuzzleTypeHints] = PuzzleTypeHints.BLANK
+    snapshots: List[Snapshot] = field(default_factory=list)
+
+
+def puzzle_type_from_str(val: str) -> PuzzleTypeHints:
+    val = val.strip().lower()
+    if is_blank(val):
+        return PuzzleTypeHints.BLANK
+    else:
+        return PuzzleTypeHints[val.upper()]
+
+
+def puzzle_type_to_str(val: PuzzleTypeHints) -> str:
+    return val.value
 
 
 def first_index_of(lst, predicate):
@@ -31,10 +71,7 @@ def last_index_of(lst, predicate):
 class SOKFileFormat:
     @classmethod
     def read(
-        cls,
-        src_stream,
-        dest_collection: Collection,
-        puzzle_type_hint: PuzzleTypes = PuzzleTypes.SOKOBAN,
+        cls, src_stream, dest_collection: Collection, puzzle_type_hint: str = "sokoban"
     ):
         SOKReader(src_stream, dest_collection, puzzle_type_hint).read()
 
@@ -59,17 +96,26 @@ class SOKTags(str, Enum):
 
 
 class SOKReader:
-    def __init__(
-        self, src_stream, dest_collection: Collection, puzzle_type_hint: PuzzleTypes
-    ):
-        self.coll_header_puzzle_type_hint: Optional[PuzzleTypes] = None
+    def __init__(self, src_stream, dest_collection: Collection, puzzle_type_hint: str):
+        self.coll_header_puzzle_type_hint: Optional[PuzzleTypeHints] = None
         self.src_stream = src_stream
         self.dest_collection = dest_collection
-        self.supplied_puzzle_type_hint = puzzle_type_hint
+        self.supplied_puzzle_type_hint: PuzzleTypeHints = puzzle_type_from_str(
+            puzzle_type_hint
+        )
+        self._puzzles: List[PuzzleData] = []
 
     def read(self):
         self.src_stream.seek(0, 0)
-        self.dest_collection.clear()
+
+        self.dest_collection.title = ""
+        self.dest_collection.author = ""
+        self.dest_collection.created_at = ""
+        self.dest_collection.updated_at = ""
+        self.dest_collection.notes = []
+        self.dest_collection.puzzles = []
+
+        self._puzzles = []
         self._split_input(self.src_stream.readlines())
         self._parse_title_lines()
         self._parse_collection_notes()
@@ -87,10 +133,10 @@ class SOKReader:
         self._split_puzzle_chunks(remaining_lines)
         self._split_snapshot_chunks()
 
-    def _split_puzzle_chunks(self, lines):
+    def _split_puzzle_chunks(self, lines: List[str]):
         remaining_lines = lines
         while len(remaining_lines) > 0:
-            puzzle = Puzzle()
+            puzzle = PuzzleData()
 
             first_note_line = first_index_of(
                 remaining_lines, lambda x: not Puzzle.is_board(x)
@@ -114,10 +160,10 @@ class SOKReader:
             else:
                 puzzle.notes = []
 
-            self.dest_collection.puzzles.append(puzzle)
+            self._puzzles.append(puzzle)
 
     def _split_snapshot_chunks(self):
-        for puzzle in self.dest_collection.puzzles:
+        for puzzle in self._puzzles:
             remaining_lines = puzzle.notes
 
             first_moves_line = first_index_of(remaining_lines, Snapshot.is_snapshot)
@@ -223,7 +269,7 @@ class SOKReader:
     def _notes_before_puzzle(self, puzzle_index: int) -> List[str]:
         if puzzle_index == 0:
             return self.dest_collection.notes
-        previous_puzzle = self.dest_collection.puzzles[puzzle_index - 1]
+        previous_puzzle = self._puzzles[puzzle_index - 1]
         if len(previous_puzzle.snapshots) > 0:
             return previous_puzzle.snapshots[-1].notes
         return previous_puzzle.notes
@@ -231,7 +277,7 @@ class SOKReader:
     def _notes_before_snapshot(
         self, puzzle_index: int, snapshot_index: int
     ) -> List[str]:
-        puzzle = self.dest_collection.puzzles[puzzle_index]
+        puzzle = self._puzzles[puzzle_index]
         if snapshot_index == 0:
             return puzzle.notes
         return puzzle.snapshots[snapshot_index - 1].notes
@@ -273,7 +319,7 @@ class SOKReader:
         return ""
 
     def _parse_title_lines(self):
-        for puzzle_index, puzzle in enumerate(self.dest_collection.puzzles):
+        for puzzle_index, puzzle in enumerate(self._puzzles):
             puzzle.title = self._get_and_remove_title_line(
                 self._notes_before_puzzle(puzzle_index)
             )
@@ -314,51 +360,75 @@ class SOKReader:
                 remaining_lines.append(line)
 
         if found_val:
-            self.coll_header_puzzle_type_hint = PuzzleTypes[found_val.strip().upper()]
+            self.coll_header_puzzle_type_hint = puzzle_type_from_str(found_val)
 
         self.dest_collection.notes = self._cleanup_whitespace(remaining_lines)
 
     def _parse_puzzles(self):
-        for puzzle in self.dest_collection.puzzles:
+        for puzzle_data in self._puzzles:
             remaining_lines = []
             puzzle_type = None
-            for line in puzzle.notes:
+            for line in puzzle_data.notes:
                 if self._is_puzzle_tag_line(line):
                     puzzle_type = puzzle_type or self._get_tag_data(
                         SOKTags.VARIANT, line
                     )
-                    puzzle.title = (
-                        puzzle.title or self._get_tag_data(SOKTags.TITLE, line) or ""
+                    puzzle_data.title = (
+                        puzzle_data.title
+                        or self._get_tag_data(SOKTags.TITLE, line)
+                        or ""
                     )
-                    puzzle.author = (
-                        puzzle.author or self._get_tag_data(SOKTags.AUTHOR, line) or ""
+                    puzzle_data.author = (
+                        puzzle_data.author
+                        or self._get_tag_data(SOKTags.AUTHOR, line)
+                        or ""
                     )
-                    puzzle.boxorder = (
-                        puzzle.boxorder
+                    puzzle_data.boxorder = (
+                        puzzle_data.boxorder
                         or self._get_tag_data(SOKTags.BOXORDER, line)
                         or ""
                     )
-                    puzzle.goalorder = (
-                        puzzle.goalorder
+                    puzzle_data.goalorder = (
+                        puzzle_data.goalorder
                         or self._get_tag_data(SOKTags.GOALORDER, line)
                         or ""
                     )
                 else:
                     remaining_lines.append(line)
 
-            puzzle.notes = self._cleanup_whitespace(remaining_lines)
+            puzzle_data.notes = self._cleanup_whitespace(remaining_lines)
 
             if puzzle_type is not None:
-                puzzle.puzzle_type = PuzzleTypes[puzzle_type.upper()]
+                puzzle_data.puzzle_type = PuzzleTypeHints[puzzle_type.upper()]
             elif self.coll_header_puzzle_type_hint is not None:
-                puzzle.puzzle_type = self.coll_header_puzzle_type_hint
+                puzzle_data.puzzle_type = self.coll_header_puzzle_type_hint
             elif self.supplied_puzzle_type_hint is not None:
-                puzzle.puzzle_type = self.supplied_puzzle_type_hint
+                puzzle_data.puzzle_type = self.supplied_puzzle_type_hint
 
-            self._parse_snapshots(puzzle)
+            if puzzle_data.puzzle_type == PuzzleTypeHints.SOKOBAN:
+                puzzle = SokobanPuzzle(board=puzzle_data.board)
+            elif puzzle_data.puzzle_type == PuzzleTypeHints.TRIOBAN:
+                puzzle = TriobanPuzzle(board=puzzle_data.board)
+            elif puzzle_data.puzzle_type == PuzzleTypeHints.HEXOBAN:
+                puzzle = HexobanPuzzle(board=puzzle_data.board)
+            elif puzzle_data.puzzle_type == PuzzleTypeHints.OCTOBAN:
+                puzzle = OctobanPuzzle(board=puzzle_data.board)
 
-    def _parse_snapshots(self, puzzle: Puzzle):
-        for snap in puzzle.snapshots:
+            for attr in {
+                "title",
+                "author",
+                "boxorder",
+                "goalorder",
+                "notes",
+                "created_at",
+                "updated_at",
+            }:
+                setattr(puzzle, attr, getattr(puzzle_data, attr))
+
+            self._parse_snapshots(puzzle_data, puzzle)
+
+    def _parse_snapshots(self, puzzle_data: PuzzleData, puzzle: Puzzle):
+        for snap in puzzle_data.snapshots:
             remaining_lines = []
             for line in snap.notes:
                 if self._is_snapshot_tag_line(line):
@@ -387,7 +457,7 @@ class SOKReader:
                     remaining_lines.append(line)
 
             snap.notes = self._cleanup_whitespace(remaining_lines)
-            snap.puzzle_type = puzzle.puzzle_type
+            puzzle.snapshots.append(snap)
 
     @staticmethod
     def _cleanup_whitespace(lst) -> List[str]:
@@ -429,9 +499,10 @@ class SOKWriter:
 
         written = False
 
-        if puzzle.puzzle_type != PuzzleTypes.SOKOBAN:
+        if str(puzzle.tessellation).lower() != "sokoban":
             written = (
-                self._write_tagged(SOKTags.VARIANT, str(puzzle.puzzle_type)) or written
+                self._write_tagged(SOKTags.VARIANT, str(puzzle.tessellation).lower())
+                or written
             )
 
         if not is_blank(puzzle.boxorder) and not is_blank(puzzle.goalorder):

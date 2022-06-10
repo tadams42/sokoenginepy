@@ -6,16 +6,139 @@ import pytest
 from sokoenginepy.game import (
     DEFAULT_PIECE_ID,
     AtomicMove,
+    BoardGraph,
     Direction,
     IllegalMoveError,
     Mover,
     NonPlayableBoardError,
-    SokobanBoard,
     SolvingMode,
     index_1d,
 )
+from sokoenginepy.io import SokobanPuzzle
 
-from .. import fixtures
+
+@pytest.fixture
+def non_playable_board():
+    return BoardGraph(SokobanPuzzle(5, 5))
+
+
+@pytest.fixture
+def off_board_position():
+    return index_1d(42, 42, 42)
+
+
+@pytest.fixture
+def forward_board():
+    data = "\n".join(
+        [
+            # 12345678
+            "#########",  # 0
+            "#$  .  .#",  # 1
+            "#   @$# #",  # 2
+            "#.$    @#",  # 3
+            "#########",  # 4
+        ]
+    )
+    return BoardGraph(SokobanPuzzle(board=data))
+
+
+@pytest.fixture
+def reverse_board():
+    data = "\n".join(
+        [
+            # 12345678
+            "#########",  # 0
+            "#.  $  $#",  # 1
+            "#   @.# #",  # 2
+            "#$.    @#",  # 3
+            "#########",  # 4
+        ]
+    )
+    return BoardGraph(SokobanPuzzle(board=data))
+
+
+@pytest.fixture
+def forward_mover_moves_cycle():
+    return [
+        Direction.LEFT,
+        Direction.LEFT,
+        Direction.LEFT,
+        Direction.DOWN,
+        Direction.RIGHT,
+        Direction.UP,
+        Direction.RIGHT,
+        Direction.RIGHT,
+        Direction.DOWN,
+        Direction.LEFT,
+        Direction.UP,
+        Direction.RIGHT,
+    ]
+
+
+@pytest.fixture
+def reverse_mover_moves_cycle():
+    return [
+        Direction.LEFT,
+        Direction.UP,
+        Direction.LEFT,
+        Direction.DOWN,
+        Direction.RIGHT,
+        Direction.RIGHT,
+        Direction.UP,
+        Direction.RIGHT,
+        Direction.DOWN,
+        Direction.LEFT,
+    ]
+
+
+@pytest.fixture
+def jumps():
+    return [
+        [AtomicMove(direction, is_jump=True) for direction in permutation]
+        for permutation in permutations(
+            [Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT]
+        )
+    ]
+
+
+@pytest.fixture
+def undone_jumps():
+    return [
+        [AtomicMove(direction, is_jump=True) for direction in permutation]
+        for permutation in permutations(
+            [Direction.DOWN, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT]
+        )
+    ]
+
+
+@pytest.fixture
+def pusher_selections():
+    return [
+        [AtomicMove(direction, is_pusher_selection=True) for direction in permutation]
+        for permutation in permutations(
+            [Direction.DOWN, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT]
+        )
+    ]
+
+
+@pytest.fixture
+def undone_pusher_selections():
+    return [
+        [AtomicMove(direction, is_pusher_selection=True) for direction in permutation]
+        for permutation in permutations(
+            [Direction.UP, Direction.LEFT, Direction.LEFT, Direction.LEFT]
+        )
+    ]
+
+
+@pytest.fixture
+def jump_dest(reverse_board):
+    return index_1d(1, 1, reverse_board.board_width)
+
+
+@pytest.fixture
+def jump_obstacle_position(reverse_board):
+    return index_1d(0, 0, reverse_board.board_width)
 
 
 class DescribeMover:
@@ -38,33 +161,43 @@ class DescribeMover:
             mover = Mover(forward_board)
             assert mover.selected_pusher == DEFAULT_PIECE_ID
 
-        def it_can_select_pusher_that_will_perform_next_move(self, forward_mover):
+        def it_can_select_pusher_that_will_perform_next_move(self, forward_board):
+            forward_mover = Mover(forward_board)
+
             forward_mover.select_pusher(DEFAULT_PIECE_ID + 1)
             assert forward_mover.selected_pusher == DEFAULT_PIECE_ID + 1
             for am in forward_mover.last_move:
                 assert am.pusher_id == DEFAULT_PIECE_ID
                 assert am.moved_box_id == None
 
-        def it_raises_if_trying_to_select_non_existent_pusher(self, forward_mover):
+        def it_raises_if_trying_to_select_non_existent_pusher(self, forward_board):
+            forward_mover = Mover(forward_board)
+
             with pytest.raises(KeyError):
                 forward_mover.select_pusher(DEFAULT_PIECE_ID + 42)
 
         def it_updates_last_move_with_pusher_selection_sequence(
-            self, forward_mover, pusher_selections
+            self, forward_board, pusher_selections
         ):
+            forward_mover = Mover(forward_board)
+
             forward_mover.select_pusher(DEFAULT_PIECE_ID + 1)
             assert forward_mover.last_move in pusher_selections
 
         def when_re_selecting_same_pusher_it_doesnt_update_last_move(
-            self, forward_mover, pusher_selections
+            self, forward_board, pusher_selections
         ):
+            forward_mover = Mover(forward_board)
+
             forward_mover.select_pusher(DEFAULT_PIECE_ID + 1)
             last_move = deepcopy(forward_mover.last_move)
             assert last_move in pusher_selections
             forward_mover.select_pusher(DEFAULT_PIECE_ID + 1)
             assert forward_mover.last_move == last_move
 
-        def it_doesnt_update_last_move_for_failed_pusher_selection(self, forward_mover):
+        def it_doesnt_update_last_move_for_failed_pusher_selection(self, forward_board):
+            forward_mover = Mover(forward_board)
+
             last_move = deepcopy(forward_mover.last_move)
             with pytest.raises(KeyError):
                 forward_mover.select_pusher(DEFAULT_PIECE_ID + 2)
@@ -77,8 +210,10 @@ class DescribeMover:
             assert forward_mover.last_move == last_move
 
         def it_undoes_pusher_selection_and_updates_last_move(
-            self, forward_mover, undone_pusher_selections
+            self, forward_board, undone_pusher_selections
         ):
+            forward_mover = Mover(forward_board)
+
             assert forward_mover.selected_pusher == DEFAULT_PIECE_ID
             forward_mover.select_pusher(DEFAULT_PIECE_ID + 1)
             assert forward_mover.selected_pusher == DEFAULT_PIECE_ID + 1
@@ -91,7 +226,9 @@ class DescribeMover:
                 assert am.moved_box_id == None
 
     class DescribeJumping:
-        def it_performs_jumps(self, reverse_mover, jump_dest):
+        def it_performs_jumps(self, forward_board, jump_dest):
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
             reverse_mover.jump(jump_dest)
             assert (
                 reverse_mover.board_manager.pusher_position(DEFAULT_PIECE_ID)
@@ -101,12 +238,16 @@ class DescribeMover:
                 assert am.pusher_id == DEFAULT_PIECE_ID
                 assert am.moved_box_id == None
 
-        def it_refuses_to_jump_in_forward_solving_mode(self, forward_mover, jump_dest):
+        def it_refuses_to_jump_in_forward_solving_mode(self, forward_board, jump_dest):
+            forward_mover = Mover(forward_board)
+
             with pytest.raises(IllegalMoveError):
                 forward_mover.jump(jump_dest)
             assert not forward_mover.last_move
 
-        def it_refuses_to_jump_after_first_pull(self, reverse_mover, jump_dest):
+        def it_refuses_to_jump_after_first_pull(self, forward_board, jump_dest):
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
             reverse_mover.pulls_boxes = True
             reverse_mover.move(Direction.DOWN)
             reverse_mover.last_move = None
@@ -114,7 +255,9 @@ class DescribeMover:
                 reverse_mover.jump(jump_dest)
             assert not reverse_mover.last_move
 
-        def it_allows_jumps_after_first_pull_is_undone(self, reverse_mover, jump_dest):
+        def it_allows_jumps_after_first_pull_is_undone(self, forward_board, jump_dest):
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
             reverse_mover.pulls_boxes = True
             reverse_mover.move(Direction.DOWN)
             assert reverse_mover.last_move[0].is_push_or_pull
@@ -126,20 +269,26 @@ class DescribeMover:
                 assert am.moved_box_id == None
 
         def it_refuses_to_jump_onto_obstacles(
-            self, reverse_mover, jump_obstacle_position
+            self, forward_board, jump_obstacle_position
         ):
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
             with pytest.raises(IllegalMoveError):
                 reverse_mover.jump(jump_obstacle_position)
             assert not reverse_mover.last_move
 
-        def it_refuses_to_jump_off_the_board(self, reverse_mover, off_board_position):
+        def it_refuses_to_jump_off_the_board(self, forward_board, off_board_position):
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
             with pytest.raises(IndexError):
                 reverse_mover.jump(off_board_position)
             assert not reverse_mover.last_move
 
         def it_updates_last_move_with_jump_sequence(
-            self, reverse_mover, jump_dest, jumps
+            self, forward_board, jump_dest, jumps
         ):
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
             reverse_mover.jump(jump_dest)
             assert reverse_mover.last_move in jumps
             for am in reverse_mover.last_move:
@@ -147,32 +296,40 @@ class DescribeMover:
                 assert am.moved_box_id == None
 
         def when_jumping_to_same_position_it_doesnt_update_last_move(
-            self, reverse_mover, jump_dest
+            self, forward_board, jump_dest
         ):
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
             reverse_mover.jump(jump_dest)
             reverse_mover.last_move = None
             reverse_mover.jump(jump_dest)
             assert not reverse_mover.last_move
 
         def it_doesnt_update_last_move_for_failed_jumps(
-            self, reverse_mover, jump_dest, jump_obstacle_position
+            self, forward_board, jump_dest, jump_obstacle_position
         ):
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
             reverse_mover.jump(jump_dest)
             last_move = deepcopy(reverse_mover.last_move)
             with pytest.raises(IllegalMoveError):
                 reverse_mover.jump(jump_obstacle_position)
             assert reverse_mover.last_move == last_move
 
-        def it_raises_when_undoing_jump_for_forward_mover(self, forward_mover, jumps):
+        def it_raises_when_undoing_jump_for_forward_mover(self, forward_board, jumps):
+            forward_mover = Mover(forward_board)
+
             forward_mover.last_move = jumps[0]
             with pytest.raises(IllegalMoveError):
                 forward_mover.undo_last_move()
             assert forward_mover.last_move == jumps[0]
 
         def it_undoes_jump_and_updates_last_move(
-            self, reverse_mover, jump_dest, undone_jumps
+            self, forward_board, jump_dest, undone_jumps
         ):
-            src = index_1d(4, 2, reverse_mover.board.width)
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
+            src = index_1d(4, 2, reverse_mover.board.board_width)
             reverse_mover.jump(jump_dest)
 
             reverse_mover.undo_last_move()
@@ -184,18 +341,22 @@ class DescribeMover:
 
     class DescribeForwardMovement:
         def it_forward_moves_pusher_in_requested_direction(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  @ $. #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(3, 2, board.width)
-            dest = index_1d(4, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#  @ $. #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(3, 2, board.board_width)
+            dest = index_1d(4, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board)
             mover.select_pusher(selected_pusher)
@@ -209,18 +370,22 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
         def when_forward_moving_pusher_doesnt_pull_box_behind_it(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "# $@ .  #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(3, 2, board.width)
-            dest = index_1d(4, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "# $@ .  #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(3, 2, board.board_width)
+            dest = index_1d(4, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board)
             mover.select_pusher(selected_pusher)
@@ -234,17 +399,21 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
         def it_refuses_to_forward_move_pusher_into_obstacles_or_off_board(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "@$   .  #",  # 2
-                "@       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(0, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "@$   .  #",  # 2
+                            "@       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(0, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board)
             mover.select_pusher(selected_pusher)
@@ -258,18 +427,22 @@ class DescribeMover:
                 assert mover.last_move == last_move
 
         def it_undoes_forward_move(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  @ $. #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(3, 2, board.width)
-            dest = index_1d(2, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#  @ $. #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(3, 2, board.board_width)
+            dest = index_1d(2, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board)
             mover.select_pusher(selected_pusher)
@@ -284,18 +457,22 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
         def when_undoing_forward_move_doesnt_pull_box_from_behind_pusher(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  @$.  #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(3, 2, board.width)
-            dest = index_1d(2, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#  @$.  #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(3, 2, board.board_width)
+            dest = index_1d(2, 2, board.board_width)
             mover = Mover(board)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover.select_pusher(selected_pusher)
@@ -313,17 +490,21 @@ class DescribeMover:
         def it_refuses_to_undo_forward_move_by_moving_pusher_into_obstacles_or_off_board(
             self,
         ):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "@$   .  #",  # 2
-                "@       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(0, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "@$   .  #",  # 2
+                            "@       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(0, 2, board.board_width)
             mover = Mover(board)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover.select_pusher(selected_pusher)
@@ -345,19 +526,23 @@ class DescribeMover:
                 assert mover.last_move[0].moved_box_id == None
 
         def it_pushes_box_in_front_of_pusher(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#   @$. #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            box_src = index_1d(5, 2, board.width)
-            box_dest = index_1d(6, 2, board.width)
-            pusher_src = index_1d(4, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#   @$. #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            box_src = index_1d(5, 2, board.board_width)
+            box_dest = index_1d(6, 2, board.board_width)
+            pusher_src = index_1d(4, 2, board.board_width)
             pusher_dest = box_src
             mover = Mover(board)
             selected_pusher = DEFAULT_PIECE_ID + 1
@@ -376,19 +561,23 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID
 
         def when_pushing_box_doesnt_pull_box_from_behind_pusher(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  $@$..#",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            box_src = index_1d(5, 2, board.width)
-            box_dest = index_1d(6, 2, board.width)
-            pusher_src = index_1d(4, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#  $@$..#",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            box_src = index_1d(5, 2, board.board_width)
+            box_dest = index_1d(6, 2, board.board_width)
+            pusher_src = index_1d(4, 2, board.board_width)
             pusher_dest = box_src
             mover = Mover(board)
             selected_pusher = DEFAULT_PIECE_ID + 1
@@ -408,17 +597,21 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID + 1
 
         def it_refuses_to_push_box_into_obstacles_or_off_board(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#####$###",  # 0
-                "#@ $$@$##",  # 1
-                "#..  $  #",  # 2
-                "#... @  #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            pusher_src = index_1d(5, 1, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#####$###",  # 0
+                            "#@ $$@$##",  # 1
+                            "#..  $  #",  # 2
+                            "#... @  #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            pusher_src = index_1d(5, 1, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board)
             mover.select_pusher(selected_pusher)
@@ -442,18 +635,22 @@ class DescribeMover:
                 assert mover.last_move == last_move
 
         def it_undoes_push(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#   @$. #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            box_src = index_1d(5, 2, board.width)
-            pusher_src = index_1d(4, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#   @$. #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            box_src = index_1d(5, 2, board.board_width)
+            pusher_src = index_1d(4, 2, board.board_width)
             pusher_dest = pusher_src - 1
             box_dest = box_src - 1
             mover = Mover(board)
@@ -474,17 +671,21 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID
 
         def it_refuses_to_undo_push_moving_pusher_into_obstacles_or_off_board(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@   $..#",  # 1
-                "@$  @@$.#",  # 2
-                "$    $..#",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            pusher_src = index_1d(0, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@   $..#",  # 1
+                            "@$  @@$.#",  # 2
+                            "$    $..#",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            pusher_src = index_1d(0, 2, board.board_width)
             mover = Mover(board)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover.select_pusher(selected_pusher)
@@ -513,7 +714,7 @@ class DescribeMover:
 
             selected_pusher = DEFAULT_PIECE_ID + 3
             mover.select_pusher(selected_pusher)
-            pusher_src = index_1d(5, 2, board.width)
+            pusher_src = index_1d(5, 2, board.board_width)
 
             # Undo into pusher
             mover.last_move = [AtomicMove(Direction.RIGHT, box_moved=True)]
@@ -538,16 +739,20 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
         def it_refuses_to_undo_push_if_there_is_no_box_behind_pusher(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#   @ .$#",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#   @ .$#",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
             mover = Mover(board)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover.select_pusher(selected_pusher)
@@ -559,18 +764,22 @@ class DescribeMover:
 
     class DescribeReverseMovement:
         def it_moves_pusher_in_requested_direction(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  @ $. #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(3, 2, board.width)
-            dest = index_1d(4, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#  @ $. #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(3, 2, board.board_width)
+            dest = index_1d(4, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
@@ -584,18 +793,22 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
         def when_reverse_moving_it_doesnt_pull_box_behind_pusher(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  @. $ #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(3, 2, board.width)
-            dest = index_1d(2, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#  @. $ #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(3, 2, board.board_width)
+            dest = index_1d(2, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
@@ -610,17 +823,21 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
         def it_refuses_to_reverse_move_pusher_into_obstacles_or_off_board(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "@.   $  #",  # 2
-                "@       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(0, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "@.   $  #",  # 2
+                            "@       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(0, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
@@ -639,18 +856,22 @@ class DescribeMover:
                 assert mover.last_move == last_move
 
         def it_undoes_reverse_move(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  @ $. #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            src = index_1d(3, 2, board.width)
-            dest = index_1d(4, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#  @ $. #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            src = index_1d(3, 2, board.board_width)
+            dest = index_1d(4, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
@@ -665,21 +886,21 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
         def when_undoing_reverse_move_it_doesnt_pull_box_behind_pusher(self):
-            # yapf: disable
-            board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  @.$  #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ])
-            # yapf: enable
+            board_str = "\n".join(
+                [
+                    # 12345678
+                    "#########",  # 0
+                    "#@      #",  # 1
+                    "#  @.$  #",  # 2
+                    "#       #",  # 3
+                    "#########",  # 4
+                ]
+            )
 
             # pulls_boxes == False
-            board = SokobanBoard(board_str=board_str)
-            src = index_1d(3, 2, board.width)
-            dest = index_1d(2, 2, board.width)
+            board = BoardGraph(SokobanPuzzle(board=board_str))
+            src = index_1d(3, 2, board.board_width)
+            dest = index_1d(2, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
@@ -697,9 +918,9 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
             # pulls_boxes == True
-            board = SokobanBoard(board_str=board_str)
-            src = index_1d(3, 2, board.width)
-            dest = index_1d(2, 2, board.width)
+            board = BoardGraph(SokobanPuzzle(board=board_str))
+            src = index_1d(3, 2, board.board_width)
+            dest = index_1d(2, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
@@ -717,19 +938,23 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == None
 
         def it_pulls_box_behind_pusher_if_pulls_boxes_is_set(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  @.$  #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            pusher_src = index_1d(3, 2, board.width)
-            pusher_dest = index_1d(2, 2, board.width)
-            box_src = index_1d(4, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#  @.$  #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            pusher_src = index_1d(3, 2, board.board_width)
+            pusher_dest = index_1d(2, 2, board.board_width)
+            box_src = index_1d(4, 2, board.board_width)
             box_dest = pusher_src
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
@@ -751,20 +976,21 @@ class DescribeMover:
         def it_refuses_to_pull_box_if_pusher_would_move_into_obstacle_or_off_board(
             self,
         ):
-            board = SokobanBoard(
-                board_str="\n".join(
-                    [
-                        # 12345678
-                        "#########",  # 0
-                        "#@ $  .$#",  # 1
-                        "@. $ @@.#",  # 2
-                        ".  $  .$#",  # 3
-                        "#########",  # 4
-                    ]
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@ $  .$#",  # 1
+                            "@. $ @@.#",  # 2
+                            ".  $  .$#",  # 3
+                            "#########",  # 4
+                        ]
+                    )
                 )
             )
-            # yapf: enable
-            pusher_src = index_1d(3, 2, board.width)
+            pusher_src = index_1d(3, 2, board.board_width)
             mover = Mover(board, SolvingMode.REVERSE)
             mover.pulls_boxes = True
             mover.select_pusher(DEFAULT_PIECE_ID + 1)
@@ -790,20 +1016,24 @@ class DescribeMover:
             assert mover.last_move == []
 
         def it_undoes_pull(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@      #",  # 1
-                "#  @.$  #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
-            pusher_src = index_1d(3, 2, board.width)
-            pusher_dest = index_1d(4, 2, board.width)
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@      #",  # 1
+                            "#  @.$  #",  # 2
+                            "#       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
+            pusher_src = index_1d(3, 2, board.board_width)
+            pusher_dest = index_1d(4, 2, board.board_width)
             box_src = pusher_dest
-            box_dest = index_1d(5, 2, board.width)
+            box_dest = index_1d(5, 2, board.board_width)
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
@@ -822,23 +1052,23 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID
 
         def it_undoes_pull_not_moving_box_behind_pusher(self):
-            # yapf: disable
-            board_str = "\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@     $#",  # 1
-                "# .@.$  #",  # 2
-                "#       #",  # 3
-                "#########",  # 4
-            ])
-            # yapf: enable
+            board_str = "\n".join(
+                [
+                    # 12345678
+                    "#########",  # 0
+                    "#@     $#",  # 1
+                    "# .@.$  #",  # 2
+                    "#       #",  # 3
+                    "#########",  # 4
+                ]
+            )
 
             # pulls_boxes == False
-            board = SokobanBoard(board_str=board_str)
-            pusher_src = index_1d(3, 2, board.width)
-            pusher_dest = index_1d(4, 2, board.width)
+            board = BoardGraph(SokobanPuzzle(board=board_str))
+            pusher_src = index_1d(3, 2, board.board_width)
+            pusher_dest = index_1d(4, 2, board.board_width)
             box_src = pusher_dest
-            box_dest = index_1d(5, 2, board.width)
+            box_dest = index_1d(5, 2, board.board_width)
             behind_pusher = pusher_src - 1
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
@@ -861,11 +1091,11 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID + 1
 
             # pulls_boxes == True
-            board = SokobanBoard(board_str=board_str)
-            pusher_src = index_1d(3, 2, board.width)
-            pusher_dest = index_1d(4, 2, board.width)
+            board = BoardGraph(SokobanPuzzle(board=board_str))
+            pusher_src = index_1d(3, 2, board.board_width)
+            pusher_dest = index_1d(4, 2, board.board_width)
             box_src = pusher_dest
-            box_dest = index_1d(5, 2, board.width)
+            box_dest = index_1d(5, 2, board.board_width)
             behind_pusher = pusher_src - 1
             selected_pusher = DEFAULT_PIECE_ID + 1
             mover = Mover(board, SolvingMode.REVERSE)
@@ -888,16 +1118,20 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == DEFAULT_PIECE_ID + 1
 
         def it_refuses_to_undo_pull_moving_into_obstacles_or_off_board(self):
-            # yapf: disable
-            board = SokobanBoard(board_str="\n".join([
-                # 12345678
-                "#########",  # 0
-                "#@ $$$$$#",  # 1
-                "@. ..@.@#",  # 2
-                ".       #",  # 3
-                "#########",  # 4
-            ]))
-            # yapf: enable
+            board = BoardGraph(
+                SokobanPuzzle(
+                    board="\n".join(
+                        [
+                            # 12345678
+                            "#########",  # 0
+                            "#@ $$$$$#",  # 1
+                            "@. ..@.@#",  # 2
+                            ".       #",  # 3
+                            "#########",  # 4
+                        ]
+                    )
+                )
+            )
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(DEFAULT_PIECE_ID + 1)
 
@@ -937,8 +1171,10 @@ class DescribeMover:
 
     class DescribeUndoLastMove:
         def it_can_undo_random_sequence_of_moves_stored_in_last_move(
-            self, reverse_mover, jump_dest, undone_jumps
+            self, forward_board, jump_dest, undone_jumps
         ):
+            reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
+
             initial_board = str(reverse_mover.board)
             moves = []
             reverse_mover.jump(jump_dest)
@@ -985,6 +1221,6 @@ class DescribeMover:
             # TODO
             pass
 
-        def when_fails_it_leaves_sucessful_moves_in_last_move(self):
+        def when_fails_it_leaves_successful_moves_in_last_move(self):
             # TODO
             pass

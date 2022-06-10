@@ -55,14 +55,14 @@
 namespace sokoengine {
 
 ///
+/// Namespace for game engine part of sokoengine
+///
+namespace game {}
+
+///
 /// Default type for sequence of strings.
 ///
 typedef std::vector<std::string> Strings;
-
-///
-/// Namespace for game engine part of sokoengine
-///
-namespace game {
 
 ///
 /// Board size type
@@ -127,7 +127,6 @@ static_assert(NULL_ID < DEFAULT_PIECE_ID, "NULL_ID must be < DEFAULT_PIECE_ID");
 ///
 typedef uint64_t zobrist_key_t;
 
-} // namespace game
 } // namespace sokoengine
 
 #endif // HEADER_GUARD

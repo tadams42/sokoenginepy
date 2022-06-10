@@ -1,16 +1,12 @@
 #include "hexoban_tessellation.hpp"
 #include "atomic_move.hpp"
-#include "board_cell.hpp"
 #include "direction.hpp"
-#include "hexoban_board.hpp"
 #include "snapshot.hpp"
 
 using namespace std;
 
 namespace sokoengine {
 namespace game {
-
-using namespace  implementation;
 
 const Directions &HexobanTessellation::legal_directions() const {
   static const Directions retv = {Direction::LEFT,       Direction::RIGHT,
@@ -21,9 +17,9 @@ const Directions &HexobanTessellation::legal_directions() const {
 
 position_t HexobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
-                                                  board_size_t board_width,
-                                                  board_size_t board_height) const {
-  position_t row = Y(position, board_width), column = X(position, board_width);
+                                                  board_size_t width,
+                                                  board_size_t height) const {
+  position_t row = Y(position, width), column = X(position, width);
   switch (direction) {
   case Direction::LEFT:
     column += -1;
@@ -52,8 +48,8 @@ position_t HexobanTessellation::neighbor_position(position_t position,
       "Unsupported Direction received in HexobanTessellation neighbor_position!");
   }
 
-  if (ON_BOARD(column, row, board_width, board_height))
-    return index_1d(column, row, board_width);
+  if (ON_BOARD(column, row, width, height))
+    return index_1d(column, row, width);
   else
     return MAX_POS + 1;
 }
@@ -116,21 +112,6 @@ char HexobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
 
 string HexobanTessellation::repr() const { return "HexobanTessellation()"; }
 string HexobanTessellation::str() const { return "hexoban"; }
-
-const VariantBoardResizer &HexobanTessellation::resizer() const {
-  static const HexobanBoardResizer retv = HexobanBoardResizer();
-  return retv;
-}
-
-const VariantBoardPrinter &HexobanTessellation::printer() const {
-  static const HexobanBoardPrinter retv = HexobanBoardPrinter();
-  return retv;
-}
-
-const VariantBoardParser &HexobanTessellation::parser() const {
-  static const HexobanBoardParser retv = HexobanBoardParser();
-  return retv;
-}
 
 } // namespace game
 } // namespace sokoengine

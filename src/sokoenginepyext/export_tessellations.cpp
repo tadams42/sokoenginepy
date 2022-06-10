@@ -2,6 +2,8 @@
 #include <map>
 
 using namespace std;
+using sokoengine::position_t;
+using sokoengine::board_size_t;
 using namespace sokoengine::game;
 
 void export_tessellations(py::module &m) {
@@ -27,7 +29,7 @@ void export_tessellations(py::module &m) {
               board_size_t board_width, board_size_t board_height) -> py::object {
              auto retv =
                  self.neighbor_position(position, direction, board_width, board_height);
-             if (retv > MAX_POS)
+             if (retv > sokoengine::MAX_POS)
                return py::none();
              else
                return py::cast(retv);

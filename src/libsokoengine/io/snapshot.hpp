@@ -1,12 +1,12 @@
 #ifndef SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "puzzle_types.hpp"
+#include "sokoengine_config.hpp"
 
 #include <memory>
 
 namespace sokoengine {
-  namespace io {
+namespace io {
 
 ///
 /// Recording of pusher movement with accompanying metadata.
@@ -43,19 +43,16 @@ public:
   }
 
   static bool is_snapshot(const std::string &line);
-  static std::string cleaned_moves(const std::string &line) ;
+  static std::string cleaned_moves(const std::string &line);
 
   explicit Snapshot(size_t id = 0, const std::string &moves = "",
                     const std::string &title = "", const std::string &duration = "",
-                    const std::string &solver = "", const std::string &notes = "",
-                    const std::string &created_at = "",
+                    const std::string &solver = "", const std::string &created_at = "",
                     const std::string &updated_at = "",
-                    const PuzzleTypes &puzzle_type = PuzzleTypes::SOKOBAN);
+                    const Strings &notes = Strings());
   Snapshot(const Snapshot &rv);
-  Snapshot& operator=(const Snapshot&);
+  Snapshot &operator=(const Snapshot &);
   virtual ~Snapshot();
-
-  void clear();
 
   size_t id() const;
   size_t &id();
@@ -67,28 +64,23 @@ public:
   std::string &duration();
   const std::string &solver() const;
   std::string &solver();
-  const std::string &notes() const;
-  std::string &notes();
+  const Strings &notes() const;
+  Strings &notes();
   const std::string &created_at() const;
   std::string &created_at();
   const std::string &updated_at() const;
   std::string &updated_at();
-  PuzzleTypes puzzle_type() const;
-  PuzzleTypes &puzzle_type();
 
   size_t pushes_count() const;
   size_t moves_count() const;
   bool is_reverse() const;
-
-  std::string reformatted(uint8_t break_long_lines_at = 80,
-                          bool rle_encode = false) const;
 
 private:
   class PIMPL;
   std::unique_ptr<PIMPL> m_impl;
 };
 
-  } // namespace io
+} // namespace io
 } // namespace sokoengine
 
 #endif // HEADER_GUARD

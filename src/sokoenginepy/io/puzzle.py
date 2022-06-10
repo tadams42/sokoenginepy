@@ -1,19 +1,36 @@
 from __future__ import annotations
 
 import re
+import textwrap
 from functools import reduce
 from operator import add
-from typing import Final, List, Optional, Set
+from typing import TYPE_CHECKING, Final, List, Optional, Set, Type
 
-from .puzzle_types import PuzzleTypes
 from .rle import Rle
 from .snapshot import Snapshot
 from .utilities import contains_only_digits_and_spaces, is_blank
 
+if TYPE_CHECKING:
+    from ..game import AnyTessellation, TessellationOrDescription
+    from .puzzle_workers import PuzzleParser, PuzzlePrinter, PuzzleResizer
+
 
 class Puzzle:
     """
-    Textual representation of game board with all its meta data and snapshots.
+    Base class for game puzzles.
+
+    Game puzzle is representation of game board together with all of its meta data and
+    snapshots.
+
+    It implements:
+        - parsing board data from text
+        - editing board: setting individual cells, resizing, trimming, ...
+
+    All positions used are 1D array indexes.
+
+    To convert 2D board coordinates into 1D array indexes, use :func:`game.index_1d`.
+    To convert 1D array indexes into board 2D coordinates, use one of :func:`game.ROW`,
+    :func:`game.x` :func:`game.COLUMN` and :func:`game.y`.
     """
 
     WALL: Final[str] = "#"
@@ -32,36 +49,6 @@ class Puzzle:
     ALT_BOX_ON_GOAL1: Final[str] = "B"
     ALT_GOAL1: Final[str] = "o"
     ALT_VISIBLE_FLOOR1: Final[str] = "_"
-
-    def __init__(
-        self,
-        id: int = 0,
-        board: str = "",
-        puzzle_type: Optional[PuzzleTypes] = PuzzleTypes.SOKOBAN,
-        title: str = "",
-        author: str = "",
-        boxorder: str = "",
-        goalorder: str = "",
-        notes: Optional[List[str]] = None,
-        snapshots: Optional[List[Snapshot]] = None,
-        created_at: str = "",
-        updated_at: str = "",
-    ):
-        self.id: int = id
-        self._board: str = board
-        self.title = title
-        self.author = author
-        self.boxorder = boxorder
-        self.goalorder = goalorder
-        self.notes: List[str] = notes or []
-        self.snapshots: List[Snapshot] = snapshots or []
-        self.created_at = created_at
-        self.updated_at = updated_at
-        self.puzzle_type: PuzzleTypes = puzzle_type or PuzzleTypes.SOKOBAN
-
-        self._pushers_count: Optional[int] = None
-        self._boxes_count: Optional[int] = None
-        self._goals_count: Optional[int] = None
 
     @classmethod
     def is_pusher(cls, character: str) -> bool:
@@ -108,6 +95,24 @@ class Puzzle:
         return character == cls.WALL
 
     @classmethod
+    def is_border_element(cls, character: str) -> bool:
+        return (
+            character == cls.WALL
+            or character == cls.BOX_ON_GOAL
+            or character == cls.ALT_BOX_ON_GOAL1
+        )
+
+    @classmethod
+    def is_puzzle_element(cls, character: str) -> bool:
+        return (
+            cls.is_empty_floor(character)
+            or cls.is_wall(character)
+            or cls.is_pusher(character)
+            or cls.is_box(character)
+            or cls.is_goal(character)
+        )
+
+    @classmethod
     def is_board(cls, line: Optional[str]) -> bool:
         """
         Checks if line contains only characters legal in textual representation of
@@ -127,31 +132,165 @@ class Puzzle:
     def is_sokoban_plus(cls, line: str) -> bool:
         return contains_only_digits_and_spaces(line) and not is_blank(line)
 
-    @property
-    def board(self) -> str:
-        return self._board
+    @classmethod
+    def instance_from(
+        cls,
+        tessellation_or_description: TessellationOrDescription = "sokoban",
+        width: int = 0,
+        height: int = 0,
+        board: Optional[str] = None,
+    ) -> Puzzle:
+        """
+        Factory method. Produces instance of one of the subclasses.
+        """
+        from ..game import Tessellation
+        from .hexoban_puzzle import HexobanPuzzle
+        from .octoban_puzzle import OctobanPuzzle
+        from .sokoban_puzzle import SokobanPuzzle
+        from .trioban_puzzle import TriobanPuzzle
 
-    @board.setter
-    def board(self, rv: str):
-        self._board = rv
-        self._pushers_count = None
-        self._boxes_count = None
-        self._goals_count = None
+        tessellation_instance = Tessellation.instance_from(tessellation_or_description)
 
-    def clear(self):
-        self.board = ""
+        for klass in [HexobanPuzzle, OctobanPuzzle, SokobanPuzzle, TriobanPuzzle]:
+            if (
+                tessellation_instance.__class__.__name__.replace(
+                    "Tessellation", ""
+                ).lower()
+                in klass.__name__.lower()
+            ):
+                return klass(width=width, height=height, board=board)
+
+        raise ValueError(tessellation_or_description)
+
+    def __init__(
+        self,
+        tessellation_or_description: TessellationOrDescription,
+        width: int = 0,
+        height: int = 0,
+        board: Optional[str] = None,
+        resizer_cls: Optional[Type[PuzzleResizer]] = None,
+        parser_cls: Optional[Type[PuzzleParser]] = None,
+        printer_cls: Optional[Type[PuzzlePrinter]] = None,
+    ):
+        from ..game import Tessellation
+        from .puzzle_workers import PuzzleParser, PuzzlePrinter, PuzzleResizer
+
+        self.id: int = 0
         self.title = ""
         self.author = ""
         self.boxorder = ""
         self.goalorder = ""
-        self.notes = []
-        self.snapshots = []
+        self.notes: List[str] = []
+        self.snapshots: List[Snapshot] = []
         self.created_at = ""
         self.updated_at = ""
-
         self._pushers_count: Optional[int] = None
         self._boxes_count: Optional[int] = None
         self._goals_count: Optional[int] = None
+
+        self._tessellation: AnyTessellation = Tessellation.instance_from(
+            tessellation_or_description
+        )
+        self._resizer_cls: Type[PuzzleResizer] = resizer_cls or PuzzleResizer
+        self._parser_cls: Type[PuzzleParser] = parser_cls or PuzzleParser
+        self._printer_cls: Type[PuzzlePrinter] = printer_cls or PuzzlePrinter
+
+        self._width: int
+        self._height: int
+        self._was_parsed: bool
+        self._original_board: str
+        # not str but list of single character strings. str is immutable and we need to
+        # be able to modify individual board cells.
+        self._parsed_board: List[str]
+
+        if is_blank(board) or board is None:
+            self._width = width
+            self._height = height
+            if self._width < 0 or self._height < 0:
+                raise ValueError("Board dimensions can't be less than zero!")
+            self._was_parsed = True
+            self._original_board = ""
+            self._parsed_board = width * height * [self.VISIBLE_FLOOR]
+
+        else:
+            self._width = 0
+            self._height = 0
+            self._was_parsed = False
+            self._original_board = board
+            self._parsed_board = []
+            if not self.is_board(self._original_board):
+                raise ValueError("Invalid characters in board string!")
+
+    @property
+    def tessellation(self) -> AnyTessellation:
+        return self._tessellation
+
+    def __getitem__(self, position: int) -> str:
+        self._reparse_if_not_parsed()
+        return self._parsed_board[position]
+
+    def __setitem__(self, position: int, c: str):
+        self._reparse_if_not_parsed()
+        if not self.is_puzzle_element(c):
+            raise ValueError("Invalid characters in board string!")
+        self._parsed_board[position] = c
+
+    def __contains__(self, position: int):
+        self._reparse_if_not_parsed()
+        return position < len(self._parsed_board)
+
+    def __str__(self):
+        return self.to_board_str(use_visible_floor=True)
+
+    def __repr__(self):
+        return "{klass}(board='\\n'.join([\n{board}\n]))".format(
+            klass=self.__class__.__name__,
+            board=textwrap.indent(
+                ",\n".join(["'{0}'".format(l) for l in str(self).split("\n")]), "    "
+            ),
+        )
+
+    def to_board_str(self, use_visible_floor=False, rle_encode=False) -> str:
+        self._reparse_if_not_parsed()
+        return self._printer_cls().print(
+            self._parsed_board, self.width, self.height, use_visible_floor, rle_encode
+        )
+
+    @property
+    def board(self) -> str:
+        return self._original_board
+
+    @board.setter
+    def board(self, rv: str):
+        if not self.is_board(rv):
+            raise ValueError("Invalid characters in board string!")
+        self._board = rv
+        self._was_parsed = False
+        self._pushers_count = None
+        self._boxes_count = None
+        self._goals_count = None
+
+    @property
+    def internal_board(self) -> str:
+        """
+        Internal, parsed board. For debugging purposes.
+        """
+        self._reparse_if_not_parsed()
+        return "".join(self._parsed_board)
+
+    @property
+    def width(self) -> int:
+        self._reparse_if_not_parsed()
+        return self._width
+
+    @property
+    def height(self) -> int:
+        self._reparse_if_not_parsed()
+        return self._height
+
+    @property
+    def size(self) -> int:
+        return self.width * self.height
 
     @property
     def pushers_count(self) -> int:
@@ -178,13 +317,199 @@ class Puzzle:
             )
         return self._goals_count
 
-    def reformatted(
-        self,
-        use_visible_floor: bool = False,
-        break_long_lines_at: int = 80,
-        rle_encode: bool = False,
-    ) -> str:
-        return self.board
+    def add_row_top(self):
+        self._reparse_if_not_parsed()
+        self._parsed_board, self._width, self._height = self._resizer.add_row_top(
+            self._parsed_board, self.width, self.height
+        )
+
+    def add_row_bottom(self):
+        self._reparse_if_not_parsed()
+        (
+            self._parsed_board,
+            self._width,
+            self._height,
+        ) = self._resizer.add_row_bottom(self._parsed_board, self.width, self.height)
+
+    def add_column_left(self):
+        self._reparse_if_not_parsed()
+        (
+            self._parsed_board,
+            self._width,
+            self._height,
+        ) = self._resizer.add_column_left(self._parsed_board, self.width, self.height)
+
+    def add_column_right(self):
+        self._reparse_if_not_parsed()
+        (
+            self._parsed_board,
+            self._width,
+            self._height,
+        ) = self._resizer.add_column_right(self._parsed_board, self.width, self.height)
+
+    def remove_row_top(self):
+        self._reparse_if_not_parsed()
+        (
+            self._parsed_board,
+            self._width,
+            self._height,
+        ) = self._resizer.remove_row_top(self._parsed_board, self.width, self.height)
+
+    def remove_row_bottom(self):
+        self._reparse_if_not_parsed()
+        (
+            self._parsed_board,
+            self._width,
+            self._height,
+        ) = self._resizer.remove_row_bottom(self._parsed_board, self.width, self.height)
+
+    def remove_column_left(self):
+        self._reparse_if_not_parsed()
+        (
+            self._parsed_board,
+            self._width,
+            self._height,
+        ) = self._resizer.remove_column_left(
+            self._parsed_board, self.width, self.height
+        )
+
+    def remove_column_right(self):
+        self._reparse_if_not_parsed()
+        (
+            self._parsed_board,
+            self._width,
+            self._height,
+        ) = self._resizer.remove_column_right(
+            self._parsed_board, self.width, self.height
+        )
+
+    def trim_left(self):
+        self._reparse_if_not_parsed()
+        self._parsed_board, self._width, self._height = self._resizer.trim_left(
+            self._parsed_board, self.width, self.height
+        )
+
+    def trim_right(self):
+        self._reparse_if_not_parsed()
+        self._parsed_board, self._width, self._height = self._resizer.trim_right(
+            self._parsed_board, self.width, self.height
+        )
+
+    def trim_top(self):
+        self._reparse_if_not_parsed()
+        self._parsed_board, self._width, self._height = self._resizer.trim_top(
+            self._parsed_board, self.width, self.height
+        )
+
+    def trim_bottom(self):
+        self._reparse_if_not_parsed()
+        self._parsed_board, self._width, self._height = self._resizer.trim_bottom(
+            self._parsed_board, self.width, self.height
+        )
+
+    def reverse_rows(self):
+        self._reparse_if_not_parsed()
+        (
+            self._parsed_board,
+            self._width,
+            self._height,
+        ) = self._resizer.reverse_rows(self._parsed_board, self.width, self.height)
+
+    def reverse_columns(self):
+        self._reparse_if_not_parsed()
+        (
+            self._parsed_board,
+            self._width,
+            self._height,
+        ) = self._resizer.reverse_columns(self._parsed_board, self.width, self.height)
+
+    def resize(self, new_width: int, new_height: int):
+        """
+        In-place resizing of board.
+
+        Adds or removes rows and columns.
+        """
+        self._reparse_if_not_parsed()
+        old_width = self.width
+        old_height = self.height
+
+        if new_height != old_height:
+            if new_height > old_height:
+                amount = new_height - old_height
+                for _ in range(0, amount):
+                    self.add_row_bottom()
+            else:
+                amount = old_height - new_height
+                for _ in range(0, amount):
+                    self.remove_row_bottom()
+
+        if new_width != old_width:
+            if new_width > old_width:
+                amount = new_width - old_width
+                for _ in range(0, amount):
+                    self.add_column_right()
+            else:
+                amount = old_width - new_width
+                for _ in range(0, amount):
+                    self.remove_column_right()
+
+    def resize_and_center(self, new_width: int, new_height: int):
+        """
+        In-place resizing of board.
+
+        Adds or removes rows and columns keeping existing board centered inside of new
+        one.
+        """
+        self._reparse_if_not_parsed()
+        left = right = top = bottom = 0
+
+        if new_width > self.width:
+            left = int((new_width - self.width) / 2)
+            right = new_width - self.width - left
+
+        if new_height > self.height:
+            top = int((new_height - self.height) / 2)
+            bottom = new_height - self.height - top
+
+        if (left, right, top, bottom) != (0, 0, 0, 0):
+            for _ in range(0, left):
+                self.add_column_left()
+            for _ in range(0, top):
+                self.add_row_top()
+
+            if (right, bottom) != (0, 0):
+                self.resize(self.width + right, self.height + bottom)
+
+    def trim(self):
+        """
+        In-place resizing of board.
+
+        Removes outer, blank rows and columns.
+        """
+        self.trim_top()
+        self.trim_bottom()
+        self.trim_left()
+        self.trim_right()
+
+    def _reparse(self):
+        if not is_blank(self._original_board):
+            board_rows = self._parser_cls().parse(self._original_board)
+            self._height = len(board_rows)
+            self._width = len(board_rows[0]) if self._height else 0
+            self._parsed_board = sum((list(_) for _ in board_rows), [])
+            for idx, val in enumerate(self._parsed_board):
+                if val == self.FLOOR:
+                    self._parsed_board[idx] = self.VISIBLE_FLOOR
+
+        self._was_parsed = True
+
+    def _reparse_if_not_parsed(self):
+        if not self._was_parsed:
+            self._reparse()
+
+    @property
+    def _resizer(self) -> PuzzleResizer:
+        return self._resizer_cls()
 
 
 _CHARACTERS: Set[str] = {

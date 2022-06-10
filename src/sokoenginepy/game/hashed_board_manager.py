@@ -8,7 +8,7 @@ from .board_state import BoardState
 from .piece import DEFAULT_PIECE_ID
 
 if TYPE_CHECKING:
-    from .variant_board import VariantBoard
+    from .board_graph import BoardGraph
 
 
 class HashedBoardManager(BoardManager):
@@ -46,11 +46,11 @@ class HashedBoardManager(BoardManager):
 
     def __init__(
         self,
-        variant_board: VariantBoard,
+        board: BoardGraph,
         boxorder: Optional[str] = None,
         goalorder: Optional[str] = None,
     ):
-        super().__init__(variant_board, boxorder, goalorder)
+        super().__init__(board, boxorder, goalorder)
         self._initial_state_hash = None
         self._state_hash = None
         self._pushers_factors = None

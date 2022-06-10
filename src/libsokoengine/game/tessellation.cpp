@@ -1,5 +1,4 @@
 #include "tessellation.hpp"
-#include "variant_board.hpp"
 #include "utilities.hpp"
 
 #include "hexoban_tessellation.hpp"
@@ -8,14 +7,11 @@
 #include "trioban_tessellation.hpp"
 
 #include <boost/algorithm/string.hpp>
-#include <typeinfo>
 
 using namespace std;
 
 namespace sokoengine {
 namespace game {
-
-using namespace implementation;
 
 const SokobanTessellation &Tessellation::SOKOBAN = SokobanTessellation();
 const HexobanTessellation &Tessellation::HEXOBAN = HexobanTessellation();
@@ -41,26 +37,11 @@ bool Tessellation::operator==(const Tessellation &rv) const {
 }
 bool Tessellation::operator!=(const Tessellation &rv) const { return !(*this == rv); }
 
-const VariantBoardResizer &Tessellation::resizer() const {
-  static const VariantBoardResizer retv = VariantBoardResizer();
-  return retv;
-}
-
-const VariantBoardPrinter &Tessellation::printer() const {
-  static const VariantBoardPrinter retv = VariantBoardPrinter();
-  return retv;
-}
-
-const VariantBoardParser &Tessellation::parser() const {
-  static const VariantBoardParser retv = VariantBoardParser();
-  return retv;
-}
-
 GraphType Tessellation::graph_type() const { return GraphType::DIRECTED; }
 
 CellOrientation Tessellation::cell_orientation(position_t position,
-                                               board_size_t board_width,
-                                               board_size_t board_height) const {
+                                               board_size_t width,
+                                               board_size_t height) const {
   return CellOrientation::DEFAULT;
 }
 

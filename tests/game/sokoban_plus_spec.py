@@ -2,7 +2,10 @@ import pytest
 
 from sokoenginepy.game import SokobanPlus, SokobanPlusDataError
 
-from ..fixtures import SokobanPlusFactory
+
+@pytest.fixture
+def sokoban_plus():
+    return SokobanPlus(pieces_count=5, boxorder="42 24 4 2", goalorder="2 24 42 4")
 
 
 class DescribeSokobanPlus:
@@ -116,10 +119,10 @@ class DescribeSokobanPlus:
         def it_converts_legacy_plus_ids_silently_if_piece_count_is_smaller_than_legacy_plus_id(
             self,
         ):
-            sokoban_plus = SokobanPlusFactory(
+            sokoban_plus = SokobanPlus(
                 pieces_count=10,
-                boxorder="1 5 42 {0} 23".format(SokobanPlus.LEGACY_DEFAULT_PLUS_ID),
-                goalorder="1 5 42 {0} 23".format(SokobanPlus.LEGACY_DEFAULT_PLUS_ID),
+                boxorder=f"1 5 42 {SokobanPlus.LEGACY_DEFAULT_PLUS_ID} 23",
+                goalorder=f"1 5 42 {SokobanPlus.LEGACY_DEFAULT_PLUS_ID} 23",
             )
             sokoban_plus.is_enabled = True
             assert sokoban_plus.boxorder == "1 5 42 {0} 23".format(
@@ -132,10 +135,10 @@ class DescribeSokobanPlus:
         def it_doesnt_convert_legacy_plus_ids_if_piece_count_is_greater_than_legacy_plus_id(
             self, sokoban_plus
         ):
-            sokoban_plus = SokobanPlusFactory(
+            sokoban_plus = SokobanPlus(
                 pieces_count=SokobanPlus.LEGACY_DEFAULT_PLUS_ID,
-                boxorder="1 5 42 {0} 23".format(SokobanPlus.LEGACY_DEFAULT_PLUS_ID),
-                goalorder="1 5 42 {0} 23".format(SokobanPlus.LEGACY_DEFAULT_PLUS_ID),
+                boxorder=f"1 5 42 {SokobanPlus.LEGACY_DEFAULT_PLUS_ID} 23",
+                goalorder=f"1 5 42 {SokobanPlus.LEGACY_DEFAULT_PLUS_ID} 23",
             )
             sokoban_plus.is_enabled = True
             assert sokoban_plus.boxorder == "1 5 42 {0} 23".format(
@@ -176,19 +179,19 @@ class DescribeSokobanPlus:
             assert not sokoban_plus.is_valid
 
         def it_validates_there_are_not_to_many_ids(self):
-            sokoban_plus = SokobanPlusFactory(
+            sokoban_plus = SokobanPlus(
                 goalorder="1 2 3 4 5 6", boxorder="6 5 4 3 2 1", pieces_count=5
             )
             assert not sokoban_plus.is_valid
 
         def it_validates_same_id_set_is_defined_for_both_piece_types(self):
-            sokoban_plus = SokobanPlusFactory(
+            sokoban_plus = SokobanPlus(
                 goalorder="1 2 3 4 5 6", boxorder="5 4 3 2 1", pieces_count=6
             )
             assert not sokoban_plus.is_valid
 
         def it_allows_that_there_are_duplicate_plus_ids_for_same_piece_type(self):
-            sokoban_plus = SokobanPlusFactory(
+            sokoban_plus = SokobanPlus(
                 goalorder="1 1 2 2 3 3", boxorder="2 2 3 3 1 1", pieces_count=10
             )
             assert sokoban_plus.is_valid

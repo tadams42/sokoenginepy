@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 from .puzzle import Puzzle
-from .puzzle_types import PuzzleTypes
 
 
 class Collection:
@@ -28,31 +27,17 @@ class Collection:
         self.notes: List[str] = notes or []
         self.puzzles: List[Puzzle] = []
 
-    def clear(self):
-        self.title = ""
-        self.author = ""
-        self.created_at = ""
-        self.updated_at = ""
-        self.notes = []
-        self.puzzles = []
-
     @staticmethod
-    def _extension_to_tessellation_hint(path: Union[str, Path]) -> PuzzleTypes:
+    def _extension_to_tessellation_hint(path: Union[str, Path]) -> str:
         file_name, file_extension = os.path.splitext(path)
-        if (
-            file_extension == ".sok"
-            or file_extension == ".txt"
-            or file_extension == ".xsb"
-        ):
-            return PuzzleTypes.SOKOBAN
-        elif file_extension == ".tsb":
-            return PuzzleTypes.TRIOBAN
+        if file_extension == ".tsb":
+            return "trioban"
         elif file_extension == ".hsb":
-            return PuzzleTypes.HEXOBAN
+            return "hexoban"
+        else:
+            return "sokoban"
 
-        return PuzzleTypes.SOKOBAN
-
-    def load(self, path: Union[str, Path], puzzle_types_hint: PuzzleTypes = None):
+    def load(self, path: Union[str, Path], puzzle_types_hint: Optional[str] = None):
         from .sok_file_format import SOKFileFormat
 
         with open(path, "r") as src_file:
@@ -72,16 +57,3 @@ class Collection:
 
         with open(path, "w") as dest_file:
             SOKFileFormat.write(self, dest_file)
-
-    def reformat(
-        self,
-        use_visible_floor: bool = False,
-        break_long_lines_at: int = 80,
-        rle_encode: bool = False,
-    ):
-        for puzzle in self.puzzles:
-            puzzle.board = puzzle.reformatted(
-                use_visible_floor, break_long_lines_at, rle_encode
-            )
-            for snapshot in puzzle.snapshots:
-                snapshot.moves = snapshot.reformatted(break_long_lines_at, rle_encode)

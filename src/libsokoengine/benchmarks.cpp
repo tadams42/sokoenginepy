@@ -14,6 +14,7 @@ using namespace std::chrono;
 namespace sokoengine {
 namespace benchmarks {
 
+using sokoengine::io::SokobanPuzzle;
 using namespace sokoengine::game;
 
 class BoardType {
@@ -22,36 +23,36 @@ public:
 
   explicit BoardType(EBoardType which) : m_board_type(which) {}
 
-  SokobanBoard board() const {
+  SokobanPuzzle board() const {
     if (m_board_type == SMALL) {
-      return SokobanBoard(string() + "##########\n" + "#      **#\n" + "#      **#\n" +
-                          "# *@   **#\n" + "#      **#\n" + "##########\n");
+      return SokobanPuzzle(string() + "##########\n" + "#      **#\n" + "#      **#\n" +
+                           "# *@   **#\n" + "#      **#\n" + "##########\n");
     } else {
-      return SokobanBoard(string() + "######################################\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#*************          *************#\n" +
-                          "#*************          *************#\n" +
-                          "#*************          *************#\n" +
-                          "#*************    *@    *************#\n" +
-                          "#*************          *************#\n" +
-                          "#*************          *************#\n" +
-                          "#*************          *************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "#************************************#\n" +
-                          "######################################\n");
+      return SokobanPuzzle(string() + "######################################\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#*************          *************#\n" +
+                           "#*************          *************#\n" +
+                           "#*************          *************#\n" +
+                           "#*************    *@    *************#\n" +
+                           "#*************          *************#\n" +
+                           "#*************          *************#\n" +
+                           "#*************          *************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "#************************************#\n" +
+                           "######################################\n");
     }
   }
 
@@ -68,9 +69,7 @@ public:
   bool is_reverse() const { return m_type == REVERSE_MOVER; }
 
   string title() const {
-    if (m_type == FORWARD_MOVER) {
-      return "Forward mover";
-    }
+    if (m_type == FORWARD_MOVER) { return "Forward mover"; }
     return "Reverse mover";
   }
 
@@ -91,17 +90,20 @@ class MovementBenchmark {
   BoardType m_board_type;
   BenchmarkType m_benchmark_type;
   size_t m_moves_count = 0;
-  SokobanBoard m_board = m_board_type.board();
-  Mover m_mover = Mover(m_board, m_benchmark_type.is_reverse() ? SolvingMode::REVERSE
-                                                               : SolvingMode::FORWARD);
+  SokobanPuzzle m_puzzle = m_board_type.board();
+  BoardGraph m_board;
+  Mover m_mover;
 
 public:
   MovementBenchmark(BoardType board_type, BenchmarkType benchmark_type,
                     size_t moves_count)
-      : m_board_type(board_type), m_benchmark_type(benchmark_type),
-        m_moves_count(moves_count), m_board(board_type.board()),
-        m_mover(m_board, benchmark_type.is_reverse() ? SolvingMode::REVERSE
-                                                     : SolvingMode::FORWARD) {}
+    : m_board_type(board_type),
+      m_benchmark_type(benchmark_type),
+      m_moves_count(moves_count),
+      m_puzzle(board_type.board()),
+      m_board(m_puzzle),
+      m_mover(m_board, benchmark_type.is_reverse() ? SolvingMode::REVERSE
+                                                   : SolvingMode::FORWARD) {}
 
   double miliseconds_used() const { return m_miliseconds_used; }
 
@@ -120,14 +122,14 @@ public:
         m_mover.undo_last_move();
         end_time = std::chrono::high_resolution_clock::now();
         m_miliseconds_used +=
-            duration_cast<duration<double>>(end_time - start_time).count();
+          duration_cast<duration<double>>(end_time - start_time).count();
         undo_move = false;
       } else {
         start_time = std::chrono::high_resolution_clock::now();
         m_mover.move(m_benchmark_type.direction());
         end_time = std::chrono::high_resolution_clock::now();
         m_miliseconds_used +=
-            duration_cast<duration<double>>(end_time - start_time).count();
+          duration_cast<duration<double>>(end_time - start_time).count();
         undo_move = true;
       }
     }
@@ -142,13 +144,14 @@ class MovementBenchmarkPrinter {
 
 public:
   MovementBenchmarkPrinter(size_t runs_count, size_t moves_per_run_count)
-      : m_runs_count(runs_count), m_moves_per_run_count(moves_per_run_count) {}
+    : m_runs_count(runs_count), m_moves_per_run_count(moves_per_run_count) {}
 
   string board_header(const BoardType &board_type) const {
-    SokobanBoard board = board_type.board();
-    BoardManager manager(board);
+    SokobanPuzzle board = board_type.board();
+    BoardGraph graph(board);
+    BoardManager manager(graph);
     ostringstream ss;
-    ss << setw(10) << left << "SokobanBoard: "
+    ss << setw(10) << left << "SokobanPuzzle: "
        << "W: " << setw(5) << left << board.width() << "H: " << setw(5) << left
        << board.height() << "P: " << setw(5) << left << manager.pushers_count()
        << "B: " << setw(5) << left << manager.boxes_count();

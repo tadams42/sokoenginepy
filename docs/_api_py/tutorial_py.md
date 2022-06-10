@@ -30,7 +30,7 @@ that state. These flags are not displayed but are used internally by board edito
 movement logic, etc.. Board elements (cells) are implemented by `BoardCell` class.
 
 Game board is implemented using `VariantBoard` base class with concrete implementations
-for each variant (ie. `SokobanBoard`, `HexobanBoard`, etc...). For speed efficiency,
+for each variant (ie. `SokobanPuzzle`, `HexobanBoard`, etc...). For speed efficiency,
 board's 2D grid can be thought of as a 1D array of `BoardCell`. This means that most
 methods in `VariantBoard` and in other places in library, use 1D indexes to reference
 individual cells. Utility functions are provided that convert 2D coordinates to 1D
@@ -51,8 +51,8 @@ indexes and vice versa (ie. `index_1d`).
 Constructing an instance of board is as easy as:
 
 ```python
->>> from sokoenginepy.game import SokobanBoard
->>> board = SokobanBoard(board_str='\n'.join([
+>>> from sokoenginepy.io import SokobanPuzzle
+>>> board = SokobanPuzzle(board='\n'.join([
 ...     '    #####',
 ...     '    #  @#',
 ...     '    #$  #',
@@ -65,7 +65,7 @@ Constructing an instance of board is as easy as:
 ...     '    #     #########',
 ...     '    #######'
 ... ]))
->>> print(board.to_str(use_visible_floor=True))
+>>> print(board)
 ----#####----------
 ----#--@#----------
 ----#$--#----------
@@ -90,12 +90,12 @@ which can be retrieved from 2D coordinates using `index_1d`.
 >>> position = index_1d(11, 8, board.width)
 >>>
 >>> board[position]
-BoardCell('@')
+'@'
 >>> print(board[position])
 @
 >>> board[position] = Puzzle.BOX
 >>> board[position]
-BoardCell('$')
+'$'
 >>> board[position].has_pusher
 False
 >>> board[position].has_box
@@ -180,7 +180,7 @@ IllegalMoveError risen!
 Pusher ID: 2 can't be placed in position 125 occupied by '#'
 
 >>> # reverse solving mode
->>> board = SokobanBoard(board_str="""
+>>> board = SokobanPuzzle(board="""
 ...     #####
 ...     #  @#
 ...     #$  #
@@ -253,7 +253,7 @@ ID 1 are a pushed onto goals with ID 1 etc... Example of `HashedBoardManager` us
 
 ```python
 >>> from sokoenginepy.game import HashedBoardManager
->>> board = SokobanBoard(board_str="""
+>>> board = SokobanPuzzle(board="""
 ...     #####
 ...     #  @#
 ...     #$  #
@@ -268,7 +268,7 @@ ID 1 are a pushed onto goals with ID 1 etc... Example of `HashedBoardManager` us
 ... """[1:-1])
 >>> manager = HashedBoardManager(board)
 >>> manager
-HashedBoardManager(variant_board=SokobanBoard(board_str='\n'.join([
+HashedBoardManager(variant_board=SokobanPuzzle(board='\n'.join([
     '    #####          ',
     '    #  @#          ',
     '    #$  #          ',
@@ -381,7 +381,7 @@ collection = Collection()
 collection.load("~/sokoban/collections/fabulous_sokoban_problems.sok")
 
 board = collection[0].to_game_board()
-# => SokobanBoard
+# => SokobanPuzzle
 
 snapshot = collection[0].snapshots[0].to_game_snapshot()
 # => Snapshot

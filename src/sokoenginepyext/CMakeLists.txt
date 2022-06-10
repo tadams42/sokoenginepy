@@ -11,7 +11,6 @@ if(ENABLE_PYTHON_EXTENSION)
         export_board_cell.cpp
         export_board_graph.cpp
         export_tessellations.cpp
-        export_boards.cpp
         export_board_manager.cpp
         export_mover.cpp
         export_sokoban_plus.cpp
@@ -42,6 +41,7 @@ file(WRITE
 )
 add_executable(benchmarks EXCLUDE_FROM_ALL "${CMAKE_BINARY_DIR}/benchmarks.cpp")
 target_link_libraries(benchmarks PUBLIC sokoengine)
+target_compile_features(benchmarks PUBLIC cxx_std_17)
 set_target_properties(benchmarks
     PROPERTIES
         EXCLUDE_FROM_DEFAULT_BUILD 1
@@ -54,6 +54,7 @@ add_valgrind_memory_check_target(benchmarks)
 
 add_executable(playground EXCLUDE_FROM_ALL playground.cpp)
 target_link_libraries(playground PUBLIC sokoengine)
+target_compile_features(playground PUBLIC cxx_std_17)
 set_target_properties(playground
     PROPERTIES
         EXCLUDE_FROM_DEFAULT_BUILD 1

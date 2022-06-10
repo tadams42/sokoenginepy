@@ -5,12 +5,12 @@ from itertools import groupby
 from typing import Iterable, List, Optional
 
 from .atomic_move import AtomicMove
+from .board_graph import BoardGraph
 from .board_manager import CellAlreadyOccupiedError
 from .direction import Direction
 from .hashed_board_manager import HashedBoardManager
 from .piece import DEFAULT_PIECE_ID
 from .solving_mode import SolvingMode
-from .variant_board import VariantBoard
 
 
 class NonPlayableBoardError(RuntimeError):
@@ -72,11 +72,11 @@ class Mover:
     """
 
     def __init__(
-        self, board: VariantBoard, solving_mode: SolvingMode = SolvingMode.FORWARD
+        self, board: BoardGraph, solving_mode: SolvingMode = SolvingMode.FORWARD
     ):
         """
         Args:
-            board: Instance of :class:`.VariantBoard` subclasses
+            board: Instance of :class:`.BoardGraph` subclasses
             solving_mode: start the game in this solving mode
         """
         self._manager = HashedBoardManager(board)
@@ -93,7 +93,7 @@ class Mover:
             self._manager.switch_boxes_and_goals()
 
     @property
-    def board(self) -> VariantBoard:
+    def board(self) -> BoardGraph:
         """Board on which :class:`.Mover` is operating on"""
         return self._manager.board
 
@@ -135,7 +135,7 @@ class Mover:
     def last_move(self) -> List[AtomicMove]:
         """Sequence of :class:`.AtomicMove` that contains most recent movement.
 
-        Whenever :class:`.Mover` performs any movemet or pusher selection, it puts
+        Whenever :class:`.Mover` performs any movement or pusher selection, it puts
         resulting :class:`.AtomicMove` into this sequence in order atomic moves
         happened.
 
@@ -149,8 +149,8 @@ class Mover:
 
         Example:
 
-            >>> from sokoenginepy import Mover, SokobanBoard, AtomicMove, Direction
-            >>> board = SokobanBoard(board_str='\\n'.join([
+            >>> from sokoenginepy import Mover, SokobanPuzzle, AtomicMove, Direction
+            >>> board = SokobanPuzzle(board='\\n'.join([
             ...     '    #####',
             ...     '    #  @#',
             ...     '    #$  #',
@@ -167,7 +167,7 @@ class Mover:
             >>> mover.last_move = [AtomicMove(Direction.UP), AtomicMove(Direction.RIGHT)]
             >>> mover.undo_last_move()
             >>> mover.board
-            SokobanBoard(board_str='\\n'.join([
+            SokobanPuzzle(board='\\n'.join([
                 '    #####          ',
                 '    #   #          ',
                 '    #$@ #          ',

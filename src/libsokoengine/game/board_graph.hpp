@@ -2,11 +2,17 @@
 #define BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include "sokoengine_config.hpp"
+
 #include "board_state.hpp"
 
 #include <stdexcept>
 
 namespace sokoengine {
+
+namespace io {
+class Puzzle;
+} // namespace io
+
 namespace game {
 
 class BoardCell;
@@ -26,7 +32,6 @@ public:
 ///
 enum class LIBSOKOENGINE_API GraphType : int { DIRECTED = 0, DIRECTED_MULTI = 1 };
 
-
 ///
 /// Board graph implementation.
 ///
@@ -35,10 +40,9 @@ public:
   ///
   /// Edge weight type
   ///
-  typedef unsigned char weight_t;
+  typedef uint8_t weight_t;
 
-  explicit BoardGraph(board_size_t board_width = 0, board_size_t board_height = 0,
-                      const GraphType &graph_type = GraphType::DIRECTED);
+  explicit BoardGraph(const io::Puzzle &puzzle);
   BoardGraph(const BoardGraph &rv);
   BoardGraph &operator=(const BoardGraph &rv);
   BoardGraph(BoardGraph &&rv);
@@ -49,11 +53,21 @@ public:
   BoardCell &cell_at(position_t position);
   const BoardCell &cell(position_t position) const;
   BoardCell &cell(position_t position);
-  const BoardCell operator[](position_t position) const;
+  const BoardCell &operator[](position_t position) const;
   BoardCell &operator[](position_t position);
+
+  const Tessellation &tessellation() const;
+
+  ///
+  /// Formatted string representation of board.
+  ///
+  std::string to_board_str(bool use_visible_floor = false,
+                           bool rle_encode = false) const;
+  std::string str() const;
 
   bool contains(position_t position) const;
   board_size_t vertices_count() const;
+  board_size_t size() const;
   board_size_t edges_count() const;
   board_size_t board_width() const;
   board_size_t board_height() const;
@@ -87,7 +101,7 @@ public:
   position_t path_destination(position_t start_position,
                               const Directions &directions_path) const;
 
-  void reconfigure_edges(const Tessellation &tessellation);
+  void reconfigure_edges();
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;

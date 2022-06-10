@@ -10,7 +10,7 @@ from .piece import DEFAULT_PIECE_ID
 from .sokoban_plus import SokobanPlus
 
 if TYPE_CHECKING:
-    from .variant_board import VariantBoard
+    from .board_graph import BoardGraph
 
 
 class CellAlreadyOccupiedError(RuntimeError):
@@ -72,11 +72,11 @@ class BoardManager:
 
     def __init__(
         self,
-        variant_board: VariantBoard,
+        board: BoardGraph,
         boxorder: Optional[str] = None,
         goalorder: Optional[str] = None,
     ):
-        self._board = variant_board
+        self._board = board
         self._boxes = utilities.Flipdict()
         self._goals = utilities.Flipdict()
         self._pushers = utilities.Flipdict()
@@ -84,8 +84,8 @@ class BoardManager:
 
         pusher_id = box_id = goal_id = DEFAULT_PIECE_ID
 
-        for position in range(0, variant_board.size):
-            cell = variant_board[position]
+        for position in range(0, board.vertices_count):
+            cell = board[position]
 
             if cell.has_pusher:
                 self._pushers[pusher_id] = position
@@ -124,21 +124,12 @@ class BoardManager:
                     )
                 ),
                 prefix + "boxorder: '{}',".format(self.boxorder or ""),
-                prefix + "goalorder: '{}',".format(self.goalorder or ""),
-                prefix + "board:\n" + str(self.board) + ">",
+                prefix + "goalorder: '{}',".format(self.goalorder or "") + ">",
             ]
         )
 
-    def __repr__(self):
-        return "{}(variant_board={}, boxorder='{}', goalorder='{}')".format(
-            self.__class__.__name__,
-            repr(self.board),
-            self.boxorder or "",
-            self.goalorder or "",
-        )
-
     @property
-    def board(self) -> VariantBoard:
+    def board(self) -> BoardGraph:
         return self._board
 
     @property

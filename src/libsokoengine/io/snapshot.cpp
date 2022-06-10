@@ -1,5 +1,5 @@
 #include "snapshot.hpp"
-#include "puzzle_types.hpp"
+
 #include "rle.hpp"
 #include "utilities.hpp"
 
@@ -21,13 +21,11 @@ public:
   string m_updated_at;
   string m_duration;
   string m_solver;
-  string m_notes;
-  PuzzleTypes m_puzzle_type;
+  Strings m_notes;
 
-  PIMPL(size_t id, const std::string &moves, const std::string &title,
-        const std::string &created_at, const std::string &updated_at,
-        const std::string &duration, const std::string &solver,
-        const std::string &notes, const PuzzleTypes &puzzle_type)
+  PIMPL(size_t id, const string &moves, const string &title, const string &created_at,
+        const string &updated_at, const string &duration, const string &solver,
+        const Strings &notes)
     : m_id(id),
       m_moves(moves),
       m_title(title),
@@ -35,22 +33,20 @@ public:
       m_updated_at(updated_at),
       m_duration(duration),
       m_solver(solver),
-      m_notes(notes),
-      m_puzzle_type(puzzle_type) {}
+      m_notes(notes) {}
 };
 
-Snapshot::Snapshot(size_t id, const std::string &moves, const std::string &title,
-                   const std::string &created_at, const std::string &updated_at,
-                   const std::string &duration, const std::string &solver,
-                   const std::string &notes, const PuzzleTypes &puzzle_type)
-  : m_impl(std::make_unique<Snapshot::PIMPL>(id, moves, title, created_at, updated_at,
-                                             duration, solver, notes, puzzle_type)) {}
+Snapshot::Snapshot(size_t id, const string &moves, const string &title,
+                   const string &created_at, const string &updated_at,
+                   const string &duration, const string &solver, const Strings &notes)
+  : m_impl(make_unique<Snapshot::PIMPL>(id, moves, title, created_at, updated_at,
+                                        duration, solver, notes)) {}
 
 Snapshot::Snapshot(const Snapshot &rv)
-  : m_impl(std::make_unique<Snapshot::PIMPL>(
-      rv.m_impl->m_id, rv.m_impl->m_moves, rv.m_impl->m_title, rv.m_impl->m_created_at,
-      rv.m_impl->m_updated_at, rv.m_impl->m_duration, rv.m_impl->m_solver,
-      rv.m_impl->m_notes, rv.m_impl->m_puzzle_type)) {}
+  : m_impl(make_unique<Snapshot::PIMPL>(rv.m_impl->m_id, rv.m_impl->m_moves,
+                                        rv.m_impl->m_title, rv.m_impl->m_created_at,
+                                        rv.m_impl->m_updated_at, rv.m_impl->m_duration,
+                                        rv.m_impl->m_solver, rv.m_impl->m_notes)) {}
 
 Snapshot &Snapshot::operator=(const Snapshot &rv) {
   m_impl->m_id = rv.m_impl->m_id;
@@ -61,7 +57,6 @@ Snapshot &Snapshot::operator=(const Snapshot &rv) {
   m_impl->m_duration = rv.m_impl->m_duration;
   m_impl->m_solver = rv.m_impl->m_solver;
   m_impl->m_notes = rv.m_impl->m_notes;
-  m_impl->m_puzzle_type = rv.m_impl->m_puzzle_type;
 
   return *this;
 }
@@ -86,21 +81,11 @@ string &Snapshot::duration() { return m_impl->m_duration; }
 const string &Snapshot::solver() const { return m_impl->m_solver; }
 string &Snapshot::solver() { return m_impl->m_solver; }
 
-const string &Snapshot::notes() const { return m_impl->m_notes; }
-string &Snapshot::notes() { return m_impl->m_notes; }
+const Strings &Snapshot::notes() const { return m_impl->m_notes; }
+Strings &Snapshot::notes() { return m_impl->m_notes; }
 
 size_t Snapshot::id() const { return m_impl->m_id; }
 size_t &Snapshot::id() { return m_impl->m_id; }
-
-PuzzleTypes Snapshot::puzzle_type() const { return m_impl->m_puzzle_type; }
-PuzzleTypes &Snapshot::puzzle_type() { return m_impl->m_puzzle_type; }
-
-void Snapshot::clear() {
-  m_impl->m_moves = m_impl->m_title = m_impl->m_created_at = m_impl->m_updated_at =
-    m_impl->m_duration = m_impl->m_solver = m_impl->m_notes = "";
-  m_impl->m_id = 1;
-  m_impl->m_puzzle_type = PuzzleTypes::SOKOBAN;
-}
 
 size_t Snapshot::pushes_count() const {
   return count_if(m_impl->m_moves.cbegin(), m_impl->m_moves.cend(),
@@ -122,11 +107,7 @@ bool Snapshot::is_reverse() const {
   });
 }
 
-std::string Snapshot::reformatted(uint8_t break_long_lines_at, bool rle_encode) const {
-  return m_impl->m_moves;
-}
-
-bool Snapshot::is_snapshot(const std::string &line) {
+bool Snapshot::is_snapshot(const string &line) {
   return !contains_only_digits_and_spaces(line) &&
          all_of(line.begin(), line.end(), [](char c) -> bool {
            return isdigit(c) || Snapshot::is_pusher_step(c) || c == Rle::EOL ||
@@ -134,9 +115,9 @@ bool Snapshot::is_snapshot(const std::string &line) {
          });
 }
 
-string Snapshot::cleaned_moves(const std::string& line) {
+string Snapshot::cleaned_moves(const string &line) {
   if (!Snapshot::is_snapshot(line)) {
-    throw std::invalid_argument("Illegal characters found in snapshot string");
+    throw invalid_argument("Illegal characters found in snapshot string");
   }
 
   return Rle::decode(line);

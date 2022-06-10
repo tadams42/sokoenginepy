@@ -4,6 +4,8 @@ namespace game = sokoengine::game;
 namespace io = sokoengine::io;
 using namespace std;
 
+using sokoengine::position_t;
+
 void export_atomic_move(py::module &);
 void export_board_cell(py::module &);
 void export_board_graph(py::module &);
@@ -23,7 +25,6 @@ PYBIND11_MODULE(sokoenginepyext, m) {
 
   py::bind_vector<sokoengine::Strings>(m_io, "StringsList");
   py::bind_vector<io::Snapshots>(m_io, "SnapshotsList");
-  py::bind_vector<io::Puzzles>(m_io, "PuzzlesList");
 
   py::register_exception<game::CellAlreadyOccupiedError>(
     m_game, "CellAlreadyOccupiedError", PyExc_RuntimeError);
@@ -52,7 +53,6 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   export_board_cell(m_game);
   export_board_graph(m_game);
   export_tessellations(m_game);
-  export_boards(m_game);
   export_sokoban_plus(m_game);
   export_board_manager(m_game);
   export_mover(m_game);
@@ -66,15 +66,15 @@ PYBIND11_MODULE(sokoenginepyext, m) {
 
 namespace pybind11 {
 
-game::position_t receive_position(const handle &board_position, bool *converted) {
+position_t receive_position(const handle &board_position, bool *converted) {
   py_int_t maybe_number;
 
   if (converted != nullptr) *converted = true;
-  game::position_t retv = numeric_limits<game::position_t>::max();
+  position_t retv = numeric_limits<position_t>::max();
   try {
     maybe_number = board_position.cast<py_int_t>();
-    if (maybe_number >= 0 && maybe_number < game::MAX_POS) {
-      retv = (game::position_t)maybe_number;
+    if (maybe_number >= 0 && maybe_number < sokoengine::MAX_POS) {
+      retv = (position_t)maybe_number;
     } else {
       if (converted != nullptr) *converted = false;
     }
@@ -85,9 +85,9 @@ game::position_t receive_position(const handle &board_position, bool *converted)
   return retv;
 }
 
-game::position_t receive_position_throw(const handle &board_position) {
+position_t receive_position_throw(const handle &board_position) {
   bool converted;
-  game::position_t retv = receive_position(board_position, &converted);
+  position_t retv = receive_position(board_position, &converted);
 
   if (!converted)
     // In places where it is checked, Python implementation rises IndexError

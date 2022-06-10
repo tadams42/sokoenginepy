@@ -13,12 +13,12 @@ class LIBSOKOENGINE_API OctobanTessellation : public Tessellation {
 public:
   virtual const Directions &legal_directions() const override;
   virtual position_t neighbor_position(position_t position, const Direction &direction,
-                                       board_size_t board_width,
-                                       board_size_t board_height) const override;
+                                       board_size_t width,
+                                       board_size_t height) const override;
   virtual AtomicMove char_to_atomic_move(char input_chr) const override;
   virtual char atomic_move_to_char(const AtomicMove &atomic_move) const override;
-  virtual CellOrientation cell_orientation(position_t position, board_size_t board_width,
-                                           board_size_t board_height) const override;
+  virtual CellOrientation cell_orientation(position_t position, board_size_t width,
+                                           board_size_t height) const override;
 
   virtual std::string str() const override;
   virtual std::string repr() const override;

@@ -1,8 +1,9 @@
 #ifndef MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "atomic_move.hpp"
 #include "sokoengine_config.hpp"
+
+#include "atomic_move.hpp"
 
 #include <deque>
 #include <memory>
@@ -11,7 +12,7 @@
 namespace sokoengine {
 namespace game {
 
-class VariantBoard;
+class BoardGraph;
 class HashedBoardManager;
 
 ///
@@ -41,7 +42,7 @@ public:
 };
 
 ///
-/// Implements movement rules on VariantBoard.
+/// Implements movement rules on BoardGraph.
 ///
 class LIBSOKOENGINE_API Mover {
 public:
@@ -50,14 +51,14 @@ public:
   ///
   typedef std::deque<AtomicMove> Moves;
 
-  explicit Mover(VariantBoard &board, const SolvingMode &mode = SolvingMode::FORWARD);
+  explicit Mover(BoardGraph &board, const SolvingMode &mode = SolvingMode::FORWARD);
   Mover(const Mover &) = delete;
   Mover(Mover &&rv);
   Mover &operator=(const Mover &) = delete;
   Mover &operator=(Mover &&rv);
   virtual ~Mover();
 
-  const VariantBoard &board() const;
+  const BoardGraph &board() const;
   SolvingMode solving_mode() const;
   const HashedBoardManager &board_manager() const;
 
@@ -75,7 +76,7 @@ public:
   void set_pulls_boxes(bool value);
 
 protected:
-  const VariantBoard &initial_board() const;
+  const BoardGraph &initial_board() const;
 
 private:
   class LIBSOKOENGINE_LOCAL PIMPL;

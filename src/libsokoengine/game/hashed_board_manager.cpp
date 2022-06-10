@@ -1,7 +1,8 @@
 #include "hashed_board_manager.hpp"
+
 #include "board_cell.hpp"
+#include "board_graph.hpp"
 #include "sokoban_plus.hpp"
-#include "variant_board.hpp"
 
 #include <chrono>
 #include <random>
@@ -14,8 +15,6 @@ using namespace std;
 
 namespace sokoengine {
 namespace game {
-
-using namespace implementation;
 
 class LIBSOKOENGINE_LOCAL HashedBoardManager::PIMPL {
 public:
@@ -47,9 +46,7 @@ public:
           tmp.clear();
         }
       }
-      if (!tmp.empty()) {
-        retv.push_back(indent + "    " + boost::join(tmp, ", "));
-      }
+      if (!tmp.empty()) { retv.push_back(indent + "    " + boost::join(tmp, ", ")); }
 
       return retv;
     };
@@ -88,8 +85,7 @@ public:
   }
 
   void zobrist_rehash(const HashedBoardManager &parent) {
-    if (!m_hash_invalidated)
-      return;
+    if (!m_hash_invalidated) return;
     m_hash_invalidated = false;
 
     set<piece_id_t> distinct_box_plus_ids;
@@ -98,7 +94,7 @@ public:
     }
 
     board_size_t board_without_walls_size =
-        parent.board().size() - parent.walls_positions().size();
+      parent.board().vertices_count() - parent.walls_positions().size();
 
     size_t random_pool_size = board_without_walls_size +
                               distinct_box_plus_ids.size() * board_without_walls_size +
@@ -112,7 +108,7 @@ public:
     m_boxes_factors = map<piece_id_t, hash_vector_t>();
     for (auto box_plus_id : distinct_box_plus_ids) {
       m_boxes_factors[box_plus_id] = hash_vector_t();
-      for (board_size_t i = 0; i < parent.board().size(); i++) {
+      for (board_size_t i = 0; i < parent.board().vertices_count(); i++) {
         if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
                       i) != parent.walls_positions().end())
           m_boxes_factors[box_plus_id].push_back(0);
@@ -120,7 +116,7 @@ public:
           m_boxes_factors[box_plus_id].push_back(random_pool[index++]);
       }
     }
-    for (board_size_t i = 0; i < parent.board().size(); i++) {
+    for (board_size_t i = 0; i < parent.board().vertices_count(); i++) {
       if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
                     i) != parent.walls_positions().end())
         m_pushers_factors.push_back(0);
@@ -131,22 +127,18 @@ public:
     // Hash from boxes positions
     for (auto box_id : parent.boxes_ids()) {
       m_state_hash ^=
-          m_boxes_factors[parent.box_plus_id(box_id)][parent.box_position(box_id)];
+        m_boxes_factors[parent.box_plus_id(box_id)][parent.box_position(box_id)];
     }
 
     for (auto pusher_id : parent.pushers_ids()) {
       m_state_hash ^= m_pushers_factors[parent.pusher_position(pusher_id)];
     }
   }
-
-protected:
-  PIMPL(const PIMPL &) = delete;
-  PIMPL &operator=(const PIMPL &) = delete;
 }; // HashedBoardManager::PIMPL
 
-HashedBoardManager::HashedBoardManager(VariantBoard &board, const string &boxorder,
+HashedBoardManager::HashedBoardManager(BoardGraph &board, const string &boxorder,
                                        const string &goalorder)
-    : BoardManager(board, boxorder, goalorder), m_impl(std::make_unique<PIMPL>()) {}
+  : BoardManager(board, boxorder, goalorder), m_impl(std::make_unique<PIMPL>()) {}
 
 HashedBoardManager::HashedBoardManager(HashedBoardManager &&) = default;
 
@@ -184,7 +176,7 @@ zobrist_key_t HashedBoardManager::external_state_hash(BoardState &board_state) c
   piece_id_t index = 0;
   for (auto box_position : board_state.boxes_positions()) {
     retv ^=
-        m_impl->m_boxes_factors[box_plus_id(DEFAULT_PIECE_ID + index)][box_position];
+      m_impl->m_boxes_factors[box_plus_id(DEFAULT_PIECE_ID + index)][box_position];
     index++;
   }
 
@@ -260,7 +252,7 @@ HashedBoardManager::solutions_hashes() const {
     auto slns = solutions();
     for (auto solution : slns) {
       const_cast<HashedBoardManager *>(this)->m_impl->m_solutions_hashes.insert(
-          external_state_hash(solution));
+        external_state_hash(solution));
     }
   }
 
@@ -278,11 +270,6 @@ string HashedBoardManager::str() const {
                      "              goalorder:", "                    goalorder:");
   boost::replace_all(retv, "              board:", "                    board:");
   return retv;
-}
-
-string HashedBoardManager::repr() const {
-  return "HashedBoardManager(variant_board=" + board().repr() + ", " + "boxorder='" +
-         boxorder() + "', " + "goalorder='" + goalorder() + "')";
 }
 
 BoardState HashedBoardManager::state() const {

@@ -13,7 +13,7 @@ namespace game {
 ///
 class LIBSOKOENGINE_API HashedBoardManager : public BoardManager {
 public:
-  explicit HashedBoardManager(VariantBoard &board, const std::string &boxorder = "",
+  explicit HashedBoardManager(BoardGraph &board, const std::string &boxorder = "",
                               const std::string &goalorder = "");
   HashedBoardManager(const HashedBoardManager &) = delete;
   HashedBoardManager(HashedBoardManager &&rv);
@@ -45,7 +45,6 @@ public:
   const solutions_hashes_t &solutions_hashes() const;
 
   virtual std::string str() const override;
-  virtual std::string repr() const override;
 
 protected:
   virtual void pusher_moved(position_t old_position,

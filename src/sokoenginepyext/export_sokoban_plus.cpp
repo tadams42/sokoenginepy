@@ -1,6 +1,7 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
+using sokoengine::piece_id_t;
 using namespace sokoengine::game;
 
 void export_sokoban_plus(py::module &m) {

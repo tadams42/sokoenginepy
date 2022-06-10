@@ -1,13 +1,46 @@
+import textwrap
 from copy import deepcopy
 
-from sokoenginepy.game import DEFAULT_PIECE_ID
+import pytest
+
+from sokoenginepy.game import DEFAULT_PIECE_ID, BoardGraph, HashedBoardManager
+from sokoenginepy.io import SokobanPuzzle
+
+
+@pytest.fixture
+def puzzle():
+    #   0123456789012345678
+    data = """
+        ----#####----------
+        ----#--@#----------
+        ----#$--#----------
+        --###--$##---------
+        --#--$-$-#---------
+        ###-#-##-#---######
+        #---#-##-#####--..#
+        #-$--$----------..#
+        #####-###-#@##--..#
+        ----#-----#########
+        ----#######--------
+    """
+    data = textwrap.dedent(data.lstrip("\n").rstrip())
+    return SokobanPuzzle(board=data)
+
+
+@pytest.fixture
+def board_graph(puzzle):
+    return BoardGraph(puzzle)
 
 
 class DescribeHashedBoardManager:
-    def it_hashes_board_layout(self, hashed_board_manager):
+    def it_hashes_board_layout(self, board_graph):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         assert hashed_board_manager.state_hash is not None
 
-    def test_moving_box_modifies_hashes_consistently(self, hashed_board_manager):
+    def test_moving_box_modifies_hashes_consistently(self, board_graph):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         initial_state_hash = hashed_board_manager.state_hash
 
         initial_box_position = hashed_board_manager.box_position(DEFAULT_PIECE_ID)
@@ -25,7 +58,9 @@ class DescribeHashedBoardManager:
         hashed_board_manager.move_box(DEFAULT_PIECE_ID, initial_box_position)
         assert hashed_board_manager.state_hash == initial_state_hash
 
-    def test_moving_pusher_modifies_hashes_consistently(self, hashed_board_manager):
+    def test_moving_pusher_modifies_hashes_consistently(self, board_graph):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         initial_state_hash = hashed_board_manager.state_hash
 
         initial_pusher_position = hashed_board_manager.pusher_position(DEFAULT_PIECE_ID)
@@ -44,8 +79,10 @@ class DescribeHashedBoardManager:
         assert hashed_board_manager.state_hash == initial_state_hash
 
     def test_setting_boxorder_or_goalorder_on_enabled_sokoban_plus_rehashes_board(
-        self, hashed_board_manager
+        self, board_graph
     ):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         initial_state_hash = hashed_board_manager.state_hash
         hashed_board_manager.enable_sokoban_plus()
         assert hashed_board_manager.is_sokoban_plus_enabled is True
@@ -60,8 +97,10 @@ class DescribeHashedBoardManager:
         assert hashed_board_manager.state_hash != initial_state_hash
 
     def test_setting_equal_boxorder_or_goalorder_on_enabled_sokoban_plus_doesnt_rehash_board(
-        self, hashed_board_manager
+        self, board_graph
     ):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         hashed_board_manager.boxorder = "1 2 3"
         hashed_board_manager.goalorder = "3 2 1"
         hashed_board_manager.enable_sokoban_plus()
@@ -74,8 +113,10 @@ class DescribeHashedBoardManager:
         assert hashed_board_manager.state_hash == initial_state_hash
 
     def test_setting_boxorder_or_goalorder_on_disabled_sokoban_plus_doesnt_rehash_board(
-        self, hashed_board_manager
+        self, board_graph
     ):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         hashed_board_manager.disable_sokoban_plus()
         initial_state_hash = hashed_board_manager.state_hash
 
@@ -85,9 +126,9 @@ class DescribeHashedBoardManager:
         hashed_board_manager.goalorder = "3 2 1"
         assert hashed_board_manager.state_hash == initial_state_hash
 
-    def test_changing_enabled_state_of_sokoban_plus_rehashes_board(
-        self, hashed_board_manager
-    ):
+    def test_changing_enabled_state_of_sokoban_plus_rehashes_board(self, board_graph):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         hashed_board_manager.disable_sokoban_plus()
 
         initial_state_hash = hashed_board_manager.state_hash
@@ -98,18 +139,18 @@ class DescribeHashedBoardManager:
         hashed_board_manager.disable_sokoban_plus()
         assert hashed_board_manager.state_hash != initial_state_hash
 
-    def test_enabling_enabled_sokoban_plus_doesnt_rehash_board(
-        self, hashed_board_manager
-    ):
+    def test_enabling_enabled_sokoban_plus_doesnt_rehash_board(self, board_graph):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         hashed_board_manager.enable_sokoban_plus()
 
         initial_state_hash = hashed_board_manager.state_hash
         hashed_board_manager.enable_sokoban_plus()
         assert hashed_board_manager.state_hash == initial_state_hash
 
-    def test_disabling_disabled_sokoban_plus_doesnt_rehash_board(
-        self, hashed_board_manager
-    ):
+    def test_disabling_disabled_sokoban_plus_doesnt_rehash_board(self, board_graph):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         hashed_board_manager.disable_sokoban_plus()
 
         initial_state_hash = hashed_board_manager.state_hash
@@ -117,8 +158,10 @@ class DescribeHashedBoardManager:
         assert hashed_board_manager.state_hash == initial_state_hash
 
     def test_solutions_hashes_are_different_for_enabled_and_disabled_sokoban_plus(
-        self, hashed_board_manager
+        self, board_graph
     ):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         disabled_hashes = deepcopy(hashed_board_manager.solutions_hashes)
 
         hashed_board_manager.boxorder = "1 3 2"
@@ -132,8 +175,10 @@ class DescribeHashedBoardManager:
         assert enabled_hashes != disabled_hashes
 
     def test_switching_boxes_and_goals_switches_between_positions_hashes(
-        self, hashed_board_manager
+        self, board_graph
     ):
+        hashed_board_manager = HashedBoardManager(board_graph)
+
         initial_hash = hashed_board_manager.state_hash
         hashed_board_manager.switch_boxes_and_goals()
         after_switch_hash = hashed_board_manager.state_hash

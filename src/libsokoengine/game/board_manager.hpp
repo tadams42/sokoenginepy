@@ -12,7 +12,7 @@
 namespace sokoengine {
 namespace game {
 
-class VariantBoard;
+class BoardGraph;
 
 ///
 /// Exception.
@@ -38,7 +38,7 @@ public:
 ///
 class LIBSOKOENGINE_API BoardManager {
 public:
-  explicit BoardManager(VariantBoard &board, const std::string &boxorder = "",
+  explicit BoardManager(BoardGraph &board, const std::string &boxorder = "",
                         const std::string &goalorder = "");
   BoardManager(const BoardManager &) = delete;
   BoardManager(BoardManager &&rv);
@@ -58,7 +58,7 @@ public:
   ///
   typedef std::map<piece_id_t, position_t> positions_by_id_t;
 
-  const VariantBoard &board() const;
+  const BoardGraph &board() const;
 
   board_size_t pushers_count() const;
   piece_ids_vector_t pushers_ids() const;
@@ -114,7 +114,6 @@ public:
   bool is_playable() const;
 
   virtual std::string str() const;
-  virtual std::string repr() const;
 
   virtual BoardState state() const;
 

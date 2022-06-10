@@ -20,11 +20,14 @@ def _get_filtered_members(mdl):
 def io_members():
     return {
         "Collection",
+        "HexobanPuzzle",
+        "is_blank",
+        "OctobanPuzzle",
         "Puzzle",
-        "PuzzleTypes",
         "Rle",
         "Snapshot",
-        "is_blank",
+        "SokobanPuzzle",
+        "TriobanPuzzle",
     }
 
 
@@ -42,21 +45,16 @@ def game_members_both():
         "Direction",
         "GraphType",
         "HashedBoardManager",
-        "HexobanBoard",
         "HexobanTessellation",
         "IllegalMoveError",
         "Mover",
         "NonPlayableBoardError",
-        "OctobanBoard",
         "OctobanTessellation",
-        "SokobanBoard",
         "SokobanPlus",
         "SokobanPlusDataError",
         "SokobanTessellation",
         "SolvingMode",
-        "TriobanBoard",
         "TriobanTessellation",
-        "VariantBoard",
     }
 
 
@@ -86,7 +84,6 @@ def game_members_py_always():
         "MoveCommand",
         "ROW",
         "SelectPusherCommand",
-        "Snapshot",
         "Tessellation",
         "TessellationOrDescription",
         "X",

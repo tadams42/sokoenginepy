@@ -1,6 +1,5 @@
 #include "trioban_tessellation.hpp"
 #include "atomic_move.hpp"
-#include "board_cell.hpp"
 #include "direction.hpp"
 #include "snapshot.hpp"
 
@@ -8,8 +7,6 @@ using namespace std;
 
 namespace sokoengine {
 namespace game {
-
-using namespace implementation;
 
 const Directions &TriobanTessellation::legal_directions() const {
   static const Directions retv{Direction::LEFT,       Direction::RIGHT,
@@ -20,12 +17,12 @@ const Directions &TriobanTessellation::legal_directions() const {
 
 position_t TriobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
-                                                  board_size_t board_width,
-                                                  board_size_t board_height) const {
-  if (!ON_BOARD(position, board_width, board_height)) return MAX_POS + 1;
-  position_t row = Y(position, board_width), column = X(position, board_width);
+                                                  board_size_t width,
+                                                  board_size_t height) const {
+  if (!ON_BOARD(position, width, height)) return MAX_POS + 1;
+  position_t row = Y(position, width), column = X(position, width);
   int8_t dy, dx;
-  bool tpd = cell_orientation(position, board_width, board_height) ==
+  bool tpd = cell_orientation(position, width, height) ==
              CellOrientation::TRIANGLE_DOWN;
 
   switch (direction) {
@@ -80,8 +77,8 @@ position_t TriobanTessellation::neighbor_position(position_t position,
 
   row += dy;
   column += dx;
-  if (ON_BOARD(column, row, board_width, board_height))
-    return index_1d(column, row, board_width);
+  if (ON_BOARD(column, row, width, height))
+    return index_1d(column, row, width);
   else
     return MAX_POS + 1;
 }
@@ -143,10 +140,10 @@ char TriobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
 }
 
 CellOrientation TriobanTessellation::cell_orientation(position_t pos,
-                                                      board_size_t board_width,
-                                                      board_size_t board_height) const {
-  position_t column = COLUMN(pos, board_width);
-  position_t row = ROW(pos, board_width);
+                                                      board_size_t width,
+                                                      board_size_t height) const {
+  position_t column = COLUMN(pos, width);
+  position_t row = ROW(pos, width);
   return (column + (row % 2)) % 2 == 0 ? CellOrientation::TRIANGLE_DOWN
                                        : CellOrientation::DEFAULT;
 }

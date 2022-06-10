@@ -5,7 +5,10 @@ import pytest
 from sokoenginepy.game import BoardCell
 from sokoenginepy.io import Puzzle
 
-from ..fixtures import BoardCellFactory
+
+@pytest.fixture
+def board_cell():
+    return BoardCell()
 
 
 class DescribeBoardCell:
@@ -19,7 +22,7 @@ class DescribeBoardCell:
             assert not board_cell.is_in_playable_area
             assert not board_cell.is_deadlock
 
-            board_cell: BoardCell = BoardCellFactory(character=Puzzle.PUSHER)
+            board_cell: BoardCell = BoardCell(character=Puzzle.PUSHER)
             assert not board_cell.is_in_playable_area
             assert not board_cell.is_deadlock
 

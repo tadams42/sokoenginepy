@@ -2,17 +2,12 @@
 import pytest
 
 from sokoenginepy.game import (
-    CellOrientation,
-    Direction,
-    HexobanBoard,
-    OctobanBoard,
-    SokobanBoard,
-    Tessellation,
-    TriobanBoard,
-    index_1d,
-    is_on_board_1d,
+    CellOrientation, Direction, Tessellation, index_1d, is_on_board_1d
 )
 
+from sokoenginepy.io import (
+    HexobanPuzzle, OctobanPuzzle, SokobanPuzzle, TriobanPuzzle
+)
 
 def triangle_points_down(position, board_width, board_height):
     return Tessellation.TRIOBAN.cell_orientation(

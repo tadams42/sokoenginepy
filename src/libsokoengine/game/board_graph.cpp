@@ -1,5 +1,6 @@
 #include "board_graph.hpp"
 #include "board_cell.hpp"
+#include "puzzle.hpp"
 #include "tessellation.hpp"
 
 #include <algorithm>
@@ -9,11 +10,13 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
 using namespace std;
-using namespace boost;
-using namespace boost::graph;
 
 namespace sokoengine {
 namespace game {
+
+using boost::on_tree_edge;
+using boost::vertex_index;
+using io::Puzzle;
 
 BoardSizeExceededError::BoardSizeExceededError(const string &mess)
   : runtime_error(mess) {}
@@ -66,23 +69,17 @@ public:
   GraphType m_graph_type;
   board_size_t m_board_width;
   board_size_t m_board_height;
+  const Tessellation &m_tessellation;
 
-  PIMPL(board_size_t board_width, board_size_t board_height,
-        const GraphType &graph_type)
-    : m_graph(board_width * board_height),
-      m_graph_type(graph_type),
-      m_board_width(board_width),
-      m_board_height(board_height) {
-    if (board_width > MAX_WIDTH)
-      throw BoardSizeExceededError("board_width id tool big!");
-    if (board_height > MAX_HEIGHT)
-      throw BoardSizeExceededError("board_height id tool big!");
+  PIMPL(board_size_t width, board_size_t height, const Tessellation &tessellation)
+    : m_graph(width * height),
+      m_graph_type(tessellation.graph_type()),
+      m_board_width(width),
+      m_board_height(height),
+      m_tessellation(tessellation) {
+    if (width > MAX_WIDTH) throw BoardSizeExceededError("width id tool big!");
+    if (height > MAX_HEIGHT) throw BoardSizeExceededError("height id tool big!");
   }
-
-  PIMPL(const PIMPL &rv) = default;
-  PIMPL &operator=(const PIMPL &rv) = default;
-  PIMPL(PIMPL &&rv) = default;
-  PIMPL &operator=(PIMPL &&rv) = default;
 
   const BoardCell &cell_at(position_t position) const {
     return const_cast<PIMPL *>(this)->cell_at(position);
@@ -148,9 +145,17 @@ public:
   }
 };
 
-BoardGraph::BoardGraph(board_size_t board_width, board_size_t board_height,
-                       const GraphType &graph_type)
-  : m_impl(std::make_unique<PIMPL>(board_width, board_height, graph_type)) {}
+BoardGraph::BoardGraph(const io::Puzzle &puzzle)
+  : m_impl(
+      std::make_unique<PIMPL>(puzzle.width(), puzzle.height(), puzzle.tessellation())) {
+  board_size_t s = puzzle.size();
+
+  for (position_t pos = 0; pos < s; ++pos) {
+    m_impl->m_graph[pos] = BoardCell(puzzle[pos]);
+  }
+
+  reconfigure_edges();
+}
 
 BoardGraph::BoardGraph(const BoardGraph &rv)
   : m_impl(std::make_unique<PIMPL>(*rv.m_impl)) {}
@@ -180,7 +185,7 @@ const BoardCell &BoardGraph::cell(position_t position) const {
 
 BoardCell &BoardGraph::cell(position_t position) { return m_impl->m_graph[position]; }
 
-const BoardCell BoardGraph::operator[](position_t position) const {
+const BoardCell &BoardGraph::operator[](position_t position) const {
   return m_impl->m_graph[position];
 }
 
@@ -192,7 +197,26 @@ bool BoardGraph::contains(position_t position) const {
   return m_impl->contains(position);
 }
 
+const Tessellation &BoardGraph::tessellation() const { return m_impl->m_tessellation; }
+
+string BoardGraph::to_board_str(bool use_visible_floor, bool rle_encode) const {
+  Puzzle::unique_ptr_t puzzle = Puzzle::instance_from(
+    m_impl->m_tessellation, m_impl->m_board_width, m_impl->m_board_height);
+
+  for (position_t pos = 0; pos < vertices_count(); pos++) {
+    puzzle->set(pos, (*this)[pos].str());
+  }
+
+  return puzzle->to_board_str(use_visible_floor, rle_encode);
+}
+
+string BoardGraph::str() const { return to_board_str(true); }
+
 board_size_t BoardGraph::vertices_count() const { return m_impl->vertices_count(); }
+
+board_size_t BoardGraph::size() const {
+  return m_impl->m_board_width * m_impl->m_board_height;
+}
 
 board_size_t BoardGraph::edges_count() const { return num_edges(m_impl->m_graph); }
 
@@ -490,12 +514,12 @@ position_t BoardGraph::path_destination(position_t start_position,
   return retv;
 }
 
-void BoardGraph::reconfigure_edges(const Tessellation &tessellation) {
+void BoardGraph::reconfigure_edges() {
   remove_all_edges();
   for (board_size_t source_position = 0; source_position < vertices_count();
        ++source_position) {
-    for (const Direction &direction : tessellation.legal_directions()) {
-      auto neighbor_position = tessellation.neighbor_position(
+    for (const Direction &direction : m_impl->m_tessellation.legal_directions()) {
+      auto neighbor_position = m_impl->m_tessellation.neighbor_position(
         source_position, direction, m_impl->m_board_width, m_impl->m_board_height);
       if (neighbor_position <= MAX_POS)
         add_edge(source_position, neighbor_position, direction);

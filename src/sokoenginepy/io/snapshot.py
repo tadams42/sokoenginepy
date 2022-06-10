@@ -3,13 +3,8 @@ from functools import reduce
 from operator import add, or_
 from typing import Final, List, Optional, Set
 
-from .puzzle_types import PuzzleTypes
 from .rle import Rle
-from .utilities import (
-    contains_only_digits_and_spaces,
-    is_blank,
-    should_insert_line_break_at,
-)
+from .utilities import contains_only_digits_and_spaces, is_blank
 
 
 class Snapshot:
@@ -78,13 +73,12 @@ class Snapshot:
         self,
         id: int = 0,
         moves: str = "",
-        puzzle_type: Optional[PuzzleTypes] = PuzzleTypes.SOKOBAN,
         title: str = "",
         duration: Optional[str] = None,
         solver: str = "",
-        notes: Optional[List[str]] = None,
         created_at: str = "",
         updated_at: str = "",
+        notes: Optional[List[str]] = None,
     ):
         self.id = id
         self._moves = moves
@@ -94,7 +88,6 @@ class Snapshot:
         self.notes: List[str] = notes or []
         self.created_at = created_at
         self.updated_at = updated_at
-        self.puzzle_type: PuzzleTypes = puzzle_type or PuzzleTypes.SOKOBAN
 
         self._pushes_count: Optional[int] = None
         self._moves_count: Optional[int] = None
@@ -149,25 +142,6 @@ class Snapshot:
             [chr == self.JUMP_BEGIN or chr == self.JUMP_END for chr in self.moves],
             False,
         )
-
-    def clear(self):
-        self._moves = ""
-        self.title = ""
-        self.duration = ""
-        self.solver = ""
-        self.notes = []
-        self.created_at = ""
-        self.updated_at = ""
-
-    def reformatted(
-        self, break_long_lines_at: int = 80, rle_encode: bool = False
-    ) -> str:
-        tmp = ""
-        for i, character in enumerate(self.moves):
-            tmp += character
-            if should_insert_line_break_at(i + 1, break_long_lines_at):
-                tmp += "\n"
-        return tmp
 
 
 _MOVEMENT_CHARACTERS: Set[str] = {

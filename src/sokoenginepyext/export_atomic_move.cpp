@@ -1,6 +1,7 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
+using namespace sokoengine;
 using namespace sokoengine::game;
 
 piece_id_t receive_pusher_id(const py::object &pusher_id) {

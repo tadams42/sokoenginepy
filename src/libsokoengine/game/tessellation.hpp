@@ -1,9 +1,10 @@
 #ifndef TESSELLATION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TESSELLATION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
+#include "sokoengine_config.hpp"
+
 #include "atomic_move.hpp"
 #include "board_graph.hpp"
-#include "sokoengine_config.hpp"
 
 #include <stdexcept>
 
@@ -11,7 +12,7 @@ namespace sokoengine {
 namespace game {
 
 ///
-/// Special property of BoardCell that is needed in some tessellations and that
+/// Special property of board position that is needed in some tessellations and that
 /// depends on cell position.
 ///
 enum class LIBSOKOENGINE_API CellOrientation : int {
@@ -19,12 +20,6 @@ enum class LIBSOKOENGINE_API CellOrientation : int {
   TRIANGLE_DOWN = 1,
   OCTAGON = 2
 };
-
-namespace implementation {
-class LIBSOKOENGINE_LOCAL VariantBoardResizer;
-class LIBSOKOENGINE_LOCAL VariantBoardParser;
-class LIBSOKOENGINE_LOCAL VariantBoardPrinter;
-} // namespace implementation
 
 class LIBSOKOENGINE_API SokobanTessellation;
 class LIBSOKOENGINE_API HexobanTessellation;
@@ -59,8 +54,8 @@ public:
   /// direction would've resulted with off-board position.
   ///
   virtual position_t neighbor_position(position_t position, const Direction &direction,
-                                       board_size_t board_width,
-                                       board_size_t board_height) const = 0;
+                                       board_size_t width,
+                                       board_size_t height) const = 0;
   ///
   /// Converts charater into instance of AtomicMove in context of Tessellation.
   ///
@@ -72,11 +67,8 @@ public:
   virtual GraphType graph_type() const;
 
   virtual CellOrientation cell_orientation(position_t position,
-                                           board_size_t board_width,
-                                           board_size_t board_height) const;
-  virtual const implementation::VariantBoardResizer &resizer() const;
-  virtual const implementation::VariantBoardPrinter &printer() const;
-  virtual const implementation::VariantBoardParser &parser() const;
+                                           board_size_t width,
+                                           board_size_t height) const;
 
   virtual std::string str() const = 0;
   virtual std::string repr() const = 0;
@@ -88,52 +80,52 @@ protected:
 ///
 /// Converts 2D board position to 1D board position
 ///
-constexpr position_t index_1d(position_t x, position_t y, board_size_t board_width) {
-  return y * board_width + x;
+constexpr position_t index_1d(position_t x, position_t y, board_size_t width) {
+  return y * width + x;
 }
 
 ///
 /// Calculates x-axis position from 1D board position
 ///
-constexpr position_t X(position_t index, board_size_t board_width) {
-  return board_width == 0 ? 0 : index % board_width;
+constexpr position_t X(position_t index, board_size_t width) {
+  return width == 0 ? 0 : index % width;
 }
 
 ///
 /// Calculates y-axis position from 1D board position
 ///
-constexpr position_t Y(position_t index, board_size_t board_width) {
-  return board_width == 0 ? 0 : index / board_width;
+constexpr position_t Y(position_t index, board_size_t width) {
+  return width == 0 ? 0 : index / width;
 }
 
 ///
 /// Alias for Y()
 ///
-constexpr position_t ROW(position_t index, board_size_t board_width) {
-  return Y(index, board_width);
+constexpr position_t ROW(position_t index, board_size_t width) {
+  return Y(index, width);
 }
 
 ///
 /// Alias for X()
 ///
-constexpr position_t COLUMN(position_t index, board_size_t board_width) {
-  return X(index, board_width);
+constexpr position_t COLUMN(position_t index, board_size_t width) {
+  return X(index, width);
 }
 
 ///
 /// Is position on given board?
 ///
-constexpr bool ON_BOARD(position_t x, position_t y, board_size_t board_width,
-                        board_size_t board_height) {
-  return x < board_width && y < board_height;
+constexpr bool ON_BOARD(position_t x, position_t y, board_size_t width,
+                        board_size_t height) {
+  return x < width && y < height;
 }
 
 ///
 /// Is position on given board?
 ///
-constexpr bool ON_BOARD(position_t pos, board_size_t board_width,
-                        board_size_t board_height) {
-  return ON_BOARD(X(pos, board_width), Y(pos, board_width), board_width, board_height);
+constexpr bool ON_BOARD(position_t pos, board_size_t width,
+                        board_size_t height) {
+  return ON_BOARD(X(pos, width), Y(pos, width), width, height);
 }
 
 } // namespace game
