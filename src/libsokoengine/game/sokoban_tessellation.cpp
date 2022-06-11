@@ -1,5 +1,5 @@
 #include "sokoban_tessellation.hpp"
-#include "atomic_move.hpp"
+#include "pusher_step.hpp"
 #include "direction.hpp"
 #include "snapshot.hpp"
 
@@ -46,7 +46,7 @@ position_t SokobanTessellation::neighbor_position(position_t position,
     return MAX_POS + 1;
 }
 
-char SokobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
+char SokobanTessellation::pusher_step_to_char(const PusherStep &rv) const {
   switch (rv.direction()) {
   case Direction::LEFT:
     return rv.is_push_or_pull() ? io::Snapshot::L : io::Snapshot::l;
@@ -57,30 +57,30 @@ char SokobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
   case Direction::DOWN:
     return rv.is_push_or_pull() ? io::Snapshot::D : io::Snapshot::d;
   default:
-    throw invalid_argument("Illegal AtomicMove character in SokobanTessellation!");
+    throw invalid_argument("Illegal PusherStep character in SokobanTessellation!");
   }
 }
 
-AtomicMove SokobanTessellation::char_to_atomic_move(char rv) const {
+PusherStep SokobanTessellation::char_to_pusher_step(char rv) const {
   switch (rv) {
   case io::Snapshot::l:
-    return AtomicMove(Direction::LEFT, false);
+    return PusherStep(Direction::LEFT, false);
   case io::Snapshot::L:
-    return AtomicMove(Direction::LEFT, true);
+    return PusherStep(Direction::LEFT, true);
   case io::Snapshot::u:
-    return AtomicMove(Direction::UP, false);
+    return PusherStep(Direction::UP, false);
   case io::Snapshot::U:
-    return AtomicMove(Direction::UP, true);
+    return PusherStep(Direction::UP, true);
   case io::Snapshot::r:
-    return AtomicMove(Direction::RIGHT, false);
+    return PusherStep(Direction::RIGHT, false);
   case io::Snapshot::R:
-    return AtomicMove(Direction::RIGHT, true);
+    return PusherStep(Direction::RIGHT, true);
   case io::Snapshot::d:
-    return AtomicMove(Direction::DOWN, false);
+    return PusherStep(Direction::DOWN, false);
   case io::Snapshot::D:
-    return AtomicMove(Direction::DOWN, true);
+    return PusherStep(Direction::DOWN, true);
   default:
-    throw invalid_argument("Illegal AtomicMove direction in SokobanTessellation!");
+    throw invalid_argument("Illegal PusherStep direction in SokobanTessellation!");
   }
 }
 

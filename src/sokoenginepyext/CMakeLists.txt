@@ -7,7 +7,7 @@ if(ENABLE_PYTHON_EXTENSION)
 
     pybind11_add_module(sokoenginepyext
         sokoenginepyext.cpp
-        export_atomic_move.cpp
+        export_pusher_step.cpp
         export_board_cell.cpp
         export_board_graph.cpp
         export_tessellations.cpp

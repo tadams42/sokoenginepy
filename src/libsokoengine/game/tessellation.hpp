@@ -3,7 +3,7 @@
 
 #include "sokoengine_config.hpp"
 
-#include "atomic_move.hpp"
+#include "pusher_step.hpp"
 #include "board_graph.hpp"
 
 #include <stdexcept>
@@ -57,13 +57,13 @@ public:
                                        board_size_t width,
                                        board_size_t height) const = 0;
   ///
-  /// Converts charater into instance of AtomicMove in context of Tessellation.
+  /// Converts charater into instance of PusherStep in context of Tessellation.
   ///
-  virtual AtomicMove char_to_atomic_move(char input_chr) const = 0;
+  virtual PusherStep char_to_pusher_step(char input_chr) const = 0;
   ///
-  /// Converts AtomicMove into character representation in context of Tessellation.
+  /// Converts PusherStep into character representation in context of Tessellation.
   ///
-  virtual char atomic_move_to_char(const AtomicMove &atomic_move) const = 0;
+  virtual char pusher_step_to_char(const PusherStep &pusher_step) const = 0;
   virtual GraphType graph_type() const;
 
   virtual CellOrientation cell_orientation(position_t position,

@@ -198,8 +198,8 @@ only when boxes with ID 1 are a pushed onto goals with ID 1 etc...
 
 ## Game snapshots and movement recording
 
-Each step of each pusher is recorded by instance of `AtomicMove`. Sequence of
-`AtomicMove` is implemented in `Snapshot`. Just like `VariantBoard`, `Snapshot` is
+Each step of each pusher is recorded by instance of `PusherStep`. Sequence of
+`PusherStep` is implemented in `Snapshot`. Just like `VariantBoard`, `Snapshot` is
 serializable to `std::string`. Traditional snapshots string format is extended to
 support recording of jumps and selecting of different pushers in `Multiban` boards,
 again following [SokobanYASC] .sok file format specification.

@@ -24,7 +24,7 @@ class MoverCommand(ABC):
     @property
     def rendered(self):
         """
-        Sequence of :class:`.AtomicMove` from last command execution (redo or undo).
+        Sequence of :class:`.PusherStep` from last command execution (redo or undo).
 
         This sequence shows the moves like they would be rendered in GUI. Because of
         that, it shows different moves between undo and redo calls.
@@ -37,7 +37,7 @@ class MoverCommand(ABC):
     @property
     def moves(self):
         """
-        Sequence of :class:`.AtomicMove` as a result of redo execution.
+        Sequence of :class:`.PusherStep` as a result of redo execution.
 
         This sequence shows the moves like they would be stored in :class:`.Snapshot`
         and remains same between undo and redo executions.

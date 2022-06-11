@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .atomic_move import AtomicMove
+    from .pusher_step import PusherStep
     from .board_cell import BoardCell
     from .board_graph import BoardGraph
     from .board_manager import (
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 else:
     try:
         from sokoenginepyext.game import (
-            AtomicMove,
+            PusherStep,
             BoardCell,
             BoardGraph,
             BoardManager,
@@ -50,7 +50,7 @@ else:
         )
 
     except ImportError:
-        from .atomic_move import AtomicMove
+        from .pusher_step import PusherStep
         from .board_cell import BoardCell
         from .board_graph import BoardGraph
         from .board_manager import (

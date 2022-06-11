@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from typing import ClassVar, Mapping, Optional, Tuple
 
-from .atomic_move import AtomicMove
+from .pusher_step import PusherStep
 from .cell_orientation import CellOrientation
 from .direction import Direction
 from .graph_type import GraphType
@@ -15,8 +15,8 @@ class TessellationBase(metaclass=ABCMeta):
     """
 
     _LEGAL_DIRECTIONS: ClassVar[Tuple[Direction, ...]] = tuple()
-    _CHR_TO_ATOMIC_MOVE: ClassVar[Mapping[str, Tuple[Direction, bool]]] = {}
-    _ATOMIC_MOVE_TO_CHR: ClassVar[Mapping[Tuple[Direction, bool], str]] = {}
+    _CHR_TO_PUSHER_STEP: ClassVar[Mapping[str, Tuple[Direction, bool]]] = {}
+    _PUSHER_STEP_TO_CHR: ClassVar[Mapping[Tuple[Direction, bool], str]] = {}
 
     @property
     def legal_directions(self) -> Tuple[Direction, ...]:
@@ -54,36 +54,36 @@ class TessellationBase(metaclass=ABCMeta):
         """
         return GraphType.DIRECTED
 
-    def atomic_move_to_char(self, atomic_move: AtomicMove) -> str:
+    def pusher_step_to_char(self, pusher_step: PusherStep) -> str:
         """
-        Converts :class:`.AtomicMove` to movement character.
+        Converts :class:`.PusherStep` to movement character.
 
         Raises:
             :exc:`ValueError`: conversion not possible in context of this tessellation
         """
         try:
-            retv = self._ATOMIC_MOVE_TO_CHR[
-                (atomic_move.direction, atomic_move.is_push_or_pull)
+            retv = self._PUSHER_STEP_TO_CHR[
+                (pusher_step.direction, pusher_step.is_push_or_pull)
             ]
         except KeyError:
-            raise ValueError(atomic_move)
+            raise ValueError(pusher_step)
 
         return retv
 
-    def char_to_atomic_move(self, input_chr: str) -> AtomicMove:
+    def char_to_pusher_step(self, input_chr: str) -> PusherStep:
         """
-        Converts movement character to :class:`.AtomicMove`.
+        Converts movement character to :class:`.PusherStep`.
 
         Raises:
             :exc:`ValueError`: conversion is not possible in context of this
                                tessellation
         """
         try:
-            direction, box_moved = self._CHR_TO_ATOMIC_MOVE[input_chr]
+            direction, box_moved = self._CHR_TO_PUSHER_STEP[input_chr]
         except KeyError:
             raise ValueError(input_chr)
 
-        return AtomicMove(direction=direction, box_moved=box_moved)
+        return PusherStep(direction=direction, box_moved=box_moved)
 
     def cell_orientation(
         self, position: int, board_width: int, board_height: int

@@ -66,9 +66,9 @@ public:
 
     m_last_move.clear();
     for (const Direction &direction : selection_path) {
-      AtomicMove atomic_move(direction, false);
-      atomic_move.set_is_pusher_selection(true);
-      m_last_move.push_back(atomic_move);
+      PusherStep pusher_step(direction, false);
+      pusher_step.set_is_pusher_selection(true);
+      m_last_move.push_back(pusher_step);
     }
 
     m_selected_pusher = pusher_id;
@@ -98,10 +98,10 @@ public:
         m_manager.board().find_jump_path(old_position, new_position));
     m_last_move.clear();
     for (const Direction &direction : path) {
-      AtomicMove atomic_move(direction, false);
-      atomic_move.set_is_jump(true);
-      atomic_move.set_pusher_id(m_selected_pusher);
-      m_last_move.push_back(atomic_move);
+      PusherStep pusher_step(direction, false);
+      pusher_step.set_is_jump(true);
+      pusher_step.set_pusher_id(m_selected_pusher);
+      m_last_move.push_back(pusher_step);
     }
   }
 
@@ -141,16 +141,16 @@ public:
       throw IllegalMoveError(exc.what());
     }
 
-    AtomicMove atomic_move(direction, is_push);
-    atomic_move.set_pusher_id(m_selected_pusher);
+    PusherStep pusher_step(direction, is_push);
+    pusher_step.set_pusher_id(m_selected_pusher);
     if (is_push) {
-      atomic_move.set_moved_box_id(m_manager.box_id_on(in_front_of_box));
+      pusher_step.set_moved_box_id(m_manager.box_id_on(in_front_of_box));
       if (options.decrease_pull_count && m_pull_count > 0) {
         m_pull_count -= 1;
       }
     }
     m_last_move.clear();
-    m_last_move.push_back(atomic_move);
+    m_last_move.push_back(pusher_step);
   }
 
   void pull_or_move(const Direction &direction, const MoveWorkerOptions &options) {
@@ -190,13 +190,13 @@ public:
       }
     }
 
-    AtomicMove atomic_move(direction, is_pull);
-    atomic_move.set_pusher_id(m_selected_pusher);
+    PusherStep pusher_step(direction, is_pull);
+    pusher_step.set_pusher_id(m_selected_pusher);
     if (is_pull) {
-      atomic_move.set_moved_box_id(m_manager.box_id_on(initial_pusher_position));
+      pusher_step.set_moved_box_id(m_manager.box_id_on(initial_pusher_position));
     }
     m_last_move.clear();
-    m_last_move.push_back(atomic_move);
+    m_last_move.push_back(pusher_step);
   }
 
   void undo_last_move() {
@@ -207,7 +207,7 @@ public:
     int pusher_change_key = 1;
     int move_key = 2;
 
-    auto key_functor = [&](const AtomicMove &elem) {
+    auto key_functor = [&](const PusherStep &elem) {
       if (elem.is_jump()) {
         return jump_key;
       } else if (elem.is_pusher_selection()) {
@@ -222,8 +222,8 @@ public:
       // gb.second -> values
 
       if (gb.first == move_key) {
-        for (const AtomicMove &am : gb.second) {
-          undo_atomic_move(am);
+        for (const PusherStep &am : gb.second) {
+          undo_pusher_step(am);
           new_last_moves.insert(new_last_moves.end(), m_last_move.begin(),
                                 m_last_move.end());
         }
@@ -243,27 +243,27 @@ public:
     m_last_move = new_last_moves;
   }
 
-  void undo_atomic_move(const AtomicMove &atomic_move) {
+  void undo_pusher_step(const PusherStep &pusher_step) {
     MoveWorkerOptions options;
     if (m_solving_mode == SolvingMode::FORWARD) {
       bool has_box_behind_pusher = m_manager.has_box_on(m_manager.board().neighbor(
-          m_manager.pusher_position(m_selected_pusher), atomic_move.direction()));
+          m_manager.pusher_position(m_selected_pusher), pusher_step.direction()));
 
-      if (!atomic_move.is_move() && !has_box_behind_pusher)
+      if (!pusher_step.is_move() && !has_box_behind_pusher)
         throw IllegalMoveError("Requested push undo, but no box behind pusher!");
 
-      options.force_pulls = !atomic_move.is_move();
+      options.force_pulls = !pusher_step.is_move();
       options.increase_pull_count = false;
-      pull_or_move(opposite(atomic_move.direction()), options);
+      pull_or_move(opposite(pusher_step.direction()), options);
     } else {
       options.decrease_pull_count = true;
-      push_or_move(opposite(atomic_move.direction()), options);
+      push_or_move(opposite(pusher_step.direction()), options);
     }
   }
 
   void undo_jump(const Mover::Moves &jump_moves) {
     Directions path;
-    for (const AtomicMove &am : jump_moves)
+    for (const PusherStep &am : jump_moves)
       path.push_back(opposite(am.direction()));
     position_t old_position = m_manager.pusher_position(m_selected_pusher);
     position_t new_position = m_manager.board().path_destination(old_position, path);
@@ -272,7 +272,7 @@ public:
 
   void undo_pusher_selection(const Mover::Moves &selection_moves) {
     Directions path;
-    for (const AtomicMove &am : selection_moves)
+    for (const PusherStep &am : selection_moves)
       path.push_back(opposite(am.direction()));
     position_t old_position = m_manager.pusher_position(m_selected_pusher);
     position_t new_position = m_manager.board().path_destination(old_position, path);

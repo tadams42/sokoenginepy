@@ -28,7 +28,7 @@ class SokobanTessellation(TessellationBase):
         Direction.DOWN,
     )
 
-    _CHR_TO_ATOMIC_MOVE: Final[Dict[str, Tuple[Direction, bool]]] = {
+    _CHR_TO_PUSHER_STEP: Final[Dict[str, Tuple[Direction, bool]]] = {
         Snapshot.l: (Direction.LEFT, False),
         Snapshot.L: (Direction.LEFT, True),
         Snapshot.r: (Direction.RIGHT, False),
@@ -39,8 +39,8 @@ class SokobanTessellation(TessellationBase):
         Snapshot.D: (Direction.DOWN, True),
     }
 
-    _ATOMIC_MOVE_TO_CHR: Final[Dict[Tuple[Direction, bool], str]] = inverted(
-        _CHR_TO_ATOMIC_MOVE
+    _PUSHER_STEP_TO_CHR: Final[Dict[Tuple[Direction, bool], str]] = inverted(
+        _CHR_TO_PUSHER_STEP
     )
 
     _NEIGHBOR_SHIFT: Final[Dict[Direction, Tuple[int, int]]] = {

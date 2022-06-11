@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from itertools import groupby
 from typing import Iterable, List, Optional
 
-from .atomic_move import AtomicMove
+from .pusher_step import PusherStep
 from .board_graph import BoardGraph
 from .board_manager import CellAlreadyOccupiedError
 from .direction import Direction
@@ -84,7 +84,7 @@ class Mover:
         self._pulls_boxes = True
         self._selected_pusher: int = DEFAULT_PIECE_ID
         self._pull_count: int = 0
-        self._last_move: List[AtomicMove] = []
+        self._last_move: List[PusherStep] = []
 
         if not self._manager.is_playable:
             raise NonPlayableBoardError
@@ -132,11 +132,11 @@ class Mover:
         self._pulls_boxes = rv
 
     @property
-    def last_move(self) -> List[AtomicMove]:
-        """Sequence of :class:`.AtomicMove` that contains most recent movement.
+    def last_move(self) -> List[PusherStep]:
+        """Sequence of :class:`.PusherStep` that contains most recent movement.
 
         Whenever :class:`.Mover` performs any movement or pusher selection, it puts
-        resulting :class:`.AtomicMove` into this sequence in order atomic moves
+        resulting :class:`.PusherStep` into this sequence in order pusher steps
         happened.
 
         This is useful for movement animation in GUI. After Mover performs movement,
@@ -145,11 +145,11 @@ class Mover:
 
         It is also possible to set this to some external sequence of moves. In that
         case, calling :meth:`.undo_last_move` will cause Mover to try to undo that
-        external sequence of atomic moves.
+        external sequence of pusher steps.
 
         Example:
 
-            >>> from sokoenginepy import Mover, SokobanPuzzle, AtomicMove, Direction
+            >>> from sokoenginepy import Mover, SokobanPuzzle, PusherStep, Direction
             >>> board = SokobanPuzzle(board='\\n'.join([
             ...     '    #####',
             ...     '    #  @#',
@@ -164,7 +164,7 @@ class Mover:
             ...     '    #######'
             ... ]))
             >>> mover = Mover(board)
-            >>> mover.last_move = [AtomicMove(Direction.UP), AtomicMove(Direction.RIGHT)]
+            >>> mover.last_move = [PusherStep(Direction.UP), PusherStep(Direction.RIGHT)]
             >>> mover.undo_last_move()
             >>> mover.board
             SokobanPuzzle(board='\\n'.join([
@@ -181,7 +181,7 @@ class Mover:
                 '    #######        '
             ]))
             >>> mover.last_move
-            [AtomicMove(Direction.LEFT, box_moved=False), AtomicMove(Direction.DOWN, box_moved=False)]
+            [PusherStep(Direction.LEFT, box_moved=False), PusherStep(Direction.DOWN, box_moved=False)]
 
         Warning:
             Subsequent movement overwrites this meaning that Mover can only undo last
@@ -191,7 +191,7 @@ class Mover:
         return self._last_move
 
     @last_move.setter
-    def last_move(self, rv: List[AtomicMove]):
+    def last_move(self, rv: List[PusherStep]):
         self._last_move = rv
 
     def select_pusher(self, pusher_id: int):
@@ -220,9 +220,9 @@ class Mover:
 
         self._last_move = []
         for direction in selection_path:
-            atomic_move = AtomicMove(direction, False)
-            atomic_move.is_pusher_selection = True
-            self._last_move.append(atomic_move)
+            pusher_step = PusherStep(direction, False)
+            pusher_step.is_pusher_selection = True
+            self._last_move.append(pusher_step)
 
         self._selected_pusher = pusher_id
 
@@ -282,10 +282,10 @@ class Mover:
         )
 
         def jump_am(direction):
-            atomic_move = AtomicMove(direction, False)
-            atomic_move.is_jump = True
-            atomic_move.pusher_id = self._selected_pusher
-            return atomic_move
+            pusher_step = PusherStep(direction, False)
+            pusher_step.is_jump = True
+            pusher_step.pusher_id = self._selected_pusher
+            return pusher_step
 
         self._last_move = [jump_am(direction) for direction in path]
 
@@ -312,8 +312,8 @@ class Mover:
 
         for moves_type, moves_group in groupby(reversed(old_last_moves), key_functor):
             if moves_type == move_key:
-                for atomic_move in moves_group:
-                    self._undo_atomic_move(atomic_move)
+                for pusher_step in moves_group:
+                    self._undo_pusher_step(pusher_step)
                     new_last_moves += self._last_move
             elif moves_type == jump_key:
                 self._undo_jump(moves_group)
@@ -324,33 +324,33 @@ class Mover:
 
         self._last_move = new_last_moves
 
-    def _undo_atomic_move(self, atomic_move: AtomicMove):
+    def _undo_pusher_step(self, pusher_step: PusherStep):
         options = MoveWorkerOptions()
         if self._solving_mode == SolvingMode.FORWARD:
             has_box_behind_pusher = self.board_manager.has_box_on(
                 self._manager.board.neighbor(
                     self.board_manager.pusher_position(self.selected_pusher),
-                    atomic_move.direction,
+                    pusher_step.direction,
                 )
             )
 
-            if not atomic_move.is_move and not has_box_behind_pusher:
+            if not pusher_step.is_move and not has_box_behind_pusher:
                 raise IllegalMoveError("Requested push undo, but no box behind pusher!")
-            options.force_pulls = not atomic_move.is_move
+            options.force_pulls = not pusher_step.is_move
             options.increase_pull_count = False
-            self._pull_or_move(atomic_move.direction.opposite, options)
+            self._pull_or_move(pusher_step.direction.opposite, options)
         else:
             options.decrease_pull_count = True
-            self._push_or_move(atomic_move.direction.opposite, options)
+            self._push_or_move(pusher_step.direction.opposite, options)
 
-    def _undo_jump(self, jump_moves: Iterable[AtomicMove]):
-        path = [atomic_move.direction.opposite for atomic_move in jump_moves]
+    def _undo_jump(self, jump_moves: Iterable[PusherStep]):
+        path = [pusher_step.direction.opposite for pusher_step in jump_moves]
         old_position = self._manager.pusher_position(self._selected_pusher)
         new_position = self._manager.board.path_destination(old_position, path)
         self.jump(new_position)
 
-    def _undo_pusher_selection(self, selection_moves: Iterable[AtomicMove]):
-        path = [atomic_move.direction.opposite for atomic_move in selection_moves]
+    def _undo_pusher_selection(self, selection_moves: Iterable[PusherStep]):
+        path = [pusher_step.direction.opposite for pusher_step in selection_moves]
         old_position = self._manager.pusher_position(self._selected_pusher)
         new_position = self._manager.board.path_destination(old_position, path)
         self.select_pusher(self._manager.pusher_id_on(new_position))
@@ -397,13 +397,13 @@ class Mover:
         except CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
-        atomic_move = AtomicMove(direction, is_push)
-        atomic_move.pusher_id = self._selected_pusher
+        pusher_step = PusherStep(direction, is_push)
+        pusher_step.pusher_id = self._selected_pusher
         if is_push:
-            atomic_move.moved_box_id = self._manager.box_id_on(in_front_of_box)
+            pusher_step.moved_box_id = self._manager.box_id_on(in_front_of_box)
             if options.decrease_pull_count and self._pull_count > 0:
                 self._pull_count -= 1
-        self._last_move = [atomic_move]
+        self._last_move = [pusher_step]
 
     def _pull_or_move(self, direction: Direction, options: MoveWorkerOptions):
         """
@@ -441,8 +441,8 @@ class Mover:
                 if options.increase_pull_count:
                     self._pull_count += 1
 
-        atomic_move = AtomicMove(direction, is_pull)
-        atomic_move.pusher_id = self._selected_pusher
+        pusher_step = PusherStep(direction, is_pull)
+        pusher_step.pusher_id = self._selected_pusher
         if is_pull:
-            atomic_move.moved_box_id = self._manager.box_id_on(initial_pusher_position)
-        self._last_move = [atomic_move]
+            pusher_step.moved_box_id = self._manager.box_id_on(initial_pusher_position)
+        self._last_move = [pusher_step]

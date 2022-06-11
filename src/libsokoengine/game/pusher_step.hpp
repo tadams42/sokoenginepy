@@ -1,5 +1,5 @@
-#ifndef ATOMIC_MOVE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
-#define ATOMIC_MOVE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#ifndef PUSHER_STEP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#define PUSHER_STEP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include "sokoengine_config.hpp"
 #include "direction.hpp"
@@ -12,16 +12,16 @@ namespace game {
 ///
 /// Single step of single pusher.
 ///
-class LIBSOKOENGINE_API AtomicMove {
+class LIBSOKOENGINE_API PusherStep {
 public:
-  explicit AtomicMove(const Direction &direction = Direction::LEFT,
+  explicit PusherStep(const Direction &direction = Direction::LEFT,
                       bool box_moved = false, bool is_jump = false,
                       bool is_pusher_selection = false,
                       piece_id_t pusher_id = DEFAULT_PIECE_ID,
                       piece_id_t moved_box_id = NULL_ID);
 
-  bool operator==(const AtomicMove &rv) const;
-  bool operator!=(const AtomicMove &rv) const;
+  bool operator==(const PusherStep &rv) const;
+  bool operator!=(const PusherStep &rv) const;
 
   std::string str() const;
   std::string repr() const;

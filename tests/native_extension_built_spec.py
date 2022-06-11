@@ -34,7 +34,7 @@ def io_members():
 @pytest.fixture
 def game_members_both():
     return {
-        "AtomicMove",
+        "PusherStep",
         "BoardCell",
         "BoardGraph",
         "BoardManager",

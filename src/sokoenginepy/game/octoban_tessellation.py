@@ -36,7 +36,7 @@ class OctobanTessellation(TessellationBase):
         Direction.SOUTH_WEST,
     )
 
-    _CHR_TO_ATOMIC_MOVE: Final[Dict[str, Tuple[Direction, bool]]] = {
+    _CHR_TO_PUSHER_STEP: Final[Dict[str, Tuple[Direction, bool]]] = {
         Snapshot.l: (Direction.LEFT, False),
         Snapshot.L: (Direction.LEFT, True),
         Snapshot.r: (Direction.RIGHT, False),
@@ -55,8 +55,8 @@ class OctobanTessellation(TessellationBase):
         Snapshot.S: (Direction.SOUTH_WEST, True),
     }
 
-    _ATOMIC_MOVE_TO_CHR: Final[Dict[Tuple[Direction, bool], str]] = inverted(
-        _CHR_TO_ATOMIC_MOVE
+    _PUSHER_STEP_TO_CHR: Final[Dict[Tuple[Direction, bool], str]] = inverted(
+        _CHR_TO_PUSHER_STEP
     )
 
     _NEIGHBOR_SHIFT: Final[Dict[Direction, Tuple[int, int]]] = {

@@ -357,8 +357,8 @@ True
 
 ## Game snapshots and movement recording
 
-Each step of each pusher is recorded by instance of `AtomicMove`. Sequence of
-`AtomicMove` is implemented in `Snapshot`. Just like `VariantBoard`, `Snapshot`
+Each step of each pusher is recorded by instance of `PusherStep`. Sequence of
+`PusherStep` is implemented in `Snapshot`. Just like `VariantBoard`, `Snapshot`
 is serializable to string. Traditional snapshots string format is extended to support
 recording of jumps and selecting of different pushers in Multiban boards, again
 following [SokobanYASC] .sok file format specification.

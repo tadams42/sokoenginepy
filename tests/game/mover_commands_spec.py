@@ -1,6 +1,6 @@
 from sokoenginepy.game import (
     DEFAULT_PIECE_ID,
-    AtomicMove,
+    PusherStep,
     Direction,
     JumpCommand,
     MoveCommand,
@@ -98,17 +98,17 @@ class DescribeMoveCommand:
         command = MoveCommand(forward_mover, Direction.UP)
 
         command.redo()
-        assert command.moves == [AtomicMove(Direction.UP)]
-        assert command.rendered == [AtomicMove(Direction.UP)]
+        assert command.moves == [PusherStep(Direction.UP)]
+        assert command.rendered == [PusherStep(Direction.UP)]
 
         command.undo()
-        assert command.moves == [AtomicMove(Direction.UP)]
-        assert command.rendered == [AtomicMove(Direction.DOWN)]
+        assert command.moves == [PusherStep(Direction.UP)]
+        assert command.rendered == [PusherStep(Direction.DOWN)]
 
         command.redo()
-        assert command.moves == [AtomicMove(Direction.UP)]
-        assert command.rendered == [AtomicMove(Direction.UP)]
+        assert command.moves == [PusherStep(Direction.UP)]
+        assert command.rendered == [PusherStep(Direction.UP)]
 
         command.undo()
-        assert command.moves == [AtomicMove(Direction.UP)]
-        assert command.rendered == [AtomicMove(Direction.DOWN)]
+        assert command.moves == [PusherStep(Direction.UP)]
+        assert command.rendered == [PusherStep(Direction.DOWN)]

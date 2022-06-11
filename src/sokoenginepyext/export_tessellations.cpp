@@ -39,11 +39,11 @@ void export_tessellations(py::module &m) {
 
       .def_property_readonly("graph_type", &Tessellation::graph_type)
 
-      .def("char_to_atomic_move", &Tessellation::char_to_atomic_move,
+      .def("char_to_pusher_step", &Tessellation::char_to_pusher_step,
            py::arg("input_chr"))
 
-      .def("atomic_move_to_char", &Tessellation::atomic_move_to_char,
-           py::arg("atomic_move"))
+      .def("pusher_step_to_char", &Tessellation::pusher_step_to_char,
+           py::arg("pusher_step"))
 
       .def("cell_orientation", &Tessellation::cell_orientation, py::arg("position"),
            py::arg("board_width"), py::arg("board_height"));

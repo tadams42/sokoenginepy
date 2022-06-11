@@ -44,7 +44,7 @@ constexpr const char* OPPOSITE_NAMES[DIRECTIONS_COUNT] = {
   "UP",   "NORTH_EAST", "RIGHT", "SOUTH_EAST"
 };
 
-void export_atomic_move(py::module &m) {
+void export_pusher_step(py::module &m) {
   auto direction_enm = py::enum_<Direction>(m, "Direction")
     .value("UP", Direction::UP)
     .value("DOWN", Direction::DOWN)
@@ -84,11 +84,11 @@ void export_atomic_move(py::module &m) {
   //   py::return_value_policy::reference
   // );
 
-  py::class_<AtomicMove>(m, "AtomicMove")
+  py::class_<PusherStep>(m, "PusherStep")
     .def(py::init([](const Direction &direction, bool box_moved, bool is_jump,
                      bool is_pusher_selection, const py::object &pusher_id,
                      const py::object &moved_box_id) {
-           return make_unique<AtomicMove>(
+           return make_unique<PusherStep>(
              direction, box_moved, is_jump, is_pusher_selection,
              receive_pusher_id(pusher_id), receive_box_id(moved_box_id));
          }),
@@ -100,13 +100,13 @@ void export_atomic_move(py::module &m) {
          py::arg("moved_box_id") = py::none())
 
     // protocols
-    .def("__eq__", &AtomicMove::operator==)
-    .def("__ne__", &AtomicMove::operator!=)
-    .def("__str__", &AtomicMove::str)
-    .def("__repr__", &AtomicMove::repr)
+    .def("__eq__", &PusherStep::operator==)
+    .def("__ne__", &PusherStep::operator!=)
+    .def("__str__", &PusherStep::str)
+    .def("__repr__", &PusherStep::repr)
 
     .def(py::pickle(
-      [](const AtomicMove &self) { // __getstate__
+      [](const PusherStep &self) { // __getstate__
         return py::make_tuple(self.direction(), self.is_push_or_pull(), self.is_jump(),
                               self.is_pusher_selection(), self.pusher_id(),
                               self.moved_box_id());
@@ -114,47 +114,47 @@ void export_atomic_move(py::module &m) {
       [](py::tuple t) { // __setstate__
         if (t.size() != 6) throw std::runtime_error("Invalid state!");
         // TODO: t[5].cast<piece_id_t>() - what if t[5] i s None?
-        return make_unique<AtomicMove>(
+        return make_unique<PusherStep>(
           t[0].cast<Direction>(), t[1].cast<bool>(), t[2].cast<bool>(),
           t[3].cast<bool>(), t[4].cast<piece_id_t>(), t[5].cast<piece_id_t>());
       }))
 
     .def_property(
       "direction",
-      [direction_enm](const AtomicMove &self) {
+      [direction_enm](const PusherStep &self) {
         return direction_enm.attr(NAMES[static_cast<uint8_t>(self.direction())]);
       },
-      &AtomicMove::set_direction
+      &PusherStep::set_direction
     )
 
-    .def_property( "direction_copy", &AtomicMove::direction, &AtomicMove::set_direction)
-    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.AtomicMove()" "a.direction"
-    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.AtomicMove()" "a.direction_copy"
-    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.AtomicMove()" "a.direction.opposite"
-    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.AtomicMove()" "a.direction_copy.opposite_copy"
+    .def_property( "direction_copy", &PusherStep::direction, &PusherStep::set_direction)
+    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.PusherStep()" "a.direction"
+    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.PusherStep()" "a.direction_copy"
+    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.PusherStep()" "a.direction.opposite"
+    // python -m timeit -r10 -s "import sokoenginepyext; a = sokoenginepyext.PusherStep()" "a.direction_copy.opposite_copy"
 
     .def_property("moved_box_id",
-                  [](const AtomicMove &self) -> py::object {
+                  [](const PusherStep &self) -> py::object {
                     if (self.moved_box_id() == NULL_ID) return py::none();
                     return py::cast(self.moved_box_id());
                   },
-                  [](AtomicMove &self, const py::object &val) {
+                  [](PusherStep &self, const py::object &val) {
                     self.set_moved_box_id(receive_box_id(val));
                   })
 
     .def_property("pusher_id",
-                  [](const AtomicMove &self) -> py::object {
+                  [](const PusherStep &self) -> py::object {
                     if (self.pusher_id() == NULL_ID) return py::none();
                     return py::cast(self.pusher_id());
                   },
-                  [](AtomicMove &self, const py::object &val) {
+                  [](PusherStep &self, const py::object &val) {
                     self.set_pusher_id(receive_pusher_id(val));
                   })
 
-    .def_property("is_move", &AtomicMove::is_move, &AtomicMove::set_is_move)
-    .def_property("is_push_or_pull", &AtomicMove::is_push_or_pull,
-                  &AtomicMove::set_is_push_or_pull)
-    .def_property("is_pusher_selection", &AtomicMove::is_pusher_selection,
-                  &AtomicMove::set_is_pusher_selection)
-    .def_property("is_jump", &AtomicMove::is_jump, &AtomicMove::set_is_jump);
+    .def_property("is_move", &PusherStep::is_move, &PusherStep::set_is_move)
+    .def_property("is_push_or_pull", &PusherStep::is_push_or_pull,
+                  &PusherStep::set_is_push_or_pull)
+    .def_property("is_pusher_selection", &PusherStep::is_pusher_selection,
+                  &PusherStep::set_is_pusher_selection)
+    .def_property("is_jump", &PusherStep::is_jump, &PusherStep::set_is_jump);
 }

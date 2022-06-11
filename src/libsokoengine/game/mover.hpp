@@ -3,7 +3,7 @@
 
 #include "sokoengine_config.hpp"
 
-#include "atomic_move.hpp"
+#include "pusher_step.hpp"
 
 #include <deque>
 #include <memory>
@@ -47,9 +47,9 @@ public:
 class LIBSOKOENGINE_API Mover {
 public:
   ///
-  /// Ordered sequence of AtomicMove.
+  /// Ordered sequence of PusherStep.
   ///
-  typedef std::deque<AtomicMove> Moves;
+  typedef std::deque<PusherStep> Moves;
 
   explicit Mover(BoardGraph &board, const SolvingMode &mode = SolvingMode::FORWARD);
   Mover(const Mover &) = delete;

@@ -1,10 +1,10 @@
 Snapshot
 ========
 
-AtomicMove
+PusherStep
 ----------
 
-.. autoclass:: sokoenginepy.AtomicMove
+.. autoclass:: sokoenginepy.PusherStep
     :members:
     :undoc-members:
 

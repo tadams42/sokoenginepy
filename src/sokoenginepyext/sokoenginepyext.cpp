@@ -6,7 +6,7 @@ using namespace std;
 
 using sokoengine::position_t;
 
-void export_atomic_move(py::module &);
+void export_pusher_step(py::module &);
 void export_board_cell(py::module &);
 void export_board_graph(py::module &);
 void export_tessellations(py::module &);
@@ -49,7 +49,7 @@ PYBIND11_MODULE(sokoenginepyext, m) {
 
   py::register_exception<game::BoardSizeExceededError>(m_game, "BoardSizeExceededError",
                                                        PyExc_RuntimeError);
-  export_atomic_move(m_game);
+  export_pusher_step(m_game);
   export_board_cell(m_game);
   export_board_graph(m_game);
   export_tessellations(m_game);

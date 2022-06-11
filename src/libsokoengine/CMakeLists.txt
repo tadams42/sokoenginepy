@@ -4,7 +4,7 @@ set(SELF_HEADERS
     game/board_cell.hpp
     game/board_graph.hpp
 
-    game/atomic_move.hpp
+    game/pusher_step.hpp
     game/mover.hpp
 
     game/board_manager.hpp
@@ -48,7 +48,7 @@ set(SELF_SOURCES
     game/board_cell.cpp
     game/board_graph.cpp
 
-    game/atomic_move.cpp
+    game/pusher_step.cpp
     game/mover.cpp
 
     game/board_manager.cpp

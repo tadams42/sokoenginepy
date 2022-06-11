@@ -4,7 +4,7 @@ from .direction import Direction
 from .piece import DEFAULT_PIECE_ID
 
 
-class AtomicMove:
+class PusherStep:
     """
     Represents single step of pusher movement.
 
@@ -38,17 +38,17 @@ class AtomicMove:
     ):
         if (box_moved or moved_box_id) and is_pusher_selection and is_jump:
             raise ValueError(
-                "AtomicMove can't be all, a push, a jump and a pusher selection!"
+                "PusherStep can't be all, a push, a jump and a pusher selection!"
             )
 
         if is_jump and is_pusher_selection:
-            raise ValueError("AtomicMove can't be both, a jump and a pusher selection!")
+            raise ValueError("PusherStep can't be both, a jump and a pusher selection!")
 
         if (box_moved or moved_box_id) and is_jump:
-            raise ValueError("AtomicMove can't be both, a push and a jump!")
+            raise ValueError("PusherStep can't be both, a push and a jump!")
 
         if (box_moved or moved_box_id) and is_pusher_selection:
-            raise ValueError("AtomicMove can't be both, a push and a pusher selection!")
+            raise ValueError("PusherStep can't be both, a push and a pusher selection!")
 
         self._box_moved: bool = False
         self._pusher_selected: bool = False
@@ -73,13 +73,13 @@ class AtomicMove:
             self.is_pusher_selection = is_pusher_selection
 
     def __repr__(self):
-        return "AtomicMove({0}, box_moved={1})".format(
+        return "PusherStep({0}, box_moved={1})".format(
             str(self.direction), self.is_push_or_pull
         )
 
     def __str__(self):
         return (
-            "AtomicMove({0}, box_moved={1}, is_jump={2}, "
+            "PusherStep({0}, box_moved={1}, is_jump={2}, "
             "is_pusher_selection={3} pusher_id={4} box_id={5})"
         ).format(
             str(self.direction),
@@ -104,7 +104,7 @@ class AtomicMove:
     @property
     def moved_box_id(self) -> Optional[int]:
         """
-        ID of box that was moved or None, depending on type of :class:`.AtomicMove`
+        ID of box that was moved or None, depending on type of :class:`.PusherStep`
         """
         return self._moved_box_id if self.is_push_or_pull else None
 

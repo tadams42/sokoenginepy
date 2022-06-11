@@ -40,7 +40,7 @@ void export_mover(py::module &m) {
                       } else {
                         Mover::Moves moves;
                         for (auto am : value)
-                          moves.push_back(am.cast<AtomicMove>());
+                          moves.push_back(am.cast<PusherStep>());
                         self.set_last_move(moves);
                       }
                     })

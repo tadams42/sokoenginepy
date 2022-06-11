@@ -1,6 +1,6 @@
 #include "octoban_tessellation.hpp"
 
-#include "atomic_move.hpp"
+#include "pusher_step.hpp"
 #include "direction.hpp"
 #include "snapshot.hpp"
 
@@ -69,54 +69,54 @@ position_t OctobanTessellation::neighbor_position(position_t position,
     return MAX_POS + 1;
 }
 
-AtomicMove OctobanTessellation::char_to_atomic_move(char rv) const {
+PusherStep OctobanTessellation::char_to_pusher_step(char rv) const {
   switch (rv) {
   case io::Snapshot::l:
-    return AtomicMove(Direction::LEFT, false);
+    return PusherStep(Direction::LEFT, false);
   case io::Snapshot::L:
-    return AtomicMove(Direction::LEFT, true);
+    return PusherStep(Direction::LEFT, true);
 
   case io::Snapshot::u:
-    return AtomicMove(Direction::UP, false);
+    return PusherStep(Direction::UP, false);
   case io::Snapshot::U:
-    return AtomicMove(Direction::UP, true);
+    return PusherStep(Direction::UP, true);
 
   case io::Snapshot::r:
-    return AtomicMove(Direction::RIGHT, false);
+    return PusherStep(Direction::RIGHT, false);
   case io::Snapshot::R:
-    return AtomicMove(Direction::RIGHT, true);
+    return PusherStep(Direction::RIGHT, true);
 
   case io::Snapshot::d:
-    return AtomicMove(Direction::DOWN, false);
+    return PusherStep(Direction::DOWN, false);
   case io::Snapshot::D:
-    return AtomicMove(Direction::DOWN, true);
+    return PusherStep(Direction::DOWN, true);
 
   case io::Snapshot::w:
-    return AtomicMove(Direction::NORTH_WEST, false);
+    return PusherStep(Direction::NORTH_WEST, false);
   case io::Snapshot::W:
-    return AtomicMove(Direction::NORTH_WEST, true);
+    return PusherStep(Direction::NORTH_WEST, true);
 
   case io::Snapshot::e:
-    return AtomicMove(Direction::SOUTH_EAST, false);
+    return PusherStep(Direction::SOUTH_EAST, false);
   case io::Snapshot::E:
-    return AtomicMove(Direction::SOUTH_EAST, true);
+    return PusherStep(Direction::SOUTH_EAST, true);
 
   case io::Snapshot::n:
-    return AtomicMove(Direction::NORTH_EAST, false);
+    return PusherStep(Direction::NORTH_EAST, false);
   case io::Snapshot::N:
-    return AtomicMove(Direction::NORTH_EAST, true);
+    return PusherStep(Direction::NORTH_EAST, true);
 
   case io::Snapshot::s:
-    return AtomicMove(Direction::SOUTH_WEST, false);
+    return PusherStep(Direction::SOUTH_WEST, false);
   case io::Snapshot::S:
-    return AtomicMove(Direction::SOUTH_WEST, true);
+    return PusherStep(Direction::SOUTH_WEST, true);
 
   default:
-    throw invalid_argument("Illegal AtomicMove direction in SokobanTessellation!");
+    throw invalid_argument("Illegal PusherStep direction in SokobanTessellation!");
   }
 }
 
-char OctobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
+char OctobanTessellation::pusher_step_to_char(const PusherStep &rv) const {
   switch (rv.direction()) {
   case Direction::LEFT:
     return rv.is_push_or_pull() ? io::Snapshot::L : io::Snapshot::l;
@@ -135,7 +135,7 @@ char OctobanTessellation::atomic_move_to_char(const AtomicMove &rv) const {
   case Direction::SOUTH_WEST:
     return rv.is_push_or_pull() ? io::Snapshot::S : io::Snapshot::s;
   default:
-    throw invalid_argument("Illegal AtomicMove direction in OctobanTessellation!");
+    throw invalid_argument("Illegal PusherStep direction in OctobanTessellation!");
   }
 }
 
