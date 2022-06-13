@@ -11,6 +11,15 @@ set(PRIVATE_HEADERS
     io/rle/evaluator.hpp
     io/rle/grammar.hpp
     io/rle/json_printer.hpp
+
+    io/snapshot/ast.hpp
+    io/snapshot/ast_adapted.hpp
+    io/snapshot/config.hpp
+    io/snapshot/error_handler.hpp
+    io/snapshot/grammar.hpp
+    io/snapshot/parser.hpp
+    io/snapshot/json_printer.hpp
+    io/snapshot/evaluator.hpp
 )
 
 set(INSTALL_HEADERS
@@ -43,6 +52,8 @@ set(INSTALL_HEADERS
     io/trioban.hpp
     io/utilities.hpp
     io/collection.hpp
+
+    io/snapshot.hpp
 
     io/rle.hpp
 )
@@ -77,6 +88,10 @@ set(SELF_SOURCES
 
     io/collection/collection.cpp
     io/collection/sok_file_format.cpp
+
+    io/snapshot/snapshot.cpp
+    io/snapshot/ast.cpp
+    io/snapshot/parser.cpp
 
     io/rle/rle.cpp
 )

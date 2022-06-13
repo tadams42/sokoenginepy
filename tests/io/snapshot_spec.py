@@ -44,8 +44,8 @@ class DescribeSnapshot:
         assert snapshot.pushes_count == 5
         assert snapshot.jumps_count == 0
         assert not snapshot.is_reverse
-        assert str(snapshot) == data
-        assert str(snapshot) == snapshot.moves_data
+        assert str(snapshot) == "lurdLURDL"
+        assert snapshot.moves_data == data
 
     def it_correctly_parses_pusher_selections(self):
         for data in [

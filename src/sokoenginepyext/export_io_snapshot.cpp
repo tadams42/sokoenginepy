@@ -1,18 +1,16 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using namespace sokoengine;
-using namespace sokoengine::io;
-using sokoengine::Strings;
+using sokoengine::game::PusherSteps;
+using sokoengine::io::HexobanSnapshot;
+using sokoengine::io::OctobanSnapshot;
+using sokoengine::io::Snapshot;
+using sokoengine::io::SokobanSnapshot;
+using sokoengine::io::Strings;
+using sokoengine::io::TriobanSnapshot;
 
 void export_io_snapshot(py::module &m) {
-  auto pySnapshot = py::class_<Snapshot>(m, "Snapshot");
-
-  pySnapshot.def(
-    py::init<size_t, string, string, string, string, string, string, Strings>(),
-    py::arg("id") = 0, py::arg("moves") = "", py::arg("title") = "",
-    py::arg("duration") = "", py::arg("solver") = "", py::arg("created_at") = "",
-    py::arg("updated_at") = "", py::arg("notes") = Strings());
+  auto pySnapshot = py::class_<Snapshot>(m, "Snapshot", py::is_final());
 
   pySnapshot.def_readonly_static("l", &Snapshot::l);
   pySnapshot.def_readonly_static("u", &Snapshot::u);
@@ -37,17 +35,27 @@ void export_io_snapshot(py::module &m) {
   pySnapshot.def_readonly_static("PUSHER_CHANGE_END", &Snapshot::PUSHER_CHANGE_END);
   pySnapshot.def_readonly_static("CURRENT_POSITION_CH", &Snapshot::CURRENT_POSITION_CH);
 
+  pySnapshot.def_static("is_move_step", &Snapshot::is_pusher_step);
+  pySnapshot.def_static("is_push_step", &Snapshot::is_pusher_step);
   pySnapshot.def_static("is_pusher_step", &Snapshot::is_pusher_step);
+  pySnapshot.def_static("is_marker", &Snapshot::is_pusher_step);
   pySnapshot.def_static("is_snapshot", &Snapshot::is_snapshot);
-  pySnapshot.def_static("cleaned_moves", &Snapshot::cleaned_moves);
+  pySnapshot.def_static("ast_json", &Snapshot::ast_json);
+
+  pySnapshot.def("to_str", &Snapshot::to_str, py::arg("rle_encode") = false);
+  pySnapshot.def("__str__", &Snapshot::str);
+  pySnapshot.def("__repr__", &Snapshot::repr);
+
+  pySnapshot.def_property_readonly("tessellation", &Snapshot::tessellation,
+                                   py::return_value_policy::reference);
 
   pySnapshot.def_property(
-    "id", [](const Snapshot &self) { return self.id(); },
-    [](Snapshot &self, size_t rv) { self.id() = rv; });
+    "moves_data", [](const Snapshot &self) { return self.moves_data(); },
+    [](Snapshot &self, const string &rv) { self.set_moves_data(rv); });
 
   pySnapshot.def_property(
-    "moves", [](const Snapshot &self) { return self.moves(); },
-    [](Snapshot &self, const string &rv) { self.moves() = rv; });
+    "pusher_steps", [](const Snapshot &self) { return self.pusher_steps(); },
+    [](Snapshot &self, const PusherSteps &rv) { self.set_pusher_steps(rv); });
 
   pySnapshot.def_property(
     "title", [](const Snapshot &self) { return self.title(); },
@@ -75,5 +83,22 @@ void export_io_snapshot(py::module &m) {
 
   pySnapshot.def_property_readonly("pushes_count", &Snapshot::pushes_count);
   pySnapshot.def_property_readonly("moves_count", &Snapshot::moves_count);
+  pySnapshot.def_property_readonly("jumps_count", &Snapshot::jumps_count);
   pySnapshot.def_property_readonly("is_reverse", &Snapshot::is_reverse);
+
+  auto pySokobanSnapshot =
+    py::class_<SokobanSnapshot, Snapshot>(m, "SokobanSnapshot", py::is_final())
+      .def(py::init<std::string>(), py::arg("moves_data") = "");
+
+  auto pyHexobanSnapshot =
+    py::class_<HexobanSnapshot, Snapshot>(m, "HexobanSnapshot", py::is_final())
+      .def(py::init<std::string>(), py::arg("moves_data") = "");
+
+  auto pyTriobanSnapshot =
+    py::class_<TriobanSnapshot, Snapshot>(m, "TriobanSnapshot", py::is_final())
+      .def(py::init<std::string>(), py::arg("moves_data") = "");
+
+  auto pyOctobanSnapshot =
+    py::class_<OctobanSnapshot, Snapshot>(m, "OctobanSnapshot", py::is_final())
+      .def(py::init<std::string>(), py::arg("moves_data") = "");
 }

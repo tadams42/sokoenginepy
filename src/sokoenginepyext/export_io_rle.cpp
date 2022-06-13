@@ -12,5 +12,5 @@ void export_io_rle(py::module &m) {
 
   pyRle.def_static("encode", &Rle::encode);
   pyRle.def_static("decode", &Rle::decode);
-  pyRle.def_static("ast", &Rle::ast);
+  pyRle.def_static("ast_json", &Rle::ast_json);
 }

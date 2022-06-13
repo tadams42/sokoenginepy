@@ -1,7 +1,8 @@
 #ifndef SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
+#include "tessellation.hpp"
+#include "mover.hpp"
 
 #include <memory>
 
@@ -36,28 +37,33 @@ public:
   static constexpr char PUSHER_CHANGE_END = '}';
   static constexpr char CURRENT_POSITION_CH = '*';
 
-  constexpr static bool is_pusher_step(char ch) {
+  static constexpr bool is_move_step(char ch) {
     return ch == l || ch == u || ch == r || ch == d || ch == w || ch == e || ch == n ||
-           ch == s || ch == L || ch == U || ch == R || ch == D || ch == W || ch == E ||
-           ch == N || ch == S;
+           ch == s;
+  }
+
+  static constexpr bool is_push_step(char ch) {
+    return ch == L || ch == U || ch == R || ch == D || ch == W || ch == E || ch == N ||
+           ch == S;
+  }
+
+  static constexpr bool is_pusher_step(char ch) {
+    return is_move_step(ch) || is_push_step(ch);
+  }
+
+  static constexpr bool is_marker(char ch) {
+    return ch == JUMP_BEGIN || ch == JUMP_END || ch == PUSHER_CHANGE_BEGIN ||
+           ch == PUSHER_CHANGE_END || ch == CURRENT_POSITION_CH;
   }
 
   static bool is_snapshot(const std::string &line);
-  static std::string cleaned_moves(const std::string &line);
+  static std::string ast_json(const std::string &line);
 
-  explicit Snapshot(size_t id = 0, const std::string &moves = "",
-                    const std::string &title = "", const std::string &duration = "",
-                    const std::string &solver = "", const std::string &created_at = "",
-                    const std::string &updated_at = "",
-                    const Strings &notes = Strings());
-  Snapshot(const Snapshot &rv);
-  Snapshot &operator=(const Snapshot &);
+  typedef std::unique_ptr<Snapshot> unique_ptr_t;
+  virtual unique_ptr_t clone() const = 0;
+
   virtual ~Snapshot();
 
-  size_t id() const;
-  size_t &id();
-  const std::string &moves() const;
-  std::string &moves();
   const std::string &title() const;
   std::string &title();
   const std::string &duration() const;
@@ -71,9 +77,28 @@ public:
   const std::string &updated_at() const;
   std::string &updated_at();
 
+  const game::Tessellation &tessellation() const;
+
+  std::string to_str(bool rle_encode = false) const;
+  std::string str() const;
+  std::string repr() const;
+
+  const std::string &moves_data() const;
+  void set_moves_data(const std::string &rv);
+  game::PusherSteps pusher_steps() const;
+  void set_pusher_steps(const game::PusherSteps &rv);
+
   size_t pushes_count() const;
   size_t moves_count() const;
+  size_t jumps_count() const;
   bool is_reverse() const;
+
+protected:
+  Snapshot(const game::Tessellation &tessellation, const std::string &moves_data);
+  Snapshot(const Snapshot &rv);
+  Snapshot &operator=(const Snapshot &rv);
+  Snapshot(Snapshot &&rv);
+  Snapshot &operator=(Snapshot &&rv);
 
 private:
   class PIMPL;
@@ -84,3 +109,4 @@ private:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

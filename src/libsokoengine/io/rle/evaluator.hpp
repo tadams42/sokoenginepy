@@ -1,5 +1,5 @@
-#ifndef RLE_EVL_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
-#define RLE_EVL_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
+#ifndef EVAL_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
+#define EVAL_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
 
 #include "ast.hpp"
 
@@ -10,6 +10,7 @@ namespace ast {
 
 struct LIBSOKOENGINE_LOCAL Evaluator {
   typedef void result_type;
+
   std::string &dest;
 
   Evaluator(std::string &dest) : dest(dest) {}

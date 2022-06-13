@@ -1,8 +1,6 @@
 #ifndef PUZZLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define PUZZLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
-
 #include "tessellation.hpp"
 
 #include <memory>
@@ -11,17 +9,10 @@ namespace sokoengine {
 namespace io {
 
 namespace implementation {
-class LIBSOKOENGINE_LOCAL PuzzleResizer;
-class LIBSOKOENGINE_LOCAL PuzzleParser;
-class LIBSOKOENGINE_LOCAL PuzzlePrinter;
+class PuzzleResizer;
+class PuzzleParser;
+class PuzzlePrinter;
 } // namespace implementation
-
-class LIBSOKOENGINE_API Snapshot;
-
-///
-/// Default type for sequence of Snapshot
-///
-typedef std::vector<Snapshot> Snapshots;
 
 ///
 /// Game board with accompanying metadata.
@@ -45,33 +36,33 @@ public:
   static constexpr char ALT_GOAL1 = 'o';
   static constexpr char ALT_VISIBLE_FLOOR1 = '_';
 
-  constexpr static bool is_pusher(char ch) {
+  static constexpr bool is_pusher(char ch) {
     return ch == PUSHER || ch == ALT_PUSHER1 || ch == ALT_PUSHER2 ||
            ch == PUSHER_ON_GOAL || ch == ALT_PUSHER_ON_GOAL1 ||
            ch == ALT_PUSHER_ON_GOAL2;
   }
 
-  constexpr static bool is_box(char ch) {
+  static constexpr bool is_box(char ch) {
     return ch == BOX || ch == ALT_BOX1 || ch == BOX_ON_GOAL || ch == ALT_BOX_ON_GOAL1;
   }
 
-  constexpr static bool is_goal(char ch) {
+  static constexpr bool is_goal(char ch) {
     return ch == GOAL || ch == ALT_GOAL1 || ch == BOX_ON_GOAL ||
            ch == ALT_BOX_ON_GOAL1 || ch == PUSHER_ON_GOAL ||
            ch == ALT_PUSHER_ON_GOAL1 || ch == ALT_PUSHER_ON_GOAL2;
   }
 
-  constexpr static bool is_empty_floor(char ch) {
+  static constexpr bool is_empty_floor(char ch) {
     return ch == FLOOR || ch == VISIBLE_FLOOR || ch == ALT_VISIBLE_FLOOR1;
   }
 
-  constexpr static bool is_wall(char ch) { return ch == WALL; }
+  static constexpr bool is_wall(char ch) { return ch == WALL; }
 
-  constexpr static bool is_border_element(char ch) {
+  static constexpr bool is_border_element(char ch) {
     return ch == WALL || ch == BOX_ON_GOAL || ch == ALT_BOX_ON_GOAL1;
   }
 
-  constexpr static bool is_puzzle_element(char ch) {
+  static constexpr bool is_puzzle_element(char ch) {
     return is_empty_floor(ch) || is_wall(ch) || is_pusher(ch) || is_box(ch) ||
            is_goal(ch);
   }
@@ -92,10 +83,8 @@ public:
   static unique_ptr_t instance_from(const std::string &tessellation_name,
                                     const std::string &board);
 
-  virtual unique_ptr_t create_clone() const = 0;
+  virtual unique_ptr_t clone() const = 0;
 
-  size_t id() const;
-  size_t &id();
   const std::string &title() const;
   std::string &title();
   const std::string &author() const;
@@ -110,15 +99,13 @@ public:
   std::string &created_at();
   const std::string &updated_at() const;
   std::string &updated_at();
-  const Snapshots &snapshots() const;
-  Snapshots &snapshots();
 
   const game::Tessellation &tessellation() const;
 
-  char at(position_t position) const;
-  void set_at(position_t position, char c);
-  char operator[](position_t position) const;
-  void set(position_t position, char c);
+  char at(game::position_t position) const;
+  void set_at(game::position_t position, char c);
+  char operator[](game::position_t position) const;
+  void set(game::position_t position, char c);
 
   std::string str() const;
   std::string repr() const;
@@ -258,3 +245,4 @@ public:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

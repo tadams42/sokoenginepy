@@ -53,7 +53,7 @@ public:
   /// Returns JSON representation of parser AST. Intended to be used for debugging
   /// purposes.
   ///
-  static std::string ast(const std::string &line);
+  static std::string ast_json(const std::string &line);
 };
 
 } // namespace io

@@ -129,7 +129,7 @@ string Rle::decode(const string &line) {
   return out.str();
 }
 
-string Rle::ast(const string &line) {
+string Rle::ast_json(const string &line) {
   ostringstream out, err;
   bool retv = sok_rle::parse_to_ast(line, out, err);
 

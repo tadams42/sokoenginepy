@@ -1,12 +1,12 @@
 #include "puzzle.hpp"
 
-#include "hexoban_puzzle.hpp"
-#include "octoban_puzzle.hpp"
 #include "rle.hpp"
-#include "snapshot.hpp"
-#include "sokoban_puzzle.hpp"
-#include "trioban_puzzle.hpp"
 #include "utilities.hpp"
+
+#include "hexoban.hpp"
+#include "octoban.hpp"
+#include "sokoban.hpp"
+#include "trioban.hpp"
 
 #include <boost/algorithm/string.hpp>
 
@@ -18,10 +18,10 @@ namespace io {
 using namespace implementation;
 using game::index_1d;
 using game::Tessellation;
+using game::position_t;
 
 class LIBSOKOENGINE_LOCAL Puzzle::PIMPL {
 public:
-  size_t m_id = 0;
   string m_title;
   string m_author;
   string m_boxorder;
@@ -29,7 +29,6 @@ public:
   Strings m_notes;
   string m_created_at;
   string m_updated_at;
-  Snapshots m_snapshots;
 
   board_size_t m_width = 0;
   board_size_t m_height = 0;
@@ -113,17 +112,11 @@ Puzzle &Puzzle::operator=(const Puzzle &rv) {
   return *this;
 }
 
-Puzzle::Puzzle(Puzzle &&rv) : m_impl(std::move(rv.m_impl)) {}
+Puzzle::Puzzle(Puzzle &&rv) = default;
 
-Puzzle &Puzzle::operator=(Puzzle &&rv) {
-  if (this != &rv) { m_impl.swap(rv.m_impl); }
-  return *this;
-}
+Puzzle &Puzzle::operator=(Puzzle &&rv) = default;
 
 Puzzle::~Puzzle() = default;
-
-size_t Puzzle::id() const { return m_impl->m_id; }
-size_t &Puzzle::id() { return m_impl->m_id; }
 
 const string &Puzzle::title() const { return m_impl->m_title; }
 string &Puzzle::title() { return m_impl->m_title; }
@@ -145,9 +138,6 @@ string &Puzzle::created_at() { return m_impl->m_created_at; }
 
 const string &Puzzle::updated_at() const { return m_impl->m_updated_at; }
 string &Puzzle::updated_at() { return m_impl->m_updated_at; }
-
-const Snapshots &Puzzle::snapshots() const { return m_impl->m_snapshots; }
-Snapshots &Puzzle::snapshots() { return m_impl->m_snapshots; }
 
 const Tessellation &Puzzle::tessellation() const { return *(m_impl->m_tessellation); }
 
@@ -200,11 +190,11 @@ string Puzzle::internal_board() const {
 string Puzzle::str() const { return to_board_str(true); }
 
 string Puzzle::repr() const {
-  string class_name = "Puzzle";
-  if (typeid(*this) == typeid(const SokobanPuzzle &)) class_name = "SokobanPuzzle";
-  if (typeid(*this) == typeid(const TriobanPuzzle &)) class_name = "TriobanPuzzle";
-  if (typeid(*this) == typeid(const OctobanPuzzle &)) class_name = "OctobanPuzzle";
-  if (typeid(*this) == typeid(const HexobanPuzzle &)) class_name = "HexobanPuzzle";
+  string klass_name = "Puzzle";
+  if (typeid(*this) == typeid(const SokobanPuzzle &)) klass_name = "SokobanPuzzle";
+  if (typeid(*this) == typeid(const TriobanPuzzle &)) klass_name = "TriobanPuzzle";
+  if (typeid(*this) == typeid(const OctobanPuzzle &)) klass_name = "OctobanPuzzle";
+  if (typeid(*this) == typeid(const HexobanPuzzle &)) klass_name = "HexobanPuzzle";
 
   Strings board_lines;
   string tmp = to_board_str(true);
@@ -213,7 +203,7 @@ string Puzzle::repr() const {
   for (string &line : board_lines)
     line = "    '" + line + "'";
 
-  return class_name + "(board='\\n'.join([\n" + boost::join(board_lines, ",\n") +
+  return klass_name + "(board='\\n'.join([\n" + boost::join(board_lines, ",\n") +
          "\n]))";
 }
 
@@ -403,7 +393,11 @@ void Puzzle::trim() {
 }
 
 bool Puzzle::is_board(const string &line) {
-  return !contains_only_digits_and_spaces(line) &&
+  bool only_digits_and_spaces = all_of(line.cbegin(), line.cend(), [](char c) -> bool {
+    return (isdigit(c) != 0) || (isspace(c) != 0);
+  });
+
+  return !only_digits_and_spaces &&
          all_of(line.begin(), line.end(), [](char c) -> bool {
            return isspace(c) || isdigit(c) || Puzzle::is_pusher(c) ||
                   Puzzle::is_box(c) || Puzzle::is_goal(c) ||
@@ -413,7 +407,11 @@ bool Puzzle::is_board(const string &line) {
 }
 
 bool Puzzle::is_sokoban_plus(const string &line) {
-  return contains_only_digits_and_spaces(line) && !is_blank(line);
+  bool only_digits_and_spaces = all_of(line.cbegin(), line.cend(), [](char c) -> bool {
+    return (isdigit(c) != 0) || (isspace(c) != 0);
+  });
+
+  return only_digits_and_spaces && !is_blank(line);
 }
 
 Puzzle::unique_ptr_t Puzzle::instance_from(const Tessellation &tessellation,

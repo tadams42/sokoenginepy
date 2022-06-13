@@ -1,12 +1,11 @@
-#include "hexoban_puzzle.hpp"
+#include "hexoban.hpp"
 
 #include "hexoban_tessellation.hpp"
 #include "rle.hpp"
 #include "utilities.hpp"
 
-#include <iostream>
-
 #include <boost/algorithm/string.hpp>
+#include <iostream>
 
 using namespace std;
 using namespace boost;
@@ -15,6 +14,7 @@ namespace sokoengine {
 namespace io {
 
 using game::index_1d;
+using game::position_t;
 using game::X;
 using game::Y;
 
@@ -48,48 +48,88 @@ public:
                        bool rle_encode = false) const override;
 };
 
-} // namespace implementation
-
-LIBSOKOENGINE_LOCAL const implementation::HexobanPuzzleResizer &hb_static_resizer() {
-  static const implementation::HexobanPuzzleResizer the_one;
+LIBSOKOENGINE_LOCAL const HexobanPuzzleResizer &hb_static_resizer() {
+  static const HexobanPuzzleResizer the_one;
   return the_one;
 }
 
-LIBSOKOENGINE_LOCAL const implementation::HexobanPuzzleParser &hb_static_parser() {
-  static const implementation::HexobanPuzzleParser the_one;
+LIBSOKOENGINE_LOCAL const HexobanPuzzleParser &hb_static_parser() {
+  static const HexobanPuzzleParser the_one;
   return the_one;
 }
 
-LIBSOKOENGINE_LOCAL const implementation::HexobanPuzzlePrinter &hb_static_printer() {
+LIBSOKOENGINE_LOCAL const HexobanPuzzlePrinter &hb_static_printer() {
   static const implementation::HexobanPuzzlePrinter the_one;
   return the_one;
 }
+
+} // namespace implementation
+
+using namespace implementation;
+
+class LIBSOKOENGINE_LOCAL HexobanPuzzle::PIMPL {
+public:
+  Snapshots m_snapshots;
+};
 
 HexobanPuzzle::HexobanPuzzle() : HexobanPuzzle(0, 0) {}
 
 HexobanPuzzle::HexobanPuzzle(board_size_t width, board_size_t height)
   : Puzzle(game::Tessellation::HEXOBAN, hb_static_resizer(), hb_static_parser(),
-           hb_static_printer(), width, height) {}
+           hb_static_printer(), width, height),
+    m_impl(make_unique<PIMPL>()) {}
 
 HexobanPuzzle::HexobanPuzzle(const string &src)
   : Puzzle(game::Tessellation::HEXOBAN, hb_static_resizer(), hb_static_parser(),
-           hb_static_printer(), src) {}
+           hb_static_printer(), src),
+    m_impl(make_unique<PIMPL>()) {}
 
-HexobanPuzzle::HexobanPuzzle(const HexobanPuzzle &rv) : Puzzle(rv) {}
+HexobanPuzzle::HexobanPuzzle(const HexobanPuzzle &rv)
+  : Puzzle(rv), m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
 
 HexobanPuzzle &HexobanPuzzle::operator=(const HexobanPuzzle &rv) {
-  if (this != &rv) Puzzle::operator=(rv);
+  if (this != &rv) {
+    Puzzle::operator=(rv);
+    m_impl = make_unique<PIMPL>(*rv.m_impl);
+  }
   return *this;
 }
 
-HexobanPuzzle::HexobanPuzzle(HexobanPuzzle &&) = default;
+HexobanPuzzle::HexobanPuzzle(HexobanPuzzle &&rv) = default;
 
-HexobanPuzzle &HexobanPuzzle::operator=(HexobanPuzzle &&) = default;
+HexobanPuzzle &HexobanPuzzle::operator=(HexobanPuzzle &&rv) = default;
 
 HexobanPuzzle::~HexobanPuzzle() = default;
 
-HexobanPuzzle::unique_ptr_t HexobanPuzzle::create_clone() const {
+HexobanPuzzle::unique_ptr_t HexobanPuzzle::clone() const {
   return make_unique<HexobanPuzzle>(*this);
+}
+
+const HexobanPuzzle::Snapshots &HexobanPuzzle::snapshots() const {
+  return m_impl->m_snapshots;
+}
+HexobanPuzzle::Snapshots &HexobanPuzzle::snapshots() { return m_impl->m_snapshots; }
+
+HexobanSnapshot::HexobanSnapshot() : Snapshot(game::Tessellation::HEXOBAN, "") {}
+
+HexobanSnapshot::HexobanSnapshot(const string &moves_data)
+  : Snapshot(game::Tessellation::HEXOBAN, moves_data) {}
+
+HexobanSnapshot::HexobanSnapshot(const HexobanSnapshot &rv) : Snapshot(rv) {}
+
+HexobanSnapshot &HexobanSnapshot::operator=(const HexobanSnapshot &rv) {
+  if (this != &rv) { Snapshot::operator=(rv); }
+  return *this;
+}
+
+HexobanSnapshot::HexobanSnapshot(HexobanSnapshot &&) = default;
+
+HexobanSnapshot &HexobanSnapshot::operator=(HexobanSnapshot &&) = default;
+
+HexobanSnapshot::~HexobanSnapshot() = default;
+
+HexobanSnapshot::unique_ptr_t HexobanSnapshot::clone() const {
+  return make_unique<HexobanSnapshot>(*this);
 }
 
 namespace implementation {
@@ -131,7 +171,7 @@ public:
 
   bool is_type1(const Strings &list) const {
     position_t rmnf = find_rightmost_non_floor(list);
-    if (rmnf <= MAX_POS) {
+    if (rmnf <= Config::MAX_POS) {
       board_size_t y = Y(rmnf, PuzzleParser::calculate_width(list));
       return y % 2 == 0;
     }
@@ -283,7 +323,7 @@ private:
 
     // Calculate parities
     position_t first_cell = find_first_non_floor(parsed);
-    if (first_cell <= MAX_POS) {
+    if (first_cell <= Config::MAX_POS) {
       int8_t first_cell_x_parity = X(first_cell, width) % 2;
       int8_t first_cell_y_parity = Y(first_cell, width) % 2;
 

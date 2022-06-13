@@ -1,29 +1,29 @@
-#ifndef ERR_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
-#define ERR_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
+#ifndef ERROR_BDC825C2_4FAB_4173_9B94_185BD7430359
+#define ERROR_BDC825C2_4FAB_4173_9B94_185BD7430359
 
 #include "sokoengine_config.hpp"
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 #include <map>
-#include <string>
 
 namespace sokoengine {
 namespace io {
-namespace sok_rle {
+namespace snapshot_parsing {
 namespace x3 = boost::spirit::x3;
 namespace parser {
 
 struct LIBSOKOENGINE_LOCAL ErrorHandlerBase {
   ErrorHandlerBase() {
-    id_map["grammar"] = "Sokoban RLE expression";
-    id_map["atoms_or_rle_or_group"] =
-      "one or more atoms, counted expresion or RLE group";
-    id_map["atom_or_group"] = "single atom or RLE group";
-    id_map["rle_chunk"] = "counted RLE expresion";
-    id_map["group"] = "RLE group";
-    id_map["atoms"] = "one or more atoms";
-    id_map["atom"] = "single atom";
+    id_map["grammar"] = "Snapshot";
+    id_map["jump_or_select_or_move"] =
+      "jump, pusher selection or pusher steps (moves or pushes)";
+    id_map["jump"] = "jump";
+    id_map["pusher_selection"] = "pusher selection";
+    id_map["steps"] = "pusher steps (moves or pushes)";
+    id_map["moves_or_pushes"] = "pusher steps (moves or pushes)";
+    id_map["pushes"] = "one or more box pushes";
+    id_map["moves"] = "one or more pusher moves (without pushing the box)";
   }
 
   template <typename Iterator, typename Exception, typename Context>
@@ -49,7 +49,7 @@ ErrorHandlerBase::on_error(Iterator &first, Iterator const &last, Exception cons
 }
 
 } // namespace parser
-} // namespace sok_rle
+} // namespace snapshot_parsing
 } // namespace io
 } // namespace sokoengine
 

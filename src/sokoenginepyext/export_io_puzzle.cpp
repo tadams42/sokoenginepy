@@ -1,13 +1,18 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using namespace sokoengine;
-using namespace sokoengine::io;
-using namespace sokoengine::game;
-using sokoengine::Strings;
+using sokoengine::board_size_t;
+using sokoengine::game::position_t;
+using sokoengine::game::Tessellation;
+using sokoengine::io::HexobanPuzzle;
+using sokoengine::io::OctobanPuzzle;
+using sokoengine::io::Puzzle;
+using sokoengine::io::SokobanPuzzle;
+using sokoengine::io::Strings;
+using sokoengine::io::TriobanPuzzle;
 
 void export_io_puzzle(py::module &m) {
-  auto pyPuzzle = py::class_<Puzzle>(m, "Puzzle");
+  auto pyPuzzle = py::class_<Puzzle>(m, "Puzzle", py::is_final());
 
   pyPuzzle.def_static(
     "instance_from",
@@ -90,10 +95,6 @@ void export_io_puzzle(py::module &m) {
   pyPuzzle.def_static("is_sokoban_plus", &Puzzle::is_sokoban_plus);
 
   pyPuzzle.def_property(
-    "id", [](const Puzzle &self) { return self.id(); },
-    [](Puzzle &self, size_t rv) { self.id() = rv; });
-
-  pyPuzzle.def_property(
     "title", [](const Puzzle &self) { return self.title(); },
     [](Puzzle &self, const string &rv) { self.title() = rv; });
 
@@ -120,10 +121,6 @@ void export_io_puzzle(py::module &m) {
   pyPuzzle.def_property(
     "updated_at", [](const Puzzle &self) { return self.updated_at(); },
     [](Puzzle &self, const string &rv) { self.updated_at() = rv; });
-
-  pyPuzzle.def_property(
-    "snapshots", [](const Puzzle &self) { return self.snapshots(); },
-    [](Puzzle &self, const Snapshots &rv) { self.snapshots() = rv; });
 
   pyPuzzle.def_property(
     "board", [](const Puzzle &self) { return self.board(); },
@@ -190,6 +187,9 @@ void export_io_puzzle(py::module &m) {
       return make_unique<SokobanPuzzle>(board_converted);
     }),
     py::arg("width") = 0, py::arg("height") = 0, py::arg("board") = py::none());
+  pySokobanPuzzle.def_property(
+    "snapshots", [](const SokobanPuzzle &self) { return self.snapshots(); },
+    [](SokobanPuzzle &self, const SokobanPuzzle::Snapshots &rv) { self.snapshots() = rv; });
 
   pyHexobanPuzzle.def(
     py::init([](board_size_t width, board_size_t height, const py::object &board) {
@@ -198,6 +198,9 @@ void export_io_puzzle(py::module &m) {
       return make_unique<HexobanPuzzle>(board_converted);
     }),
     py::arg("width") = 0, py::arg("height") = 0, py::arg("board") = py::none());
+  pyHexobanPuzzle.def_property(
+    "snapshots", [](const HexobanPuzzle &self) { return self.snapshots(); },
+    [](HexobanPuzzle &self, const HexobanPuzzle::Snapshots &rv) { self.snapshots() = rv; });
 
   pyTriobanPuzzle.def(
     py::init([](board_size_t width, board_size_t height, const py::object &board) {
@@ -206,6 +209,9 @@ void export_io_puzzle(py::module &m) {
       return make_unique<TriobanPuzzle>(board_converted);
     }),
     py::arg("width") = 0, py::arg("height") = 0, py::arg("board") = py::none());
+  pyTriobanPuzzle.def_property(
+    "snapshots", [](const TriobanPuzzle &self) { return self.snapshots(); },
+    [](TriobanPuzzle &self, const TriobanPuzzle::Snapshots &rv) { self.snapshots() = rv; });
 
   pyOctobanPuzzle.def(
     py::init([](board_size_t width, board_size_t height, const py::object &board) {
@@ -214,4 +220,7 @@ void export_io_puzzle(py::module &m) {
       return make_unique<OctobanPuzzle>(board_converted);
     }),
     py::arg("width") = 0, py::arg("height") = 0, py::arg("board") = py::none());
+  pyOctobanPuzzle.def_property(
+    "snapshots", [](const OctobanPuzzle &self) { return self.snapshots(); },
+    [](OctobanPuzzle &self, const OctobanPuzzle::Snapshots &rv) { self.snapshots() = rv; });
 }
