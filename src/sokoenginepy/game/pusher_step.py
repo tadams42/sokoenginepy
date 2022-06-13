@@ -25,6 +25,7 @@ class PusherStep:
         "_pusher_id",
         "_moved_box_id",
         "direction",
+        "is_current_pos",
     ]
 
     def __init__(
@@ -35,6 +36,7 @@ class PusherStep:
         is_pusher_selection: bool = False,
         pusher_id: int = DEFAULT_PIECE_ID,
         moved_box_id: Optional[int] = None,
+        is_current_pos: bool = False,
     ):
         if (box_moved or moved_box_id) and is_pusher_selection and is_jump:
             raise ValueError(
@@ -57,6 +59,7 @@ class PusherStep:
         self.pusher_id = pusher_id
         self._moved_box_id: Optional[int] = None
         self.direction: Direction = direction
+        self.is_current_pos = is_current_pos
 
         if box_moved:
             self.is_push_or_pull = True

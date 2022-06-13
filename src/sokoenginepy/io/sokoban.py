@@ -3,9 +3,15 @@ from __future__ import annotations
 from typing import Optional
 
 from .puzzle import Puzzle
+from .snapshot import Snapshot
 
 
-class OctobanPuzzle(Puzzle):
+class SokobanSnapshot(Snapshot):
+    def __init__(self, moves_data: str = ""):
+        super().__init__(tessellation_or_description="sokoban", moves_data=moves_data)
+
+
+class SokobanPuzzle(Puzzle):
     def __init__(self, width: int = 0, height: int = 0, board: Optional[str] = None):
         """
         Arguments:
@@ -15,7 +21,7 @@ class OctobanPuzzle(Puzzle):
                 ignoring ``width`` and ``height``.
         """
         super().__init__(
-            tessellation_or_description="octoban",
+            tessellation_or_description="sokoban",
             width=width,
             height=height,
             board=board,

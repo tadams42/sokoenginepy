@@ -64,9 +64,6 @@ class DescribeSokobanPuzzle:
 
     def it_carries_some_metadata(self):
         puzzle = SokobanPuzzle()
-        assert puzzle.id == 0
-        puzzle.id = 42
-        assert puzzle.id == 42
         puzzle.title = "title"
         assert puzzle.title == "title"
         puzzle.author = "author"

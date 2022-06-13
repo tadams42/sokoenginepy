@@ -6,17 +6,17 @@ class BoardState:
     Sample of board state.
     """
 
-    UNKNOWN_ZOBRIST_HASH = 0
+    ZOBRIST_HASH_NOT_SET = 0
 
     def __init__(
         self,
         pushers_positions: Optional[List[int]] = None,
         boxes_positions: Optional[List[int]] = None,
-        zobrist_hash: int = UNKNOWN_ZOBRIST_HASH,
+        zobrist_hash: int = ZOBRIST_HASH_NOT_SET,
     ):
         self.pushers_positions = pushers_positions or []
         self.boxes_positions = boxes_positions or []
-        self.zobrist_hash = zobrist_hash or self.UNKNOWN_ZOBRIST_HASH
+        self.zobrist_hash = zobrist_hash or self.ZOBRIST_HASH_NOT_SET
 
     @property
     def pushers_positions(self) -> List[int]:
@@ -49,7 +49,7 @@ class BoardState:
 
     @zobrist_hash.setter
     def zobrist_hash(self, rv: int):
-        self._zobrist_hash = rv or self.UNKNOWN_ZOBRIST_HASH
+        self._zobrist_hash = rv or self.ZOBRIST_HASH_NOT_SET
 
     def __str__(self) -> str:
         prefix = (len(self.__class__.__name__) + 2) * " "
@@ -74,7 +74,7 @@ class BoardState:
     def __eq__(self, other) -> bool:
         return (
             self.zobrist_hash is not None
-            and self.zobrist_hash is not self.UNKNOWN_ZOBRIST_HASH
+            and self.zobrist_hash is not self.ZOBRIST_HASH_NOT_SET
             and self.zobrist_hash == other.zobrist_hash
         ) or (
             self.boxes_positions == other.boxes_positions

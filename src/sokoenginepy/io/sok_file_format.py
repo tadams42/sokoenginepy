@@ -10,12 +10,12 @@ from typing import List, Optional
 import arrow
 
 from .collection import Collection
-from .hexoban_puzzle import HexobanPuzzle
-from .octoban_puzzle import OctobanPuzzle
+from .hexoban import HexobanPuzzle
+from .octoban import OctobanPuzzle
 from .puzzle import Puzzle
 from .snapshot import Snapshot
-from .sokoban_puzzle import SokobanPuzzle
-from .trioban_puzzle import TriobanPuzzle
+from .sokoban import SokobanPuzzle
+from .trioban import TriobanPuzzle
 from .utilities import is_blank
 
 _SELF_DIR = Path(__file__).absolute().resolve().parent
@@ -32,7 +32,6 @@ class PuzzleTypeHints(enum.Enum):
 
 @dataclass
 class PuzzleData:
-    id: Optional[int] = 0
     title: Optional[str] = None
     board: Optional[str] = None
     author: Optional[str] = None

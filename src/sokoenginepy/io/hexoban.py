@@ -3,8 +3,14 @@ from __future__ import annotations
 from typing import List, Optional, Tuple
 
 from .puzzle import Puzzle
-from .puzzle_workers import PuzzleParser, PuzzlePrinter, PuzzleResizer
+from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
 from .rle import Rle
+from .snapshot import Snapshot
+
+
+class HexobanSnapshot(Snapshot):
+    def __init__(self, moves_data: str = ""):
+        super().__init__(tessellation_or_description="hexoban", moves_data=moves_data)
 
 
 class HexobanPuzzle(Puzzle):
@@ -17,7 +23,7 @@ class HexobanPuzzle(Puzzle):
                 ignoring ``width`` and ``height``.
         """
         super().__init__(
-            tessellation_or_description="Trioban",
+            tessellation_or_description="hexoban",
             width=width,
             height=height,
             board=board,

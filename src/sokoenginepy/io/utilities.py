@@ -22,13 +22,6 @@ def contains_only_digits_and_spaces(line: Optional[str]) -> bool:
     )
 
 
-def should_insert_line_break_at(position: int, line_length=80) -> bool:
-    """For given ``position`` in string, should we insert line break?"""
-    if line_length > 0 and position:
-        return (position % line_length) == 0
-    return False
-
-
 def in_batches(iterable, of_size=1):
     """
     Generator that yields generator slices of iterable.

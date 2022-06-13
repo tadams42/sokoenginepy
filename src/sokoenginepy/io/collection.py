@@ -47,11 +47,6 @@ class Collection:
                 puzzle_types_hint or self._extension_to_tessellation_hint(path),
             )
 
-        for i in range(0, len(self.puzzles)):
-            self.puzzles[i].id = i + 1
-            for j in range(0, len(self.puzzles[i].snapshots)):
-                self.puzzles[i].snapshots[j].id = j + 1
-
     def save(self, path: Union[str, Path]):
         from .sok_file_format import SOKFileFormat
 

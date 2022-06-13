@@ -1,15 +1,21 @@
-import re
-from functools import reduce
-from operator import add, or_
-from typing import Final, List, Optional, Set
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Final, List
 
 from .rle import Rle
 from .utilities import contains_only_digits_and_spaces, is_blank
 
+if TYPE_CHECKING:
+    from ..game import AnyTessellation, PusherStep, TessellationOrDescription
+    from .snapshot_parsing import MovementTokens
+
 
 class Snapshot:
     """
-    Recording of pusher movement with accompanying metadata.
+    Base class for game snapshots and accompanying metadata.
+
+    Game snapshot is sequence of pusher steps representing actual steps, jumps (in
+    reverse solving mode) and pusher selections (in Multiban variant).
     """
 
     # Characters used in textual representation of game snapshot. Not all game variants
@@ -40,8 +46,26 @@ class Snapshot:
     CURRENT_POSITION_CH: Final[str] = "*"
 
     @classmethod
+    def is_move_step(cls, character: str) -> bool:
+        from .snapshot_parsing import Constants
+
+        return character in Constants.MOVE_CHARACTERS
+
+    @classmethod
+    def is_push_step(cls, character: str) -> bool:
+        from .snapshot_parsing import Constants
+
+        return character in Constants.PUSH_CHARACTERS
+
+    @classmethod
     def is_pusher_step(cls, character: str) -> bool:
-        return character in _MOVEMENT_CHARACTERS
+        return cls.is_move_step(character) or cls.is_push_step(character)
+
+    @classmethod
+    def is_marker(cls, character: str) -> bool:
+        from .snapshot_parsing import Constants
+
+        return character in Constants.MARKERS
 
     @classmethod
     def is_snapshot(cls, line: str) -> bool:
@@ -53,127 +77,202 @@ class Snapshot:
         - Rle characters
         - spaces and newlines
         """
+        from .snapshot_parsing import Constants
+
         return (
             not is_blank(line)
             and not contains_only_digits_and_spaces(line)
             and all(
-                True if _RE_SNAPSHOT_STRING.match(l) else False
+                True if Constants.RE_SNAPSHOT_STRING.match(l) else False
                 for l in line.splitlines()
             )
         )
 
-    @classmethod
-    def cleaned_moves(cls, line: str) -> str:
-        if not cls.is_snapshot(line):
-            raise ValueError("Illegal characters found in snapshot string")
-
-        return Rle.decode(line)
-
     def __init__(
         self,
-        id: int = 0,
-        moves: str = "",
-        title: str = "",
-        duration: Optional[str] = None,
-        solver: str = "",
-        created_at: str = "",
-        updated_at: str = "",
-        notes: Optional[List[str]] = None,
+        tessellation_or_description: TessellationOrDescription = "sokoban",
+        moves_data: str = "",
     ):
-        self.id = id
-        self._moves = moves
-        self.title = title
-        self.duration = duration
-        self.solver = solver
-        self.notes: List[str] = notes or []
-        self.created_at = created_at
-        self.updated_at = updated_at
+        from ..game import Tessellation
 
-        self._pushes_count: Optional[int] = None
-        self._moves_count: Optional[int] = None
-        self._is_reverse: Optional[int] = None
+        self.id = 0
+        self.title: str = ""
+        self.duration: str = ""
+        self.solver: str = ""
+        self.notes: List[str] = []
+        self.created_at: str = ""
+        self.updated_at: str = ""
+
+        self._tessellation = Tessellation.instance_from(tessellation_or_description)
+
+        if not is_blank(moves_data) and not self.is_snapshot(moves_data):
+            raise ValueError("Invalid characters in snapshot string!")
+        self._moves_data: str = moves_data or ""
+
+        self._parsed_moves: MovementTokens = []
+        self._was_parsed = False
+        self._pushes_count: int = 0
+        self._moves_count: int = 0
+        self._jumps_count: int = 0
+        self._is_reverse: bool = False
+
+    def to_str(self, rle_encode=False) -> str:
+        self._reparse_if_not_parsed()
+
+        retv = "".join(str(_) for _ in self._parsed_moves)
+
+        # Reverse snapshots must start with jump, even if it is empty one
+        if self.is_reverse and (
+            not self._parsed_moves
+            or (self._parsed_moves and retv[0] != self.JUMP_BEGIN)
+        ):
+            retv = self.JUMP_BEGIN + self.JUMP_END + retv
+
+        if rle_encode:
+            retv = Rle.encode(retv)
+
+        return retv
+
+    def __str__(self):
+        return self.to_str(rle_encode=False)
+
+    def __repr__(self):
+        klass = self.__class__.__name__
+        return f'{klass}(moves_data="{self.to_str(rle_encode=False)}")'
 
     @property
-    def moves(self):
-        return self._moves
+    def tessellation(self) -> AnyTessellation:
+        return self._tessellation
 
-    @moves.setter
-    def moves(self, rv):
-        self._moves = rv
-        self._pushes_count = None
-        self._moves_count = None
-        self._is_reverse = None
+    @property
+    def moves_data(self) -> str:
+        return self._moves_data
+
+    @moves_data.setter
+    def moves_data(self, rv: str):
+        if not is_blank(rv) and not self.is_snapshot(rv):
+            raise ValueError("Invalid characters in snapshot string!")
+        self._moves_data = rv or ""
+        self._was_parsed = False
+
+    @property
+    def pusher_steps(self) -> List[PusherStep]:
+        """
+        Game engine representation of pusher movement.
+        """
+        self._reparse_if_not_parsed()
+        return sum((_.pusher_steps(self.tessellation) for _ in self._parsed_moves), [])
+
+    @pusher_steps.setter
+    def pusher_steps(self, rv: List[PusherStep]):
+        """
+        Warning:
+            This will replace ``moves_data`` with ``rv`` converted to ``str``.
+        """
+        from .snapshot_parsing import Jump, PusherSelection, Steps
+
+        i = 0
+        iend = len(rv)
+
+        self._parsed_moves = []
+        self._pushes_count = 0
+        self._moves_count = 0
+        self._jumps_count = 0
+        self._is_reverse = False
+        self._was_parsed = True
+
+        while i < iend:
+            if rv[i].is_jump:
+                jump = Jump("")
+                while i < iend and rv[i].is_jump:
+                    jump.data += self.tessellation.pusher_step_to_char(rv[i])
+                    if rv[i].is_current_pos:
+                        jump.data += self.CURRENT_POSITION_CH
+                    i += 1
+                self._parsed_moves.append(jump)
+                self._jumps_count += 1
+                self._is_reverse = True
+                self._moves_count += jump.moves_count
+
+            elif rv[i].is_pusher_selection:
+                pusher_selection = PusherSelection("")
+                while i < iend and rv[i].is_pusher_selection:
+                    pusher_selection.data += self.tessellation.pusher_step_to_char(
+                        rv[i]
+                    )
+                    if rv[i].is_current_pos:
+                        pusher_selection.data += self.CURRENT_POSITION_CH
+                    i += 1
+                self._parsed_moves.append(pusher_selection)
+
+            else:
+                steps = Steps("")
+                while i < iend and not rv[i].is_jump and not rv[i].is_pusher_selection:
+                    steps.data += self.tessellation.pusher_step_to_char(rv[i])
+                    if rv[i].is_current_pos:
+                        steps.data += self.CURRENT_POSITION_CH
+                    i += 1
+                self._parsed_moves.append(steps)
+                self._pushes_count += steps.pushes_count
+                self._moves_count += steps.moves_count
+
+        self._moves_data = self.to_str(rle_encode=False)
 
     @property
     def pushes_count(self) -> int:
-        if self._pushes_count is None:
-            self._pushes_count = reduce(
-                add,
-                [
-                    1 if (self.is_pusher_step(chr) and chr.isupper()) else 0
-                    for chr in self.moves
-                ],
-                0,
-            )
-
+        """
+        Count of box pushing steps.
+        """
+        self._reparse_if_not_parsed()
         return self._pushes_count
 
     @property
     def moves_count(self) -> int:
         """
-        This is just an approximation. Since snapshot is not fully parsed, this method
-        may also count pusher steps that are part of jumps and / or pusher selections.
+        Count of steps that are:
+            - not pushing a box
+            - jumping (in reverse solving mode)
         """
-        if self._moves_count is None:
-            self._moves_count = reduce(
-                add,
-                [
-                    1 if (self.is_pusher_step(chr) and chr.islower()) else 0
-                    for chr in self.moves
-                ],
-                0,
-            )
+        self._reparse_if_not_parsed()
         return self._moves_count
 
     @property
+    def jumps_count(self) -> int:
+        """
+        Count of sequences of steps that are jumps. Jumps are possible when board is
+        being solved in reverse mode.
+        """
+        self._reparse_if_not_parsed()
+        return self._jumps_count
+
+    @property
     def is_reverse(self) -> bool:
-        return reduce(
-            or_,
-            [chr == self.JUMP_BEGIN or chr == self.JUMP_END for chr in self.moves],
-            False,
-        )
+        """
+        True if snapshot contains any jumps.
+        """
+        self._reparse_if_not_parsed()
+        return self._is_reverse
 
+    def _reparse_if_not_parsed(self):
+        if not self._was_parsed:
+            self._reparse()
 
-_MOVEMENT_CHARACTERS: Set[str] = {
-    Snapshot.l,
-    Snapshot.u,
-    Snapshot.r,
-    Snapshot.d,
-    Snapshot.L,
-    Snapshot.U,
-    Snapshot.R,
-    Snapshot.D,
-    Snapshot.W,
-    Snapshot.W,
-    Snapshot.e,
-    Snapshot.E,
-    Snapshot.n,
-    Snapshot.N,
-    Snapshot.s,
-    Snapshot.S,
-}
-_CHARACTERS: Set[str] = _MOVEMENT_CHARACTERS.union(
-    {
-        Snapshot.JUMP_BEGIN,
-        Snapshot.JUMP_END,
-        Snapshot.PUSHER_CHANGE_BEGIN,
-        Snapshot.PUSHER_CHANGE_END,
-        Snapshot.CURRENT_POSITION_CH,
-    }
-)
-_RE_SNAPSHOT_STRING = re.compile(
-    r"^([0-9\s"
-    + re.escape("".join(_CHARACTERS))
-    + re.escape("".join(Rle.DELIMITERS))
-    + "])*$"
-)
+    def _reparse(self):
+        from .snapshot_parsing import Jump, Parser
+
+        self._parsed_moves = []
+        self._pushes_count = 0
+        self._moves_count = 0
+        self._jumps_count = 0
+        self._is_reverse = False
+
+        self._parsed_moves = Parser.parse(self._moves_data)
+
+        for _ in self._parsed_moves:
+            if isinstance(_, Jump):
+                self._jumps_count += 1
+                self._is_reverse = True
+            self._moves_count += _.moves_count
+            self._pushes_count += _.pushes_count
+
+        self._was_parsed = True

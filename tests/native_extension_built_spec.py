@@ -21,13 +21,17 @@ def io_members():
     return {
         "Collection",
         "HexobanPuzzle",
+        "HexobanSnapshot",
         "is_blank",
         "OctobanPuzzle",
+        "OctobanSnapshot",
         "Puzzle",
         "Rle",
         "Snapshot",
         "SokobanPuzzle",
+        "SokobanSnapshot",
         "TriobanPuzzle",
+        "TriobanSnapshot",
     }
 
 

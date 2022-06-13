@@ -12,7 +12,7 @@ from .utilities import contains_only_digits_and_spaces, is_blank
 
 if TYPE_CHECKING:
     from ..game import AnyTessellation, TessellationOrDescription
-    from .puzzle_workers import PuzzleParser, PuzzlePrinter, PuzzleResizer
+    from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
 
 
 class Puzzle:
@@ -144,10 +144,10 @@ class Puzzle:
         Factory method. Produces instance of one of the subclasses.
         """
         from ..game import Tessellation
-        from .hexoban_puzzle import HexobanPuzzle
-        from .octoban_puzzle import OctobanPuzzle
-        from .sokoban_puzzle import SokobanPuzzle
-        from .trioban_puzzle import TriobanPuzzle
+        from .hexoban import HexobanPuzzle
+        from .octoban import OctobanPuzzle
+        from .sokoban import SokobanPuzzle
+        from .trioban import TriobanPuzzle
 
         tessellation_instance = Tessellation.instance_from(tessellation_or_description)
 
@@ -173,9 +173,8 @@ class Puzzle:
         printer_cls: Optional[Type[PuzzlePrinter]] = None,
     ):
         from ..game import Tessellation
-        from .puzzle_workers import PuzzleParser, PuzzlePrinter, PuzzleResizer
+        from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
 
-        self.id: int = 0
         self.title = ""
         self.author = ""
         self.boxorder = ""

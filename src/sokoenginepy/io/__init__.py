@@ -2,13 +2,13 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .collection import Collection
-    from .hexoban_puzzle import HexobanPuzzle
-    from .octoban_puzzle import OctobanPuzzle
+    from .hexoban import HexobanPuzzle, HexobanSnapshot
+    from .octoban import OctobanPuzzle, OctobanSnapshot
     from .puzzle import Puzzle
     from .rle import Rle
     from .snapshot import Snapshot
-    from .sokoban_puzzle import SokobanPuzzle
-    from .trioban_puzzle import TriobanPuzzle
+    from .sokoban import SokobanPuzzle, SokobanSnapshot
+    from .trioban import TriobanPuzzle, TriobanSnapshot
     from .utilities import is_blank
 
 else:
@@ -27,11 +27,11 @@ else:
 
     except ImportError:
         from .collection import Collection
-        from .hexoban_puzzle import HexobanPuzzle
-        from .octoban_puzzle import OctobanPuzzle
+        from .hexoban import HexobanPuzzle, HexobanSnapshot
+        from .octoban import OctobanPuzzle, OctobanSnapshot
         from .puzzle import Puzzle
         from .rle import Rle
         from .snapshot import Snapshot
-        from .sokoban_puzzle import SokobanPuzzle
-        from .trioban_puzzle import TriobanPuzzle
+        from .sokoban import SokobanPuzzle, SokobanSnapshot
+        from .trioban import TriobanPuzzle, TriobanSnapshot
         from .utilities import is_blank
