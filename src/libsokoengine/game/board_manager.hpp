@@ -1,18 +1,17 @@
 #ifndef BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "board_graph.hpp"
-#include "board_state.hpp"
+#include "sokoengine_config.hpp"
 
 #include <map>
-#include <memory>
 #include <stdexcept>
-#include <vector>
+#include <memory>
 
 namespace sokoengine {
 namespace game {
 
 class BoardGraph;
+class BoardState;
 
 ///
 /// Exception.
@@ -123,7 +122,7 @@ protected:
   virtual void box_moved(position_t old_position, position_t to_new_position);
 
 private:
-  class LIBSOKOENGINE_LOCAL PIMPL;
+  class PIMPL;
   std::unique_ptr<PIMPL> m_impl;
 };
 
@@ -131,3 +130,4 @@ private:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

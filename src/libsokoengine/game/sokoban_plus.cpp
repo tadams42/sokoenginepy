@@ -14,6 +14,8 @@ using namespace boost;
 namespace sokoengine {
 namespace game {
 
+using io::Strings;
+
 SokobanPlusDataError::SokobanPlusDataError(const string &mess)
   : invalid_argument(mess) {}
 
@@ -88,7 +90,7 @@ public:
     IdsMap retv;
     piece_id_t index = 0;
     for (const auto &plus_id : cleaned) {
-      retv[index + DEFAULT_PIECE_ID] = plus_id;
+      retv[index + Config::DEFAULT_PIECE_ID] = plus_id;
       index++;
     }
 

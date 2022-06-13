@@ -1,7 +1,8 @@
 #include "board_graph.hpp"
+
 #include "board_cell.hpp"
 #include "puzzle.hpp"
-#include "tessellation.hpp"
+#include "board_state.hpp"
 
 #include <algorithm>
 #include <boost/foreach.hpp>
@@ -14,9 +15,16 @@ using namespace std;
 namespace sokoengine {
 namespace game {
 
+namespace implementation {
+
+static constexpr BoardGraph::weight_t _MAX_EDGE_WEIGHT = 100;
+
+} // namespace implementation
+
 using boost::on_tree_edge;
 using boost::vertex_index;
 using io::Puzzle;
+using namespace implementation;
 
 BoardSizeExceededError::BoardSizeExceededError(const string &mess)
   : runtime_error(mess) {}
@@ -60,8 +68,6 @@ typedef GraphT::out_edge_iterator out_edge_iterator;
 
 using namespace implementation;
 
-static constexpr const BoardGraph::weight_t _MAX_EDGE_WEIGHT = 100;
-
 class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
 public:
   typedef std::function<bool(position_t)> IsObstacleFunctor;
@@ -77,8 +83,8 @@ public:
       m_board_width(width),
       m_board_height(height),
       m_tessellation(tessellation) {
-    if (width > MAX_WIDTH) throw BoardSizeExceededError("width id tool big!");
-    if (height > MAX_HEIGHT) throw BoardSizeExceededError("height id tool big!");
+    if (width > Config::MAX_WIDTH) throw BoardSizeExceededError("width id tool big!");
+    if (height > Config::MAX_HEIGHT) throw BoardSizeExceededError("height id tool big!");
   }
 
   const BoardCell &cell_at(position_t position) const {
@@ -505,7 +511,7 @@ position_t BoardGraph::path_destination(position_t start_position,
   position_t retv = start_position, next_target;
   for (const Direction &direction : directions_path) {
     next_target = neighbor_at(retv, direction);
-    if (next_target > MAX_POS) {
+    if (next_target > Config::MAX_POS) {
       break;
     } else {
       retv = next_target;
@@ -521,7 +527,7 @@ void BoardGraph::reconfigure_edges() {
     for (const Direction &direction : m_impl->m_tessellation.legal_directions()) {
       auto neighbor_position = m_impl->m_tessellation.neighbor_position(
         source_position, direction, m_impl->m_board_width, m_impl->m_board_height);
-      if (neighbor_position <= MAX_POS)
+      if (neighbor_position <= Config::MAX_POS)
         add_edge(source_position, neighbor_position, direction);
     }
   }

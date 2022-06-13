@@ -4,6 +4,7 @@
 #include "board_graph.hpp"
 #include "hashed_board_manager.hpp"
 #include "sokoban_plus.hpp"
+#include "board_state.hpp"
 
 #include <algorithm>
 
@@ -19,6 +20,8 @@ using namespace std;
 namespace sokoengine {
 namespace game {
 
+using io::Strings;
+
 CellAlreadyOccupiedError::CellAlreadyOccupiedError(const string &mess)
   : runtime_error(mess) {}
 
@@ -30,7 +33,7 @@ BoxGoalSwitchError::~BoxGoalSwitchError() = default;
 
 namespace implementation {
 
-enum class Selectors : char { BOXES, GOALS, PUSHERS };
+enum class LIBSOKOENGINE_LOCAL Selectors : char { BOXES, GOALS, PUSHERS };
 
 } // namespace implementation
 
@@ -54,7 +57,7 @@ public:
   PIMPL(BoardGraph &board, const string &boxorder, const string &goalorder)
     : m_board(board) {
     piece_id_t pusher_id, box_id, goal_id;
-    pusher_id = box_id = goal_id = DEFAULT_PIECE_ID;
+    pusher_id = box_id = goal_id = Config::DEFAULT_PIECE_ID;
 
     for (position_t curent_pos = 0; curent_pos < m_board.vertices_count();
          ++curent_pos) {
@@ -412,7 +415,7 @@ BoardManager::solutions_vector_t BoardManager::solutions() const {
     piece_id_t index = 0;
     bool retv = true;
     for (auto box_position : b_positions) {
-      auto b_id = index + DEFAULT_PIECE_ID;
+      auto b_id = index + Config::DEFAULT_PIECE_ID;
       auto b_plus_id = box_plus_id(b_id);
       auto g_id = goal_id_on(box_position);
       auto g_plus_id = goal_plus_id(g_id);
@@ -449,7 +452,7 @@ void BoardManager::switch_boxes_and_goals() {
     auto old_goal_position = goal_position(bg_pair.second.first);
 
     if (old_box_position != old_goal_position) {
-      piece_id_t moved_pusher_id = DEFAULT_PIECE_ID - 1;
+      piece_id_t moved_pusher_id = Config::DEFAULT_PIECE_ID - 1;
       if (has_pusher_on(old_goal_position)) {
         moved_pusher_id = pusher_id_on(old_goal_position);
         m_impl->update_position(moved_pusher_id, Selectors::PUSHERS, -1);
@@ -465,7 +468,7 @@ void BoardManager::switch_boxes_and_goals() {
       m_impl->m_board.cell(old_goal_position).put_box();
       box_moved(old_box_position, old_goal_position);
 
-      if (moved_pusher_id != DEFAULT_PIECE_ID - 1) {
+      if (moved_pusher_id != Config::DEFAULT_PIECE_ID - 1) {
         m_impl->update_position(moved_pusher_id, Selectors::PUSHERS, old_box_position);
         m_impl->m_board.cell(old_box_position).put_pusher();
         pusher_moved(old_goal_position, old_box_position);

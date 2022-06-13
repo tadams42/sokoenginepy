@@ -1,8 +1,9 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using namespace sokoengine::io;
-using sokoengine::Strings;
+using sokoengine::io::Collection;
+using sokoengine::io::Puzzles;
+using sokoengine::io::Strings;
 
 void export_io_collection(py::module &m) {
   auto pyCollection = py::class_<Collection>(m, "Collection");

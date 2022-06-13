@@ -1,8 +1,11 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using sokoengine::zobrist_key_t;
-using namespace sokoengine::game;
+using sokoengine::game::BoardGraph;
+using sokoengine::game::BoardManager;
+using sokoengine::game::BoardState;
+using sokoengine::game::HashedBoardManager;
+using sokoengine::game::zobrist_key_t;
 
 void export_board_manager(py::module &m) {
   py::class_<BoardState>(m, "BoardState")
@@ -14,7 +17,7 @@ void export_board_manager(py::module &m) {
          }),
          py::arg("pushers_positions") = py::none(),
          py::arg("boxes_positions") = py::none(),
-         py::arg("zobrist_hash") = UNKNOWN_ZOBRIST_HASH)
+         py::arg("zobrist_hash") = BoardState::ZOBRIST_HASH_NOT_SET)
 
     // protocols
     .def("__eq__", &BoardState::operator==)
@@ -22,24 +25,25 @@ void export_board_manager(py::module &m) {
     .def("__str__", &BoardState::str)
     .def("__repr__", &BoardState::repr)
 
-    .def_property("pushers_positions",
-                  [](BoardState &self) { return self.pushers_positions(); },
-                  [](BoardState &self, const py::iterable &rv) {
-                    self.pushers_positions() = py::receive_positions_throw(rv);
-                  })
+    .def_property(
+      "pushers_positions", [](BoardState &self) { return self.pushers_positions(); },
+      [](BoardState &self, const py::iterable &rv) {
+        self.pushers_positions() = py::receive_positions_throw(rv);
+      })
 
-    .def_property("boxes_positions",
-                  [](BoardState &self) { return self.boxes_positions(); },
-                  [](BoardState &self, const py::iterable &rv) {
-                    self.boxes_positions() = py::receive_positions_throw(rv);
-                  })
+    .def_property(
+      "boxes_positions", [](BoardState &self) { return self.boxes_positions(); },
+      [](BoardState &self, const py::iterable &rv) {
+        self.boxes_positions() = py::receive_positions_throw(rv);
+      })
 
-    .def_property("zobrist_hash", [](BoardState &self) { return self.zobrist_hash(); },
-                  [](BoardState &self, zobrist_key_t rv) { self.zobrist_hash() = rv; });
+    .def_property(
+      "zobrist_hash", [](BoardState &self) { return self.zobrist_hash(); },
+      [](BoardState &self, zobrist_key_t rv) { self.zobrist_hash() = rv; });
 
   py::class_<BoardManager>(m, "BoardManager")
-    .def(py::init<BoardGraph &, const string &, const string &>(),
-         py::arg("board"), py::arg("boxorder") = "", py::arg("goalorder") = "")
+    .def(py::init<BoardGraph &, const string &, const string &>(), py::arg("board"),
+         py::arg("boxorder") = "", py::arg("goalorder") = "")
 
     // protocols
     .def("__str__", &BoardManager::str)
@@ -123,8 +127,8 @@ void export_board_manager(py::module &m) {
     .def_property_readonly("is_playable", &BoardManager::is_playable);
 
   py::class_<HashedBoardManager, BoardManager>(m, "HashedBoardManager")
-    .def(py::init<BoardGraph &, const string &, const string &>(),
-         py::arg("board"), py::arg("boxorder") = "", py::arg("goalorder") = "")
+    .def(py::init<BoardGraph &, const string &, const string &>(), py::arg("board"),
+         py::arg("boxorder") = "", py::arg("goalorder") = "")
 
     .def("__str__", &HashedBoardManager::str)
 

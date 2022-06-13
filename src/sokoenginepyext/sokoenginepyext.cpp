@@ -1,10 +1,19 @@
 #include "sokoenginepyext.hpp"
 
-namespace game = sokoengine::game;
-namespace io = sokoengine::io;
 using namespace std;
 
-using sokoengine::position_t;
+using sokoengine::Config;
+using sokoengine::game::BoardSizeExceededError;
+using sokoengine::game::BoxGoalSwitchError;
+using sokoengine::game::CellAlreadyOccupiedError;
+using sokoengine::game::IllegalMoveError;
+using sokoengine::game::KeyError;
+using sokoengine::game::NonPlayableBoardError;
+using sokoengine::game::position_t;
+using sokoengine::game::Positions;
+using sokoengine::game::SokobanPlusDataError;
+using sokoengine::io::is_blank;
+using sokoengine::io::Strings;
 
 void export_pusher_step(py::module &);
 void export_board_cell(py::module &);
@@ -23,32 +32,31 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   py::module_ m_game = m.def_submodule("game");
   py::module_ m_io = m.def_submodule("io");
 
-  py::bind_vector<sokoengine::Strings>(m_io, "StringsList");
-  py::bind_vector<io::Snapshots>(m_io, "SnapshotsList");
+  py::bind_vector<Strings>(m_io, "StringsList");
 
-  py::register_exception<game::CellAlreadyOccupiedError>(
-    m_game, "CellAlreadyOccupiedError", PyExc_RuntimeError);
-
-  py::register_exception<game::BoxGoalSwitchError>(m_game, "BoxGoalSwitchError",
+  py::register_exception<CellAlreadyOccupiedError>(m_game, "CellAlreadyOccupiedError",
                                                    PyExc_RuntimeError);
+
+  py::register_exception<BoxGoalSwitchError>(m_game, "BoxGoalSwitchError",
+                                             PyExc_RuntimeError);
 
   // py::register_exception<sokoengine::InvalidPieceIdError>(
   //   m_game, "InvalidPieceIdError", PyExc_ValueError
   // );
 
-  py::register_exception<game::SokobanPlusDataError>(m_game, "SokobanPlusDataError",
-                                                     PyExc_ValueError);
+  py::register_exception<SokobanPlusDataError>(m_game, "SokobanPlusDataError",
+                                               PyExc_ValueError);
 
-  py::register_exception<game::NonPlayableBoardError>(m_game, "NonPlayableBoardError",
-                                                      PyExc_RuntimeError);
+  py::register_exception<NonPlayableBoardError>(m_game, "NonPlayableBoardError",
+                                                PyExc_RuntimeError);
 
-  py::register_exception<game::IllegalMoveError>(m_game, "IllegalMoveError",
+  py::register_exception<IllegalMoveError>(m_game, "IllegalMoveError",
+                                           PyExc_RuntimeError);
+
+  py::register_exception<KeyError>(m_game, "ExtKeyError", PyExc_KeyError);
+
+  py::register_exception<BoardSizeExceededError>(m_game, "BoardSizeExceededError",
                                                  PyExc_RuntimeError);
-
-  py::register_exception<game::KeyError>(m_game, "ExtKeyError", PyExc_KeyError);
-
-  py::register_exception<game::BoardSizeExceededError>(m_game, "BoardSizeExceededError",
-                                                       PyExc_RuntimeError);
   export_pusher_step(m_game);
   export_board_cell(m_game);
   export_board_graph(m_game);
@@ -57,7 +65,7 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   export_board_manager(m_game);
   export_mover(m_game);
 
-  m_io.def("is_blank", &io::is_blank);
+  m_io.def("is_blank", &is_blank);
   export_io_snapshot(m_io);
   export_io_puzzle(m_io);
   export_io_collection(m_io);
@@ -73,7 +81,7 @@ position_t receive_position(const handle &board_position, bool *converted) {
   position_t retv = numeric_limits<position_t>::max();
   try {
     maybe_number = board_position.cast<py_int_t>();
-    if (maybe_number >= 0 && maybe_number < sokoengine::MAX_POS) {
+    if (maybe_number >= 0 && maybe_number < Config::MAX_POS) {
       retv = (position_t)maybe_number;
     } else {
       if (converted != nullptr) *converted = false;
@@ -97,8 +105,8 @@ position_t receive_position_throw(const handle &board_position) {
     return retv;
 }
 
-game::Positions receive_positions_throw(const py::iterable &positions) {
-  game::Positions retv;
+Positions receive_positions_throw(const py::iterable &positions) {
+  Positions retv;
   if (!positions.is_none()) {
     for (auto val : positions) {
       retv.push_back(receive_position_throw(val));

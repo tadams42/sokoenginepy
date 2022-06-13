@@ -1,11 +1,10 @@
 #ifndef BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
-
-#include "board_state.hpp"
+#include "tessellation.hpp"
 
 #include <stdexcept>
+#include <memory>
 
 namespace sokoengine {
 
@@ -16,7 +15,6 @@ class Puzzle;
 namespace game {
 
 class BoardCell;
-class Tessellation;
 
 ///
 /// Exception.
@@ -27,10 +25,6 @@ public:
   virtual ~BoardSizeExceededError();
 };
 
-///
-/// Type of graph
-///
-enum class LIBSOKOENGINE_API GraphType : int { DIRECTED = 0, DIRECTED_MULTI = 1 };
 
 ///
 /// Board graph implementation.
@@ -104,7 +98,7 @@ public:
   void reconfigure_edges();
 
 private:
-  class LIBSOKOENGINE_LOCAL PIMPL;
+  class PIMPL;
   std::unique_ptr<PIMPL> m_impl;
 };
 
@@ -112,3 +106,4 @@ private:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

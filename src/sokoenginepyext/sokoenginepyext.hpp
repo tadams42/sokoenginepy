@@ -7,8 +7,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MAKE_OPAQUE(sokoengine::Strings);
-PYBIND11_MAKE_OPAQUE(sokoengine::io::Snapshots);
+PYBIND11_MAKE_OPAQUE(sokoengine::io::Strings);
 
 namespace pybind11 {
 
@@ -33,9 +32,9 @@ template <typename T> struct extract {
 
 typedef long long py_int_t;
 
-sokoengine::position_t receive_position(const py::handle &board_position,
+sokoengine::game::position_t receive_position(const py::handle &board_position,
                                               bool *converted = nullptr);
-sokoengine::position_t receive_position_throw(const py::handle &board_position);
+sokoengine::game::position_t receive_position_throw(const py::handle &board_position);
 
 sokoengine::game::Positions
 receive_positions_throw(const py::iterable &pushers_positions);

@@ -43,7 +43,7 @@ position_t SokobanTessellation::neighbor_position(position_t position,
   if (ON_BOARD(column, row, width, height))
     return index_1d(column, row, width);
   else
-    return MAX_POS + 1;
+    return Config::MAX_POS + 1;
 }
 
 char SokobanTessellation::pusher_step_to_char(const PusherStep &rv) const {

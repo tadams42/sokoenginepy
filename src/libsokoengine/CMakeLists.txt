@@ -1,6 +1,19 @@
 # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 
-set(SELF_HEADERS
+set(PRIVATE_HEADERS
+    io/collection/sok_file_format.hpp
+    io/collection/SOK_format_specification.h
+
+    io/rle/ast.hpp
+    io/rle/ast_adapted.hpp
+    io/rle/config.hpp
+    io/rle/error_handler.hpp
+    io/rle/evaluator.hpp
+    io/rle/grammar.hpp
+    io/rle/json_printer.hpp
+)
+
+set(INSTALL_HEADERS
     game/board_cell.hpp
     game/board_graph.hpp
 
@@ -24,24 +37,14 @@ set(SELF_HEADERS
     benchmarks.hpp
 
     io/puzzle.hpp
-    io/hexoban_puzzle.hpp
-    io/octoban_puzzle.hpp
-    io/sokoban_puzzle.hpp
-    io/trioban_puzzle.hpp
-    io/snapshot.hpp
-    io/collection.hpp
-    io/sok_file_format.hpp
-    io/SOK_format_specification.h
+    io/hexoban.hpp
+    io/octoban.hpp
+    io/sokoban.hpp
+    io/trioban.hpp
     io/utilities.hpp
-    io/rle/rle.hpp
-    io/rle/rle.hpp
-    io/rle/rle_ast.hpp
-    io/rle/rle_ast_adapted.hpp
-    io/rle/rle_config.hpp
-    io/rle/rle_error_handler.hpp
-    io/rle/rle_evaluator.hpp
-    io/rle/rle_grammar.hpp
-    io/rle/rle_json_printer.hpp
+    io/collection.hpp
+
+    io/rle.hpp
 )
 
 set(SELF_SOURCES
@@ -66,14 +69,15 @@ set(SELF_SOURCES
     benchmarks.cpp
 
     io/puzzle.cpp
-    io/sokoban_puzzle.cpp
-    io/octoban_puzzle.cpp
-    io/trioban_puzzle.cpp
-    io/hexoban_puzzle.cpp
-    io/snapshot.cpp
-    io/collection.cpp
-    io/sok_file_format.cpp
+    io/sokoban.cpp
+    io/octoban.cpp
+    io/trioban.cpp
+    io/hexoban.cpp
     io/utilities.cpp
+
+    io/collection/collection.cpp
+    io/collection/sok_file_format.cpp
+
     io/rle/rle.cpp
 )
 
@@ -81,13 +85,12 @@ set(SELF_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/game
     ${CMAKE_CURRENT_SOURCE_DIR}/io
-    ${CMAKE_CURRENT_SOURCE_DIR}/io/rle
 )
 
 #..............................................................................
 #                       sokoengine OBJECT library
 #..............................................................................
-add_library(sokoengine_obj OBJECT ${SELF_HEADERS} ${SELF_SOURCES})
+add_library(sokoengine_obj OBJECT ${INSTALL_HEADERS} ${PRIVATE_HEADERS} ${SELF_SOURCES})
 
 target_include_directories(sokoengine_obj
     PUBLIC
@@ -209,7 +212,7 @@ install(
 
 # Install header files
 install(
-    FILES ${SELF_HEADERS}
+    FILES ${INSTALL_HEADERS}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sokoengine
 )
 

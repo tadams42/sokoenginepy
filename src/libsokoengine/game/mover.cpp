@@ -1,9 +1,12 @@
 #include "mover.hpp"
 
 #include "board_cell.hpp"
-#include "cppitertools/groupby.hpp"
+#include "board_graph.hpp"
 #include "hashed_board_manager.hpp"
+#include "pusher_step.hpp"
 #include "puzzle.hpp"
+
+#include "cppitertools/groupby.hpp"
 
 #include <algorithm>
 
@@ -16,7 +19,7 @@ namespace game {
 using io::Puzzle;
 
 NonPlayableBoardError::NonPlayableBoardError()
-    : runtime_error("Board is not playable!") {}
+  : runtime_error("Board is not playable!") {}
 
 NonPlayableBoardError::~NonPlayableBoardError() = default;
 
@@ -30,19 +33,15 @@ public:
   HashedBoardManager m_manager;
   SolvingMode m_solving_mode;
   bool m_pulls_boxes = true;
-  piece_id_t m_selected_pusher = DEFAULT_PIECE_ID;
+  piece_id_t m_selected_pusher = Config::DEFAULT_PIECE_ID;
   size_t m_pull_count = 0;
-  Mover::Moves m_last_move;
+  PusherSteps m_last_move;
 
   PIMPL(BoardGraph &board, SolvingMode mode)
-      : m_initial_board(board), m_manager(board), m_solving_mode(mode) {
-    if (!m_manager.is_playable()) {
-      throw NonPlayableBoardError();
-    }
+    : m_initial_board(board), m_manager(board), m_solving_mode(mode) {
+    if (!m_manager.is_playable()) { throw NonPlayableBoardError(); }
 
-    if (m_solving_mode == SolvingMode::REVERSE) {
-      m_manager.switch_boxes_and_goals();
-    }
+    if (m_solving_mode == SolvingMode::REVERSE) { m_manager.switch_boxes_and_goals(); }
   }
 
   PIMPL(PIMPL &&rv) = default;
@@ -55,14 +54,13 @@ public:
   };
 
   void select_pusher(piece_id_t pusher_id) {
-    if (pusher_id == m_selected_pusher)
-      return;
+    if (pusher_id == m_selected_pusher) return;
 
     position_t old_pusher_position = m_manager.pusher_position(m_selected_pusher);
     position_t new_pusher_position = m_manager.pusher_position(pusher_id);
 
     auto selection_path = m_manager.board().positions_path_to_directions_path(
-        m_manager.board().find_jump_path(old_pusher_position, new_pusher_position));
+      m_manager.board().find_jump_path(old_pusher_position, new_pusher_position));
 
     m_last_move.clear();
     for (const Direction &direction : selection_path) {
@@ -84,9 +82,7 @@ public:
     }
 
     position_t old_position = m_manager.pusher_position(m_selected_pusher);
-    if (old_position == new_position) {
-      return;
-    }
+    if (old_position == new_position) { return; }
 
     try {
       m_manager.move_pusher_from(old_position, new_position);
@@ -95,7 +91,7 @@ public:
     }
 
     auto path = m_manager.board().positions_path_to_directions_path(
-        m_manager.board().find_jump_path(old_position, new_position));
+      m_manager.board().find_jump_path(old_position, new_position));
     m_last_move.clear();
     for (const Direction &direction : path) {
       PusherStep pusher_step(direction, false);
@@ -108,12 +104,12 @@ public:
   void push_or_move(const Direction &direction, const MoveWorkerOptions &options) {
     position_t initial_pusher_position = m_manager.pusher_position(m_selected_pusher);
     position_t in_front_of_pusher =
-        m_manager.board().neighbor(initial_pusher_position, direction);
+      m_manager.board().neighbor(initial_pusher_position, direction);
 
-    if (in_front_of_pusher > MAX_POS) {
+    if (in_front_of_pusher > Config::MAX_POS) {
       throw IllegalMoveError(
-          "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-          ", direction: " + direction_str(direction) + ")");
+        "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
+        ", direction: " + direction_str(direction) + ")");
     }
 
     bool is_push = false;
@@ -122,7 +118,7 @@ public:
     if (m_manager.has_box_on(in_front_of_pusher)) {
       is_push = true;
       in_front_of_box = m_manager.board().neighbor(in_front_of_pusher, direction);
-      if (in_front_of_box > MAX_POS) {
+      if (in_front_of_box > Config::MAX_POS) {
         throw IllegalMoveError("Can't push box off board (ID: " +
                                std::to_string(m_manager.box_id_on(in_front_of_pusher)) +
                                ", direction: " + direction_str(direction) + ")");
@@ -145,9 +141,7 @@ public:
     pusher_step.set_pusher_id(m_selected_pusher);
     if (is_push) {
       pusher_step.set_moved_box_id(m_manager.box_id_on(in_front_of_box));
-      if (options.decrease_pull_count && m_pull_count > 0) {
-        m_pull_count -= 1;
-      }
+      if (options.decrease_pull_count && m_pull_count > 0) { m_pull_count -= 1; }
     }
     m_last_move.clear();
     m_last_move.push_back(pusher_step);
@@ -156,12 +150,12 @@ public:
   void pull_or_move(const Direction &direction, const MoveWorkerOptions &options) {
     position_t initial_pusher_position = m_manager.pusher_position(m_selected_pusher);
     position_t in_front_of_pusher =
-        m_manager.board().neighbor(initial_pusher_position, direction);
+      m_manager.board().neighbor(initial_pusher_position, direction);
 
-    if (in_front_of_pusher > MAX_POS) {
+    if (in_front_of_pusher > Config::MAX_POS) {
       throw IllegalMoveError(
-          "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-          ", direction: " + direction_str(direction) + ")");
+        "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
+        ", direction: " + direction_str(direction) + ")");
     }
 
     try {
@@ -174,9 +168,9 @@ public:
 
     if (options.force_pulls) {
       position_t behind_pusher =
-          m_manager.board().neighbor(initial_pusher_position, opposite(direction));
+        m_manager.board().neighbor(initial_pusher_position, opposite(direction));
 
-      if (behind_pusher <= MAX_POS &&
+      if (behind_pusher <= Config::MAX_POS &&
           m_manager.board().cell(behind_pusher).has_box()) {
         is_pull = true;
         try {
@@ -184,9 +178,7 @@ public:
         } catch (const CellAlreadyOccupiedError &exc) {
           throw IllegalMoveError(exc.what());
         }
-        if (options.increase_pull_count) {
-          m_pull_count += 1;
-        }
+        if (options.increase_pull_count) { m_pull_count += 1; }
       }
     }
 
@@ -200,8 +192,8 @@ public:
   }
 
   void undo_last_move() {
-    Mover::Moves new_last_moves;
-    Mover::Moves old_last_moves = m_last_move;
+    PusherSteps new_last_moves;
+    PusherSteps old_last_moves = m_last_move;
 
     int jump_key = 0;
     int pusher_change_key = 1;
@@ -228,12 +220,12 @@ public:
                                 m_last_move.end());
         }
       } else if (gb.first == jump_key) {
-        Mover::Moves tmp(gb.second.begin(), gb.second.end());
+        PusherSteps tmp(gb.second.begin(), gb.second.end());
         undo_jump(tmp);
         new_last_moves.insert(new_last_moves.end(), m_last_move.begin(),
                               m_last_move.end());
       } else {
-        Mover::Moves tmp(gb.second.begin(), gb.second.end());
+        PusherSteps tmp(gb.second.begin(), gb.second.end());
         undo_pusher_selection(tmp);
         new_last_moves.insert(new_last_moves.end(), m_last_move.begin(),
                               m_last_move.end());
@@ -247,7 +239,7 @@ public:
     MoveWorkerOptions options;
     if (m_solving_mode == SolvingMode::FORWARD) {
       bool has_box_behind_pusher = m_manager.has_box_on(m_manager.board().neighbor(
-          m_manager.pusher_position(m_selected_pusher), pusher_step.direction()));
+        m_manager.pusher_position(m_selected_pusher), pusher_step.direction()));
 
       if (!pusher_step.is_move() && !has_box_behind_pusher)
         throw IllegalMoveError("Requested push undo, but no box behind pusher!");
@@ -261,7 +253,7 @@ public:
     }
   }
 
-  void undo_jump(const Mover::Moves &jump_moves) {
+  void undo_jump(const PusherSteps &jump_moves) {
     Directions path;
     for (const PusherStep &am : jump_moves)
       path.push_back(opposite(am.direction()));
@@ -270,7 +262,7 @@ public:
     jump(new_position);
   }
 
-  void undo_pusher_selection(const Mover::Moves &selection_moves) {
+  void undo_pusher_selection(const PusherSteps &selection_moves) {
     Directions path;
     for (const PusherStep &am : selection_moves)
       path.push_back(opposite(am.direction()));
@@ -285,7 +277,7 @@ protected:
 };
 
 Mover::Mover(BoardGraph &board, const SolvingMode &mode)
-    : m_impl(std::make_unique<PIMPL>(board, mode)) {}
+  : m_impl(std::make_unique<PIMPL>(board, mode)) {}
 
 Mover::Mover(Mover &&) = default;
 
@@ -319,9 +311,9 @@ void Mover::move(const Direction &direction) {
 
 void Mover::undo_last_move() { m_impl->undo_last_move(); }
 
-const Mover::Moves &Mover::last_move() const { return m_impl->m_last_move; }
+const PusherSteps &Mover::last_move() const { return m_impl->m_last_move; }
 
-void Mover::set_last_move(const Moves &rv) { m_impl->m_last_move = rv; }
+void Mover::set_last_move(const PusherSteps &rv) { m_impl->m_last_move = rv; }
 
 bool Mover::pulls_boxes() const { return m_impl->m_pulls_boxes; }
 

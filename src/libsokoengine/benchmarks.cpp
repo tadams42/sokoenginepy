@@ -17,7 +17,7 @@ namespace benchmarks {
 using sokoengine::io::SokobanPuzzle;
 using namespace sokoengine::game;
 
-class BoardType {
+class LIBSOKOENGINE_LOCAL BoardType {
 public:
   enum EBoardType { SMALL, LARGE };
 
@@ -60,7 +60,7 @@ private:
   EBoardType m_board_type = EBoardType::SMALL;
 };
 
-class BenchmarkType {
+class LIBSOKOENGINE_LOCAL BenchmarkType {
 public:
   enum EBenchmarkType { FORWARD_MOVER, REVERSE_MOVER };
 
@@ -85,7 +85,7 @@ private:
   EBenchmarkType m_type = EBenchmarkType::FORWARD_MOVER;
 };
 
-class MovementBenchmark {
+class LIBSOKOENGINE_LOCAL MovementBenchmark {
   double m_miliseconds_used = 0;
   BoardType m_board_type;
   BenchmarkType m_benchmark_type;
@@ -138,7 +138,7 @@ public:
   }
 };
 
-class MovementBenchmarkPrinter {
+class LIBSOKOENGINE_LOCAL MovementBenchmarkPrinter {
   size_t m_runs_count;
   size_t m_moves_per_run_count;
 

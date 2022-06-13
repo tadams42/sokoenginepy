@@ -1,9 +1,7 @@
 #ifndef MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
-
-#include "pusher_step.hpp"
+#include "direction.hpp"
 
 #include <deque>
 #include <memory>
@@ -14,6 +12,7 @@ namespace game {
 
 class BoardGraph;
 class HashedBoardManager;
+class PusherStep;
 
 ///
 /// Movement mode of operation.
@@ -42,15 +41,15 @@ public:
 };
 
 ///
+/// Ordered sequence of PusherStep.
+///
+typedef std::vector<PusherStep> PusherSteps;
+
+///
 /// Implements movement rules on BoardGraph.
 ///
 class LIBSOKOENGINE_API Mover {
 public:
-  ///
-  /// Ordered sequence of PusherStep.
-  ///
-  typedef std::deque<PusherStep> Moves;
-
   explicit Mover(BoardGraph &board, const SolvingMode &mode = SolvingMode::FORWARD);
   Mover(const Mover &) = delete;
   Mover(Mover &&rv);
@@ -69,8 +68,8 @@ public:
   virtual void move(const Direction &direction);
 
   virtual void undo_last_move();
-  virtual const Moves &last_move() const;
-  void set_last_move(const Moves &rv);
+  virtual const PusherSteps &last_move() const;
+  void set_last_move(const PusherSteps &rv);
 
   bool pulls_boxes() const;
   void set_pulls_boxes(bool value);
@@ -79,7 +78,7 @@ protected:
   const BoardGraph &initial_board() const;
 
 private:
-  class LIBSOKOENGINE_LOCAL PIMPL;
+  class PIMPL;
   std::unique_ptr<PIMPL> m_impl;
 };
 
@@ -87,3 +86,4 @@ private:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

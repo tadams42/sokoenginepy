@@ -1,9 +1,13 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using namespace sokoengine;
-using namespace sokoengine::game;
-using namespace sokoengine::io;
+using sokoengine::Config;
+using sokoengine::game::BoardCell;
+using sokoengine::game::BoardGraph;
+using sokoengine::game::Direction;
+using sokoengine::game::GraphType;
+using sokoengine::game::position_t;
+using sokoengine::io::Puzzle;
 
 void export_board_graph(py::module &m) {
   py::enum_<GraphType>(m, "GraphType")
@@ -77,7 +81,7 @@ void export_board_graph(py::module &m) {
       [](const BoardGraph &self, position_t from_position,
          const Direction &direction) -> py::object {
         position_t retv = self.neighbor_at(from_position, direction);
-        if (retv > MAX_POS) return py::none();
+        if (retv > Config::MAX_POS) return py::none();
         return py::cast(retv);
       },
       py::arg("src"), py::arg("direction"))

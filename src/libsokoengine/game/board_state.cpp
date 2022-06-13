@@ -8,6 +8,8 @@ using namespace std;
 namespace sokoengine {
 namespace game {
 
+using io::Strings;
+
 class LIBSOKOENGINE_LOCAL BoardState::PIMPL {
 public:
   Positions m_pushers_positions;
@@ -44,7 +46,7 @@ BoardState &BoardState::operator=(BoardState &&) = default;
 BoardState::~BoardState() = default;
 
 bool BoardState::operator==(const BoardState &rv) const {
-  return (m_impl->m_zobrist_hash != UNKNOWN_ZOBRIST_HASH &&
+  return (m_impl->m_zobrist_hash != ZOBRIST_HASH_NOT_SET &&
           m_impl->m_zobrist_hash == rv.m_impl->m_zobrist_hash) ||
          (m_impl->m_pushers_positions == rv.m_impl->m_pushers_positions &&
           m_impl->m_boxes_positions == rv.m_impl->m_boxes_positions);

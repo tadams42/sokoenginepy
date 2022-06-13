@@ -3,8 +3,6 @@
 
 #include "sokoengine_config.hpp"
 
-#include <string>
-
 namespace sokoengine {
 namespace game {
 
@@ -25,20 +23,20 @@ enum class LIBSOKOENGINE_API Direction : uint8_t {
 ///
 /// Movement directions count.
 ///
-constexpr uint8_t DIRECTIONS_COUNT =
+static constexpr uint8_t DIRECTIONS_COUNT =
   static_cast<uint8_t>(Direction::NORTH_WEST) + 1;
 
 ///
 /// Directions lookup.
 ///
-constexpr Direction DIRECTIONS[DIRECTIONS_COUNT] = {
+static constexpr const Direction DIRECTIONS[DIRECTIONS_COUNT] = {
   Direction::UP,   Direction::NORTH_EAST, Direction::RIGHT, Direction::SOUTH_EAST,
   Direction::DOWN, Direction::SOUTH_WEST, Direction::LEFT,  Direction::NORTH_WEST};
 
 ///
 /// Opposite directions lookup
 ///
-constexpr Direction OPPOSITE_DIRECTIONS[DIRECTIONS_COUNT] = {
+static constexpr const Direction OPPOSITE_DIRECTIONS[DIRECTIONS_COUNT] = {
   Direction::DOWN, Direction::SOUTH_WEST, Direction::LEFT,  Direction::NORTH_WEST,
   Direction::UP,   Direction::NORTH_EAST, Direction::RIGHT, Direction::SOUTH_EAST};
 
@@ -64,3 +62,4 @@ LIBSOKOENGINE_API const std::string &direction_str(Direction d);
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

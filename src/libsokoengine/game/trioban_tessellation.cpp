@@ -19,7 +19,7 @@ position_t TriobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
                                                   board_size_t width,
                                                   board_size_t height) const {
-  if (!ON_BOARD(position, width, height)) return MAX_POS + 1;
+  if (!ON_BOARD(position, width, height)) return Config::MAX_POS + 1;
   position_t row = Y(position, width), column = X(position, width);
   int8_t dy, dx;
   bool tpd = cell_orientation(position, width, height) ==
@@ -80,7 +80,7 @@ position_t TriobanTessellation::neighbor_position(position_t position,
   if (ON_BOARD(column, row, width, height))
     return index_1d(column, row, width);
   else
-    return MAX_POS + 1;
+    return Config::MAX_POS + 1;
 }
 
 PusherStep TriobanTessellation::char_to_pusher_step(char rv) const {

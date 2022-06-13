@@ -1,8 +1,9 @@
 #include "rle.hpp"
-#include "rle_config.hpp"
-#include "rle_evaluator.hpp"
-#include "rle_grammar.hpp"
-#include "rle_json_printer.hpp"
+
+#include "config.hpp"
+#include "evaluator.hpp"
+#include "grammar.hpp"
+#include "json_printer.hpp"
 
 #include <iostream>
 #include <algorithm>
@@ -13,6 +14,7 @@ using namespace std;
 
 namespace sokoengine {
 namespace io {
+namespace sok_rle {
 
 namespace x3 = boost::spirit::x3;
 
@@ -89,6 +91,8 @@ LIBSOKOENGINE_LOCAL bool parse_to_eval(const std::string &src, std::ostream &des
   }
 }
 
+} // namespace sok_rle
+
 string Rle::encode(const string &line) {
   string to_encode = line;
 
@@ -116,7 +120,7 @@ string Rle::encode(const string &line) {
 
 string Rle::decode(const string &line) {
   ostringstream out, err;
-  bool retv = parse_to_eval(line, out, err);
+  bool retv = sok_rle::parse_to_eval(line, out, err);
 
   if (!retv) {
     throw invalid_argument(err.str());
@@ -127,7 +131,7 @@ string Rle::decode(const string &line) {
 
 string Rle::ast(const string &line) {
   ostringstream out, err;
-  bool retv = parse_to_ast(line, out, err);
+  bool retv = sok_rle::parse_to_ast(line, out, err);
 
   if (!retv) {
     throw invalid_argument(err.str());

@@ -52,7 +52,7 @@ protected:
   virtual void box_moved(position_t old_position, position_t to_new_position) override;
 
 private:
-  class LIBSOKOENGINE_LOCAL PIMPL;
+  class PIMPL;
   std::unique_ptr<PIMPL> m_impl;
 };
 
@@ -60,3 +60,4 @@ private:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

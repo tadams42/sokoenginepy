@@ -1,6 +1,10 @@
 #include "collection.hpp"
 
-#include "snapshot.hpp"
+#include "hexoban.hpp"
+#include "octoban.hpp"
+#include "sokoban.hpp"
+#include "trioban.hpp"
+
 #include "sok_file_format.hpp"
 
 #include <fstream>
@@ -11,6 +15,7 @@ namespace sokoengine {
 namespace io {
 
 using namespace implementation;
+using game::position_t;
 
 class LIBSOKOENGINE_LOCAL Collection::PIMPL {
 public:
@@ -85,21 +90,6 @@ bool Collection::load(const string &path, const string &puzzle_type_hint) {
   ifstream input(path, ios_base::binary);
   SOKFileFormat reader;
   reader.read(input, *this, puzzle_type_hint);
-  size_t id = 1;
-
-  for (auto &puzzle_variant : m_impl->m_puzzles) {
-    visit(
-      [&id](auto &puzzle) {
-        puzzle.id() = id++;
-
-        size_t snapshot_id = 1;
-        for (Snapshot &snapshot : puzzle.snapshots()) {
-          snapshot.id() = snapshot_id++;
-        }
-      },
-      puzzle_variant);
-  }
-
   return true;
 }
 

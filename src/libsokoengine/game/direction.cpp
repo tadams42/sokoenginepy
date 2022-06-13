@@ -4,8 +4,8 @@ using namespace std;
 
 namespace sokoengine {
 namespace game {
+namespace implementation {
 
-LIBSOKOENGINE_LOCAL
 static const string strs[DIRECTIONS_COUNT] = {
   string("Direction.UP"),
   string("Direction.DOWN"),
@@ -17,8 +17,10 @@ static const string strs[DIRECTIONS_COUNT] = {
   string("Direction.SOUTH_WEST")
 };
 
+} // namespace implementation
+
 LIBSOKOENGINE_API const std::string& direction_repr(Direction d) {
-  return strs[direction_pack(d)];
+  return implementation::strs[direction_pack(d)];
 }
 
 LIBSOKOENGINE_API const std::string& direction_str(Direction d) {

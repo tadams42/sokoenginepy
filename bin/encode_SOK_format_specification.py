@@ -8,7 +8,9 @@ _SELF_DIR = Path(__file__).absolute().resolve().parent
 def encode_spec_to_C_header():
     src_dir = (_SELF_DIR / ".." / "src").resolve()
     src_path = src_dir / "sokoenginepy" / "io" / "SOK_format_specification.txt"
-    dst_path = src_dir / "libsokoengine" / "io" / "SOK_format_specification.h"
+    dst_path = (
+        src_dir / "libsokoengine" / "io" / "collection" / "SOK_format_specification.h"
+    )
 
     print(f"Generating \n    {dst_path}\nfrom\n    {src_path}")
 

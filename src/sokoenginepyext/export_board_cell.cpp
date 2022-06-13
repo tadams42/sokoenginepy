@@ -1,14 +1,14 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using namespace sokoengine;
-using namespace sokoengine::game;
+using sokoengine::game::BoardCell;
+using sokoengine::io::Puzzle;
 
 void export_board_cell(py::module &m) {
   py::class_<BoardCell> pyBoardCell(m, "BoardCell");
 
   pyBoardCell
-    .def(py::init<char, bool, bool>(), py::arg("character") = sokoengine::io::Puzzle::FLOOR,
+    .def(py::init<char, bool, bool>(), py::arg("character") = Puzzle::FLOOR,
          py::arg("is_in_playable_area") = false, py::arg("is_deadlock") = false)
 
     // protocols

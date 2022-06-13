@@ -1,5 +1,8 @@
 #include "board_cell.hpp"
+
 #include "puzzle.hpp"
+
+#include <stdexcept>
 
 using namespace std;
 using namespace sokoengine;

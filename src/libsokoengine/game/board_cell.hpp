@@ -3,8 +3,6 @@
 
 #include "sokoengine_config.hpp"
 
-#include <string>
-
 namespace sokoengine {
 namespace game {
 
@@ -62,3 +60,4 @@ private:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

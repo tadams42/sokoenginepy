@@ -30,3 +30,4 @@ protected:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

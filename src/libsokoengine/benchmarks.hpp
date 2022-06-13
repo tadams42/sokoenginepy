@@ -10,3 +10,4 @@ int LIBSOKOENGINE_API run_benchmarks(double pivot_speed = 0);
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

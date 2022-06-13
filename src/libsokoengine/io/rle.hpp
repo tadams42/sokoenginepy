@@ -3,15 +3,13 @@
 
 #include "sokoengine_config.hpp"
 
-#include <string>
-
 namespace sokoengine {
 namespace io {
 
 ///
 /// Rle encoding and decoding.
 ///
-class LIBSOKOENGINE_LOCAL Rle {
+class LIBSOKOENGINE_API Rle {
 public:
   ///
   /// Counted group delimiter. ie. "ab3(cd)e4f" will be decoded as "abcdcdcdefff".
@@ -62,3 +60,4 @@ public:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

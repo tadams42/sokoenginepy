@@ -32,10 +32,10 @@ public:
 ///
 class LIBSOKOENGINE_API SokobanPlus {
 public:
-  constexpr static u_int8_t DEFAULT_PLUS_ID = 0;
-  constexpr static u_int8_t LEGACY_DEFAULT_PLUS_ID = 99;
+  static constexpr u_int8_t DEFAULT_PLUS_ID = 0;
+  static constexpr u_int8_t LEGACY_DEFAULT_PLUS_ID = 99;
 
-  constexpr static bool is_valid_plus_id(piece_id_t id) {
+  static constexpr bool is_valid_plus_id(piece_id_t id) {
     return id >= DEFAULT_PLUS_ID;
   }
 
@@ -60,7 +60,7 @@ public:
   bool is_valid() const;
   bool is_enabled() const;
   bool is_validated() const;
-  Strings errors() const;
+  io::Strings errors() const;
 
   void enable();
   void disable();
@@ -69,7 +69,7 @@ public:
   piece_id_t goal_plus_id(piece_id_t for_id) const;
 
 private:
-  class LIBSOKOENGINE_LOCAL PIMPL;
+  class PIMPL;
   std::unique_ptr<PIMPL> m_impl;
 };
 
@@ -77,3 +77,4 @@ private:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

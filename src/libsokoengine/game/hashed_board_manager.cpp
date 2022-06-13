@@ -2,6 +2,7 @@
 
 #include "board_cell.hpp"
 #include "board_graph.hpp"
+#include "board_state.hpp"
 #include "sokoban_plus.hpp"
 
 #include <chrono>
@@ -15,6 +16,8 @@ using namespace std;
 
 namespace sokoengine {
 namespace game {
+
+using io::Strings;
 
 class LIBSOKOENGINE_LOCAL HashedBoardManager::PIMPL {
 public:
@@ -176,7 +179,8 @@ zobrist_key_t HashedBoardManager::external_state_hash(BoardState &board_state) c
   piece_id_t index = 0;
   for (auto box_position : board_state.boxes_positions()) {
     retv ^=
-      m_impl->m_boxes_factors[box_plus_id(DEFAULT_PIECE_ID + index)][box_position];
+      m_impl
+        ->m_boxes_factors[box_plus_id(Config::DEFAULT_PIECE_ID + index)][box_position];
     index++;
   }
 

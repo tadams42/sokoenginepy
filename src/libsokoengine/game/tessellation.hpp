@@ -1,30 +1,48 @@
 #ifndef TESSELLATION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TESSELLATION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
-
-#include "pusher_step.hpp"
-#include "board_graph.hpp"
-
-#include <stdexcept>
+#include "direction.hpp"
 
 namespace sokoengine {
 namespace game {
+
+class PusherStep;
+
+///
+/// Ordered collection of Directions usually describing continuous board path.
+///
+typedef std::vector<Direction> Directions;
+
+///
+/// Type of graph
+///
+enum class LIBSOKOENGINE_API GraphType : int {
+  ///
+  /// Directed graphs
+  ///
+  DIRECTED,
+
+  ///
+  /// Directed graphs with self loops and parallel edges
+  ///
+  DIRECTED_MULTI
+};
+
 
 ///
 /// Special property of board position that is needed in some tessellations and that
 /// depends on cell position.
 ///
 enum class LIBSOKOENGINE_API CellOrientation : int {
-  DEFAULT = 0,
-  TRIANGLE_DOWN = 1,
-  OCTAGON = 2
+  DEFAULT,
+  TRIANGLE_DOWN,
+  OCTAGON,
 };
 
-class LIBSOKOENGINE_API SokobanTessellation;
-class LIBSOKOENGINE_API HexobanTessellation;
-class LIBSOKOENGINE_API TriobanTessellation;
-class LIBSOKOENGINE_API OctobanTessellation;
+class SokobanTessellation;
+class HexobanTessellation;
+class TriobanTessellation;
+class OctobanTessellation;
 
 ///
 /// Base class for tessellations.
@@ -132,3 +150,4 @@ constexpr bool ON_BOARD(position_t pos, board_size_t width,
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

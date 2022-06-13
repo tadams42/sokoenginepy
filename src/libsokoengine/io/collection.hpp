@@ -3,23 +3,18 @@
 
 #include "sokoengine_config.hpp"
 
-#include "hexoban_puzzle.hpp"
-#include "octoban_puzzle.hpp"
-#include "sokoban_puzzle.hpp"
-#include "trioban_puzzle.hpp"
-
 #include <filesystem>
-#include <memory>
 #include <variant>
 
 namespace sokoengine {
-
-/// Namespace for I/O part of sokoengine
-///
 namespace io {
 
-typedef std::variant<HexobanPuzzle, TriobanPuzzle, OctobanPuzzle, SokobanPuzzle>
-  AnyPuzzle;
+class SokobanPuzzle;
+class HexobanPuzzle;
+class TriobanPuzzle;
+class OctobanPuzzle;
+
+typedef std::variant<SokobanPuzzle, HexobanPuzzle, TriobanPuzzle, OctobanPuzzle> AnyPuzzle;
 
 ///
 /// Default type for sequence of Puzzle
@@ -67,3 +62,4 @@ private:
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file

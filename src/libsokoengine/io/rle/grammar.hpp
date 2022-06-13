@@ -1,10 +1,10 @@
-#ifndef RLE_GRAMMAR_DEF_0FEA723A_C86F_6753_04ABD475F6FCA5FB
-#define RLE_GRAMMAR_DEF_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#ifndef RLE_GRAMMAR_DEF_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
+#define RLE_GRAMMAR_DEF_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
 
 #include "puzzle.hpp"
-#include "rle_ast.hpp"
-#include "rle_ast_adapted.hpp"
-#include "rle_error_handler.hpp"
+#include "ast.hpp"
+#include "ast_adapted.hpp"
+#include "error_handler.hpp"
 #include "snapshot.hpp"
 
 namespace sokoengine {
