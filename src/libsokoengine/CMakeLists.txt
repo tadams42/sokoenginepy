@@ -6,7 +6,7 @@ set(PRIVATE_HEADERS
 
     io/rle/ast.hpp
     io/rle/ast_adapted.hpp
-    io/rle/config.hpp
+    io/rle/rle_config.hpp
     io/rle/error_handler.hpp
     io/rle/evaluator.hpp
     io/rle/grammar.hpp
@@ -14,86 +14,74 @@ set(PRIVATE_HEADERS
 
     io/snapshot/ast.hpp
     io/snapshot/ast_adapted.hpp
-    io/snapshot/config.hpp
+    io/snapshot/snapshot_config.hpp
     io/snapshot/error_handler.hpp
-    io/snapshot/grammar.hpp
-    io/snapshot/parser.hpp
-    io/snapshot/json_printer.hpp
     io/snapshot/evaluator.hpp
+    io/snapshot/grammar.hpp
+    io/snapshot/json_printer.hpp
+    io/snapshot/parser.hpp
 )
 
 set(INSTALL_HEADERS
-    game/board_cell.hpp
-    game/board_graph.hpp
-
-    game/pusher_step.hpp
-    game/mover.hpp
-
-    game/board_manager.hpp
-    game/board_state.hpp
-    game/hashed_board_manager.hpp
-    game/sokoban_plus.hpp
-
-    game/direction.hpp
-    game/hexoban_tessellation.hpp
-    game/octoban_tessellation.hpp
-    game/sokoban_tessellation.hpp
-    game/tessellation.hpp
-    game/trioban_tessellation.hpp
-
-    sokoengine_config.hpp
+    config.hpp
     sokoengine.hpp
     benchmarks.hpp
 
-    io/puzzle.hpp
+    game/board_cell.hpp
+    game/board_graph.hpp
+    game/board_state.hpp
+    game/board_manager.hpp
+    game/hashed_board_manager.hpp
+    game/mover.hpp
+    game/pusher_step.hpp
+    game/sokoban_plus.hpp
+    game/tessellation.hpp
+    game/hexoban_tessellation.hpp
+    game/octoban_tessellation.hpp
+    game/sokoban_tessellation.hpp
+    game/trioban_tessellation.hpp
+
+    io/collection.hpp
     io/hexoban.hpp
     io/octoban.hpp
+    io/puzzle.hpp
+    io/rle.hpp
+    io/snapshot.hpp
     io/sokoban.hpp
     io/trioban.hpp
-    io/utilities.hpp
-    io/collection.hpp
-
-    io/snapshot.hpp
-
-    io/rle.hpp
 )
 
 set(SELF_SOURCES
+    benchmarks.cpp
+
     game/board_cell.cpp
     game/board_graph.cpp
-
-    game/pusher_step.cpp
-    game/mover.cpp
-
     game/board_manager.cpp
     game/board_state.cpp
     game/hashed_board_manager.cpp
+    game/mover.cpp
+    game/pusher_step.cpp
     game/sokoban_plus.cpp
-
-    game/direction.cpp
+    game/tessellation.cpp
     game/hexoban_tessellation.cpp
     game/octoban_tessellation.cpp
     game/sokoban_tessellation.cpp
     game/trioban_tessellation.cpp
-    game/tessellation.cpp
-
-    benchmarks.cpp
-
-    io/puzzle.cpp
-    io/sokoban.cpp
-    io/octoban.cpp
-    io/trioban.cpp
-    io/hexoban.cpp
-    io/utilities.cpp
 
     io/collection/collection.cpp
     io/collection/sok_file_format.cpp
 
-    io/snapshot/snapshot.cpp
+    io/rle/rle.cpp
+
     io/snapshot/ast.cpp
     io/snapshot/parser.cpp
+    io/snapshot/snapshot.cpp
 
-    io/rle/rle.cpp
+    io/hexoban.cpp
+    io/octoban.cpp
+    io/puzzle.cpp
+    io/sokoban.cpp
+    io/trioban.cpp
 )
 
 set(SELF_INCLUDE_DIRS
@@ -102,26 +90,27 @@ set(SELF_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/io
 )
 
-#..............................................................................
-#                       sokoengine OBJECT library
-#..............................................................................
+# ..............................................................................
+# sokoengine OBJECT library
+# ..............................................................................
 add_library(sokoengine_obj OBJECT ${INSTALL_HEADERS} ${PRIVATE_HEADERS} ${SELF_SOURCES})
 
 target_include_directories(sokoengine_obj
     PUBLIC
-        ${SELF_INCLUDE_DIRS}
+    ${SELF_INCLUDE_DIRS}
     PRIVATE
-        $<TARGET_PROPERTY:CPPITERTOOLS::cppitertools,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:CPPITERTOOLS::cppitertools,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 target_link_libraries(sokoengine_obj
     PRIVATE
-        # We don't actually link agains any of objects in following libraries Thus we
-        # hide this dependency once we are installed. As a consequence, consumers of
-        # libsokoengine don't need to link against boost - they don't even need to have
-        # boost installed
-        "$<BUILD_INTERFACE:Boost::boost>"
-        "$<BUILD_INTERFACE:CPPITERTOOLS::cppitertools>"
+
+    # We don't actually link agains any of objects in following libraries Thus we
+    # hide this dependency once we are installed. As a consequence, consumers of
+    # libsokoengine don't need to link against boost - they don't even need to have
+    # boost installed
+    "$<BUILD_INTERFACE:Boost::boost>"
+    "$<BUILD_INTERFACE:CPPITERTOOLS::cppitertools>"
 )
 
 target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
@@ -129,64 +118,66 @@ target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
 if(${BUILD_SHARED_LIBS})
     target_compile_definitions(sokoengine_obj
         PUBLIC
-            LIBSOKOENGINE_DLL
+        LIBSOKOENGINE_DLL
         PRIVATE
-            LIBSOKOENGINE_DLL_EXPORTS
+        LIBSOKOENGINE_DLL_EXPORTS
     )
     target_compile_options(sokoengine_obj
         PUBLIC
-            $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
-                -fvisibility=hidden
-                -fvisibility-inlines-hidden
-            >
-            # $<$<CXX_COMPILER_ID:MSVC>: ...>
+        $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
+        -fvisibility=hidden
+        -fvisibility-inlines-hidden
+        >
+
+        # $<$<CXX_COMPILER_ID:MSVC>: ...>
     )
 endif()
 
 target_compile_options(sokoengine_obj
     PRIVATE
-        $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
-            $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>
-            -Wno-overloaded-virtual
-            -Wno-unused-parameter
-            # -Wno-attributes
-        >
-        # $<$<CXX_COMPILER_ID:MSVC>: ...>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
+    $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>
+    -Wno-overloaded-virtual
+    -Wno-unused-parameter
+
+    # -Wno-attributes
+    >
+
+    # $<$<CXX_COMPILER_ID:MSVC>: ...>
 )
 
 # include(CMakePrintHelpers)
 # cmake_print_properties(
-#     TARGETS sokoengine_obj
-#     PROPERTIES COMPILE_FEATURES COMPILE_FLAGS COMPILE_OPTIONS
+# TARGETS sokoengine_obj
+# PROPERTIES COMPILE_FEATURES COMPILE_FLAGS COMPILE_OPTIONS
 # )
-
 set_target_properties(sokoengine_obj
     PROPERTIES
-        POSITION_INDEPENDENT_CODE ON
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
-        INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON
+    POSITION_INDEPENDENT_CODE ON
+    INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
+    INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON
 )
 
-#..............................................................................
-#                            sokoengine library
-#..............................................................................
+# ..............................................................................
+# sokoengine library
+# ..............................................................................
 add_library(sokoengine sokoengine.hpp)
 
 target_link_libraries(sokoengine PRIVATE sokoengine_obj)
 
 target_include_directories(sokoengine
     PUBLIC
-        "$<BUILD_INTERFACE:${SELF_INCLUDE_DIRS}>"
-        "$<INSTALL_INTERFACE:include/sokoengine>"
+    "$<BUILD_INTERFACE:${SELF_INCLUDE_DIRS}>"
+    "$<INSTALL_INTERFACE:include/sokoengine>"
 )
 
 set_target_properties(sokoengine
     PROPERTIES
-        VERSION ${PROJECT_VERSION}
-        SOVERSION ${PROJECT_VERSION_MAJOR}
-        POSITION_INDEPENDENT_CODE ON
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
-        INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    POSITION_INDEPENDENT_CODE ON
+    INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
+    INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON
 )
 
 if(${BUILD_SHARED_LIBS})
@@ -197,22 +188,22 @@ if(${BUILD_SHARED_LIBS})
         APPEND PROPERTY COMPATIBLE_INTERFACE_STRING sokoengine_MAJOR_VERSION)
 endif()
 
-#..............................................................................
-#                                   install
+# ..............................................................................
+# install
 # 1. Install targets and export them unto common namespace:
-#   - INSTALL(TARGETS target1 EXPORT fooTargets ...)
-#   - INSTALL(TARGETS target2 EXPORT fooTargets ...)
+# - INSTALL(TARGETS target1 EXPORT fooTargets ...)
+# - INSTALL(TARGETS target2 EXPORT fooTargets ...)
 # 2. Install additional files (ie. library headers):
-#   - INSTALL(FILES ...)
+# - INSTALL(FILES ...)
 # 3. Install generated config for all exported targets:
-#   - INSTALL(EXPORT FooTargets ...)
+# - INSTALL(EXPORT FooTargets ...)
 # 4. Generate CMake package so that it can be found via find_package:
-#   - configure_package_config_file
-#   - write_basic_package_version_file
+# - configure_package_config_file
+# - write_basic_package_version_file
 # 5. Install CMake package configs:
-#   - INSTALL(FILES ...)
+# - INSTALL(FILES ...)
 # 6. Export targets for consuming from within build dir
-#..............................................................................
+# ..............................................................................
 
 # Here, the EXPORT option tells CMake to create an export called libsokoengineTargets.
 # Note, we have not asked CMake to install the export yet.
@@ -242,6 +233,7 @@ install(
     EXPORT libsokoengineTargets
     FILE libsokoengineTargets.cmake
     NAMESPACE libsokoengine::
+
     # was: DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/libsokoengine/cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libsokoengine
 )
@@ -249,6 +241,7 @@ install(
 configure_package_config_file(
     ${PROJECT_SOURCE_DIR}/cmake/libsokoengineConfig.cmake.in
     ${PROJECT_BINARY_DIR}/libsokoengineConfig.cmake
+
     # was INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/libsokoengine/cmake
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libsokoengine
 )
@@ -261,7 +254,8 @@ write_basic_package_version_file(
 
 install(
     FILES ${PROJECT_BINARY_DIR}/libsokoengineConfig.cmake
-          ${PROJECT_BINARY_DIR}/libsokoengineConfigVersion.cmake
+    ${PROJECT_BINARY_DIR}/libsokoengineConfigVersion.cmake
+
     # was DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/libsokoengine/cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libsokoengine
 )
@@ -270,16 +264,16 @@ install(
 # This allows clients to consume libsokoengine from local build. Ie. if we build
 # libosokengine in
 #
-#     /tmp/builds/libsokoengine/debug
-#     /tmp/builds/libsokoengine/release
+# /tmp/builds/libsokoengine/debug
+# /tmp/builds/libsokoengine/release
 #
 # then other package can consume it via:
 #
-#   find_package(
-#       libsokoengine 0.5.0 REQUIRED
-#       CONFIG
-#       PATHS "/tmp/builds/libsokoengine/debug" "/tmp/builds/libsokoengine/release"
-#   )
+# find_package(
+# libsokoengine 0.5.0 REQUIRED
+# CONFIG
+# PATHS "/tmp/builds/libsokoengine/debug" "/tmp/builds/libsokoengine/release"
+# )
 export(
     EXPORT libsokoengineTargets
     FILE "${PROJECT_BINARY_DIR}/libsokoengineTargets.cmake"

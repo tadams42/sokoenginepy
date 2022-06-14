@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, List, Optional, Set
 
 from .board_manager import BoardManager
 from .board_state import BoardState
-from .piece import DEFAULT_PIECE_ID
+from .config import Config
 
 if TYPE_CHECKING:
     from .board_graph import BoardGraph
@@ -162,9 +162,9 @@ class HashedBoardManager(BoardManager):
 
         retv = self.initial_state_hash
         for index, box_position in enumerate(board_state.boxes_positions):
-            retv ^= self._boxes_factors[self.box_plus_id(DEFAULT_PIECE_ID + index)][
-                box_position
-            ]
+            retv ^= self._boxes_factors[
+                self.box_plus_id(Config.DEFAULT_PIECE_ID + index)
+            ][box_position]
 
         for pusher_position in board_state.pushers_positions:
             retv ^= self._pushers_factors[pusher_position]

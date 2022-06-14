@@ -3,16 +3,11 @@
 
 #include "board_cell.hpp"
 #include "pusher_step.hpp"
-
-#include "hexoban_tessellation.hpp"
-#include "octoban_tessellation.hpp"
-#include "sokoban_tessellation.hpp"
-#include "trioban_tessellation.hpp"
+#include "mover.hpp"
 
 #include "board_graph.hpp"
 #include "board_state.hpp"
 #include "hashed_board_manager.hpp"
-#include "mover.hpp"
 #include "sokoban_plus.hpp"
 
 #include "benchmarks.hpp"
@@ -24,8 +19,12 @@
 #include "sokoban.hpp"
 #include "trioban.hpp"
 
+#include "hexoban_tessellation.hpp"
+#include "octoban_tessellation.hpp"
+#include "sokoban_tessellation.hpp"
+#include "trioban_tessellation.hpp"
+
 #include "rle.hpp"
-#include "utilities.hpp"
 
 #endif // HEADER_GUARD
 /// @file

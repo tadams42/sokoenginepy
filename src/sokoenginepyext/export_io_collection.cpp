@@ -4,6 +4,7 @@ using namespace std;
 using sokoengine::io::Collection;
 using sokoengine::io::Puzzles;
 using sokoengine::io::Strings;
+using sokoengine::game::Tessellation;
 
 void export_io_collection(py::module &m) {
   auto pyCollection = py::class_<Collection>(m, "Collection");
@@ -40,9 +41,9 @@ void export_io_collection(py::module &m) {
   pyCollection
     .def("load", py::overload_cast<const filesystem::path &>(&Collection::load))
     .def("load",
-         py::overload_cast<const filesystem::path &, const string &>(&Collection::load))
+         py::overload_cast<const filesystem::path &, Tessellation>(&Collection::load))
     .def("load", py::overload_cast<const string &>(&Collection::load))
-    .def("load", py::overload_cast<const string &, const string &>(&Collection::load));
+    .def("load", py::overload_cast<const string &, Tessellation>(&Collection::load));
 
   pyCollection
     .def("save",

@@ -15,7 +15,7 @@ namespace sokoengine {
 namespace io {
 
 using namespace implementation;
-using game::position_t;
+using game::Tessellation;
 
 class LIBSOKOENGINE_LOCAL Collection::PIMPL {
 public:
@@ -34,17 +34,17 @@ public:
       m_updated_at(updated_at),
       m_notes(notes) {}
 
-  string extension_to_tessellation_hint(const string &path) {
+  Tessellation extension_to_tessellation_hint(const string &path) {
     string file_extension = path.substr(path.length() - 4, 4);
     if (file_extension == ".sok" || file_extension == ".txt" ||
         file_extension == ".xsb") {
-      return "sokoban";
+      return Tessellation::SOKOBAN;
     } else if (file_extension == ".tsb") {
-      return "trioban";
+      return Tessellation::TRIOBAN;
     } else if (file_extension == ".hsb") {
-      return "hexoban";
+      return Tessellation::HEXOBAN;
     }
-    return "sokoban";
+    return Tessellation::SOKOBAN;
   }
 };
 
@@ -78,7 +78,7 @@ bool Collection::load(const filesystem::path &path) {
   return load(path, m_impl->extension_to_tessellation_hint(path));
 }
 
-bool Collection::load(const filesystem::path &path, const string &puzzle_type_hint) {
+bool Collection::load(const filesystem::path &path, Tessellation puzzle_type_hint) {
   return load(path.string(), puzzle_type_hint);
 }
 
@@ -86,7 +86,7 @@ bool Collection::load(const string &path) {
   return load(path, m_impl->extension_to_tessellation_hint(path));
 }
 
-bool Collection::load(const string &path, const string &puzzle_type_hint) {
+bool Collection::load(const string &path, Tessellation puzzle_type_hint) {
   ifstream input(path, ios_base::binary);
   SOKFileFormat reader;
   reader.read(input, *this, puzzle_type_hint);

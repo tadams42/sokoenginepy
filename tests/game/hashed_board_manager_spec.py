@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import pytest
 
-from sokoenginepy.game import DEFAULT_PIECE_ID, BoardGraph, HashedBoardManager
+from sokoenginepy.game import BoardGraph, Config, HashedBoardManager
 from sokoenginepy.io import SokobanPuzzle
 
 
@@ -43,7 +43,9 @@ class DescribeHashedBoardManager:
 
         initial_state_hash = hashed_board_manager.state_hash
 
-        initial_box_position = hashed_board_manager.box_position(DEFAULT_PIECE_ID)
+        initial_box_position = hashed_board_manager.box_position(
+            Config.DEFAULT_PIECE_ID
+        )
         new_box_position = initial_box_position + 1
 
         hashed_board_manager.move_box_from(initial_box_position, new_box_position)
@@ -52,10 +54,10 @@ class DescribeHashedBoardManager:
         hashed_board_manager.move_box_from(new_box_position, initial_box_position)
         assert hashed_board_manager.state_hash == initial_state_hash
 
-        hashed_board_manager.move_box(DEFAULT_PIECE_ID, new_box_position)
+        hashed_board_manager.move_box(Config.DEFAULT_PIECE_ID, new_box_position)
         assert hashed_board_manager.state_hash != initial_state_hash
 
-        hashed_board_manager.move_box(DEFAULT_PIECE_ID, initial_box_position)
+        hashed_board_manager.move_box(Config.DEFAULT_PIECE_ID, initial_box_position)
         assert hashed_board_manager.state_hash == initial_state_hash
 
     def test_moving_pusher_modifies_hashes_consistently(self, board_graph):
@@ -63,7 +65,9 @@ class DescribeHashedBoardManager:
 
         initial_state_hash = hashed_board_manager.state_hash
 
-        initial_pusher_position = hashed_board_manager.pusher_position(DEFAULT_PIECE_ID)
+        initial_pusher_position = hashed_board_manager.pusher_position(
+            Config.DEFAULT_PIECE_ID
+        )
         new_pusher_position = initial_pusher_position - 1
 
         hashed_board_manager.move_pusher_from(
@@ -74,8 +78,10 @@ class DescribeHashedBoardManager:
         )
         assert hashed_board_manager.state_hash == initial_state_hash
 
-        hashed_board_manager.move_pusher(DEFAULT_PIECE_ID, new_pusher_position)
-        hashed_board_manager.move_pusher(DEFAULT_PIECE_ID, initial_pusher_position)
+        hashed_board_manager.move_pusher(Config.DEFAULT_PIECE_ID, new_pusher_position)
+        hashed_board_manager.move_pusher(
+            Config.DEFAULT_PIECE_ID, initial_pusher_position
+        )
         assert hashed_board_manager.state_hash == initial_state_hash
 
     def test_setting_boxorder_or_goalorder_on_enabled_sokoban_plus_rehashes_board(

@@ -1,7 +1,7 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using sokoengine::Config;
+using sokoengine::game::Config;
 using sokoengine::game::Direction;
 using sokoengine::game::DIRECTIONS_COUNT;
 using sokoengine::game::OPPOSITE_DIRECTIONS;

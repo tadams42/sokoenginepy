@@ -1,6 +1,6 @@
 #include "hexoban_tessellation.hpp"
+
 #include "pusher_step.hpp"
-#include "direction.hpp"
 #include "snapshot.hpp"
 
 using namespace std;
@@ -109,9 +109,6 @@ char HexobanTessellation::pusher_step_to_char(const PusherStep &rv) const {
     throw invalid_argument("Illegal PusherStep direction in HexobanTessellation!");
   }
 }
-
-string HexobanTessellation::repr() const { return "HexobanTessellation()"; }
-string HexobanTessellation::str() const { return "hexoban"; }
 
 } // namespace game
 } // namespace sokoengine

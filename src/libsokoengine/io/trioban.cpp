@@ -1,14 +1,13 @@
 #include "trioban.hpp"
 
-#include "trioban_tessellation.hpp"
-
 using namespace std;
 
 namespace sokoengine {
 namespace io {
-namespace implementation {
 
-using game::position_t;
+using game::Tessellation;
+
+namespace implementation {
 
 LIBSOKOENGINE_LOCAL const PuzzleResizer &tb_static_resizer() {
   static const PuzzleResizer the_one;
@@ -37,12 +36,12 @@ public:
 TriobanPuzzle::TriobanPuzzle() : TriobanPuzzle(0, 0) {}
 
 TriobanPuzzle::TriobanPuzzle(board_size_t width, board_size_t height)
-  : Puzzle(game::Tessellation::TRIOBAN, tb_static_resizer(), tb_static_parser(),
+  : Puzzle(Tessellation::TRIOBAN, tb_static_resizer(), tb_static_parser(),
            tb_static_printer(), width, height),
     m_impl(make_unique<PIMPL>()) {}
 
 TriobanPuzzle::TriobanPuzzle(const string &src)
-  : Puzzle(game::Tessellation::TRIOBAN, tb_static_resizer(), tb_static_parser(),
+  : Puzzle(Tessellation::TRIOBAN, tb_static_resizer(), tb_static_parser(),
            tb_static_printer(), src),
     m_impl(make_unique<PIMPL>()) {}
 
@@ -72,10 +71,10 @@ const TriobanPuzzle::Snapshots &TriobanPuzzle::snapshots() const {
 }
 TriobanPuzzle::Snapshots &TriobanPuzzle::snapshots() { return m_impl->m_snapshots; }
 
-TriobanSnapshot::TriobanSnapshot() : Snapshot(game::Tessellation::TRIOBAN, "") {}
+TriobanSnapshot::TriobanSnapshot() : Snapshot(Tessellation::TRIOBAN, "") {}
 
 TriobanSnapshot::TriobanSnapshot(const string &moves_data)
-  : Snapshot(game::Tessellation::TRIOBAN, moves_data) {}
+  : Snapshot(Tessellation::TRIOBAN, moves_data) {}
 
 TriobanSnapshot::TriobanSnapshot(const TriobanSnapshot &rv) : Snapshot(rv) {}
 

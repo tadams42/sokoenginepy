@@ -1,7 +1,7 @@
 #ifndef SOKOBAN_PLUS_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define SOKOBAN_PLUS_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
+#include "config.hpp"
 
 #include <memory>
 #include <stdexcept>
@@ -10,7 +10,7 @@ namespace sokoengine {
 namespace game {
 
 ///
-/// Exception.
+/// @exception
 ///
 class LIBSOKOENGINE_API SokobanPlusDataError : public std::invalid_argument {
 public:
@@ -19,7 +19,7 @@ public:
 };
 
 ///
-/// Exception.
+/// @exception
 ///
 class LIBSOKOENGINE_API KeyError : public std::invalid_argument {
 public:

@@ -1,13 +1,14 @@
 #include "octoban_tessellation.hpp"
 
 #include "pusher_step.hpp"
-#include "direction.hpp"
 #include "snapshot.hpp"
 
 using namespace std;
 
 namespace sokoengine {
 namespace game {
+
+using io::CellOrientation;
 
 const Directions &OctobanTessellation::legal_directions() const {
   static const Directions retv = {Direction::LEFT,       Direction::RIGHT,
@@ -23,8 +24,7 @@ position_t OctobanTessellation::neighbor_position(position_t position,
                                                   board_size_t height) const {
   position_t row = Y(position, width), column = X(position, width);
 
-  if (cell_orientation(position, width, height) !=
-        CellOrientation::OCTAGON &&
+  if (cell_orientation(position, width, height) != CellOrientation::OCTAGON &&
       (direction == Direction::NORTH_EAST || direction == Direction::NORTH_WEST ||
        direction == Direction::SOUTH_EAST || direction == Direction::SOUTH_WEST)) {
     return Config::MAX_POS + 1;
@@ -147,9 +147,6 @@ CellOrientation OctobanTessellation::cell_orientation(position_t pos,
   return ((column + (row % 2)) % 2 == 0) ? CellOrientation::OCTAGON
                                          : CellOrientation::DEFAULT;
 }
-
-string OctobanTessellation::repr() const { return "OctobanTessellation()"; }
-string OctobanTessellation::str() const { return "octoban"; }
 
 } // namespace game
 } // namespace sokoengine

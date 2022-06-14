@@ -1,11 +1,12 @@
 #include "octoban.hpp"
 
-#include "octoban_tessellation.hpp"
-
 using namespace std;
 
 namespace sokoengine {
 namespace io {
+
+using game::Tessellation;
+
 namespace implementation {
 
 LIBSOKOENGINE_LOCAL const PuzzleResizer &ob_static_resizer() {
@@ -35,12 +36,12 @@ public:
 OctobanPuzzle::OctobanPuzzle() : OctobanPuzzle(0, 0) {}
 
 OctobanPuzzle::OctobanPuzzle(board_size_t width, board_size_t height)
-  : Puzzle(game::Tessellation::OCTOBAN, ob_static_resizer(), ob_static_parser(),
+  : Puzzle(Tessellation::OCTOBAN, ob_static_resizer(), ob_static_parser(),
            ob_static_printer(), width, height),
     m_impl(make_unique<PIMPL>()) {}
 
 OctobanPuzzle::OctobanPuzzle(const string &src)
-  : Puzzle(game::Tessellation::OCTOBAN, ob_static_resizer(), ob_static_parser(),
+  : Puzzle(Tessellation::OCTOBAN, ob_static_resizer(), ob_static_parser(),
            ob_static_printer(), src),
     m_impl(make_unique<PIMPL>()) {}
 
@@ -70,10 +71,10 @@ const OctobanPuzzle::Snapshots &OctobanPuzzle::snapshots() const {
 }
 OctobanPuzzle::Snapshots &OctobanPuzzle::snapshots() { return m_impl->m_snapshots; }
 
-OctobanSnapshot::OctobanSnapshot() : Snapshot(game::Tessellation::OCTOBAN, "") {}
+OctobanSnapshot::OctobanSnapshot() : Snapshot(Tessellation::OCTOBAN, "") {}
 
 OctobanSnapshot::OctobanSnapshot(const string &moves_data)
-  : Snapshot(game::Tessellation::OCTOBAN, moves_data) {}
+  : Snapshot(Tessellation::OCTOBAN, moves_data) {}
 
 OctobanSnapshot::OctobanSnapshot(const OctobanSnapshot &rv) : Snapshot(rv) {}
 

@@ -1,7 +1,6 @@
 #include "sok_file_format.hpp"
 
 #include "collection.hpp"
-#include "utilities.hpp"
 
 #include "hexoban.hpp"
 #include "octoban.hpp"
@@ -15,6 +14,9 @@ using namespace boost;
 
 namespace sokoengine {
 namespace io {
+
+using game::Tessellation;
+
 namespace implementation {
 
 enum class LIBSOKOENGINE_LOCAL PuzzleTypeHints : unsigned short {
@@ -50,7 +52,7 @@ struct LIBSOKOENGINE_LOCAL PuzzleData {
   SnapshotsData snapshots;
 };
 
-typedef vector<PuzzleData> CollectionData;
+typedef vector<PuzzleData> PuzzlesData;
 
 static constexpr const char *TAG_AUTHOR = "author";
 static constexpr const char *TAG_TITLE = "title";
@@ -85,6 +87,26 @@ LIBSOKOENGINE_LOCAL PuzzleTypeHints puzzle_type_from_str(const string &val) {
     return PuzzleTypeHints::OCTOBAN;
   } else {
     throw invalid_argument("Unknown PuzzleTypeHints " + val + "!");
+  }
+}
+
+LIBSOKOENGINE_LOCAL PuzzleTypeHints
+puzzle_type_from_tessellation(Tessellation tessellation) {
+  switch (tessellation) {
+  case Tessellation::SOKOBAN:
+    return PuzzleTypeHints::SOKOBAN;
+    break;
+  case Tessellation::HEXOBAN:
+    return PuzzleTypeHints::HEXOBAN;
+    break;
+  case Tessellation::TRIOBAN:
+    return PuzzleTypeHints::TRIOBAN;
+    break;
+  case Tessellation::OCTOBAN:
+    return PuzzleTypeHints::OCTOBAN;
+    break;
+    // Do not handle default, let compiler generate warning when another tessellation
+    // is added...
   }
 }
 
@@ -134,6 +156,7 @@ class LIBSOKOENGINE_LOCAL PuzzleVisitor {
 
 public:
   PuzzleVisitor(const PuzzleData &puzzle_data) : m_puzzle_data(puzzle_data) {}
+
   void operator()(SokobanPuzzle &puzzle) {
     copy_puzzle_metadata(puzzle);
     for (auto &snapshot_data : m_puzzle_data.snapshots) {
@@ -141,6 +164,7 @@ public:
       copy_snapshot_metadata(puzzle.snapshots().back(), snapshot_data);
     }
   }
+
   void operator()(TriobanPuzzle &puzzle) {
     copy_puzzle_metadata(puzzle);
     for (auto &snapshot_data : m_puzzle_data.snapshots) {
@@ -148,6 +172,7 @@ public:
       copy_snapshot_metadata(puzzle.snapshots().back(), snapshot_data);
     }
   }
+
   void operator()(OctobanPuzzle &puzzle) {
     copy_puzzle_metadata(puzzle);
     for (auto &snapshot_data : m_puzzle_data.snapshots) {
@@ -155,6 +180,7 @@ public:
       copy_snapshot_metadata(puzzle.snapshots().back(), snapshot_data);
     }
   }
+
   void operator()(HexobanPuzzle &puzzle) {
     copy_puzzle_metadata(puzzle);
     for (auto &snapshot_data : m_puzzle_data.snapshots) {
@@ -167,16 +193,16 @@ public:
 class LIBSOKOENGINE_LOCAL SOKReader {
   istream &m_stream;
   Collection &m_destination;
-  CollectionData m_data;
+  PuzzlesData m_data;
   PuzzleTypeHints m_supplied_variant_hint;
   PuzzleTypeHints m_collection_header_variant_hint = PuzzleTypeHints::BLANK;
   string m_current_line;
 
 public:
-  SOKReader(istream &src, Collection &dest, const string &variant_hint)
+  SOKReader(istream &src, Collection &dest, Tessellation tessellation_hint)
     : m_stream(src),
       m_destination(dest),
-      m_supplied_variant_hint(puzzle_type_from_str(variant_hint)) {}
+      m_supplied_variant_hint(puzzle_type_from_tessellation(tessellation_hint)) {}
 
   void read() {
     if (m_stream.fail()) { throw runtime_error("Unknown input stream error!"); }
@@ -523,6 +549,25 @@ LIBSOKOENGINE_LOCAL static bool write_tagged(ostream &dest, string tag_name,
   return (bool)dest;
 }
 
+LIBSOKOENGINE_LOCAL static string to_str(Tessellation tessellation) {
+  switch (tessellation) {
+  case Tessellation::SOKOBAN:
+    return "sokoban";
+    break;
+  case Tessellation::HEXOBAN:
+    return "hexoban";
+    break;
+  case Tessellation::TRIOBAN:
+    return "trioban";
+    break;
+  case Tessellation::OCTOBAN:
+    return "octoban";
+    break;
+    // Do not handle default, let compiler generate warning when another tessellation
+    // is added...
+  }
+}
+
 class LIBSOKOENGINE_LOCAL PuzzleWriteVisitor {
 public:
   PuzzleWriteVisitor(ostream &dest, bool &success) : m_stream(dest), retv(success) {}
@@ -566,9 +611,9 @@ private:
 
     bool written = false;
 
-    if (puzzle.tessellation().str() != "sokoban")
+    if (puzzle.tessellation() != Tessellation::SOKOBAN)
       written =
-        write_tagged(m_stream, TAG_VARIANT, puzzle.tessellation().str()) || written;
+        write_tagged(m_stream, TAG_VARIANT, to_str(puzzle.tessellation())) || written;
 
     written = write_tagged(m_stream, TAG_AUTHOR, puzzle.author()) || written;
     if (!is_blank(puzzle.boxorder()) && !is_blank(puzzle.goalorder())) {
@@ -678,8 +723,9 @@ private:
 
 SOKFileFormat::~SOKFileFormat() {}
 
-void SOKFileFormat::read(istream &src, Collection &dest, const string &variant_hint) {
-  SOKReader reader(src, dest, variant_hint);
+void SOKFileFormat::read(istream &src, Collection &dest,
+                         Tessellation tessellation_hint) {
+  SOKReader reader(src, dest, tessellation_hint);
   reader.read();
 }
 

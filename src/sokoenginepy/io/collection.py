@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 from .puzzle import Puzzle
+
+if TYPE_CHECKING:
+    from ..game import Tessellation
 
 
 class Collection:
@@ -28,16 +31,20 @@ class Collection:
         self.puzzles: List[Puzzle] = []
 
     @staticmethod
-    def _extension_to_tessellation_hint(path: Union[str, Path]) -> str:
+    def _extension_to_tessellation_hint(path: Union[str, Path]) -> Tessellation:
+        from ..game import Tessellation
+
         file_name, file_extension = os.path.splitext(path)
         if file_extension == ".tsb":
-            return "trioban"
+            return Tessellation.TRIOBAN
         elif file_extension == ".hsb":
-            return "hexoban"
+            return Tessellation.HEXOBAN
         else:
-            return "sokoban"
+            return Tessellation.SOKOBAN
 
-    def load(self, path: Union[str, Path], puzzle_types_hint: Optional[str] = None):
+    def load(
+        self, path: Union[str, Path], puzzle_types_hint: Optional[Tessellation] = None
+    ):
         from .sok_file_format import SOKFileFormat
 
         with open(path, "r") as src_file:

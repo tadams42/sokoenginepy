@@ -1,7 +1,7 @@
 #include "puzzle.hpp"
 
 #include "rle.hpp"
-#include "utilities.hpp"
+#include "tessellation.hpp"
 
 #include "hexoban.hpp"
 #include "octoban.hpp"
@@ -15,10 +15,14 @@ using namespace std;
 namespace sokoengine {
 namespace io {
 
-using namespace implementation;
+using game::BaseTessellation;
 using game::index_1d;
 using game::Tessellation;
-using game::position_t;
+using implementation::_copy;
+using implementation::parsed_board_t;
+using implementation::PuzzleParser;
+using implementation::PuzzlePrinter;
+using implementation::PuzzleResizer;
 
 class LIBSOKOENGINE_LOCAL Puzzle::PIMPL {
 public:
@@ -36,8 +40,8 @@ public:
   string m_original_board;
   parsed_board_t m_parsed_board;
 
-  // Non-owned ptr
-  const Tessellation *m_tessellation = nullptr;
+  Tessellation m_tessellation;
+
   // Non-owned ptr
   const PuzzleResizer *m_resizer = nullptr;
   // Non-owned ptr
@@ -51,7 +55,7 @@ public:
       m_height(0),
       m_was_parsed(false),
       m_original_board(board),
-      m_tessellation(&tessellation),
+      m_tessellation(tessellation),
       m_resizer(&resizer),
       m_parser(&parser),
       m_printer(&printer) {
@@ -67,7 +71,7 @@ public:
       m_height(height),
       m_was_parsed(true),
       m_parsed_board(width * height, Puzzle::VISIBLE_FLOOR),
-      m_tessellation(&tessellation),
+      m_tessellation(tessellation),
       m_resizer(&resizer),
       m_parser(&parser),
       m_printer(&printer) {}
@@ -139,7 +143,12 @@ string &Puzzle::created_at() { return m_impl->m_created_at; }
 const string &Puzzle::updated_at() const { return m_impl->m_updated_at; }
 string &Puzzle::updated_at() { return m_impl->m_updated_at; }
 
-const Tessellation &Puzzle::tessellation() const { return *(m_impl->m_tessellation); }
+Tessellation Puzzle::tessellation() const { return m_impl->m_tessellation; }
+
+CellOrientation Puzzle::cell_orientation(position_t position) const {
+  return BaseTessellation::instance(m_impl->m_tessellation)
+    .cell_orientation(position, width(), height());
+}
 
 char Puzzle::at(position_t position) const {
   m_impl->reparse_if_not_parsed();
@@ -191,10 +200,22 @@ string Puzzle::str() const { return to_board_str(true); }
 
 string Puzzle::repr() const {
   string klass_name = "Puzzle";
-  if (typeid(*this) == typeid(const SokobanPuzzle &)) klass_name = "SokobanPuzzle";
-  if (typeid(*this) == typeid(const TriobanPuzzle &)) klass_name = "TriobanPuzzle";
-  if (typeid(*this) == typeid(const OctobanPuzzle &)) klass_name = "OctobanPuzzle";
-  if (typeid(*this) == typeid(const HexobanPuzzle &)) klass_name = "HexobanPuzzle";
+  switch (m_impl->m_tessellation) {
+  case Tessellation::SOKOBAN:
+    klass_name = "SokobanPuzzle";
+    break;
+  case Tessellation::HEXOBAN:
+    klass_name = "TriobanPuzzle";
+    break;
+  case Tessellation::TRIOBAN:
+    klass_name = "OctobanPuzzle";
+    break;
+  case Tessellation::OCTOBAN:
+    klass_name = "HexobanPuzzle";
+    break;
+    // Do not handle default, let compiler generate warning when another tessellation
+    // is added...
+  }
 
   Strings board_lines;
   string tmp = to_board_str(true);
@@ -414,41 +435,49 @@ bool Puzzle::is_sokoban_plus(const string &line) {
   return only_digits_and_spaces && !is_blank(line);
 }
 
-Puzzle::unique_ptr_t Puzzle::instance_from(const Tessellation &tessellation,
+Puzzle::unique_ptr_t Puzzle::instance_from(Tessellation tessellation,
                                            board_size_t width, board_size_t height) {
-  return instance_from(tessellation.str(), width, height);
-}
-
-Puzzle::unique_ptr_t Puzzle::instance_from(const string &tessellation_name,
-                                           board_size_t width, board_size_t height) {
-  if (tessellation_name == "sokoban")
+  switch (tessellation) {
+  case Tessellation::SOKOBAN:
     return make_unique<SokobanPuzzle>(width, height);
-  else if (tessellation_name == "trioban")
-    return make_unique<TriobanPuzzle>(width, height);
-  else if (tessellation_name == "octoban")
-    return make_unique<OctobanPuzzle>(width, height);
-  else if (tessellation_name == "hexoban")
+    break;
+  case Tessellation::HEXOBAN:
     return make_unique<HexobanPuzzle>(width, height);
-
-  throw std::invalid_argument("Don't know about tessellation: " + tessellation_name);
+    break;
+  case Tessellation::TRIOBAN:
+    return make_unique<TriobanPuzzle>(width, height);
+    break;
+  case Tessellation::OCTOBAN:
+    return make_unique<OctobanPuzzle>(width, height);
+    break;
+    // Do not handle default, let compiler generate warning when another tessellation
+    // is added...
+  }
 }
 
-Puzzle::unique_ptr_t Puzzle::instance_from(const Tessellation &tessellation,
+Puzzle::unique_ptr_t Puzzle::instance_from(Tessellation tessellation,
                                            const string &board) {
-  return instance_from(tessellation.str(), board);
+  switch (tessellation) {
+  case Tessellation::SOKOBAN:
+    return make_unique<SokobanPuzzle>(board);
+    break;
+  case Tessellation::HEXOBAN:
+    return make_unique<HexobanPuzzle>(board);
+    break;
+  case Tessellation::TRIOBAN:
+    return make_unique<TriobanPuzzle>(board);
+    break;
+  case Tessellation::OCTOBAN:
+    return make_unique<OctobanPuzzle>(board);
+    break;
+    // Do not handle default, let compiler generate warning when another tessellation
+    // is added...
+  }
 }
 
-Puzzle::unique_ptr_t Puzzle::instance_from(const string &tessellation_name,
-                                           const string &board) {
-  if (tessellation_name == "sokoban")
-    return make_unique<HexobanPuzzle>(board);
-  else if (tessellation_name == "trioban")
-    return make_unique<HexobanPuzzle>(board);
-  else if (tessellation_name == "octoban")
-    return make_unique<HexobanPuzzle>(board);
-  else if (tessellation_name == "hexoban")
-    return make_unique<HexobanPuzzle>(board);
-  throw std::invalid_argument("Don't know about tessellation: " + tessellation_name);
+bool is_blank(const std::string &line) {
+  return line.empty() || all_of(line.begin(), line.end(),
+                                [](char c) -> bool { return isspace(c) != 0; });
 }
 
 namespace implementation {

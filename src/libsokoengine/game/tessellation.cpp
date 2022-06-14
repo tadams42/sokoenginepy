@@ -1,5 +1,4 @@
 #include "tessellation.hpp"
-#include "utilities.hpp"
 
 #include "hexoban_tessellation.hpp"
 #include "octoban_tessellation.hpp"
@@ -13,35 +12,55 @@ using namespace std;
 namespace sokoengine {
 namespace game {
 
-const SokobanTessellation &Tessellation::SOKOBAN = SokobanTessellation();
-const HexobanTessellation &Tessellation::HEXOBAN = HexobanTessellation();
-const TriobanTessellation &Tessellation::TRIOBAN = TriobanTessellation();
-const OctobanTessellation &Tessellation::OCTOBAN = OctobanTessellation();
+using io::CellOrientation;
 
-const Tessellation &Tessellation::instance_from(const string &name) {
-  string check_name = boost::trim_copy(name);
-  boost::to_lower(check_name);
+namespace implementation {
 
-  if (check_name == "sokoban" or io::is_blank(name)) return SOKOBAN;
-  if (check_name == "trioban") return TRIOBAN;
-  if (check_name == "hexoban") return HEXOBAN;
-  if (check_name == "octoban") return OCTOBAN;
+static const string strs[DIRECTIONS_COUNT] = {
+  string("Direction.UP"),         string("Direction.DOWN"),
+  string("Direction.LEFT"),       string("Direction.RIGHT"),
+  string("Direction.NORTH_WEST"), string("Direction.NORTH_EAST"),
+  string("Direction.SOUTH_EAST"), string("Direction.SOUTH_WEST")};
 
-  throw invalid_argument(name);
+} // namespace implementation
+
+const std::string &BaseTessellation::direction_repr(Direction d) {
+  return implementation::strs[direction_pack(d)];
 }
 
-Tessellation::~Tessellation() = default;
-
-bool Tessellation::operator==(const Tessellation &rv) const {
-  return typeid(*this) == typeid(rv);
+const std::string &BaseTessellation::direction_str(Direction d) {
+  return direction_repr(d);
 }
-bool Tessellation::operator!=(const Tessellation &rv) const { return !(*this == rv); }
 
-GraphType Tessellation::graph_type() const { return GraphType::DIRECTED; }
+const BaseTessellation &BaseTessellation::instance(const Tessellation &tessellation) {
+  static const SokobanTessellation SOKOBAN;
+  static const HexobanTessellation HEXOBAN;
+  static const TriobanTessellation TRIOBAN;
+  static const OctobanTessellation OCTOBAN;
 
-CellOrientation Tessellation::cell_orientation(position_t position,
-                                               board_size_t width,
-                                               board_size_t height) const {
+  switch (tessellation) {
+  case Tessellation::SOKOBAN:
+    return SOKOBAN;
+    break;
+  case Tessellation::HEXOBAN:
+    return HEXOBAN;
+    break;
+  case Tessellation::TRIOBAN:
+    return TRIOBAN;
+    break;
+  case Tessellation::OCTOBAN:
+    return OCTOBAN;
+    break;
+    // Do not handle default, let compiler generate warning when another tessellation
+    // is added...
+  }
+}
+
+GraphType BaseTessellation::graph_type() const { return GraphType::DIRECTED; }
+
+CellOrientation BaseTessellation::cell_orientation(position_t position,
+                                                   board_size_t width,
+                                                   board_size_t height) const {
   return CellOrientation::DEFAULT;
 }
 

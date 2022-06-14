@@ -1,7 +1,7 @@
 #ifndef AST_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
 #define AST_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
 
-#include "sokoengine_config.hpp"
+#include "config.hpp"
 
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <list>

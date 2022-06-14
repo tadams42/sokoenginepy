@@ -3,12 +3,12 @@ from __future__ import annotations
 from typing import Dict, Final, Optional, Tuple
 
 from ..io import Snapshot
-from .direction import Direction
-from .tessellation_base import TessellationBase
-from .utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
+from .base_tessellation import COLUMN, ROW, BaseTessellation, index_1d, is_on_board_2d
+from .config import Direction
+from .utilities import inverted
 
 
-class SokobanTessellation(TessellationBase):
+class SokobanTessellation(BaseTessellation):
     """
     Board is laid out on squares.
 
@@ -67,6 +67,3 @@ class SokobanTessellation(TessellationBase):
             return index_1d(column, row, board_width)
 
         return None
-
-    def __str__(self):
-        return "sokoban"

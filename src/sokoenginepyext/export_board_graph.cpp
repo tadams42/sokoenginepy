@@ -1,12 +1,12 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
-using sokoengine::Config;
+using sokoengine::position_t;
 using sokoengine::game::BoardCell;
 using sokoengine::game::BoardGraph;
+using sokoengine::game::Config;
 using sokoengine::game::Direction;
 using sokoengine::game::GraphType;
-using sokoengine::game::position_t;
 using sokoengine::io::Puzzle;
 
 void export_board_graph(py::module &m) {
@@ -16,6 +16,13 @@ void export_board_graph(py::module &m) {
     // We don't want constants be available in module scope
     // .export_values()
     ;
+
+  py::class_<Config>(m, "Config")
+    .def_readonly_static("MAX_WIDTH", &Config::MAX_WIDTH)
+    .def_readonly_static("MAX_HEIGHT", &Config::MAX_HEIGHT)
+    .def_readonly_static("MAX_POS", &Config::MAX_POS)
+    .def_readonly_static("DEFAULT_PIECE_ID", &Config::DEFAULT_PIECE_ID)
+    .def_readonly_static("NULL_ID", &Config::NULL_ID);
 
   py::class_<BoardGraph>(m, "BoardGraph")
     .def(py::init<const Puzzle &>(), py::arg("puzzle"))
@@ -55,6 +62,10 @@ void export_board_graph(py::module &m) {
     .def_property_readonly("edges_count", &BoardGraph::edges_count)
     .def_property_readonly("board_width", &BoardGraph::board_width)
     .def_property_readonly("board_height", &BoardGraph::board_height)
+    .def_property_readonly("tessellation", &BoardGraph::tessellation)
+
+    .def("to_board_str", &BoardGraph::to_board_str,
+         py::arg("use_visible_floor") = false, py::arg("rle_encode") = false)
 
     .def(
       "has_edge",

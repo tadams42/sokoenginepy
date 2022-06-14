@@ -1,7 +1,7 @@
 #ifndef BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "tessellation.hpp"
+#include "config.hpp"
 
 #include <stdexcept>
 #include <memory>
@@ -17,7 +17,7 @@ namespace game {
 class BoardCell;
 
 ///
-/// Exception.
+/// @exception
 ///
 class LIBSOKOENGINE_API BoardSizeExceededError : public std::runtime_error {
 public:
@@ -50,7 +50,7 @@ public:
   const BoardCell &operator[](position_t position) const;
   BoardCell &operator[](position_t position);
 
-  const Tessellation &tessellation() const;
+  Tessellation tessellation() const;
 
   ///
   /// Formatted string representation of board.

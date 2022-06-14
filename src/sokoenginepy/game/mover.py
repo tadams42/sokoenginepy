@@ -1,16 +1,23 @@
 from __future__ import annotations
 
+import enum
 from dataclasses import dataclass
 from itertools import groupby
 from typing import Iterable, List, Optional
 
-from .pusher_step import PusherStep
 from .board_graph import BoardGraph
 from .board_manager import CellAlreadyOccupiedError
-from .direction import Direction
+from .config import Direction, Config
 from .hashed_board_manager import HashedBoardManager
-from .piece import DEFAULT_PIECE_ID
-from .solving_mode import SolvingMode
+from .pusher_step import PusherStep
+
+
+class SolvingMode(enum.Enum):
+    FORWARD = 0
+    REVERSE = 1
+
+    def __repr__(self):
+        return "SolvingMode." + self.name
 
 
 class NonPlayableBoardError(RuntimeError):
@@ -82,7 +89,7 @@ class Mover:
         self._manager = HashedBoardManager(board)
         self._solving_mode = solving_mode
         self._pulls_boxes = True
-        self._selected_pusher: int = DEFAULT_PIECE_ID
+        self._selected_pusher: int = Config.DEFAULT_PIECE_ID
         self._pull_count: int = 0
         self._last_move: List[PusherStep] = []
 
@@ -198,7 +205,7 @@ class Mover:
         """
         Selects pusher that will perform next move.
 
-        Mover always selects :data:`.DEFAULT_PIECE_ID` before any movements is
+        Mover always selects :data:`Config.DEFAULT_PIECE_ID` before any movements is
         performed. This means that for single-pusher boards, that single pusher is
         always automatically selected and this method doesn't need to be called.
 

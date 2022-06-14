@@ -1,12 +1,17 @@
 #ifndef SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "tessellation.hpp"
-#include "mover.hpp"
+#include "config.hpp"
 
 #include <memory>
 
 namespace sokoengine {
+
+namespace game {
+class PusherStep;
+typedef std::vector<PusherStep> PusherSteps;
+}
+
 namespace io {
 
 ///
@@ -77,7 +82,7 @@ public:
   const std::string &updated_at() const;
   std::string &updated_at();
 
-  const game::Tessellation &tessellation() const;
+  game::Tessellation tessellation() const;
 
   std::string to_str(bool rle_encode = false) const;
   std::string str() const;

@@ -1,7 +1,7 @@
 #ifndef AST_BDC825C2_4FAB_4173_9B94_185BD7430359
 #define AST_BDC825C2_4FAB_4173_9B94_185BD7430359
 
-#include "sokoengine_config.hpp"
+#include "config.hpp"
 
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <list>
@@ -10,7 +10,7 @@
 namespace sokoengine {
 
 namespace game {
-class Tessellation;
+class BaseTessellation;
 class PusherStep;
 }; // namespace game
 
@@ -29,7 +29,8 @@ public:
   size_t pushes_count() const;
   size_t moves_count() const;
   const std::string &to_str() const;
-  Converted pusher_steps(const game::Tessellation &tessellation) const;
+  Converted
+  pusher_steps(const game::BaseTessellation &tessellation) const;
 };
 
 class LIBSOKOENGINE_LOCAL Jump {
@@ -40,7 +41,8 @@ public:
   size_t pushes_count() const;
   size_t moves_count() const;
   std::string to_str() const;
-  Converted pusher_steps(const game::Tessellation &tessellation) const;
+  Converted
+  pusher_steps(const game::BaseTessellation &tessellation) const;
 };
 
 class LIBSOKOENGINE_LOCAL PusherSelection {
@@ -51,7 +53,8 @@ public:
   size_t pushes_count() const;
   size_t moves_count() const;
   std::string to_str() const;
-  Converted pusher_steps(const game::Tessellation &tessellation) const;
+  Converted
+  pusher_steps(const game::BaseTessellation &tessellation) const;
 };
 
 typedef std::variant<Steps, PusherSelection, Jump> parsed_type_t;

@@ -1,6 +1,6 @@
 #include "sokoban_tessellation.hpp"
+
 #include "pusher_step.hpp"
-#include "direction.hpp"
 #include "snapshot.hpp"
 
 #include <map>
@@ -83,9 +83,6 @@ PusherStep SokobanTessellation::char_to_pusher_step(char rv) const {
     throw invalid_argument("Illegal PusherStep direction in SokobanTessellation!");
   }
 }
-
-string SokobanTessellation::repr() const { return "SokobanTessellation()"; }
-string SokobanTessellation::str() const { return "sokoban"; }
 
 } // namespace game
 } // namespace sokoengine

@@ -1,12 +1,14 @@
 #include "trioban_tessellation.hpp"
+
 #include "pusher_step.hpp"
-#include "direction.hpp"
 #include "snapshot.hpp"
 
 using namespace std;
 
 namespace sokoengine {
 namespace game {
+
+using io::CellOrientation;
 
 const Directions &TriobanTessellation::legal_directions() const {
   static const Directions retv{Direction::LEFT,       Direction::RIGHT,
@@ -149,9 +151,6 @@ CellOrientation TriobanTessellation::cell_orientation(position_t pos,
 }
 
 GraphType TriobanTessellation::graph_type() const { return GraphType::DIRECTED_MULTI; }
-
-string TriobanTessellation::repr() const { return "TriobanTessellation()"; }
-string TriobanTessellation::str() const { return "trioban"; }
 
 } // namespace game
 } // namespace sokoengine

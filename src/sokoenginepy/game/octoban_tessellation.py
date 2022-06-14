@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from typing import Dict, Final, Optional, Tuple
 
-from ..io import Snapshot
-from .cell_orientation import CellOrientation
-from .direction import Direction
-from .tessellation_base import TessellationBase
-from .utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
+from ..io import CellOrientation, Snapshot
+from .base_tessellation import COLUMN, ROW, BaseTessellation, index_1d, is_on_board_2d
+from .config import Direction
+from .utilities import inverted
 
 
-class OctobanTessellation(TessellationBase):
+class OctobanTessellation(BaseTessellation):
     """
     Board space is laid out on alternating squares and octagons with origin of
     coordinate system being octagon. Tessellation allows all 8 directions of movement
@@ -108,6 +107,3 @@ class OctobanTessellation(TessellationBase):
             if (column + (row % 2)) % 2 == 0
             else CellOrientation.DEFAULT
         )
-
-    def __str__(self):
-        return "octoban"

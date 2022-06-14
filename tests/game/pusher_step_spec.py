@@ -1,6 +1,6 @@
 import pytest
 
-from sokoenginepy.game import DEFAULT_PIECE_ID, PusherStep, Direction
+from sokoenginepy.game import Config, Direction, PusherStep
 
 from ..fixtures import PusherStepFactory
 
@@ -19,7 +19,7 @@ class DescribePusherStep:
             assert not pusher_step.is_move
             assert not pusher_step.is_pusher_selection
             assert not pusher_step.is_jump
-            assert pusher_step.pusher_id == DEFAULT_PIECE_ID
+            assert pusher_step.pusher_id == Config.DEFAULT_PIECE_ID
             assert pusher_step.moved_box_id is None
 
         def it_validates_parameters(self):
@@ -43,14 +43,14 @@ class DescribePusherStep:
 
     class Describe_moved_box_id:
         def test_get_returns_none_if_move_is_not_push_or_pull(self, pusher_step):
-            pusher_step.moved_box_id = DEFAULT_PIECE_ID
+            pusher_step.moved_box_id = Config.DEFAULT_PIECE_ID
             pusher_step.is_push_or_pull = False
             assert pusher_step.moved_box_id is None
 
         def test_get_returns_box_that_moved_if_move_is_push_or_pull(self, pusher_step):
             pusher_step.is_push_or_pull = True
-            pusher_step.moved_box_id = DEFAULT_PIECE_ID + 42
-            assert pusher_step.moved_box_id == DEFAULT_PIECE_ID + 42
+            pusher_step.moved_box_id = Config.DEFAULT_PIECE_ID + 42
+            assert pusher_step.moved_box_id == Config.DEFAULT_PIECE_ID + 42
 
         def test_when_setting_to_none_it_also_resets_push_or_pull_flag(
             self, pusher_step
@@ -66,9 +66,9 @@ class DescribePusherStep:
             self, pusher_step
         ):
             pusher_step.is_push_or_pull = False
-            pusher_step.moved_box_id = DEFAULT_PIECE_ID + 42
+            pusher_step.moved_box_id = Config.DEFAULT_PIECE_ID + 42
 
-            assert pusher_step.moved_box_id == DEFAULT_PIECE_ID + 42
+            assert pusher_step.moved_box_id == Config.DEFAULT_PIECE_ID + 42
             assert pusher_step.is_push_or_pull
             assert not pusher_step.is_move
 
@@ -107,24 +107,24 @@ class DescribePusherStep:
 
     class Describe_pusher_id:
         def it_returns_id_of_pusher_that_performed_movement(self, pusher_step):
-            pusher_step.pusher_id = DEFAULT_PIECE_ID + 42
-            assert pusher_step.pusher_id == DEFAULT_PIECE_ID + 42
+            pusher_step.pusher_id = Config.DEFAULT_PIECE_ID + 42
+            assert pusher_step.pusher_id == Config.DEFAULT_PIECE_ID + 42
 
         def it_sets_it_to_default_if_illegal_value_provided(self, pusher_step):
             pusher_step.pusher_id = 4
             assert pusher_step.pusher_id == 4
             pusher_step.pusher_id = -42
-            assert pusher_step.pusher_id == DEFAULT_PIECE_ID
+            assert pusher_step.pusher_id == Config.DEFAULT_PIECE_ID
 
             pusher_step.pusher_id = 4
             assert pusher_step.pusher_id == 4
             pusher_step.pusher_id = None
-            assert pusher_step.pusher_id == DEFAULT_PIECE_ID
+            assert pusher_step.pusher_id == Config.DEFAULT_PIECE_ID
 
             pusher_step.pusher_id = 4
             assert pusher_step.pusher_id == 4
             pusher_step.pusher_id = "ZOMG!"
-            assert pusher_step.pusher_id == DEFAULT_PIECE_ID
+            assert pusher_step.pusher_id == Config.DEFAULT_PIECE_ID
 
     class Describe_is_move:
         def it_returns_true_if_box_was_not_moved(self, pusher_step):

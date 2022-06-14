@@ -2,8 +2,10 @@
 
 using namespace std;
 using sokoengine::board_size_t;
-using sokoengine::game::position_t;
+using sokoengine::position_t;
+using sokoengine::game::BaseTessellation;
 using sokoengine::game::Tessellation;
+using sokoengine::io::CellOrientation;
 using sokoengine::io::HexobanPuzzle;
 using sokoengine::io::OctobanPuzzle;
 using sokoengine::io::Puzzle;
@@ -12,60 +14,21 @@ using sokoengine::io::Strings;
 using sokoengine::io::TriobanPuzzle;
 
 void export_io_puzzle(py::module &m) {
+  py::enum_<CellOrientation>(m, "CellOrientation")
+    .value("DEFAULT", CellOrientation::DEFAULT)
+    .value("TRIANGLE_DOWN", CellOrientation::TRIANGLE_DOWN)
+    .value("OCTAGON", CellOrientation::OCTAGON)
+    // We don't want constants be available in module scope
+    // .export_values()
+    ;
+
   auto pyPuzzle = py::class_<Puzzle>(m, "Puzzle", py::is_final());
 
-  pyPuzzle.def_static(
-    "instance_from",
-    [](const py::object &tessellation_or_description, board_size_t width,
-       board_size_t height, const py::object &board) -> py::object {
-      py::extract<string> string_obj(tessellation_or_description);
-      py::extract<const Tessellation &> tessellation_obj(tessellation_or_description);
-
-      string description;
-      if (string_obj.check()) {
-        description = string_obj();
-      } else if (tessellation_obj.check()) {
-        const Tessellation &tessellation = tessellation_obj();
-        description = tessellation.str();
-      } else
-        throw std::invalid_argument(
-          string() + "tessellation_or_description can't be converted to " +
-          "known tessellation type");
-
-      unique_ptr<Puzzle> puzzle;
-
-      if (board.is_none()) {
-        puzzle = Puzzle::instance_from(description, width, height);
-      } else {
-        string board_converted = py::extract<string>(board)();
-        puzzle = Puzzle::instance_from(description, board_converted);
-      }
-
-      if (description == "sokoban") {
-        auto down_casted = py::cast<unique_ptr<SokobanPuzzle>>(
-          unique_ptr<SokobanPuzzle>(static_cast<SokobanPuzzle *>(puzzle.get())));
-        puzzle.release();
-        return down_casted;
-      } else if (description == "trioban") {
-        auto down_casted = py::cast<unique_ptr<TriobanPuzzle>>(
-          unique_ptr<TriobanPuzzle>(static_cast<TriobanPuzzle *>(puzzle.release())));
-        puzzle.release();
-        return down_casted;
-      } else if (description == "octoban") {
-        auto down_casted = py::cast<unique_ptr<OctobanPuzzle>>(
-          unique_ptr<OctobanPuzzle>(static_cast<OctobanPuzzle *>(puzzle.release())));
-        puzzle.release();
-        return down_casted;
-      } else if (description == "hexoban") {
-        auto down_casted = py::cast<unique_ptr<HexobanPuzzle>>(
-          unique_ptr<HexobanPuzzle>(static_cast<HexobanPuzzle *>(puzzle.release())));
-        puzzle.release();
-        return down_casted;
-      }
-      throw std::invalid_argument("Don't know about tessellation: " + description);
-    },
-    py::arg("tessellation_or_description") = py::cast<string>("sokoban"),
-    py::arg("width") = 0, py::arg("height") = 0, py::arg("board") = py::none());
+  pyPuzzle
+    .def("instance_from", py::overload_cast<Tessellation, board_size_t, board_size_t>(
+                            &Puzzle::instance_from))
+    .def("instance_from",
+         py::overload_cast<Tessellation, const string &>(&Puzzle::instance_from));
 
   pyPuzzle.def_readonly_static("WALL", &Puzzle::WALL);
   pyPuzzle.def_readonly_static("PUSHER", &Puzzle::PUSHER);
@@ -126,8 +89,8 @@ void export_io_puzzle(py::module &m) {
     "board", [](const Puzzle &self) { return self.board(); },
     [](Puzzle &self, const string &rv) { self.set_board(rv); });
 
-  pyPuzzle.def_property_readonly("tessellation", &Puzzle::tessellation,
-                                 py::return_value_policy::reference);
+  pyPuzzle.def_property_readonly("tessellation", &Puzzle::tessellation);
+  pyPuzzle.def("cell_orientation", &Puzzle::cell_orientation, py::arg("position"));
 
   pyPuzzle.def(
     "__getitem__",
@@ -189,7 +152,9 @@ void export_io_puzzle(py::module &m) {
     py::arg("width") = 0, py::arg("height") = 0, py::arg("board") = py::none());
   pySokobanPuzzle.def_property(
     "snapshots", [](const SokobanPuzzle &self) { return self.snapshots(); },
-    [](SokobanPuzzle &self, const SokobanPuzzle::Snapshots &rv) { self.snapshots() = rv; });
+    [](SokobanPuzzle &self, const SokobanPuzzle::Snapshots &rv) {
+      self.snapshots() = rv;
+    });
 
   pyHexobanPuzzle.def(
     py::init([](board_size_t width, board_size_t height, const py::object &board) {
@@ -200,7 +165,9 @@ void export_io_puzzle(py::module &m) {
     py::arg("width") = 0, py::arg("height") = 0, py::arg("board") = py::none());
   pyHexobanPuzzle.def_property(
     "snapshots", [](const HexobanPuzzle &self) { return self.snapshots(); },
-    [](HexobanPuzzle &self, const HexobanPuzzle::Snapshots &rv) { self.snapshots() = rv; });
+    [](HexobanPuzzle &self, const HexobanPuzzle::Snapshots &rv) {
+      self.snapshots() = rv;
+    });
 
   pyTriobanPuzzle.def(
     py::init([](board_size_t width, board_size_t height, const py::object &board) {
@@ -211,7 +178,9 @@ void export_io_puzzle(py::module &m) {
     py::arg("width") = 0, py::arg("height") = 0, py::arg("board") = py::none());
   pyTriobanPuzzle.def_property(
     "snapshots", [](const TriobanPuzzle &self) { return self.snapshots(); },
-    [](TriobanPuzzle &self, const TriobanPuzzle::Snapshots &rv) { self.snapshots() = rv; });
+    [](TriobanPuzzle &self, const TriobanPuzzle::Snapshots &rv) {
+      self.snapshots() = rv;
+    });
 
   pyOctobanPuzzle.def(
     py::init([](board_size_t width, board_size_t height, const py::object &board) {
@@ -222,5 +191,7 @@ void export_io_puzzle(py::module &m) {
     py::arg("width") = 0, py::arg("height") = 0, py::arg("board") = py::none());
   pyOctobanPuzzle.def_property(
     "snapshots", [](const OctobanPuzzle &self) { return self.snapshots(); },
-    [](OctobanPuzzle &self, const OctobanPuzzle::Snapshots &rv) { self.snapshots() = rv; });
+    [](OctobanPuzzle &self, const OctobanPuzzle::Snapshots &rv) {
+      self.snapshots() = rv;
+    });
 }

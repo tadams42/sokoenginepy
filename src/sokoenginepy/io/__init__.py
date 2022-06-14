@@ -4,20 +4,19 @@ if TYPE_CHECKING:
     from .collection import Collection
     from .hexoban import HexobanPuzzle, HexobanSnapshot
     from .octoban import OctobanPuzzle, OctobanSnapshot
-    from .puzzle import Puzzle
+    from .puzzle import CellOrientation, Puzzle
     from .rle import Rle
     from .snapshot import Snapshot
     from .sokoban import SokobanPuzzle, SokobanSnapshot
     from .trioban import TriobanPuzzle, TriobanSnapshot
-    from .utilities import is_blank
 
 else:
     try:
         from sokoenginepyext.io import (
+            CellOrientation,
             Collection,
             HexobanPuzzle,
             HexobanSnapshot,
-            is_blank,
             OctobanPuzzle,
             OctobanSnapshot,
             Puzzle,
@@ -33,9 +32,10 @@ else:
         from .collection import Collection
         from .hexoban import HexobanPuzzle, HexobanSnapshot
         from .octoban import OctobanPuzzle, OctobanSnapshot
-        from .puzzle import Puzzle
+        from .puzzle import CellOrientation, Puzzle
         from .rle import Rle
         from .snapshot import Snapshot
         from .sokoban import SokobanPuzzle, SokobanSnapshot
         from .trioban import TriobanPuzzle, TriobanSnapshot
-        from .utilities import is_blank
+
+from .utilities import is_blank

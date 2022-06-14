@@ -4,11 +4,11 @@ from itertools import permutations
 import pytest
 
 from sokoenginepy.game import (
-    DEFAULT_PIECE_ID,
     BoardGraph,
     BoardManager,
     BoardState,
     CellAlreadyOccupiedError,
+    Config,
     SokobanPlus,
     index_1d,
 )
@@ -63,8 +63,8 @@ def switched_puzzle():
 @pytest.fixture
 def pushers_positions(puzzle):
     return {
-        DEFAULT_PIECE_ID: index_1d(7, 1, puzzle.width),
-        DEFAULT_PIECE_ID + 1: index_1d(11, 8, puzzle.width),
+        Config.DEFAULT_PIECE_ID: index_1d(7, 1, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 1: index_1d(11, 8, puzzle.width),
     }
 
 
@@ -76,12 +76,12 @@ def invalid_pusher_position():
 @pytest.fixture
 def boxes_positions(puzzle):
     return {
-        DEFAULT_PIECE_ID: index_1d(5, 2, puzzle.width),
-        DEFAULT_PIECE_ID + 1: index_1d(7, 3, puzzle.width),
-        DEFAULT_PIECE_ID + 2: index_1d(5, 4, puzzle.width),
-        DEFAULT_PIECE_ID + 3: index_1d(7, 4, puzzle.width),
-        DEFAULT_PIECE_ID + 4: index_1d(2, 7, puzzle.width),
-        DEFAULT_PIECE_ID + 5: index_1d(5, 7, puzzle.width),
+        Config.DEFAULT_PIECE_ID: index_1d(5, 2, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 1: index_1d(7, 3, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 2: index_1d(5, 4, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 3: index_1d(7, 4, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 4: index_1d(2, 7, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 5: index_1d(5, 7, puzzle.width),
     }
 
 
@@ -93,12 +93,12 @@ def invalid_box_position():
 @pytest.fixture
 def goals_positions(puzzle):
     return {
-        DEFAULT_PIECE_ID: index_1d(16, 6, puzzle.width),
-        DEFAULT_PIECE_ID + 1: index_1d(17, 6, puzzle.width),
-        DEFAULT_PIECE_ID + 2: index_1d(16, 7, puzzle.width),
-        DEFAULT_PIECE_ID + 3: index_1d(17, 7, puzzle.width),
-        DEFAULT_PIECE_ID + 4: index_1d(16, 8, puzzle.width),
-        DEFAULT_PIECE_ID + 5: index_1d(17, 8, puzzle.width),
+        Config.DEFAULT_PIECE_ID: index_1d(16, 6, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 1: index_1d(17, 6, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 2: index_1d(16, 7, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 3: index_1d(17, 7, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 4: index_1d(16, 8, puzzle.width),
+        Config.DEFAULT_PIECE_ID + 5: index_1d(17, 8, puzzle.width),
     }
 
 
@@ -145,24 +145,24 @@ def sokoban_plus_solutions():
 @pytest.fixture
 def switched_boxes(goals_positions):
     return {
-        DEFAULT_PIECE_ID: goals_positions[DEFAULT_PIECE_ID],
-        DEFAULT_PIECE_ID + 1: goals_positions[DEFAULT_PIECE_ID + 1],
-        DEFAULT_PIECE_ID + 2: goals_positions[DEFAULT_PIECE_ID + 2],
-        DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
-        DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
-        DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
+        Config.DEFAULT_PIECE_ID: goals_positions[Config.DEFAULT_PIECE_ID],
+        Config.DEFAULT_PIECE_ID + 1: goals_positions[Config.DEFAULT_PIECE_ID + 1],
+        Config.DEFAULT_PIECE_ID + 2: goals_positions[Config.DEFAULT_PIECE_ID + 2],
+        Config.DEFAULT_PIECE_ID + 3: goals_positions[Config.DEFAULT_PIECE_ID + 3],
+        Config.DEFAULT_PIECE_ID + 4: goals_positions[Config.DEFAULT_PIECE_ID + 4],
+        Config.DEFAULT_PIECE_ID + 5: goals_positions[Config.DEFAULT_PIECE_ID + 5],
     }
 
 
 @pytest.fixture
 def switched_goals(boxes_positions):
     return {
-        DEFAULT_PIECE_ID: boxes_positions[DEFAULT_PIECE_ID],
-        DEFAULT_PIECE_ID + 1: boxes_positions[DEFAULT_PIECE_ID + 1],
-        DEFAULT_PIECE_ID + 2: boxes_positions[DEFAULT_PIECE_ID + 2],
-        DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
-        DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
-        DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
+        Config.DEFAULT_PIECE_ID: boxes_positions[Config.DEFAULT_PIECE_ID],
+        Config.DEFAULT_PIECE_ID + 1: boxes_positions[Config.DEFAULT_PIECE_ID + 1],
+        Config.DEFAULT_PIECE_ID + 2: boxes_positions[Config.DEFAULT_PIECE_ID + 2],
+        Config.DEFAULT_PIECE_ID + 3: boxes_positions[Config.DEFAULT_PIECE_ID + 3],
+        Config.DEFAULT_PIECE_ID + 4: boxes_positions[Config.DEFAULT_PIECE_ID + 4],
+        Config.DEFAULT_PIECE_ID + 5: boxes_positions[Config.DEFAULT_PIECE_ID + 5],
     }
 
 
@@ -172,12 +172,12 @@ def switched_goals_plus(boxes_positions):
     # goalorder 3 2 1
     # (box, goal) id pairs [(2, 1), (3, 2), (1, 3), (4, 4), (5, 5), (6, 6)]
     return {
-        DEFAULT_PIECE_ID: boxes_positions[DEFAULT_PIECE_ID + 1],
-        DEFAULT_PIECE_ID + 1: boxes_positions[DEFAULT_PIECE_ID + 2],
-        DEFAULT_PIECE_ID + 2: boxes_positions[DEFAULT_PIECE_ID],
-        DEFAULT_PIECE_ID + 3: boxes_positions[DEFAULT_PIECE_ID + 3],
-        DEFAULT_PIECE_ID + 4: boxes_positions[DEFAULT_PIECE_ID + 4],
-        DEFAULT_PIECE_ID + 5: boxes_positions[DEFAULT_PIECE_ID + 5],
+        Config.DEFAULT_PIECE_ID: boxes_positions[Config.DEFAULT_PIECE_ID + 1],
+        Config.DEFAULT_PIECE_ID + 1: boxes_positions[Config.DEFAULT_PIECE_ID + 2],
+        Config.DEFAULT_PIECE_ID + 2: boxes_positions[Config.DEFAULT_PIECE_ID],
+        Config.DEFAULT_PIECE_ID + 3: boxes_positions[Config.DEFAULT_PIECE_ID + 3],
+        Config.DEFAULT_PIECE_ID + 4: boxes_positions[Config.DEFAULT_PIECE_ID + 4],
+        Config.DEFAULT_PIECE_ID + 5: boxes_positions[Config.DEFAULT_PIECE_ID + 5],
     }
 
 
@@ -187,49 +187,49 @@ def switched_boxes_plus(goals_positions):
     # goalorder 3 2 1
     # (box, goal) id pairs [(2, 1), (3, 2), (1, 3), (4, 4), (5, 5), (6, 6)]
     return {
-        DEFAULT_PIECE_ID: goals_positions[DEFAULT_PIECE_ID + 2],
-        DEFAULT_PIECE_ID + 1: goals_positions[DEFAULT_PIECE_ID],
-        DEFAULT_PIECE_ID + 2: goals_positions[DEFAULT_PIECE_ID + 1],
-        DEFAULT_PIECE_ID + 3: goals_positions[DEFAULT_PIECE_ID + 3],
-        DEFAULT_PIECE_ID + 4: goals_positions[DEFAULT_PIECE_ID + 4],
-        DEFAULT_PIECE_ID + 5: goals_positions[DEFAULT_PIECE_ID + 5],
+        Config.DEFAULT_PIECE_ID: goals_positions[Config.DEFAULT_PIECE_ID + 2],
+        Config.DEFAULT_PIECE_ID + 1: goals_positions[Config.DEFAULT_PIECE_ID],
+        Config.DEFAULT_PIECE_ID + 2: goals_positions[Config.DEFAULT_PIECE_ID + 1],
+        Config.DEFAULT_PIECE_ID + 3: goals_positions[Config.DEFAULT_PIECE_ID + 3],
+        Config.DEFAULT_PIECE_ID + 4: goals_positions[Config.DEFAULT_PIECE_ID + 4],
+        Config.DEFAULT_PIECE_ID + 5: goals_positions[Config.DEFAULT_PIECE_ID + 5],
     }
 
 
 @pytest.fixture
 def boxes_ids():
     return [
-        DEFAULT_PIECE_ID,
-        DEFAULT_PIECE_ID + 1,
-        DEFAULT_PIECE_ID + 2,
-        DEFAULT_PIECE_ID + 3,
-        DEFAULT_PIECE_ID + 4,
-        DEFAULT_PIECE_ID + 5,
+        Config.DEFAULT_PIECE_ID,
+        Config.DEFAULT_PIECE_ID + 1,
+        Config.DEFAULT_PIECE_ID + 2,
+        Config.DEFAULT_PIECE_ID + 3,
+        Config.DEFAULT_PIECE_ID + 4,
+        Config.DEFAULT_PIECE_ID + 5,
     ]
 
 
 @pytest.fixture
 def goals_ids():
     return [
-        DEFAULT_PIECE_ID,
-        DEFAULT_PIECE_ID + 1,
-        DEFAULT_PIECE_ID + 2,
-        DEFAULT_PIECE_ID + 3,
-        DEFAULT_PIECE_ID + 4,
-        DEFAULT_PIECE_ID + 5,
+        Config.DEFAULT_PIECE_ID,
+        Config.DEFAULT_PIECE_ID + 1,
+        Config.DEFAULT_PIECE_ID + 2,
+        Config.DEFAULT_PIECE_ID + 3,
+        Config.DEFAULT_PIECE_ID + 4,
+        Config.DEFAULT_PIECE_ID + 5,
     ]
 
 
 @pytest.fixture
 def pusher_ids():
-    return [DEFAULT_PIECE_ID, DEFAULT_PIECE_ID + 1]
+    return [Config.DEFAULT_PIECE_ID, Config.DEFAULT_PIECE_ID + 1]
 
 
 @pytest.fixture
 def normalized_pushers_positions(board_width):
     return {
-        DEFAULT_PIECE_ID: index_1d(5, 1, board_width),
-        DEFAULT_PIECE_ID + 1: index_1d(8, 4, board_width),
+        Config.DEFAULT_PIECE_ID: index_1d(5, 1, board_width),
+        Config.DEFAULT_PIECE_ID + 1: index_1d(8, 4, board_width),
     }
 
 
@@ -251,13 +251,15 @@ class DescribeBoardManager:
 
         with pytest.raises(KeyError):
             board_manager.pusher_position(
-                DEFAULT_PIECE_ID + board_manager.pushers_count
+                Config.DEFAULT_PIECE_ID + board_manager.pushers_count
             )
         with pytest.raises(KeyError):
             board_manager.pusher_id_on(invalid_pusher_position)
 
         assert (
-            board_manager.has_pusher(DEFAULT_PIECE_ID + board_manager.pushers_count)
+            board_manager.has_pusher(
+                Config.DEFAULT_PIECE_ID + board_manager.pushers_count
+            )
             is False
         )
         assert board_manager.has_pusher_on(invalid_pusher_position) is False
@@ -278,12 +280,15 @@ class DescribeBoardManager:
             assert board_manager.has_box_on(box_position) is True
 
         with pytest.raises(KeyError):
-            board_manager.box_position(DEFAULT_PIECE_ID + board_manager.boxes_count)
+            board_manager.box_position(
+                Config.DEFAULT_PIECE_ID + board_manager.boxes_count
+            )
         with pytest.raises(KeyError):
             board_manager.box_id_on(invalid_box_position)
 
         assert (
-            board_manager.has_box(DEFAULT_PIECE_ID + board_manager.boxes_count) is False
+            board_manager.has_box(Config.DEFAULT_PIECE_ID + board_manager.boxes_count)
+            is False
         )
         assert board_manager.has_box_on(invalid_box_position) is False
 
@@ -292,7 +297,9 @@ class DescribeBoardManager:
 
         # Doesn't rise KeyError if plus is disabled...
         assert (
-            board_manager.box_plus_id(DEFAULT_PIECE_ID + board_manager.boxes_count)
+            board_manager.box_plus_id(
+                Config.DEFAULT_PIECE_ID + board_manager.boxes_count
+            )
             == SokobanPlus.DEFAULT_PLUS_ID
         )
 
@@ -300,25 +307,25 @@ class DescribeBoardManager:
         board_manager.goalorder = "3 1 2"
         board_manager.enable_sokoban_plus()
 
-        assert board_manager.box_plus_id(DEFAULT_PIECE_ID) == 1
-        assert board_manager.box_plus_id(DEFAULT_PIECE_ID + 1) == 3
-        assert board_manager.box_plus_id(DEFAULT_PIECE_ID + 2) == 2
+        assert board_manager.box_plus_id(Config.DEFAULT_PIECE_ID) == 1
+        assert board_manager.box_plus_id(Config.DEFAULT_PIECE_ID + 1) == 3
+        assert board_manager.box_plus_id(Config.DEFAULT_PIECE_ID + 2) == 2
         assert (
-            board_manager.box_plus_id(DEFAULT_PIECE_ID + 3)
+            board_manager.box_plus_id(Config.DEFAULT_PIECE_ID + 3)
             == SokobanPlus.DEFAULT_PLUS_ID
         )
         assert (
-            board_manager.box_plus_id(DEFAULT_PIECE_ID + 4)
+            board_manager.box_plus_id(Config.DEFAULT_PIECE_ID + 4)
             == SokobanPlus.DEFAULT_PLUS_ID
         )
         assert (
-            board_manager.box_plus_id(DEFAULT_PIECE_ID + 5)
+            board_manager.box_plus_id(Config.DEFAULT_PIECE_ID + 5)
             == SokobanPlus.DEFAULT_PLUS_ID
         )
 
         with pytest.raises(KeyError):
             assert board_manager.box_plus_id(
-                DEFAULT_PIECE_ID + board_manager.boxes_count
+                Config.DEFAULT_PIECE_ID + board_manager.boxes_count
             )
 
     def it_memoizes_goals(
@@ -337,12 +344,14 @@ class DescribeBoardManager:
             assert board_manager.has_goal_on(goal_position) is True
 
         with pytest.raises(KeyError):
-            board_manager.goal_position(DEFAULT_PIECE_ID + board_manager.goals_count)
+            board_manager.goal_position(
+                Config.DEFAULT_PIECE_ID + board_manager.goals_count
+            )
         with pytest.raises(KeyError):
             board_manager.goal_id_on(invalid_goal_position)
 
         assert (
-            board_manager.has_goal(DEFAULT_PIECE_ID + board_manager.goals_count)
+            board_manager.has_goal(Config.DEFAULT_PIECE_ID + board_manager.goals_count)
             is False
         )
         assert board_manager.has_goal_on(invalid_goal_position) is False
@@ -352,7 +361,9 @@ class DescribeBoardManager:
 
         # Doesn't rise KeyError if plus is disabled...
         assert (
-            board_manager.goal_plus_id(DEFAULT_PIECE_ID + board_manager.goals_count)
+            board_manager.goal_plus_id(
+                Config.DEFAULT_PIECE_ID + board_manager.goals_count
+            )
             == SokobanPlus.DEFAULT_PLUS_ID
         )
 
@@ -360,25 +371,25 @@ class DescribeBoardManager:
         board_manager.goalorder = "3 1 2"
         board_manager.enable_sokoban_plus()
 
-        assert board_manager.goal_plus_id(DEFAULT_PIECE_ID) == 3
-        assert board_manager.goal_plus_id(DEFAULT_PIECE_ID + 1) == 1
-        assert board_manager.goal_plus_id(DEFAULT_PIECE_ID + 2) == 2
+        assert board_manager.goal_plus_id(Config.DEFAULT_PIECE_ID) == 3
+        assert board_manager.goal_plus_id(Config.DEFAULT_PIECE_ID + 1) == 1
+        assert board_manager.goal_plus_id(Config.DEFAULT_PIECE_ID + 2) == 2
         assert (
-            board_manager.goal_plus_id(DEFAULT_PIECE_ID + 3)
+            board_manager.goal_plus_id(Config.DEFAULT_PIECE_ID + 3)
             == SokobanPlus.DEFAULT_PLUS_ID
         )
         assert (
-            board_manager.goal_plus_id(DEFAULT_PIECE_ID + 4)
+            board_manager.goal_plus_id(Config.DEFAULT_PIECE_ID + 4)
             == SokobanPlus.DEFAULT_PLUS_ID
         )
         assert (
-            board_manager.goal_plus_id(DEFAULT_PIECE_ID + 5)
+            board_manager.goal_plus_id(Config.DEFAULT_PIECE_ID + 5)
             == SokobanPlus.DEFAULT_PLUS_ID
         )
 
         with pytest.raises(KeyError):
             assert board_manager.goal_plus_id(
-                DEFAULT_PIECE_ID + board_manager.goals_count
+                Config.DEFAULT_PIECE_ID + board_manager.goals_count
             )
 
     def it_calculates_all_valid_board_solutions(
@@ -397,17 +408,17 @@ class DescribeBoardManager:
     def it_moves_boxes(self, board_graph):
         board_manager = BoardManager(board_graph)
 
-        old_box_position = board_manager.box_position(DEFAULT_PIECE_ID)
-        board_manager.move_box(DEFAULT_PIECE_ID, 0)
-        assert board_manager.box_position(DEFAULT_PIECE_ID) == 0
+        old_box_position = board_manager.box_position(Config.DEFAULT_PIECE_ID)
+        board_manager.move_box(Config.DEFAULT_PIECE_ID, 0)
+        assert board_manager.box_position(Config.DEFAULT_PIECE_ID) == 0
         assert board_manager.has_box_on(0)
         assert not board_manager.has_box_on(old_box_position)
         assert board_manager.board[0].has_box
         assert not board_manager.board[old_box_position].has_box
-        board_manager.move_box(DEFAULT_PIECE_ID, old_box_position)
+        board_manager.move_box(Config.DEFAULT_PIECE_ID, old_box_position)
 
         board_manager.move_box_from(old_box_position, 0)
-        assert board_manager.box_position(DEFAULT_PIECE_ID) == 0
+        assert board_manager.box_position(Config.DEFAULT_PIECE_ID) == 0
         assert board_manager.has_box_on(0)
         assert not board_manager.has_box_on(old_box_position)
         assert board_manager.board[0].has_box
@@ -416,17 +427,17 @@ class DescribeBoardManager:
     def it_moves_pushers(self, board_graph):
         board_manager = BoardManager(board_graph)
 
-        old_pusher_position = board_manager.pusher_position(DEFAULT_PIECE_ID)
-        board_manager.move_pusher(DEFAULT_PIECE_ID, 0)
-        assert board_manager.pusher_position(DEFAULT_PIECE_ID) == 0
+        old_pusher_position = board_manager.pusher_position(Config.DEFAULT_PIECE_ID)
+        board_manager.move_pusher(Config.DEFAULT_PIECE_ID, 0)
+        assert board_manager.pusher_position(Config.DEFAULT_PIECE_ID) == 0
         assert board_manager.has_pusher_on(0)
         assert not board_manager.has_pusher_on(old_pusher_position)
         assert board_manager.board[0].has_pusher
         assert not board_manager.board[old_pusher_position].has_pusher
-        board_manager.move_pusher(DEFAULT_PIECE_ID, old_pusher_position)
+        board_manager.move_pusher(Config.DEFAULT_PIECE_ID, old_pusher_position)
 
         board_manager.move_pusher_from(old_pusher_position, 0)
-        assert board_manager.pusher_position(DEFAULT_PIECE_ID) == 0
+        assert board_manager.pusher_position(Config.DEFAULT_PIECE_ID) == 0
         assert board_manager.has_pusher_on(0)
         assert not board_manager.has_pusher_on(old_pusher_position)
         assert board_manager.board[0].has_pusher
@@ -437,21 +448,21 @@ class DescribeBoardManager:
     ):
         wall_position = index_1d(4, 0, board_graph.board_width)
         board_manager = BoardManager(board_graph)
-        box_id = DEFAULT_PIECE_ID
+        box_id = Config.DEFAULT_PIECE_ID
         box_position = board_manager.box_position(box_id)
 
         with pytest.raises(CellAlreadyOccupiedError):
-            board_manager.move_box(box_id, boxes_positions[DEFAULT_PIECE_ID + 1])
+            board_manager.move_box(box_id, boxes_positions[Config.DEFAULT_PIECE_ID + 1])
         with pytest.raises(CellAlreadyOccupiedError):
             board_manager.move_box_from(
-                box_position, boxes_positions[DEFAULT_PIECE_ID + 1]
+                box_position, boxes_positions[Config.DEFAULT_PIECE_ID + 1]
             )
 
         with pytest.raises(CellAlreadyOccupiedError):
-            board_manager.move_box(box_id, pushers_positions[DEFAULT_PIECE_ID])
+            board_manager.move_box(box_id, pushers_positions[Config.DEFAULT_PIECE_ID])
         with pytest.raises(CellAlreadyOccupiedError):
             board_manager.move_box_from(
-                box_position, pushers_positions[DEFAULT_PIECE_ID]
+                box_position, pushers_positions[Config.DEFAULT_PIECE_ID]
             )
 
         with pytest.raises(CellAlreadyOccupiedError):
@@ -464,23 +475,25 @@ class DescribeBoardManager:
     ):
         wall_position = index_1d(4, 0, board_graph.board_width)
         board_manager = BoardManager(board_graph)
-        pusher_id = DEFAULT_PIECE_ID
+        pusher_id = Config.DEFAULT_PIECE_ID
         pusher_position = board_manager.pusher_position(pusher_id)
 
         with pytest.raises(CellAlreadyOccupiedError):
-            board_manager.move_pusher(pusher_id, boxes_positions[DEFAULT_PIECE_ID])
+            board_manager.move_pusher(
+                pusher_id, boxes_positions[Config.DEFAULT_PIECE_ID]
+            )
         with pytest.raises(CellAlreadyOccupiedError):
             board_manager.move_pusher_from(
-                pusher_position, boxes_positions[DEFAULT_PIECE_ID]
+                pusher_position, boxes_positions[Config.DEFAULT_PIECE_ID]
             )
 
         with pytest.raises(CellAlreadyOccupiedError):
             board_manager.move_pusher(
-                pusher_id, pushers_positions[DEFAULT_PIECE_ID + 1]
+                pusher_id, pushers_positions[Config.DEFAULT_PIECE_ID + 1]
             )
         with pytest.raises(CellAlreadyOccupiedError):
             board_manager.move_pusher_from(
-                pusher_position, pushers_positions[DEFAULT_PIECE_ID + 1]
+                pusher_position, pushers_positions[Config.DEFAULT_PIECE_ID + 1]
             )
 
         with pytest.raises(CellAlreadyOccupiedError):

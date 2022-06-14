@@ -32,9 +32,9 @@ template <typename T> struct extract {
 
 typedef long long py_int_t;
 
-sokoengine::game::position_t receive_position(const py::handle &board_position,
+sokoengine::position_t receive_position(const py::handle &board_position,
                                               bool *converted = nullptr);
-sokoengine::game::position_t receive_position_throw(const py::handle &board_position);
+sokoengine::position_t receive_position_throw(const py::handle &board_position);
 
 sokoengine::game::Positions
 receive_positions_throw(const py::iterable &pushers_positions);

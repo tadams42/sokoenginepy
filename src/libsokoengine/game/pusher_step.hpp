@@ -1,7 +1,7 @@
 #ifndef PUSHER_STEP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define PUSHER_STEP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "direction.hpp"
+#include "config.hpp"
 
 namespace sokoengine {
 namespace game {

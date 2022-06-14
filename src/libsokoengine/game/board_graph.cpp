@@ -1,8 +1,9 @@
 #include "board_graph.hpp"
 
 #include "board_cell.hpp"
-#include "puzzle.hpp"
 #include "board_state.hpp"
+#include "puzzle.hpp"
+#include "tessellation.hpp"
 
 #include <algorithm>
 #include <boost/foreach.hpp>
@@ -14,24 +15,9 @@ using namespace std;
 
 namespace sokoengine {
 namespace game {
-
 namespace implementation {
 
 static constexpr BoardGraph::weight_t _MAX_EDGE_WEIGHT = 100;
-
-} // namespace implementation
-
-using boost::on_tree_edge;
-using boost::vertex_index;
-using io::Puzzle;
-using namespace implementation;
-
-BoardSizeExceededError::BoardSizeExceededError(const string &mess)
-  : runtime_error(mess) {}
-
-BoardSizeExceededError::~BoardSizeExceededError() = default;
-
-namespace implementation {
 
 struct GraphEdgePropertyT {
   GraphEdgePropertyT() : weight(1), direction(Direction::LEFT) {}
@@ -64,27 +50,37 @@ typedef GraphT::vertex_descriptor vertex_descriptor;
 typedef GraphT::edge_descriptor edge_descriptor;
 typedef GraphT::vertex_iterator vertex_iterator;
 typedef GraphT::out_edge_iterator out_edge_iterator;
+
 } // namespace implementation
 
+using boost::on_tree_edge;
+using boost::vertex_index;
+using io::Puzzle;
 using namespace implementation;
+
+BoardSizeExceededError::BoardSizeExceededError(const string &mess)
+  : runtime_error(mess) {}
+
+BoardSizeExceededError::~BoardSizeExceededError() = default;
 
 class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
 public:
   typedef std::function<bool(position_t)> IsObstacleFunctor;
   GraphT m_graph;
-  GraphType m_graph_type;
+  Tessellation m_tessellation;
   board_size_t m_board_width;
   board_size_t m_board_height;
-  const Tessellation &m_tessellation;
+  GraphType m_graph_type;
 
   PIMPL(board_size_t width, board_size_t height, const Tessellation &tessellation)
     : m_graph(width * height),
-      m_graph_type(tessellation.graph_type()),
+      m_tessellation(tessellation),
       m_board_width(width),
       m_board_height(height),
-      m_tessellation(tessellation) {
+      m_graph_type(BaseTessellation::instance(tessellation).graph_type()) {
     if (width > Config::MAX_WIDTH) throw BoardSizeExceededError("width id tool big!");
-    if (height > Config::MAX_HEIGHT) throw BoardSizeExceededError("height id tool big!");
+    if (height > Config::MAX_HEIGHT)
+      throw BoardSizeExceededError("height id tool big!");
   }
 
   const BoardCell &cell_at(position_t position) const {
@@ -203,7 +199,7 @@ bool BoardGraph::contains(position_t position) const {
   return m_impl->contains(position);
 }
 
-const Tessellation &BoardGraph::tessellation() const { return m_impl->m_tessellation; }
+Tessellation BoardGraph::tessellation() const { return m_impl->m_tessellation; }
 
 string BoardGraph::to_board_str(bool use_visible_floor, bool rle_encode) const {
   Puzzle::unique_ptr_t puzzle = Puzzle::instance_from(
@@ -522,10 +518,14 @@ position_t BoardGraph::path_destination(position_t start_position,
 
 void BoardGraph::reconfigure_edges() {
   remove_all_edges();
+
+  const BaseTessellation &tessellation =
+    BaseTessellation::instance(m_impl->m_tessellation);
+
   for (board_size_t source_position = 0; source_position < vertices_count();
        ++source_position) {
-    for (const Direction &direction : m_impl->m_tessellation.legal_directions()) {
-      auto neighbor_position = m_impl->m_tessellation.neighbor_position(
+    for (const Direction &direction : tessellation.legal_directions()) {
+      auto neighbor_position = tessellation.neighbor_position(
         source_position, direction, m_impl->m_board_width, m_impl->m_board_height);
       if (neighbor_position <= Config::MAX_POS)
         add_edge(source_position, neighbor_position, direction);

@@ -9,7 +9,7 @@ namespace game {
 ///
 /// Tessellation for Octoban.
 ///
-class LIBSOKOENGINE_API OctobanTessellation : public Tessellation {
+class LIBSOKOENGINE_API OctobanTessellation : public BaseTessellation {
 public:
   virtual const Directions &legal_directions() const override;
   virtual position_t neighbor_position(position_t position, const Direction &direction,
@@ -17,15 +17,8 @@ public:
                                        board_size_t height) const override;
   virtual PusherStep char_to_pusher_step(char input_chr) const override;
   virtual char pusher_step_to_char(const PusherStep &pusher_step) const override;
-  virtual CellOrientation cell_orientation(position_t position, board_size_t width,
-                                           board_size_t height) const override;
-
-  virtual std::string str() const override;
-  virtual std::string repr() const override;
-
-protected:
-  OctobanTessellation() = default;
-  friend class Tessellation;
+  virtual io::CellOrientation cell_orientation(position_t position, board_size_t width,
+                                               board_size_t height) const override;
 };
 
 } // namespace game

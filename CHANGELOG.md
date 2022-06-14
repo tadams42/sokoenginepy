@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.0 (unreleased)
+
+- massive refactoring and cleanup or public API
+- cleanly separated I/O from game engine (both architecturally and in implementation)
+  - `VariantBoard` monstrosity is gone
+  - Tessellation selection via inelegant and unsafe strings is gone
+- replaced hand written parsers with Boost.X3 on C++ side and Lark on Python side
+- implemented parts of I/O that were missing on C++ side
+- integrated C++ docs into Sphinx generated documentation
+  - all docs (Python and C++) are available in the same place
+  - Doxygen docs remain available and up to date
+
 ## 0.5.4 (2022-03-06)
 
 - improved build process for Python native extension

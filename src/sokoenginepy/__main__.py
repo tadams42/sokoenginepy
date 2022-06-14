@@ -1,4 +1,5 @@
-from .game.utilities import run_benchmarks
+from .game.utilities.mover_benchmarks import run_benchmarks
+
 
 if __name__ == "__main__":
     run_benchmarks()

@@ -2,17 +2,16 @@
 
 using namespace std;
 
-using sokoengine::Config;
+using sokoengine::game::Config;
 using sokoengine::game::BoardSizeExceededError;
 using sokoengine::game::BoxGoalSwitchError;
 using sokoengine::game::CellAlreadyOccupiedError;
 using sokoengine::game::IllegalMoveError;
 using sokoengine::game::KeyError;
 using sokoengine::game::NonPlayableBoardError;
-using sokoengine::game::position_t;
+using sokoengine::position_t;
 using sokoengine::game::Positions;
 using sokoengine::game::SokobanPlusDataError;
-using sokoengine::io::is_blank;
 using sokoengine::io::Strings;
 
 void export_pusher_step(py::module &);
@@ -56,7 +55,7 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   py::register_exception<KeyError>(m_game, "ExtKeyError", PyExc_KeyError);
 
   py::register_exception<BoardSizeExceededError>(m_game, "BoardSizeExceededError",
-                                                 PyExc_RuntimeError);
+                                                 PyExc_ValueError);
   export_pusher_step(m_game);
   export_board_cell(m_game);
   export_board_graph(m_game);
@@ -64,8 +63,6 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   export_sokoban_plus(m_game);
   export_board_manager(m_game);
   export_mover(m_game);
-
-  m_io.def("is_blank", &is_blank);
   export_io_snapshot(m_io);
   export_io_puzzle(m_io);
   export_io_collection(m_io);

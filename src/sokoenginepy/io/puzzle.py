@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 import re
 import textwrap
 from functools import reduce
@@ -11,8 +12,20 @@ from .snapshot import Snapshot
 from .utilities import contains_only_digits_and_spaces, is_blank
 
 if TYPE_CHECKING:
-    from ..game import AnyTessellation, TessellationOrDescription
+    from ..game import BaseTessellation, Tessellation
     from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
+
+
+class CellOrientation(enum.Enum):
+    """
+    Dynamic board cell property that depends on cell position in some tessellations.
+    ie. in Trioban, origin of coordinate system is triangle pointing upwards. This means
+    that orientation of all other triangles depends on orientation of origin.
+    """
+
+    DEFAULT = 0
+    TRIANGLE_DOWN = 1
+    OCTAGON = 2
 
 
 class Puzzle:
@@ -135,7 +148,7 @@ class Puzzle:
     @classmethod
     def instance_from(
         cls,
-        tessellation_or_description: TessellationOrDescription = "sokoban",
+        tessellation: Tessellation,
         width: int = 0,
         height: int = 0,
         board: Optional[str] = None,
@@ -143,13 +156,13 @@ class Puzzle:
         """
         Factory method. Produces instance of one of the subclasses.
         """
-        from ..game import Tessellation
+        from ..game import BaseTessellation
         from .hexoban import HexobanPuzzle
         from .octoban import OctobanPuzzle
         from .sokoban import SokobanPuzzle
         from .trioban import TriobanPuzzle
 
-        tessellation_instance = Tessellation.instance_from(tessellation_or_description)
+        tessellation_instance = BaseTessellation.instance(tessellation)
 
         for klass in [HexobanPuzzle, OctobanPuzzle, SokobanPuzzle, TriobanPuzzle]:
             if (
@@ -160,11 +173,11 @@ class Puzzle:
             ):
                 return klass(width=width, height=height, board=board)
 
-        raise ValueError(tessellation_or_description)
+        raise ValueError(tessellation)
 
     def __init__(
         self,
-        tessellation_or_description: TessellationOrDescription,
+        tessellation: Tessellation,
         width: int = 0,
         height: int = 0,
         board: Optional[str] = None,
@@ -172,7 +185,6 @@ class Puzzle:
         parser_cls: Optional[Type[PuzzleParser]] = None,
         printer_cls: Optional[Type[PuzzlePrinter]] = None,
     ):
-        from ..game import Tessellation
         from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
 
         self.title = ""
@@ -187,9 +199,8 @@ class Puzzle:
         self._boxes_count: Optional[int] = None
         self._goals_count: Optional[int] = None
 
-        self._tessellation: AnyTessellation = Tessellation.instance_from(
-            tessellation_or_description
-        )
+        self._tessellation: Tessellation = tessellation
+        self._tessellation_obj_val: Optional[BaseTessellation] = None
         self._resizer_cls: Type[PuzzleResizer] = resizer_cls or PuzzleResizer
         self._parser_cls: Type[PuzzleParser] = parser_cls or PuzzleParser
         self._printer_cls: Type[PuzzlePrinter] = printer_cls or PuzzlePrinter
@@ -221,8 +232,21 @@ class Puzzle:
                 raise ValueError("Invalid characters in board string!")
 
     @property
-    def tessellation(self) -> AnyTessellation:
+    def tessellation(self) -> Tessellation:
         return self._tessellation
+
+    @property
+    def _tessellation_obj(self):
+        from ..game import BaseTessellation
+
+        if self._tessellation_obj_val is None:
+            self._tessellation_obj_val = BaseTessellation.instance(self._tessellation)
+
+        return self._tessellation_obj_val
+
+    def cell_orientation(self, pos: int) -> CellOrientation:
+        self._reparse_if_not_parsed()
+        return self._tessellation_obj.cell_orientation(pos, self.width, self.height)
 
     def __getitem__(self, position: int) -> str:
         self._reparse_if_not_parsed()

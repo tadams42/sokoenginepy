@@ -4,8 +4,8 @@ using namespace std;
 using sokoengine::game::BoardGraph;
 using sokoengine::game::Mover;
 using sokoengine::game::PusherStep;
-using sokoengine::game::SolvingMode;
 using sokoengine::game::PusherSteps;
+using sokoengine::game::SolvingMode;
 
 void export_mover(py::module &m) {
   py::enum_<SolvingMode>(m, "SolvingMode")
@@ -16,10 +16,8 @@ void export_mover(py::module &m) {
     ;
 
   py::class_<Mover>(m, "Mover")
-    .def(py::init([](BoardGraph &board, const SolvingMode &solving_mode) {
-           return make_unique<Mover>(board, solving_mode);
-         }),
-         py::arg("board"), py::arg("solving_mode") = SolvingMode::FORWARD)
+    .def(py::init<BoardGraph &, SolvingMode>(), py::arg("board"),
+         py::arg("solving_mode") = SolvingMode::FORWARD)
 
     .def_property_readonly("board", &Mover::board, py::return_value_policy::reference)
 

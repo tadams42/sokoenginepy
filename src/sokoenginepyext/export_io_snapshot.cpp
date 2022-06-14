@@ -46,8 +46,7 @@ void export_io_snapshot(py::module &m) {
   pySnapshot.def("__str__", &Snapshot::str);
   pySnapshot.def("__repr__", &Snapshot::repr);
 
-  pySnapshot.def_property_readonly("tessellation", &Snapshot::tessellation,
-                                   py::return_value_policy::reference);
+  pySnapshot.def_property_readonly("tessellation", &Snapshot::tessellation);
 
   pySnapshot.def_property(
     "moves_data", [](const Snapshot &self) { return self.moves_data(); },

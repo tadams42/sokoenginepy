@@ -2,15 +2,21 @@ from __future__ import annotations
 
 from typing import Final, Mapping, Optional, Tuple
 
-from ..io import Snapshot
-from .cell_orientation import CellOrientation
-from .direction import Direction
-from .graph_type import GraphType
-from .tessellation_base import TessellationBase
-from .utilities import COLUMN, ROW, index_1d, inverted, is_on_board_2d
+from ..io import CellOrientation, Snapshot
+from .base_tessellation import (
+    COLUMN,
+    ROW,
+    BaseTessellation,
+    Direction,
+    GraphType,
+    index_1d,
+    is_on_board_2d,
+)
+from .config import Direction, GraphType
+from .utilities import inverted
 
 
-class TriobanTessellation(TessellationBase):
+class TriobanTessellation(BaseTessellation):
     """
     Board is laid out on alternating triangles with origin triangle pointing down.
 
@@ -127,6 +133,3 @@ class TriobanTessellation(TessellationBase):
             if (column + (row % 2)) % 2 == 0
             else CellOrientation.DEFAULT
         )
-
-    def __str__(self):
-        return "trioban"

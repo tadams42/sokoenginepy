@@ -1,13 +1,13 @@
 #include "rle.hpp"
 
-#include "config.hpp"
 #include "evaluator.hpp"
 #include "grammar.hpp"
 #include "json_printer.hpp"
+#include "rle_config.hpp"
 
-#include <iostream>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <iostream>
 #include <sstream>
 
 using namespace std;
@@ -122,9 +122,7 @@ string Rle::decode(const string &line) {
   ostringstream out, err;
   bool retv = sok_rle::parse_to_eval(line, out, err);
 
-  if (!retv) {
-    throw invalid_argument(err.str());
-  }
+  if (!retv) { throw invalid_argument(err.str()); }
 
   return out.str();
 }
@@ -133,9 +131,7 @@ string Rle::ast_json(const string &line) {
   ostringstream out, err;
   bool retv = sok_rle::parse_to_ast(line, out, err);
 
-  if (!retv) {
-    throw invalid_argument(err.str());
-  }
+  if (!retv) { throw invalid_argument(err.str()); }
 
   return out.str();
 }

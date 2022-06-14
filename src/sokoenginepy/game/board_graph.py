@@ -1,25 +1,20 @@
+from __future__ import annotations
+
 from collections import deque
-from enum import IntEnum
 from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import networkx as nx
 
 from ..io import Puzzle
+from .base_tessellation import BaseTessellation, Tessellation
 from .board_cell import BoardCell
-from .direction import Direction
-from .graph_type import GraphType
-from .tessellation import AnyTessellation, Tessellation
+from .config import Config, Direction, GraphType
 
 # (1, 0, {'direction': Direction.LEFT})
 Edge = Tuple[int, int, Dict[str, Union[Direction, int]]]
 BoardCellOrStr = Union[BoardCell, str]
 Positions = List[int]
 Directions = List[Direction]
-
-
-class EngineConfig(IntEnum):
-    MAX_BOARD_WIDTH = 4096
-    MAX_BOARD_HEIGHT = 4096
 
 
 class BoardGraph:
@@ -35,10 +30,7 @@ class BoardGraph:
     _MAX_EDGE_WEIGHT = 100  # must be > len(Direction)
 
     def __init__(self, puzzle: Puzzle):
-        if (
-            puzzle.width > EngineConfig.MAX_BOARD_HEIGHT
-            or puzzle.height > EngineConfig.MAX_BOARD_HEIGHT
-        ):
+        if puzzle.width > Config.MAX_HEIGHT or puzzle.height > Config.MAX_WIDTH:
             raise ValueError(
                 "Board width and height must be >= 0 and <= MAX_BOARD_WIDTH, "
                 "MAX_BOARD_HEIGHT`!"
@@ -46,16 +38,15 @@ class BoardGraph:
 
         self._board_width = puzzle.width
         self._board_height = puzzle.height
-        self._tessellation = Tessellation.instance_from(puzzle.tessellation)
+        self._tessellation = puzzle.tessellation
 
-        if self._tessellation.graph_type == GraphType.DIRECTED:
+        tessellation = BaseTessellation.instance(self._tessellation)
+        if tessellation.graph_type == GraphType.DIRECTED:
             self._graph = nx.DiGraph()
-        elif self._tessellation.graph_type == GraphType.DIRECTED_MULTI:
+        elif tessellation.graph_type == GraphType.DIRECTED_MULTI:
             self._graph = nx.MultiDiGraph()
         else:
-            raise ValueError(
-                f"Unknown graph_type: {self._tessellation.graph_type.name}!"
-            )
+            raise ValueError(f"Unknown graph_type: {tessellation.graph_type.name}!")
 
         for position in range(0, self.board_width * self.board_height):
             self._graph.add_node(
@@ -90,7 +81,7 @@ class BoardGraph:
         return position in self._graph
 
     @property
-    def tessellation(self) -> AnyTessellation:
+    def tessellation(self) -> Tessellation:
         return self._tessellation
 
     def to_board_str(self, use_visible_floor=False, rle_encode=False) -> str:
@@ -407,10 +398,12 @@ class BoardGraph:
         return retv
 
     def reconfigure_edges(self):
+        tessellation = BaseTessellation.instance(self.tessellation)
+
         self.remove_all_edges()
         for src in range(self.vertices_count):
-            for direction in self._tessellation.legal_directions:
-                neighbor_position = self._tessellation.neighbor_position(
+            for direction in tessellation.legal_directions:
+                neighbor_position = tessellation.neighbor_position(
                     src, direction, self.board_width, self.board_height
                 )
                 if neighbor_position is not None:

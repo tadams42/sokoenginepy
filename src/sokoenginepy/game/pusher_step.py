@@ -1,7 +1,6 @@
 from typing import Optional
 
-from .direction import Direction
-from .piece import DEFAULT_PIECE_ID
+from .config import Config, Direction
 
 
 class PusherStep:
@@ -34,7 +33,7 @@ class PusherStep:
         box_moved: bool = False,
         is_jump: bool = False,
         is_pusher_selection: bool = False,
-        pusher_id: int = DEFAULT_PIECE_ID,
+        pusher_id: int = Config.DEFAULT_PIECE_ID,
         moved_box_id: Optional[int] = None,
         is_current_pos: bool = False,
     ):
@@ -117,7 +116,7 @@ class PusherStep:
         Updates ID of moved box and if this ID is valid, also changes this to
         push/pull. If removing ID, changes this to not-push/not-pull
         """
-        if isinstance(value, int) and value >= DEFAULT_PIECE_ID:
+        if isinstance(value, int) and value >= Config.DEFAULT_PIECE_ID:
             self._moved_box_id = value
             self.is_push_or_pull = True
         else:
@@ -133,12 +132,12 @@ class PusherStep:
     def pusher_id(self, value: int):
         """
         Note:
-            Pusher ID can't be None, thus we always set it to DEFAULT_PIECE_ID
+            Pusher ID can't be None, thus we always set it to Config.DEFAULT_PIECE_ID
         """
-        if isinstance(value, int) and value >= DEFAULT_PIECE_ID:
+        if isinstance(value, int) and value >= Config.DEFAULT_PIECE_ID:
             self._pusher_id = value
         else:
-            self._pusher_id = DEFAULT_PIECE_ID
+            self._pusher_id = Config.DEFAULT_PIECE_ID
 
     @property
     def is_move(self) -> bool:

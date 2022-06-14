@@ -10,7 +10,9 @@ from .snapshot import Snapshot
 
 class HexobanSnapshot(Snapshot):
     def __init__(self, moves_data: str = ""):
-        super().__init__(tessellation_or_description="hexoban", moves_data=moves_data)
+        from ..game import Tessellation
+
+        super().__init__(tessellation=Tessellation.HEXOBAN, moves_data=moves_data)
 
 
 class HexobanPuzzle(Puzzle):
@@ -22,8 +24,10 @@ class HexobanPuzzle(Puzzle):
             board: If not blank, it will be parsed and board will be created from it,
                 ignoring ``width`` and ``height``.
         """
+        from ..game import Tessellation
+
         super().__init__(
-            tessellation_or_description="hexoban",
+            tessellation=Tessellation.HEXOBAN,
             width=width,
             height=height,
             board=board,

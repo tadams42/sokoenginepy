@@ -1,7 +1,7 @@
 #ifndef BENCHMARKS_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BENCHMARKS_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
+#include "config.hpp"
 
 namespace sokoengine {
 

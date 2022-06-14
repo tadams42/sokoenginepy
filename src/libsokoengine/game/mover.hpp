@@ -1,7 +1,7 @@
 #ifndef MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "direction.hpp"
+#include "config.hpp"
 
 #include <deque>
 #include <memory>
@@ -23,7 +23,7 @@ enum class LIBSOKOENGINE_API SolvingMode : uint8_t {
 };
 
 ///
-/// Exception.
+/// @exception.
 ///
 class LIBSOKOENGINE_API NonPlayableBoardError : public std::runtime_error {
 public:
@@ -32,7 +32,7 @@ public:
 };
 
 ///
-/// Exception.
+/// @exception.
 ///
 class LIBSOKOENGINE_API IllegalMoveError : public std::runtime_error {
 public:
@@ -50,7 +50,7 @@ typedef std::vector<PusherStep> PusherSteps;
 ///
 class LIBSOKOENGINE_API Mover {
 public:
-  explicit Mover(BoardGraph &board, const SolvingMode &mode = SolvingMode::FORWARD);
+  explicit Mover(BoardGraph &board, SolvingMode mode = SolvingMode::FORWARD);
   Mover(const Mover &) = delete;
   Mover(Mover &&rv);
   Mover &operator=(const Mover &) = delete;

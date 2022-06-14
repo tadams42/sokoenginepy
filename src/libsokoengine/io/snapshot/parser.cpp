@@ -1,15 +1,15 @@
 #include "parser.hpp"
 
-#include "config.hpp"
 #include "error_handler.hpp"
-#include "grammar.hpp"
 #include "evaluator.hpp"
+#include "grammar.hpp"
 #include "json_printer.hpp"
+#include "snapshot_config.hpp"
 
-using std::string;
-using std::ostream;
 using std::endl;
+using std::ostream;
 using std::ostringstream;
+using std::string;
 
 namespace sokoengine {
 namespace io {
@@ -45,8 +45,7 @@ LIBSOKOENGINE_LOCAL bool _parse(iterator_type &iter, iterator_type end,
 //
 // This one is mainly for experimentation and grammar debugging purposes.
 //
-LIBSOKOENGINE_LOCAL bool parse_to_ast(const string &src, ostream &dest,
-                                      ostream &err) {
+LIBSOKOENGINE_LOCAL bool parse_to_ast(const string &src, ostream &dest, ostream &err) {
   iterator_type iter = src.begin();
   iterator_type end = src.end();
   ast::Snapshot ast;
@@ -92,9 +91,7 @@ SnapshotData Parser::parse(const string &src) {
   ostringstream err;
   bool retv = parse_to_eval(src, out, err);
 
-  if (!retv) {
-    throw std::invalid_argument(err.str());
-  }
+  if (!retv) { throw std::invalid_argument(err.str()); }
 
   return out;
 }
@@ -103,9 +100,7 @@ string Parser::ast_json(const string &line) {
   ostringstream out, err;
   bool retv = parse_to_ast(line, out, err);
 
-  if (!retv) {
-    throw std::invalid_argument(err.str());
-  }
+  if (!retv) { throw std::invalid_argument(err.str()); }
 
   return out.str();
 }

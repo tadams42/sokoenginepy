@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Final, List, Optional
 
-from .piece import DEFAULT_PIECE_ID
+from .config import Config
 
 
 class SokobanPlusDataError(ValueError):
@@ -246,7 +246,7 @@ class SokobanPlus:
 
         retv = dict()
         for index, plus_id in enumerate(expanded):
-            retv[DEFAULT_PIECE_ID + index] = plus_id
+            retv[Config.DEFAULT_PIECE_ID + index] = plus_id
 
         return retv
 

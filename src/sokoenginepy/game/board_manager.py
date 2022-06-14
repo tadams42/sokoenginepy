@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Tuple
 
 from . import utilities
 from .board_state import BoardState
-from .piece import DEFAULT_PIECE_ID
+from .config import Config
 from .sokoban_plus import SokobanPlus
 
 if TYPE_CHECKING:
@@ -31,7 +31,7 @@ class BoardManager:
       that piece in various contexts.
 
       IDs are assigned by simply counting from top left corner of board, starting
-      with :data:`.DEFAULT_PIECE_ID`
+      with :data:`Config.DEFAULT_PIECE_ID`
 
       .. image:: /images/assigning_ids.png
           :alt: Assigning board elements' IDs
@@ -82,7 +82,7 @@ class BoardManager:
         self._pushers = utilities.Flipdict()
         self._walls: List[int] = []
 
-        pusher_id = box_id = goal_id = DEFAULT_PIECE_ID
+        pusher_id = box_id = goal_id = Config.DEFAULT_PIECE_ID
 
         for position in range(0, board.vertices_count):
             cell = board[position]
@@ -495,7 +495,7 @@ class BoardManager:
         def is_valid_solution(boxes_positions):
             retv = True
             for index, box_position in enumerate(boxes_positions):
-                box_id = index + DEFAULT_PIECE_ID
+                box_id = index + Config.DEFAULT_PIECE_ID
                 box_plus_id = self.box_plus_id(box_id)
                 goal_id = self.goal_id_on(box_position)
                 goal_plus_id = self.goal_plus_id(goal_id)

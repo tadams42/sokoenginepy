@@ -1,15 +1,67 @@
 from __future__ import annotations
 
+import enum
 from abc import ABCMeta, abstractmethod
-from typing import ClassVar, Mapping, Optional, Tuple
+from typing import TYPE_CHECKING, ClassVar, Mapping, Optional, Tuple, Union
 
+from ..io import CellOrientation
+from .config import Direction, GraphType
 from .pusher_step import PusherStep
-from .cell_orientation import CellOrientation
-from .direction import Direction
-from .graph_type import GraphType
+
+if TYPE_CHECKING:
+    from .hexoban_tessellation import HexobanTessellation
+    from .octoban_tessellation import OctobanTessellation
+    from .sokoban_tessellation import SokobanTessellation
+    from .trioban_tessellation import TriobanTessellation
 
 
-class TessellationBase(metaclass=ABCMeta):
+class Tessellation(enum.Enum):
+    SOKOBAN = 0
+    HEXOBAN = 1
+    TRIOBAN = 2
+    OCTOBAN = 3
+
+
+def index_1d(x: int, y: int, board_width: int) -> int:
+    """Converts 2D coordinate to board position index."""
+    return y * board_width + x
+
+
+def X(index: int, board_width: int) -> int:
+    """x component of board position index."""
+    return 0 if board_width == 0 else index % board_width
+
+
+def Y(index: int, board_width: int) -> int:
+    """y component of board position index."""
+    return 0 if board_width == 0 else int(index / board_width)
+
+
+def ROW(index: int, board_width: int) -> int:
+    """x component of board position index."""
+    return Y(index, board_width)
+
+
+def COLUMN(index: int, board_width: int) -> int:
+    """y component of board position index."""
+    return X(index, board_width)
+
+
+def is_on_board_2d(x: int, y: int, board_width: int, board_height: int) -> bool:
+    return x >= 0 and y >= 0 and x < board_width and y < board_height
+
+
+def is_on_board_1d(index: Optional[int], board_width: int, board_height: int) -> bool:
+    return (
+        index is not None
+        and index >= 0
+        and is_on_board_2d(
+            X(index, board_width), Y(index, board_width), board_width, board_height
+        )
+    )
+
+
+class BaseTessellation(metaclass=ABCMeta):
     """
     Base class for all tessellation implementations.
     """
@@ -17,6 +69,31 @@ class TessellationBase(metaclass=ABCMeta):
     _LEGAL_DIRECTIONS: ClassVar[Tuple[Direction, ...]] = tuple()
     _CHR_TO_PUSHER_STEP: ClassVar[Mapping[str, Tuple[Direction, bool]]] = {}
     _PUSHER_STEP_TO_CHR: ClassVar[Mapping[Tuple[Direction, bool], str]] = {}
+
+    @classmethod
+    def instance(
+        cls, tessellation: Tessellation
+    ) -> Union[
+        TriobanTessellation,
+        OctobanTessellation,
+        HexobanTessellation,
+        SokobanTessellation,
+    ]:
+        from .hexoban_tessellation import HexobanTessellation
+        from .octoban_tessellation import OctobanTessellation
+        from .sokoban_tessellation import SokobanTessellation
+        from .trioban_tessellation import TriobanTessellation
+
+        if tessellation == Tessellation.SOKOBAN:
+            return SokobanTessellation()
+        elif tessellation == Tessellation.HEXOBAN:
+            return HexobanTessellation()
+        elif tessellation == Tessellation.TRIOBAN:
+            return TriobanTessellation()
+        elif tessellation == Tessellation.OCTOBAN:
+            return OctobanTessellation()
+        else:
+            raise ValueError("Unknown tessellation!")
 
     @property
     def legal_directions(self) -> Tuple[Direction, ...]:
@@ -92,9 +169,3 @@ class TessellationBase(metaclass=ABCMeta):
         Calculates board cell orientation for given coordinate.
         """
         return CellOrientation.DEFAULT
-
-    def __eq__(self, rv):
-        return self.__class__.__name__ == rv.__class__.__name__
-
-    def __ne__(self, other):
-        return not self == other

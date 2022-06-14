@@ -1,5 +1,4 @@
 #include "sokoban_plus.hpp"
-#include "utilities.hpp"
 
 #include <map>
 #include <set>

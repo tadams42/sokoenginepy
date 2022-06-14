@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, List
+from typing import TYPE_CHECKING, Final, List, Optional
 
 from .rle import Rle
 from .utilities import contains_only_digits_and_spaces, is_blank
 
 if TYPE_CHECKING:
-    from ..game import AnyTessellation, PusherStep, TessellationOrDescription
+    from ..game import BaseTessellation, PusherStep, Tessellation
     from .snapshot_parsing import MovementTokens
 
 
@@ -88,13 +88,7 @@ class Snapshot:
             )
         )
 
-    def __init__(
-        self,
-        tessellation_or_description: TessellationOrDescription = "sokoban",
-        moves_data: str = "",
-    ):
-        from ..game import Tessellation
-
+    def __init__(self, tessellation: Tessellation, moves_data: str = ""):
         self.id = 0
         self.title: str = ""
         self.duration: str = ""
@@ -103,7 +97,8 @@ class Snapshot:
         self.created_at: str = ""
         self.updated_at: str = ""
 
-        self._tessellation = Tessellation.instance_from(tessellation_or_description)
+        self._tessellation = tessellation
+        self._tessellation_obj_val: Optional[BaseTessellation] = None
 
         if not is_blank(moves_data) and not self.is_snapshot(moves_data):
             raise ValueError("Invalid characters in snapshot string!")
@@ -141,8 +136,17 @@ class Snapshot:
         return f'{klass}(moves_data="{self.to_str(rle_encode=False)}")'
 
     @property
-    def tessellation(self) -> AnyTessellation:
+    def tessellation(self) -> Tessellation:
         return self._tessellation
+
+    @property
+    def _tessellation_obj(self):
+        from ..game import BaseTessellation
+
+        if self._tessellation_obj_val is None:
+            self._tessellation_obj_val = BaseTessellation.instance(self._tessellation)
+
+        return self._tessellation_obj_val
 
     @property
     def moves_data(self) -> str:
@@ -161,7 +165,9 @@ class Snapshot:
         Game engine representation of pusher movement.
         """
         self._reparse_if_not_parsed()
-        return sum((_.pusher_steps(self.tessellation) for _ in self._parsed_moves), [])
+        return sum(
+            (_.pusher_steps(self._tessellation_obj) for _ in self._parsed_moves), []
+        )
 
     @pusher_steps.setter
     def pusher_steps(self, rv: List[PusherStep]):
@@ -185,7 +191,7 @@ class Snapshot:
             if rv[i].is_jump:
                 jump = Jump("")
                 while i < iend and rv[i].is_jump:
-                    jump.data += self.tessellation.pusher_step_to_char(rv[i])
+                    jump.data += self._tessellation_obj.pusher_step_to_char(rv[i])
                     if rv[i].is_current_pos:
                         jump.data += self.CURRENT_POSITION_CH
                     i += 1
@@ -197,7 +203,7 @@ class Snapshot:
             elif rv[i].is_pusher_selection:
                 pusher_selection = PusherSelection("")
                 while i < iend and rv[i].is_pusher_selection:
-                    pusher_selection.data += self.tessellation.pusher_step_to_char(
+                    pusher_selection.data += self._tessellation_obj.pusher_step_to_char(
                         rv[i]
                     )
                     if rv[i].is_current_pos:
@@ -208,7 +214,7 @@ class Snapshot:
             else:
                 steps = Steps("")
                 while i < iend and not rv[i].is_jump and not rv[i].is_pusher_selection:
-                    steps.data += self.tessellation.pusher_step_to_char(rv[i])
+                    steps.data += self._tessellation_obj.pusher_step_to_char(rv[i])
                     if rv[i].is_current_pos:
                         steps.data += self.CURRENT_POSITION_CH
                     i += 1

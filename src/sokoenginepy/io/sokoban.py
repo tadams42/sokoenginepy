@@ -8,7 +8,9 @@ from .snapshot import Snapshot
 
 class SokobanSnapshot(Snapshot):
     def __init__(self, moves_data: str = ""):
-        super().__init__(tessellation_or_description="sokoban", moves_data=moves_data)
+        from ..game import Tessellation
+
+        super().__init__(tessellation=Tessellation.SOKOBAN, moves_data=moves_data)
 
 
 class SokobanPuzzle(Puzzle):
@@ -20,9 +22,8 @@ class SokobanPuzzle(Puzzle):
             board: If not blank, it will be parsed and board will be created from it,
                 ignoring ``width`` and ``height``.
         """
+        from ..game import Tessellation
+
         super().__init__(
-            tessellation_or_description="sokoban",
-            width=width,
-            height=height,
-            board=board,
+            tessellation=Tessellation.SOKOBAN, width=width, height=height, board=board
         )

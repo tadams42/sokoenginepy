@@ -1,20 +1,18 @@
 #include "hexoban.hpp"
 
-#include "hexoban_tessellation.hpp"
 #include "rle.hpp"
-#include "utilities.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 
 using namespace std;
-using namespace boost;
 
 namespace sokoengine {
 namespace io {
 
+using game::Config;
+using game::Tessellation;
 using game::index_1d;
-using game::position_t;
 using game::X;
 using game::Y;
 
@@ -75,12 +73,12 @@ public:
 HexobanPuzzle::HexobanPuzzle() : HexobanPuzzle(0, 0) {}
 
 HexobanPuzzle::HexobanPuzzle(board_size_t width, board_size_t height)
-  : Puzzle(game::Tessellation::HEXOBAN, hb_static_resizer(), hb_static_parser(),
+  : Puzzle(Tessellation::HEXOBAN, hb_static_resizer(), hb_static_parser(),
            hb_static_printer(), width, height),
     m_impl(make_unique<PIMPL>()) {}
 
 HexobanPuzzle::HexobanPuzzle(const string &src)
-  : Puzzle(game::Tessellation::HEXOBAN, hb_static_resizer(), hb_static_parser(),
+  : Puzzle(Tessellation::HEXOBAN, hb_static_resizer(), hb_static_parser(),
            hb_static_printer(), src),
     m_impl(make_unique<PIMPL>()) {}
 
@@ -110,10 +108,10 @@ const HexobanPuzzle::Snapshots &HexobanPuzzle::snapshots() const {
 }
 HexobanPuzzle::Snapshots &HexobanPuzzle::snapshots() { return m_impl->m_snapshots; }
 
-HexobanSnapshot::HexobanSnapshot() : Snapshot(game::Tessellation::HEXOBAN, "") {}
+HexobanSnapshot::HexobanSnapshot() : Snapshot(Tessellation::HEXOBAN, "") {}
 
 HexobanSnapshot::HexobanSnapshot(const string &moves_data)
-  : Snapshot(game::Tessellation::HEXOBAN, moves_data) {}
+  : Snapshot(Tessellation::HEXOBAN, moves_data) {}
 
 HexobanSnapshot::HexobanSnapshot(const HexobanSnapshot &rv) : Snapshot(rv) {}
 
@@ -166,7 +164,7 @@ public:
     retv_list = PuzzleParser::normalize_width(retv_list, floor);
     if (is_type1(retv_list)) { remove_column_right(retv_list); }
 
-    return join(retv_list, "\n");
+    return boost::join(retv_list, "\n");
   }
 
   bool is_type1(const Strings &list) const {

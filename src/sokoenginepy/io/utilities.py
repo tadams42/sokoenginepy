@@ -1,7 +1,7 @@
 import itertools
 import re
 from functools import reduce
-from typing import List, Optional, Tuple
+from typing import Optional
 
 _RE_ONLY_DIGITS_AND_SPACES = re.compile(r"^([0-9\s])*$")
 

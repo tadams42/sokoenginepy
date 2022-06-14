@@ -5,6 +5,7 @@
 #include "hashed_board_manager.hpp"
 #include "pusher_step.hpp"
 #include "puzzle.hpp"
+#include "tessellation.hpp"
 
 #include "cppitertools/groupby.hpp"
 
@@ -109,7 +110,7 @@ public:
     if (in_front_of_pusher > Config::MAX_POS) {
       throw IllegalMoveError(
         "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-        ", direction: " + direction_str(direction) + ")");
+        ", direction: " + BaseTessellation::direction_str(direction) + ")");
     }
 
     bool is_push = false;
@@ -119,9 +120,10 @@ public:
       is_push = true;
       in_front_of_box = m_manager.board().neighbor(in_front_of_pusher, direction);
       if (in_front_of_box > Config::MAX_POS) {
-        throw IllegalMoveError("Can't push box off board (ID: " +
-                               std::to_string(m_manager.box_id_on(in_front_of_pusher)) +
-                               ", direction: " + direction_str(direction) + ")");
+        throw IllegalMoveError(
+          "Can't push box off board (ID: " +
+          std::to_string(m_manager.box_id_on(in_front_of_pusher)) +
+          ", direction: " + BaseTessellation::direction_str(direction) + ")");
       }
 
       try {
@@ -155,7 +157,7 @@ public:
     if (in_front_of_pusher > Config::MAX_POS) {
       throw IllegalMoveError(
         "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-        ", direction: " + direction_str(direction) + ")");
+        ", direction: " + BaseTessellation::direction_str(direction) + ")");
     }
 
     try {
@@ -276,7 +278,7 @@ protected:
   PIMPL &operator=(const PIMPL &) = delete;
 };
 
-Mover::Mover(BoardGraph &board, const SolvingMode &mode)
+Mover::Mover(BoardGraph &board, SolvingMode mode)
   : m_impl(std::make_unique<PIMPL>(board, mode)) {}
 
 Mover::Mover(Mover &&) = default;

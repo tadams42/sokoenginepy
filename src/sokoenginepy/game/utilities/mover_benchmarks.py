@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 import operator
+import textwrap
 import time
 from enum import IntEnum
 from functools import reduce
-from textwrap import dedent
+
+from sokoenginepy.game import BoardGraph, Direction, Mover, SolvingMode
+from sokoenginepy.io import SokobanPuzzle
 
 
 class BoardType(IntEnum):
@@ -10,28 +15,20 @@ class BoardType(IntEnum):
     LARGE = 2
 
     @property
-    def board(self):
-        from ..sokoban_board import SokobanBoard
-
+    def puzzle(self) -> SokobanPuzzle:
         if self == self.SMALL:
-            return SokobanBoard(
-                board_str=dedent(
-                    """
+            data = """
                 ##########
                 #      **#
                 #      **#
                 # *@   **#
                 #      **#
                 ##########
-            """[
-                        1:-1
-                    ]
-                )
-            )
+            """
+            data = textwrap.dedent(data.lstrip("\n").rstrip())
+            return SokobanPuzzle(board=data)
         else:
-            return SokobanBoard(
-                board_str=dedent(
-                    """
+            data = """
                 ######################################
                 #************************************#
                 #************************************#
@@ -57,11 +54,8 @@ class BoardType(IntEnum):
                 #************************************#
                 #************************************#
                 ######################################
-            """[
-                        1:-1
-                    ]
-                )
-            )
+            """
+            return SokobanPuzzle(board=data)
 
 
 class BenchmarkType(IntEnum):
@@ -69,17 +63,15 @@ class BenchmarkType(IntEnum):
     REVERSE_MOVER = 1
 
     @property
-    def is_reverse(self):
+    def is_reverse(self) -> bool:
         return self == self.REVERSE_MOVER
 
     @property
-    def title(self):
+    def title(self) -> str:
         return self.name.replace("_", " ").lower().title()
 
     @property
-    def direction(self):
-        from ..direction import Direction
-
+    def direction(self) -> Direction:
         if self == self.FORWARD_MOVER:
             return Direction.LEFT
         else:
@@ -87,17 +79,18 @@ class BenchmarkType(IntEnum):
 
 
 class MovementBenchmark:
-    def __init__(self, board_type, benchmark_type, moves_count):
-        from ..mover import Mover
-        from ..solving_mode import SolvingMode
-
+    def __init__(
+        self, board_type: BoardType, benchmark_type: BenchmarkType, moves_count: int
+    ):
         self.milliseconds_used = 0
         self.board_type = board_type
         self.benchmark_type = benchmark_type
         self.moves_count = moves_count
-        self.board = self.board_type.board
+        self.puzzle = self.board_type.puzzle
+        self.graph = BoardGraph(self.puzzle)
+
         self.mover = Mover(
-            self.board,
+            self.graph,
             (
                 SolvingMode.REVERSE
                 if self.benchmark_type.is_reverse
@@ -107,7 +100,7 @@ class MovementBenchmark:
         self.mover.pulls_boxes = True
 
     @property
-    def moves_per_second(self):
+    def moves_per_second(self) -> float:
         return self.moves_count / (self.milliseconds_used / 1000)
 
     def run(self):
@@ -131,7 +124,7 @@ class MovementBenchmark:
 
 
 class MovementBenchmarkPrinter:
-    def __init__(self, runs_count, moves_per_run_count):
+    def __init__(self, runs_count: int, moves_per_run_count: int):
         self.runs_count = runs_count
         self.moves_per_run_count = moves_per_run_count
 
@@ -141,17 +134,19 @@ class MovementBenchmarkPrinter:
         return (
             "{:<10} W:{:<5} H:{:<5} P:{:<5} B:{:<5}".format(
                 "Board: ",
-                benchmarker.mover.board.width,
-                benchmarker.mover.board.height,
+                benchmarker.puzzle.width,
+                benchmarker.puzzle.height,
                 benchmarker.mover.board_manager.pushers_count,
                 benchmarker.mover.board_manager.boxes_count,
             )
             + "\n"
             + str(benchmarker.mover.board)
-            + "Moves count: {0}".format(self.moves_per_run_count)
+            + "\nMoves count: {0}".format(self.moves_per_run_count)
         )
 
-    def run_and_print_experiment(self, board_type, benchmark_type, pivot_speed=None):
+    def run_and_print_experiment(
+        self, board_type: BoardType, benchmark_type: BenchmarkType, pivot_speed=None
+    ):
         speeds = []
         times = []
 
@@ -200,7 +195,7 @@ class MovementBenchmarkPrinter:
             runs = 10
             moves_per_run = 3e4
 
-        printer = MovementBenchmarkPrinter(runs, moves_per_run)
+        printer = MovementBenchmarkPrinter(runs, int(moves_per_run))
         print(printer.board_header(BoardType.SMALL))
 
         # Speed of early, not thoroughly tested, C++ only implementation

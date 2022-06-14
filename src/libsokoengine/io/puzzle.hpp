@@ -1,7 +1,7 @@
 #ifndef PUZZLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define PUZZLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "tessellation.hpp"
+#include "config.hpp"
 
 #include <memory>
 
@@ -74,13 +74,9 @@ public:
 
   typedef std::unique_ptr<Puzzle> unique_ptr_t;
 
-  static unique_ptr_t instance_from(const game::Tessellation &tessellation,
-                                    board_size_t width, board_size_t height);
-  static unique_ptr_t instance_from(const std::string &tessellation_name,
-                                    board_size_t width, board_size_t height);
-  static unique_ptr_t instance_from(const game::Tessellation &tessellation,
-                                    const std::string &board);
-  static unique_ptr_t instance_from(const std::string &tessellation_name,
+  static unique_ptr_t instance_from(game::Tessellation tessellation, board_size_t width,
+                                    board_size_t height);
+  static unique_ptr_t instance_from(game::Tessellation tessellation,
                                     const std::string &board);
 
   virtual unique_ptr_t clone() const = 0;
@@ -100,12 +96,13 @@ public:
   const std::string &updated_at() const;
   std::string &updated_at();
 
-  const game::Tessellation &tessellation() const;
+  game::Tessellation tessellation() const;
+  CellOrientation cell_orientation(position_t position) const;
 
-  char at(game::position_t position) const;
-  void set_at(game::position_t position, char c);
-  char operator[](game::position_t position) const;
-  void set(game::position_t position, char c);
+  char at(position_t position) const;
+  void set_at(position_t position, char c);
+  char operator[](position_t position) const;
+  void set(position_t position, char c);
 
   std::string str() const;
   std::string repr() const;

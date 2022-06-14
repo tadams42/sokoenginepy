@@ -1,7 +1,7 @@
 #ifndef ERROR_BDC825C2_4FAB_4173_9B94_185BD7430359
 #define ERROR_BDC825C2_4FAB_4173_9B94_185BD7430359
 
-#include "sokoengine_config.hpp"
+#include "config.hpp"
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>

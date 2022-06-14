@@ -1,14 +1,15 @@
 #include "snapshot.hpp"
 
 #include "ast.hpp"
-#include "hexoban.hpp"
-#include "octoban.hpp"
 #include "parser.hpp"
 #include "pusher_step.hpp"
 #include "rle.hpp"
+#include "tessellation.hpp"
+
+#include "hexoban.hpp"
+#include "octoban.hpp"
 #include "sokoban.hpp"
 #include "trioban.hpp"
-#include "utilities.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
@@ -17,9 +18,9 @@ namespace sokoengine {
 namespace io {
 
 using namespace std;
-using namespace implementation;
 using game::PusherStep;
 using game::PusherSteps;
+using game::BaseTessellation;
 using game::Tessellation;
 using snapshot_parsing::Parser;
 using snapshot_parsing::evaluated_ast::Jump;
@@ -36,8 +37,7 @@ public:
   string m_solver;
   Strings m_notes;
 
-  // Non-owned ptr
-  const Tessellation *m_tessellation = nullptr;
+  Tessellation m_tessellation;
 
   bool m_was_parsed = false;
   string m_moves_data;
@@ -48,7 +48,7 @@ public:
   bool m_is_reverse = false;
 
   PIMPL(const Tessellation &tessellation, const string &moves_data)
-    : m_tessellation(&tessellation), m_was_parsed(false), m_moves_data(moves_data) {}
+    : m_tessellation(tessellation), m_was_parsed(false), m_moves_data(moves_data) {}
 
   void reparse() {
     m_parsed_moves = SnapshotData();
@@ -78,7 +78,7 @@ public:
   }
 };
 
-Snapshot::Snapshot(const game::Tessellation &tessellation, const string &moves_data)
+Snapshot::Snapshot(const Tessellation &tessellation, const string &moves_data)
   : m_impl(make_unique<Snapshot::PIMPL>(tessellation, moves_data)) {
   if (!is_blank(moves_data) && !Snapshot::is_snapshot(moves_data)) {
     throw invalid_argument("Invalid characters in snapshot string!");
@@ -101,7 +101,7 @@ Snapshot &Snapshot::operator=(Snapshot &&rv) {
 
 Snapshot::~Snapshot() = default;
 
-const Tessellation &Snapshot::tessellation() const { return *(m_impl->m_tessellation); }
+Tessellation Snapshot::tessellation() const { return m_impl->m_tessellation; }
 
 const string &Snapshot::title() const { return m_impl->m_title; }
 string &Snapshot::title() { return m_impl->m_title; }
@@ -173,7 +173,8 @@ PusherSteps Snapshot::pusher_steps() const {
   m_impl->reparse_if_not_parsed();
 
   PusherSteps retv;
-  const Tessellation &tessellation = *(m_impl->m_tessellation);
+  const BaseTessellation &tessellation =
+    BaseTessellation::instance(m_impl->m_tessellation);
 
   for (const auto &part_variant : m_impl->m_parsed_moves) {
     std::visit(
@@ -198,11 +199,14 @@ void Snapshot::set_pusher_steps(const PusherSteps &rv) {
   m_impl->m_is_reverse = false;
   m_impl->m_was_parsed = true;
 
+  const BaseTessellation &tessellation =
+    BaseTessellation::instance(m_impl->m_tessellation);
+
   while (i < iend) {
     if (rv[i].is_jump()) {
       Jump jump;
       while (i < iend && rv[i].is_jump()) {
-        jump.data.append(1, m_impl->m_tessellation->pusher_step_to_char(rv[i]));
+        jump.data.append(1, tessellation.pusher_step_to_char(rv[i]));
         if (rv[i].is_current_pos()) { jump.data.append(1, CURRENT_POSITION_CH); }
         i++;
       }
@@ -215,8 +219,7 @@ void Snapshot::set_pusher_steps(const PusherSteps &rv) {
     else if (rv[i].is_pusher_selection()) {
       PusherSelection pusher_selection;
       while (i < iend && rv[i].is_pusher_selection()) {
-        pusher_selection.data.append(
-          1, m_impl->m_tessellation->pusher_step_to_char(rv[i]));
+        pusher_selection.data.append(1, tessellation.pusher_step_to_char(rv[i]));
         if (rv[i].is_current_pos()) {
           pusher_selection.data.append(1, CURRENT_POSITION_CH);
         }
@@ -228,7 +231,7 @@ void Snapshot::set_pusher_steps(const PusherSteps &rv) {
     else {
       Steps steps;
       while (i < iend && !rv[i].is_jump() && !rv[i].is_pusher_selection()) {
-        steps.data.append(1, m_impl->m_tessellation->pusher_step_to_char(rv[i]));
+        steps.data.append(1, tessellation.pusher_step_to_char(rv[i]));
         if (rv[i].is_current_pos()) { steps.data.append(1, CURRENT_POSITION_CH); }
         i++;
       }

@@ -2,6 +2,7 @@
 
 #include "pusher_step.hpp"
 #include "snapshot.hpp"
+#include "tessellation.hpp"
 
 #include <algorithm>
 
@@ -11,10 +12,10 @@ namespace snapshot_parsing {
 namespace evaluated_ast {
 
 using namespace std;
-using game::Tessellation;
+using game::BaseTessellation;
 
 LIBSOKOENGINE_LOCAL Converted converted(const string &data,
-                                        const Tessellation &tessellation) {
+                                        const BaseTessellation &tessellation) {
   Converted retv;
 
   for (char c : data) {
@@ -40,7 +41,7 @@ size_t Steps::moves_count() const {
 
 const string &Steps::to_str() const { return data; }
 
-Converted Steps::pusher_steps(const game::Tessellation &tessellation) const {
+Converted Steps::pusher_steps(const BaseTessellation &tessellation) const {
   return converted(data, tessellation);
 }
 
@@ -55,7 +56,7 @@ string Jump::to_str() const {
   return string(1, Snapshot::JUMP_BEGIN) + data + Snapshot::JUMP_END;
 }
 
-Converted Jump::pusher_steps(const game::Tessellation &tessellation) const {
+Converted Jump::pusher_steps(const BaseTessellation &tessellation) const {
   Converted retv = converted(data, tessellation);
   for (auto &s : retv)
     s.set_is_jump(true);
@@ -70,7 +71,7 @@ string PusherSelection::to_str() const {
   return string(1, Snapshot::PUSHER_CHANGE_BEGIN) + data + Snapshot::PUSHER_CHANGE_END;
 }
 
-Converted PusherSelection::pusher_steps(const game::Tessellation &tessellation) const {
+Converted PusherSelection::pusher_steps(const BaseTessellation &tessellation) const {
   Converted retv = converted(data, tessellation);
   for (auto &s : retv)
     s.set_is_pusher_selection(true);

@@ -1,7 +1,7 @@
 #ifndef BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
+#include "config.hpp"
 
 #include <map>
 #include <stdexcept>
@@ -14,7 +14,7 @@ class BoardGraph;
 class BoardState;
 
 ///
-/// Exception.
+/// @exception
 ///
 class LIBSOKOENGINE_API CellAlreadyOccupiedError : public std::runtime_error {
 public:
@@ -23,7 +23,7 @@ public:
 };
 
 ///
-/// Exception.
+/// @exception
 ///
 class LIBSOKOENGINE_API BoxGoalSwitchError : public std::runtime_error {
 public:

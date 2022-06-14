@@ -1,7 +1,7 @@
 #ifndef SOK_FILE_FORMAT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define SOK_FILE_FORMAT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
+#include "config.hpp"
 
 #include <iostream>
 
@@ -19,7 +19,7 @@ public:
   virtual ~SOKFileFormat();
 
   void read(std::istream &src, Collection &dest,
-            const std::string &puzzle_type_hint = "sokoban");
+            game::Tessellation tessellation_hint = game::Tessellation::SOKOBAN);
   bool write(const Puzzle &puzzle, std::ostream &dest);
   bool write(const Collection &collection, std::ostream &dest);
 };

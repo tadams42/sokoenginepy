@@ -1,5 +1,7 @@
 #include "pusher_step.hpp"
 
+#include "tessellation.hpp"
+
 #include <stdexcept>
 
 using namespace std;
@@ -53,17 +55,18 @@ bool PusherStep::operator==(const PusherStep &rv) const {
 bool PusherStep::operator!=(const PusherStep &rv) const { return !(*this == rv); }
 
 string PusherStep::str() const {
-  return string() + "PusherStep(" + direction_str(direction()) +
+  return string() + "PusherStep(" + BaseTessellation::direction_str(direction()) +
          ", box_moved=" + (is_push_or_pull() ? "True" : "False") +
          ", is_jump=" + (is_jump() ? "True" : "False") +
          ", is_pusher_selection=" + (is_pusher_selection() ? "True" : "False") +
-         ", pusher_id=" + (pusher_id() == Config::NULL_ID ? "None" : to_string(pusher_id())) +
+         ", pusher_id=" +
+         (pusher_id() == Config::NULL_ID ? "None" : to_string(pusher_id())) +
          ", moved_box_id=" +
          (moved_box_id() == Config::NULL_ID ? "None" : to_string(moved_box_id())) + ")";
 }
 
 string PusherStep::repr() const {
-  return string() + "PusherStep(" + direction_repr(direction()) +
+  return string() + "PusherStep(" + BaseTessellation::direction_repr(direction()) +
          ", box_moved=" + (is_push_or_pull() ? "True" : "False") + ")";
 }
 

@@ -1,7 +1,7 @@
 #ifndef COLLECTION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define COLLECTION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
+#include "config.hpp"
 
 #include <filesystem>
 #include <variant>
@@ -46,9 +46,9 @@ public:
   Puzzles &puzzles();
 
   bool load(const std::filesystem::path &path);
-  bool load(const std::filesystem::path &path, const std::string &puzzle_type_hint);
+  bool load(const std::filesystem::path &path, game::Tessellation puzzle_type_hint);
   bool load(const std::string &path);
-  bool load(const std::string &path, const std::string &puzzle_type_hint);
+  bool load(const std::string &path, game::Tessellation puzzle_type_hint);
 
   bool save(const std::filesystem::path &path) const;
   bool save(const std::string &path) const;

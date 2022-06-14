@@ -11,7 +11,7 @@ from .snapshot import Snapshot
 from .utilities import is_blank
 
 if TYPE_CHECKING:
-    from ..game import AnyTessellation, PusherStep
+    from ..game import BaseTessellation, PusherStep, Tessellation
 
 
 class Constants:
@@ -74,7 +74,7 @@ class Steps:
         return self.data
 
     @classmethod
-    def converted(cls, data: str, tessellation: AnyTessellation) -> List[PusherStep]:
+    def converted(cls, data: str, tessellation: BaseTessellation) -> List[PusherStep]:
         retv: List[PusherStep] = []
         for _ in data:
             if _ == Constants.CURRENT_POSITION_CH:
@@ -86,7 +86,7 @@ class Steps:
 
         return retv
 
-    def pusher_steps(self, tessellation: AnyTessellation) -> List[PusherStep]:
+    def pusher_steps(self, tessellation: BaseTessellation) -> List[PusherStep]:
         return self.converted(self.data, tessellation)
 
 
@@ -102,7 +102,7 @@ class Jump:
     def __str__(self):
         return Constants.JUMP_BEGIN + self.data + Constants.JUMP_END
 
-    def pusher_steps(self, tessellation: AnyTessellation) -> List[PusherStep]:
+    def pusher_steps(self, tessellation: BaseTessellation) -> List[PusherStep]:
         retv = Steps.converted(self.data, tessellation)
         for _ in retv:
             _.is_jump = True
@@ -118,7 +118,7 @@ class PusherSelection:
     def __str__(self):
         return Constants.PUSHER_CHANGE_BEGIN + self.data + Constants.PUSHER_CHANGE_END
 
-    def pusher_steps(self, tessellation: AnyTessellation) -> List[PusherStep]:
+    def pusher_steps(self, tessellation: BaseTessellation) -> List[PusherStep]:
         retv = Steps.converted(self.data, tessellation)
         for _ in retv:
             _.is_pusher_selection = True
