@@ -32,7 +32,7 @@ from sokoenginepy.game import BoardGraph, Mover, Direction, Config
 
 data = textwrap.dedent("""
         #####
-        #   #
+        #  @#
         #$  #
       ###  $##
       #  $ $ #
@@ -46,6 +46,7 @@ data = textwrap.dedent("""
 puzzle = SokobanPuzzle(board=data)
 board = BoardGraph(puzzle)
 mover = Mover(board)
+mover.select_pusher(Config.DEFAULT_PIECE_ID + 1)
 mover.move(Direction.UP)
 ```
 
@@ -55,9 +56,9 @@ or in C++:
 #include <sokoengine.hpp>
 
 using sokoengine::game::BoardGraph;
-using sokoengine::game::Config;
 using sokoengine::game::Direction;
 using sokoengine::game::Mover;
+using sokoengine::game::Config;
 using sokoengine::io::SokobanPuzzle;
 using std::string;
 
@@ -80,6 +81,7 @@ int main() {
   SokobanPuzzle puzzle(data);
   BoardGraph board(puzzle);
   Mover mover(board);
+  mover.select_pusher(Config::DEFAULT_PIECE_ID + 1);
   mover.move(Direction::UP);
 
   return 0;
@@ -122,12 +124,9 @@ For more elaborate details, see [INSTALL.md](./INSTALL.md)
 
 ## Documentation
 
-Tutorial: [Read the Docs - Tutorial](https://sokoenginepy.readthedocs.io/en/latest/tutorial.html)
-Python docs: [Read the Docs](http://sokoenginepy.readthedocs.io/)
-C++ docs: [libsokoengine Doxygen documentation](http://tadams42.github.io/sokoenginepy/)
-
-and C++ API reference, tutorials and everything else is available at [Read the
-Docs].
+- Tutorial: [Read the Docs - Tutorial](https://sokoenginepy.readthedocs.io/en/latest/tutorial.html)
+- Python docs: [Read the Docs](http://sokoenginepy.readthedocs.io/)
+- C++ docs: [libsokoengine Doxygen documentation](http://tadams42.github.io/sokoenginepy/)
 
 If you're looking for C++ docs in Doxygen format, they are here:
 
