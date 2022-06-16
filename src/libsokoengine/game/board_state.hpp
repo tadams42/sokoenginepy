@@ -14,11 +14,11 @@ namespace game {
 ///
 class LIBSOKOENGINE_API BoardState {
 public:
-  static constexpr zobrist_key_t ZOBRIST_HASH_NOT_SET = 0;
+  static constexpr zobrist_key_t NO_HASH = 0;
 
   BoardState(const Positions &pushers_positions = Positions(),
              const Positions &boxes_positions = Positions(),
-             zobrist_key_t zobrist_hash = ZOBRIST_HASH_NOT_SET);
+             zobrist_key_t zobrist_hash = NO_HASH);
   BoardState(const BoardState &rv);
   BoardState(BoardState &&rv);
   BoardState &operator=(const BoardState &rv);

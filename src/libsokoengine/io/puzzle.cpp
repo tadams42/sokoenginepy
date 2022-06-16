@@ -197,13 +197,13 @@ string Puzzle::repr() const {
     klass_name = "SokobanPuzzle";
     break;
   case Tessellation::HEXOBAN:
-    klass_name = "TriobanPuzzle";
+    klass_name = "HexobanPuzzle";
     break;
   case Tessellation::TRIOBAN:
-    klass_name = "OctobanPuzzle";
+    klass_name = "TriobanPuzzle";
     break;
   case Tessellation::OCTOBAN:
-    klass_name = "HexobanPuzzle";
+    klass_name = "OctobanPuzzle";
     break;
     // Do not handle default, let compiler generate warning when another tessellation
     // is added...

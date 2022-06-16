@@ -1,3 +1,7 @@
+"""
+Module that handles Sokoban I/O and text processing.
+"""
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

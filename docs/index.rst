@@ -1,15 +1,14 @@
 .. mdinclude:: ../README.md
 
-
 Tables of contents and indices
 ------------------------------
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 4
 
     install
+    tutorial
     api_py
-    api_cpp
     license
     changelog
 

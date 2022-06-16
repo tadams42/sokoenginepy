@@ -1,3 +1,4 @@
+import pytest
 from sokoenginepy.io import Rle
 
 
@@ -10,7 +11,10 @@ class DescribeRle:
         assert Rle.encode("aaaabbfghijbbccdeee") == "4a2bfghij2b2cd3e"
         assert Rle.encode(" aaaaaaaaaa   ") == " 10a3 "
         assert Rle.encode("   ") == "3 "
-        assert Rle.encode("1234567890") == "1234567890"
+
+    def it_rle_line_must_have_at_least_one_non_digit(self):
+        with pytest.raises(ValueError):
+            assert Rle.encode("1234567890") == "1234567890"
 
     def it_decodes_rle_string(self):
         assert Rle.decode("4a4b2cd3e") == "aaaabbbbccdeee"

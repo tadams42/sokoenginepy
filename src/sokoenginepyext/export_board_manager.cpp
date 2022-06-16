@@ -17,7 +17,7 @@ void export_board_manager(py::module &m) {
          }),
          py::arg("pushers_positions") = py::none(),
          py::arg("boxes_positions") = py::none(),
-         py::arg("zobrist_hash") = BoardState::ZOBRIST_HASH_NOT_SET)
+         py::arg("zobrist_hash") = BoardState::NO_HASH)
 
     // protocols
     .def("__eq__", &BoardState::operator==)

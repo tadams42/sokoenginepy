@@ -30,8 +30,10 @@ class BoardManager:
       numerical ID to each individual piece. This ID can then be used to refer to
       that piece in various contexts.
 
-      IDs are assigned by simply counting from top left corner of board, starting
-      with :data:`Config.DEFAULT_PIECE_ID`
+      How are piece IDs assigned? We start scanning game board from top left corner to
+      the right, row by row. First encountered box will get ``box.id =
+      Config.DEFAULT_PIECE_ID``, second one ``box.id = Config.DEFAULT_PIECE_ID + 1``,
+      etc... Same goes for pushers and goals.
 
       .. image:: /images/assigning_ids.png
           :alt: Assigning board elements' IDs
@@ -60,14 +62,6 @@ class BoardManager:
     Note:
         Movement methods here are just for state and board cell updates, they don't
         implement full game logic. For game logic see :class:`.Mover`
-
-    Warning:
-        Once we create instance of :class:`.BoardManager` from some
-        :class:`.VariantBoard` instance, that board should not be edited.
-        :class:`.BoardManager` will update cells on board when pieces are moved, and
-        editing board cells directly (ie. adding/removing pushers or boxes, changing
-        board size, changing walls layout, etc...) will not sync these edits back to
-        our :class:`.BoardManager` instance.
     """
 
     def __init__(

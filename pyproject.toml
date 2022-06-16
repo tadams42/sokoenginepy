@@ -20,7 +20,7 @@ addopts = [
 	# built. We can't use --doctest-modules.
 	# "--doctest-modules",
 	"--doctest-glob=*.rst",
-	"--doctest-glob=tutorial_py.md",
+	"--doctest-glob=tutorial_.md",
 	"--ignore=bin",
 	"--ignore=build",
 	"--ignore=cmake",

@@ -52,7 +52,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "m2r2",
-    "breathe",
+    # "breathe",
 ]
 
 needs_sphinx = "4.4"
@@ -113,5 +113,5 @@ autodoc_member_order = "groupwise"
 
 # -- Options for Doxygen C++ input -------------------------------------------
 
-breathe_projects = {"libsokofile": str(_SELF_DIR / "_doxygen" / "xml")}
-breathe_default_project = "libsokofile"
+# breathe_projects = {"libsokoengine": str(_SELF_DIR / "_doxygen" / "xml")}
+# breathe_default_project = "libsokoengine"

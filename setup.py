@@ -63,9 +63,10 @@ class SokoenginepyextOptions:
     )
 
     INCLUDE_DIRS = ["/tmp/cmake_cache"] + [
-        dir_path
-        for _ in ["src/libsokoengine", "src/sokoenginepyext"]
-        for dir_path, directories, files in os.walk(_)
+        "src/libsokoengine",
+        "src/libsokoengine/game",
+        "src/libsokoengine/io",
+        "src/sokoenginepyext",
     ]
 
     CPPITERTOOLS_DIR = os.path.abspath("/tmp/cmake_cache/cppitertools")

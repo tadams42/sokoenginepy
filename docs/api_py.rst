@@ -1,15 +1,29 @@
-Python API
-==========
+API reference
+=============
+
+sokoenginepy.io
+---------------
+
+.. automodule:: sokoenginepy.io
 
 .. toctree::
     :maxdepth: 4
 
-    _api_py/tutorial
-    _api_py/sokoenginepy.tessellation
-    _api_py/sokoenginepy.board
-    _api_py/sokoenginepy.graph
-    _api_py/sokoenginepy.manager
-    _api_py/sokoenginepy.snapshot
-    _api_py/sokoenginepy.game
-    _api_py/sokoenginepy.io
-    _api_py/sokoenginepy.utilities
+    _api_py/puzzle
+    _api_py/snapshot
+    _api_py/collection
+
+
+sokoenginepy.game
+-----------------
+
+.. automodule:: sokoenginepy.game
+
+.. toctree::
+    :maxdepth: 4
+
+    _api_py/game_config
+    _api_py/tessellation
+    _api_py/board_graph
+    _api_py/board_manager
+    _api_py/mover

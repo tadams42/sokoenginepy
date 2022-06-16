@@ -53,7 +53,7 @@ class Constants:
         + re.escape("".join(MOVE_CHARACTERS))
         + re.escape("".join(PUSH_CHARACTERS))
         + re.escape("".join(MARKERS))
-        + re.escape("".join(Rle.DELIMITERS))
+        + re.escape("".join({Rle.GROUP_START, Rle.GROUP_END, Rle.EOL}))
         + "])*$"
     )
 

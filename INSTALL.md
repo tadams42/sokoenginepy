@@ -54,6 +54,15 @@ Following environment variables control building of this native extension:
 If built, native extension is used automatically - Python code calling stuff from
 `sokoenginepy` doesn't need to change at all.
 
+In short, to ensure that `pip` will always try to build native extension in development
+environment:
+
+```sh
+export SOKOFILEPYEXT_BUILD=1
+export SOKOENGINEPYEXT_BUILD=1
+pip install -e ".[dev]"
+```
+
 ## 2. libsokoengine C++ library
 
 ```sh

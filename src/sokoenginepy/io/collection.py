@@ -12,6 +12,10 @@ if TYPE_CHECKING:
 class Collection:
     """
     Collection of one or more game puzzles.
+
+    Attributes:
+        title(str): Title
+        author(str): Author
     """
 
     def __init__(

@@ -173,13 +173,8 @@ class HexobanTextConverter:
             if layout_ok:
                 internal.append(internal_line)
 
-        print("\n".join(internal))
-        print("Calc wdth: ", PuzzleParser.calculate_width(internal))
-
         if layout_ok:
             internal = PuzzleParser.normalize_width(internal, Puzzle.VISIBLE_FLOOR)
-
-        print("\n".join(internal))
 
         return internal, layout_ok
 

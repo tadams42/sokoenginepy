@@ -9,9 +9,10 @@
   - Tessellation selection via inelegant and unsafe strings is gone
 - replaced hand written parsers with Boost.X3 on C++ side and Lark on Python side
 - implemented parts of I/O that were missing on C++ side
-- integrated C++ docs into Sphinx generated documentation
-  - all docs (Python and C++) are available in the same place
-  - Doxygen docs remain available and up to date
+  - Python doesn't really need I/O speedup here, but it was missing part of
+    libsokoengine C++.
+  - since we want to test C++, we export io from C++ to Python and make sure it passes
+    same test suite
 
 ## 0.5.4 (2022-03-06)
 

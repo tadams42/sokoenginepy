@@ -41,9 +41,9 @@ class Puzzle:
 
     All positions used are 1D array indexes.
 
-    To convert 2D board coordinates into 1D array indexes, use :func:`game.index_1d`.
-    To convert 1D array indexes into board 2D coordinates, use one of :func:`game.ROW`,
-    :func:`game.x` :func:`game.COLUMN` and :func:`game.y`.
+    To convert 2D board coordinates into 1D array indexes, use ``game.index_1d``.
+    To convert 1D array indexes into board 2D coordinates, use one of ``game.ROW``,
+    ``game.x`` ``game.COLUMN`` and ``game.y``.
     """
 
     WALL: Final[str] = "#"
@@ -555,6 +555,6 @@ _CHARACTERS: Set[str] = {
 _RE_BOARD_STRING = re.compile(
     r"^([0-9\s"
     + re.escape("".join(_CHARACTERS))
-    + re.escape("".join(Rle.DELIMITERS))
+    + re.escape("".join({Rle.GROUP_START, Rle.GROUP_END, Rle.EOL}))
     + "])*$"
 )

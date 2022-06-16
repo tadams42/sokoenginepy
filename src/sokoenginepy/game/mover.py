@@ -156,8 +156,9 @@ class Mover:
 
         Example:
 
-            >>> from sokoenginepy import Mover, SokobanPuzzle, PusherStep, Direction
-            >>> board = SokobanPuzzle(board='\\n'.join([
+            >>> from sokoenginepy.game import Mover, PusherStep, Direction, BoardGraph
+            >>> from sokoenginepy.io import SokobanPuzzle
+            >>> puzzle = SokobanPuzzle(board='\\n'.join([
             ...     '    #####',
             ...     '    #  @#',
             ...     '    #$  #',
@@ -170,23 +171,22 @@ class Mover:
             ...     '    #     #########',
             ...     '    #######'
             ... ]))
+            >>> board = BoardGraph(puzzle)
             >>> mover = Mover(board)
             >>> mover.last_move = [PusherStep(Direction.UP), PusherStep(Direction.RIGHT)]
             >>> mover.undo_last_move()
-            >>> mover.board
-            SokobanPuzzle(board='\\n'.join([
-                '    #####          ',
-                '    #   #          ',
-                '    #$@ #          ',
-                '  ###  $##         ',
-                '  #  $ $ #         ',
-                '### # ## #   ######',
-                '#   # ## #####  ..#',
-                '# $  $          ..#',
-                '##### ### #@##  ..#',
-                '    #     #########',
-                '    #######        '
-            ]))
+            >>> print(mover.board)
+            ----#####----------
+            ----#---#----------
+            ----#$@-#----------
+            --###--$##---------
+            --#--$-$-#---------
+            ###-#-##-#---######
+            #---#-##-#####--..#
+            #-$--$----------..#
+            #####-###-#@##--..#
+            ----#-----#########
+            ----#######--------
             >>> mover.last_move
             [PusherStep(Direction.LEFT, box_moved=False), PusherStep(Direction.DOWN, box_moved=False)]
 
