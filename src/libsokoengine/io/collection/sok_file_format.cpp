@@ -1,5 +1,6 @@
 #include "sok_file_format.hpp"
 
+#include "SOK_format_specification.h"
 #include "collection.hpp"
 
 #include "hexoban.hpp"
@@ -755,9 +756,7 @@ public:
 
 private:
   bool write_collection_header(const Collection &collection) {
-#include "SOK_format_specification.h"
-
-    m_stream << SOK_format_specification_res << endl;
+    m_stream << SOK_format_specification << endl;
 
     bool write_created_at =
       SOKTags::write_tagged(m_stream, SOKTags::DATE_CREATED, collection.created_at());

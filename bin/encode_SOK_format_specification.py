@@ -15,10 +15,11 @@ def encode_spec_to_C_header():
     print(f"Generating \n    {dst_path}\nfrom\n    {src_path}")
 
     with open(src_path, "r") as f:
-        data = "\n".join(_.strip() for _ in f.readlines()).encode()
+        data = "\n".join(_.strip() for _ in f.readlines())
+        data = data.encode("UTF-8")
 
     with open(dst_path, "w") as f:
-        f.write("const unsigned char SOK_format_specification_res[] = {\n")
+        f.write("static const std::string SOK_format_specification = {\n")
 
         lines = [
             "  " + ", ".join(batch)
@@ -28,8 +29,6 @@ def encode_spec_to_C_header():
         f.write(",\n".join(lines))
 
         f.write("\n};\n")
-
-        # f.write(f"const unsigned int SOK_format_specification_res_len = {len(data)};\n")
 
 
 if __name__ == "__main__":
