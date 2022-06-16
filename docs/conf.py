@@ -8,6 +8,9 @@ import os
 import shlex
 import sys
 from datetime import datetime
+from pathlib import Path
+
+_SELF_DIR = Path(__file__).parent.absolute().resolve()
 
 # -- Path setup --------------------------------------------------------------
 
@@ -28,17 +31,12 @@ on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 # -- Project information -----------------------------------------------------
 
 project = "sokoenginepy"
-copyright = "2022, Tomislav Adamic"
-author = "Tomislav Adamic"
-# General information about the project.
-project = "sokoenginepy"
 copyright = (
     ", ".join(str(y) for y in range(2017, datetime.now().year + 1))
     + ", Tomislav Adamic"
 )
 author = "Tomislav Adamic"
-# The full version, including alpha/beta/rc tags
-version = release = "0.5.4"
+version = release = "0.6.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -50,17 +48,26 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.ifconfig",
-    "sphinx.ext.viewcode",
+    # "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "m2r2",
+    # "breathe",
 ]
+
+needs_sphinx = "4.4"
+
+# autodoc_type_aliases = {
+#     "AnyTessellation": "sokoenginepy.AnyTessellation",
+#     "TessellationOrDescription": "sokoenginepy.TessellationOrDescription",
+# }
+autodoc_typehints_format = "short"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
-source_suffix = [".rst", ".md"]
+source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -91,11 +98,6 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
     html_theme = "sphinx_rtd_theme"
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
-
 
 # -- Extension configuration -------------------------------------------------
 
@@ -108,3 +110,8 @@ intersphinx_mapping = {
 
 # autodoc_member_order = 'bysource'
 autodoc_member_order = "groupwise"
+
+# -- Options for Doxygen C++ input -------------------------------------------
+
+# breathe_projects = {"libsokoengine": str(_SELF_DIR / "_doxygen" / "xml")}
+# breathe_default_project = "libsokoengine"

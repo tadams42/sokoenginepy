@@ -1,10 +1,3 @@
-from . import utilities
-from .board import *
-from .game import *
-from .graph import *
-from .input_output import *
-from .manager import *
-from .snapshot import *
-from .tessellation import *
+from . import game, io
 
-__version__ = "0.5.4"
+__version__ = "0.6.0"

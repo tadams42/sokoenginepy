@@ -1,109 +1,21 @@
+<!-- omit in toc -->
 # Install
 
-## Install from PyPi
+- [1. Python package](#1-python-package)
+  - [1.1. Running tests and benchmarks](#11-running-tests-and-benchmarks)
+  - [1.2. Python native extension](#12-python-native-extension)
+- [2. libsokoengine C++ library](#2-libsokoengine-c-library)
+  - [2.1. Build and install from source](#21-build-and-install-from-source)
+  - [2.2. Integrating into other CMake projects](#22-integrating-into-other-cmake-projects)
+  - [2.3. Other make targets](#23-other-make-targets)
+
+## 1. Python package
 
 ```sh
 pip install sokoenginepy
 ```
 
-## Python dev environment
-
-```sh
-cd path/to/cloned/repo/sokoenginepy
-python3.9 -m venv .venv
-source .venv/bin/activate
-pip install -U pip wheel
-pip install -e .[dev]
-```
-
-## Build Python packages
-
-```sh
-source .venv/bin/activate
-python -m build
-```
-
-## C++ native extension
-
-There is optional C++ native extension that is built automatically with `pip install`
-if all dependencies are met and OS is **Linux**.
-
-Native extension needs [Boost.Graph] and [pybind11]. [Boost.Graph] needs to be installed
-on system, everything else is pulled automatically:
-
-```sh
-sudo apt install python3-dev libboost-graph-dev
-```
-
-and then we can compile native extension in dev environment:
-
-```sh
-export SOKOENGINEPYEXT_BUILD=True
-# optionally, to compile without optimizations
-export SOKOENGINEPYEXT_DEBUG=True
-pip install -e .[dev]
-```
-
-Notes:
-
-- `python setup.py develop` performs similar install but without additional
-  development packages
-- `python setup.py develop` will fail when trying to build native extension with
-  message that it is missing `pybind11` headers. This is most probably `setuptools`
-  [bug](https://github.com/pybind/python_example/issues/16)
-- `pip install -e .` will always work and is equivalent to calling `python setup.py
-  development` but with some `pip` magic that makes `setuptools` problem go away
-
-C++ extension is used automatically (for example, running tests will actually use native
-code and effectively test native extension instead of Python code).
-
-To control process of building native extension, use following environment variables:
-
-- `SOKOENGINEPYEXT_BUILD`
-  - Default: True
-  - if `true`, `pip install` will try to build native C++ code
-  - note that even if `true` and native code build fails, `pip install` will silently
-    fallback to installing package without native extension
-  - to see if compilation actually succeeded run `pip install -v` which will display
-    all compile commands and their output
-
-- `SOKOENGINEPYEXT_DEBUG`
-  - Default: False
-  - Enables debug build of native code
-
-No client's source code needs to be changed in any case. Only difference is that when
-we have native code built, stuff runs faster. A lot faster. (this can be checked by
-running `mover_benchmarks.py` with and without native extension built).
-
-To debug native code, use `gdb` like this:
-
-```sh
-sudo apt install python3-dbg
-pip install gdbgui --upgrade
-rm -r build/
-SOKOENGINEPYEXT_DEBUG=True pip install -e .
-gdbgui 'python crash.py'
-gdbgui '.venv/bin/python .venv/bin/py.test tests/crash_test.py'
-```
-
-In cases where developing against native extension is undesirable, use this:
-
-```sh
-rm -r build/
-SOKOENGINEPYEXT_BUILD=False pip install -e .
-```
-
-profiling native extension from Python:
-
-```sh
-rm -r build/
-SOKOENGINEPYEXT_DEBUG=True pip install -e .
-valgrind --dump-line=yes --dump-instr=yes --tool=callgrind --collect-jumps=yes \
-    --callgrind-out-file=mover_profiling.log python bin/mover_profiling.py
-kcachegrind mover_profiling.log
-```
-
-## Running tests
+### 1.1. Running tests and benchmarks
 
 ```sh
 py.test
@@ -115,54 +27,116 @@ or to get more verbose output
 py.test --spec
 ```
 
-## Running under PyPy3
+We can also run some built-in, rudimentary benchmarks:
 
 ```sh
-wget https://bitbucket.org/pypy/pypy/downloads/pypy3-v5.8.0-linux64.tar.bz2
-tar -xvjf pypy3-v5.8.0-linux64.tar.bz2
-virtualenv -p pypy3-v5.8.0-linux64/bin/pypy3 .venvpypy
-source .venvpypy/bin/activate
-pip install -U pip wheel
+python -m sokoenginepy
 ```
 
-## Profiling
+### 1.2. Python native extension
 
-Use IPython shell to generate profiling data
+When installing from source, `pip` will try to build native C++ extension. If build
+fails for whatever reason, `pip` will fallback to installing pure Python implementation.
 
-```python
-%prun -D program.prof [mover.move(d) for d in moves_cycle]
-```
-
-After that, it is viewable by either Snakeviz
+This native extension needs:
 
 ```sh
-snakeviz program.prof
+sudo apt install python3-dev libboost-graph-dev
 ```
 
-or as call graph through KCacheGrind
+Following environment variables control building of this native extension:
+
+- `SOKOENGINEPYEXT_BUILD` (default: `true`)
+  - should native extension be built?
+- `SOKOENGINEPYEXT_DEBUG` (default: `false`)
+  - should we build non-optimized native extension?
+
+If built, native extension is used automatically - Python code calling stuff from
+`sokoenginepy` doesn't need to change at all.
+
+In short, to ensure that `pip` will always try to build native extension in development
+environment:
 
 ```sh
-pyprof2calltree -i program.prof
-kcachegrind program.prof.log
+export SOKOFILEPYEXT_BUILD=1
+export SOKOENGINEPYEXT_BUILD=1
+pip install -e ".[dev]"
 ```
 
-There is also a suite of `Mover` benchmarks:
+## 2. libsokoengine C++ library
 
 ```sh
-python bin/mover_benchmarks.py
+sudo apt install git build-essential libboost-graph-dev cmake doxygen
 ```
 
-And useful `Mover` profiling script:
+### 2.1. Build and install from source
 
 ```sh
-pip install pyprof2calltree
-python bin/mover_profiling.py
-pyprof2calltree -i moves_profile.prof
-pyprof2calltree -i single_move_profile.prof
-kcachegrind moves_profile.prof.log
-kcachegrind single_move_profile.prof.log
+git clone https://github.com/tadams42/sokoenginepy.git
+cmake --preset "debug"
+cd build/debug
+make && make install
 ```
 
-[pybind11]: http://pybind11.readthedocs.io/en/stable/index.html
-[NetworkX]: https://networkx.github.io/
-[Boost.Graph]: https://www.boost.org/doc/libs/1_61_0/libs/graph/doc/index.html
+uninstall:
+
+```sh
+xargs rm < install_manifest.txt
+```
+
+### 2.2. Integrating into other CMake projects
+
+When `libsokoengine` is installed, it can be found by `cmake`'s `find_package`:
+
+```cmake
+find_package(libsokoengine 0.5.0 REQUIRED)
+add_executable(sokoban_app main.cpp)
+target_link_libraries(sokoban_app PUBLIC libsokoengine::sokoengine)
+```
+
+It is also possible to use `libsokoengine` directly from built sources. In this case,
+`find_package` needs `PATHS` argument. Assuming we'd built `libsokoengine` in
+`/home/foo/development/sokoenginepy/build/debug`, we can use it (without installing it)
+in other project like this:
+
+```cmake
+set(DEV_PATH_HINT1 "../sokoenginepy/build/debug")
+set(DEV_PATH_HINT2 "../sokoenginepy/build/release")
+cmake_path(ABSOLUTE_PATH DEV_PATH_HINT1 BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
+cmake_path(ABSOLUTE_PATH DEV_PATH_HINT2 BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
+find_package(
+    libsokoengine 0.5.0 REQUIRED
+    CONFIG
+    PATHS ${DEV_PATH_HINT1}
+          ${DEV_PATH_HINT2}
+)
+```
+
+### 2.3. Other make targets
+
+- `benchmarks` - a suite of benchmarks for `Mover`
+
+  ```sh
+  make benchmarks
+  ./benchmarks
+  ```
+
+- `valgrind_profile_playground` - a profiling data generator
+
+  ```sh
+  sudo apt install kcachegrind valgrind
+  make valgrind_profile_playground
+  kcachegrind playground_dump.pid
+  ```
+
+- Python extension
+
+  It is possible to re-build Python extension via cmake (usually faster than going
+  through `pip install`). This can be useful for development environments.
+
+  ```sh
+  cd build/debug
+  make sokoenginepyext
+  cd ../../src
+  ln -sf ../build/debug/src/sokoenginepyext/sokoenginepyext.cpython-39-x86_64-linux-gnu.so
+  ```

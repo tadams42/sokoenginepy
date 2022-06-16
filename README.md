@@ -13,28 +13,80 @@ This project implements various utilities for Sokoban:
 
 - board representation for Sokoban, Hexoban, Trioban and Octoban variants with support
   for Sokoban+ and Multiban for all four variants
-- movement implementation
-- reading and writing of level collections in `.sok`, `.xsb`, `.tsb`, `.hsb` and `.txt`
-  file formats
+- game engine implementation
+- [SokobanYASC] compatible level collections file reader / writer
 
-It provides two almost identical implementations:
+It provides two implementations:
 
-- `sokoneginepy` - Python implementation and package
-- `libsokoengine` - C++ library with API that is 99.99% identical to Python
+- `sokoenginepy` - pure Python implementation
+- `libsokoengine` - C++ library
 
-On Linux, Python package can also be optionally built with native extensions so that it
-utilizes `libsokoengine` for raw speed.
+## Example
 
-`libsokoengine` can be built completely independently, and consumed by native C++
-clients.
+In Python:
 
-## Why?
+```python
+import textwrap
+from sokoenginepy.io import SokobanPuzzle
+from sokoenginepy.game import BoardGraph, Mover, Direction, Config
 
-- experimenting with [Boost.Graph] in C++ and [NetworkX] in Python
-- experimenting with [pybind11]
-- playing with Sokoban file formats; conversion and validation, especially for Hexoban
-  variant
-- ...
+data = textwrap.dedent("""
+        #####
+        #  @#
+        #$  #
+      ###  $##
+      #  $ $ #
+    ### # ## #   ######
+    #   # ## #####  ..#
+    # $  $          ..#
+    ##### ### #@##  ..#
+        #     #########
+        #######
+""".lstrip("\n").rstrip())
+puzzle = SokobanPuzzle(board=data)
+board = BoardGraph(puzzle)
+mover = Mover(board)
+mover.select_pusher(Config.DEFAULT_PIECE_ID + 1)
+mover.move(Direction.UP)
+```
+
+or in C++:
+
+```cpp
+#include <sokoengine.hpp>
+
+using sokoengine::game::BoardGraph;
+using sokoengine::game::Direction;
+using sokoengine::game::Mover;
+using sokoengine::game::Config;
+using sokoengine::io::SokobanPuzzle;
+using std::string;
+
+int main() {
+  string data =
+    string() +
+    "    #####\n" +
+    "    #  @#\n" +
+    "    #$  #\n" +
+    "  ###  $##\n" +
+    "  #  $ $ #\n" +
+    "### # ## #   ######\n" +
+    "#   # ## #####  ..#\n" +
+    "# $  $          ..#\n" +
+    "##### ### #@##  ..#\n" +
+    "    #     #########\n" +
+    "    #######\n"
+  ;
+
+  SokobanPuzzle puzzle(data);
+  BoardGraph board(puzzle);
+  Mover mover(board);
+  mover.select_pusher(Config::DEFAULT_PIECE_ID + 1);
+  mover.move(Direction::UP);
+
+  return 0;
+}
+```
 
 ## Install
 
@@ -44,17 +96,44 @@ clients.
 pip install sokoenginepy
 ```
 
-- `libsokoengine` can be built from source code, details are in `README.libsokoengine.md`
-- `sokoenginepy` can be optionally built with native C++ extensions, details are in
-  `INSTALL.md`
+or `libsokoengine` C++ library:
+
+```sh
+sudo apt install git build-essential libboost-graph-dev cmake doxygen
+git clone https://github.com/tadams42/sokoenginepy.git
+cd sokoenginepy/
+cmake --preset "debug"
+cd build/debug/
+make && make install
+```
+
+On Linux, installing package via `pip` will also try to build native C++ extension that
+utilizes `libsokoengine` for improved speed. In case it can't build, it will install
+pure Python implementation. On any other OS, `pip` will install pure Python only.
+
+For more elaborate details, see [INSTALL.md](./INSTALL.md)
+
+## Why?
+
+- experimenting with [Boost.X3] in C++
+- experimenting with [Boost.Graph] in C++
+- experimenting with [NetworkX] in Python
+- experimenting with [pybind11]
+- playing with [SokobanYASC] `.sok` file format and providing fully compatible
+  implementation for it in both, Python and C++
 
 ## Documentation
 
-- [Python usage tutorial](https://sokoenginepy.readthedocs.io/en/latest/tutorial.html)
-- [Python docs](http://sokoenginepy.readthedocs.io/en/latest/)
-- [C++ docs](http://tadams42.github.io/sokoenginepy/)
+- Tutorial: [Read the Docs - Tutorial](https://sokoenginepy.readthedocs.io/en/development/tutorial.html)
+- Python docs: [Read the Docs](http://sokoenginepy.readthedocs.io/development)
+- C++ docs: [libsokoengine Doxygen documentation](http://tadams42.github.io/sokoenginepy/)
 
-[SokobanYASC]: https://sourceforge.net/projects/sokobanyasc/
+If you're looking for C++ docs in Doxygen format, they are here:
+
 [Boost.Graph]: https://www.boost.org/doc/libs/1_78_0/libs/graph/doc/index.html
+[Boost.X3]: https://www.boost.org/doc/libs/1_79_0/libs/spirit/doc/x3/html/spirit_x3/preface.html
 [NetworkX]: https://networkx.org/
 [pybind11]: http://pybind11.readthedocs.io/en/stable/index.html
+[PyPi]: https://pypi.org/
+[cmake]: https://cmake.org/
+[SokobanYASC]: https://sourceforge.net/projects/sokobanyasc/

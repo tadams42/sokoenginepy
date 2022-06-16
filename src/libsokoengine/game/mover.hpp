@@ -1,29 +1,29 @@
-#ifndef MOVER_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
-#define MOVER_HPP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#ifndef MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+#define MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "atomic_move.hpp"
-#include "sokoengine_config.hpp"
+#include "config.hpp"
 
 #include <deque>
 #include <memory>
 #include <stdexcept>
 
 namespace sokoengine {
+namespace game {
 
-class VariantBoard;
-class Direction;
+class BoardGraph;
 class HashedBoardManager;
+class PusherStep;
 
 ///
 /// Movement mode of operation.
 ///
-enum class LIBSOKOENGINE_API SolvingMode : char {
+enum class LIBSOKOENGINE_API SolvingMode : uint8_t {
   FORWARD,
   REVERSE,
 };
 
 ///
-/// Exception.
+/// @exception.
 ///
 class LIBSOKOENGINE_API NonPlayableBoardError : public std::runtime_error {
 public:
@@ -32,7 +32,7 @@ public:
 };
 
 ///
-/// Exception.
+/// @exception.
 ///
 class LIBSOKOENGINE_API IllegalMoveError : public std::runtime_error {
 public:
@@ -41,23 +41,23 @@ public:
 };
 
 ///
-/// Implements movement rules on VariantBoard.
+/// Ordered sequence of PusherStep.
+///
+typedef std::vector<PusherStep> PusherSteps;
+
+///
+/// Implements movement rules on BoardGraph.
 ///
 class LIBSOKOENGINE_API Mover {
 public:
-  ///
-  /// Ordered sequence of AtomicMove.
-  ///
-  typedef std::deque<AtomicMove> Moves;
-
-  Mover(VariantBoard &board, const SolvingMode &mode = SolvingMode::FORWARD);
+  explicit Mover(BoardGraph &board, SolvingMode mode = SolvingMode::FORWARD);
   Mover(const Mover &) = delete;
   Mover(Mover &&rv);
   Mover &operator=(const Mover &) = delete;
   Mover &operator=(Mover &&rv);
   virtual ~Mover();
 
-  const VariantBoard &board() const;
+  const BoardGraph &board() const;
   SolvingMode solving_mode() const;
   const HashedBoardManager &board_manager() const;
 
@@ -68,20 +68,22 @@ public:
   virtual void move(const Direction &direction);
 
   virtual void undo_last_move();
-  virtual const Moves &last_move() const;
-  void set_last_move(const Moves &rv);
+  virtual const PusherSteps &last_move() const;
+  void set_last_move(const PusherSteps &rv);
 
   bool pulls_boxes() const;
   void set_pulls_boxes(bool value);
 
 protected:
-  const VariantBoard &initial_board() const;
+  const BoardGraph &initial_board() const;
 
 private:
-  class LIBSOKOENGINE_LOCAL PIMPL;
+  class PIMPL;
   std::unique_ptr<PIMPL> m_impl;
 };
 
+} // namespace game
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
+/// @file
