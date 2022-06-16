@@ -124,8 +124,8 @@ For more elaborate details, see [INSTALL.md](./INSTALL.md)
 
 ## Documentation
 
-- Tutorial: [Read the Docs - Tutorial](https://sokoenginepy.readthedocs.io/en/development/tutorial.html)
-- Python docs: [Read the Docs](http://sokoenginepy.readthedocs.io/development)
+- Tutorial: [Read the Docs - Tutorial](https://sokoenginepy.readthedocs.io/en/latest/tutorial.html)
+- Python docs: [Read the Docs](https://sokoenginepy.readthedocs.io/en/latest/)
 - C++ docs: [libsokoengine Doxygen documentation](http://tadams42.github.io/sokoenginepy/)
 
 If you're looking for C++ docs in Doxygen format, they are here:
