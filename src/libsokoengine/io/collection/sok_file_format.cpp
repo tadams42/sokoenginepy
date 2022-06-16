@@ -252,7 +252,7 @@ public:
 
   static bool write_tagged(ostream &dest, const string &tag, const string &data) {
     if (!is_blank(data) && !is_blank(tag)) {
-      dest << boost::trim_copy(tag) << ": " << boost::trim_right_copy(data) << endl;
+      dest << tag << ": " << boost::trim_right_copy(data) << endl;
       return true;
     }
     return false;
@@ -757,7 +757,7 @@ private:
   bool write_collection_header(const Collection &collection) {
 #include "SOK_format_specification.h"
 
-    m_stream << SOK_format_specification_res;
+    m_stream << SOK_format_specification_res << endl;
 
     bool write_created_at =
       SOKTags::write_tagged(m_stream, SOKTags::DATE_CREATED, collection.created_at());

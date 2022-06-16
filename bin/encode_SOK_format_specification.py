@@ -14,8 +14,8 @@ def encode_spec_to_C_header():
 
     print(f"Generating \n    {dst_path}\nfrom\n    {src_path}")
 
-    with open(src_path, "rb") as f:
-        data = f.read()
+    with open(src_path, "r") as f:
+        data = "\n".join(_.strip() for _ in f.readlines()).encode()
 
     with open(dst_path, "w") as f:
         f.write("const unsigned char SOK_format_specification_res[] = {\n")
