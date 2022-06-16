@@ -117,7 +117,6 @@ public:
   virtual BoardState state() const;
 
 protected:
-  static std::string to_str(const positions_by_id_t &m);
   virtual void pusher_moved(position_t old_position, position_t to_new_position);
   virtual void box_moved(position_t old_position, position_t to_new_position);
 

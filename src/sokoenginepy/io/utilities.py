@@ -1,14 +1,23 @@
 import itertools
 import re
 from functools import reduce
-from typing import Optional
+from typing import Iterable, List, Optional, Union
 
 _RE_ONLY_DIGITS_AND_SPACES = re.compile(r"^([0-9\s])*$")
 
 
-def is_blank(line: Optional[str]) -> bool:
+def is_blank(data: Optional[Union[str, List[str]]]) -> bool:
     """True if ``line`` is empty or it contains only spaces."""
-    return line is None or line.strip() == ""
+
+    _check = lambda l: l is None or l.strip() == ""
+
+    if not data:
+        return True
+
+    if isinstance(data, str):
+        return _check(data)
+
+    return all(_check(_) for _ in data)
 
 
 def contains_only_digits_and_spaces(line: Optional[str]) -> bool:

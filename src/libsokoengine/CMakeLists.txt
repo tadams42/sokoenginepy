@@ -1,5 +1,3 @@
-# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
-
 set(PRIVATE_HEADERS
     io/collection/sok_file_format.hpp
     io/collection/SOK_format_specification.h
@@ -102,17 +100,16 @@ target_include_directories(sokoengine_obj
     $<TARGET_PROPERTY:CPPITERTOOLS::cppitertools,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-target_link_libraries(sokoengine_obj
-    PRIVATE
-
-    # We don't actually link agains any of objects in following libraries Thus we
-    # hide this dependency once we are installed. As a consequence, consumers of
-    # libsokoengine don't need to link against boost - they don't even need to have
-    # boost installed
-    "$<BUILD_INTERFACE:Boost::boost>"
-    "$<BUILD_INTERFACE:CPPITERTOOLS::cppitertools>"
-)
-
+# We link (where necessary) thse dependencies statically, there is no need to expose
+# them to targes consuming sokoengine_obj.
+# As a consequence, consumers of libsokoengine don't need to link against boost.
+# They don't even need to have boost installed, since no libsokoengine public
+# headers include anything from Boost.
+# target_link_libraries(sokoengine_obj
+# PRIVATE
+# "$<BUILD_INTERFACE:Boost::boost>"
+# "$<BUILD_INTERFACE:CPPITERTOOLS::cppitertools>"
+# )
 target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
 
 if(${BUILD_SHARED_LIBS})

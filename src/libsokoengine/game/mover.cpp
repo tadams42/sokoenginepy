@@ -12,7 +12,6 @@
 #include <algorithm>
 
 using namespace std;
-using namespace iter;
 
 namespace sokoengine {
 namespace game {
@@ -211,7 +210,7 @@ public:
     };
 
     reverse(old_last_moves.begin(), old_last_moves.end());
-    for (auto &&gb : groupby(old_last_moves, key_functor)) {
+    for (auto &&gb : iter::groupby(old_last_moves, key_functor)) {
       // gb.first -> key
       // gb.second -> values
 

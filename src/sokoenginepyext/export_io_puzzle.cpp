@@ -78,14 +78,6 @@ void export_io_puzzle(py::module &m) {
     [](Puzzle &self, const Strings &rv) { self.notes() = rv; });
 
   pyPuzzle.def_property(
-    "created_at", [](const Puzzle &self) { return self.created_at(); },
-    [](Puzzle &self, const string &rv) { self.created_at() = rv; });
-
-  pyPuzzle.def_property(
-    "updated_at", [](const Puzzle &self) { return self.updated_at(); },
-    [](Puzzle &self, const string &rv) { self.updated_at() = rv; });
-
-  pyPuzzle.def_property(
     "board", [](const Puzzle &self) { return self.board(); },
     [](Puzzle &self, const string &rv) { self.set_board(rv); });
 

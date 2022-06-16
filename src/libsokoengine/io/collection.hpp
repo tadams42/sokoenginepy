@@ -46,9 +46,9 @@ public:
   Puzzles &puzzles();
 
   bool load(const std::filesystem::path &path);
-  bool load(const std::filesystem::path &path, game::Tessellation puzzle_type_hint);
+  bool load(const std::filesystem::path &path, game::Tessellation tessellation_hint);
   bool load(const std::string &path);
-  bool load(const std::string &path, game::Tessellation puzzle_type_hint);
+  bool load(const std::string &path, game::Tessellation tessellation_hint);
 
   bool save(const std::filesystem::path &path) const;
   bool save(const std::string &path) const;

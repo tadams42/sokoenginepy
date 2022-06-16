@@ -193,8 +193,7 @@ class Puzzle:
         self.goalorder = ""
         self.notes: List[str] = []
         self.snapshots: List[Snapshot] = []
-        self.created_at = ""
-        self.updated_at = ""
+
         self._pushers_count: Optional[int] = None
         self._boxes_count: Optional[int] = None
         self._goals_count: Optional[int] = None

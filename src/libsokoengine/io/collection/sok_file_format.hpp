@@ -20,7 +20,6 @@ public:
 
   void read(std::istream &src, Collection &dest,
             game::Tessellation tessellation_hint = game::Tessellation::SOKOBAN);
-  bool write(const Puzzle &puzzle, std::ostream &dest);
   bool write(const Collection &collection, std::ostream &dest);
 };
 

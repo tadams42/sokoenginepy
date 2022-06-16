@@ -91,10 +91,6 @@ public:
   std::string &goalorder();
   const Strings &notes() const;
   Strings &notes();
-  const std::string &created_at() const;
-  std::string &created_at();
-  const std::string &updated_at() const;
-  std::string &updated_at();
 
   game::Tessellation tessellation() const;
   CellOrientation cell_orientation(position_t position) const;

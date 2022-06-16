@@ -1,11 +1,13 @@
 #include <sokoengine.hpp>
+
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 using namespace sokoengine::game;
 using namespace sokoengine::io;
 
-int main() {
+void is_everyone_here() {
   SokobanPuzzle s;
   HexobanPuzzle h;
   TriobanPuzzle t;
@@ -20,6 +22,10 @@ int main() {
   HexobanSnapshot hs;
   TriobanSnapshot ts;
   OctobanSnapshot os;
+}
+
+int main() {
+  is_everyone_here();
 
   return 0;
 }

@@ -31,8 +31,6 @@ public:
   string m_boxorder;
   string m_goalorder;
   Strings m_notes;
-  string m_created_at;
-  string m_updated_at;
 
   board_size_t m_width = 0;
   board_size_t m_height = 0;
@@ -136,12 +134,6 @@ string &Puzzle::goalorder() { return m_impl->m_goalorder; }
 
 const Strings &Puzzle::notes() const { return m_impl->m_notes; }
 Strings &Puzzle::notes() { return m_impl->m_notes; }
-
-const string &Puzzle::created_at() const { return m_impl->m_created_at; }
-string &Puzzle::created_at() { return m_impl->m_created_at; }
-
-const string &Puzzle::updated_at() const { return m_impl->m_updated_at; }
-string &Puzzle::updated_at() { return m_impl->m_updated_at; }
 
 Tessellation Puzzle::tessellation() const { return m_impl->m_tessellation; }
 
@@ -453,6 +445,7 @@ Puzzle::unique_ptr_t Puzzle::instance_from(Tessellation tessellation,
     // Do not handle default, let compiler generate warning when another tessellation
     // is added...
   }
+  throw invalid_argument("Unknown tessellation!");
 }
 
 Puzzle::unique_ptr_t Puzzle::instance_from(Tessellation tessellation,
@@ -473,6 +466,7 @@ Puzzle::unique_ptr_t Puzzle::instance_from(Tessellation tessellation,
     // Do not handle default, let compiler generate warning when another tessellation
     // is added...
   }
+  throw invalid_argument("Unknown tessellation!");
 }
 
 bool is_blank(const std::string &line) {

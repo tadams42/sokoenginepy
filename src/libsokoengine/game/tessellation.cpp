@@ -54,6 +54,7 @@ const BaseTessellation &BaseTessellation::instance(const Tessellation &tessellat
     // Do not handle default, let compiler generate warning when another tessellation
     // is added...
   }
+  throw invalid_argument("Unknown tessellation!");
 }
 
 GraphType BaseTessellation::graph_type() const { return GraphType::DIRECTED; }

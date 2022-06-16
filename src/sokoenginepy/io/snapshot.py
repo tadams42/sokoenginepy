@@ -89,13 +89,9 @@ class Snapshot:
         )
 
     def __init__(self, tessellation: Tessellation, moves_data: str = ""):
-        self.id = 0
         self.title: str = ""
-        self.duration: str = ""
         self.solver: str = ""
         self.notes: List[str] = []
-        self.created_at: str = ""
-        self.updated_at: str = ""
 
         self._tessellation = tessellation
         self._tessellation_obj_val: Optional[BaseTessellation] = None

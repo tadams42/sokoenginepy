@@ -12,7 +12,7 @@ namespace sokoengine {
 namespace game {
 class BaseTessellation;
 class PusherStep;
-}; // namespace game
+} // namespace game
 
 namespace io {
 namespace snapshot_parsing {

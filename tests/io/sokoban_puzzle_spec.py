@@ -72,10 +72,6 @@ class DescribeSokobanPuzzle:
         assert puzzle.boxorder == "boxorder"
         puzzle.goalorder = "goalorder"
         assert puzzle.goalorder == "goalorder"
-        puzzle.created_at = "created_at"
-        assert puzzle.created_at == "created_at"
-        puzzle.updated_at = "updated_at"
-        assert puzzle.updated_at == "updated_at"
 
     def it_can_access_individual_board_characters(self):
         puzzle = SokobanPuzzle(width=5, height=5)

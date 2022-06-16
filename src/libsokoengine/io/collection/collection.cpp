@@ -78,18 +78,18 @@ bool Collection::load(const filesystem::path &path) {
   return load(path, m_impl->extension_to_tessellation_hint(path));
 }
 
-bool Collection::load(const filesystem::path &path, Tessellation puzzle_type_hint) {
-  return load(path.string(), puzzle_type_hint);
+bool Collection::load(const filesystem::path &path, Tessellation tessellation_hint) {
+  return load(path.string(), tessellation_hint);
 }
 
 bool Collection::load(const string &path) {
   return load(path, m_impl->extension_to_tessellation_hint(path));
 }
 
-bool Collection::load(const string &path, Tessellation puzzle_type_hint) {
+bool Collection::load(const string &path, Tessellation tessellation_hint) {
   ifstream input(path, ios_base::binary);
   SOKFileFormat reader;
-  reader.read(input, *this, puzzle_type_hint);
+  reader.read(input, *this, tessellation_hint);
   return true;
 }
 

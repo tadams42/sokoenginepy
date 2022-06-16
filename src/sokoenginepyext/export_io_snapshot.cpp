@@ -61,24 +61,12 @@ void export_io_snapshot(py::module &m) {
     [](Snapshot &self, const string &rv) { self.title() = rv; });
 
   pySnapshot.def_property(
-    "duration", [](const Snapshot &self) { return self.duration(); },
-    [](Snapshot &self, const string &rv) { self.duration() = rv; });
-
-  pySnapshot.def_property(
     "solver", [](const Snapshot &self) { return self.solver(); },
     [](Snapshot &self, const string &rv) { self.solver() = rv; });
 
   pySnapshot.def_property(
     "notes", [](const Snapshot &self) { return self.notes(); },
     [](Snapshot &self, const Strings &rv) { self.notes() = rv; });
-
-  pySnapshot.def_property(
-    "created_at", [](const Snapshot &self) { return self.created_at(); },
-    [](Snapshot &self, const string &rv) { self.created_at() = rv; });
-
-  pySnapshot.def_property(
-    "updated_at", [](const Snapshot &self) { return self.updated_at(); },
-    [](Snapshot &self, const string &rv) { self.updated_at() = rv; });
 
   pySnapshot.def_property_readonly("pushes_count", &Snapshot::pushes_count);
   pySnapshot.def_property_readonly("moves_count", &Snapshot::moves_count);

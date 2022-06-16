@@ -22,6 +22,23 @@ namespace game {
 
 using io::Strings;
 
+namespace implementation {
+
+LIBSOKOENGINE_LOCAL string to_str(const BoardManager::positions_by_id_t &m) {
+  auto converter = [&]() {
+    Strings retv;
+    for (auto p : m) {
+      retv.push_back(string() + boost::lexical_cast<string>(p.first) + ": " +
+                     boost::lexical_cast<string>(p.second));
+    }
+    return retv;
+  };
+
+  return string("{") + boost::join(converter(), ", ") + "}";
+}
+
+} // namespace implementation
+
 CellAlreadyOccupiedError::CellAlreadyOccupiedError(const string &mess)
   : runtime_error(mess) {}
 
@@ -494,19 +511,6 @@ bool BoardManager::is_solved() const {
 bool BoardManager::is_playable() const {
   return pushers_count() > 0 && boxes_count() > 0 && goals_count() > 0 &&
          boxes_count() == goals_count();
-}
-
-string BoardManager::to_str(const positions_by_id_t &m) {
-  auto converter = [&]() {
-    Strings retv;
-    for (auto p : m) {
-      retv.push_back(string() + boost::lexical_cast<string>(p.first) + ": " +
-                     boost::lexical_cast<string>(p.second));
-    }
-    return retv;
-  };
-
-  return string("{") + boost::join(converter(), ", ") + "}";
 }
 
 string BoardManager::str() const {

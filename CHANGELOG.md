@@ -3,6 +3,7 @@
 ## 1.0.0 (unreleased)
 
 - massive refactoring and cleanup or public API
+- updated .sok format reader to v0.19
 - cleanly separated I/O from game engine (both architecturally and in implementation)
   - `VariantBoard` monstrosity is gone
   - Tessellation selection via inelegant and unsafe strings is gone

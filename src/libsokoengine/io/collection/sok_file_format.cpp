@@ -7,10 +7,15 @@
 #include "sokoban.hpp"
 #include "trioban.hpp"
 
+#include <algorithm>
 #include <boost/algorithm/string.hpp>
 
-using namespace std;
-using namespace boost;
+using std::endl;
+using std::ios_base;
+using std::istream;
+using std::ostream;
+using std::string;
+using std::vector;
 
 namespace sokoengine {
 namespace io {
@@ -19,143 +24,272 @@ using game::Tessellation;
 
 namespace implementation {
 
-enum class LIBSOKOENGINE_LOCAL PuzzleTypeHints : unsigned short {
-  SOKOBAN = 0,
-  TRIOBAN,
-  HEXOBAN,
-  OCTOBAN,
-  BLANK,
-};
-
 struct LIBSOKOENGINE_LOCAL SnapshotData {
+  string moves_data;
   string title;
-  string duration;
   string solver;
   Strings notes;
-  string created_at;
-  string updated_at;
-  string moves_data;
 };
-
 typedef vector<SnapshotData> SnapshotsData;
 
 struct LIBSOKOENGINE_LOCAL PuzzleData {
-  string title;
   string board;
+  Tessellation tessellation = Tessellation::SOKOBAN;
+  string title;
   string author;
   string boxorder;
   string goalorder;
   Strings notes;
-  string created_at;
-  string updated_at;
-  PuzzleTypeHints puzzle_type;
   SnapshotsData snapshots;
 };
-
 typedef vector<PuzzleData> PuzzlesData;
 
-static constexpr const char *TAG_AUTHOR = "author";
-static constexpr const char *TAG_TITLE = "title";
-static constexpr const char *TAG_GOALORDER = "goalorder";
-static constexpr const char *TAG_BOXORDER = "boxorder";
-static constexpr const char *TAG_SOLVER = "solver";
-static constexpr const char *TAG_VARIANT = "game";
-static constexpr const char *TAG_CREATED_AT = "date created";
-static constexpr const char *TAG_SNAPSHOT_CREATED_AT = "date";
-static constexpr const char *TAG_UPDATED_AT = "date of last change";
-static constexpr const char *TAG_DURATION = "time";
-static constexpr const char *MARKERS_RAW_FILE_NOTES = "::";
-static constexpr const char *MARKERS_TAG_DELIMITERS = "=:";
+struct LIBSOKOENGINE_LOCAL CollectionData {
+  string title;
+  string author;
+  string created_at;
+  string updated_at;
+  Strings notes;
+  Tessellation header_tessellation_hint = Tessellation::SOKOBAN;
+  bool was_tessellation_hint_in_header = false;
+  PuzzlesData puzzles;
+};
 
-LIBSOKOENGINE_LOCAL string &strip_and_downcase(string &line) {
-  boost::trim(line);
-  boost::to_lower(line);
-  return line;
-}
+class LIBSOKOENGINE_LOCAL SOKTags {
+public:
+  static const string AUTHOR;
+  static const string TITLE;
+  static const string COLLECTION;
+  static const string GOALORDER;
+  static const string BOXORDER;
+  static const string SOLVER;
+  static const string VARIANT;
+  static const string DATE_CREATED;
+  static const string DATE_OF_LAST_CHANGE;
+  static const string RAW_FILE_NOTES;
+  static const string TAG_DELIMITERS;
 
-LIBSOKOENGINE_LOCAL PuzzleTypeHints puzzle_type_from_str(const string &val) {
-  string vval = val;
-  strip_and_downcase(vval);
-  if (is_blank(val)) { return PuzzleTypeHints::BLANK; }
-  if (vval == "sokoban") {
-    return PuzzleTypeHints::SOKOBAN;
-  } else if (vval == "trioban") {
-    return PuzzleTypeHints::TRIOBAN;
-  } else if (vval == "hexoban") {
-    return PuzzleTypeHints::HEXOBAN;
-  } else if (vval == "octoban") {
-    return PuzzleTypeHints::OCTOBAN;
-  } else {
-    throw invalid_argument("Unknown PuzzleTypeHints " + val + "!");
+  static Tessellation tessellation_from_string(const string &line) {
+    string tessellation = line;
+    boost::trim(tessellation);
+    boost::to_lower(tessellation);
+    if (tessellation == "sokoban") {
+      return Tessellation::SOKOBAN;
+    } else if (tessellation == "trioban") {
+      return Tessellation::TRIOBAN;
+    } else if (tessellation == "hexoban") {
+      return Tessellation::HEXOBAN;
+    } else if (tessellation == "octoban") {
+      return Tessellation::OCTOBAN;
+    } else {
+      throw std::invalid_argument("Unknown Tessellation \"" + tessellation + "\"!");
+    }
   }
-}
 
-LIBSOKOENGINE_LOCAL PuzzleTypeHints
-puzzle_type_from_tessellation(Tessellation tessellation) {
-  switch (tessellation) {
-  case Tessellation::SOKOBAN:
-    return PuzzleTypeHints::SOKOBAN;
-    break;
-  case Tessellation::HEXOBAN:
-    return PuzzleTypeHints::HEXOBAN;
-    break;
-  case Tessellation::TRIOBAN:
-    return PuzzleTypeHints::TRIOBAN;
-    break;
-  case Tessellation::OCTOBAN:
-    return PuzzleTypeHints::OCTOBAN;
-    break;
-    // Do not handle default, let compiler generate warning when another tessellation
-    // is added...
+  static Strings extract_collection_attributes(CollectionData &dest,
+                                               const Strings &notes) {
+    Strings remaining_lines;
+    string tessellation;
+    bool tessellation_found = false;
+
+    for (const string &line : notes) {
+      bool was_tagged = is_raw_file_notes_line(line);
+      string value;
+
+      if (!was_tagged) {
+        value = get_tag_data(TITLE, line, was_tagged);
+        if (was_tagged) { dest.title = value; }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(AUTHOR, line, was_tagged);
+        if (was_tagged) { dest.author = value; }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(COLLECTION, line, was_tagged);
+        if (was_tagged) { dest.title = value; }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(VARIANT, line, was_tagged);
+        if (was_tagged) {
+          tessellation = value;
+          tessellation_found = true;
+          break;
+        }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(DATE_CREATED, line, was_tagged);
+        if (was_tagged) { dest.created_at = value; }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(DATE_OF_LAST_CHANGE, line, was_tagged);
+        if (was_tagged) { dest.updated_at = value; }
+      }
+
+      if (!was_tagged) { remaining_lines.push_back(line); }
+    }
+
+    if (tessellation_found && !is_blank(tessellation)) {
+      dest.was_tessellation_hint_in_header = tessellation_found;
+      dest.header_tessellation_hint = tessellation_from_string(tessellation);
+    }
+
+    return remaining_lines;
   }
-}
 
-LIBSOKOENGINE_LOCAL string puzzle_type_to_str(PuzzleTypeHints val) {
-  switch (val) {
-  case PuzzleTypeHints::OCTOBAN:
-    return string("octoban");
-    break;
-  case PuzzleTypeHints::TRIOBAN:
-    return string("trioban");
-    break;
-  case PuzzleTypeHints::HEXOBAN:
-    return string("hexoban");
-    break;
-  case PuzzleTypeHints::BLANK:
-    return "";
-    break;
-    ;
-  case PuzzleTypeHints::SOKOBAN:
-  default:
-    return string("sokoban");
-    break;
+  static Strings extract_puzzle_attributes(
+    PuzzleData &dest, const Strings &notes, bool has_tessellation_header,
+    Tessellation collection_header_tessellation_hint, bool has_supplied_tessellation,
+    Tessellation supplied_tessellation) {
+    Strings remaining_lines;
+    string tessellation;
+    bool tessellation_found = false;
+
+    for (const string &line : notes) {
+      bool was_tagged = false;
+      string value;
+
+      if (!was_tagged) {
+        value = get_tag_data(TITLE, line, was_tagged);
+        if (was_tagged) { dest.title = value; }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(AUTHOR, line, was_tagged);
+        if (was_tagged) { dest.author = value; }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(VARIANT, line, was_tagged);
+        if (was_tagged) {
+          tessellation = value;
+          tessellation_found = true;
+          break;
+        }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(BOXORDER, line, was_tagged);
+        if (was_tagged) { dest.boxorder = value; }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(GOALORDER, line, was_tagged);
+        if (was_tagged) { dest.goalorder = value; }
+      }
+
+      if (!was_tagged) { remaining_lines.push_back(line); }
+    }
+
+    if (tessellation_found && !is_blank(tessellation)) {
+      dest.tessellation = tessellation_from_string(tessellation);
+    } else if (has_tessellation_header) {
+      dest.tessellation = collection_header_tessellation_hint;
+    } else if (has_supplied_tessellation) {
+      dest.tessellation = supplied_tessellation;
+    } else {
+      dest.tessellation = Tessellation::SOKOBAN;
+    }
+
+    return remaining_lines;
   }
-}
 
-class LIBSOKOENGINE_LOCAL PuzzleVisitor {
-  const PuzzleData &m_puzzle_data;
+  static Strings extract_snapshot_attributes(SnapshotData &dest, const Strings &notes) {
+    Strings remaining_lines;
+
+    for (const string &line : notes) {
+      bool was_tagged = false;
+      string value;
+
+      if (!was_tagged) {
+        value = get_tag_data(TITLE, line, was_tagged);
+        if (was_tagged) { dest.title = value; }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(AUTHOR, line, was_tagged);
+        if (was_tagged) { dest.solver = value; }
+      }
+
+      if (!was_tagged) {
+        value = get_tag_data(SOLVER, line, was_tagged);
+        if (was_tagged) { dest.solver = value; }
+      }
+
+      if (!was_tagged) { remaining_lines.push_back(line); }
+    }
+
+    return remaining_lines;
+  }
+
+  static string get_tag_data(const string &tag, const string &line, bool &tag_found) {
+    tag_found = false;
+    string retv;
+    size_t delimit_pos = line.find_first_of(TAG_DELIMITERS);
+    if (delimit_pos != string::npos) {
+      string found_tag = line.substr(0, delimit_pos);
+
+      string looking_for_tag = boost::trim_copy(boost::to_lower_copy(tag));
+      boost::trim(found_tag);
+      boost::to_lower(found_tag);
+
+      if (looking_for_tag == found_tag) {
+        retv = line.substr(delimit_pos + 1, line.length());
+        boost::trim(retv);
+        tag_found = true;
+      }
+    }
+    return retv;
+  }
+
+  static bool is_raw_file_notes_line(const string &line) {
+    return boost::starts_with(line, RAW_FILE_NOTES);
+  }
+
+  static bool write_tagged(ostream &dest, const string &tag, const string &data) {
+    if (!is_blank(data) && !is_blank(tag)) {
+      dest << boost::trim_copy(tag) << ": " << boost::trim_right_copy(data) << endl;
+      return true;
+    }
+    return false;
+  }
+};
+
+const string SOKTags::AUTHOR = "Author";
+const string SOKTags::TITLE = "Title";
+const string SOKTags::COLLECTION = "Collection";
+const string SOKTags::GOALORDER = "goalorder";
+const string SOKTags::BOXORDER = "boxorder";
+const string SOKTags::SOLVER = "Solver";
+const string SOKTags::VARIANT = "Game";
+const string SOKTags::DATE_CREATED = "Date Created";
+const string SOKTags::DATE_OF_LAST_CHANGE = "Date of Last Change";
+const string SOKTags::RAW_FILE_NOTES = "::";
+const string SOKTags::TAG_DELIMITERS = "=:";
+
+class LIBSOKOENGINE_LOCAL PuzzleConsumeVisitor {
+  PuzzleData &m_puzzle_data;
 
   void copy_puzzle_metadata(Puzzle &puzzle) {
-    puzzle.title() = m_puzzle_data.title;
-    puzzle.author() = m_puzzle_data.author;
-    puzzle.boxorder() = m_puzzle_data.boxorder;
-    puzzle.goalorder() = m_puzzle_data.goalorder;
-    puzzle.notes() = m_puzzle_data.notes;
-    puzzle.created_at() = m_puzzle_data.created_at;
-    puzzle.updated_at() = m_puzzle_data.updated_at;
+    puzzle.title().swap(m_puzzle_data.title);
+    puzzle.author().swap(m_puzzle_data.author);
+    puzzle.boxorder().swap(m_puzzle_data.boxorder);
+    puzzle.goalorder().swap(m_puzzle_data.goalorder);
+    puzzle.notes().swap(m_puzzle_data.notes);
   }
 
-  void copy_snapshot_metadata(Snapshot &snapshot, const SnapshotData &data) {
-    snapshot.title() = data.title;
-    snapshot.duration() = data.duration;
-    snapshot.solver() = data.solver;
-    snapshot.notes() = data.notes;
-    snapshot.created_at() = data.created_at;
-    snapshot.updated_at() = data.updated_at;
+  void copy_snapshot_metadata(Snapshot &snapshot, SnapshotData &data) {
+    snapshot.title().swap(data.title);
+    snapshot.solver().swap(data.solver);
+    snapshot.notes().swap(data.notes);
   }
 
 public:
-  PuzzleVisitor(const PuzzleData &puzzle_data) : m_puzzle_data(puzzle_data) {}
+  PuzzleConsumeVisitor(PuzzleData &puzzle_data) : m_puzzle_data(puzzle_data) {}
 
   void operator()(SokobanPuzzle &puzzle) {
     copy_puzzle_metadata(puzzle);
@@ -191,329 +325,227 @@ public:
 };
 
 class LIBSOKOENGINE_LOCAL SOKReader {
-  istream &m_stream;
-  Collection &m_destination;
-  PuzzlesData m_data;
-  PuzzleTypeHints m_supplied_variant_hint;
-  PuzzleTypeHints m_collection_header_variant_hint = PuzzleTypeHints::BLANK;
-  string m_current_line;
+  istream &m_src;
+  Collection &m_dest;
+  Tessellation m_supplied_tessellation_hint;
+  CollectionData m_data;
 
 public:
   SOKReader(istream &src, Collection &dest, Tessellation tessellation_hint)
-    : m_stream(src),
-      m_destination(dest),
-      m_supplied_variant_hint(puzzle_type_from_tessellation(tessellation_hint)) {}
+    : m_src(src), m_dest(dest), m_supplied_tessellation_hint(tessellation_hint) {}
 
   void read() {
-    if (m_stream.fail()) { throw runtime_error("Unknown input stream error!"); }
-    m_stream.clear();
-    m_stream.seekg(0, ios_base::beg);
-
-    m_destination.title() = m_destination.author() = m_destination.created_at() =
-      m_destination.updated_at() = "";
-    m_destination.notes() = Strings();
-    m_destination.puzzles().clear();
-    m_data.clear();
-
-    read_collection_notes();
-    read_puzzles();
-    parse_title_lines();
-
-    for (auto &puzzle_data : m_data) {
-      switch (puzzle_data.puzzle_type) {
-      case PuzzleTypeHints::SOKOBAN:
-        m_destination.puzzles().emplace_back(SokobanPuzzle(puzzle_data.board));
-        break;
-      case PuzzleTypeHints::HEXOBAN:
-        m_destination.puzzles().emplace_back(HexobanPuzzle(puzzle_data.board));
-        break;
-      case PuzzleTypeHints::TRIOBAN:
-        m_destination.puzzles().emplace_back(TriobanPuzzle(puzzle_data.board));
-        break;
-      case PuzzleTypeHints::OCTOBAN:
-        m_destination.puzzles().emplace_back(OctobanPuzzle(puzzle_data.board));
-        break;
-      default:
-        throw std::invalid_argument("Unknown puzzle type!");
-      }
-
-      auto &puzzle_variant = m_destination.puzzles().back();
-      std::visit(PuzzleVisitor(puzzle_data), puzzle_variant);
-    }
+    parse();
+    consume();
   }
 
 private:
-  static void assign_to_blank(string &dest, const string &src) {
-    if (is_blank(dest)) dest = src;
-  }
+  void consume() {
+    m_dest.title().swap(m_data.title);
+    m_dest.author().swap(m_data.author);
+    m_dest.created_at().swap(m_data.created_at);
+    m_dest.updated_at().swap(m_data.updated_at);
+    m_dest.notes().swap(m_data.notes);
 
-  static void assign_to_blank(PuzzleTypeHints &dest, const string &src) {
-    if (dest == PuzzleTypeHints::BLANK) { dest = puzzle_type_from_str(src); }
-  }
-
-  static bool is_tagged_as(const string &line, const string &tag_name) {
-    bool contains_sokoban_tag = boost::istarts_with(boost::trim_copy(line), tag_name);
-    bool contains_tag_separator =
-      (line.find_first_of(MARKERS_TAG_DELIMITERS) != string::npos);
-    return (contains_sokoban_tag && contains_tag_separator);
-  }
-
-  void read_collection_notes() {
-    while (getline(m_stream, m_current_line) && !Puzzle::is_board(m_current_line)) {
-      if (is_collection_tag_line(m_current_line)) {
-        assign_to_blank(m_collection_header_variant_hint,
-                        get_tag_data(m_current_line, TAG_VARIANT));
-        assign_to_blank(m_destination.title(), get_tag_data(m_current_line, TAG_TITLE));
-        assign_to_blank(m_destination.author(),
-                        get_tag_data(m_current_line, TAG_AUTHOR));
-        assign_to_blank(m_destination.created_at(),
-                        get_tag_data(m_current_line, TAG_CREATED_AT));
-        assign_to_blank(m_destination.updated_at(),
-                        get_tag_data(m_current_line, TAG_UPDATED_AT));
-      } else {
-        if (!is_raw_file_notes_line(m_current_line))
-          m_destination.notes().push_back(m_current_line);
+    for (PuzzleData &puzzle_data : m_data.puzzles) {
+      switch (puzzle_data.tessellation) {
+      case Tessellation::SOKOBAN:
+        m_dest.puzzles().emplace_back(SokobanPuzzle(puzzle_data.board));
+        break;
+      case Tessellation::HEXOBAN:
+        m_dest.puzzles().emplace_back(HexobanPuzzle(puzzle_data.board));
+        break;
+      case Tessellation::TRIOBAN:
+        m_dest.puzzles().emplace_back(TriobanPuzzle(puzzle_data.board));
+        break;
+      case Tessellation::OCTOBAN:
+        m_dest.puzzles().emplace_back(OctobanPuzzle(puzzle_data.board));
+        break;
+        // Do not handle default, let compiler generate warning if another tessellation
+        // is added...
       }
+
+      auto &puzzle_variant = m_dest.puzzles().back();
+      std::visit(PuzzleConsumeVisitor(puzzle_data), puzzle_variant);
     }
   }
 
-  static bool is_collection_tag_line(const string &line) {
-    return is_tagged_as(line, TAG_VARIANT) || is_tagged_as(line, TAG_TITLE) ||
-           is_tagged_as(line, TAG_AUTHOR) || is_tagged_as(line, TAG_CREATED_AT) ||
-           is_tagged_as(line, TAG_UPDATED_AT);
+  void parse() {
+    if (m_src.fail()) { throw std::runtime_error("Unknown input stream error!"); }
+    m_data = CollectionData();
+    m_src.clear();
+    m_src.seekg(0, ios_base::beg);
+    split_input();
+    parse_title_lines();
+    parse_notes();
   }
 
-  string read_board() {
+  void split_input() {
+    string line;
     Strings lines;
-    if (m_stream && Puzzle::is_board(m_current_line)) {
-      lines.push_back(boost::trim_right_copy(m_current_line));
-      while (getline(m_stream, m_current_line) && Puzzle::is_board(m_current_line)) {
-        lines.push_back(boost::trim_right_copy(m_current_line));
-      }
+    while (getline(m_src, line)) {
+      lines.push_back(line + '\n');
     }
-    return boost::join(lines, "\n");
+
+    auto first_board_line =
+      std::find_if(lines.cbegin(), lines.cend(),
+                   [](const string &line) { return Puzzle::is_board(line); });
+
+    Strings remaining_lines;
+    if (first_board_line != lines.cend()) {
+      std::copy(lines.cbegin(), first_board_line, std::back_inserter(m_data.notes));
+      std::copy(first_board_line, lines.cend(), std::back_inserter(remaining_lines));
+      lines.clear();
+    } else {
+      m_data.notes.swap(lines);
+    }
+
+    split_puzzle_chunks(remaining_lines);
+    split_snapshot_chunks();
   }
 
-  void read_puzzle_notes(PuzzleData &puzzle) {
-    string puzzle_variant;
-    if (m_stream && !Puzzle::is_board(m_current_line) &&
-        !Snapshot::is_snapshot(m_current_line)) {
-      parse_puzzle_note_line(puzzle, m_current_line);
-      puzzle_variant = get_tag_data(m_current_line, TAG_VARIANT);
-      if (!is_puzzle_tag_line(m_current_line)) puzzle.notes.push_back(m_current_line);
+  void split_puzzle_chunks(Strings &remaining_lines) {
+    while (remaining_lines.size() > 0) {
+      m_data.puzzles.push_back(PuzzleData());
+      PuzzleData &puzzle = m_data.puzzles.back();
 
-      while (getline(m_stream, m_current_line) && !Puzzle::is_board(m_current_line) &&
-             !Snapshot::is_snapshot(m_current_line)) {
-        if (is_puzzle_tag_line(m_current_line)) {
-          parse_puzzle_note_line(puzzle, m_current_line);
-          assign_to_blank(puzzle_variant, get_tag_data(m_current_line, TAG_VARIANT));
+      auto first_note_line =
+        std::find_if(remaining_lines.cbegin(), remaining_lines.cend(),
+                     [](const string &line) { return !Puzzle::is_board(line); });
+
+      if (first_note_line != remaining_lines.cend()) {
+        Strings board;
+        std::copy(remaining_lines.cbegin(), first_note_line, std::back_inserter(board));
+        puzzle.board = boost::join(board, "");
+        remaining_lines.erase(remaining_lines.cbegin(), first_note_line);
+      } else {
+        puzzle.board = boost::join(remaining_lines, "");
+        remaining_lines.clear();
+      }
+
+      if (remaining_lines.size() > 0) {
+        auto first_board_line =
+          std::find_if(remaining_lines.cbegin(), remaining_lines.cend(),
+                       [](const string &line) { return Puzzle::is_board(line); });
+
+        if (first_board_line != remaining_lines.cend()) {
+          std::copy(remaining_lines.cbegin(), first_board_line,
+                    std::back_inserter(puzzle.notes));
+          remaining_lines.erase(remaining_lines.cbegin(), first_board_line);
         } else {
-          puzzle.notes.push_back(m_current_line);
-        }
-      }
-    }
-
-    assign_to_blank(puzzle_variant,
-                    puzzle_type_to_str(m_collection_header_variant_hint));
-    assign_to_blank(puzzle_variant, puzzle_type_to_str(m_supplied_variant_hint));
-    assign_to_blank(puzzle_variant, "sokoban");
-    puzzle.puzzle_type = puzzle_type_from_str(puzzle_variant);
-  }
-
-  static void parse_puzzle_note_line(PuzzleData &puzzle, const string &note_line) {
-    assign_to_blank(puzzle.boxorder, get_tag_data(note_line, TAG_BOXORDER));
-    assign_to_blank(puzzle.goalorder, get_tag_data(note_line, TAG_GOALORDER));
-    assign_to_blank(puzzle.title, get_tag_data(note_line, TAG_TITLE));
-    assign_to_blank(puzzle.author, get_tag_data(note_line, TAG_AUTHOR));
-  }
-
-  static bool is_puzzle_tag_line(const string &line) {
-    return is_tagged_as(line, TAG_TITLE) || is_tagged_as(line, TAG_AUTHOR) ||
-           is_tagged_as(line, TAG_VARIANT) || is_tagged_as(line, TAG_BOXORDER) ||
-           is_tagged_as(line, TAG_GOALORDER);
-  }
-
-  string read_moves() {
-    string moves;
-    if (m_stream && Snapshot::is_snapshot(m_current_line)) {
-      moves = boost::trim_right_copy(m_current_line);
-      while (getline(m_stream, m_current_line) &&
-             Snapshot::is_snapshot(m_current_line)) {
-        moves += boost::trim_right_copy(m_current_line);
-      }
-      boost::trim_right(moves);
-    }
-    return moves;
-  }
-
-  void read_snapshot_notes(SnapshotData &snapshot) {
-    if (m_stream && !Puzzle::is_board(m_current_line) &&
-        !Snapshot::is_snapshot(m_current_line)) {
-      parse_snapshot_note_line(snapshot, m_current_line);
-      if (is_snapshot_tag_line(m_current_line))
-        snapshot.notes.push_back(m_current_line);
-
-      while (getline(m_stream, m_current_line) &&
-             !Snapshot::is_snapshot(m_current_line) &&
-             !Puzzle::is_board(m_current_line)) {
-        if (is_snapshot_tag_line(m_current_line)) {
-          parse_snapshot_note_line(snapshot, m_current_line);
-        } else {
-          snapshot.notes.push_back(m_current_line);
+          puzzle.notes.swap(remaining_lines);
         }
       }
     }
   }
 
-  static void parse_snapshot_note_line(SnapshotData &snapshot,
-                                       const string &note_line) {
-    assign_to_blank(snapshot.title, get_tag_data(note_line, TAG_TITLE));
-    assign_to_blank(snapshot.solver, get_tag_data(note_line, TAG_SOLVER));
-    assign_to_blank(snapshot.solver, get_tag_data(note_line, TAG_AUTHOR));
-    assign_to_blank(snapshot.created_at, get_tag_data(note_line, TAG_CREATED_AT));
-    assign_to_blank(snapshot.created_at,
-                    get_tag_data(note_line, TAG_SNAPSHOT_CREATED_AT));
-    assign_to_blank(snapshot.duration, get_tag_data(note_line, TAG_DURATION));
-  }
+  void split_snapshot_chunks() {
+    for (PuzzleData &puzzle : m_data.puzzles) {
+      Strings remaining_lines;
+      remaining_lines.swap(puzzle.notes);
 
-  static bool is_snapshot_tag_line(const string &line) {
-    return is_tagged_as(line, TAG_TITLE) || is_tagged_as(line, TAG_AUTHOR) ||
-           is_tagged_as(line, TAG_SOLVER) || is_tagged_as(line, TAG_CREATED_AT) ||
-           is_tagged_as(line, TAG_SNAPSHOT_CREATED_AT) ||
-           is_tagged_as(line, TAG_DURATION);
-  }
+      auto first_moves_line =
+        std::find_if(remaining_lines.cbegin(), remaining_lines.cend(),
+                     [](const string &line) { return Snapshot::is_snapshot(line); });
+      if (first_moves_line != remaining_lines.cend()) {
+        std::copy(remaining_lines.cbegin(), first_moves_line,
+                  std::back_inserter(puzzle.notes));
+        remaining_lines.erase(remaining_lines.cbegin(), first_moves_line);
+      } else {
+        remaining_lines.swap(puzzle.notes);
+      }
 
-  void read_puzzles() {
-    bool puzzle_read = true;
-    while (m_stream && puzzle_read) {
-      m_data.push_back(PuzzleData());
-      PuzzleData &puzzle_data = m_data.back();
-      puzzle_data.board = read_board();
-      read_puzzle_notes(puzzle_data);
-      bool snapshot_read = true;
-      while (m_stream && snapshot_read) {
-        SnapshotData snapshot;
-        snapshot.moves_data = read_moves();
-        if (!is_blank(snapshot.moves_data)) {
-          read_snapshot_notes(snapshot);
-          puzzle_data.snapshots.push_back(snapshot);
+      puzzle.snapshots.clear();
+
+      while (remaining_lines.size() > 0) {
+        puzzle.snapshots.push_back(SnapshotData());
+        SnapshotData &snapshot = puzzle.snapshots.back();
+
+        auto first_note_line =
+          std::find_if(remaining_lines.cbegin(), remaining_lines.cend(),
+                       [](const string &line) { return !Snapshot::is_snapshot(line); });
+
+        if (first_note_line != remaining_lines.cend()) {
+          Strings moves_lines;
+          std::copy(remaining_lines.cbegin(), first_note_line,
+                    std::back_inserter(moves_lines));
+          for (string &ln : moves_lines) {
+            boost::trim(ln);
+          }
+          snapshot.moves_data = boost::join(moves_lines, "");
+          remaining_lines.erase(remaining_lines.cbegin(), first_note_line);
         } else {
-          snapshot_read = false;
+          for (string &ln : remaining_lines) {
+            boost::trim(ln);
+          }
+          snapshot.moves_data = boost::join(remaining_lines, "");
+          remaining_lines.clear();
         }
-      }
 
-      if (is_blank(puzzle_data.board)) {
-        m_data.pop_back();
-        puzzle_read = false;
-      }
-    }
-  }
+        if (remaining_lines.size() > 0) {
+          auto first_moves_line = std::find_if(
+            remaining_lines.cbegin(), remaining_lines.cend(),
+            [](const string &line) { return Snapshot::is_snapshot(line); });
 
-  // @verbatim
-  // :: Raw File Notes                                         ::
-  // ::   Raw file notes are only intended for someone looking ::
-  // ::   at the raw file in a text editor. These lines begin  ::
-  // ::   with "::".                                           ::
-  // @endverbatim
-  static bool is_raw_file_notes_line(const string &line) {
-    return (boost::starts_with(line, MARKERS_RAW_FILE_NOTES));
-  }
-
-  static string get_tag_data(const string &line, const string &tag_name) {
-    string retv;
-    size_t delimit_pos = line.find_first_of(MARKERS_TAG_DELIMITERS);
-    if (delimit_pos != string::npos) {
-      string found_tag_name = line.substr(0, delimit_pos);
-      if (tag_name == strip_and_downcase(found_tag_name)) {
-        retv = line.substr(delimit_pos + 1, line.length());
-        boost::trim(retv);
-      }
-    }
-    return retv;
-  }
-
-  void parse_title_lines() {
-    size_t i, iend = m_data.size();
-    for (i = 0; i < iend; ++i) {
-      auto &puzzle = m_data[i];
-      if (is_blank(puzzle.title))
-        puzzle.title = remove_title_line(notes_before_puzzle(i));
-
-      size_t j, jend = puzzle.snapshots.size();
-      for (j = 0; j < jend; ++j) {
-        auto &snapshot = puzzle.snapshots[j];
-        if (is_blank(snapshot.title))
-          snapshot.title = remove_title_line(notes_before_snapshot(i, j));
-      }
-    }
-
-    cleanup_whitespace(m_destination.notes());
-    for (auto &puzzle : m_data) {
-      cleanup_whitespace(puzzle.notes);
-      for (auto &snapshot : puzzle.snapshots) {
-        cleanup_whitespace(snapshot.notes);
+          if (first_moves_line != remaining_lines.cend()) {
+            std::copy(remaining_lines.cbegin(), first_moves_line,
+                      std::back_inserter(snapshot.notes));
+            remaining_lines.erase(remaining_lines.cbegin(), first_moves_line);
+          } else {
+            snapshot.notes.swap(remaining_lines);
+          }
+        }
       }
     }
   }
 
   Strings &notes_before_puzzle(size_t puzzle_index) {
-    if (puzzle_index == 0) return m_destination.notes();
-    auto &previous_puzzle = m_data[puzzle_index - 1];
-    if (previous_puzzle.snapshots.size() == 0) {
-      return previous_puzzle.notes;
-    } else {
+    if (puzzle_index == 0) { return m_data.notes; }
+    PuzzleData &previous_puzzle = m_data.puzzles[puzzle_index - 1];
+    if (previous_puzzle.snapshots.size() > 0) {
       return previous_puzzle.snapshots.back().notes;
     }
+    return previous_puzzle.notes;
   }
 
   Strings &notes_before_snapshot(size_t puzzle_index, size_t snapshot_index) {
-    auto &puzzle = m_data[puzzle_index];
-    if (snapshot_index == 0) {
-      return puzzle.notes;
-    } else {
-      return puzzle.snapshots[snapshot_index - 1].notes;
-    }
+    PuzzleData &puzzle = m_data.puzzles[puzzle_index];
+    if (snapshot_index == 0) { return puzzle.notes; }
+    return puzzle.snapshots[snapshot_index - 1].notes;
   }
 
-  // @verbatim
-  // ::   Titles                                               ::
-  // ::   A title line is the last non-blank text line before  ::
-  // ::   a puzzle or a game, provided the line is preceded     ::
-  // ::   by a blank line or it is the only text line at this  ::
-  // ::   position in the file.                                ::
-  // ::                                                        ::
-  // ::   Title lines are optional unless a single or a last   ::
-  // ::   text line from a preceding puzzle, game, or file      ::
-  // ::   header can be mistaken for a title line.             ::
-  // @endverbatim
-  static string remove_title_line(Strings &notes) {
-    auto candidate = find_if(notes.rbegin(), notes.rend(), [](const string &s) {
-      return !is_blank(s) && !Puzzle::is_board(s) && !Snapshot::is_snapshot(s);
-    });
+  string get_and_remove_title_line(Strings &notes) {
+    // :: Titles                                                 ::
+    // ::   A title line is the last non-blank text line before  ::
+    // ::   a board, a saved game, or a solution, provided the   ::
+    // ::   line is preceded by a blank line or it is the only   ::
+    // ::   text line at this position in the file.              ::
+    // ::                                                        ::
+    // ::   Title lines are optional unless a single or a last   ::
+    // ::   text line from a preceding puzzle, saved game,       ::
+    // ::   solution, or file header can be mistaken for a title ::
+    // ::   line.                                                ::
+    // if (notes.size() == 0) return "";
 
-    bool is_title_line = false;
-    if (candidate != notes.rend()) {
-      Strings::const_reverse_iterator preceding_line = candidate;
-      if (preceding_line != notes.rend()) ++preceding_line;
-      Strings::const_reverse_iterator following_line = candidate;
-      if (following_line != notes.rbegin()) --following_line;
+    // auto b = notes.rbegin();
+    // auto e = notes.rend();
+    // auto f = [](const string &s) { return !is_blank(s); };
+    // Strings::const_reverse_iterator candidate = find_if(b, e, f);
 
-      bool preceding_ok = preceding_line == notes.rend()
-                            ? true
-                            : is_blank(*preceding_line) ||
-                                Puzzle::is_board(*preceding_line) ||
-                                Snapshot::is_snapshot(*preceding_line);
+    Strings::const_reverse_iterator candidate = find_if(
+      notes.rbegin(), notes.rend(), [](const string &s) { return !is_blank(s); });
 
-      bool following_ok = following_line == candidate
-                            ? true
-                            : is_blank(*following_line) ||
-                                Puzzle::is_board(*following_line) ||
-                                Snapshot::is_snapshot(*following_line);
+    if (candidate == notes.rend()) { return ""; }
 
-      is_title_line =
-        preceding_ok && following_ok && !is_collection_tag_line(*candidate) &&
-        !is_puzzle_tag_line(*candidate) && !is_snapshot_tag_line(*candidate);
-    }
+    Strings::const_reverse_iterator preceding_line = candidate;
+    if (preceding_line != notes.rend()) ++preceding_line;
+    Strings::const_reverse_iterator following_line = candidate;
+    if (following_line != notes.rbegin()) --following_line;
+
+    bool preceding_ok =
+      preceding_line == notes.rend() ? true : is_blank(*preceding_line);
+    bool following_ok = following_line == candidate ? true : is_blank(*following_line);
+    bool is_title_line = preceding_ok && following_ok;
 
     if (is_title_line) {
       string title_line = *candidate;
@@ -524,7 +556,42 @@ private:
     return "";
   }
 
-  static void cleanup_whitespace(Strings &notes) {
+  void parse_title_lines() {
+    for (size_t puzzle_index = 0; puzzle_index < m_data.puzzles.size();
+         puzzle_index++) {
+      PuzzleData &puzzle = m_data.puzzles[puzzle_index];
+      Strings &notes_bp = notes_before_puzzle(puzzle_index);
+      puzzle.title = get_and_remove_title_line(notes_bp);
+
+      for (size_t snapshot_index = 0; snapshot_index < puzzle.snapshots.size();
+           snapshot_index++) {
+        SnapshotData &snapshot = puzzle.snapshots[snapshot_index];
+        Strings &notes_bs = notes_before_snapshot(puzzle_index, snapshot_index);
+        snapshot.title = get_and_remove_title_line(notes_bs);
+      }
+    }
+  }
+
+  void parse_notes() {
+    Strings remaining_lines =
+      SOKTags::extract_collection_attributes(m_data, m_data.notes);
+    m_data.notes.swap(cleanup_whitespace(remaining_lines));
+
+    for (PuzzleData &puzzle : m_data.puzzles) {
+      remaining_lines = SOKTags::extract_puzzle_attributes(
+        puzzle, puzzle.notes, m_data.was_tessellation_hint_in_header,
+        m_data.header_tessellation_hint, true, m_supplied_tessellation_hint);
+      puzzle.notes.swap(cleanup_whitespace(remaining_lines));
+
+      for (SnapshotData &snapshot : puzzle.snapshots) {
+        remaining_lines =
+          SOKTags::extract_snapshot_attributes(snapshot, snapshot.notes);
+        snapshot.notes.swap(cleanup_whitespace(remaining_lines));
+      }
+    }
+  }
+
+  Strings &cleanup_whitespace(Strings &notes) {
     Strings::iterator tit;
     tit = unique(notes.begin(), notes.end(), [](const string &l, const string &r) {
       return is_blank(l) && is_blank(r);
@@ -537,19 +604,12 @@ private:
     for (string &line : notes) {
       boost::trim_right(line);
     }
+
+    return notes;
   }
 };
 
-LIBSOKOENGINE_LOCAL static bool write_tagged(ostream &dest, string tag_name,
-                                             string tag_data) {
-  if (is_blank(tag_name) || is_blank(tag_data)) return false;
-  tag_name[0] = toupper(tag_name[0]);
-  boost::trim_right(tag_data);
-  dest << tag_name << ": " << tag_data << endl;
-  return (bool)dest;
-}
-
-LIBSOKOENGINE_LOCAL static string to_str(Tessellation tessellation) {
+LIBSOKOENGINE_LOCAL string to_str(Tessellation tessellation) {
   switch (tessellation) {
   case Tessellation::SOKOBAN:
     return "sokoban";
@@ -566,6 +626,7 @@ LIBSOKOENGINE_LOCAL static string to_str(Tessellation tessellation) {
     // Do not handle default, let compiler generate warning when another tessellation
     // is added...
   }
+  throw std::invalid_argument("Unknown tessellation!");
 }
 
 class LIBSOKOENGINE_LOCAL PuzzleWriteVisitor {
@@ -602,7 +663,7 @@ private:
   bool &retv;
 
   bool write_puzzle(const Puzzle &puzzle) {
-    if (puzzle.size() == 0) return true;
+    if (is_blank(puzzle.board())) return true;
 
     if (!is_blank(puzzle.title()))
       m_stream << boost::trim_copy(puzzle.title()) << endl << endl;
@@ -612,18 +673,24 @@ private:
     bool written = false;
 
     if (puzzle.tessellation() != Tessellation::SOKOBAN)
-      written =
-        write_tagged(m_stream, TAG_VARIANT, to_str(puzzle.tessellation())) || written;
+      written = SOKTags::write_tagged(m_stream, SOKTags::VARIANT,
+                                      to_str(puzzle.tessellation())) ||
+                written;
 
-    written = write_tagged(m_stream, TAG_AUTHOR, puzzle.author()) || written;
     if (!is_blank(puzzle.boxorder()) && !is_blank(puzzle.goalorder())) {
-      written = write_tagged(m_stream, TAG_BOXORDER, puzzle.boxorder()) || written;
-      written = write_tagged(m_stream, TAG_GOALORDER, puzzle.goalorder()) || written;
+      written = SOKTags::write_tagged(m_stream, SOKTags::BOXORDER, puzzle.boxorder()) ||
+                written;
+      written =
+        SOKTags::write_tagged(m_stream, SOKTags::GOALORDER, puzzle.goalorder()) ||
+        written;
     }
+
+    written =
+      SOKTags::write_tagged(m_stream, SOKTags::AUTHOR, puzzle.author()) || written;
 
     bool non_blank_found = false;
     for (const string &line : puzzle.notes()) {
-      non_blank_found = non_blank_found || is_blank(line);
+      non_blank_found = non_blank_found || !is_blank(line);
     }
     if (non_blank_found) {
       for (const string &line : puzzle.notes()) {
@@ -642,17 +709,21 @@ private:
     if (!is_blank(snapshot.title()))
       m_stream << boost::trim_copy(snapshot.title()) << endl;
 
-    m_stream << boost::trim_copy(snapshot.moves_data()) << endl << endl;
+    // TODO: wrap at 70
+    string moves_data = boost::trim_copy(snapshot.moves_data());
+    size_t write_count = 0;
+    for (auto c: moves_data) {
+      m_stream << c;
+      write_count++;
+      if (write_count % 70 == 0) { m_stream << endl; }
+    }
+    m_stream << endl << endl;
 
-    bool written = false;
-    written = write_tagged(m_stream, TAG_SOLVER, snapshot.solver()) || written;
-    written =
-      write_tagged(m_stream, TAG_SNAPSHOT_CREATED_AT, snapshot.created_at()) || written;
-    written = write_tagged(m_stream, TAG_DURATION, snapshot.duration()) || written;
+    bool written = SOKTags::write_tagged(m_stream, SOKTags::SOLVER, snapshot.solver());
 
     bool non_blank_found = false;
     for (const string &line : snapshot.notes()) {
-      non_blank_found = non_blank_found || is_blank(line);
+      non_blank_found = non_blank_found || !is_blank(line);
     }
     if (non_blank_found) {
       for (const string &line : snapshot.notes()) {
@@ -671,7 +742,7 @@ class LIBSOKOENGINE_LOCAL SOKWriter {
 
 public:
   SOKWriter(ostream &dest) : m_stream(dest) {
-    if (dest.fail()) { throw runtime_error("Unknown output stream error!"); }
+    if (dest.fail()) { throw std::runtime_error("Unknown output stream error!"); }
   }
 
   bool write(const Collection &collection) {
@@ -689,9 +760,9 @@ private:
     m_stream << SOK_format_specification_res;
 
     bool write_created_at =
-      write_tagged(m_stream, TAG_CREATED_AT, collection.created_at());
-    bool write_updated_at =
-      write_tagged(m_stream, TAG_UPDATED_AT, collection.updated_at());
+      SOKTags::write_tagged(m_stream, SOKTags::DATE_CREATED, collection.created_at());
+    bool write_updated_at = SOKTags::write_tagged(
+      m_stream, SOKTags::DATE_OF_LAST_CHANGE, collection.updated_at());
 
     if (write_created_at || write_updated_at) {
       m_stream << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl
@@ -701,8 +772,11 @@ private:
     }
 
     bool written = false;
-    written = write_tagged(m_stream, TAG_AUTHOR, collection.author()) || written;
-    written = write_tagged(m_stream, TAG_TITLE, collection.title()) || written;
+    written =
+      SOKTags::write_tagged(m_stream, SOKTags::COLLECTION, collection.title()) ||
+      written;
+    written =
+      SOKTags::write_tagged(m_stream, SOKTags::AUTHOR, collection.author()) || written;
 
     bool non_blank_found = false;
     for (const string &line : collection.notes()) {

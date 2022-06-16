@@ -71,16 +71,10 @@ public:
 
   const std::string &title() const;
   std::string &title();
-  const std::string &duration() const;
-  std::string &duration();
   const std::string &solver() const;
   std::string &solver();
   const Strings &notes() const;
   Strings &notes();
-  const std::string &created_at() const;
-  std::string &created_at();
-  const std::string &updated_at() const;
-  std::string &updated_at();
 
   game::Tessellation tessellation() const;
 

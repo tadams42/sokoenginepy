@@ -1,13 +1,14 @@
 {
-  "version": 2,
+  "version": 4,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 19,
-    "patch": 8
+    "minor": 23,
+    "patch": 0
   },
   "configurePresets": [
     {
       "name": "_debug",
+      "description": "Base preset for debug configurations.",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
@@ -17,7 +18,17 @@
       }
     },
     {
+      "name": "_debug_clang",
+      "hidden": true,
+      "description": "Base preset for debug configurations with Clang compiler. Without this, debugging from VSCode doesn't show symbols, only addresses. See https://code.visualstudio.com/docs/cpp/faq-cpp#_how-do-i-enable-debug-symbols",
+      "inherits": ["_debug"],
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS_DEBUG": "--debug -fstandalone-debug"
+      }
+    },
+    {
       "name": "_release",
+      "description": "Base preset for release configurations.",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
@@ -28,6 +39,7 @@
     },
     {
       "name": "_gcc",
+      "description": "Base preset for compiling with gcc.",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_C_COMPILER": "/usr/bin/gcc",
@@ -36,6 +48,7 @@
     },
     {
       "name": "_clang",
+      "description": "Base preset for compiling with Clang.",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_C_COMPILER": "/usr/bin/clang",
@@ -44,18 +57,21 @@
     },
     {
       "name": "_make",
+      "description": "Base preset for Make generator.",
       "hidden": true,
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
       "name": "_ninja",
+      "description": "Base preset for Ninja generator.",
       "hidden": true,
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
       "name": "debug",
+      "description": "Generate debug build with gcc and make",
       "inherits": ["_gcc", "_debug", "_make"],
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/dev_installs/${presetName}"
@@ -63,11 +79,13 @@
     },
     {
       "name": "release",
+      "description": "Generate release build with gcc and ninja",
       "inherits": ["_gcc", "_release", "_ninja"]
     },
     {
       "name": "vscode",
-      "inherits": ["_clang", "_debug", "_ninja"]
+      "description": "Generate VSCode debug build with clang and ninja",
+      "inherits": ["_clang", "_debug_clang", "_ninja"]
     }
   ]
 }

@@ -1,7 +1,7 @@
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::         Sokoban (c) by Falcon Co., Ltd., Japan         ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::                    File Format 0.17                    ::
+::                    File Format 0.19                    ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::                                                        ::
 :: File Notes                                  Optional   ::
@@ -38,7 +38,7 @@
 :: Titles                                                 ::
 ::   A title line is the last non-blank text line before  ::
 ::   a board, a saved game, or a solution, provided the   ::
-::   line is preceded  by a blank line or it is the only  ::
+::   line is preceded by a blank line or it is the only   ::
 ::   text line at this position in the file.              ::
 ::                                                        ::
 ::   Title lines are optional unless a single or a last   ::
@@ -55,7 +55,7 @@
 ::::::::::::::::::::::::::: Board ::::::::::::::::::::::::::
 :: Legend.................:      :.................Legend ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: Wall...................: #  # :...................Wall ::
+:: Wall...................: W  # :...................Wall ::
 :: Pusher.................: p  @ :.................Pusher ::
 :: Pusher on goal square..: P  + :..Pusher on goal square ::
 :: Box....................: b  $ :....................Box ::
@@ -104,7 +104,7 @@
 ::                                                        ::
 ::   Reverse mode saved games and solutions must begin    ::
 ::   with a jump, even if it is empty. An example:        ::
-::   "[]U[rr]d".                                          ::
+::   "[]Urrd".                                            ::
 ::                                                        ::
 ::   Pusher changes: Only in puzzles with multiple        ::
 ::   pushers, e.g., Multiban. Moves inside the braces     ::

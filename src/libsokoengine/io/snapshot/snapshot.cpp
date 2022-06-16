@@ -31,9 +31,6 @@ using snapshot_parsing::evaluated_ast::Steps;
 class LIBSOKOENGINE_LOCAL Snapshot::PIMPL {
 public:
   string m_title;
-  string m_created_at;
-  string m_updated_at;
-  string m_duration;
   string m_solver;
   Strings m_notes;
 
@@ -105,15 +102,6 @@ Tessellation Snapshot::tessellation() const { return m_impl->m_tessellation; }
 
 const string &Snapshot::title() const { return m_impl->m_title; }
 string &Snapshot::title() { return m_impl->m_title; }
-
-const string &Snapshot::created_at() const { return m_impl->m_created_at; }
-string &Snapshot::created_at() { return m_impl->m_created_at; }
-
-const string &Snapshot::updated_at() const { return m_impl->m_updated_at; }
-string &Snapshot::updated_at() { return m_impl->m_updated_at; }
-
-const string &Snapshot::duration() const { return m_impl->m_duration; }
-string &Snapshot::duration() { return m_impl->m_duration; }
 
 const string &Snapshot::solver() const { return m_impl->m_solver; }
 string &Snapshot::solver() { return m_impl->m_solver; }
