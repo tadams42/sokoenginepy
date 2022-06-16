@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 (unreleased)
+## 0.6.0 (2022-06-16)
 
 - massive refactoring and cleanup or public API
 - updated .sok format reader to v0.19
@@ -10,9 +10,9 @@
 - replaced hand written parsers with Boost.X3 on C++ side and Lark on Python side
 - implemented parts of I/O that were missing on C++ side
   - Python doesn't really need I/O speedup here, but it was missing part of
-    libsokoengine C++.
-  - since we want to test C++, we export io from C++ to Python and make sure it passes
-    same test suite
+    libsokoengine C++
+  - consequently, to be able to test C++ I/O implementation, it was exported into Python
+    and is used alongside other parts of native extension
 
 ## 0.5.4 (2022-03-06)
 
