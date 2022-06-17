@@ -64,21 +64,21 @@ char SokobanTessellation::pusher_step_to_char(const PusherStep &rv) const {
 PusherStep SokobanTessellation::char_to_pusher_step(char rv) const {
   switch (rv) {
   case io::Snapshot::l:
-    return PusherStep(Direction::LEFT, false);
+    return PusherStep(Direction::LEFT, Config::NO_ID);
   case io::Snapshot::L:
-    return PusherStep(Direction::LEFT, true);
+    return PusherStep(Direction::LEFT, Config::DEFAULT_ID);
   case io::Snapshot::u:
-    return PusherStep(Direction::UP, false);
+    return PusherStep(Direction::UP, Config::NO_ID);
   case io::Snapshot::U:
-    return PusherStep(Direction::UP, true);
+    return PusherStep(Direction::UP, Config::DEFAULT_ID);
   case io::Snapshot::r:
-    return PusherStep(Direction::RIGHT, false);
+    return PusherStep(Direction::RIGHT, Config::NO_ID);
   case io::Snapshot::R:
-    return PusherStep(Direction::RIGHT, true);
+    return PusherStep(Direction::RIGHT, Config::DEFAULT_ID);
   case io::Snapshot::d:
-    return PusherStep(Direction::DOWN, false);
+    return PusherStep(Direction::DOWN, Config::NO_ID);
   case io::Snapshot::D:
-    return PusherStep(Direction::DOWN, true);
+    return PusherStep(Direction::DOWN, Config::DEFAULT_ID);
   default:
     throw invalid_argument("Illegal PusherStep direction in SokobanTessellation!");
   }

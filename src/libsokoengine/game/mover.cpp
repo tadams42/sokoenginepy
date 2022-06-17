@@ -63,7 +63,7 @@ public:
 
     m_last_move.clear();
     for (const Direction &direction : selection_path) {
-      PusherStep pusher_step(direction, false);
+      PusherStep pusher_step(direction, Config::NO_ID);
       pusher_step.set_is_pusher_selection(true);
       m_last_move.push_back(pusher_step);
     }
@@ -93,7 +93,7 @@ public:
       m_manager.board().find_jump_path(old_position, new_position));
     m_last_move.clear();
     for (const Direction &direction : path) {
-      PusherStep pusher_step(direction, false);
+      PusherStep pusher_step(direction, Config::NO_ID);
       pusher_step.set_is_jump(true);
       pusher_step.set_pusher_id(m_selected_pusher);
       m_last_move.push_back(pusher_step);
@@ -137,7 +137,7 @@ public:
       throw IllegalMoveError(exc.what());
     }
 
-    PusherStep pusher_step(direction, is_push);
+    PusherStep pusher_step(direction);
     pusher_step.set_pusher_id(m_selected_pusher);
     if (is_push) {
       pusher_step.set_moved_box_id(m_manager.box_id_on(in_front_of_box));
@@ -182,7 +182,7 @@ public:
       }
     }
 
-    PusherStep pusher_step(direction, is_pull);
+    PusherStep pusher_step(direction);
     pusher_step.set_pusher_id(m_selected_pusher);
     if (is_pull) {
       pusher_step.set_moved_box_id(m_manager.box_id_on(initial_pusher_position));

@@ -57,34 +57,34 @@ position_t HexobanTessellation::neighbor_position(position_t position,
 PusherStep HexobanTessellation::char_to_pusher_step(char rv) const {
   switch (rv) {
   case io::Snapshot::l:
-    return PusherStep(Direction::LEFT, false);
+    return PusherStep(Direction::LEFT, Config::NO_ID);
   case io::Snapshot::L:
-    return PusherStep(Direction::LEFT, true);
+    return PusherStep(Direction::LEFT, Config::DEFAULT_ID);
 
   case io::Snapshot::r:
-    return PusherStep(Direction::RIGHT, false);
+    return PusherStep(Direction::RIGHT, Config::NO_ID);
   case io::Snapshot::R:
-    return PusherStep(Direction::RIGHT, true);
+    return PusherStep(Direction::RIGHT, Config::DEFAULT_ID);
 
   case io::Snapshot::u:
-    return PusherStep(Direction::NORTH_WEST, false);
+    return PusherStep(Direction::NORTH_WEST, Config::NO_ID);
   case io::Snapshot::U:
-    return PusherStep(Direction::NORTH_WEST, true);
+    return PusherStep(Direction::NORTH_WEST, Config::DEFAULT_ID);
 
   case io::Snapshot::d:
-    return PusherStep(Direction::SOUTH_EAST, false);
+    return PusherStep(Direction::SOUTH_EAST, Config::NO_ID);
   case io::Snapshot::D:
-    return PusherStep(Direction::SOUTH_EAST, true);
+    return PusherStep(Direction::SOUTH_EAST, Config::DEFAULT_ID);
 
   case io::Snapshot::n:
-    return PusherStep(Direction::NORTH_EAST, false);
+    return PusherStep(Direction::NORTH_EAST, Config::NO_ID);
   case io::Snapshot::N:
-    return PusherStep(Direction::NORTH_EAST, true);
+    return PusherStep(Direction::NORTH_EAST, Config::DEFAULT_ID);
 
   case io::Snapshot::s:
-    return PusherStep(Direction::SOUTH_WEST, false);
+    return PusherStep(Direction::SOUTH_WEST, Config::NO_ID);
   case io::Snapshot::S:
-    return PusherStep(Direction::SOUTH_WEST, true);
+    return PusherStep(Direction::SOUTH_WEST, Config::DEFAULT_ID);
 
   default:
     throw invalid_argument("Illegal PusherStep character in HexobanTessellation!");

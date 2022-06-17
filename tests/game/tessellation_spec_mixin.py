@@ -1,6 +1,7 @@
 import pytest
 
-from sokoenginepy.game import PusherStep
+
+from sokoenginepy.game import PusherStep, Config
 
 
 class TessellationSpecMixin:
@@ -24,9 +25,9 @@ class TessellationSpecMixin:
 
     def test_it_raises_when_converting_illegal_direction(self):
         for index, illegal_direction in enumerate(self.illegal_directions):
-            move = PusherStep(illegal_direction, False)
+            move = PusherStep(illegal_direction, Config.NO_ID)
             with pytest.raises(ValueError):
                 self.tessellation.pusher_step_to_char(move)
-            push = PusherStep(illegal_direction, True)
+            push = PusherStep(illegal_direction, Config.DEFAULT_ID)
             with pytest.raises(ValueError):
                 self.tessellation.pusher_step_to_char(push)

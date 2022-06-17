@@ -13,6 +13,9 @@
     returns `Config.NO_POS`.
   - this makes APIs easier to use and pybind11 bridge more efficient (because pybind11
     doesn't need to handle `None`)
+- simplified `PusherStep`
+  - signaling box movement is now done by single attribute, `moved_box_id`
+  - added explicit constant for "no piece ID is present" situations (`Config.NO_ID`)
 
 ## 0.6.0 (2022-06-16)
 

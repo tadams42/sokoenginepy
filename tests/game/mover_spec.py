@@ -168,7 +168,7 @@ class DescribeMover:
             assert forward_mover.selected_pusher == Config.DEFAULT_ID + 1
             for am in forward_mover.last_move:
                 assert am.pusher_id == Config.DEFAULT_ID
-                assert am.moved_box_id == None
+                assert am.moved_box_id == Config.NO_ID
 
         def it_raises_if_trying_to_select_non_existent_pusher(self, forward_board):
             forward_mover = Mover(forward_board)
@@ -223,7 +223,7 @@ class DescribeMover:
             assert forward_mover.last_move in undone_pusher_selections
             for am in forward_mover.last_move:
                 assert am.pusher_id == Config.DEFAULT_ID
-                assert am.moved_box_id == None
+                assert am.moved_box_id == Config.NO_ID
 
     class DescribeJumping:
         def it_performs_jumps(self, forward_board, jump_dest):
@@ -236,7 +236,7 @@ class DescribeMover:
             )
             for am in reverse_mover.last_move:
                 assert am.pusher_id == Config.DEFAULT_ID
-                assert am.moved_box_id == None
+                assert am.moved_box_id == Config.NO_ID
 
         def it_refuses_to_jump_in_forward_solving_mode(self, forward_board, jump_dest):
             forward_mover = Mover(forward_board)
@@ -266,7 +266,7 @@ class DescribeMover:
             assert reverse_mover.board[jump_dest].has_pusher
             for am in reverse_mover.last_move:
                 assert am.pusher_id == Config.DEFAULT_ID
-                assert am.moved_box_id == None
+                assert am.moved_box_id == Config.NO_ID
 
         def it_refuses_to_jump_onto_obstacles(
             self, forward_board, jump_obstacle_position
@@ -293,7 +293,7 @@ class DescribeMover:
             assert reverse_mover.last_move in jumps
             for am in reverse_mover.last_move:
                 assert am.pusher_id == Config.DEFAULT_ID
-                assert am.moved_box_id == None
+                assert am.moved_box_id == Config.NO_ID
 
         def when_jumping_to_same_position_it_doesnt_update_last_move(
             self, forward_board, jump_dest
@@ -367,7 +367,7 @@ class DescribeMover:
             assert board[dest].has_pusher
             assert mover.last_move == [PusherStep(Direction.RIGHT)]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == None
+            assert mover.last_move[0].moved_box_id == Config.NO_ID
 
         def when_forward_moving_pusher_doesnt_pull_box_behind_it(self):
             board = BoardGraph(
@@ -396,7 +396,7 @@ class DescribeMover:
             assert board[dest].has_pusher
             assert mover.last_move == [PusherStep(Direction.RIGHT)]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == None
+            assert mover.last_move[0].moved_box_id == Config.NO_ID
 
         def it_refuses_to_forward_move_pusher_into_obstacles_or_off_board(self):
             board = BoardGraph(
@@ -454,7 +454,7 @@ class DescribeMover:
             assert board[dest].has_pusher
             assert mover.last_move == [PusherStep(Direction.LEFT)]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == None
+            assert mover.last_move[0].moved_box_id == Config.NO_ID
 
         def when_undoing_forward_move_doesnt_pull_box_from_behind_pusher(self):
             board = BoardGraph(
@@ -485,7 +485,7 @@ class DescribeMover:
             assert board[dest].has_pusher
             assert mover.last_move == [PusherStep(Direction.LEFT)]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == None
+            assert mover.last_move[0].moved_box_id == Config.NO_ID
 
         def it_refuses_to_undo_forward_move_by_moving_pusher_into_obstacles_or_off_board(
             self,
@@ -523,7 +523,7 @@ class DescribeMover:
                 # last move shuould be unchanged
                 assert mover.last_move == [PusherStep(direction)]
                 assert mover.last_move[0].pusher_id == Config.DEFAULT_ID
-                assert mover.last_move[0].moved_box_id == None
+                assert mover.last_move[0].moved_box_id == Config.NO_ID
 
         def it_pushes_box_in_front_of_pusher(self):
             board = BoardGraph(
@@ -556,9 +556,11 @@ class DescribeMover:
             assert not mover.board[pusher_src].has_pusher
             assert mover.board[box_dest].has_box
             assert mover.board[pusher_dest].has_pusher
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
+            ]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == Config.DEFAULT_PIECE_ID
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID
 
         def when_pushing_box_doesnt_pull_box_from_behind_pusher(self):
             board = BoardGraph(
@@ -592,9 +594,11 @@ class DescribeMover:
             assert mover.board[box_dest].has_box
             assert mover.board[pusher_dest].has_pusher
             assert not mover.board[pusher_src].has_box
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID + 1)
+            ]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == Config.DEFAULT_PIECE_ID + 1
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID + 1
 
         def it_refuses_to_push_box_into_obstacles_or_off_board(self):
             board = BoardGraph(
@@ -657,7 +661,9 @@ class DescribeMover:
             selected_pusher = Config.DEFAULT_ID + 1
             mover.select_pusher(selected_pusher)
 
-            mover.last_move = [PusherStep(Direction.RIGHT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
+            ]
             mover.undo_last_move()
 
             assert mover.board_manager.box_position(Config.DEFAULT_ID) == box_dest
@@ -666,7 +672,9 @@ class DescribeMover:
             assert not mover.board[pusher_src].has_pusher
             assert mover.board[box_dest].has_box
             assert mover.board[pusher_dest].has_pusher
-            assert mover.last_move == [PusherStep(Direction.LEFT, box_moved=True)]
+            assert mover.last_move == [
+                PusherStep(Direction.LEFT, moved_box_id=Config.DEFAULT_ID)
+            ]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID
 
@@ -691,56 +699,68 @@ class DescribeMover:
             mover.select_pusher(selected_pusher)
 
             # Undo into off board
-            mover.last_move = [PusherStep(Direction.RIGHT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID + 1)
+            ]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.board_manager.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
             assert board[board.neighbor(pusher_src, Direction.RIGHT)].has_box
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
                 PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID + 1)
-            assert mover.last_move[0].moved_box_id == None
+            ]
             assert mover.last_move[0].pusher_id == Config.DEFAULT_ID
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID + 1
 
             # Undo into wall
-            mover.last_move = [PusherStep(Direction.DOWN, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.DOWN, moved_box_id=Config.DEFAULT_ID + 3)
+            ]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.board_manager.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
             assert board[board.neighbor(pusher_src, Direction.DOWN)].has_box
-            assert mover.last_move == [PusherStep(Direction.DOWN, box_moved=True)]
+            assert mover.last_move == [
                 PusherStep(Direction.DOWN, moved_box_id=Config.DEFAULT_ID + 3)
-            assert mover.last_move[0].moved_box_id == None
+            ]
             assert mover.last_move[0].pusher_id == Config.DEFAULT_ID
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID + 3
 
             selected_pusher = Config.DEFAULT_ID + 3
             mover.select_pusher(selected_pusher)
             pusher_src = index_1d(5, 2, board.board_width)
 
             # Undo into pusher
-            mover.last_move = [PusherStep(Direction.RIGHT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID + 2)
+            ]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.board_manager.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
             assert board[board.neighbor(pusher_src, Direction.RIGHT)].has_box
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
                 PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID + 2)
-            assert mover.last_move[0].moved_box_id == None
+            ]
             assert mover.last_move[0].pusher_id == Config.DEFAULT_ID
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID + 2
 
             # Undo into box
-            mover.last_move = [PusherStep(Direction.DOWN, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.DOWN, moved_box_id=Config.DEFAULT_ID + 4)
+            ]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
             assert mover.board_manager.pusher_position(selected_pusher) == pusher_src
             assert board[pusher_src].has_pusher
             assert board[board.neighbor(pusher_src, Direction.DOWN)].has_box
-            assert mover.last_move == [PusherStep(Direction.DOWN, box_moved=True)]
+            assert mover.last_move == [
                 PusherStep(Direction.DOWN, moved_box_id=Config.DEFAULT_ID + 1)
-            assert mover.last_move[0].moved_box_id == None
+            ]
             assert mover.last_move[0].pusher_id == Config.DEFAULT_ID
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID + 4
 
         def it_refuses_to_undo_push_if_there_is_no_box_behind_pusher(self):
             board = BoardGraph(
@@ -761,10 +781,14 @@ class DescribeMover:
             selected_pusher = Config.DEFAULT_ID + 1
             mover.select_pusher(selected_pusher)
 
-            mover.last_move = [PusherStep(Direction.RIGHT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
+            ]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
+            ]
 
     class DescribeReverseMovement:
         def it_moves_pusher_in_requested_direction(self):
@@ -794,7 +818,7 @@ class DescribeMover:
             assert board[dest].has_pusher
             assert mover.last_move == [PusherStep(Direction.RIGHT)]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == None
+            assert mover.last_move[0].moved_box_id == Config.NO_ID
 
         def when_reverse_moving_it_doesnt_pull_box_behind_pusher(self):
             board = BoardGraph(
@@ -824,7 +848,7 @@ class DescribeMover:
             assert board[dest].has_pusher
             assert mover.last_move == [PusherStep(Direction.LEFT)]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == None
+            assert mover.last_move[0].moved_box_id == Config.NO_ID
 
         def it_refuses_to_reverse_move_pusher_into_obstacles_or_off_board(self):
             board = BoardGraph(
@@ -887,7 +911,7 @@ class DescribeMover:
             assert board[dest].has_pusher
             assert mover.last_move == [PusherStep(Direction.RIGHT)]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == None
+            assert mover.last_move[0].moved_box_id == Config.NO_ID
 
         def when_undoing_reverse_move_it_doesnt_pull_box_behind_pusher(self):
             board_str = "\n".join(
@@ -919,7 +943,7 @@ class DescribeMover:
             assert board[dest].has_pusher
             assert mover.last_move == [PusherStep(Direction.LEFT)]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == None
+            assert mover.last_move[0].moved_box_id == Config.NO_ID
 
             # pulls_boxes == True
             board = BoardGraph(SokobanPuzzle(board=board_str))
@@ -939,7 +963,7 @@ class DescribeMover:
             assert board[dest].has_pusher
             assert mover.last_move == [PusherStep(Direction.LEFT)]
             assert mover.last_move[0].pusher_id == selected_pusher
-            assert mover.last_move[0].moved_box_id == None
+            assert mover.last_move[0].moved_box_id == Config.NO_ID
 
         def it_pulls_box_behind_pusher_if_pulls_boxes_is_set(self):
             board = BoardGraph(
@@ -973,7 +997,9 @@ class DescribeMover:
             assert not board[pusher_src].has_pusher
             assert board[box_dest].has_box
             assert not board[box_src].has_box
-            assert mover.last_move == [PusherStep(Direction.LEFT, box_moved=True)]
+            assert mover.last_move == [
+                PusherStep(Direction.LEFT, moved_box_id=Config.DEFAULT_ID)
+            ]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID
 
@@ -1042,7 +1068,9 @@ class DescribeMover:
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
 
-            mover.last_move = [PusherStep(Direction.LEFT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.LEFT, moved_box_id=Config.DEFAULT_ID)
+            ]
             mover.undo_last_move()
 
             assert mover.board_manager.pusher_position(selected_pusher) == pusher_dest
@@ -1051,7 +1079,9 @@ class DescribeMover:
             assert not board[pusher_src].has_pusher
             assert board[box_dest].has_box
             assert not board[box_src].has_box
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
+            ]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID
 
@@ -1078,7 +1108,9 @@ class DescribeMover:
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
 
-            mover.last_move = [PusherStep(Direction.LEFT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.LEFT, moved_box_id=Config.DEFAULT_ID)
+            ]
             mover.pulls_boxes = False
             mover.undo_last_move()
 
@@ -1090,7 +1122,9 @@ class DescribeMover:
             assert not board[box_src].has_box
             assert board[behind_pusher].has_box
             assert not board[pusher_src].has_box
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
+            ]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID + 1
 
@@ -1105,7 +1139,9 @@ class DescribeMover:
             mover = Mover(board, SolvingMode.REVERSE)
             mover.select_pusher(selected_pusher)
 
-            mover.last_move = [PusherStep(Direction.LEFT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.LEFT, moved_box_id=Config.DEFAULT_ID)
+            ]
             mover.pulls_boxes = True
             mover.undo_last_move()
 
@@ -1117,7 +1153,9 @@ class DescribeMover:
             assert not board[box_src].has_box
             assert board[behind_pusher].has_box
             assert not board[pusher_src].has_box
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
+            ]
             assert mover.last_move[0].pusher_id == selected_pusher
             assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID + 1
 
@@ -1140,38 +1178,54 @@ class DescribeMover:
             mover.select_pusher(Config.DEFAULT_ID + 1)
 
             # undo into off board
-            mover.last_move = [PusherStep(Direction.RIGHT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
+            ]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
                 PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
-            assert mover.last_move[0].moved_box_id == None
+            ]
+            assert mover.last_move[0].pusher_id == Config.DEFAULT_ID
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID
 
             # undo into wall
-            mover.last_move = [PusherStep(Direction.DOWN, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.DOWN, moved_box_id=Config.DEFAULT_ID)
+            ]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [PusherStep(Direction.DOWN, box_moved=True)]
+            assert mover.last_move == [
                 PusherStep(Direction.DOWN, moved_box_id=Config.DEFAULT_ID)
-            assert mover.last_move[0].moved_box_id == None
+            ]
+            assert mover.last_move[0].pusher_id == Config.DEFAULT_ID
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID
 
-            mover.select_pusher(Config.DEFAULT_PIECE_ID + 2)
+            mover.select_pusher(Config.DEFAULT_ID + 2)
 
             # undo into box
-            mover.last_move = [PusherStep(Direction.RIGHT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
+            ]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [PusherStep(Direction.RIGHT, box_moved=True)]
+            assert mover.last_move == [
                 PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID)
-            assert mover.last_move[0].moved_box_id == None
+            ]
+            assert mover.last_move[0].pusher_id == Config.DEFAULT_ID
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID
 
             # undo into pusher
-            mover.last_move = [PusherStep(Direction.LEFT, box_moved=True)]
+            mover.last_move = [
+                PusherStep(Direction.LEFT, moved_box_id=Config.DEFAULT_ID)
+            ]
             with pytest.raises(IllegalMoveError):
                 mover.undo_last_move()
-            assert mover.last_move == [PusherStep(Direction.LEFT, box_moved=True)]
+            assert mover.last_move == [
                 PusherStep(Direction.LEFT, moved_box_id=Config.DEFAULT_ID)
-            assert mover.last_move[0].moved_box_id == None
+            ]
+            assert mover.last_move[0].pusher_id == Config.DEFAULT_ID
+            assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID
 
     class DescribeUndoLastMove:
         def it_can_undo_random_sequence_of_moves_stored_in_last_move(

@@ -227,7 +227,7 @@ class Mover:
 
         self._last_move = []
         for direction in selection_path:
-            pusher_step = PusherStep(direction, False)
+            pusher_step = PusherStep(direction)
             pusher_step.is_pusher_selection = True
             self._last_move.append(pusher_step)
 
@@ -289,7 +289,7 @@ class Mover:
         )
 
         def jump_am(direction):
-            pusher_step = PusherStep(direction, False)
+            pusher_step = PusherStep(direction)
             pusher_step.is_jump = True
             pusher_step.pusher_id = self._selected_pusher
             return pusher_step
@@ -404,7 +404,7 @@ class Mover:
         except CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
-        pusher_step = PusherStep(direction, is_push)
+        pusher_step = PusherStep(direction)
         pusher_step.pusher_id = self._selected_pusher
         if is_push:
             pusher_step.moved_box_id = self._manager.box_id_on(in_front_of_box)
@@ -451,7 +451,7 @@ class Mover:
                 if options.increase_pull_count:
                     self._pull_count += 1
 
-        pusher_step = PusherStep(direction, is_pull)
+        pusher_step = PusherStep(direction)
         pusher_step.pusher_id = self._selected_pusher
         if is_pull:
             pusher_step.moved_box_id = self._manager.box_id_on(initial_pusher_position)
