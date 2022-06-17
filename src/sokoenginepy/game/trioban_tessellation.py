@@ -4,8 +4,8 @@ from typing import Final, Mapping, Optional, Tuple
 
 from ..io import CellOrientation, Snapshot
 from .base_tessellation import (
-    COLUMN,
-    ROW,
+    index_column,
+    index_row,
     BaseTessellation,
     Direction,
     GraphType,
@@ -70,8 +70,8 @@ class TriobanTessellation(BaseTessellation):
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
     ) -> Optional[int]:
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
         triangle_points_down = (
             self.cell_orientation(position, board_width, board_height)
             == CellOrientation.TRIANGLE_DOWN
@@ -126,8 +126,8 @@ class TriobanTessellation(BaseTessellation):
     def cell_orientation(
         self, position: int, board_width: int, board_height: int
     ) -> CellOrientation:
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
         return (
             CellOrientation.TRIANGLE_DOWN
             if (column + (row % 2)) % 2 == 0

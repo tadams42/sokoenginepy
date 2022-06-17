@@ -89,7 +89,7 @@ public:
     IdsMap retv;
     piece_id_t index = 0;
     for (const auto &plus_id : cleaned) {
-      retv[index + Config::DEFAULT_PIECE_ID] = plus_id;
+      retv[index + Config::DEFAULT_ID] = plus_id;
       index++;
     }
 

@@ -46,7 +46,7 @@ data = textwrap.dedent("""
 puzzle = SokobanPuzzle(board=data)
 board = BoardGraph(puzzle)
 mover = Mover(board)
-mover.select_pusher(Config.DEFAULT_PIECE_ID + 1)
+mover.select_pusher(Config.DEFAULT_ID + 1)
 mover.move(Direction.UP)
 ```
 
@@ -81,7 +81,7 @@ int main() {
   SokobanPuzzle puzzle(data);
   BoardGraph board(puzzle);
   Mover mover(board);
-  mover.select_pusher(Config::DEFAULT_PIECE_ID + 1);
+  mover.select_pusher(Config::DEFAULT_ID + 1);
   mover.move(Direction::UP);
 
   return 0;

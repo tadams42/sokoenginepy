@@ -32,7 +32,7 @@ class BoardManager:
 
       How are piece IDs assigned? We start scanning game board from top left corner to
       the right, row by row. First encountered box will get ``box.id =
-      Config.DEFAULT_PIECE_ID``, second one ``box.id = Config.DEFAULT_PIECE_ID + 1``,
+      Config.DEFAULT_ID``, second one ``box.id = Config.DEFAULT_ID + 1``,
       etc... Same goes for pushers and goals.
 
       .. image:: /images/assigning_ids.png
@@ -76,7 +76,7 @@ class BoardManager:
         self._pushers = utilities.Flipdict()
         self._walls: List[int] = []
 
-        pusher_id = box_id = goal_id = Config.DEFAULT_PIECE_ID
+        pusher_id = box_id = goal_id = Config.DEFAULT_ID
 
         for position in range(0, board.vertices_count):
             cell = board[position]
@@ -489,7 +489,7 @@ class BoardManager:
         def is_valid_solution(boxes_positions):
             retv = True
             for index, box_position in enumerate(boxes_positions):
-                box_id = index + Config.DEFAULT_PIECE_ID
+                box_id = index + Config.DEFAULT_ID
                 box_plus_id = self.box_plus_id(box_id)
                 goal_id = self.goal_id_on(box_position)
                 goal_plus_id = self.goal_plus_id(goal_id)

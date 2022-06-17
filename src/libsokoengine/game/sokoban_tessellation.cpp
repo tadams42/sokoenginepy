@@ -21,7 +21,7 @@ position_t SokobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
                                                   board_size_t width,
                                                   board_size_t height) const {
-  position_t row = Y(position, width), column = X(position, width);
+  position_t row = index_y(position, width), column = index_x(position, width);
   switch (direction) {
   case Direction::LEFT:
     column += -1;
@@ -40,7 +40,7 @@ position_t SokobanTessellation::neighbor_position(position_t position,
       "Unsupported Direction received in SokobanTessellation neighbor_position!");
   }
 
-  if (ON_BOARD(column, row, width, height))
+  if (is_on_board_2d(column, row, width, height))
     return index_1d(column, row, width);
   else
     return Config::MAX_POS + 1;

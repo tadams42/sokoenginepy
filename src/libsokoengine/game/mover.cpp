@@ -33,14 +33,13 @@ public:
   HashedBoardManager m_manager;
   SolvingMode m_solving_mode;
   bool m_pulls_boxes = true;
-  piece_id_t m_selected_pusher = Config::DEFAULT_PIECE_ID;
+  piece_id_t m_selected_pusher = Config::DEFAULT_ID;
   size_t m_pull_count = 0;
   PusherSteps m_last_move;
 
   PIMPL(BoardGraph &board, SolvingMode mode)
     : m_initial_board(board), m_manager(board), m_solving_mode(mode) {
     if (!m_manager.is_playable()) { throw NonPlayableBoardError(); }
-
     if (m_solving_mode == SolvingMode::REVERSE) { m_manager.switch_boxes_and_goals(); }
   }
 

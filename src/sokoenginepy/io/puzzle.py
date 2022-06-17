@@ -42,8 +42,8 @@ class Puzzle:
     All positions used are 1D array indexes.
 
     To convert 2D board coordinates into 1D array indexes, use ``game.index_1d``.
-    To convert 1D array indexes into board 2D coordinates, use one of ``game.ROW``,
-    ``game.x`` ``game.COLUMN`` and ``game.y``.
+    To convert 1D array indexes into board 2D coordinates, use one of ``game.index_row``,
+    ``game.index_x`` ``game.index_column`` and ``game.index_y``.
     """
 
     WALL: Final[str] = "#"
@@ -222,13 +222,13 @@ class Puzzle:
             self._parsed_board = width * height * [self.VISIBLE_FLOOR]
 
         else:
+            if not self.is_board(board):
+                raise ValueError("Invalid characters in board string!")
             self._width = 0
             self._height = 0
             self._was_parsed = False
             self._original_board = board
             self._parsed_board = []
-            if not self.is_board(self._original_board):
-                raise ValueError("Invalid characters in board string!")
 
     @property
     def tessellation(self) -> Tessellation:
@@ -252,9 +252,9 @@ class Puzzle:
         return self._parsed_board[position]
 
     def __setitem__(self, position: int, c: str):
-        self._reparse_if_not_parsed()
         if not self.is_puzzle_element(c):
             raise ValueError("Invalid characters in board string!")
+        self._reparse_if_not_parsed()
         self._parsed_board[position] = c
 
     def __contains__(self, position: int):

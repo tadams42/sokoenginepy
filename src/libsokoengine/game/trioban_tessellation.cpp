@@ -21,8 +21,8 @@ position_t TriobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
                                                   board_size_t width,
                                                   board_size_t height) const {
-  if (!ON_BOARD(position, width, height)) return Config::MAX_POS + 1;
-  position_t row = Y(position, width), column = X(position, width);
+  if (!is_on_board_1d(position, width, height)) return Config::NO_POS;
+  position_t row = index_y(position, width), column = index_x(position, width);
   int8_t dy, dx;
   bool tpd = cell_orientation(position, width, height) ==
              CellOrientation::TRIANGLE_DOWN;
@@ -79,10 +79,10 @@ position_t TriobanTessellation::neighbor_position(position_t position,
 
   row += dy;
   column += dx;
-  if (ON_BOARD(column, row, width, height))
+  if (is_on_board_2d(column, row, width, height))
     return index_1d(column, row, width);
   else
-    return Config::MAX_POS + 1;
+    return Config::NO_POS;
 }
 
 PusherStep TriobanTessellation::char_to_pusher_step(char rv) const {
@@ -144,8 +144,8 @@ char TriobanTessellation::pusher_step_to_char(const PusherStep &rv) const {
 CellOrientation TriobanTessellation::cell_orientation(position_t pos,
                                                       board_size_t width,
                                                       board_size_t height) const {
-  position_t column = COLUMN(pos, width);
-  position_t row = ROW(pos, width);
+  position_t column = index_column(pos, width);
+  position_t row = index_row(pos, width);
   return (column + (row % 2)) % 2 == 0 ? CellOrientation::TRIANGLE_DOWN
                                        : CellOrientation::DEFAULT;
 }

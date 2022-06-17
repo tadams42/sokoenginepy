@@ -49,18 +49,18 @@ class Config:
     MAX_WIDTH: Final[int] = 4096
     MAX_HEIGHT: Final[int] = 4096
     MAX_POS: Final[int] = MAX_WIDTH * MAX_HEIGHT
-
+    NO_POS: Final[int] = -1
     NULL_ID: Final[int] = 0
 
     #: All pieces on board (pushers, boxes) and goals are assigned ID to be used for
     #: referring them.
     #:
     #: Piece ids are assigned by numbering each type of piece or goal starting with
-    #: ``DEFAULT_PIECE_ID``
+    #: ``DEFAULT_ID``
     #:
     #: .. image:: /images/assigning_ids.png
     #:     :alt: Assigning IDs to pieces and goals
     #:
     #: Once assigned, id of a piece doesn't change by either moving piece or
     #: applying board view transformations.
-    DEFAULT_PIECE_ID: Final[int] = 1
+    DEFAULT_ID: Final[int] = 1

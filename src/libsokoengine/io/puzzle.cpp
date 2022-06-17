@@ -148,10 +148,10 @@ char Puzzle::at(position_t position) const {
 }
 
 void Puzzle::set_at(position_t position, char c) {
-  m_impl->reparse_if_not_parsed();
   if (!is_puzzle_element(c)) {
     throw std::invalid_argument(string("Not a game character: '") + c + "'!");
   }
+  m_impl->reparse_if_not_parsed();
   m_impl->m_parsed_board.at(position) = c;
 }
 
@@ -161,10 +161,10 @@ char Puzzle::operator[](position_t position) const {
 }
 
 void Puzzle::set(position_t position, char c) {
-  m_impl->reparse_if_not_parsed();
   if (!is_puzzle_element(c)) {
     throw std::invalid_argument(string("Not a game character: '") + c + "'!");
   }
+  m_impl->reparse_if_not_parsed();
   m_impl->m_parsed_board[position] = c;
 }
 

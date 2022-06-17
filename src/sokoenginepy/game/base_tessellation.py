@@ -27,24 +27,24 @@ def index_1d(x: int, y: int, board_width: int) -> int:
     return y * board_width + x
 
 
-def X(index: int, board_width: int) -> int:
+def index_x(index: int, board_width: int) -> int:
     """x component of board position index."""
     return 0 if board_width == 0 else index % board_width
 
 
-def Y(index: int, board_width: int) -> int:
+def index_y(index: int, board_width: int) -> int:
     """y component of board position index."""
     return 0 if board_width == 0 else int(index / board_width)
 
 
-def ROW(index: int, board_width: int) -> int:
+def index_row(index: int, board_width: int) -> int:
     """x component of board position index."""
-    return Y(index, board_width)
+    return index_y(index, board_width)
 
 
-def COLUMN(index: int, board_width: int) -> int:
+def index_column(index: int, board_width: int) -> int:
     """y component of board position index."""
-    return X(index, board_width)
+    return index_x(index, board_width)
 
 
 def is_on_board_2d(x: int, y: int, board_width: int, board_height: int) -> bool:
@@ -56,7 +56,10 @@ def is_on_board_1d(index: Optional[int], board_width: int, board_height: int) ->
         index is not None
         and index >= 0
         and is_on_board_2d(
-            X(index, board_width), Y(index, board_width), board_width, board_height
+            index_x(index, board_width),
+            index_y(index, board_width),
+            board_width,
+            board_height,
         )
     )
 
@@ -113,8 +116,8 @@ class BaseTessellation(metaclass=ABCMeta):
 
         To convert 2D coordinates into vertex index, use :func:`.index_1d` method.
 
-        To convert 1D vertex index into 2D coordinates, use combinations of :func:`.ROW`
-        and :func:`.COLUMN` functions.
+        To convert 1D vertex index into 2D coordinates, use combinations of
+        :func:`.index_row` and :func:`.index_column` functions.
 
         Returns:
             int: New position or `None` when new position would be off-board.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0 (unreleased)
+
+- renamed `DEFAULT_PIECE_ID` -> `DEFAULT_ID`
+- renamed index functions
+  - `X()` -> `index_x()`
+  - `Y()` -> `index_y()`
+  - `ROW()` -> `index_row()`
+  - `COLUMN()` -> `index_column()`
+
 ## 0.6.0 (2022-06-16)
 
 - massive refactoring and cleanup or public API

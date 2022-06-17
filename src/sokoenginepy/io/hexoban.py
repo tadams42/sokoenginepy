@@ -74,21 +74,21 @@ class HexobanTextConverter:
         return "\n".join(retv)
 
     def is_type1(self, strings: List[str]) -> bool:
-        from ..game import Y
+        from ..game import index_y
 
         rmnf = self._find_rightmost_non_floor(strings)
 
         if rmnf is None:
             return False
         elif rmnf > 0:
-            y = Y(rmnf, PuzzleParser.calculate_width(strings))
+            y = index_y(rmnf, PuzzleParser.calculate_width(strings))
             return y % 2 == 0
         else:  # rmnf == 0
             return True
 
     @staticmethod
     def _find_rightmost_non_floor(strings: List[str]) -> Optional[int]:
-        from ..game import X, Y, index_1d
+        from ..game import index_x, index_y, index_1d
 
         def rightmost_finder(strings: List[str], row_parity: int):
             cell_found = False
@@ -122,10 +122,10 @@ class HexobanTextConverter:
         if rightmost_in_even_rows is None or rightmost_in_odd_rows is None:
             return index_1d(0, 0, width)
 
-        odd_x = X(rightmost_in_odd_rows, width)
-        odd_y = Y(rightmost_in_odd_rows, width)
-        even_x = X(rightmost_in_even_rows, width)
-        even_y = Y(rightmost_in_even_rows, width)
+        odd_x = index_x(rightmost_in_odd_rows, width)
+        odd_y = index_y(rightmost_in_odd_rows, width)
+        even_x = index_x(rightmost_in_even_rows, width)
+        even_y = index_y(rightmost_in_even_rows, width)
 
         if odd_x > even_x:
             return rightmost_in_odd_rows
@@ -221,7 +221,7 @@ class HexobanTextConverter:
         return layout_ok, should_copy_cell
 
     def _preparse_board(self, board: str) -> Tuple[List[str], int, int, int, int]:
-        from ..game import X, Y
+        from ..game import index_x, index_y
 
         parsed: List[str] = PuzzleParser.cleaned_board_lines(board)
         width = len(parsed[0]) if parsed else 0
@@ -247,8 +247,8 @@ class HexobanTextConverter:
             # Calculate parities
             first_cell = self._find_first_non_floor(parsed)
             if first_cell is not None:
-                first_cell_x_parity = X(first_cell, width) % 2
-                first_cell_y_parity = Y(first_cell, width) % 2
+                first_cell_x_parity = index_x(first_cell, width) % 2
+                first_cell_y_parity = index_y(first_cell, width) % 2
 
                 if first_cell_y_parity == 0:
                     even_row_x_parity = first_cell_x_parity

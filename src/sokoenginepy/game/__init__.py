@@ -74,11 +74,11 @@ else:
         from .trioban_tessellation import TriobanTessellation
 
 from .base_tessellation import (
-    COLUMN,
-    ROW,
-    X,
-    Y,
     index_1d,
+    index_column,
+    index_row,
+    index_x,
+    index_y,
     is_on_board_1d,
     is_on_board_2d,
 )

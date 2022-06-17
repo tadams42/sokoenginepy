@@ -180,7 +180,7 @@ zobrist_key_t HashedBoardManager::external_state_hash(BoardState &board_state) c
   for (auto box_position : board_state.boxes_positions()) {
     retv ^=
       m_impl
-        ->m_boxes_factors[box_plus_id(Config::DEFAULT_PIECE_ID + index)][box_position];
+        ->m_boxes_factors[box_plus_id(Config::DEFAULT_ID + index)][box_position];
     index++;
   }
 

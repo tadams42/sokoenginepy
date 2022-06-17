@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Dict, Final, Optional, Tuple
 
 from ..io import CellOrientation, Snapshot
-from .base_tessellation import COLUMN, ROW, BaseTessellation, index_1d, is_on_board_2d
+from .base_tessellation import index_column, index_row, BaseTessellation, index_1d, is_on_board_2d
 from .config import Direction
 from .utilities import inverted
 
@@ -82,8 +82,8 @@ class OctobanTessellation(BaseTessellation):
         ):
             return None
 
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
         row_shift, column_shift = self._NEIGHBOR_SHIFT.get(direction, (None, None))
 
         if row_shift is None or column_shift is None:
@@ -100,8 +100,8 @@ class OctobanTessellation(BaseTessellation):
     def cell_orientation(
         self, position: int, board_width: int, board_height: int
     ) -> CellOrientation:
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
         return (
             CellOrientation.OCTAGON
             if (column + (row % 2)) % 2 == 0

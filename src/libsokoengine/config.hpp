@@ -88,35 +88,35 @@ namespace sokoengine {
     ///
     /// Calculates x-axis position from 1D board position
     ///
-    constexpr position_t X(position_t index, board_size_t width) {
+    constexpr position_t index_x(position_t index, board_size_t width) {
       return width == 0 ? 0 : index % width;
     }
 
     ///
     /// Calculates y-axis position from 1D board position
     ///
-    constexpr position_t Y(position_t index, board_size_t width) {
+    constexpr position_t index_y(position_t index, board_size_t width) {
       return width == 0 ? 0 : index / width;
     }
 
     ///
-    /// Alias for Y()
+    /// Alias for index_y()
     ///
-    constexpr position_t ROW(position_t index, board_size_t width) {
-      return Y(index, width);
+    constexpr position_t index_row(position_t index, board_size_t width) {
+      return index_y(index, width);
     }
 
     ///
-    /// Alias for X()
+    /// Alias for index_x()
     ///
-    constexpr position_t COLUMN(position_t index, board_size_t width) {
-      return X(index, width);
+    constexpr position_t index_column(position_t index, board_size_t width) {
+      return index_x(index, width);
     }
 
     ///
     /// Is position on given board?
     ///
-    constexpr bool ON_BOARD(position_t x, position_t y, board_size_t width,
+    constexpr bool is_on_board_2d(position_t x, position_t y, board_size_t width,
                             board_size_t height) {
       return x < width && y < height;
     }
@@ -124,8 +124,8 @@ namespace sokoengine {
     ///
     /// Is position on given board?
     ///
-    constexpr bool ON_BOARD(position_t pos, board_size_t width, board_size_t height) {
-      return ON_BOARD(X(pos, width), Y(pos, width), width, height);
+    constexpr bool is_on_board_1d(position_t pos, board_size_t width, board_size_t height) {
+      return is_on_board_2d(index_x(pos, width), index_y(pos, width), width, height);
     }
 
 
@@ -247,15 +247,16 @@ namespace sokoengine {
       /// box or goal on board.
       ///
       /// Piece ids are assigned sequentially to all board pieces starting  with
-      /// DEFAULT_PIECE_ID.
+      /// DEFAULT_ID.
       ///
-      static constexpr game::piece_id_t DEFAULT_PIECE_ID = 1;
+      static constexpr game::piece_id_t DEFAULT_ID = 1;
 
       ///
-      /// Value that represents state where ID of a piece has not yet been assigned to it.
+      /// Value that represents state where ID of a piece has not yet been assigned to
+      /// it.
       ///
-      static constexpr game::piece_id_t NULL_ID = 0;
-      static_assert(NULL_ID < DEFAULT_PIECE_ID, "NULL_ID must be < DEFAULT_PIECE_ID");
+      static constexpr game::piece_id_t NO_ID = 0;
+      static_assert(NO_ID < DEFAULT_ID, "NO_ID must be < DEFAULT_ID");
     };
   } // namespace game
 

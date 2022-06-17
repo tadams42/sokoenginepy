@@ -154,7 +154,7 @@ This is how to play game in regular, forward solving mode:
 >>> # select pusher that will perform movement
 >>> # notice that our starting board, already has two pushers
 >>> # so we need to tell Mover which one we want to move
->>> forward_mover.select_pusher(Config.DEFAULT_PIECE_ID + 1)
+>>> forward_mover.select_pusher(Config.DEFAULT_ID + 1)
 >>> # perform movement
 >>> forward_mover.move(Direction.UP)
 >>> # try to perform illegal move raises IllegalMoveError
@@ -218,9 +218,9 @@ board pieces (pushers, boxes and goals) and tracks their positions:
 False
 >>> forward_mover.board_manager.has_pusher_on(144)
 True
->>> forward_mover.board_manager.pusher_position(Config.DEFAULT_PIECE_ID)
+>>> forward_mover.board_manager.pusher_position(Config.DEFAULT_ID)
 26
->>> forward_mover.board_manager.box_position(Config.DEFAULT_PIECE_ID + 2)
+>>> forward_mover.board_manager.box_position(Config.DEFAULT_ID + 2)
 81
 
 ```
@@ -228,8 +228,8 @@ True
 How are piece IDs assigned?
 
 We start scanning game board from top left corner to the right, row by row. First
-encountered box will get `box.id = Config.DEFAULT_PIECE_ID`, second one `box.id =
-Config.DEFAULT_PIECE_ID + 1`, etc... Same goes for pushers and goals.
+encountered box will get `box.id = Config.DEFAULT_ID`, second one `box.id =
+Config.DEFAULT_ID + 1`, etc... Same goes for pushers and goals.
 
 ## Position hashing
 
@@ -290,9 +290,9 @@ Position of each ID in Sokoban+ string, determines ID of the piece that will get
 
 | box/goal ID          | box Sokoban+ ID | goal Sokoban+ ID |
 | -------------------- | --------------- | ---------------- |
-| DEFAULT_PIECE_ID     | 1               | 3                |
-| DEFAULT_PIECE_ID + 1 | 3               | 2                |
-| DEFAULT_PIECE_ID + 2 | 2               | 1                |
+| DEFAULT_ID     | 1               | 3                |
+| DEFAULT_ID + 1 | 3               | 2                |
+| DEFAULT_ID + 2 | 2               | 1                |
 
 When `boxorder` and `goalorder` are present, valid and enabled, then new victory
 conditions are activated for given `Mover`. This affects result of call to

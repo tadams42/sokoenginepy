@@ -246,7 +246,7 @@ class SokobanPlus:
 
         retv = dict()
         for index, plus_id in enumerate(expanded):
-            retv[Config.DEFAULT_PIECE_ID + index] = plus_id
+            retv[Config.DEFAULT_ID + index] = plus_id
 
         return retv
 

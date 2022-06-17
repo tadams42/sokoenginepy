@@ -1,5 +1,4 @@
 import glob
-
 import inspect
 import os
 from inspect import getsourcefile
@@ -90,16 +89,16 @@ def game_members_py_only():
     # Stuff that is always used from Python implementation, even when native extension
     # is built and loaded
     return {
-        "COLUMN",
-        "JumpCommand",
-        "MoveCommand",
-        "ROW",
-        "SelectPusherCommand",
-        "X",
-        "Y",
         "index_1d",
+        "index_column",
+        "index_row",
+        "index_x",
+        "index_y",
         "is_on_board_1d",
         "is_on_board_2d",
+        "JumpCommand",
+        "MoveCommand",
+        "SelectPusherCommand",
     }
 
 

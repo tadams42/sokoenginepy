@@ -3,8 +3,14 @@ from __future__ import annotations
 from typing import Dict, Final, Optional, Tuple
 
 from ..io import Snapshot
-from .base_tessellation import COLUMN, ROW, BaseTessellation, index_1d, is_on_board_2d
-from .config import Direction
+from .base_tessellation import (
+    BaseTessellation,
+    index_1d,
+    index_column,
+    index_row,
+    is_on_board_2d,
+)
+from .config import Config, Direction
 from .utilities import inverted
 
 
@@ -71,8 +77,8 @@ class HexobanTessellation(BaseTessellation):
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
     ) -> Optional[int]:
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
 
         if direction == Direction.LEFT:
             column -= 1

@@ -21,8 +21,8 @@ void export_board_graph(py::module &m) {
     .def_readonly_static("MAX_WIDTH", &Config::MAX_WIDTH)
     .def_readonly_static("MAX_HEIGHT", &Config::MAX_HEIGHT)
     .def_readonly_static("MAX_POS", &Config::MAX_POS)
-    .def_readonly_static("DEFAULT_PIECE_ID", &Config::DEFAULT_PIECE_ID)
-    .def_readonly_static("NULL_ID", &Config::NULL_ID);
+    .def_readonly_static("DEFAULT_ID", &Config::DEFAULT_ID)
+    .def_readonly_static("NO_ID", &Config::NO_ID)
 
   py::class_<BoardGraph>(m, "BoardGraph")
     .def(py::init<const Puzzle &>(), py::arg("puzzle"))

@@ -7,7 +7,7 @@ from typing import Iterable, List, Optional
 
 from .board_graph import BoardGraph
 from .board_manager import CellAlreadyOccupiedError
-from .config import Direction, Config
+from .config import Config, Direction
 from .hashed_board_manager import HashedBoardManager
 from .pusher_step import PusherStep
 
@@ -89,7 +89,7 @@ class Mover:
         self._manager = HashedBoardManager(board)
         self._solving_mode = solving_mode
         self._pulls_boxes = True
-        self._selected_pusher: int = Config.DEFAULT_PIECE_ID
+        self._selected_pusher: int = Config.DEFAULT_ID
         self._pull_count: int = 0
         self._last_move: List[PusherStep] = []
 
@@ -205,7 +205,7 @@ class Mover:
         """
         Selects pusher that will perform next move.
 
-        Mover always selects :data:`Config.DEFAULT_PIECE_ID` before any movements is
+        Mover always selects :data:`Config.DEFAULT_ID` before any movements is
         performed. This means that for single-pusher boards, that single pusher is
         always automatically selected and this method doesn't need to be called.
 
