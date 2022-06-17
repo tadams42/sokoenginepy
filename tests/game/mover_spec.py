@@ -250,7 +250,7 @@ class DescribeMover:
 
             reverse_mover.pulls_boxes = True
             reverse_mover.move(Direction.DOWN)
-            reverse_mover.last_move = None
+            reverse_mover.last_move = []
             with pytest.raises(IllegalMoveError):
                 reverse_mover.jump(jump_dest)
             assert not reverse_mover.last_move
@@ -301,7 +301,7 @@ class DescribeMover:
             reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
 
             reverse_mover.jump(jump_dest)
-            reverse_mover.last_move = None
+            reverse_mover.last_move = []
             reverse_mover.jump(jump_dest)
             assert not reverse_mover.last_move
 
@@ -1178,13 +1178,12 @@ class DescribeMover:
             self, forward_board, jump_dest, undone_jumps
         ):
             reverse_mover = Mover(forward_board, SolvingMode.REVERSE)
-
             initial_board = str(reverse_mover.board)
             moves = []
+
             reverse_mover.jump(jump_dest)
             moves += reverse_mover.last_move
             jump = deepcopy(reverse_mover.last_move)
-
             reverse_mover.select_pusher(Config.DEFAULT_ID + 1)
             moves += reverse_mover.last_move
             selection = deepcopy(reverse_mover.last_move)

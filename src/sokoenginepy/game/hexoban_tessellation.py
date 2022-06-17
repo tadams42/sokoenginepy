@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Final, Optional, Tuple
+from typing import Dict, Final, Tuple
 
 from ..io import Snapshot
 from .base_tessellation import (
@@ -76,7 +76,7 @@ class HexobanTessellation(BaseTessellation):
 
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
+    ) -> int:
         row = index_row(position, board_width)
         column = index_column(position, board_width)
 
@@ -101,4 +101,5 @@ class HexobanTessellation(BaseTessellation):
 
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
-        return None
+
+        return Config.NO_POS

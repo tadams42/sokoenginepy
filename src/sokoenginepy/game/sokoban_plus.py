@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Final, List, Optional
+from typing import Dict, Final, List
 
 from .config import Config
 
@@ -48,12 +48,7 @@ class SokobanPlus:
     #: transparently.
     DEFAULT_PLUS_ID: Final[int] = 0
 
-    def __init__(
-        self,
-        pieces_count: int,
-        boxorder: Optional[str] = None,
-        goalorder: Optional[str] = None,
-    ):
+    def __init__(self, pieces_count: int, boxorder: str = "", goalorder: str = ""):
         """
         Args:
             boxorder: Space separated integers describing Sokoban+ IDs for boxes

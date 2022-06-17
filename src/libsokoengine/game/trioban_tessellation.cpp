@@ -24,8 +24,8 @@ position_t TriobanTessellation::neighbor_position(position_t position,
   if (!is_on_board_1d(position, width, height)) return Config::NO_POS;
   position_t row = index_y(position, width), column = index_x(position, width);
   int8_t dy, dx;
-  bool tpd = cell_orientation(position, width, height) ==
-             CellOrientation::TRIANGLE_DOWN;
+  bool tpd =
+    cell_orientation(position, width, height) == CellOrientation::TRIANGLE_DOWN;
 
   switch (direction) {
   case Direction::LEFT:

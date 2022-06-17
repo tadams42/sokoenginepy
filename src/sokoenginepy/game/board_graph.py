@@ -121,7 +121,7 @@ class BoardGraph:
         retv = False
         out_edge: Edge
         try:
-            if src is not None:
+            if src >= 0 and src != Config.NO_POS:
                 for out_edge in self._graph.edges(src, data=True):
                     retv = retv or (
                         out_edge[1] == dst
@@ -183,12 +183,12 @@ class BoardGraph:
 
         return weight
 
-    def neighbor(self, src: int, direction: Direction) -> Optional[int]:
+    def neighbor(self, src: int, direction: Direction) -> int:
         """
         Calculates neighbor position in ``direction``.
 
         Returns:
-            Target position or `None`.
+            Target position or Config.NO_POS
 
         Raises:
             IndexError: ``src`` off board
@@ -200,7 +200,7 @@ class BoardGraph:
                 if out_edge[2][self._KEY_DIRECTION] == direction:
                     return out_edge[1]
 
-        return None
+        return Config.NO_POS
 
     def wall_neighbors(self, src: int) -> Positions:
         """
@@ -391,7 +391,7 @@ class BoardGraph:
         retv = src
         for direction in directions:
             next_target = self.neighbor(retv, direction)
-            if next_target:
+            if next_target != Config.NO_POS:
                 retv = next_target
             else:
                 break
@@ -406,7 +406,7 @@ class BoardGraph:
                 neighbor_position = tessellation.neighbor_position(
                     src, direction, self.board_width, self.board_height
                 )
-                if neighbor_position is not None:
+                if neighbor_position >= 0 and neighbor_position != Config.NO_POS:
                     self.add_edge(src, neighbor_position, direction)
 
     _CurrentReachables = Sequence[int]

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Dict, Final, Optional, Tuple
+from typing import Dict, Final, Tuple
 
 from ..io import Snapshot
 from .base_tessellation import index_column, index_row, BaseTessellation, index_1d, is_on_board_2d
-from .config import Direction
+from .config import Config, Direction
 from .utilities import inverted
 
 
@@ -52,7 +52,7 @@ class SokobanTessellation(BaseTessellation):
 
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
+    ) -> int:
         row = index_row(position, board_width)
         column = index_column(position, board_width)
         row_shift, column_shift = self._NEIGHBOR_SHIFT.get(direction, (None, None))
@@ -66,4 +66,4 @@ class SokobanTessellation(BaseTessellation):
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
 
-        return None
+        return Config.NO_POS

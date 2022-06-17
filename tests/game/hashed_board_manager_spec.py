@@ -91,7 +91,7 @@ class DescribeHashedBoardManager:
         hashed_board_manager.boxorder = "1 2 3"
         assert hashed_board_manager.state_hash != initial_state_hash
 
-        hashed_board_manager.boxorder = None
+        hashed_board_manager.boxorder = ""
         initial_state_hash = hashed_board_manager.state_hash
         hashed_board_manager.enable_sokoban_plus()
         assert hashed_board_manager.is_sokoban_plus_enabled is True

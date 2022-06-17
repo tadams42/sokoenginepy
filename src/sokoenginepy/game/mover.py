@@ -373,20 +373,20 @@ class Mover:
             initial_pusher_position, direction
         )
 
-        if not in_front_of_pusher:
+        if in_front_of_pusher == Config.NO_POS:
             raise IllegalMoveError(
                 "Can't move pusher off board! (ID: "
                 + "{0}, direction: {1})".format(self._selected_pusher, str(direction))
             )
 
         is_push = False
-        in_front_of_box = None
+        in_front_of_box = Config.NO_POS
         if self._manager.has_box_on(in_front_of_pusher):
             is_push = True
             in_front_of_box = self._manager.board.neighbor(
                 in_front_of_pusher, direction
             )
-            if not in_front_of_box:
+            if in_front_of_box == Config.NO_POS:
                 raise IllegalMoveError(
                     "Can't push box off board! (ID: "
                     + "{0}, direction: {1})".format(
@@ -423,7 +423,7 @@ class Mover:
             initial_pusher_position, direction
         )
 
-        if not in_front_of_pusher:
+        if in_front_of_pusher == Config.NO_POS:
             raise IllegalMoveError(
                 "Can't move pusher off board! (ID: "
                 + "{0}, direction: {1})".format(self._selected_pusher, str(direction))
@@ -439,7 +439,10 @@ class Mover:
             behind_pusher = self._manager.board.neighbor(
                 initial_pusher_position, direction.opposite
             )
-            if behind_pusher and self._manager.board[behind_pusher].has_box:
+            if (
+                behind_pusher != Config.NO_POS
+                and self._manager.board[behind_pusher].has_box
+            ):
                 is_pull = True
                 try:
                     self._manager.move_box_from(behind_pusher, initial_pusher_position)

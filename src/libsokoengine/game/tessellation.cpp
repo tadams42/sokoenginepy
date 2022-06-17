@@ -17,10 +17,15 @@ using io::CellOrientation;
 namespace implementation {
 
 static const string strs[DIRECTIONS_COUNT] = {
-  string("Direction.UP"),         string("Direction.DOWN"),
-  string("Direction.LEFT"),       string("Direction.RIGHT"),
-  string("Direction.NORTH_WEST"), string("Direction.NORTH_EAST"),
-  string("Direction.SOUTH_EAST"), string("Direction.SOUTH_WEST")};
+  string("Direction.UP"),
+  string("Direction.NORTH_EAST"),
+  string("Direction.RIGHT"),
+  string("Direction.SOUTH_EAST"),
+  string("Direction.DOWN"),
+  string("Direction.SOUTH_WEST"),
+  string("Direction.LEFT"),
+  string("Direction.NORTH_WEST"),
+};
 
 } // namespace implementation
 

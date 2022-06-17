@@ -8,6 +8,11 @@
   - `Y()` -> `index_y()`
   - `ROW()` -> `index_row()`
   - `COLUMN()` -> `index_column()`
+- replaced use of `None` in method arguments and returned values with explicit constants
+  - ie. `BoardGraph.neighbor()` now always returns `int` and instead of `None` it
+    returns `Config.NO_POS`.
+  - this makes APIs easier to use and pybind11 bridge more efficient (because pybind11
+    doesn't need to handle `None`)
 
 ## 0.6.0 (2022-06-16)
 

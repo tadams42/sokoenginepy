@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Final, Mapping, Optional, Tuple
+from typing import Final, Mapping, Tuple
 
 from ..io import CellOrientation, Snapshot
 from .base_tessellation import (
@@ -12,7 +12,7 @@ from .base_tessellation import (
     index_1d,
     is_on_board_2d,
 )
-from .config import Direction, GraphType
+from .config import Direction, GraphType, Config
 from .utilities import inverted
 
 
@@ -69,7 +69,7 @@ class TriobanTessellation(BaseTessellation):
 
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
+    ) -> int:
         row = index_row(position, board_width)
         column = index_column(position, board_width)
         triangle_points_down = (
@@ -121,7 +121,7 @@ class TriobanTessellation(BaseTessellation):
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
 
-        return None
+        return Config.NO_POS
 
     def cell_orientation(
         self, position: int, board_width: int, board_height: int

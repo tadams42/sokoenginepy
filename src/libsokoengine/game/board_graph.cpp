@@ -284,7 +284,7 @@ position_t BoardGraph::neighbor(position_t from_position,
   if (edge != edges.second)
     return get(boost::vertex_index, m_impl->m_graph,
                boost::target(*edge, m_impl->m_graph));
-  return numeric_limits<position_t>::max();
+  return Config::NO_POS;
 }
 
 position_t BoardGraph::neighbor_at(position_t from_position,
@@ -507,7 +507,7 @@ position_t BoardGraph::path_destination(position_t start_position,
   position_t retv = start_position, next_target;
   for (const Direction &direction : directions_path) {
     next_target = neighbor_at(retv, direction);
-    if (next_target > Config::MAX_POS) {
+    if (next_target == Config::NO_POS) {
       break;
     } else {
       retv = next_target;
@@ -527,7 +527,7 @@ void BoardGraph::reconfigure_edges() {
     for (const Direction &direction : tessellation.legal_directions()) {
       auto neighbor_position = tessellation.neighbor_position(
         source_position, direction, m_impl->m_board_width, m_impl->m_board_height);
-      if (neighbor_position <= Config::MAX_POS)
+      if (neighbor_position != Config::NO_POS)
         add_edge(source_position, neighbor_position, direction);
     }
   }

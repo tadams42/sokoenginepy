@@ -14,7 +14,7 @@ class LIBSOKOENGINE_LOCAL BoardState::PIMPL {
 public:
   Positions m_pushers_positions;
   Positions m_boxes_positions;
-  zobrist_key_t m_zobrist_hash;
+  zobrist_key_t m_zobrist_hash = BoardState::NO_HASH;
 
   PIMPL(const Positions &pushers_positions, const Positions &boxes_positions,
         zobrist_key_t zobrist_hash)

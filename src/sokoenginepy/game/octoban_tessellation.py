@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Dict, Final, Optional, Tuple
+from typing import Dict, Final, Tuple
 
 from ..io import CellOrientation, Snapshot
 from .base_tessellation import index_column, index_row, BaseTessellation, index_1d, is_on_board_2d
-from .config import Direction
+from .config import Config, Direction
 from .utilities import inverted
 
 
@@ -71,7 +71,7 @@ class OctobanTessellation(BaseTessellation):
 
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
+    ) -> int:
         if self.cell_orientation(
             position, board_width, board_height
         ) != CellOrientation.OCTAGON and (
@@ -80,7 +80,7 @@ class OctobanTessellation(BaseTessellation):
             or direction == Direction.SOUTH_EAST
             or direction == Direction.SOUTH_WEST
         ):
-            return None
+            return Config.NO_POS
 
         row = index_row(position, board_width)
         column = index_column(position, board_width)
@@ -95,7 +95,7 @@ class OctobanTessellation(BaseTessellation):
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
 
-        return None
+        return Config.NO_POS
 
     def cell_orientation(
         self, position: int, board_width: int, board_height: int

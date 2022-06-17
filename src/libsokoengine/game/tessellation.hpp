@@ -24,8 +24,8 @@ public:
   ///
   /// Calculate new position in given direction.
   ///
-  /// Returns either new position or invalid number (> MAX_POS) if movement in given
-  /// direction would've resulted with off-board position.
+  /// Returns either a new position or Config::NO_POS if movement in given direction
+  /// would've resulted with off-board position.
   ///
   virtual position_t neighbor_position(position_t position, const Direction &direction,
                                        board_size_t width,

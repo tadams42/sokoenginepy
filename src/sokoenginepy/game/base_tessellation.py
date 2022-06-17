@@ -5,7 +5,7 @@ from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, ClassVar, Mapping, Optional, Tuple, Union
 
 from ..io import CellOrientation
-from .config import Direction, GraphType
+from .config import Config, Direction, GraphType
 from .pusher_step import PusherStep
 
 if TYPE_CHECKING:
@@ -108,7 +108,7 @@ class BaseTessellation(metaclass=ABCMeta):
     @abstractmethod
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
+    ) -> int:
         """
         Calculates neighbor position in given direction.
 
@@ -120,7 +120,7 @@ class BaseTessellation(metaclass=ABCMeta):
         :func:`.index_row` and :func:`.index_column` functions.
 
         Returns:
-            int: New position or `None` when new position would be off-board.
+            int: New position or `.Config.NO_POS` when new position would be off-board.
 
         Raises:
             :exc:`ValueError`: ``direction`` is not one of :attr:`legal_directions`
@@ -163,7 +163,10 @@ class BaseTessellation(metaclass=ABCMeta):
         except KeyError:
             raise ValueError(input_chr)
 
-        return PusherStep(direction=direction, box_moved=box_moved)
+        return PusherStep(
+            direction=direction,
+            moved_box_id=Config.NO_ID if not box_moved else Config.DEFAULT_ID,
+        )
 
     def cell_orientation(
         self, position: int, board_width: int, board_height: int

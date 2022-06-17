@@ -27,7 +27,7 @@ position_t OctobanTessellation::neighbor_position(position_t position,
   if (cell_orientation(position, width, height) != CellOrientation::OCTAGON &&
       (direction == Direction::NORTH_EAST || direction == Direction::NORTH_WEST ||
        direction == Direction::SOUTH_EAST || direction == Direction::SOUTH_WEST)) {
-    return Config::MAX_POS + 1;
+    return Config::NO_POS;
   }
 
   switch (direction) {
@@ -66,7 +66,7 @@ position_t OctobanTessellation::neighbor_position(position_t position,
   if (is_on_board_2d(column, row, width, height))
     return index_1d(column, row, width);
   else
-    return Config::MAX_POS + 1;
+    return Config::NO_POS;
 }
 
 PusherStep OctobanTessellation::char_to_pusher_step(char rv) const {

@@ -141,7 +141,7 @@ class HashedBoardManager(BoardManager):
             self._zobrist_rehash()
         return self._initial_state_hash
 
-    def external_state_hash(self, board_state) -> Optional[int]:
+    def external_state_hash(self, board_state) -> int:
         """
         Calculates Zobrist hash of given ``board_state`` as if that ``board_state``
         was applied to initial ``board`` (to board where no movement happened).
@@ -152,19 +152,19 @@ class HashedBoardManager(BoardManager):
             and len(board_state.boxes_positions) == self.goals_count
 
         Returns:
-            Value of hash or None if it can't be calculated
+            Value of hash or `BoardState.NO_HASH` if it can't be calculated
         """
         if (
             len(board_state.boxes_positions) != self.boxes_count
             or len(board_state.boxes_positions) != self.goals_count
         ):
-            return None
+            return BoardState.NO_HASH
 
         retv = self.initial_state_hash
         for index, box_position in enumerate(board_state.boxes_positions):
-            retv ^= self._boxes_factors[
-                self.box_plus_id(Config.DEFAULT_PIECE_ID + index)
-            ][box_position]
+            retv ^= self._boxes_factors[self.box_plus_id(Config.DEFAULT_ID + index)][
+                box_position
+            ]
 
         for pusher_position in board_state.pushers_positions:
             retv ^= self._pushers_factors[pusher_position]

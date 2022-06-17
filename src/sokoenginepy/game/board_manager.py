@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property, partial
 from itertools import permutations
-from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Iterable, List, Tuple
 
 from . import utilities
 from .board_state import BoardState
@@ -64,12 +64,7 @@ class BoardManager:
         implement full game logic. For game logic see :class:`.Mover`
     """
 
-    def __init__(
-        self,
-        board: BoardGraph,
-        boxorder: Optional[str] = None,
-        goalorder: Optional[str] = None,
-    ):
+    def __init__(self, board: BoardGraph, boxorder: str = "", goalorder: str = ""):
         self._board = board
         self._boxes = utilities.Flipdict()
         self._goals = utilities.Flipdict()

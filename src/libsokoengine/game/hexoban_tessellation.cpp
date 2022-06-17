@@ -51,7 +51,7 @@ position_t HexobanTessellation::neighbor_position(position_t position,
   if (is_on_board_2d(column, row, width, height))
     return index_1d(column, row, width);
   else
-    return Config::MAX_POS + 1;
+    return Config::NO_POS;
 }
 
 PusherStep HexobanTessellation::char_to_pusher_step(char rv) const {

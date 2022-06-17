@@ -48,9 +48,7 @@ class GraphType(enum.Enum):
 class Config:
     MAX_WIDTH: Final[int] = 4096
     MAX_HEIGHT: Final[int] = 4096
-    MAX_POS: Final[int] = MAX_WIDTH * MAX_HEIGHT
     NO_POS: Final[int] = -1
-    NULL_ID: Final[int] = 0
 
     #: All pieces on board (pushers, boxes) and goals are assigned ID to be used for
     #: referring them.
@@ -64,3 +62,5 @@ class Config:
     #: Once assigned, id of a piece doesn't change by either moving piece or
     #: applying board view transformations.
     DEFAULT_ID: Final[int] = 1
+
+    NO_ID: Final[int] = -1

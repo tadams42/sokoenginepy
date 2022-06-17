@@ -22,8 +22,8 @@ using io::Strings;
 class LIBSOKOENGINE_LOCAL HashedBoardManager::PIMPL {
 public:
   bool m_hash_invalidated = true;
-  zobrist_key_t m_initial_state_hash = 0;
-  zobrist_key_t m_state_hash = 0;
+  zobrist_key_t m_initial_state_hash = BoardState::NO_HASH;
+  zobrist_key_t m_state_hash = BoardState::NO_HASH;
 
   typedef vector<zobrist_key_t> hash_vector_t;
 
@@ -170,7 +170,7 @@ zobrist_key_t HashedBoardManager::initial_state_hash() const {
 zobrist_key_t HashedBoardManager::external_state_hash(BoardState &board_state) const {
   if (board_state.boxes_positions().size() != boxes_count() ||
       board_state.boxes_positions().size() != goals_count())
-    return 0;
+    return BoardState::NO_HASH;
 
   const_cast<HashedBoardManager *>(this)->m_impl->zobrist_rehash(*this);
 
