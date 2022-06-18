@@ -95,7 +95,7 @@ class BoardGraph:
         return puzzle.to_board_str(use_visible_floor, rle_encode)
 
     def __str__(self) -> str:
-        return self.to_board_str(True)
+        return self.to_board_str(False)
 
     @property
     def vertices_count(self) -> int:

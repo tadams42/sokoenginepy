@@ -188,7 +188,7 @@ string Puzzle::internal_board() const {
   return string(m_impl->m_parsed_board.cbegin(), m_impl->m_parsed_board.cend());
 }
 
-string Puzzle::str() const { return to_board_str(true); }
+string Puzzle::str() const { return to_board_str(false); }
 
 string Puzzle::repr() const {
   string klass_name = "Puzzle";

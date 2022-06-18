@@ -212,7 +212,7 @@ string BoardGraph::to_board_str(bool use_visible_floor, bool rle_encode) const {
   return puzzle->to_board_str(use_visible_floor, rle_encode);
 }
 
-string BoardGraph::str() const { return to_board_str(true); }
+string BoardGraph::str() const { return to_board_str(false); }
 
 board_size_t BoardGraph::vertices_count() const { return m_impl->vertices_count(); }
 

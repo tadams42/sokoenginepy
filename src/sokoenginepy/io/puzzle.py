@@ -261,13 +261,19 @@ class Puzzle:
         return position < len(self._parsed_board)
 
     def __str__(self):
-        return self.to_board_str(use_visible_floor=True)
+        return self.to_board_str(use_visible_floor=False)
 
     def __repr__(self):
         return "{klass}(board='\\n'.join([\n{board}\n]))".format(
             klass=self.__class__.__name__,
             board=textwrap.indent(
-                ",\n".join(["'{0}'".format(l) for l in str(self).split("\n")]), "    "
+                ",\n".join(
+                    [
+                        "'{0}'".format(l)
+                        for l in self.to_board_str(use_visible_floor=True).split("\n")
+                    ]
+                ),
+                "    ",
             ),
         )
 

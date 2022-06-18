@@ -48,7 +48,7 @@ board = BoardGraph(puzzle)
 mover = Mover(board)
 mover.select_pusher(Config.DEFAULT_ID + 1)
 mover.move(Direction.UP)
-print(board.to_board_str())
+print(board)
 ```
 
 or in C++:
@@ -86,7 +86,7 @@ int main() {
   mover.select_pusher(Config::DEFAULT_ID + 1);
   mover.move(Direction::UP);
 
-  std::cout << board.to_board_str() << std::endl;
+  std::cout << board.str() << std::endl;
 
   return 0;
 }

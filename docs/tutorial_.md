@@ -188,7 +188,7 @@ And to play in reverse mode:
 ... """.lstrip("\n").rstrip()))
 >>> board2 = BoardGraph(puzzle2)
 >>> reverse_mover = Mover(board2, SolvingMode.REVERSE)
->>> print(reverse_mover.board)
+>>> print(reverse_mover.board.to_board_str(use_visible_floor=True))
 ----#####----------
 ----#--@#----------
 ----#.--#----------
