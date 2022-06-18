@@ -15,8 +15,9 @@ from .utilities import inverted
 
 
 class HexobanTessellation(BaseTessellation):
-
     """
+    Tessellation for Hexoban game variant.
+
     Board space is laid out on vertical hexagons with following coordinate system:
 
     .. image:: /images/hexoban_coordinates.png

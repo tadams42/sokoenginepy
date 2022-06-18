@@ -45,12 +45,56 @@ public:
   const Puzzles &puzzles() const;
   Puzzles &puzzles();
 
+  ///
+  /// Loads collection from ``path``.
+  ///
+  /// Loader supports SokobanYASC .sok format, but will happily try to load older
+  /// similar, textual sokoban files (usually with extensions `.txt`, `.tsb` and
+  /// `.hsb`).
+  ///
   bool load(const std::filesystem::path &path);
+  ///
+  /// Loads collection from ``path``.
+  ///
+  /// Loader supports SokobanYASC .sok format, but will happily try to load older
+  /// similar, textual sokoban files (usually with extensions `.txt`, `.tsb` and
+  /// `.hsb`).
+  ///
+  /// @param path source file path
+  /// @param tessellation_hint If puzzles in file don't specify their game tessellation
+  ///        assume this value.
+  ///
   bool load(const std::filesystem::path &path, game::Tessellation tessellation_hint);
+  ///
+  /// Loads collection from ``path``.
+  ///
+  /// Loader supports SokobanYASC .sok format, but will happily try to load older
+  /// similar, textual sokoban files (usually with extensions `.txt`, `.tsb` and
+  /// `.hsb`).
+  ///
   bool load(const std::string &path);
+  ///
+  /// Loads collection from ``path``.
+  ///
+  /// Loader supports SokobanYASC .sok format, but will happily try to load older
+  /// similar, textual sokoban files (usually with extensions `.txt`, `.tsb` and
+  /// `.hsb`).
+  ///
+  /// @param path source file path
+  /// @param tessellation_hint If puzzles in file don't specify their game tessellation
+  ///        assume this value.
+  ///
   bool load(const std::string &path, game::Tessellation tessellation_hint);
 
+  ///
+  /// Saves collection to file at `path` in SokobanYASC .sok format.
+  /// @note File can have any kind of extension, not necessary `.sok`.
+  ///
   bool save(const std::filesystem::path &path) const;
+  ///
+  /// Saves collection to file at `path` in SokobanYASC .sok format.
+  /// @note File can have any kind of extension, not necessary `.sok`.
+  ///
   bool save(const std::string &path) const;
 
 private:
@@ -63,3 +107,9 @@ private:
 
 #endif // HEADER_GUARD
 /// @file
+
+///
+/// @page sok_fileformat SokobanYASC .sok file format
+///
+/// @include SOK_format_specification.txt
+///

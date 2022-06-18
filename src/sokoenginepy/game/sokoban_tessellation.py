@@ -1,15 +1,23 @@
 from __future__ import annotations
 
-from typing import Dict, Final, Tuple
+from typing import Dict, Final, List, Optional, Tuple
 
 from ..io import Snapshot
-from .base_tessellation import index_column, index_row, BaseTessellation, index_1d, is_on_board_2d
+from .base_tessellation import (
+    BaseTessellation,
+    index_1d,
+    index_column,
+    index_row,
+    is_on_board_2d,
+)
 from .config import Config, Direction
 from .utilities import inverted
 
 
 class SokobanTessellation(BaseTessellation):
     """
+    Tessellation for Sokoban game variant.
+
     Board is laid out on squares.
 
     Direction <-> character mapping:
@@ -43,19 +51,23 @@ class SokobanTessellation(BaseTessellation):
         _CHR_TO_PUSHER_STEP
     )
 
-    _NEIGHBOR_SHIFT: Final[Dict[Direction, Tuple[int, int]]] = {
-        Direction.LEFT: (0, -1),
-        Direction.RIGHT: (0, 1),
-        Direction.UP: (-1, 0),
-        Direction.DOWN: (1, 0),
-    }
+    _NEIGHBOR_SHIFT: Final[List[Tuple[Optional[int], Optional[int]]]] = [
+        (-1, 0),  # UP
+        (None, None),
+        (0, 1),  # RIGHT
+        (None, None),
+        (1, 0),  # DOWN
+        (None, None),
+        (0, -1),  # LEFT
+        (None, None),
+    ]
 
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
     ) -> int:
         row = index_row(position, board_width)
         column = index_column(position, board_width)
-        row_shift, column_shift = self._NEIGHBOR_SHIFT.get(direction, (None, None))
+        row_shift, column_shift = self._NEIGHBOR_SHIFT[direction.value]
 
         if row_shift is None or column_shift is None:
             raise ValueError(direction)

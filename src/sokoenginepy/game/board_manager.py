@@ -62,9 +62,9 @@ class BoardManager:
     >>> manager.boxes_positions
     {1: 14, 2: 21}
 
-    If we edit the board (ie. after box ID 2 was moved) without using the manager and
-    attach manager to it afterwards, we can see that suddenly our box ID 2 had gotten
-    ID 1.
+    We can edit the board (simulating movement of box ID 2) directly, without using the
+    manager. If we attach manager to that board after edit, we get expected but wrong
+    ID assigned to the box we'd just "moved":
 
     >>> board[21] = " "
     >>> board[9] = "$"
@@ -96,6 +96,11 @@ class BoardManager:
     Note:
         Movement methods in `BoardManager` only implement board updates. They don't
         implement full game logic. For game logic see :class:`.Mover`
+
+    Arguments:
+        board: board to mange
+        boxorder: Sokoban+ data (see :class:`.SokobanPlus`)
+        goalorder: Sokoban+ data (see :class:`.SokobanPlus`)
 
     See:
         - `Mover`

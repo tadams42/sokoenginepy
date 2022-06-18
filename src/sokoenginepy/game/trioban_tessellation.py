@@ -18,6 +18,8 @@ from .utilities import inverted
 
 class TriobanTessellation(BaseTessellation):
     """
+    Tessellation for Trioban game variant.
+
     Board is laid out on alternating triangles with origin triangle pointing down.
 
     Direction <-> character mapping:

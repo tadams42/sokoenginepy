@@ -200,11 +200,16 @@ class Mover:
 
     def select_pusher(self, pusher_id: int):
         """
-        Selects pusher that will perform next move.
+        Selects pusher that will perform next move. If this pusher is already selected,
+        does nothing.
 
-        Mover always selects :data:`Config.DEFAULT_ID` before any movements is
-        performed. This means that for single-pusher boards, that single pusher is
-        always automatically selected and this method doesn't need to be called.
+        From current position, generates sequence of steps needed to select pusher_id
+        and stores them into last_move(). Sets internal selected pusher_id to newly
+        selected pusher
+
+        Mover initially always selects :data:`Config.DEFAULT_ID`. This means that for
+        single-pusher boards, single pusher is always automatically selected and this
+        method doesn't need to be called.
 
         See Also:
             `.BoardManager.pushers_ids`

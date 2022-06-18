@@ -3,13 +3,21 @@ from __future__ import annotations
 from typing import Dict, Final, Tuple
 
 from ..io import CellOrientation, Snapshot
-from .base_tessellation import index_column, index_row, BaseTessellation, index_1d, is_on_board_2d
+from .base_tessellation import (
+    index_column,
+    index_row,
+    BaseTessellation,
+    index_1d,
+    is_on_board_2d,
+)
 from .config import Config, Direction
 from .utilities import inverted
 
 
 class OctobanTessellation(BaseTessellation):
     """
+    Tessellation for Octoban game variant.
+
     Board space is laid out on alternating squares and octagons with origin of
     coordinate system being octagon. Tessellation allows all 8 directions of movement
     from Direction and depending on current pusher position some of these directions do

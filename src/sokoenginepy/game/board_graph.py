@@ -141,7 +141,7 @@ class BoardGraph:
 
         Returns:
             Zero when no out edges exist or or any of positions is illegal type or out
-            of bound board index.
+            of board position.
         """
         try:
             # retv = self._graph.number_of_edges(src, dst)
@@ -156,7 +156,7 @@ class BoardGraph:
 
     def add_edge(self, src: int, neighbor: int, direction: Direction):
         """
-        Adds edges between to existing positions.
+        Adds edges between two existing positions.
 
         Raises:
             IndexError: ``src`` or ``neighbor`` off board
@@ -167,7 +167,7 @@ class BoardGraph:
 
     def out_edge_weight(self, target_position: int) -> int:
         """
-        Calculates edge weight based on BoardCell on ``target_position``.
+        Calculates edge weight based on BoardCell in ``target_position``.
 
         Raises:
             IndexError: ``target_position`` off board
@@ -185,7 +185,7 @@ class BoardGraph:
 
     def neighbor(self, src: int, direction: Direction) -> int:
         """
-        Calculates neighbor position in ``direction``.
+        Neighbor position in ``direction``.
 
         Returns:
             Target position or Config.NO_POS
@@ -204,8 +204,6 @@ class BoardGraph:
 
     def wall_neighbors(self, src: int) -> Positions:
         """
-        Gets a list of all neighboring walls.
-
         Raises:
             IndexError: ``src`` off board
             KeyError: ``src`` illegal values
@@ -217,8 +215,6 @@ class BoardGraph:
 
     def all_neighbors(self, src: int) -> Positions:
         """
-        Gets a list of all neighbors.
-
         Raises:
             IndexError: ``src`` off board
             KeyError: ``src`` illegal values
@@ -274,8 +270,7 @@ class BoardGraph:
 
     def find_jump_path(self, src: int, dst: int) -> Positions:
         """
-        Returns:
-            List of positions through which pusher must pass when jumping
+        Finds list of positions through which pusher must pass when jumping
 
         Raises:
             IndexError: ``src`` or ``dst`` off board
@@ -285,9 +280,8 @@ class BoardGraph:
 
     def find_move_path(self, src: int, dst: int) -> Positions:
         """
-        Returns:
-            List of positions through which pusher must pass when moving without
-            pushing boxes
+        Finds list of positions through which pusher must pass when moving without
+        pushing boxes
 
         Raises:
             IndexError: ``src`` or ``dst`` off board
@@ -359,9 +353,8 @@ class BoardGraph:
         self, pusher_position: int, excluded_positions: Optional[Positions] = None
     ) -> Positions:
         """
-        Returns:
-            List of positions that are reachable by pusher standing on
-            ``pusher_position``.
+        Finds all positions that are reachable by pusher standing on
+        ``pusher_position``.
         """
         return self._reachables(
             root=pusher_position,
@@ -373,8 +366,7 @@ class BoardGraph:
         self, pusher_position: int, excluded_positions: Optional[Positions] = None
     ) -> int:
         """
-        Returns:
-            Top-left position reachable by pusher.
+        Finds top-left position reachable by pusher without pushing any boxes.
         """
         reachables = self.positions_reachable_by_pusher(
             pusher_position=pusher_position, excluded_positions=excluded_positions
@@ -385,6 +377,10 @@ class BoardGraph:
             return pusher_position
 
     def path_destination(self, src: int, directions: Directions) -> int:
+        """
+        Given movement path ``directions``, calculates position at the end of tha
+        movement.
+        """
         if not directions:
             self[src]
 
@@ -398,6 +394,9 @@ class BoardGraph:
         return retv
 
     def reconfigure_edges(self):
+        """
+        Resets all graph edges using board's tessellation.
+        """
         tessellation = BaseTessellation.instance(self.tessellation)
 
         self.remove_all_edges()

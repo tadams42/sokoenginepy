@@ -16,6 +16,9 @@ class BoardState:
     NO_HASH: ClassVar[int] = 0
 
     #: Zobrist hash of state.
+    #:
+    #: See Also:
+    #:     `.HashedBoardManager`
     zobrist_hash: int = NO_HASH
 
     #: Positions of pushers sorted by pusher ID.

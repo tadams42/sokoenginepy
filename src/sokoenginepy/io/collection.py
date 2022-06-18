@@ -36,6 +36,11 @@ class Collection:
         Loader supports SokobanYASC .sok format, but will happily try to load older
         similar, textual sokoban files (usually with extensions ``.txt``, ``.tsb`` and
         ``.hsb``).
+
+        Arguments:
+            path: source file path
+            tessellation_hint: If puzzles in file don't specify their game tessellation
+                assume this value.
         """
         from .sok_file_format import SOKFileFormat
 

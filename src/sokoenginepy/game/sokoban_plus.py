@@ -134,6 +134,10 @@ class SokobanPlus:
 
     @property
     def is_enabled(self) -> bool:
+        """
+        Raises:
+            :exc:`SokobanPlusDataError`: Trying to enable invalid Sokoban+
+        """
         return self._is_enabled
 
     @property
@@ -142,10 +146,6 @@ class SokobanPlus:
 
     @is_enabled.setter
     def is_enabled(self, value):
-        """
-        Raises:
-            :exc:`SokobanPlusDataError`: Trying to enable invalid Sokoban+
-        """
         if value:
             if not self.is_valid:
                 raise SokobanPlusDataError(self._errors)

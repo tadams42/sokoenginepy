@@ -108,14 +108,12 @@ class DescribeBoardGraph:
             assert not board_graph[0].is_wall
             assert board_graph[0].has_pusher
             assert not board_graph[0].is_in_playable_area
-            assert not board_graph[0].is_deadlock
 
             board_graph[0] = Puzzle.PUSHER
 
             assert not board_graph[0].is_wall
             assert board_graph[0].has_pusher
             assert not board_graph[0].is_in_playable_area
-            assert not board_graph[0].is_deadlock
 
         def it_raises_if_trying_to_set_invalid_cell_value(self, board_graph):
             illegal_cells = ["", None]
