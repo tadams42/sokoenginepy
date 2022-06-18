@@ -9,6 +9,10 @@ from .snapshot import Snapshot
 
 
 class HexobanSnapshot(Snapshot):
+    """
+    `Snapshot` implementation for `.Tessellation.HEXOBAN` and `.HexobanTessellation`.
+    """
+
     def __init__(self, moves_data: str = ""):
         from ..game import Tessellation
 
@@ -16,14 +20,17 @@ class HexobanSnapshot(Snapshot):
 
 
 class HexobanPuzzle(Puzzle):
+    """
+    `Puzzle` implementation for `.Tessellation.HEXOBAN` and `.HexobanTessellation`.
+
+    Arguments:
+        width: number of columns
+        height: number of rows
+        board: If not blank, it will be parsed and board will be created from it,
+            ignoring ``width`` and ``height``.
+    """
+
     def __init__(self, width: int = 0, height: int = 0, board: Optional[str] = None):
-        """
-        Arguments:
-            width: number of columns
-            height: number of rows
-            board: If not blank, it will be parsed and board will be created from it,
-                ignoring ``width`` and ``height``.
-        """
         from ..game import Tessellation
 
         super().__init__(
@@ -88,7 +95,7 @@ class HexobanTextConverter:
 
     @staticmethod
     def _find_rightmost_non_floor(strings: List[str]) -> Optional[int]:
-        from ..game import index_x, index_y, index_1d
+        from ..game import index_1d, index_x, index_y
 
         def rightmost_finder(strings: List[str], row_parity: int):
             cell_found = False

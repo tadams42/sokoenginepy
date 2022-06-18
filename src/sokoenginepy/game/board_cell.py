@@ -119,12 +119,11 @@ class BoardCell:
         True if this cell allows putting box or pusher on self.
 
         Note:
-            This method is not used by BoardCell modifiers (ie. `put_box`,
-            `put_pusher`, etc...). As far as BoardCell is concerned, nothing prevents
-            clients from putting box on wall (which replaces that wall with box).
-            This method is intended to be used by higher game logic classes that
-            would implement pusher movement in which case putting ie. pusher onto
-            same cell where box is makes no sense.
+            This method is not used by BoardCell modifiers (ie. `put_box`, `put_pusher`,
+            etc...). As far as BoardCell is concerned, nothing prevents clients from
+            putting box on wall (which replaces that wall with box). This method is
+            used by higher game logic that implement pusher movement in which case
+            putting ie. pusher onto same cell where box is makes no sense.
         """
         return not (self.has_box or self.has_pusher or self.is_wall)
 

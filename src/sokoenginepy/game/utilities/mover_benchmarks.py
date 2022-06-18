@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 import operator
 import textwrap
 import time
@@ -58,9 +59,9 @@ class BoardType(IntEnum):
             return SokobanPuzzle(board=data)
 
 
-class BenchmarkType(IntEnum):
-    FORWARD_MOVER = 0
-    REVERSE_MOVER = 1
+class BenchmarkType(enum.Enum):
+    FORWARD_MOVER = Direction.LEFT
+    REVERSE_MOVER = Direction.RIGHT
 
     @property
     def is_reverse(self) -> bool:
@@ -69,13 +70,6 @@ class BenchmarkType(IntEnum):
     @property
     def title(self) -> str:
         return self.name.replace("_", " ").lower().title()
-
-    @property
-    def direction(self) -> Direction:
-        if self == self.FORWARD_MOVER:
-            return Direction.LEFT
-        else:
-            return Direction.RIGHT
 
 
 class MovementBenchmark:
@@ -115,7 +109,7 @@ class MovementBenchmark:
                 undo_move = False
             else:
                 start_time = time.perf_counter()
-                self.mover.move(self.benchmark_type.direction)
+                self.mover.move(self.benchmark_type.value)
                 end_time = time.perf_counter()
                 total_time += end_time - start_time
                 undo_move = True

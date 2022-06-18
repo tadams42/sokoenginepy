@@ -173,7 +173,7 @@ And to play in reverse mode:
 
 ```python
 >>> # reverse solving mode
->>> puzzle2 = SokobanPuzzle(board="""
+>>> puzzle2 = SokobanPuzzle(board=textwrap.dedent("""
 ...         #####
 ...         #  @#
 ...         #$  #
@@ -185,21 +185,21 @@ And to play in reverse mode:
 ...     ##### ### #@##  ..#
 ...         #     #########
 ...         #######
-... """[1:-1])
+... """.lstrip("\n").rstrip()))
 >>> board2 = BoardGraph(puzzle2)
 >>> reverse_mover = Mover(board2, SolvingMode.REVERSE)
 >>> print(reverse_mover.board)
---------#####----------
---------#--@#----------
---------#.--#----------
-------###--.##---------
-------#--.-.-#---------
-----###-#-##-#---######
-----#---#-##-#####--$$#
-----#-.--.----------$$#
-----#####-###-#@##--$$#
---------#-----#########
---------#######--------
+----#####----------
+----#--@#----------
+----#.--#----------
+--###--.##---------
+--#--.-.-#---------
+###-#-##-#---######
+#---#-##-#####--$$#
+#-.--.----------$$#
+#####-###-#@##--$$#
+----#-----#########
+----#######--------
 
 ```
 
@@ -251,11 +251,6 @@ True
 
 ```
 
-Zobrist hashing is deterministic which means that undoing box move will return hash
-value to previous one. `Mover` doesn't or use board hashing internally in any way, but
-any kind of solver implementations will need it to speed up game-space searches and
-position caching.
-
 ## Victory conditions and Sokoban+
 
 Board manager is also used fof checking of victory conditions. There are two types of
@@ -288,8 +283,8 @@ How are `Sokoban+` strings interpreted?
 Position of each ID in Sokoban+ string, determines ID of the piece that will get that
 `plus_id`. Or, by example:
 
-| box/goal ID          | box Sokoban+ ID | goal Sokoban+ ID |
-| -------------------- | --------------- | ---------------- |
+| box/goal ID    | box Sokoban+ ID | goal Sokoban+ ID |
+| -------------- | --------------- | ---------------- |
 | DEFAULT_ID     | 1               | 3                |
 | DEFAULT_ID + 1 | 3               | 2                |
 | DEFAULT_ID + 2 | 2               | 1                |

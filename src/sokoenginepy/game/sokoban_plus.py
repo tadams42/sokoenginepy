@@ -35,6 +35,11 @@ class SokobanPlus:
     must also contain number 42 twice.
 
     Sokoban+ data parser accepts any positive integer as plus id.
+
+    Arguments:
+        boxorder: Space separated integers describing Sokoban+ IDs for boxes
+        goalorder: Space separated integers describing Sokoban+ IDs for goals
+        pieces_count: Total count of boxes/goals on board
     """
 
     LEGACY_DEFAULT_PLUS_ID: Final[int] = 99
@@ -49,12 +54,6 @@ class SokobanPlus:
     DEFAULT_PLUS_ID: Final[int] = 0
 
     def __init__(self, pieces_count: int, boxorder: str = "", goalorder: str = ""):
-        """
-        Args:
-            boxorder: Space separated integers describing Sokoban+ IDs for boxes
-            goalorder: Space separated integers describing Sokoban+ IDs for goals
-            pieces_count: Total count of boxes/goals on board
-        """
         self._is_enabled = False
         self._is_validated = False
         self._errors: List[str] = []

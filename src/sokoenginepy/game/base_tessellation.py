@@ -16,9 +16,22 @@ if TYPE_CHECKING:
 
 
 class Tessellation(enum.Enum):
+    """Supported game tessellations."""
+
+    #: See Also:
+    #      :class:`.SokobanTessellation`
     SOKOBAN = 0
+
+    #: See Also:
+    #      :class:`.HexobanTessellation`
     HEXOBAN = 1
+
+    #: See Also:
+    #      :class:`.TriobanTessellation`
     TRIOBAN = 2
+
+    #: See Also:
+    #      :class:`.OctobanTessellation`
     OCTOBAN = 3
 
 

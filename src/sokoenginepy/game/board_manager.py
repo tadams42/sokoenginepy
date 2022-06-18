@@ -22,46 +22,85 @@ class BoxGoalSwitchError(RuntimeError):
 
 
 class BoardManager:
-    """Memoizes, tracks and updates positions of all pieces.
+    """
+    Memoizes, tracks and updates positions of all pieces.
 
-    - Provides efficient means to inspect positions of pushers, boxes and goals. To
-      understand how this works, we need to have a way of identifying individual
-      pushers, boxes and goals. :class:`.BoardManager` does that by assigning
-      numerical ID to each individual piece. This ID can then be used to refer to
-      that piece in various contexts.
+    - assigns and maintains piece IDs
+    - manages Sokoban+ piece IDs
+    - moves pieces while preserving their IDs
+    - checks if board is solved
 
-      How are piece IDs assigned? We start scanning game board from top left corner to
-      the right, row by row. First encountered box will get ``box.id =
-      Config.DEFAULT_ID``, second one ``box.id = Config.DEFAULT_ID + 1``,
-      etc... Same goes for pushers and goals.
+    ``BoardManager`` implements efficient means to inspect positions of pushers, boxes
+    and goals. To be able to do that, pieces must be uniquely identified.
+    ``BoardManager`` assigns unique numerical ID to each individual piece. This ID can
+    then be used to refer to that piece in various contexts.
 
-      .. image:: /images/assigning_ids.png
-          :alt: Assigning board elements' IDs
+    How are piece IDs assigned? Start scanning game board from top left corner, going
+    row by row, from left to the right.  First encountered box will get ``box.id =
+    Config.DEFAULT_ID``, second one ``box.id = Config.DEFAULT_ID + 1``, etc... Same goes
+    for pushers and goals.
 
-    - Provides efficient means of pieces movement. Ie. we can move pushers and boxes
-      and :class:`.BoardManager` will update internal state and board cells.
+    .. image:: /images/assigning_ids.png
+        :alt: Assigning board elements' IDs
 
-      This movement preserves piece IDs in context of board state changes. To illustrate,
-      let's assume we create :class:`.BoardManager` from board with two pushers one
-      above the other. After then we edit the board, placing pusher ID 2 in row above
-      pusher ID 1. Finally, we create another instance of :class:`.BoardManager`. If we
-      now inspect pusher IDs in first and second :class:`.BoardManager` instance, they
-      will be different. Have we used movement methods instead of board editing, these
-      IDs would be preserved:
+    ``BoardManager`` also ensures that piece IDs remain unchanged when pieces are moved
+    on board. This is best illustrated by example. Let's construct a board with 2 boxes.
 
-      .. |img1| image:: /images/movement_vs_transfer1.png
-      .. |img2| image:: /images/movement_vs_transfer2.png
-      .. |img3| image:: /images/movement_vs_transfer3.png
+    >>> from sokoenginepy.game import BoardGraph, BoardManager, Config
+    >>> from sokoenginepy.io import SokobanPuzzle
+    >>> data = "\\n".join([
+    ...     "######",
+    ...     "#    #",
+    ...     "# $  #",
+    ...     "#  $.#",
+    ...     "#@ . #",
+    ...     "######",
+    ... ])
+    >>> puzzle = SokobanPuzzle(board=data)
+    >>> board = BoardGraph(puzzle)
+    >>> manager = BoardManager(board)
+    >>> manager.boxes_positions
+    {1: 14, 2: 21}
 
-      +------------------+------------------+------------------+
-      | 1) Initial board | 2) Edited board  | 3) Box ID:1 moved|
-      +------------------+------------------+------------------+
-      |      |img1|      |      |img2|      |      |img3|      |
-      +------------------+------------------+------------------+
+    If we edit the board (ie. after box ID 2 was moved) without using the manager and
+    attach manager to it afterwards, we can see that suddenly our box ID 2 had gotten
+    ID 1.
+
+    >>> board[21] = " "
+    >>> board[9] = "$"
+    >>> print(board.to_board_str())
+    ######
+    #  $ #
+    # $  #
+    #   .#
+    #@ . #
+    ######
+    >>> manager = BoardManager(board)
+    >>> manager.boxes_positions
+    {1: 9, 2: 14}
+
+    Moving box through manager (via `BoardManager.move_box_from`) would've preserved
+    ID of moved box. Same goes for pushers.
+
+    .. |img1| image:: /images/movement_vs_transfer1.png
+    .. |img2| image:: /images/movement_vs_transfer2.png
+    .. |img3| image:: /images/movement_vs_transfer3.png
+
+    +------------------+------------------+------------------+
+    | Initial board    | Box edited       | Box moved through|
+    |                  | without manager  | manager          |
+    +------------------+------------------+------------------+
+    |      |img1|      |      |img2|      |      |img3|      |
+    +------------------+------------------+------------------+
 
     Note:
-        Movement methods here are just for state and board cell updates, they don't
+        Movement methods in `BoardManager` only implement board updates. They don't
         implement full game logic. For game logic see :class:`.Mover`
+
+    See:
+        - `Mover`
+        - `SokobanPlus`
+        - `BoardState`
     """
 
     def __init__(self, board: BoardGraph, boxorder: str = "", goalorder: str = ""):
@@ -135,9 +174,7 @@ class BoardManager:
 
     @cached_property
     def pushers_ids(self) -> List[int]:
-        """
-        IDs of all pushers on board.
-        """
+        """IDs of all pushers on board."""
         return list(self._pushers.keys())
 
     @property
@@ -414,13 +451,20 @@ class BoardManager:
 
     @property
     def is_sokoban_plus_enabled(self) -> bool:
+        """
+        Are Sokoban+ rule enabled for current game?
+
+        See Also:
+            - enable_sokoban_plus
+        """
         return self._sokoban_plus.is_enabled
 
     def enable_sokoban_plus(self):
         """
         Enables using Sokoban+ rules for this board.
 
-        Enabling these, changes victory condition for given board.
+        Enabling these, changes victory condition for given board (return value of
+        `is_solved`).
 
         See Also:
             :class:`.SokobanPlus`
@@ -452,6 +496,16 @@ class BoardManager:
 
     @property
     def is_solved(self) -> bool:
+        """
+        Checks for game victory.
+
+        1. ``Classic`` victory is any board position in which each box is positioned on
+           top of each goal
+        2. ``Sokoban+`` victory is board position where each box is positioned on top of
+           each goal with the same Sokoban+ ID as that box
+
+        Result depends on `.is_sokoban_plus_enabled`.
+        """
         if self.boxes_count != self.goals_count:
             return False
 
@@ -476,7 +530,7 @@ class BoardManager:
         Generator for all configurations of boxes that result in solved board.
 
         Note:
-            Resultset depends on `.BoardManager.is_sokoban_plus_enabled`.
+            Result set depends on `is_sokoban_plus_enabled`.
         """
         if self.boxes_count != self.goals_count:
             return []
@@ -524,7 +578,15 @@ class BoardManager:
             del boxes_todo[index]
 
     def switch_boxes_and_goals(self):
-        """Switches positions of boxes and goals pairs."""
+        """
+        Switches positions of boxes and goals pairs. This is used by `Mover` in
+        `SolvingMode.REVERSE`.
+
+        Raises:
+            BoxGoalSwitchError: when board can't be switched. These kinds of boards
+                are usualy also not `is_playable`.
+        """
+
         if self.boxes_count != self.goals_count:
             raise BoxGoalSwitchError(
                 "Unable to switch boxes and goals - counts are not the same"
@@ -563,6 +625,9 @@ class BoardManager:
 
     @property
     def is_playable(self) -> bool:
+        """
+        Checks minimal requirement for board to be playable.
+        """
         return (
             self.pushers_count > 0
             and self.boxes_count == self.goals_count
@@ -572,6 +637,9 @@ class BoardManager:
 
     @property
     def state(self) -> BoardState:
+        """
+        Snapshots current board state.
+        """
         pushers_positions = self.pushers_positions
         boxes_positions = self.boxes_positions
         return BoardState(

@@ -10,13 +10,7 @@ if TYPE_CHECKING:
 
 
 class Collection:
-    """
-    Collection of one or more game puzzles.
-
-    Attributes:
-        title(str): Title
-        author(str): Author
-    """
+    """Collection of one or more game puzzles."""
 
     def __init__(
         self,
@@ -33,6 +27,35 @@ class Collection:
         self.notes: List[str] = notes or []
         self.puzzles: List[Puzzle] = []
 
+    def load(
+        self, path: Union[str, Path], tessellation_hint: Optional[Tessellation] = None
+    ):
+        """
+        Loads collection from ``path``.
+
+        Loader supports SokobanYASC .sok format, but will happily try to load older
+        similar, textual sokoban files (usually with extensions ``.txt``, ``.tsb`` and
+        ``.hsb``).
+        """
+        from .sok_file_format import SOKFileFormat
+
+        with open(path, "r") as f:
+            SOKFileFormat.read(
+                f, self, tessellation_hint or self._extension_to_tessellation_hint(path)
+            )
+
+    def save(self, path: Union[str, Path]):
+        """
+        Saves collection to file at ``path`` in SokobanYASC .sok format.
+
+        Note:
+            File can have any kind of extension, not necessary ``.sok``.
+        """
+        from .sok_file_format import SOKFileFormat
+
+        with open(path, "w") as f:
+            SOKFileFormat.write(self, f)
+
     @staticmethod
     def _extension_to_tessellation_hint(path: Union[str, Path]) -> Tessellation:
         from ..game import Tessellation
@@ -44,19 +67,3 @@ class Collection:
             return Tessellation.HEXOBAN
         else:
             return Tessellation.SOKOBAN
-
-    def load(
-        self, path: Union[str, Path], tessellation_hint: Optional[Tessellation] = None
-    ):
-        from .sok_file_format import SOKFileFormat
-
-        with open(path, "r") as f:
-            SOKFileFormat.read(
-                f, self, tessellation_hint or self._extension_to_tessellation_hint(path)
-            )
-
-    def save(self, path: Union[str, Path]):
-        from .sok_file_format import SOKFileFormat
-
-        with open(path, "w") as f:
-            SOKFileFormat.write(self, f)

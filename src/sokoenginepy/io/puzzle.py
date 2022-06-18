@@ -33,17 +33,16 @@ class Puzzle:
     Base class for game puzzles.
 
     Game puzzle is representation of game board together with all of its meta data and
-    snapshots.
+    snapshots. It implements:
 
-    It implements:
-        - parsing board data from text
-        - editing board: setting individual cells, resizing, trimming, ...
+    - parsing board data from text
+    - editing board: setting individual cells, resizing, trimming, ...
 
     All positions used are 1D array indexes.
 
-    To convert 2D board coordinates into 1D array indexes, use ``game.index_1d``.
-    To convert 1D array indexes into board 2D coordinates, use one of ``game.index_row``,
-    ``game.index_x`` ``game.index_column`` and ``game.index_y``.
+    To convert 2D board coordinates into 1D array indexes, use `.index_1d`. To convert
+    1D array indexes into board 2D coordinates, use one of `.index_row`, `.index_x`
+    `.index_column` and `.index_y`.
     """
 
     WALL: Final[str] = "#"
@@ -273,6 +272,7 @@ class Puzzle:
         )
 
     def to_board_str(self, use_visible_floor=False, rle_encode=False) -> str:
+        """Formatted output of parsed and validated board."""
         self._reparse_if_not_parsed()
         return self._printer_cls().print(
             self._parsed_board, self.width, self.height, use_visible_floor, rle_encode
@@ -280,6 +280,7 @@ class Puzzle:
 
     @property
     def board(self) -> str:
+        """Original, unparsed board."""
         return self._original_board
 
     @board.setter
@@ -294,9 +295,7 @@ class Puzzle:
 
     @property
     def internal_board(self) -> str:
-        """
-        Internal, parsed board. For debugging purposes.
-        """
+        """Internal, parsed board. For debugging purposes."""
         self._reparse_if_not_parsed()
         return "".join(self._parsed_board)
 
