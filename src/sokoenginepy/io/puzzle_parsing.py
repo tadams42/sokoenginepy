@@ -336,7 +336,7 @@ class PuzzleParser:
         if not Puzzle.is_board(line):
             raise ValueError("Illegal characters found in board string")
 
-        return cls.normalize_width(Rle.decode(line).split("\n"))
+        return cls.normalize_width(Rle.decode(line).lstrip("\n").rstrip().split("\n"))
 
 
 class PuzzlePrinter:

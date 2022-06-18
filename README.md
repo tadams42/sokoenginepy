@@ -42,18 +42,21 @@ data = textwrap.dedent("""
     ##### ### #@##  ..#
         #     #########
         #######
-""".lstrip("\n").rstrip())
+""")
 puzzle = SokobanPuzzle(board=data)
 board = BoardGraph(puzzle)
 mover = Mover(board)
 mover.select_pusher(Config.DEFAULT_ID + 1)
 mover.move(Direction.UP)
+print(board.to_board_str())
 ```
 
 or in C++:
 
 ```cpp
 #include <sokoengine.hpp>
+
+#include <iostream>
 
 using sokoengine::game::BoardGraph;
 using sokoengine::game::Direction;
@@ -63,26 +66,27 @@ using sokoengine::io::SokobanPuzzle;
 using std::string;
 
 int main() {
-  string data =
-    string() +
-    "    #####\n" +
-    "    #  @#\n" +
-    "    #$  #\n" +
-    "  ###  $##\n" +
-    "  #  $ $ #\n" +
-    "### # ## #   ######\n" +
-    "#   # ## #####  ..#\n" +
-    "# $  $          ..#\n" +
-    "##### ### #@##  ..#\n" +
-    "    #     #########\n" +
-    "    #######\n"
-  ;
+  string data = R"""(
+    #####
+    #  @#
+    #$  #
+  ###  $##
+  #  $ $ #
+### # ## #   ######
+#   # ## #####  ..#
+# $  $          ..#
+##### ### #@##  ..#
+    #     #########
+    #######
+)""";
 
   SokobanPuzzle puzzle(data);
   BoardGraph board(puzzle);
   Mover mover(board);
   mover.select_pusher(Config::DEFAULT_ID + 1);
   mover.move(Direction::UP);
+
+  std::cout << board.to_board_str() << std::endl;
 
   return 0;
 }

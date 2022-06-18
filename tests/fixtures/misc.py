@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
@@ -10,13 +9,6 @@ _SELF_DIR = Path(__file__).parent.absolute().resolve()
 
 
 fake = Faker()
-
-
-@dataclass
-class BoardData:
-    board: str
-    width: int
-    height: int
 
 
 @pytest.fixture(scope="session")

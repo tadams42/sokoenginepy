@@ -31,7 +31,7 @@ def puzzle():
         ----#-----#########
         ----#######--------
     """
-    data = textwrap.dedent(data.lstrip("\n").rstrip())
+    data = textwrap.dedent(data)
     return SokobanPuzzle(board=data)
 
 
@@ -56,7 +56,7 @@ def switched_puzzle():
         ----#-----#########
         ----#######--------
     """
-    data = textwrap.dedent(data.lstrip("\n").rstrip())
+    data = textwrap.dedent(data)
     return SokobanPuzzle(board=data)
 
 
@@ -532,30 +532,35 @@ class DescribeBoardManager:
         assert board_manager.goals_positions == goals_positions
 
     def test_switching_moves_pusher_out_of_the_way(self):
-        board = "\n".join(
-            [
-                "########",
-                "#------#",
-                "#--+---#",
-                "#----$-#",
-                "########",
-            ]
-        )
-        switched_board = "\n".join(
-            [
-                "########",
-                "#------#",
-                "#--$---#",
-                "#----+-#",
-                "########",
-            ]
-        )
+        board = """
+            ########
+            #------#
+            #--+---#
+            #----$-#
+            ########
+        """
+        board = textwrap.dedent(board)
+
+        switched_board = """
+            ########
+            #------#
+            #--$---#
+            #----+-#
+            ########
+        """
+        switched_board = textwrap.dedent(switched_board)
 
         puzzle = SokobanPuzzle(board=board)
         graph = BoardGraph(puzzle)
         board_manager = BoardManager(graph)
 
         board_manager.switch_boxes_and_goals()
-        assert str(board_manager.board) == switched_board
+        assert (
+            board_manager.board.to_board_str(use_visible_floor=True)
+            == switched_board.lstrip("\n").rstrip()
+        )
         board_manager.switch_boxes_and_goals()
-        assert str(board_manager.board) == board
+        assert (
+            board_manager.board.to_board_str(use_visible_floor=True)
+            == board.lstrip("\n").rstrip()
+        )

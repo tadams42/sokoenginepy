@@ -23,7 +23,7 @@ def puzzle():
         ----#-----#########
         ----#######--------
     """
-    data = textwrap.dedent(data.lstrip("\n").rstrip())
+    data = textwrap.dedent(data)
     return SokobanPuzzle(board=data)
 
 

@@ -662,12 +662,28 @@ Strings PuzzleParser::normalize_width(const Strings &strings, char fill_chr) {
   return retv;
 }
 
+static void trim_R_newlines(std::string &s) {
+  s.erase(
+    s.begin(),
+    std::find_if(
+      s.begin(), s.end(), [](unsigned char ch) { return ch != '\n'; }
+    )
+  );
+  s.erase(
+    std::find_if(
+      s.rbegin(), s.rend(), [](unsigned char ch) { return ch != '\n'; }
+    ).base(),
+    s.end()
+  );
+}
+
 Strings PuzzleParser::cleaned_board_lines(const std::string &line) {
   if (is_blank(line)) { return Strings(); }
   if (!io::Puzzle::is_board(line)) {
     throw std::invalid_argument("Illegal characters found in board string");
   }
   string data = io::Rle::decode(line);
+  trim_R_newlines(data);
 
   Strings board_lines;
   if (!is_blank(data)) {

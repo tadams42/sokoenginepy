@@ -39,28 +39,22 @@ class DescribeCollection:
         assert list(puzzle.notes) == ["Time: 00:01:00", "", "Some puzzle notes"]
         assert not is_blank(puzzle.board)
 
-        expected_board = (
-            "\n".join(
-                textwrap.dedent(
-                    """
-                    #####
-                    #   #
-                    #$  #
-                  ###  $##
-                  #  $ $ #
-                ### # ## #   ######
-                #   # ## #####  ..#
-                # $  $          ..#
-                ##### ### #@##  ..#
-                    #     #########
-                    #######
-                """
-                )
-                .lstrip("\n")
-                .splitlines()
-            )
-            + "\n"
-        )
+        expected_board = textwrap.dedent(
+            """
+                #####
+                #   #
+                #$  #
+              ###  $##
+              #  $ $ #
+            ### # ## #   ######
+            #   # ## #####  ..#
+            # $  $          ..#
+            ##### ### #@##  ..#
+                #     #########
+                #######
+            """
+        ).lstrip("\n")
+
         assert puzzle.board == expected_board
 
         snapshot = puzzle.snapshots[0]
