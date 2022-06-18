@@ -2,16 +2,16 @@
 
 #include "board_cell.hpp"
 #include "board_graph.hpp"
+#include "board_state.hpp"
 #include "hashed_board_manager.hpp"
 #include "sokoban_plus.hpp"
-#include "board_state.hpp"
 
 #include <algorithm>
+#include <charconv>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/bimap.hpp>
 #include <boost/bimap/set_of.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace boost;
 using namespace boost::bimaps;
@@ -28,8 +28,7 @@ LIBSOKOENGINE_LOCAL string to_str(const BoardManager::positions_by_id_t &m) {
   auto converter = [&]() {
     Strings retv;
     for (auto p : m) {
-      retv.push_back(string() + boost::lexical_cast<string>(p.first) + ": " +
-                     boost::lexical_cast<string>(p.second));
+      retv.push_back(std::to_string(p.first) + ": " + std::to_string(p.second));
     }
     return retv;
   };
@@ -518,7 +517,7 @@ string BoardManager::str() const {
     size_t max_members = 10;
     Strings tmp;
     for (size_t i = 0; i < min(positions.size(), max_members); ++i) {
-      tmp.push_back(boost::lexical_cast<string>(positions[i]));
+      tmp.push_back(std::to_string(positions[i]));
     }
 
     if (positions.size() <= max_members)

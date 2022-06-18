@@ -68,13 +68,26 @@ typedef uint32_t position_t;
 /// Namespace for game engine part of sokoengine
 ///
 namespace game {
+
 ///
-/// Plane tessellations
+/// Supported game tessellations.
 ///
 enum class LIBSOKOENGINE_API Tessellation : uint8_t {
+  ///
+  /// @sa SokobanTessellation
+  ///
   SOKOBAN = 0,
+  ///
+  /// @sa HexobanTessellation
+  ///
   HEXOBAN,
+  ///
+  /// @sa TriobanTessellation
+  ///
   TRIOBAN,
+  ///
+  /// @sa OctobanTessellation
+  ///
   OCTOBAN
 };
 
@@ -171,7 +184,7 @@ constexpr uint8_t direction_pack(const Direction &direction) {
 }
 
 ///
-/// Reverses direction_pack().
+/// Number of available Direction.
 ///
 static constexpr uint8_t DIRECTIONS_COUNT = direction_pack(Direction::NORTH_WEST) + 1;
 
@@ -189,17 +202,20 @@ static constexpr const Direction OPPOSITE_DIRECTIONS[DIRECTIONS_COUNT] = {
   Direction::DOWN, Direction::SOUTH_WEST, Direction::LEFT,  Direction::NORTH_WEST,
   Direction::UP,   Direction::NORTH_EAST, Direction::RIGHT, Direction::SOUTH_EAST};
 
+///
+/// Reverse operation from direction_pack().
+///
 constexpr const Direction &direction_unpack(uint8_t val) { return DIRECTIONS[val]; }
 
 ///
-/// Opposite direction lookup.
+/// Opposite Direction lookup.
 ///
 LIBSOKOENGINE_API constexpr Direction opposite(const Direction d) {
   return OPPOSITE_DIRECTIONS[static_cast<uint8_t>(d)];
 }
 
 ///
-/// Type of graph
+/// Types of BoardGraph.
 ///
 enum class LIBSOKOENGINE_API GraphType : int {
   ///
@@ -214,7 +230,9 @@ enum class LIBSOKOENGINE_API GraphType : int {
 };
 
 ///
-/// Game configuration
+/// Various constants used across game namespace. Since they are needed by many modules
+/// it made more sense to place them here in their own class, than into one or more
+/// other classes.
 ///
 class LIBSOKOENGINE_API Config {
 public:
@@ -240,17 +258,20 @@ public:
                 "NO_POS must be greater than any valid board position!");
 
   ///
-  /// Default ID of a piece (box, goal or pusher) - ID assigned to first pusher,
-  /// box or goal on board.
+  /// Default ID for pieces for situations whe one is needed and **must** be provided.
   ///
-  /// Piece ids are assigned sequentially to all board pieces starting  with
-  /// DEFAULT_ID.
+  /// @sa
+  /// - BoardManager
+  /// - PusherStep
   ///
   static constexpr game::piece_id_t DEFAULT_ID = 1;
 
   ///
-  /// Value that represents state where ID of a piece has not yet been assigned to
-  /// it.
+  /// Invalid, non-existing ID of a piece.
+  ///
+  /// @sa
+  /// - BoardManager
+  /// - PusherStep
   ///
   static constexpr game::piece_id_t NO_ID = 0;
   static_assert(NO_ID < DEFAULT_ID, "NO_ID must be less than DEFAULT_ID");

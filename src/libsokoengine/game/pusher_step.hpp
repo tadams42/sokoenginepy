@@ -47,6 +47,11 @@ private:
   piece_id_t m_moved_box_id;
 };
 
+namespace implementation {
+LIBSOKOENGINE_LOCAL const std::string &direction_repr(Direction d);
+LIBSOKOENGINE_LOCAL const std::string &direction_str(Direction d);
+} // namespace implementation
+
 } // namespace game
 } // namespace sokoengine
 

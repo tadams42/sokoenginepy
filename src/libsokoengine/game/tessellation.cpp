@@ -14,29 +14,6 @@ namespace game {
 
 using io::CellOrientation;
 
-namespace implementation {
-
-static const string strs[DIRECTIONS_COUNT] = {
-  string("Direction.UP"),
-  string("Direction.NORTH_EAST"),
-  string("Direction.RIGHT"),
-  string("Direction.SOUTH_EAST"),
-  string("Direction.DOWN"),
-  string("Direction.SOUTH_WEST"),
-  string("Direction.LEFT"),
-  string("Direction.NORTH_WEST"),
-};
-
-} // namespace implementation
-
-const std::string &BaseTessellation::direction_repr(Direction d) {
-  return implementation::strs[direction_pack(d)];
-}
-
-const std::string &BaseTessellation::direction_str(Direction d) {
-  return direction_repr(d);
-}
-
 const BaseTessellation &BaseTessellation::instance(const Tessellation &tessellation) {
   static const SokobanTessellation SOKOBAN;
   static const HexobanTessellation HEXOBAN;

@@ -10,7 +10,6 @@
 #include <unordered_set>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 
@@ -43,7 +42,7 @@ public:
 
       Strings tmp;
       for (auto id : v) {
-        tmp.push_back(boost::lexical_cast<string>(id));
+        tmp.push_back(std::to_string(id));
         if (tmp.size() == 5) {
           retv.push_back(indent + "    " + boost::join(tmp, ", "));
           tmp.clear();
@@ -63,7 +62,7 @@ public:
     auto converter = [&]() {
       Strings retv;
       for (auto p : m) {
-        retv.push_back(indent + "    " + boost::lexical_cast<string>(p.first) + ": " +
+        retv.push_back(indent + "    " + std::to_string(p.first) + ": " +
                        to_str(p.second, 4 + add_indent));
       }
       return retv;
@@ -179,8 +178,7 @@ zobrist_key_t HashedBoardManager::external_state_hash(BoardState &board_state) c
   piece_id_t index = 0;
   for (auto box_position : board_state.boxes_positions()) {
     retv ^=
-      m_impl
-        ->m_boxes_factors[box_plus_id(Config::DEFAULT_ID + index)][box_position];
+      m_impl->m_boxes_factors[box_plus_id(Config::DEFAULT_ID + index)][box_position];
     index++;
   }
 

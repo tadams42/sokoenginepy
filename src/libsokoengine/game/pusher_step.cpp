@@ -10,6 +10,29 @@ using namespace std;
 namespace sokoengine {
 namespace game {
 
+namespace implementation {
+
+// clang-format off
+static const string strs[DIRECTIONS_COUNT] = {
+  string("Direction.UP"),
+  string("Direction.NORTH_EAST"),
+  string("Direction.RIGHT"),
+  string("Direction.SOUTH_EAST"),
+  string("Direction.DOWN"),
+  string("Direction.SOUTH_WEST"),
+  string("Direction.LEFT"),
+  string("Direction.NORTH_WEST"),
+};
+// clang-format on
+
+const std::string &direction_repr(Direction d) {
+  return implementation::strs[direction_pack(d)];
+}
+
+const std::string &direction_str(Direction d) { return direction_repr(d); }
+
+} // namespace implementation
+
 using io::is_blank;
 using io::Strings;
 
@@ -69,7 +92,7 @@ string PusherStep::repr() const {
   if (m_is_current_pos) curr_pos = "is_current_pos=True";
 
   Strings args;
-  args.push_back(BaseTessellation::direction_str(direction()));
+  args.push_back(implementation::direction_str(direction()));
   if (!is_blank(s_box_id)) args.push_back(s_box_id);
   if (!is_blank(s_jump)) args.push_back(s_jump);
   if (!is_blank(s_pusher_select)) args.push_back(s_pusher_select);

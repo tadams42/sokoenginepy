@@ -98,12 +98,10 @@ class DescribeBoardGraph:
     class describe_setitem:
         def it_sets_board_cell_on_position(self, board_graph):
             board_graph[0].is_in_playable_area = True
-            board_graph[0].is_deadlock = True
             board_graph[0].is_wall = True
 
             bc = BoardCell(Puzzle.PUSHER)
             bc.is_in_playable_area = False
-            bc.is_deadlock = False
 
             board_graph[0] = bc
 

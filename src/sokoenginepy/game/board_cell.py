@@ -8,7 +8,7 @@ class BoardCell:
     Note:
         There is no game logic encoded in this class. It is perfectly fine to put
         pusher on wall cell (in which case wall will be replaced by pusher). This is
-        by design: :class:`.BoardCell` is value class, not game logic class.
+        by design: :class:`.BoardCell` is a value class, not game logic class.
     """
 
     __slots__ = [
@@ -17,21 +17,14 @@ class BoardCell:
         "_has_goal",
         "_is_wall",
         "is_in_playable_area",
-        "is_deadlock",
     ]
 
-    def __init__(
-        self,
-        character: str = Puzzle.FLOOR,
-        is_in_playable_area: bool = False,
-        is_deadlock: bool = False,
-    ):
+    def __init__(self, character: str = Puzzle.FLOOR):
         self._has_box: bool = False
         self._has_pusher: bool = False
         self._has_goal: bool = False
         self._is_wall: bool = False
-        self.is_in_playable_area: bool = is_in_playable_area
-        self.is_deadlock: bool = is_deadlock
+        self.is_in_playable_area: bool = False
 
         if not Puzzle.is_empty_floor(character):
             if Puzzle.is_wall(character):

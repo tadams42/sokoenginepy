@@ -9,25 +9,66 @@ namespace game {
 ///
 /// Stores properties of one cell in board layout.
 ///
+/// @note
+/// There is no game logic encoded in this class. It is perfectly fine to put pusher on
+/// wall cell (in which case wall will be replaced by pusher). This is by design:
+/// BoardCell is a value class, not game logic class.
 class LIBSOKOENGINE_API BoardCell {
 public:
-  explicit BoardCell(char rv = ' ', bool is_in_playable_area = false,
-                     bool is_deadlock = false);
+  explicit BoardCell(char rv = ' ');
 
   bool operator==(const BoardCell &rv) const;
   bool operator!=(const BoardCell &rv) const;
   bool operator==(char rv) const;
   bool operator!=(char rv) const;
 
-  char str() const;
-  std::string repr() const;
+  ///
+  /// Pretty-print cell contents.
+  ///
   char to_str(bool use_visible_floor = false) const;
 
+  ///
+  /// Same as to_str() bit with hardcoded defaults.
+  ///
+  char str() const;
+
+  ///
+  /// Pretty-print cell object
+  ///
+  std::string repr() const;
+
+  ///
+  /// Clears cell, converting it to empty floor.
+  ///
   void clear();
+
+  ///
+  /// True if there is pusher, box or goal on this cell.
+  ///
   bool has_piece() const;
+
+  ///
+  /// True if there is no pieces and no wall on this cell.
+  ///
   bool is_empty_floor() const;
+
+  ///
+  /// True if this is either a wall or box on goal.
+  ///
   bool is_border_element() const;
+
+  ///
+  /// True if this cell allows putting box or pusher on self.
+  ///
+  /// @note
+  /// This method is not used by BoardCell modifiers (ie. put_box(), put_pusher(),
+  /// etc...). As far as BoardCell is concerned, nothing prevents clients from putting
+  /// box on wall (which replaces that wall with box). This method is used by higher
+  /// game logic that implement pusher movement in which case putting ie. pusher onto
+  /// same cell where box is makes no sense.
+  ///
   bool can_put_pusher_or_box() const;
+
   bool has_box() const;
   void set_has_box(bool rv);
   void put_box();
@@ -44,8 +85,6 @@ public:
   void set_is_wall(bool rv);
   bool is_in_playable_area() const;
   void set_is_in_playable_area(bool rv);
-  bool is_deadlock() const;
-  void set_is_deadlock(bool rv);
 
 private:
   bool m_box : 1;      // Does it contain box?
@@ -53,7 +92,6 @@ private:
   bool m_goal : 1;     // Does it contain goal?
   bool m_wall : 1;     // Does it contain wall?
   bool m_playable : 1; // Is in playable area?
-  bool m_deadlock : 1; // Is movement deadlock?
 };
 
 } // namespace game

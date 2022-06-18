@@ -1,11 +1,11 @@
 #include "sokoban_plus.hpp"
 
+#include <charconv>
 #include <map>
 #include <set>
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -58,19 +58,27 @@ public:
     string ids_str_trimmed = rstrip_default_plus_ids(ids_str);
 
     Strings ids_str_splitted;
-    boost::algorithm::split(ids_str_splitted, ids_str_trimmed, is_space(), boost::token_compress_on);
+    boost::algorithm::split(ids_str_splitted, ids_str_trimmed, is_space(),
+                            boost::token_compress_on);
 
     vector<piece_id_t> cleaned;
     for (const string &str_id : ids_str_splitted) {
       if (!io::is_blank(str_id)) {
         piece_id_t converted_id;
 
-        try {
-          converted_id = lexical_cast<piece_id_t>(str_id);
-        } catch (const bad_lexical_cast &) {
-          throw SokobanPlusDataError(
-            "Can't parse Sokoban+ string! Illegal characters found. Only "
-            "digits and spaces allowed.");
+        auto [ptr, ec]{
+          std::from_chars(str_id.data(), str_id.data() + str_id.size(), converted_id)};
+        if (ec != std::errc()) {
+          if (ec == std::errc::invalid_argument) {
+            throw invalid_argument("Couldn't parse Sokoban+ string! \"" + str_id +
+                                   "\" is not a number!");
+          } else if (ec == std::errc::result_out_of_range) {
+            throw invalid_argument("Couldn't parse Sokoban+ string! \"" + str_id +
+                                   "\" to large for piece ID!");
+          } else {
+            throw invalid_argument("Couldn't parse Sokoban+ string! \"" + str_id +
+                                   "\" couldn't be converted to integer piece ID!");
+          }
         }
 
         if (converted_id == LEGACY_DEFAULT_PLUS_ID &&
@@ -215,9 +223,7 @@ void SokobanPlus::set_goalorder(const string &rv) {
 }
 
 bool SokobanPlus::is_valid() const {
-  if (m_impl->m_validated == true) {
-    return m_impl->m_errors.empty();
-  }
+  if (m_impl->m_validated == true) { return m_impl->m_errors.empty(); }
 
   m_impl->m_errors.clear();
   try {

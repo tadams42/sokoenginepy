@@ -8,8 +8,7 @@ void export_board_cell(py::module &m) {
   py::class_<BoardCell> pyBoardCell(m, "BoardCell");
 
   pyBoardCell
-    .def(py::init<char, bool, bool>(), py::arg("character") = Puzzle::FLOOR,
-         py::arg("is_in_playable_area") = false, py::arg("is_deadlock") = false)
+    .def(py::init<char>(), py::arg("character") = Puzzle::FLOOR)
 
     // protocols
     .def("__eq__",
@@ -24,13 +23,14 @@ void export_board_cell(py::module &m) {
 
     .def(py::pickle(
       [](const BoardCell &self) { // __getstate__
-        return py::make_tuple(self.str(), self.is_in_playable_area(),
-                              self.is_deadlock());
+        return py::make_tuple(self.str(), self.is_in_playable_area());
       },
       [](py::tuple t) { // __setstate__
-        if (t.size() != 3) throw std::runtime_error("Invalid state!");
-        return make_unique<BoardCell>(t[0].cast<char>(), t[1].cast<bool>(),
-                                      t[2].cast<bool>());
+        if (t.size() != 2)
+          throw std::runtime_error("Invalid BoardCell pickling state!");
+        auto retv = make_unique<BoardCell>(t[0].cast<char>());
+        retv->set_is_in_playable_area(t[1].cast<bool>());
+        return retv;
       }))
 
     // instance methods and properties
@@ -51,6 +51,5 @@ void export_board_cell(py::module &m) {
     .def("remove_pusher", &BoardCell::remove_pusher)
     .def_property("is_wall", &BoardCell::is_wall, &BoardCell::set_is_wall)
     .def_property("is_in_playable_area", &BoardCell::is_in_playable_area,
-                  &BoardCell::set_is_in_playable_area)
-    .def_property("is_deadlock", &BoardCell::is_deadlock, &BoardCell::set_is_deadlock);
+                  &BoardCell::set_is_in_playable_area);
 }
