@@ -52,9 +52,9 @@ public:
   /// older puzzles with Sokoban+, legacy default value is converted
   /// transparently.
   ///
-  static constexpr u_int8_t DEFAULT_PLUS_ID = 0;
+  static constexpr piece_id_t DEFAULT_PLUS_ID = 0;
 
-  static constexpr u_int8_t LEGACY_DEFAULT_PLUS_ID = 99;
+  static constexpr piece_id_t LEGACY_DEFAULT_PLUS_ID = 99;
 
   static constexpr bool is_valid_plus_id(piece_id_t id) {
     return id >= DEFAULT_PLUS_ID;

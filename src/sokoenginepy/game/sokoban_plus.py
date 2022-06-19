@@ -54,6 +54,9 @@ class SokobanPlus:
     DEFAULT_PLUS_ID: Final[int] = 0
 
     def __init__(self, pieces_count: int, boxorder: str = "", goalorder: str = ""):
+        if pieces_count < 0:
+            raise ValueError("pieces_count must be >= 0!")
+
         self._is_enabled = False
         self._is_validated = False
         self._errors: List[str] = []
@@ -74,6 +77,8 @@ class SokobanPlus:
 
     @pieces_count.setter
     def pieces_count(self, rv):
+        if rv < 0:
+            raise ValueError("pieces_count must be >= 0!")
         if rv != self._pieces_count:
             self.is_enabled = False
             self._is_validated = False

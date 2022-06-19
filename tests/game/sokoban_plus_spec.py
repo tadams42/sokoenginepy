@@ -9,6 +9,12 @@ def sokoban_plus():
 
 
 class DescribeSokobanPlus:
+    class describe_is_valid_plus_id:
+        def it_validates_id(self):
+            assert SokobanPlus.is_valid_plus_id(SokobanPlus.DEFAULT_PLUS_ID)
+            assert SokobanPlus.is_valid_plus_id(10)
+            assert not SokobanPlus.is_valid_plus_id(-1)
+
     class Describe_init:
         def it_doesnt_validate_on_init(self):
             raised = False
@@ -24,6 +30,16 @@ class DescribeSokobanPlus:
         def it_always_creates_disabled_instance(self):
             sokoban_plus = SokobanPlus(42, "foo bar", "4 2")
             assert not sokoban_plus.is_enabled
+
+        def it_validates_piece_count_is_greater_or_equal_than_zero(self):
+            with pytest.raises(ValueError):
+                SokobanPlus(-1, "", "")
+
+    class describe_pieces_count:
+        def it_validates_piece_count_is_greater_or_equal_than_zero(self):
+            sokoban_plus = SokobanPlus(0)
+            with pytest.raises(ValueError):
+                sokoban_plus.pieces_count = -42
 
     class Describe_boxorder_and_goalorder:
         def test_they_return_order_object_from_init_if_sokoban_plus_is_not_valid(
@@ -85,19 +101,39 @@ class DescribeSokobanPlus:
         def it_returns_default_plus_id_for_disabled_sokoban_plus(self, sokoban_plus):
             assert sokoban_plus.box_plus_id(42) == SokobanPlus.DEFAULT_PLUS_ID
 
+        def it_returns_default_plus_id_for_disabled_sokoban_plus_and_invalid_id(
+            self, sokoban_plus
+        ):
+            assert sokoban_plus.box_plus_id(-42) == SokobanPlus.DEFAULT_PLUS_ID
+
         def it_returns_box_plus_id_for_enabled_sokoban_plus(self, sokoban_plus):
             sokoban_plus.is_enabled = True
             assert sokoban_plus.box_plus_id(2) == int(sokoban_plus.boxorder.split()[1])
 
+        def it_raises_for_enabled_sokoban_plus_and_invalid_id(self, sokoban_plus):
+            sokoban_plus.is_enabled = True
+            with pytest.raises(KeyError):
+                sokoban_plus.box_plus_id(-1)
+
     class Describe_getter_for_goal_plus_id:
         def it_returns_default_plus_id_for_disabled_sokoban_plus(self, sokoban_plus):
             assert sokoban_plus.goal_plus_id(42) == SokobanPlus.DEFAULT_PLUS_ID
+
+        def it_returns_default_plus_id_for_disabled_sokoban_plus_and_invalid_id(
+            self, sokoban_plus
+        ):
+            assert sokoban_plus.goal_plus_id(-42) == SokobanPlus.DEFAULT_PLUS_ID
 
         def it_returns_goal_plus_id_for_enabled_sokoban_plus(self, sokoban_plus):
             sokoban_plus.is_enabled = True
             assert sokoban_plus.goal_plus_id(2) == int(
                 sokoban_plus.goalorder.split()[1]
             )
+
+        def it_raises_for_enabled_sokoban_plus_and_invalid_id(self, sokoban_plus):
+            sokoban_plus.is_enabled = True
+            with pytest.raises(KeyError):
+                sokoban_plus.goal_plus_id(-1)
 
     class When_it_is_set_to_enabled:
         def it_parses_init_data(self, sokoban_plus):
@@ -157,19 +193,6 @@ class DescribeSokobanPlus:
             sokoban_plus = SokobanPlus(3, "-1 -2 -3", "3 2 1")
             assert not sokoban_plus.is_valid
             assert len(sokoban_plus.errors) > 0
-
-        def it_validates_piece_count_is_greater_or_equal_than_zero(
-            self, is_using_native
-        ):
-            sokoban_plus = SokobanPlus(42, "1 2 3", "3 2 1")
-            assert sokoban_plus.is_valid
-
-            if is_using_native:
-                with pytest.raises(TypeError):
-                    sokoban_plus = SokobanPlus(-42, "1 2 3", "3 2 1")
-            else:
-                sokoban_plus = SokobanPlus(-42, "1 2 3", "3 2 1")
-                assert not sokoban_plus.is_valid
 
         def it_validates_ids_lengths_are_equal_to_piece_count(self):
             sokoban_plus = SokobanPlus(4, "1 2 3", "3 2 1")
