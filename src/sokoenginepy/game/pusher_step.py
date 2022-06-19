@@ -145,6 +145,8 @@ class PusherStep:
 
         When setting box ID on ie. ``jump``, that ``jump`` will become ``push``.
         To change ``push`` into ``move``, set box ID to `Config.NO_ID`.
+
+        Setting it to invalid value will silently set it to `.Config.NO_ID`.
         """
         return self._moved_box_id
 

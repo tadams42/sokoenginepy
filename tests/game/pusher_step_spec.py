@@ -47,16 +47,19 @@ class DescribePusherStep:
             assert pusher_step.pusher_id == Config.DEFAULT_ID
             assert pusher_step.moved_box_id == Config.NO_ID
 
-        def it_correctly_sets_pusher_id(self, is_using_native):
+        def it_correctly_sets_pusher_id(self):
             pusher_step = PusherStep(direction=Direction.RIGHT, pusher_id=42)
             assert pusher_step.pusher_id == 42
 
-            if is_using_native:
-                with pytest.raises(TypeError):
-                    pusher_step = PusherStep(direction=Direction.RIGHT, pusher_id=-42)
-            else:
-                pusher_step = PusherStep(direction=Direction.RIGHT, pusher_id=-42)
-                assert pusher_step.pusher_id == Config.DEFAULT_ID
+            pusher_step = PusherStep(direction=Direction.RIGHT, pusher_id=-42)
+            assert pusher_step.pusher_id == Config.DEFAULT_ID
+
+        def it_correctly_sets_moved_box_id(self):
+            pusher_step = PusherStep(direction=Direction.RIGHT, moved_box_id=42)
+            assert pusher_step.moved_box_id == 42
+
+            pusher_step = PusherStep(direction=Direction.RIGHT, moved_box_id=-42)
+            assert pusher_step.moved_box_id == Config.NO_ID
 
         def it_validates_parameters(self):
             with pytest.raises(ValueError):
@@ -96,7 +99,7 @@ class DescribePusherStep:
             assert pusher_step.is_push_or_pull
             assert not pusher_step.is_move
 
-        def it_sets_it_to_no_id_if_illegal_value_provided(self, is_using_native):
+        def it_sets_it_to_no_id_if_illegal_value_provided(self):
             pusher_step = PusherStep(moved_box_id=0)
             assert pusher_step.moved_box_id == Config.NO_ID
 
@@ -104,13 +107,8 @@ class DescribePusherStep:
             pusher_step.moved_box_id = 0
             assert pusher_step.moved_box_id == Config.NO_ID
 
-            pusher_step = PusherStep(moved_box_id=42)
-            if is_using_native:
-                with pytest.raises(TypeError):
-                    pusher_step.moved_box_id = -42
-            else:
-                pusher_step.moved_box_id = -42
-                assert pusher_step.moved_box_id == Config.NO_ID
+            pusher_step.moved_box_id = -42
+            assert pusher_step.moved_box_id == Config.NO_ID
 
         def test_setter_assumes_push_when_setting_to_valid_value(self):
             pusher_step = PusherStep()
@@ -142,7 +140,7 @@ class DescribePusherStep:
             pusher_step = PusherStep(pusher_id=42)
             assert pusher_step.pusher_id == 42
 
-        def it_sets_it_to_default_if_illegal_value_provided(self, is_using_native):
+        def it_sets_it_to_default_if_illegal_value_provided(self):
             pusher_step = PusherStep(pusher_id=42)
             pusher_step.pusher_id = 0
             assert pusher_step.pusher_id == Config.DEFAULT_ID
@@ -152,12 +150,8 @@ class DescribePusherStep:
             assert pusher_step.pusher_id == Config.DEFAULT_ID
 
             pusher_step = PusherStep(pusher_id=42)
-            if is_using_native:
-                with pytest.raises(TypeError):
-                    pusher_step.pusher_id = -42
-            else:
-                pusher_step.pusher_id = -42
-                assert pusher_step.pusher_id == Config.DEFAULT_ID
+            pusher_step.pusher_id = -42
+            assert pusher_step.pusher_id == Config.DEFAULT_ID
 
     class Describe_is_move:
         def it_returns_true_if_box_was_not_moved(self):
