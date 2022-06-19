@@ -46,26 +46,21 @@ def io_members_py_only():
 
 @pytest.fixture
 def game_members():
-    return {
+    klasses = {
         "BaseTessellation",
         "BoardCell",
         "BoardGraph",
         "BoardManager",
         "BoardState",
-        "BoxGoalSwitchError",
-        "CellAlreadyOccupiedError",
         "Direction",
         "Edge",
         "GraphType",
         "HashedBoardManager",
         "HexobanTessellation",
-        "IllegalMoveError",
         "Mover",
-        "NonPlayableBoardError",
         "OctobanTessellation",
         "PusherStep",
         "SokobanPlus",
-        "SokobanPlusDataError",
         "SokobanTessellation",
         "SolvingMode",
         "Tessellation",
@@ -73,12 +68,24 @@ def game_members():
         "Config",
     }
 
+    exceptions = {
+        "BoxGoalSwitchError",
+        "CellAlreadyOccupiedError",
+        "IllegalMoveError",
+        "NonPlayableBoardError",
+        "SokobanPlusDataError",
+    }
+
+    return klasses.union(exceptions)
+
 
 @pytest.fixture
 def game_members_native_only():
     return {
         # Mapped to Python KeyError
-        "ExtKeyError",
+        "PieceNotFoundError",
+        # Mapped to Python IndexError
+        "InvalidPositionError",
     }
 
 

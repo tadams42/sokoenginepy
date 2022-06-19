@@ -5,8 +5,9 @@ using namespace std;
 using sokoengine::game::BoxGoalSwitchError;
 using sokoengine::game::CellAlreadyOccupiedError;
 using sokoengine::game::IllegalMoveError;
-using sokoengine::game::KeyError;
+using sokoengine::game::InvalidPositionError;
 using sokoengine::game::NonPlayableBoardError;
+using sokoengine::game::PieceNotFoundError;
 using sokoengine::game::SokobanPlusDataError;
 using sokoengine::io::Strings;
 
@@ -44,7 +45,11 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   py::register_exception<IllegalMoveError>(m_game, "IllegalMoveError",
                                            PyExc_RuntimeError);
 
-  py::register_exception<KeyError>(m_game, "ExtKeyError", PyExc_KeyError);
+  py::register_exception<PieceNotFoundError>(m_game, "PieceNotFoundError",
+                                             PyExc_KeyError);
+
+  py::register_exception<InvalidPositionError>(m_game, "InvalidPositionError",
+                                               PyExc_IndexError);
 
   export_pusher_step(m_game);
   export_board_cell(m_game);

@@ -20,6 +20,21 @@ using namespace std;
 namespace sokoengine {
 namespace game {
 
+PieceNotFoundError::PieceNotFoundError(Selectors piece, long id)
+  : invalid_argument(string(piece == Selectors::PUSHERS ? "Pusher"
+                            : piece == Selectors::BOXES ? "Box"
+                                                        : "Goal") +
+                     " with ID: " + std::to_string(id) + " not found!") {}
+
+PieceNotFoundError::PieceNotFoundError(Selectors piece, long position,
+                                       char ignored)
+  : invalid_argument(string(piece == Selectors::PUSHERS ? "Pusher"
+                            : piece == Selectors::BOXES ? "Box"
+                                                        : "Goal") +
+                     " on position " + std::to_string(position) + " not found!") {}
+
+PieceNotFoundError::~PieceNotFoundError() = default;
+
 using io::Strings;
 
 namespace implementation {
@@ -46,12 +61,6 @@ CellAlreadyOccupiedError::~CellAlreadyOccupiedError() = default;
 BoxGoalSwitchError::BoxGoalSwitchError(const string &mess) : runtime_error(mess) {}
 
 BoxGoalSwitchError::~BoxGoalSwitchError() = default;
-
-namespace implementation {
-
-enum class LIBSOKOENGINE_LOCAL Selectors : char { BOXES, GOALS, PUSHERS };
-
-} // namespace implementation
 
 using namespace implementation;
 
@@ -100,11 +109,7 @@ public:
              : which == Selectors::BOXES ? m_boxes.left.at(id)
                                          : m_goals.left.at(id);
     } catch (const out_of_range &) {
-      throw KeyError(string("No ") +
-                     (which == Selectors::PUSHERS ? "pusher"
-                      : which == Selectors::BOXES ? "box"
-                                                  : "goal") +
-                     " with ID: " + to_string(id));
+      throw PieceNotFoundError(which, id);
     }
   }
 
@@ -114,11 +119,7 @@ public:
              : which == Selectors::BOXES ? m_boxes.right.at(position)
                                          : m_goals.right.at(position);
     } catch (const out_of_range &) {
-      throw KeyError(string("No ") +
-                     (which == Selectors::PUSHERS ? "pusher"
-                      : which == Selectors::BOXES ? "box"
-                                                  : "goal") +
-                     " on position: " + to_string(position));
+      throw PieceNotFoundError(which, position, ' ');
     }
   }
 

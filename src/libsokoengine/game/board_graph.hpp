@@ -16,6 +16,12 @@ namespace game {
 
 class BoardCell;
 
+class LIBSOKOENGINE_API InvalidPositionError : public std::out_of_range {
+public:
+  InvalidPositionError(long position);
+  virtual ~InvalidPositionError();
+};
+
 struct LIBSOKOENGINE_API Edge {
 public:
   position_t u;
@@ -56,11 +62,11 @@ public:
   virtual ~BoardGraph();
 
   ///
-  /// @throws std::out_of_range when `position` is off board
+  /// @throws InvalidPositionError when `position` is off board
   ///
   const BoardCell &cell_at(position_t position) const;
   ///
-  /// @throws std::out_of_range when `position` is off board
+  /// @throws InvalidPositionError when `position` is off board
   ///
   BoardCell &cell_at(position_t position);
 
@@ -106,7 +112,7 @@ public:
   ///
   /// Edges inspector, for debugging purposes
   ///
-  /// @throws std::out_of_range when `src` is off board
+  /// @throws InvalidPositionError when `src` is off board
   ///
   Edges out_edges(position_t src) const;
 
@@ -124,17 +130,17 @@ public:
   ///
   /// @returns Target position or Config::NO_POS
   ///
-  /// @throws std::out_of_range when `src` is off board
+  /// @throws InvalidPositionError when `src` is off board
   ///
   position_t neighbor_at(position_t src, const Direction &direction) const;
 
   ///
-  /// @throws std::out_of_range when `src` is off board
+  /// @throws InvalidPositionError when `src` is off board
   ///
   Positions wall_neighbors(position_t src) const;
 
   ///
-  /// @throws std::out_of_range when `src` is off board
+  /// @throws InvalidPositionError when `src` is off board
   ///
   Positions all_neighbors(position_t src) const;
 
@@ -142,7 +148,7 @@ public:
   /// Calculates shortest path between two positions with all positions having equal
   /// weight.
   ///
-  /// @throws std::out_of_range when `src` or `dst` are off board
+  /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
   Positions shortest_path(position_t src, position_t dst) const;
 
@@ -150,7 +156,7 @@ public:
   /// Calculates shortest path between two positions not passing through board obstacles
   /// (walls, boxes, other pushers, etc...).
   ///
-  /// @throws std::out_of_range when `src` or `dst` are off board
+  /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
   Positions dijkstra_path(position_t src, position_t dst) const;
 
@@ -158,21 +164,21 @@ public:
   /// Finds list of positions through which pusher must pass when moving without pushing
   /// boxes
   ///
-  /// @throws std::out_of_range when `src` or `dst` are off board
+  /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
   Positions find_move_path(position_t src, position_t dst) const;
 
   ///
   /// Finds list of positions through which pusher must pass when jumping
   ///
-  /// @throws std::out_of_range when `src` or `dst` are off board
+  /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
   Positions find_jump_path(position_t src, position_t dst) const;
 
   ///
   /// Converts path expressed as positions to one expressed as :class:`.Direction`.
   ///
-  /// @throws std::out_of_range Any position in `positions` is off board
+  /// @throws InvalidPositionError Any position in `positions` is off board
   ///
   Directions positions_path_to_directions_path(const Positions &positions) const;
 
@@ -183,7 +189,7 @@ public:
   /// If any direction in `directions` would've lead off board, stops the search and
   /// returns position reached up to that point.
   ///
-  /// @throws std::out_of_range when `src` is off board
+  /// @throws InvalidPositionError when `src` is off board
   ///
   position_t path_destination(position_t src, const Directions &directions) const;
 
@@ -192,7 +198,7 @@ public:
   ///
   /// Doesn't require that ``pusher_position`` actually has pusher.
   ///
-  /// @throws std::out_of_range when `pusher_position` is off board. Doesn't throw if
+  /// @throws InvalidPositionError when `pusher_position` is off board. Doesn't throw if
   ///         any position in `excluded_positions` is off board; it simply ignores
   ///         those
   ///
@@ -205,7 +211,7 @@ public:
   ///
   /// Doesn't require that ``pusher_position`` actually has pusher.
   ///
-  /// @throws std::out_of_range when `pusher_position` is off board. Doesn't throw if
+  /// @throws InvalidPositionError when `pusher_position` is off board. Doesn't throw if
   ///         any position in `excluded_positions` is off board; it simply ignores
   ///         those
   ///

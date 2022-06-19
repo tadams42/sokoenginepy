@@ -246,8 +246,8 @@ class DescribeBoardManager:
         for pusher_id, pusher_position in pushers_positions.items():
             assert board_manager.pusher_position(pusher_id) == pusher_position
             assert board_manager.pusher_id_on(pusher_position) == pusher_id
-            assert board_manager.has_pusher(pusher_id) is True
-            assert board_manager.has_pusher_on(pusher_position) is True
+            assert board_manager.has_pusher(pusher_id)
+            assert board_manager.has_pusher_on(pusher_position)
 
         with pytest.raises(KeyError):
             board_manager.pusher_position(
@@ -256,11 +256,22 @@ class DescribeBoardManager:
         with pytest.raises(KeyError):
             board_manager.pusher_id_on(invalid_pusher_position)
 
-        assert (
-            board_manager.has_pusher(Config.DEFAULT_ID + board_manager.pushers_count)
-            is False
+        assert not board_manager.has_pusher(
+            Config.DEFAULT_ID + board_manager.pushers_count
         )
-        assert board_manager.has_pusher_on(invalid_pusher_position) is False
+        assert not board_manager.has_pusher_on(invalid_pusher_position)
+
+    def test_has_methods_dont_raise_for_invalid_args(self, board_graph):
+        board_manager = BoardManager(board_graph)
+
+        assert not board_manager.has_pusher(-1)
+        assert not board_manager.has_pusher(42000)
+
+        assert not board_manager.has_box(-1)
+        assert not board_manager.has_box_on(42000)
+
+        assert not board_manager.has_goal(-1)
+        assert not board_manager.has_goal_on(42000)
 
     def it_memoizes_boxes(
         self, board_graph, boxes_positions, boxes_ids, invalid_box_position
@@ -274,19 +285,16 @@ class DescribeBoardManager:
         for box_id, box_position in boxes_positions.items():
             assert board_manager.box_position(box_id) == box_position
             assert board_manager.box_id_on(box_position) == box_id
-            assert board_manager.has_box(box_id) is True
-            assert board_manager.has_box_on(box_position) is True
+            assert board_manager.has_box(box_id)
+            assert board_manager.has_box_on(box_position)
 
         with pytest.raises(KeyError):
             board_manager.box_position(Config.DEFAULT_ID + board_manager.boxes_count)
         with pytest.raises(KeyError):
             board_manager.box_id_on(invalid_box_position)
 
-        assert (
-            board_manager.has_box(Config.DEFAULT_ID + board_manager.boxes_count)
-            is False
-        )
-        assert board_manager.has_box_on(invalid_box_position) is False
+        assert not board_manager.has_box(Config.DEFAULT_ID + board_manager.boxes_count)
+        assert not board_manager.has_box_on(invalid_box_position)
 
         for box_id, box_position in boxes_positions.items():
             assert board_manager.box_plus_id(box_id) == SokobanPlus.DEFAULT_PLUS_ID
@@ -334,19 +342,16 @@ class DescribeBoardManager:
         for goal_id, goal_position in goals_positions.items():
             assert board_manager.goal_position(goal_id) == goal_position
             assert board_manager.goal_id_on(goal_position) == goal_id
-            assert board_manager.has_goal(goal_id) is True
-            assert board_manager.has_goal_on(goal_position) is True
+            assert board_manager.has_goal(goal_id)
+            assert board_manager.has_goal_on(goal_position)
 
         with pytest.raises(KeyError):
             board_manager.goal_position(Config.DEFAULT_ID + board_manager.goals_count)
         with pytest.raises(KeyError):
             board_manager.goal_id_on(invalid_goal_position)
 
-        assert (
-            board_manager.has_goal(Config.DEFAULT_ID + board_manager.goals_count)
-            is False
-        )
-        assert board_manager.has_goal_on(invalid_goal_position) is False
+        assert not board_manager.has_goal(Config.DEFAULT_ID + board_manager.goals_count)
+        assert not board_manager.has_goal_on(invalid_goal_position)
 
         for goal_id, goal_position in goals_positions.items():
             assert board_manager.goal_plus_id(goal_id) == SokobanPlus.DEFAULT_PLUS_ID
@@ -414,6 +419,25 @@ class DescribeBoardManager:
         assert board_manager.board[0].has_box
         assert not board_manager.board[old_box_position].has_box
 
+    def it_validates_positions_when_moving_boxes(self, board_graph):
+        board_manager = BoardManager(board_graph)
+
+        with pytest.raises(IndexError):
+            board_manager.move_box(Config.DEFAULT_ID, 42000)
+        with pytest.raises(IndexError):
+            board_manager.move_box(Config.DEFAULT_ID, -1)
+
+        old_box_position = board_manager.box_position(Config.DEFAULT_ID)
+        with pytest.raises(IndexError):
+            board_manager.move_box_from(old_box_position, 42000)
+        with pytest.raises(IndexError):
+            board_manager.move_box_from(old_box_position, -1)
+
+        with pytest.raises(IndexError):
+            board_manager.move_box_from(42000, 0)
+        with pytest.raises(IndexError):
+            board_manager.move_box_from(-1, 0)
+
     def it_moves_pushers(self, board_graph):
         board_manager = BoardManager(board_graph)
 
@@ -432,6 +456,25 @@ class DescribeBoardManager:
         assert not board_manager.has_pusher_on(old_pusher_position)
         assert board_manager.board[0].has_pusher
         assert not board_manager.board[old_pusher_position].has_pusher
+
+    def it_validates_positions_when_moving_pushers(self, board_graph):
+        board_manager = BoardManager(board_graph)
+
+        with pytest.raises(IndexError):
+            board_manager.move_pusher(Config.DEFAULT_ID, 42000)
+        with pytest.raises(IndexError):
+            board_manager.move_pusher(Config.DEFAULT_ID, -1)
+
+        old_pusher_position = board_manager.pusher_position(Config.DEFAULT_ID)
+        with pytest.raises(IndexError):
+            board_manager.move_pusher_from(old_pusher_position, 42000)
+        with pytest.raises(IndexError):
+            board_manager.move_pusher_from(old_pusher_position, -1)
+
+        with pytest.raises(IndexError):
+            board_manager.move_pusher_from(42000, 0)
+        with pytest.raises(IndexError):
+            board_manager.move_pusher_from(-1, 0)
 
     def test_moving_box_onto_obstacle_raises_exception(
         self, board_graph, pushers_positions, boxes_positions

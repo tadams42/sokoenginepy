@@ -199,7 +199,7 @@ class BoardManager:
         try:
             return self._pushers[pusher_id]
         except KeyError:
-            raise KeyError("No pusher with ID: {0}".format(pusher_id))
+            raise KeyError(f"No pusher with ID: {pusher_id}")
 
     def pusher_id_on(self, position: int) -> int:
         """
@@ -209,7 +209,7 @@ class BoardManager:
         try:
             return self._pushers.flip[position]
         except KeyError:
-            raise KeyError("No pusher on position: {0}".format(position))
+            raise KeyError(f"No pusher on position: {position}")
 
     def has_pusher(self, pusher_id: int) -> bool:
         return pusher_id in self._pushers
@@ -229,6 +229,7 @@ class BoardManager:
             :exc:`KeyError`: there is no pusher on ``old_position``
             :exc:`CellAlreadyOccupiedError`: there is an obstacle (
                 wall/box/another pusher) on ``to_new_position``
+            :exc:`IndexError`: of board ``old_position`` or ``to_new_position``
         """
         if old_position == to_new_position:
             return
@@ -236,14 +237,12 @@ class BoardManager:
         dest_cell = self._board[to_new_position]
         if not dest_cell.can_put_pusher_or_box:
             raise CellAlreadyOccupiedError(
-                "Pusher ID: {0} ".format(self.pusher_id_on(old_position))
-                + "can't be placed in position {0} occupied by '{1}'".format(
-                    to_new_position, dest_cell
-                )
+                f"Pusher ID: {self.pusher_id_on(old_position)} can't be placed in "
+                f"position {to_new_position} occupied by '{dest_cell}'"
             )
 
-        self._pushers[self._pushers.flip[old_position]] = to_new_position
         self._board[old_position].remove_pusher()
+        self._pushers[self._pushers.flip[old_position]] = to_new_position
         dest_cell.put_pusher()
 
         self._pusher_moved(old_position, to_new_position)
@@ -256,15 +255,13 @@ class BoardManager:
             :exc:`KeyError`: there is no pusher with ID ``pusher_id``
             :exc:`CellAlreadyOccupiedError`: there is a pusher already on
                 ``to_new_position``
+            :exc:`IndexError`: of board ``to_new_position``
 
         Note:
             Allows placing a pusher onto position occupied by box. This is for cases
             when we switch box/goals positions in reverse solving mode. In this
             situation it is legal for pusher to end up standing on top of the box.
             Game rules say that for these situations, first move(s) must be jumps.
-
-        Warning:
-            It doesn't verify if ``to_new_position`` is valid on-board position.
         """
         self.move_pusher_from(self._pushers[pusher_id], to_new_position)
 
@@ -300,7 +297,7 @@ class BoardManager:
         try:
             return self._boxes[box_id]
         except KeyError:
-            raise KeyError("No box with ID: {0}".format(box_id))
+            raise KeyError(f"No box with ID: {box_id}")
 
     def box_id_on(self, position: int) -> int:
         """
@@ -310,7 +307,7 @@ class BoardManager:
         try:
             return self._boxes.flip[position]
         except KeyError:
-            raise KeyError("No box on position: {0}".format(position))
+            raise KeyError(f"No box on position: {position}")
 
     def has_box(self, box_id: int) -> bool:
         return box_id in self._boxes
@@ -330,6 +327,7 @@ class BoardManager:
             :exc:`KeyError`: there is no box on ``old_position``
             :exc:`CellAlreadyOccupiedError`: there is an obstacle ( wall/box/pusher)
                 on ``to_new_position``
+            :exc:`IndexError`: of board ``old_position`` or ``to_new_position``
         """
         if old_position == to_new_position:
             return
@@ -337,14 +335,12 @@ class BoardManager:
         dest_cell = self._board[to_new_position]
         if not dest_cell.can_put_pusher_or_box:
             raise CellAlreadyOccupiedError(
-                "Box ID: {0} ".format(self.box_id_on(old_position))
-                + "can't be placed in position {0} occupied by '{1}'".format(
-                    to_new_position, dest_cell
-                )
+                f"Box ID: {self.box_id_on(old_position)} can't be placed in "
+                f"position {to_new_position} occupied by '{dest_cell}'"
             )
 
-        self._boxes[self._boxes.flip[old_position]] = to_new_position
         self._board[old_position].remove_box()
+        self._boxes[self._boxes.flip[old_position]] = to_new_position
         dest_cell.put_box()
 
         self._box_moved(old_position, to_new_position)
@@ -357,6 +353,7 @@ class BoardManager:
             :exc:`KeyError`: there is no box on ``old_position``
             :exc:`CellAlreadyOccupiedError`: there is an obstacle ( wall/box/another
                 pusher) on ``to_new_position``
+            :exc:`IndexError`: of board ``to_new_position``
         """
         self.move_box_from(self._boxes[box_id], to_new_position)
 
@@ -392,7 +389,7 @@ class BoardManager:
         try:
             return self._goals[goal_id]
         except KeyError:
-            raise KeyError("No goal with ID: {0}".format(goal_id))
+            raise KeyError(f"No goal with ID: {goal_id}")
 
     def goal_id_on(self, position: int) -> int:
         """
@@ -404,7 +401,7 @@ class BoardManager:
         try:
             return self._goals.flip[position]
         except KeyError:
-            raise KeyError("No goal on position: {0}".format(position))
+            raise KeyError(f"No goal on position: {position}")
 
     def has_goal(self, goal_id: int) -> bool:
         return goal_id in self._goals

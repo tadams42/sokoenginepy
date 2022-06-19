@@ -105,7 +105,7 @@ public:
   /// single-pusher boards, single pusher is always automatically selected and this
   /// method doesn't need to be called.
   ///
-  /// @throws KeyError no such pusher
+  /// @throws PieceNotFoundError no such pusher
   ///
   virtual void select_pusher(piece_id_t pusher_id);
 

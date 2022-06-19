@@ -1,5 +1,7 @@
 #include "sokoban_plus.hpp"
 
+#include "board_manager.hpp"
+
 #include <charconv>
 #include <map>
 #include <set>
@@ -19,10 +21,6 @@ SokobanPlusDataError::SokobanPlusDataError(const string &mess)
   : invalid_argument(mess) {}
 
 SokobanPlusDataError::~SokobanPlusDataError() = default;
-
-KeyError::KeyError(const string &mess) : invalid_argument(mess) {}
-
-KeyError::~KeyError() = default;
 
 class LIBSOKOENGINE_LOCAL SokobanPlus::PIMPL {
 public:
@@ -259,7 +257,7 @@ piece_id_t SokobanPlus::box_plus_id(piece_id_t for_id) const {
   try {
     return m_impl->get_plus_id(for_id, m_impl->m_box_plus_ids);
   } catch (const out_of_range &) {
-    throw KeyError("No box with ID: " + std::to_string(for_id));
+    throw PieceNotFoundError(Selectors::BOXES, for_id);
   }
 }
 
@@ -267,7 +265,7 @@ piece_id_t SokobanPlus::goal_plus_id(piece_id_t for_id) const {
   try {
     return m_impl->get_plus_id(for_id, m_impl->m_goal_plus_ids);
   } catch (const out_of_range &) {
-    throw KeyError("No goal with ID: " + std::to_string(for_id));
+    throw PieceNotFoundError(Selectors::GOALS, for_id);
   }
 }
 

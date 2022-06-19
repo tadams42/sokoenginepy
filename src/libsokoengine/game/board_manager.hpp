@@ -4,8 +4,8 @@
 #include "config.hpp"
 
 #include <map>
-#include <stdexcept>
 #include <memory>
+#include <stdexcept>
 
 namespace sokoengine {
 namespace game {
@@ -25,6 +25,19 @@ public:
   virtual ~BoxGoalSwitchError();
 };
 
+///
+/// Selectors for PieceNotFoundError constructor
+///
+enum class LIBSOKOENGINE_API Selectors : int8_t { BOXES, GOALS, PUSHERS };
+
+class LIBSOKOENGINE_API PieceNotFoundError : public std::invalid_argument {
+public:
+  PieceNotFoundError(Selectors piece, long id);
+  PieceNotFoundError(Selectors piece, long position, char ignored);
+  virtual ~PieceNotFoundError();
+};
+
+///
 /// Memoizes, tracks and updates positions of all pieces.
 ///
 /// - assigns and maintains piece IDs
@@ -101,9 +114,11 @@ public:
 /// Moving box through manager (via move_box_from()) would've preserved ID of moved box.
 /// Same goes for pushers.
 ///
-/// | Initial board                  | Box edited without manager     | Box moved through manager      |
-/// | ------------------------------ | ------------------------------ | ------------------------------ |
-/// | ![](movement_vs_transfer1.png) | ![](movement_vs_transfer2.png) | ![](movement_vs_transfer3.png) |
+/// | Initial board                  | Box edited without manager     | Box moved
+/// through manager      | | ------------------------------ |
+/// ------------------------------ | ------------------------------ | |
+/// ![](movement_vs_transfer1.png) | ![](movement_vs_transfer2.png) |
+/// ![](movement_vs_transfer3.png) |
 ///
 /// @note
 /// Movement methods in BoardManager only implement board updates. They don't implement
@@ -141,9 +156,6 @@ public:
   ///
   typedef std::map<piece_id_t, position_t> positions_by_id_t;
 
-  const BoardGraph &board() const;
-  const Positions &walls_positions() const;
-
   // --------------------------------------------------------------------------
   // Pushers
   // --------------------------------------------------------------------------
@@ -157,11 +169,11 @@ public:
   ///
   positions_by_id_t pushers_positions() const;
   ///
-  /// @throws KeyError No pusher with ID `pusher_id`
+  /// @throws PieceNotFoundError No pusher with ID `pusher_id`
   ///
   position_t pusher_position(piece_id_t pusher_id) const;
   ///
-  /// @throws KeyError No pusher on `position`
+  /// @throws PieceNotFoundError No pusher on `position`
   ///
   piece_id_t pusher_id_on(position_t position) const;
   bool has_pusher(piece_id_t pusher_id) const;
@@ -169,17 +181,19 @@ public:
   ///
   /// Updates board state and board cells with changed pusher position.
   ///
-  /// @throws KeyError there is no pusher on `old_position`
+  /// @throws PieceNotFoundError there is no pusher on `old_position`
   /// @throws CellAlreadyOccupiedError there is an obstacle (wall/box/another pusher) on
   ///         `to_new_position`
+  /// @throws InvalidPositionError `old_position` or `to_new_position` is of board
   ///
   void move_pusher_from(position_t old_position, position_t to_new_position);
   ///
   /// Updates board state and board cells with changed pusher position.
   ///
-  /// @throws KeyError there is no pusher on `old_position`
+  /// @throws PieceNotFoundError there is no pusher on `old_position`
   /// @throws CellAlreadyOccupiedError there is an obstacle (wall/box/another pusher) on
   ///         `to_new_position`
+  /// @throws InvalidPositionError `to_new_position` is of board
   ///
   /// @note
   /// Allows placing a pusher onto position occupied by box. This is for cases when we
@@ -205,11 +219,11 @@ public:
   ///
   positions_by_id_t boxes_positions() const;
   ///
-  /// @throws KeyError No box with ID `pusher_id`
+  /// @throws PieceNotFoundError No box with ID `box_id`
   ///
   position_t box_position(piece_id_t box_id) const;
   ///
-  /// @throws KeyError No box on `position`
+  /// @throws PieceNotFoundError No box on `position`
   ///
   piece_id_t box_id_on(position_t position) const;
   bool has_box(piece_id_t box_id) const;
@@ -217,17 +231,19 @@ public:
   ///
   /// Updates board state and board cells with changed box position.
   ///
-  /// @throws KeyError there is no box on `old_position`
+  /// @throws PieceNotFoundError there is no box on `old_position`
   /// @throws CellAlreadyOccupiedError there is an obstacle (wall/box/pusher) on
   ///         `to_new_position`
+  /// @throws InvalidPositionError `old_position` or `to_new_position` is of board
   ///
   void move_box_from(position_t old_position, position_t to_new_position);
   ///
   /// Updates board state and board cells with changed box position.
   ///
-  /// @throws KeyError there is no pusher on `old_position`
+  /// @throws PieceNotFoundError there is no pusher on `old_position`
   /// @throws CellAlreadyOccupiedError there is an obstacle (wall/box/pusher) on
   ///         `to_new_position`
+  /// @throws InvalidPositionError `to_new_position` is of board
   ///
   void move_box(piece_id_t box_id, position_t to_new_position);
 
@@ -244,24 +260,42 @@ public:
   ///
   positions_by_id_t goals_positions() const;
   ///
-  /// @throws KeyError No goal with ID `pusher_id`
+  /// @throws PieceNotFoundError No goal with ID `goal_id`
   ///
   position_t goal_position(piece_id_t goal_id) const;
   ///
-  /// @throws KeyError No goal on `position`
+  /// @throws PieceNotFoundError No goal on `position`
   ///
   piece_id_t goal_id_on(position_t position) const;
   bool has_goal(piece_id_t goal_id) const;
   bool has_goal_on(position_t position) const;
 
   // --------------------------------------------------------------------------
-  // Goals
+  // Sokoban+
   // --------------------------------------------------------------------------
 
+  ///
+  /// Get Sokoban+ ID for box.
+  ///
+  /// @returns
+  /// If Sokoban+ is enabled returns Sokoban+ ID of a box. If not, returns
+  /// DEFAULT_PLUS_ID
+  ///
+  /// @throws PieceNotFoundError No box with ID `box_id`, but only if i Sokoban+ is
+  /// enabled
   ///
   /// @sa SokobanPlus::box_plus_id()
   ///
   piece_id_t box_plus_id(piece_id_t box_id) const;
+  ///
+  /// Get Sokoban+ ID for goal.
+  ///
+  /// @returns
+  /// If Sokoban+ is enabled returns Sokoban+ ID of a goal. If not, returns
+  /// DEFAULT_PLUS_ID
+  ///
+  /// @throws PieceNotFoundError No goal with ID `goal_id`, but only if i Sokoban+ is
+  /// enabled
   ///
   /// @sa SokobanPlus::goal_plus_id()
   ///
@@ -274,7 +308,19 @@ public:
   /// @sa SokobanPlus::goalorder()
   ///
   std::string goalorder() const;
+  ///
+  /// If `rv` is different from existing `boxorder`, disables Sokoban+ and sets boxorder
+  /// to new value.
+  ///
+  /// @sa SokobanPlus::set_boxorder()
+  ///
   virtual void set_boxorder(const std::string &rv);
+  ///
+  /// If `rv` is different from existing `goalorder`, disables Sokoban+ and sets
+  /// goalorder to new value.
+  ///
+  /// @sa SokobanPlus::set_goalorder()
+  ///
   virtual void set_goalorder(const std::string &rv);
 
   ///
@@ -297,14 +343,28 @@ public:
   /// Enabling these, changes victory condition for given board (return value of
   /// is_solved() ).
   ///
-  /// @sa SokobanPlus
+  /// @sa SokobanPlus.enable()
+  ///
+  /// @throws SokobanPlusDataError Trying to enable invalid Sokoban+
   ///
   virtual void enable_sokoban_plus();
 
   ///
   /// Disables using Sokoban+ rules for this board.
   ///
+  /// Disabling these, changes victory condition for given board (return value of
+  /// is_solved() ).
+  ///
+  /// @sa SokobanPlus.disable()
+  ///
   virtual void disable_sokoban_plus();
+
+  // --------------------------------------------------------------------------
+  // Board state
+  // --------------------------------------------------------------------------
+
+  const BoardGraph &board() const;
+  const Positions &walls_positions() const;
 
   ///
   /// All boxes configurations that are solution to board.
@@ -314,8 +374,7 @@ public:
   ///
   /// All configurations of boxes that result in solved board.
   ///
-  /// @note
-  ///   Result depends on s_sokoban_plus_enabled()
+  /// Result depends on is_sokoban_plus_enabled()
   ///
   solutions_vector_t solutions() const;
 
@@ -341,7 +400,7 @@ public:
   virtual void switch_boxes_and_goals();
 
   ///
-  /// Checks minimal requirement for board to be playable.
+  /// Checks minimal requirements for board to be playable.
   ///
   bool is_playable() const;
 

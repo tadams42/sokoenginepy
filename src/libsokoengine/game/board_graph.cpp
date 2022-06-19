@@ -14,6 +14,13 @@
 
 namespace sokoengine {
 namespace game {
+
+InvalidPositionError::InvalidPositionError(long position)
+  : std::out_of_range("Board index " + std::to_string(position) + " is out of range!") {
+}
+
+InvalidPositionError::~InvalidPositionError() = default;
+
 namespace implementation {
 
 typedef uint8_t edge_weight_t;
@@ -132,8 +139,7 @@ public:
   bool contains(position_t v) const { return v < vertices_count(); }
 
   void is_valid_or_throw(position_t v) const {
-    if (!contains(v))
-      throw std::out_of_range("Board index " + std::to_string(v) + " is out of range!");
+    if (!contains(v)) throw InvalidPositionError(v);
   }
 
   void set_weights_to_edges() {

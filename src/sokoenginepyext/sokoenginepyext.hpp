@@ -26,7 +26,6 @@ PYBIND11_MAKE_OPAQUE(sokoengine::io::Strings);
 //
 // pybind11 will raise exception:
 //
-//
 // TypeError: foo(): incompatible function arguments. The following argument types are
 // supported:
 //     1. (bar: int) -> None
@@ -36,8 +35,7 @@ typedef std::vector<py_int_t> py_int_vect_t;
 
 static inline sokoengine::position_t position_or_throw(py_int_t position) {
   if (position < 0 || position >= std::numeric_limits<sokoengine::position_t>::max())
-    throw std::out_of_range("Board index " + std::to_string(position) +
-                            " is out of range!");
+    throw sokoengine::game::InvalidPositionError(position);
   return static_cast<sokoengine::position_t>(position);
 }
 
@@ -58,4 +56,12 @@ positions_no_throw(const py_int_vect_t &positions) {
       retv.push_back(static_cast<sokoengine::position_t>(p));
   }
   return retv;
+}
+
+static inline sokoengine::game::piece_id_t
+piece_or_throw(sokoengine::game::Selectors piece, py_int_t piece_id) {
+  if (piece_id < 0 ||
+      piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
+    throw sokoengine::game::PieceNotFoundError(piece, piece_id);
+  return static_cast<sokoengine::game::piece_id_t>(piece_id);
 }

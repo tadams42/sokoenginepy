@@ -15,12 +15,6 @@ public:
   virtual ~SokobanPlusDataError();
 };
 
-class LIBSOKOENGINE_API KeyError : public std::invalid_argument {
-public:
-  explicit KeyError(const std::string &mess);
-  virtual ~KeyError();
-};
-
 ///
 /// Manages Sokoban+ data for game board.
 ///
@@ -89,12 +83,20 @@ public:
   /// Space separated integers describing Sokoban+ IDs for boxes
   ///
   std::string boxorder() const;
+  ///
+  /// If rv is different from existing `boxorder`, disables Sokoban+ and sets boxorder
+  /// to new value.
+  ///
   void set_boxorder(const std::string &rv);
 
   ///
   /// Space separated integers describing Sokoban+ IDs for goals
   ///
   std::string goalorder() const;
+  ///
+  /// If rv is different from existing `goalorder`, disables Sokoban+ and sets goalorder
+  /// to new value.
+  ///
   void set_goalorder(const std::string &rv);
 
   bool is_valid() const;
@@ -115,7 +117,8 @@ public:
   /// If Sokoban+ is enabled returns Sokoban+ ID of a box. If not, returns
   /// DEFAULT_PLUS_ID
   ///
-  /// @throws KeyError No box with ID for_id, but only if i Sokoban+ is enabled
+  /// @throws PieceNotFoundError No box with ID for_id, but only if i Sokoban+ is
+  /// enabled
   ///
   piece_id_t box_plus_id(piece_id_t for_id) const;
 
@@ -126,7 +129,8 @@ public:
   /// If Sokoban+ is enabled returns Sokoban+ ID of a goal. If not, returns
   /// DEFAULT_PLUS_ID
   ///
-  /// @throws KeyError No goal with ID for_id, but only if i Sokoban+ is enabled
+  /// @throws PieceNotFoundError No goal with ID for_id, but only if i Sokoban+ is
+  /// enabled
   ///
   piece_id_t goal_plus_id(piece_id_t for_id) const;
 
