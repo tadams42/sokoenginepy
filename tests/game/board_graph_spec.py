@@ -1,9 +1,18 @@
 import textwrap
 from itertools import permutations
+from typing import List
 
 import pytest
 
-from sokoenginepy.game import BoardCell, BoardGraph, Config, Direction, index_1d
+from sokoenginepy.game import (
+    BoardCell,
+    BoardGraph,
+    Config,
+    Direction,
+    Edge,
+    Tessellation,
+    index_1d,
+)
 from sokoenginepy.io import Puzzle, SokobanPuzzle, TriobanPuzzle
 
 
@@ -28,22 +37,20 @@ def puzzle():
 
 @pytest.fixture
 def solved_puzzle():
-    data = "\n".join(
-        [
-            # 123456789012345678
-            "    #####          ",  # 0
-            "    #  @#          ",  # 1
-            "    #   #          ",  # 2
-            "  ###   ##         ",  # 3
-            "  #      #         ",  # 4
-            "### # ## #   ######",  # 5
-            "#   # ## #####  **#",  # 6
-            "#               **#",  # 7
-            "##### ### #@##  **#",  # 8
-            "    #     #########",  # 9
-            "    #######        ",  # 0
-        ]
-    )
+    data = """
+            #####
+            #  @#
+            #   #
+          ###   ##
+          #      #
+        ### # ## #   ######
+        #   # ## #####  **#
+        #               **#
+        ##### ### #@##  **#
+            #     #########
+            #######
+    """
+    data = textwrap.dedent(data)
     return SokobanPuzzle(board=data)
 
 
@@ -75,44 +82,124 @@ def directions_path():
     ]
 
 
-@pytest.fixture
-def illegal_types():
-    return [-42000, None, "", "ZOMG!", "42"]
+def _sorted(edges: List[Edge]):
+    return sorted(edges, key=lambda e: (e.u, e.v, e.direction.value))
 
 
 class DescribeBoardGraph:
+    class describe_init:
+        def it_configures_all_edges_in_board(self):
+            graph = BoardGraph(SokobanPuzzle(width=2, height=2))
+
+            assert graph.edges_count == 8
+
+            assert _sorted(graph.out_edges(0)) == _sorted(
+                [
+                    Edge(u=0, v=1, direction=Direction.RIGHT),
+                    Edge(u=0, v=2, direction=Direction.DOWN),
+                ]
+            )
+            assert _sorted(graph.out_edges(1)) == _sorted(
+                [
+                    Edge(u=1, v=0, direction=Direction.LEFT),
+                    Edge(u=1, v=3, direction=Direction.DOWN),
+                ]
+            )
+            assert _sorted(graph.out_edges(2)) == _sorted(
+                [
+                    Edge(u=2, v=3, direction=Direction.RIGHT),
+                    Edge(u=2, v=0, direction=Direction.UP),
+                ]
+            )
+            assert _sorted(graph.out_edges(3)) == _sorted(
+                [
+                    Edge(u=3, v=2, direction=Direction.LEFT),
+                    Edge(u=3, v=1, direction=Direction.UP),
+                ]
+            )
+
+            with pytest.raises(IndexError):
+                graph.out_edges(4)
+
+        def it_configures_trioban_edges_without_duplicates(self):
+            graph = BoardGraph(TriobanPuzzle(width=2, height=2))
+
+            assert _sorted(graph.out_edges(0)) == _sorted(
+                [
+                    Edge(u=0, v=1, direction=Direction.RIGHT),
+                    Edge(u=0, v=1, direction=Direction.SOUTH_EAST),
+                ]
+            )
+
+            assert _sorted(graph.out_edges(1)) == _sorted(
+                [
+                    Edge(u=1, v=0, direction=Direction.LEFT),
+                    Edge(u=1, v=0, direction=Direction.NORTH_WEST),
+                    Edge(u=1, v=3, direction=Direction.SOUTH_EAST),
+                    Edge(u=1, v=3, direction=Direction.SOUTH_WEST),
+                ]
+            )
+
+            assert _sorted(graph.out_edges(2)) == _sorted(
+                [
+                    Edge(u=2, v=3, direction=Direction.RIGHT),
+                    Edge(u=2, v=3, direction=Direction.NORTH_EAST),
+                ]
+            )
+
+            assert _sorted(graph.out_edges(3)) == _sorted(
+                [
+                    Edge(u=3, v=2, direction=Direction.LEFT),
+                    Edge(u=3, v=2, direction=Direction.SOUTH_WEST),
+                    Edge(u=3, v=1, direction=Direction.NORTH_EAST),
+                    Edge(u=3, v=1, direction=Direction.NORTH_WEST),
+                ]
+            )
+
+            assert graph.edges_count == 12
+
+        def it_raises_if_width_or_height_is_too_large(self):
+            puzzle = SokobanPuzzle(Config.MAX_WIDTH + 1, 42)
+            with pytest.raises(ValueError):
+                BoardGraph(puzzle)
+
+            puzzle = SokobanPuzzle(42, Config.MAX_HEIGHT + 1)
+            with pytest.raises(ValueError):
+                BoardGraph(puzzle)
+
+            puzzle = SokobanPuzzle(Config.MAX_WIDTH + 1, Config.MAX_HEIGHT)
+            with pytest.raises(ValueError):
+                BoardGraph(puzzle)
+
     class describe_getitem:
         def it_returns_board_cell_on_position(self, board_graph):
             assert isinstance(board_graph[0], BoardCell)
 
-        def it_raises_if_trying_to_get_invalid_position(
-            self, is_using_native, illegal_types, board_graph
-        ):
+        def it_raises_if_trying_to_get_invalid_position(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph[42000]
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph[_]
+
+            with pytest.raises(IndexError):
+                board_graph[-1]
 
     class describe_setitem:
         def it_sets_board_cell_on_position(self, board_graph):
-            board_graph[0].is_in_playable_area = True
-            board_graph[0].is_wall = True
-
-            bc = BoardCell(Puzzle.PUSHER)
-            bc.is_in_playable_area = False
-
-            board_graph[0] = bc
-
-            assert not board_graph[0].is_wall
+            assert board_graph[0].is_empty_floor
+            board_graph[0] = BoardCell(Puzzle.PUSHER)
             assert board_graph[0].has_pusher
+
+        def it_sets_character_on_position(self, board_graph):
+            assert board_graph[0].is_empty_floor
+            board_graph[0] = Puzzle.PUSHER
+            assert board_graph[0].has_pusher
+
+        def it_doesnt_preserve_secondary_cell_flags_on_modified_cell(self, board_graph):
+            board_graph[0].is_in_playable_area = True
+            board_graph[0] = Puzzle.PUSHER
             assert not board_graph[0].is_in_playable_area
 
-            board_graph[0] = Puzzle.PUSHER
-
-            assert not board_graph[0].is_wall
-            assert board_graph[0].has_pusher
+            board_graph[0].is_in_playable_area = True
+            board_graph[0] = BoardCell(Puzzle.PUSHER)
             assert not board_graph[0].is_in_playable_area
 
         def it_raises_if_trying_to_set_invalid_cell_value(self, board_graph):
@@ -121,222 +208,73 @@ class DescribeBoardGraph:
                 with pytest.raises(ValueError):
                     board_graph[0] = _
 
-        def it_raises_if_trying_to_set_invalid_position(
-            self, is_using_native, board_graph, illegal_types
-        ):
-            board_cell = BoardCell()
+        def it_raises_if_trying_to_get_invalid_position(self, board_graph):
+            with pytest.raises(IndexError):
+                board_graph[42000] = " "
 
             with pytest.raises(IndexError):
-                board_graph[42000] = board_cell
-
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph[_] = board_cell
+                board_graph[-1] = " "
 
     class describe_contains:
         def it_detects_if_position_is_in_graph(self, board_graph):
             assert 0 in board_graph
 
-        def it_doesnt_rise_if_checking_invalid_position_value(
-            self, board_graph, is_using_native, illegal_types
-        ):
+        def it_doesnt_rise_if_checking_invalid_position_value(self, board_graph):
             assert 42000 not in board_graph
+            assert -1 not in board_graph
 
-            for _ in illegal_types:
-                if is_using_native:
-                    with pytest.raises(TypeError):
-                        assert _ not in board_graph
-                else:
-                    assert _ not in board_graph
+    def it_provides_underlying_tessellation(self, board_graph):
+        assert board_graph.tessellation == Tessellation.SOKOBAN
 
-    class describe_vertices_count:
-        def it_returns_number_of_graph_positions(self, puzzle, board_graph):
-            assert board_graph.vertices_count == puzzle.width * puzzle.height
+    def it_provides_number_of_graph_edges(self, board_graph):
+        assert board_graph.edges_count == 776
 
-    class describe_edges_count:
-        def it_returns_number_of_graph_edges(self, board_graph):
-            assert board_graph.edges_count == 776
+    def it_provides_graph_size(self, puzzle, board_graph):
+        assert board_graph.size == puzzle.width * puzzle.height
 
-    class describe_has_edge:
-        def it_checks_if_edge_in_given_direction_exists(self, board_graph):
-            assert board_graph.has_edge(0, 1, Direction.RIGHT)
-            assert not board_graph.has_edge(0, 1, Direction.LEFT)
+    def it_provides_width_of_underlying_board(self, puzzle, board_graph):
+        assert board_graph.board_width == puzzle.width
 
-        def it_doesnt_rise_if_checking_invalid_position_value(
-            self, board_graph, is_using_native, illegal_types
-        ):
-            assert not board_graph.has_edge(42000, 1, Direction.LEFT)
-            assert not board_graph.has_edge(1, 42000, Direction.LEFT)
-
-            for _ in [None, "", "ZOMG!", "42"]:
-                with pytest.raises(TypeError):
-                    assert not board_graph.has_edge(_, 1, Direction.LEFT)
-
-            if is_using_native:
-                with pytest.raises(TypeError):
-                    assert not board_graph.has_edge(-42000, 1, Direction.LEFT)
-                with pytest.raises(TypeError):
-                    assert not board_graph.has_edge(1, -42000, Direction.LEFT)
-            else:
-                assert not board_graph.has_edge(-42000, 1, Direction.LEFT)
-                assert not board_graph.has_edge(1, -42000, Direction.LEFT)
-
-    class describe_out_edges_count:
-        def it_returns_number_of_edges_going_from_source_to_target_position(
-            self, board_graph
-        ):
-            assert board_graph.out_edges_count(0, 1) == 1
-
-        def it_doesnt_rise_if_checking_invalid_position_value(
-            self, board_graph, is_using_native, illegal_types
-        ):
-            assert board_graph.out_edges_count(42000, 1) == 0
-            assert board_graph.out_edges_count(1, 42000) == 0
-
-            for _ in illegal_types:
-                if is_using_native:
-                    with pytest.raises(TypeError):
-                        assert not board_graph.out_edges_count(_, 1, Direction.LEFT)
-                    with pytest.raises(TypeError):
-                        assert not board_graph.out_edges_count(1, _, Direction.LEFT)
-                else:
-                    assert board_graph.out_edges_count(_, 1) == 0
-                    assert board_graph.out_edges_count(1, _) == 0
-
-    class describe_remove_all_edges:
-        def it_removes_all_edges_from_graph(self, board_graph):
-            board_graph.remove_all_edges()
-            assert board_graph.edges_count == 0
-
-    class describe_add_edge:
-        def it_adds_edge_between_two_positions(self, board_graph):
-            board_graph.remove_all_edges()
-            board_graph.add_edge(0, 1, Direction.LEFT)
-            assert board_graph.edges_count == 1
-            assert board_graph.has_edge(0, 1, Direction.LEFT)
-
-        def it_raises_if_any_of_positions_are_invalid_values(
-            self, is_using_native, board_graph, illegal_types
-        ):
-            board_graph.remove_all_edges()
-
-            with pytest.raises(IndexError):
-                board_graph.add_edge(42000, 1, Direction.LEFT)
-            with pytest.raises(IndexError):
-                board_graph.add_edge(1, 42000, Direction.LEFT)
-
-            exc_cls = TypeError if is_using_native else KeyError
-            for k in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.add_edge(k, 1, Direction.LEFT)
-                with pytest.raises(exc_cls):
-                    board_graph.add_edge(1, k, Direction.LEFT)
-
-        def it_allows_adding_duplicate_edges(self):
-            board_graph = BoardGraph(SokobanPuzzle(width=2, height=2))
-            board_graph.remove_all_edges()
-            board_graph.add_edge(0, 1, Direction.LEFT)
-            board_graph.add_edge(0, 1, Direction.LEFT)
-            assert board_graph.edges_count == 1
-            assert board_graph.has_edge(0, 1, Direction.LEFT)
-
-            board_graph = BoardGraph(TriobanPuzzle(width=2, height=2))
-            board_graph.remove_all_edges()
-            board_graph.add_edge(0, 1, Direction.LEFT)
-            board_graph.add_edge(0, 1, Direction.LEFT)
-            assert board_graph.edges_count == 2
-            assert board_graph.has_edge(0, 1, Direction.LEFT)
-
-    class describe_out_edge_weight:
-        def it_returns_max_weight_for_wall_cell_target(
-            self, is_using_native, board_graph
-        ):
-            board_graph[1].is_wall = True
-            if not is_using_native:
-                assert board_graph.out_edge_weight(1) > len(Direction)
-            else:
-                assert board_graph.out_edge_weight(1) > Direction.__len__()
-
-        def it_returns_max_weight_for_pusher_cell_target(
-            self, is_using_native, board_graph
-        ):
-            board_graph[1].has_pusher = True
-            if not is_using_native:
-                assert board_graph.out_edge_weight(1) > len(Direction)
-            else:
-                assert board_graph.out_edge_weight(1) > Direction.__len__()
-
-        def it_returns_max_weight_for_box_cell_target(
-            self, is_using_native, board_graph
-        ):
-            board_graph[1].has_box = True
-            if not is_using_native:
-                assert board_graph.out_edge_weight(1) > len(Direction)
-            else:
-                assert board_graph.out_edge_weight(1) > Direction.__len__()
-
-        def it_returns_one_for_other_cells(self, board_graph):
-            board_graph[1].clear()
-            assert board_graph.out_edge_weight(1) == 1
-            board_graph[1].has_goal = True
-            assert board_graph.out_edge_weight(1) == 1
-
-        def it_raises_if_position_is_invalid_value(
-            self, is_using_native, board_graph, illegal_types
-        ):
-            with pytest.raises(IndexError):
-                board_graph.out_edge_weight(42000)
-
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.out_edge_weight(_)
+    def it_provides_height_of_underlying_board(self, puzzle, board_graph):
+        assert board_graph.board_height == puzzle.height
 
     class describe_neighbor:
         def it_returns_neighbor_position_in_given_direction(self, board_graph):
             assert board_graph.neighbor(0, Direction.RIGHT) == 1
 
-        def it_returns_no_pos_for_off_board_direction(self, board_graph):
+        def it_returns_no_pos_if_direction_leads_off_board(self, board_graph):
             assert board_graph.neighbor(0, Direction.UP) == Config.NO_POS
 
-        def it_raises_if_position_is_invalid_value(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_starting_position_is_off_board(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.neighbor(42000, Direction.UP)
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.neighbor(_, Direction.UP)
+
+            with pytest.raises(IndexError):
+                board_graph.neighbor(-1, Direction.UP)
 
     class describe_wall_neighbors:
         def it_returns_positions_of_walls_for_given_vertice(self):
-            board_str = "\n".join(
-                [
-                    # 123456
-                    "#######",  # 0
-                    "#.$# @#",  # 1
-                    "#######",  # 2
-                ]
+            board_str = textwrap.dedent(
+                """
+                #######
+                #.$# @#
+                #######
+                """
             )
             board_graph = BoardGraph(SokobanPuzzle(board=board_str))
             wall_neighbors = board_graph.wall_neighbors(0)
+
             assert index_1d(0, 1, 7) in wall_neighbors
             assert index_1d(1, 0, 7) in wall_neighbors
 
-        def it_raises_if_position_is_invalid_value(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_starting_position_is_off_board(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.wall_neighbors(42000)
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.wall_neighbors(_)
+            with pytest.raises(IndexError):
+                board_graph.wall_neighbors(-1)
 
     class describe_all_neighbors:
-        def it_returns_positions_of_all_neghbor_positions_for_given_vertice(
+        def it_returns_positions_of_all_neighbor_positions_for_given_vertice(
             self, board_graph
         ):
             all_neighbors = board_graph.all_neighbors(0)
@@ -344,45 +282,33 @@ class DescribeBoardGraph:
             assert index_1d(1, 1, board_graph.board_width) not in all_neighbors
             assert index_1d(1, 0, board_graph.board_width) in all_neighbors
 
-        def it_raises_if_position_is_invalid_value(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_starting_position_is_off_board(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.all_neighbors(42000)
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.all_neighbors(_)
+            with pytest.raises(IndexError):
+                board_graph.all_neighbors(-1)
 
     class describe_shortest_path:
-        def it_raises_if_any_of_positions_are_invalid_values(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_any_of_positions_are_of_board(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.shortest_path(1, 42000)
             with pytest.raises(IndexError):
                 board_graph.shortest_path(42000, 1)
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.shortest_path(_, 1)
-                with pytest.raises(exc_cls):
-                    board_graph.shortest_path(1, _)
+            with pytest.raises(IndexError):
+                board_graph.shortest_path(1, -1)
+            with pytest.raises(IndexError):
+                board_graph.shortest_path(-1, 1)
 
     class describe_dijkstra_path:
-        def it_raises_if_any_of_positions_are_invalid_values(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_any_of_positions_are_of_board(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.dijkstra_path(1, 42000)
             with pytest.raises(IndexError):
                 board_graph.dijkstra_path(42000, 1)
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.dijkstra_path(_, 1)
-                with pytest.raises(exc_cls):
-                    board_graph.dijkstra_path(1, _)
+            with pytest.raises(IndexError):
+                board_graph.dijkstra_path(1, -1)
+            with pytest.raises(IndexError):
+                board_graph.dijkstra_path(-1, 1)
 
     class describe_find_jump_path:
         def it_returns_sequence_of_positions_defining_shortest_path_for_pusher_jump(
@@ -405,19 +331,15 @@ class DescribeBoardGraph:
                 ]
             )
 
-        def it_raises_if_any_of_positions_are_invalid_values(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_any_of_positions_are_of_board(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.find_jump_path(1, 42000)
             with pytest.raises(IndexError):
                 board_graph.find_jump_path(42000, 1)
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.find_jump_path(_, 1)
-                with pytest.raises(exc_cls):
-                    board_graph.find_jump_path(1, _)
+            with pytest.raises(IndexError):
+                board_graph.find_jump_path(1, -1)
+            with pytest.raises(IndexError):
+                board_graph.find_jump_path(-1, 1)
 
     class describe_find_move_path:
         def it_returns_sequence_of_positions_defining_shortest_path_for_pusher_movement_without_pushing_boxes(
@@ -440,19 +362,15 @@ class DescribeBoardGraph:
                 ]
             )
 
-        def it_raises_if_any_of_positions_are_invalid_values(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_any_of_positions_are_of_board(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.find_move_path(1, 42000)
             with pytest.raises(IndexError):
                 board_graph.find_move_path(42000, 1)
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.find_move_path(_, 1)
-                with pytest.raises(exc_cls):
-                    board_graph.find_move_path(1, _)
+            with pytest.raises(IndexError):
+                board_graph.find_move_path(1, -1)
+            with pytest.raises(IndexError):
+                board_graph.find_move_path(-1, 1)
 
         def it_returns_empty_sequence_if_movement_is_blocked(self, board_graph):
             assert (
@@ -467,24 +385,19 @@ class DescribeBoardGraph:
             )
             assert calculated_directions_path == directions_path
 
-        def it_raises_if_any_of_positions_are_invalid_values(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_any_of_positions_are_of_board(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.positions_path_to_directions_path([42000])
             with pytest.raises(IndexError):
                 board_graph.positions_path_to_directions_path([1, 42000])
             with pytest.raises(IndexError):
                 board_graph.positions_path_to_directions_path([42000, 1])
-
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.positions_path_to_directions_path([_])
-                with pytest.raises(exc_cls):
-                    board_graph.positions_path_to_directions_path([1, _])
-                with pytest.raises(exc_cls):
-                    board_graph.positions_path_to_directions_path([_, 1])
+            with pytest.raises(IndexError):
+                board_graph.positions_path_to_directions_path([-1])
+            with pytest.raises(IndexError):
+                board_graph.positions_path_to_directions_path([1, -1])
+            with pytest.raises(IndexError):
+                board_graph.positions_path_to_directions_path([-1, 1])
 
         def it_returns_empty_path_if_source_path_is_to_short(self, board_graph):
             assert board_graph.positions_path_to_directions_path([]) == []
@@ -492,15 +405,14 @@ class DescribeBoardGraph:
 
     class describe_mark_play_area:
         def it_calculates_playable_area_of_board_marking_all_playable_cells(self):
-            board_str = "\n".join(
-                [
-                    # 123456
-                    "#######",  # 0
-                    "#.$# @#",  # 1
-                    "#######",  # 2
-                    "#     #",  # 3
-                    "#######",  # 4
-                ]
+            board_str = textwrap.dedent(
+                """
+                #######
+                #.$# @#
+                #######
+                #     #
+                #######
+                """
             )
             board_graph = BoardGraph(SokobanPuzzle(board=board_str))
 
@@ -512,7 +424,7 @@ class DescribeBoardGraph:
             ]
 
             board_graph.mark_play_area()
-            for pos in range(board_graph.vertices_count):
+            for pos in range(board_graph.size):
                 if pos in expected_playable_cells:
                     assert board_graph[pos].is_in_playable_area
                 else:
@@ -589,15 +501,34 @@ class DescribeBoardGraph:
                 == expected
             )
 
-        def it_raises_if_start_position_is_illegal_value(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_start_position_is_off_board(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.positions_reachable_by_pusher(42000)
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.positions_reachable_by_pusher(_)
+            with pytest.raises(IndexError):
+                board_graph.positions_reachable_by_pusher(-1)
+
+        def it_ignores_off_board_positions_in_excluded_positions(self):
+            expected = [
+                index_1d(5, 1, 7),
+                index_1d(4, 1, 7),
+                index_1d(3, 1, 7),
+                index_1d(3, 2, 7),
+            ]
+            excluded = [
+                index_1d(3, 3, 7),
+                index_1d(2, 3, 7),
+                index_1d(1, 3, 7),
+                index_1d(1, 2, 7),
+                index_1d(1, 1, 7),
+                -1,
+                42000,
+            ]
+            assert (
+                self.board_graph.positions_reachable_by_pusher(
+                    pusher_position=index_1d(5, 1, 7), excluded_positions=excluded
+                )
+                == expected
+            )
 
     class describe_normalized_pusher_position:
         board_str = "\n".join(
@@ -628,15 +559,17 @@ class DescribeBoardGraph:
                 excluded_positions=[index_1d(1, 1, 7)],
             ) == index_1d(3, 1, 7)
 
-        def it_raises_if_start_position_is_illegal_value(
-            self, is_using_native, illegal_types
-        ):
+        def it_raises_if_start_position_is_off_board(self):
             with pytest.raises(IndexError):
                 self.board_graph.normalized_pusher_position(42000)
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    self.board_graph.normalized_pusher_position(_)
+            with pytest.raises(IndexError):
+                self.board_graph.normalized_pusher_position(-1)
+
+        def it_ignores_off_board_positions_in_excluded_positions(self):
+            assert self.board_graph.normalized_pusher_position(
+                pusher_position=index_1d(4, 1, 7),
+                excluded_positions=[index_1d(1, 1, 7), -1, 42000],
+            ) == index_1d(3, 1, 7)
 
     class describe_path_destination:
         def it_calculates_destination_position_from_source_and_directions_path(
@@ -662,40 +595,28 @@ class DescribeBoardGraph:
                 start_position, directions_path
             ) == index_1d(11, 9, board_graph.board_width)
 
-        def it_raises_if_start_position_is_illegal_value(
-            self, is_using_native, board_graph, illegal_types
-        ):
+        def it_raises_if_start_position_is_illegal_value(self, board_graph):
             with pytest.raises(IndexError):
                 board_graph.path_destination(42000, [])
-            exc_cls = TypeError if is_using_native else KeyError
-            for _ in illegal_types:
-                with pytest.raises(exc_cls):
-                    board_graph.path_destination(_, [])
+
+            with pytest.raises(IndexError):
+                board_graph.path_destination(-1, [])
 
     # class describe__reachables:
-    #     board = "\n".join(
-    #         [
-    #             # 123456
-    #             "#######",  # 0
-    #             "#.$# @#",  # 1
-    #             "#######",  # 2
-    #             "#     #",  # 3
-    #             "#######",  # 4
-    #         ]
-    #     )
+    #     board = """
+    #         #######
+    #         #.$# @#
+    #         #######
+    #         #     #
+    #         #######
+    #     """
     #     board_graph = BoardGraph(SokobanPuzzle(board=board))
 
     #     def it_calculates_all_positions_reachable_from_root(self):
-    #         if not hasattr(self.board_graph, "_reachables"):
-    #             return
-
     #         root = index_1d(5, 1, 7)
     #         assert self.board_graph._reachables(root) == [root, index_1d(4, 1, 7)]
 
     #     def it_skips_explicitly_excluded_positions(self):
-    #         if not hasattr(self.board_graph, "_reachables"):
-    #             return
-
     #         root = index_1d(5, 1, 7)
     #         assert self.board_graph._reachables(root, excluded_positions=[root]) == [
     #             index_1d(4, 1, 7)
@@ -704,26 +625,3 @@ class DescribeBoardGraph:
     #         assert self.board_graph._reachables(
     #             root, excluded_positions=[index_1d(4, 1, 7)]
     #         ) == [root]
-
-    class describe_reconfigure_edges:
-        def it_reconfigures_all_edges_in_board(self):
-            graph = BoardGraph(SokobanPuzzle(width=2, height=2))
-            graph.remove_all_edges()
-            graph.reconfigure_edges()
-
-            assert graph.edges_count == 8
-            assert graph.has_edge(0, 1, Direction.RIGHT)
-            assert graph.has_edge(1, 0, Direction.LEFT)
-            assert graph.has_edge(0, 2, Direction.DOWN)
-            assert graph.has_edge(2, 0, Direction.UP)
-            assert graph.has_edge(2, 3, Direction.RIGHT)
-            assert graph.has_edge(3, 2, Direction.LEFT)
-            assert graph.has_edge(1, 3, Direction.DOWN)
-            assert graph.has_edge(3, 1, Direction.UP)
-
-        def it_doesnt_create_duplicate_direction_edges_in_multidigraph(self):
-            graph = BoardGraph(TriobanPuzzle(width=2, height=2))
-            graph.remove_all_edges()
-            graph.reconfigure_edges()
-            assert graph.out_edges_count(0, 1) == 2
-            assert graph.out_edges_count(1, 0) == 2

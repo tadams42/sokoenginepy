@@ -9,4 +9,53 @@ namespace py = pybind11;
 
 PYBIND11_MAKE_OPAQUE(sokoengine::io::Strings);
 
-typedef long long py_int_t;
+//
+// pybind11 reduces all integer arguments to this type
+//
+// ie. exporting C++ function:
+//
+//	void foo(uint8_t bar);
+//
+// will still generate Python signature
+//
+//      void foo(int bar);
+//
+// When foo is called from Python side like this:
+//
+//     foo(1_000_000_000_000_000_000_000_000)
+//
+// pybind11 will raise exception:
+//
+//
+// TypeError: foo(): incompatible function arguments. The following argument types are
+// supported:
+//     1. (bar: int) -> None
+typedef int py_int_t;
+
+typedef std::vector<py_int_t> py_int_vect_t;
+
+static inline sokoengine::position_t position_or_throw(py_int_t position) {
+  if (position < 0 || position >= std::numeric_limits<sokoengine::position_t>::max())
+    throw std::out_of_range("Board index " + std::to_string(position) +
+                            " is out of range!");
+  return static_cast<sokoengine::position_t>(position);
+}
+
+static inline sokoengine::game::Positions
+positions_or_throw(const py_int_vect_t &positions) {
+  sokoengine::game::Positions retv;
+  for (auto p : positions) {
+    retv.push_back(position_or_throw(p));
+  }
+  return retv;
+}
+
+static inline sokoengine::game::Positions
+positions_no_throw(const py_int_vect_t &positions) {
+  sokoengine::game::Positions retv;
+  for (auto p : positions) {
+    if (p >= 0 || p < std::numeric_limits<sokoengine::position_t>::max())
+      retv.push_back(static_cast<sokoengine::position_t>(p));
+  }
+  return retv;
+}

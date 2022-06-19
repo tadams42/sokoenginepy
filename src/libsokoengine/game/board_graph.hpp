@@ -16,11 +16,28 @@ namespace game {
 
 class BoardCell;
 
-class LIBSOKOENGINE_API BoardSizeExceededError : public std::runtime_error {
+struct LIBSOKOENGINE_API Edge {
 public:
-  explicit BoardSizeExceededError(const std::string &mess);
-  virtual ~BoardSizeExceededError();
+  position_t u;
+  position_t v;
+  Direction direction;
+
+  explicit Edge(position_t u = Config::NO_POS, position_t v = Config::NO_POS,
+                Direction direction = Direction::LEFT);
+  Edge(const Edge &rv);
+  Edge(Edge &&rv);
+  Edge &operator=(const Edge &rv);
+  Edge &operator=(Edge &&rv);
+  ~Edge();
+
+  bool operator==(const Edge &rv) const;
+  bool operator!=(const Edge &rv) const;
+
+  std::string str() const;
+  std::string repr() const;
 };
+
+typedef std::vector<Edge> Edges;
 
 ///
 /// Board graph implementation (using Boost::Graph under the hood).
@@ -28,10 +45,9 @@ public:
 class LIBSOKOENGINE_API BoardGraph {
 public:
   ///
-  /// Edge weight type
+  /// @throws std::range_error when puzzle width is greater than Config::MAX_WIDTH
+  ///         or puzzle.height() is greater than Config::MAX_HEIGHT
   ///
-  typedef uint8_t weight_t;
-
   explicit BoardGraph(const io::Puzzle &puzzle);
   BoardGraph(const BoardGraph &rv);
   BoardGraph &operator=(const BoardGraph &rv);
@@ -39,11 +55,33 @@ public:
   BoardGraph &operator=(BoardGraph &&rv);
   virtual ~BoardGraph();
 
+  ///
+  /// @throws std::out_of_range when `position` is off board
+  ///
   const BoardCell &cell_at(position_t position) const;
+  ///
+  /// @throws std::out_of_range when `position` is off board
+  ///
   BoardCell &cell_at(position_t position);
+
+  ///
+  /// @warning Doesn't validate if `src` is on board position.
+  ///
   const BoardCell &cell(position_t position) const;
+
+  ///
+  /// @warning Doesn't validate if `src` is on board position.
+  ///
   BoardCell &cell(position_t position);
+
+  ///
+  /// @warning Doesn't validate if `src` is on board position.
+  ///
   const BoardCell &operator[](position_t position) const;
+
+  ///
+  /// @warning Doesn't validate if `src` is on board position.
+  ///
   BoardCell &operator[](position_t position);
 
   Tessellation tessellation() const;
@@ -53,50 +91,31 @@ public:
   ///
   std::string to_board_str(bool use_visible_floor = false,
                            bool rle_encode = false) const;
+
   ///
   /// Same as to_board_str() but with hardcoded defaults.
   ///
   std::string str() const;
 
   bool contains(position_t position) const;
-  board_size_t vertices_count() const;
   board_size_t size() const;
   board_size_t edges_count() const;
   board_size_t board_width() const;
   board_size_t board_height() const;
 
-  bool has_edge(position_t src, position_t dst, const Direction &direction) const;
-
   ///
-  /// Number of out-edges from `src` to `dst`.
+  /// Edges inspector, for debugging purposes
   ///
-  /// @returns
-  /// Zero when no out edges exist or or any of positions is out of board position.
+  /// @throws std::out_of_range when `src` is off board
   ///
-  board_size_t out_edges_count(position_t src, position_t dst) const;
-  void remove_all_edges();
-
-  ///
-  /// Adds edges between two existing positions.
-  ///
-  /// @throws std::out_of_range when either source_position or neighbor_position is off
-  ///         board
-  ///
-  void add_edge(position_t src, position_t dst, const Direction &direction);
-
-  ///
-  /// Calculates edge weight based on BoardCell in `target_position`.
-  ///
-  /// @throws std::out_of_range when target_position is off board
-  ///
-  weight_t out_edge_weight(position_t target_position) const;
+  Edges out_edges(position_t src) const;
 
   ///
   /// Neighbor position in `direction`.
   ///
   /// @returns Target position or Config::NO_POS
   ///
-  /// @warning Doesn't validate `src`
+  /// @warning Doesn't validate if `src` is on board position.
   ///
   position_t neighbor(position_t src, const Direction &direction) const;
 
@@ -109,44 +128,73 @@ public:
   ///
   position_t neighbor_at(position_t src, const Direction &direction) const;
 
+  ///
+  /// @throws std::out_of_range when `src` is off board
+  ///
   Positions wall_neighbors(position_t src) const;
+
+  ///
+  /// @throws std::out_of_range when `src` is off board
+  ///
   Positions all_neighbors(position_t src) const;
 
   ///
   /// Calculates shortest path between two positions with all positions having equal
   /// weight.
   ///
-  /// @throws std::out_of_range when src or dst are off board
+  /// @throws std::out_of_range when `src` or `dst` are off board
   ///
   Positions shortest_path(position_t src, position_t dst) const;
+
   ///
   /// Calculates shortest path between two positions not passing through board obstacles
-  /// (walls, other pushers, etc...).
+  /// (walls, boxes, other pushers, etc...).
   ///
-  /// @throws std::out_of_range when src or dst are off board
+  /// @throws std::out_of_range when `src` or `dst` are off board
   ///
   Positions dijkstra_path(position_t src, position_t dst) const;
+
   ///
   /// Finds list of positions through which pusher must pass when moving without pushing
   /// boxes
   ///
-  /// @throws std::out_of_range when src or dst are off board
+  /// @throws std::out_of_range when `src` or `dst` are off board
   ///
   Positions find_move_path(position_t src, position_t dst) const;
+
   ///
   /// Finds list of positions through which pusher must pass when jumping
   ///
-  /// @throws std::out_of_range when src or dst are off board
+  /// @throws std::out_of_range when `src` or `dst` are off board
   ///
   Positions find_jump_path(position_t src, position_t dst) const;
+
   ///
   /// Converts path expressed as positions to one expressed as :class:`.Direction`.
   ///
-  /// @throws std::Any of positions in `positions` off board
+  /// @throws std::out_of_range Any position in `positions` is off board
   ///
-  Directions positions_path_to_directions_path(const Positions &positions_path) const;
+  Directions positions_path_to_directions_path(const Positions &positions) const;
+
+  ///
+  /// Given movement path `directions`, calculates target position at the end of that
+  /// movement.
+  ///
+  /// If any direction in `directions` would've lead off board, stops the search and
+  /// returns position reached up to that point.
+  ///
+  /// @throws std::out_of_range when `src` is off board
+  ///
+  position_t path_destination(position_t src, const Directions &directions) const;
+
   ///
   /// Finds all positions that are reachable by pusher standing on `pusher_position`.
+  ///
+  /// Doesn't require that ``pusher_position`` actually has pusher.
+  ///
+  /// @throws std::out_of_range when `pusher_position` is off board. Doesn't throw if
+  ///         any position in `excluded_positions` is off board; it simply ignores
+  ///         those
   ///
   Positions positions_reachable_by_pusher(
     position_t pusher_position,
@@ -155,25 +203,21 @@ public:
   ///
   /// Finds top-left position reachable by pusher without pushing any boxes.
   ///
+  /// Doesn't require that ``pusher_position`` actually has pusher.
+  ///
+  /// @throws std::out_of_range when `pusher_position` is off board. Doesn't throw if
+  ///         any position in `excluded_positions` is off board; it simply ignores
+  ///         those
+  ///
   position_t
   normalized_pusher_position(position_t pusher_position,
                              const Positions &excluded_positions = Positions()) const;
+
   ///
-  /// Sets flag on all BoardCell in graph that are playable: reachable by any
-  /// box or any pusher.
+  /// Sets flag on all BoardCell in graph that are playable: reachable by any box or any
+  /// pusher.
   ///
   void mark_play_area();
-
-  ///
-  /// Given movement path ``directions``, calculates position at the end of tha
-  /// movement.
-  ///
-  position_t path_destination(position_t src, const Directions &directions_path) const;
-
-  ///
-  /// Resets all graph edges using board's tessellation.
-  ///
-  void reconfigure_edges();
 
 private:
   class PIMPL;

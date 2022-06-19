@@ -55,6 +55,7 @@ def game_members():
         "BoxGoalSwitchError",
         "CellAlreadyOccupiedError",
         "Direction",
+        "Edge",
         "GraphType",
         "HashedBoardManager",
         "HexobanTessellation",
@@ -76,9 +77,6 @@ def game_members():
 @pytest.fixture
 def game_members_native_only():
     return {
-        # Makes no sense in Python layer because board size is not limited (yet) in
-        # Python
-        "BoardSizeExceededError",
         # Mapped to Python KeyError
         "ExtKeyError",
     }

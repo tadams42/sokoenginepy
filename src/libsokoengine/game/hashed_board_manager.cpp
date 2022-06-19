@@ -96,7 +96,7 @@ public:
     }
 
     board_size_t board_without_walls_size =
-      parent.board().vertices_count() - parent.walls_positions().size();
+      parent.board().size() - parent.walls_positions().size();
 
     size_t random_pool_size = board_without_walls_size +
                               distinct_box_plus_ids.size() * board_without_walls_size +
@@ -110,7 +110,7 @@ public:
     m_boxes_factors = map<piece_id_t, hash_vector_t>();
     for (auto box_plus_id : distinct_box_plus_ids) {
       m_boxes_factors[box_plus_id] = hash_vector_t();
-      for (board_size_t i = 0; i < parent.board().vertices_count(); i++) {
+      for (board_size_t i = 0; i < parent.board().size(); i++) {
         if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
                       i) != parent.walls_positions().end())
           m_boxes_factors[box_plus_id].push_back(0);
@@ -118,7 +118,7 @@ public:
           m_boxes_factors[box_plus_id].push_back(random_pool[index++]);
       }
     }
-    for (board_size_t i = 0; i < parent.board().vertices_count(); i++) {
+    for (board_size_t i = 0; i < parent.board().size(); i++) {
       if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
                     i) != parent.walls_positions().end())
         m_pushers_factors.push_back(0);

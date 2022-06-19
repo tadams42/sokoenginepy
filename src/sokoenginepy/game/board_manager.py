@@ -117,7 +117,7 @@ class BoardManager:
 
         pusher_id = box_id = goal_id = Config.DEFAULT_ID
 
-        for position in range(0, board.vertices_count):
+        for position in range(0, board.size):
             cell = board[position]
 
             if cell.has_pusher:

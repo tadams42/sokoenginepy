@@ -2,7 +2,6 @@
 
 using namespace std;
 
-using sokoengine::game::BoardSizeExceededError;
 using sokoengine::game::BoxGoalSwitchError;
 using sokoengine::game::CellAlreadyOccupiedError;
 using sokoengine::game::IllegalMoveError;
@@ -47,8 +46,6 @@ PYBIND11_MODULE(sokoenginepyext, m) {
 
   py::register_exception<KeyError>(m_game, "ExtKeyError", PyExc_KeyError);
 
-  py::register_exception<BoardSizeExceededError>(m_game, "BoardSizeExceededError",
-                                                 PyExc_ValueError);
   export_pusher_step(m_game);
   export_board_cell(m_game);
   export_board_graph(m_game);

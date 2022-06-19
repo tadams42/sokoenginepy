@@ -3,7 +3,6 @@
 
 #include "config.hpp"
 
-#include <deque>
 #include <memory>
 #include <stdexcept>
 

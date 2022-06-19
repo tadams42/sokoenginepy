@@ -75,8 +75,7 @@ public:
     piece_id_t pusher_id, box_id, goal_id;
     pusher_id = box_id = goal_id = Config::DEFAULT_ID;
 
-    for (position_t curent_pos = 0; curent_pos < m_board.vertices_count();
-         ++curent_pos) {
+    for (position_t curent_pos = 0; curent_pos < m_board.size(); ++curent_pos) {
       BoardCell cell(m_board[curent_pos]);
 
       if (cell.has_pusher()) {
