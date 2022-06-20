@@ -7,7 +7,18 @@ namespace sokoengine {
 namespace game {
 
 ///
-/// Tessellation for Octoban.
+/// Tessellation for Octoban game variant.
+///
+/// Board space is laid out on alternating squares and octagons with origin of
+/// coordinate system being octagon. Tessellation allows all 8 directions of movement
+/// from Direction and depending on current pusher position some of these directions do
+/// not result in successful move.
+///
+/// Direction <-> character mapping:
+///
+/// | UP   | NORTH_EAST | RIGHT | SOUTH_EAST | DOWN | SOUTH_WEST | LEFT | NORTH_WEST |
+/// | ---- | ---------- | ----- | ---------- | ---- | ---------- | ---- | ---------- |
+/// | u, U | n, N       | r, R  | e, E       | d, D | s, S       | l, L | w, W       |
 ///
 class LIBSOKOENGINE_API OctobanTessellation : public BaseTessellation {
 public:

@@ -21,11 +21,11 @@ position_t TriobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
                                                   board_size_t width,
                                                   board_size_t height) const {
-  if (!ON_BOARD(position, width, height)) return Config::MAX_POS + 1;
-  position_t row = Y(position, width), column = X(position, width);
+  if (!is_on_board_1d(position, width, height)) return Config::NO_POS;
+  position_t row = index_y(position, width), column = index_x(position, width);
   int8_t dy, dx;
-  bool tpd = cell_orientation(position, width, height) ==
-             CellOrientation::TRIANGLE_DOWN;
+  bool tpd =
+    cell_orientation(position, width, height) == CellOrientation::TRIANGLE_DOWN;
 
   switch (direction) {
   case Direction::LEFT:
@@ -79,43 +79,43 @@ position_t TriobanTessellation::neighbor_position(position_t position,
 
   row += dy;
   column += dx;
-  if (ON_BOARD(column, row, width, height))
+  if (is_on_board_2d(column, row, width, height))
     return index_1d(column, row, width);
   else
-    return Config::MAX_POS + 1;
+    return Config::NO_POS;
 }
 
 PusherStep TriobanTessellation::char_to_pusher_step(char rv) const {
   switch (rv) {
   case io::Snapshot::l:
-    return PusherStep(Direction::LEFT, false);
+    return PusherStep(Direction::LEFT, Config::NO_ID);
   case io::Snapshot::L:
-    return PusherStep(Direction::LEFT, true);
+    return PusherStep(Direction::LEFT, Config::DEFAULT_ID);
 
   case io::Snapshot::r:
-    return PusherStep(Direction::RIGHT, false);
+    return PusherStep(Direction::RIGHT, Config::NO_ID);
   case io::Snapshot::R:
-    return PusherStep(Direction::RIGHT, true);
+    return PusherStep(Direction::RIGHT, Config::DEFAULT_ID);
 
   case io::Snapshot::n:
-    return PusherStep(Direction::NORTH_EAST, false);
+    return PusherStep(Direction::NORTH_EAST, Config::NO_ID);
   case io::Snapshot::N:
-    return PusherStep(Direction::NORTH_EAST, true);
+    return PusherStep(Direction::NORTH_EAST, Config::DEFAULT_ID);
 
   case io::Snapshot::u:
-    return PusherStep(Direction::NORTH_WEST, false);
+    return PusherStep(Direction::NORTH_WEST, Config::NO_ID);
   case io::Snapshot::U:
-    return PusherStep(Direction::NORTH_WEST, true);
+    return PusherStep(Direction::NORTH_WEST, Config::DEFAULT_ID);
 
   case io::Snapshot::d:
-    return PusherStep(Direction::SOUTH_EAST, false);
+    return PusherStep(Direction::SOUTH_EAST, Config::NO_ID);
   case io::Snapshot::D:
-    return PusherStep(Direction::SOUTH_EAST, true);
+    return PusherStep(Direction::SOUTH_EAST, Config::DEFAULT_ID);
 
   case io::Snapshot::s:
-    return PusherStep(Direction::SOUTH_WEST, false);
+    return PusherStep(Direction::SOUTH_WEST, Config::NO_ID);
   case io::Snapshot::S:
-    return PusherStep(Direction::SOUTH_WEST, true);
+    return PusherStep(Direction::SOUTH_WEST, Config::DEFAULT_ID);
 
   default:
     throw invalid_argument("Illegal PusherStep character in TriobanTessellation!");
@@ -144,8 +144,8 @@ char TriobanTessellation::pusher_step_to_char(const PusherStep &rv) const {
 CellOrientation TriobanTessellation::cell_orientation(position_t pos,
                                                       board_size_t width,
                                                       board_size_t height) const {
-  position_t column = COLUMN(pos, width);
-  position_t row = ROW(pos, width);
+  position_t column = index_column(pos, width);
+  position_t row = index_row(pos, width);
   return (column + (row % 2)) % 2 == 0 ? CellOrientation::TRIANGLE_DOWN
                                        : CellOrientation::DEFAULT;
 }

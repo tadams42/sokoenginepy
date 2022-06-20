@@ -10,7 +10,6 @@
 #include <unordered_set>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 
@@ -22,8 +21,8 @@ using io::Strings;
 class LIBSOKOENGINE_LOCAL HashedBoardManager::PIMPL {
 public:
   bool m_hash_invalidated = true;
-  zobrist_key_t m_initial_state_hash = 0;
-  zobrist_key_t m_state_hash = 0;
+  zobrist_key_t m_initial_state_hash = BoardState::NO_HASH;
+  zobrist_key_t m_state_hash = BoardState::NO_HASH;
 
   typedef vector<zobrist_key_t> hash_vector_t;
 
@@ -43,7 +42,7 @@ public:
 
       Strings tmp;
       for (auto id : v) {
-        tmp.push_back(boost::lexical_cast<string>(id));
+        tmp.push_back(std::to_string(id));
         if (tmp.size() == 5) {
           retv.push_back(indent + "    " + boost::join(tmp, ", "));
           tmp.clear();
@@ -63,7 +62,7 @@ public:
     auto converter = [&]() {
       Strings retv;
       for (auto p : m) {
-        retv.push_back(indent + "    " + boost::lexical_cast<string>(p.first) + ": " +
+        retv.push_back(indent + "    " + std::to_string(p.first) + ": " +
                        to_str(p.second, 4 + add_indent));
       }
       return retv;
@@ -97,7 +96,7 @@ public:
     }
 
     board_size_t board_without_walls_size =
-      parent.board().vertices_count() - parent.walls_positions().size();
+      parent.board().size() - parent.walls_positions().size();
 
     size_t random_pool_size = board_without_walls_size +
                               distinct_box_plus_ids.size() * board_without_walls_size +
@@ -111,7 +110,7 @@ public:
     m_boxes_factors = map<piece_id_t, hash_vector_t>();
     for (auto box_plus_id : distinct_box_plus_ids) {
       m_boxes_factors[box_plus_id] = hash_vector_t();
-      for (board_size_t i = 0; i < parent.board().vertices_count(); i++) {
+      for (board_size_t i = 0; i < parent.board().size(); i++) {
         if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
                       i) != parent.walls_positions().end())
           m_boxes_factors[box_plus_id].push_back(0);
@@ -119,7 +118,7 @@ public:
           m_boxes_factors[box_plus_id].push_back(random_pool[index++]);
       }
     }
-    for (board_size_t i = 0; i < parent.board().vertices_count(); i++) {
+    for (board_size_t i = 0; i < parent.board().size(); i++) {
       if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
                     i) != parent.walls_positions().end())
         m_pushers_factors.push_back(0);
@@ -170,7 +169,7 @@ zobrist_key_t HashedBoardManager::initial_state_hash() const {
 zobrist_key_t HashedBoardManager::external_state_hash(BoardState &board_state) const {
   if (board_state.boxes_positions().size() != boxes_count() ||
       board_state.boxes_positions().size() != goals_count())
-    return 0;
+    return BoardState::NO_HASH;
 
   const_cast<HashedBoardManager *>(this)->m_impl->zobrist_rehash(*this);
 
@@ -179,8 +178,7 @@ zobrist_key_t HashedBoardManager::external_state_hash(BoardState &board_state) c
   piece_id_t index = 0;
   for (auto box_position : board_state.boxes_positions()) {
     retv ^=
-      m_impl
-        ->m_boxes_factors[box_plus_id(Config::DEFAULT_PIECE_ID + index)][box_position];
+      m_impl->m_boxes_factors[box_plus_id(Config::DEFAULT_ID + index)][box_position];
     index++;
   }
 

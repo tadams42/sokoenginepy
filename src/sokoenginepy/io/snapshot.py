@@ -14,7 +14,7 @@ class Snapshot:
     """
     Base class for game snapshots and accompanying metadata.
 
-    Game snapshot is sequence of pusher steps representing actual steps, jumps (in
+    Game snapshot is a sequence of pusher steps representing actual steps, jumps (in
     reverse solving mode) and pusher selections (in Multiban variant).
     """
 
@@ -108,6 +108,8 @@ class Snapshot:
         self._is_reverse: bool = False
 
     def to_str(self, rle_encode=False) -> str:
+        """Formatted output of parsed and validated moves data."""
+
         self._reparse_if_not_parsed()
 
         retv = "".join(str(_) for _ in self._parsed_moves)
@@ -158,7 +160,10 @@ class Snapshot:
     @property
     def pusher_steps(self) -> List[PusherStep]:
         """
-        Game engine representation of pusher movement.
+        Game engine representation of pusher steps.
+
+        Warning:
+            Setting this property will also replace ``moves_data``.
         """
         self._reparse_if_not_parsed()
         return sum(
@@ -167,10 +172,6 @@ class Snapshot:
 
     @pusher_steps.setter
     def pusher_steps(self, rv: List[PusherStep]):
-        """
-        Warning:
-            This will replace ``moves_data`` with ``rv`` converted to ``str``.
-        """
         from .snapshot_parsing import Jump, PusherSelection, Steps
 
         i = 0
@@ -222,18 +223,14 @@ class Snapshot:
 
     @property
     def pushes_count(self) -> int:
-        """
-        Count of box pushing steps.
-        """
+        """Count of box pushing steps."""
         self._reparse_if_not_parsed()
         return self._pushes_count
 
     @property
     def moves_count(self) -> int:
         """
-        Count of steps that are:
-            - not pushing a box
-            - jumping (in reverse solving mode)
+        Count of steps that are not pushing a box and are not selecting pusher.
         """
         self._reparse_if_not_parsed()
         return self._moves_count
@@ -241,7 +238,7 @@ class Snapshot:
     @property
     def jumps_count(self) -> int:
         """
-        Count of sequences of steps that are jumps. Jumps are possible when board is
+        Count of groups of steps that are jumps. Jumps are possible when board is
         being solved in reverse mode.
         """
         self._reparse_if_not_parsed()
@@ -249,9 +246,7 @@ class Snapshot:
 
     @property
     def is_reverse(self) -> bool:
-        """
-        True if snapshot contains any jumps.
-        """
+        """True if snapshot contains any jumps."""
         self._reparse_if_not_parsed()
         return self._is_reverse
 

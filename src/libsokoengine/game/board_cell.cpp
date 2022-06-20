@@ -10,13 +10,8 @@ using namespace sokoengine;
 namespace sokoengine {
 namespace game {
 
-BoardCell::BoardCell(char rv, bool is_in_playable_area, bool is_deadlock)
-  : m_box(false),
-    m_pusher(false),
-    m_goal(false),
-    m_wall(false),
-    m_playable(is_in_playable_area),
-    m_deadlock(is_deadlock) {
+BoardCell::BoardCell(char rv)
+  : m_box(false), m_pusher(false), m_goal(false), m_wall(false), m_playable(false) {
   if (!io::Puzzle::is_empty_floor(rv)) {
     if (io::Puzzle::is_wall(rv)) {
       set_is_wall(true);
@@ -146,9 +141,6 @@ void BoardCell::set_is_wall(bool rv) {
 
 bool BoardCell::is_in_playable_area() const { return m_playable; }
 void BoardCell::set_is_in_playable_area(bool rv) { m_playable = rv; }
-
-bool BoardCell::is_deadlock() const { return m_deadlock; }
-void BoardCell::set_is_deadlock(bool rv) { m_deadlock = rv; }
 
 } // namespace game
 } // namespace sokoengine

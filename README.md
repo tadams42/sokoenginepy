@@ -42,18 +42,21 @@ data = textwrap.dedent("""
     ##### ### #@##  ..#
         #     #########
         #######
-""".lstrip("\n").rstrip())
+""")
 puzzle = SokobanPuzzle(board=data)
 board = BoardGraph(puzzle)
 mover = Mover(board)
-mover.select_pusher(Config.DEFAULT_PIECE_ID + 1)
+mover.select_pusher(Config.DEFAULT_ID + 1)
 mover.move(Direction.UP)
+print(board)
 ```
 
 or in C++:
 
 ```cpp
 #include <sokoengine.hpp>
+
+#include <iostream>
 
 using sokoengine::game::BoardGraph;
 using sokoengine::game::Direction;
@@ -63,26 +66,27 @@ using sokoengine::io::SokobanPuzzle;
 using std::string;
 
 int main() {
-  string data =
-    string() +
-    "    #####\n" +
-    "    #  @#\n" +
-    "    #$  #\n" +
-    "  ###  $##\n" +
-    "  #  $ $ #\n" +
-    "### # ## #   ######\n" +
-    "#   # ## #####  ..#\n" +
-    "# $  $          ..#\n" +
-    "##### ### #@##  ..#\n" +
-    "    #     #########\n" +
-    "    #######\n"
-  ;
+  string data = R"""(
+    #####
+    #  @#
+    #$  #
+  ###  $##
+  #  $ $ #
+### # ## #   ######
+#   # ## #####  ..#
+# $  $          ..#
+##### ### #@##  ..#
+    #     #########
+    #######
+)""";
 
   SokobanPuzzle puzzle(data);
   BoardGraph board(puzzle);
   Mover mover(board);
-  mover.select_pusher(Config::DEFAULT_PIECE_ID + 1);
+  mover.select_pusher(Config::DEFAULT_ID + 1);
   mover.move(Direction::UP);
+
+  std::cout << board.str() << std::endl;
 
   return 0;
 }
@@ -124,8 +128,8 @@ For more elaborate details, see [INSTALL.md](./INSTALL.md)
 
 ## Documentation
 
-- Tutorial: [Read the Docs - Tutorial](https://sokoenginepy.readthedocs.io/en/development/tutorial.html)
-- Python docs: [Read the Docs](http://sokoenginepy.readthedocs.io/development)
+- Tutorial: [Read the Docs - Tutorial](https://sokoenginepy.readthedocs.io/en/latest/tutorial.html)
+- Python docs: [Read the Docs](https://sokoenginepy.readthedocs.io/en/latest/)
 - C++ docs: [libsokoengine Doxygen documentation](http://tadams42.github.io/sokoenginepy/)
 
 If you're looking for C++ docs in Doxygen format, they are here:

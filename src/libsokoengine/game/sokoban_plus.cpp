@@ -1,11 +1,13 @@
 #include "sokoban_plus.hpp"
 
+#include "board_manager.hpp"
+
+#include <charconv>
 #include <map>
 #include <set>
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -19,10 +21,6 @@ SokobanPlusDataError::SokobanPlusDataError(const string &mess)
   : invalid_argument(mess) {}
 
 SokobanPlusDataError::~SokobanPlusDataError() = default;
-
-KeyError::KeyError(const string &mess) : invalid_argument(mess) {}
-
-KeyError::~KeyError() = default;
 
 class LIBSOKOENGINE_LOCAL SokobanPlus::PIMPL {
 public:
@@ -58,19 +56,27 @@ public:
     string ids_str_trimmed = rstrip_default_plus_ids(ids_str);
 
     Strings ids_str_splitted;
-    boost::algorithm::split(ids_str_splitted, ids_str_trimmed, is_space(), boost::token_compress_on);
+    boost::algorithm::split(ids_str_splitted, ids_str_trimmed, is_space(),
+                            boost::token_compress_on);
 
     vector<piece_id_t> cleaned;
     for (const string &str_id : ids_str_splitted) {
       if (!io::is_blank(str_id)) {
         piece_id_t converted_id;
 
-        try {
-          converted_id = lexical_cast<piece_id_t>(str_id);
-        } catch (const bad_lexical_cast &) {
-          throw SokobanPlusDataError(
-            "Can't parse Sokoban+ string! Illegal characters found. Only "
-            "digits and spaces allowed.");
+        auto [ptr, ec]{
+          std::from_chars(str_id.data(), str_id.data() + str_id.size(), converted_id)};
+        if (ec != std::errc()) {
+          if (ec == std::errc::invalid_argument) {
+            throw invalid_argument("Couldn't parse Sokoban+ string! \"" + str_id +
+                                   "\" is not a number!");
+          } else if (ec == std::errc::result_out_of_range) {
+            throw invalid_argument("Couldn't parse Sokoban+ string! \"" + str_id +
+                                   "\" to large for piece ID!");
+          } else {
+            throw invalid_argument("Couldn't parse Sokoban+ string! \"" + str_id +
+                                   "\" couldn't be converted to integer piece ID!");
+          }
         }
 
         if (converted_id == LEGACY_DEFAULT_PLUS_ID &&
@@ -89,7 +95,7 @@ public:
     IdsMap retv;
     piece_id_t index = 0;
     for (const auto &plus_id : cleaned) {
-      retv[index + Config::DEFAULT_PIECE_ID] = plus_id;
+      retv[index + Config::DEFAULT_ID] = plus_id;
       index++;
     }
 
@@ -215,9 +221,7 @@ void SokobanPlus::set_goalorder(const string &rv) {
 }
 
 bool SokobanPlus::is_valid() const {
-  if (m_impl->m_validated == true) {
-    return m_impl->m_errors.empty();
-  }
+  if (m_impl->m_validated == true) { return m_impl->m_errors.empty(); }
 
   m_impl->m_errors.clear();
   try {
@@ -253,7 +257,7 @@ piece_id_t SokobanPlus::box_plus_id(piece_id_t for_id) const {
   try {
     return m_impl->get_plus_id(for_id, m_impl->m_box_plus_ids);
   } catch (const out_of_range &) {
-    throw KeyError("No box with ID: " + std::to_string(for_id));
+    throw PieceNotFoundError(Selectors::BOXES, for_id);
   }
 }
 
@@ -261,7 +265,7 @@ piece_id_t SokobanPlus::goal_plus_id(piece_id_t for_id) const {
   try {
     return m_impl->get_plus_id(for_id, m_impl->m_goal_plus_ids);
   } catch (const out_of_range &) {
-    throw KeyError("No goal with ID: " + std::to_string(for_id));
+    throw PieceNotFoundError(Selectors::GOALS, for_id);
   }
 }
 

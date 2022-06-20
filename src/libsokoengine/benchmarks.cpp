@@ -6,6 +6,7 @@
 #include <iostream>
 #include <numeric>
 #include <sstream>
+#include <deque>
 #include <string>
 
 using namespace std;

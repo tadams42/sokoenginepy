@@ -8,12 +8,16 @@ namespace sokoengine {
 namespace io {
 
 ///
-/// Snapshot implementation for Octoban
+/// Snapshot implementation for game::Tessellation::OCTOBAN and
+/// game::OctobanTessellation
 ///
 class LIBSOKOENGINE_API OctobanSnapshot : public Snapshot {
 public:
   OctobanSnapshot();
-  explicit OctobanSnapshot(const std::string &moves_data);
+  ///
+  /// @param moves pusher steps in textual representation.
+  ///
+  explicit OctobanSnapshot(const std::string &moves);
   OctobanSnapshot(const OctobanSnapshot &rv);
   OctobanSnapshot &operator=(const OctobanSnapshot &rv);
   OctobanSnapshot(OctobanSnapshot &&rv);
@@ -23,13 +27,20 @@ public:
 };
 
 ///
-/// Board implementation for Octoban.
+/// Puzzle implementation for game::Tessellation::HEXOBAN and game::OctobanTessellation
 ///
 class LIBSOKOENGINE_API OctobanPuzzle : public Puzzle {
 public:
   OctobanPuzzle();
+  ///
+  /// @param width number of columns
+  /// @param height number of rows
+  ///
   OctobanPuzzle(board_size_t width, board_size_t height);
-  explicit OctobanPuzzle(const std::string &src);
+  ///
+  /// @param board game board in textual representation.
+  ///
+  explicit OctobanPuzzle(const std::string &board);
   OctobanPuzzle(const OctobanPuzzle &rv);
   OctobanPuzzle &operator=(const OctobanPuzzle &rv);
   OctobanPuzzle(OctobanPuzzle &&rv);

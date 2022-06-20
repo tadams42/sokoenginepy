@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .base_tessellation import BaseTessellation, Tessellation
     from .board_cell import BoardCell
-    from .board_graph import BoardGraph
+    from .board_graph import BoardGraph, Edge
     from .board_manager import (
         BoardManager,
         BoxGoalSwitchError,
@@ -37,6 +37,7 @@ else:
             CellAlreadyOccupiedError,
             Config,
             Direction,
+            Edge,
             GraphType,
             HashedBoardManager,
             HexobanTessellation,
@@ -56,7 +57,7 @@ else:
     except ImportError:
         from .base_tessellation import BaseTessellation, Tessellation
         from .board_cell import BoardCell
-        from .board_graph import BoardGraph
+        from .board_graph import BoardGraph, Edge
         from .board_manager import (
             BoardManager,
             BoxGoalSwitchError,
@@ -73,12 +74,12 @@ else:
         from .sokoban_tessellation import SokobanTessellation
         from .trioban_tessellation import TriobanTessellation
 
-from .base_tessellation import (
-    COLUMN,
-    ROW,
-    X,
-    Y,
+from .coordinate_helpers import (
     index_1d,
+    index_column,
+    index_row,
+    index_x,
+    index_y,
     is_on_board_1d,
     is_on_board_2d,
 )

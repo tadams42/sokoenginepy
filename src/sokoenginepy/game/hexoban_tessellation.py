@@ -1,16 +1,18 @@
 from __future__ import annotations
 
-from typing import Dict, Final, Optional, Tuple
+from typing import Dict, Final, Tuple
 
 from ..io import Snapshot
-from .base_tessellation import COLUMN, ROW, BaseTessellation, index_1d, is_on_board_2d
-from .config import Direction
+from .base_tessellation import BaseTessellation
+from .config import Config, Direction
+from .coordinate_helpers import index_1d, index_column, index_row, is_on_board_2d
 from .utilities import inverted
 
 
 class HexobanTessellation(BaseTessellation):
-
     """
+    Tessellation for Hexoban game variant.
+
     Board space is laid out on vertical hexagons with following coordinate system:
 
     .. image:: /images/hexoban_coordinates.png
@@ -70,9 +72,18 @@ class HexobanTessellation(BaseTessellation):
 
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+    ) -> int:
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
+        if board_width < 0:
+            raise ValueError(f"Board width {board_width} is invalid value!")
+
+        if board_height < 0:
+            raise ValueError(f"Board height {board_height} is invalid value!")
+
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
 
         if direction == Direction.LEFT:
             column -= 1
@@ -95,4 +106,5 @@ class HexobanTessellation(BaseTessellation):
 
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
-        return None
+
+        return Config.NO_POS

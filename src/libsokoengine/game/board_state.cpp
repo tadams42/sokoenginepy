@@ -1,7 +1,6 @@
 #include "board_state.hpp"
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 
@@ -14,12 +13,13 @@ class LIBSOKOENGINE_LOCAL BoardState::PIMPL {
 public:
   Positions m_pushers_positions;
   Positions m_boxes_positions;
-  zobrist_key_t m_zobrist_hash;
+  zobrist_key_t m_zobrist_hash = BoardState::NO_HASH;
 
   PIMPL(const Positions &pushers_positions, const Positions &boxes_positions,
         zobrist_key_t zobrist_hash)
-      : m_pushers_positions(pushers_positions), m_boxes_positions(boxes_positions),
-        m_zobrist_hash(zobrist_hash) {}
+    : m_pushers_positions(pushers_positions),
+      m_boxes_positions(boxes_positions),
+      m_zobrist_hash(zobrist_hash) {}
 
   PIMPL(const PIMPL &rv) = default;
   PIMPL &operator=(const PIMPL &rv) = default;
@@ -29,13 +29,12 @@ public:
 
 BoardState::BoardState(const Positions &pushers_positions,
                        const Positions &boxes_positions, zobrist_key_t zobrist_hash)
-    : m_impl(make_unique<PIMPL>(pushers_positions, boxes_positions, zobrist_hash)) {}
+  : m_impl(make_unique<PIMPL>(pushers_positions, boxes_positions, zobrist_hash)) {}
 
 BoardState::BoardState(const BoardState &rv) : m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
 
 BoardState &BoardState::operator=(const BoardState &rv) {
-  if (this != &rv)
-    m_impl = make_unique<PIMPL>(*rv.m_impl);
+  if (this != &rv) m_impl = make_unique<PIMPL>(*rv.m_impl);
   return *this;
 }
 
@@ -74,7 +73,7 @@ string BoardState::str() const {
   auto converter = [&](const Positions &v) {
     Strings retv;
     for (auto position : v)
-      retv.push_back(boost::lexical_cast<string>(position));
+      retv.push_back(std::to_string(position));
     return retv;
   };
 
@@ -82,23 +81,21 @@ string BoardState::str() const {
          boost::join(converter(m_impl->m_pushers_positions), ", ") + "],\n" +
          "            boxes_positions=[" +
          boost::join(converter(m_impl->m_boxes_positions), ", ") + "],\n" +
-         "            zobrist_hash=" +
-         boost::lexical_cast<string>(m_impl->m_zobrist_hash) + ">";
+         "            zobrist_hash=" + std::to_string(m_impl->m_zobrist_hash) + ">";
 }
 
 string BoardState::repr() const {
   auto converter = [&](const Positions &v) {
     Strings retv;
     for (auto position : v)
-      retv.push_back(boost::lexical_cast<string>(position));
+      retv.push_back(std::to_string(position));
     return retv;
   };
 
   return "BoardState(pushers_positions=[" +
          boost::join(converter(m_impl->m_pushers_positions), ", ") + "], " +
          "boxes_positions=[" + boost::join(converter(m_impl->m_boxes_positions), ", ") +
-         "], " + "zobrist_hash=" + boost::lexical_cast<string>(m_impl->m_zobrist_hash) +
-         ")";
+         "], " + "zobrist_hash=" + std::to_string(m_impl->m_zobrist_hash) + ")";
 }
 
 } // namespace game

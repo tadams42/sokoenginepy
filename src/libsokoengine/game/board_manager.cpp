@@ -2,16 +2,16 @@
 
 #include "board_cell.hpp"
 #include "board_graph.hpp"
+#include "board_state.hpp"
 #include "hashed_board_manager.hpp"
 #include "sokoban_plus.hpp"
-#include "board_state.hpp"
 
 #include <algorithm>
+#include <charconv>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/bimap.hpp>
 #include <boost/bimap/set_of.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace boost;
 using namespace boost::bimaps;
@@ -19,6 +19,21 @@ using namespace std;
 
 namespace sokoengine {
 namespace game {
+
+PieceNotFoundError::PieceNotFoundError(Selectors piece, long id)
+  : invalid_argument(string(piece == Selectors::PUSHERS ? "Pusher"
+                            : piece == Selectors::BOXES ? "Box"
+                                                        : "Goal") +
+                     " with ID: " + std::to_string(id) + " not found!") {}
+
+PieceNotFoundError::PieceNotFoundError(Selectors piece, long position,
+                                       char ignored)
+  : invalid_argument(string(piece == Selectors::PUSHERS ? "Pusher"
+                            : piece == Selectors::BOXES ? "Box"
+                                                        : "Goal") +
+                     " on position " + std::to_string(position) + " not found!") {}
+
+PieceNotFoundError::~PieceNotFoundError() = default;
 
 using io::Strings;
 
@@ -28,8 +43,7 @@ LIBSOKOENGINE_LOCAL string to_str(const BoardManager::positions_by_id_t &m) {
   auto converter = [&]() {
     Strings retv;
     for (auto p : m) {
-      retv.push_back(string() + boost::lexical_cast<string>(p.first) + ": " +
-                     boost::lexical_cast<string>(p.second));
+      retv.push_back(std::to_string(p.first) + ": " + std::to_string(p.second));
     }
     return retv;
   };
@@ -47,12 +61,6 @@ CellAlreadyOccupiedError::~CellAlreadyOccupiedError() = default;
 BoxGoalSwitchError::BoxGoalSwitchError(const string &mess) : runtime_error(mess) {}
 
 BoxGoalSwitchError::~BoxGoalSwitchError() = default;
-
-namespace implementation {
-
-enum class LIBSOKOENGINE_LOCAL Selectors : char { BOXES, GOALS, PUSHERS };
-
-} // namespace implementation
 
 using namespace implementation;
 
@@ -74,10 +82,9 @@ public:
   PIMPL(BoardGraph &board, const string &boxorder, const string &goalorder)
     : m_board(board) {
     piece_id_t pusher_id, box_id, goal_id;
-    pusher_id = box_id = goal_id = Config::DEFAULT_PIECE_ID;
+    pusher_id = box_id = goal_id = Config::DEFAULT_ID;
 
-    for (position_t curent_pos = 0; curent_pos < m_board.vertices_count();
-         ++curent_pos) {
+    for (position_t curent_pos = 0; curent_pos < m_board.size(); ++curent_pos) {
       BoardCell cell(m_board[curent_pos]);
 
       if (cell.has_pusher()) {
@@ -102,11 +109,7 @@ public:
              : which == Selectors::BOXES ? m_boxes.left.at(id)
                                          : m_goals.left.at(id);
     } catch (const out_of_range &) {
-      throw KeyError(string("No ") +
-                     (which == Selectors::PUSHERS ? "pusher"
-                      : which == Selectors::BOXES ? "box"
-                                                  : "goal") +
-                     " with ID: " + to_string(id));
+      throw PieceNotFoundError(which, id);
     }
   }
 
@@ -116,11 +119,7 @@ public:
              : which == Selectors::BOXES ? m_boxes.right.at(position)
                                          : m_goals.right.at(position);
     } catch (const out_of_range &) {
-      throw KeyError(string("No ") +
-                     (which == Selectors::PUSHERS ? "pusher"
-                      : which == Selectors::BOXES ? "box"
-                                                  : "goal") +
-                     " on position: " + to_string(position));
+      throw PieceNotFoundError(which, position, ' ');
     }
   }
 
@@ -432,7 +431,7 @@ BoardManager::solutions_vector_t BoardManager::solutions() const {
     piece_id_t index = 0;
     bool retv = true;
     for (auto box_position : b_positions) {
-      auto b_id = index + Config::DEFAULT_PIECE_ID;
+      auto b_id = index + Config::DEFAULT_ID;
       auto b_plus_id = box_plus_id(b_id);
       auto g_id = goal_id_on(box_position);
       auto g_plus_id = goal_plus_id(g_id);
@@ -469,7 +468,7 @@ void BoardManager::switch_boxes_and_goals() {
     auto old_goal_position = goal_position(bg_pair.second.first);
 
     if (old_box_position != old_goal_position) {
-      piece_id_t moved_pusher_id = Config::DEFAULT_PIECE_ID - 1;
+      piece_id_t moved_pusher_id = Config::DEFAULT_ID - 1;
       if (has_pusher_on(old_goal_position)) {
         moved_pusher_id = pusher_id_on(old_goal_position);
         m_impl->update_position(moved_pusher_id, Selectors::PUSHERS, -1);
@@ -485,7 +484,7 @@ void BoardManager::switch_boxes_and_goals() {
       m_impl->m_board.cell(old_goal_position).put_box();
       box_moved(old_box_position, old_goal_position);
 
-      if (moved_pusher_id != Config::DEFAULT_PIECE_ID - 1) {
+      if (moved_pusher_id != Config::DEFAULT_ID - 1) {
         m_impl->update_position(moved_pusher_id, Selectors::PUSHERS, old_box_position);
         m_impl->m_board.cell(old_box_position).put_pusher();
         pusher_moved(old_goal_position, old_box_position);
@@ -518,7 +517,7 @@ string BoardManager::str() const {
     size_t max_members = 10;
     Strings tmp;
     for (size_t i = 0; i < min(positions.size(), max_members); ++i) {
-      tmp.push_back(boost::lexical_cast<string>(positions[i]));
+      tmp.push_back(std::to_string(positions[i]));
     }
 
     if (positions.size() <= max_members)

@@ -1,4 +1,4 @@
-from sokoenginepy.game import X, Y, index_1d, is_on_board_1d, is_on_board_2d
+from sokoenginepy.game import index_x, index_y, index_1d, is_on_board_1d, is_on_board_2d
 
 
 class Describe_INDEX:
@@ -10,16 +10,16 @@ class Describe_INDEX:
 
 class Describe_X:
     def it_calculates_X_coordinate_from_1D_index(self):
-        assert X(0, 5) == 0
-        assert X(29, 5) == 4
-        assert X(18, 5) == 3
+        assert index_x(0, 5) == 0
+        assert index_x(29, 5) == 4
+        assert index_x(18, 5) == 3
 
 
 class Describe_Y:
     def it_calculates_Y_coordinate_from_1D_index(self):
-        assert Y(0, 5) == 0
-        assert Y(29, 5) == 5
-        assert Y(18, 5) == 3
+        assert index_y(0, 5) == 0
+        assert index_y(29, 5) == 5
+        assert index_y(18, 5) == 3
 
 
 class Describe_on_board_2d:

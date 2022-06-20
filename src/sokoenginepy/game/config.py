@@ -38,29 +38,44 @@ _OPPOSITE: List[Direction] = [
 
 class GraphType(enum.Enum):
     """
-    Type of board graph.
+    Types of `BoardGraph`.
     """
 
+    #: Directed graphs
     DIRECTED = 0
+
+    #: Directed graphs with self loops and parallel edges
     DIRECTED_MULTI = 1
 
 
 class Config:
+    """
+    Various constants used across game package. Since they are needed by many modules
+    it made more sense to place them here in their own class, than into one or more
+    other classes.
+    """
+
+    #: Max board width
     MAX_WIDTH: Final[int] = 4096
+
+    #: Max board height
     MAX_HEIGHT: Final[int] = 4096
-    MAX_POS: Final[int] = MAX_WIDTH * MAX_HEIGHT
 
-    NULL_ID: Final[int] = 0
+    #: Invalid board position
+    NO_POS: Final[int] = -1
 
-    #: All pieces on board (pushers, boxes) and goals are assigned ID to be used for
-    #: referring them.
+    #: Default ID for pieces for situations whe one is needed and **must** be provided.
     #:
-    #: Piece ids are assigned by numbering each type of piece or goal starting with
-    #: ``DEFAULT_PIECE_ID``
+    #: See Also:
+    #:     - :class:`.BoardManager`
+    #:     - :class:`.PusherStep`
+    DEFAULT_ID: Final[int] = 1
+
+    #: Invalid, non-existing ID of a piece. It is used in situations where it would
+    #: be OK to use `None`, but this is more specific and has same type as piece IDs
+    #: have.
     #:
-    #: .. image:: /images/assigning_ids.png
-    #:     :alt: Assigning IDs to pieces and goals
-    #:
-    #: Once assigned, id of a piece doesn't change by either moving piece or
-    #: applying board view transformations.
-    DEFAULT_PIECE_ID: Final[int] = 1
+    #: See Also:
+    #:     - :class:`.BoardManager`
+    #:     - :class:`.PusherStep`
+    NO_ID: Final[int] = -1

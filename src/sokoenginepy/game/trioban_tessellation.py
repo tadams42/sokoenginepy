@@ -1,23 +1,18 @@
 from __future__ import annotations
 
-from typing import Final, Mapping, Optional, Tuple
+from typing import Final, Mapping, Tuple
 
 from ..io import CellOrientation, Snapshot
-from .base_tessellation import (
-    COLUMN,
-    ROW,
-    BaseTessellation,
-    Direction,
-    GraphType,
-    index_1d,
-    is_on_board_2d,
-)
-from .config import Direction, GraphType
+from .base_tessellation import BaseTessellation
+from .config import Config, Direction, GraphType
+from .coordinate_helpers import index_1d, index_column, index_row, is_on_board_2d
 from .utilities import inverted
 
 
 class TriobanTessellation(BaseTessellation):
     """
+    Tessellation for Trioban game variant.
+
     Board is laid out on alternating triangles with origin triangle pointing down.
 
     Direction <-> character mapping:
@@ -69,13 +64,13 @@ class TriobanTessellation(BaseTessellation):
 
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+    ) -> int:
         triangle_points_down = (
             self.cell_orientation(position, board_width, board_height)
             == CellOrientation.TRIANGLE_DOWN
         )
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
 
         dx, dy = 0, 0
         if direction == Direction.LEFT:
@@ -121,13 +116,22 @@ class TriobanTessellation(BaseTessellation):
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
 
-        return None
+        return Config.NO_POS
 
     def cell_orientation(
         self, position: int, board_width: int, board_height: int
     ) -> CellOrientation:
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
+        if board_width < 0:
+            raise ValueError(f"Board width {board_width} is invalid value!")
+
+        if board_height < 0:
+            raise ValueError(f"Board height {board_height} is invalid value!")
+
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
         return (
             CellOrientation.TRIANGLE_DOWN
             if (column + (row % 2)) % 2 == 0

@@ -25,10 +25,19 @@ void export_io_puzzle(py::module &m) {
   auto pyPuzzle = py::class_<Puzzle>(m, "Puzzle", py::is_final());
 
   pyPuzzle
-    .def("instance_from", py::overload_cast<Tessellation, board_size_t, board_size_t>(
-                            &Puzzle::instance_from))
-    .def("instance_from",
-         py::overload_cast<Tessellation, const string &>(&Puzzle::instance_from));
+    .def_static(
+      "instance_from",
+      [](Tessellation tessellation, py_int_t width, py_int_t height) {
+        return Puzzle::instance_from(tessellation, size_or_throw(width),
+                                     size_or_throw(height));
+      },
+      py::arg("tessellation"), py::arg("width"), py::arg("height"))
+    .def_static(
+      "instance_from",
+      [](Tessellation tessellation, const std::string &board) {
+        return Puzzle::instance_from(tessellation, board);
+      },
+      py::arg("tessellation"), py::arg("board"));
 
   pyPuzzle.def_readonly_static("WALL", &Puzzle::WALL);
   pyPuzzle.def_readonly_static("PUSHER", &Puzzle::PUSHER);
@@ -82,16 +91,26 @@ void export_io_puzzle(py::module &m) {
     [](Puzzle &self, const string &rv) { self.set_board(rv); });
 
   pyPuzzle.def_property_readonly("tessellation", &Puzzle::tessellation);
-  pyPuzzle.def("cell_orientation", &Puzzle::cell_orientation, py::arg("position"));
+
+  pyPuzzle.def(
+    "cell_orientation",
+    [](const Puzzle &self, py_int_t position) {
+      return self.cell_orientation(position_or_throw(position));
+    },
+    py::arg("position"));
 
   pyPuzzle.def(
     "__getitem__",
-    [](const Puzzle &self, position_t position) -> char { return self.at(position); },
+    [](const Puzzle &self, py_int_t position) -> char {
+      return self.at(position_or_throw(position));
+    },
     py::arg("position"));
 
   pyPuzzle.def(
     "__setitem__",
-    [](Puzzle &self, position_t position, char c) { self.set_at(position, c); },
+    [](Puzzle &self, py_int_t position, char c) {
+      self.set_at(position_or_throw(position), c);
+    },
     py::arg("position"), py::arg("char"));
 
   pyPuzzle.def("__str__", &Puzzle::str);
@@ -121,9 +140,22 @@ void export_io_puzzle(py::module &m) {
   pyPuzzle.def("trim_bottom", &Puzzle::trim_bottom);
   pyPuzzle.def("reverse_rows", &Puzzle::reverse_rows);
   pyPuzzle.def("reverse_columns", &Puzzle::reverse_columns);
-  pyPuzzle.def("resize", &Puzzle::resize, py::arg("new_width"), py::arg("new_height"));
-  pyPuzzle.def("resize_and_center", &Puzzle::resize_and_center, py::arg("new_width"),
-               py::arg("new_height"));
+
+  pyPuzzle.def(
+    "resize",
+    [](Puzzle &self, py_int_t new_width, py_int_t new_height) {
+      return self.resize(size_or_throw(new_width), size_or_throw(new_height));
+    },
+    py::arg("new_width"), py::arg("new_height"));
+
+  pyPuzzle.def(
+    "resize_and_center",
+    [](Puzzle &self, py_int_t new_width, py_int_t new_height) {
+      return self.resize_and_center(size_or_throw(new_width),
+                                    size_or_throw(new_height));
+    },
+    py::arg("new_width"), py::arg("new_height"));
+
   pyPuzzle.def("trim", &Puzzle::trim);
 
   auto pySokobanPuzzle =
@@ -136,8 +168,9 @@ void export_io_puzzle(py::module &m) {
     py::class_<HexobanPuzzle, Puzzle>(m, "HexobanPuzzle", py::is_final());
 
   pySokobanPuzzle.def(
-    py::init([](board_size_t width, board_size_t height, const py::object &board) {
-      if (board.is_none()) return make_unique<SokobanPuzzle>(width, height);
+    py::init([](py_int_t width, py_int_t height, const py::object &board) {
+      if (board.is_none())
+        return make_unique<SokobanPuzzle>(size_or_throw(width), size_or_throw(height));
       string board_converted = board.cast<string>();
       return make_unique<SokobanPuzzle>(board_converted);
     }),
@@ -149,8 +182,9 @@ void export_io_puzzle(py::module &m) {
     });
 
   pyHexobanPuzzle.def(
-    py::init([](board_size_t width, board_size_t height, const py::object &board) {
-      if (board.is_none()) return make_unique<HexobanPuzzle>(width, height);
+    py::init([](py_int_t width, py_int_t height, const py::object &board) {
+      if (board.is_none())
+        return make_unique<HexobanPuzzle>(size_or_throw(width), size_or_throw(height));
       string board_converted = board.cast<string>();
       return make_unique<HexobanPuzzle>(board_converted);
     }),
@@ -162,8 +196,9 @@ void export_io_puzzle(py::module &m) {
     });
 
   pyTriobanPuzzle.def(
-    py::init([](board_size_t width, board_size_t height, const py::object &board) {
-      if (board.is_none()) return make_unique<TriobanPuzzle>(width, height);
+    py::init([](py_int_t width, py_int_t height, const py::object &board) {
+      if (board.is_none())
+        return make_unique<TriobanPuzzle>(size_or_throw(width), size_or_throw(height));
       string board_converted = board.cast<string>();
       return make_unique<TriobanPuzzle>(board_converted);
     }),
@@ -175,8 +210,9 @@ void export_io_puzzle(py::module &m) {
     });
 
   pyOctobanPuzzle.def(
-    py::init([](board_size_t width, board_size_t height, const py::object &board) {
-      if (board.is_none()) return make_unique<OctobanPuzzle>(width, height);
+    py::init([](py_int_t width, py_int_t height, const py::object &board) {
+      if (board.is_none())
+        return make_unique<OctobanPuzzle>(size_or_throw(width), size_or_throw(height));
       string board_converted = board.cast<string>();
       return make_unique<OctobanPuzzle>(board_converted);
     }),

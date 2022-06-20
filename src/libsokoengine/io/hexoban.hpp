@@ -8,12 +8,16 @@ namespace sokoengine {
 namespace io {
 
 ///
-/// Snapshot implementation for Hexoban
+/// Snapshot implementation for game::Tessellation::HEXOBAN and
+/// game::HexobanTessellation
 ///
 class LIBSOKOENGINE_API HexobanSnapshot : public Snapshot {
 public:
   HexobanSnapshot();
-  explicit HexobanSnapshot(const std::string &moves_data);
+  ///
+  /// @param moves pusher steps in textual representation.
+  ///
+  explicit HexobanSnapshot(const std::string &moves);
   HexobanSnapshot(const HexobanSnapshot &rv);
   HexobanSnapshot &operator=(const HexobanSnapshot &rv);
   HexobanSnapshot(HexobanSnapshot &&rv);
@@ -23,13 +27,21 @@ public:
 };
 
 ///
-/// Board implementation for Hexoban.
+/// Puzzle implementation for game::Tessellation::HEXOBAN and game::HexobanTessellation
 ///
 class LIBSOKOENGINE_API HexobanPuzzle : public Puzzle {
 public:
   HexobanPuzzle();
+
+  ///
+  /// @param width number of columns
+  /// @param height number of rows
+  ///
   HexobanPuzzle(board_size_t width, board_size_t height);
-  explicit HexobanPuzzle(const std::string &src);
+  ///
+  /// @param board game board in textual representation.
+  ///
+  explicit HexobanPuzzle(const std::string &board);
   HexobanPuzzle(const HexobanPuzzle &rv);
   HexobanPuzzle &operator=(const HexobanPuzzle &rv);
   HexobanPuzzle(HexobanPuzzle &&rv);

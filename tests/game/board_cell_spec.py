@@ -20,11 +20,9 @@ class DescribeBoardCell:
         def it_initializes_secondary_flags_to_false_by_default(self):
             board_cell = BoardCell()
             assert not board_cell.is_in_playable_area
-            assert not board_cell.is_deadlock
 
             board_cell: BoardCell = BoardCell(character=Puzzle.PUSHER)
             assert not board_cell.is_in_playable_area
-            assert not board_cell.is_deadlock
 
         def it_raises_on_illegal_character(self):
             with pytest.raises(ValueError):
@@ -38,8 +36,6 @@ class DescribeBoardCell:
         def it_doesnt_compare_secondary_flags(self, board_cell):
             board_cell2 = copy.copy(board_cell)
             assert board_cell == board_cell2
-            board_cell.is_deadlock = True
-            board_cell2.is_deadlock = False
             board_cell.is_in_playable_area = True
             board_cell2.is_in_playable_area = False
             assert board_cell == board_cell2
@@ -72,10 +68,8 @@ class DescribeBoardCell:
             assert board_cell.has_pusher
 
         def test_setter_doesnt_change_secondary_flags(self, board_cell):
-            board_cell.is_deadlock = True
             board_cell.is_in_playable_area = True
             board_cell.has_pusher = True
-            assert board_cell.is_deadlock
             assert board_cell.is_in_playable_area
 
     class Describe_has_box:
@@ -108,10 +102,8 @@ class DescribeBoardCell:
             assert board_cell.has_box
 
         def test_setter_doesnt_change_secondary_flags(self, board_cell):
-            board_cell.is_deadlock = True
             board_cell.is_in_playable_area = True
             board_cell.has_box = True
-            assert board_cell.is_deadlock
             assert board_cell.is_in_playable_area
 
     class Describe_has_goal:
@@ -148,10 +140,8 @@ class DescribeBoardCell:
             assert board_cell.has_goal
 
         def test_setter_doesnt_change_secondary_flags(self, board_cell):
-            board_cell.is_deadlock = True
             board_cell.is_in_playable_area = True
             board_cell.has_goal = True
-            assert board_cell.is_deadlock
             assert board_cell.is_in_playable_area
 
     class Describe_is_wall:
@@ -179,10 +169,8 @@ class DescribeBoardCell:
             assert not board_cell.has_goal
 
         def test_setter_doesnt_change_secondary_flags(self, board_cell):
-            board_cell.is_deadlock = True
             board_cell.is_in_playable_area = True
             board_cell.is_wall = True
-            assert board_cell.is_deadlock
             assert board_cell.is_in_playable_area
 
     class Describe_can_put_pusher_or_box:

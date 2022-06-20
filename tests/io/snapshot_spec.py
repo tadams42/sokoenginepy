@@ -1,6 +1,6 @@
 import pytest
 
-from sokoenginepy.game import Direction, PusherStep
+from sokoenginepy.game import Config, Direction, PusherStep
 from sokoenginepy.io import SokobanSnapshot
 
 
@@ -120,11 +120,11 @@ class DescribeSnapshot:
             PusherStep(Direction.UP),
             PusherStep(Direction.RIGHT),
             PusherStep(Direction.DOWN),
-            PusherStep(Direction.LEFT, box_moved=True),
-            PusherStep(Direction.UP, box_moved=True),
-            PusherStep(Direction.RIGHT, box_moved=True),
-            PusherStep(Direction.DOWN, box_moved=True),
-            PusherStep(Direction.DOWN, box_moved=True),
+            PusherStep(Direction.LEFT, moved_box_id=Config.DEFAULT_ID),
+            PusherStep(Direction.UP, moved_box_id=Config.DEFAULT_ID),
+            PusherStep(Direction.RIGHT, moved_box_id=Config.DEFAULT_ID),
+            PusherStep(Direction.DOWN, moved_box_id=Config.DEFAULT_ID),
+            PusherStep(Direction.DOWN, moved_box_id=Config.DEFAULT_ID),
         ]
 
         steps = steps0

@@ -1,15 +1,18 @@
 from __future__ import annotations
 
-from typing import Dict, Final, Optional, Tuple
+from typing import Dict, Final, List, Optional, Tuple
 
 from ..io import Snapshot
-from .base_tessellation import COLUMN, ROW, BaseTessellation, index_1d, is_on_board_2d
-from .config import Direction
+from .base_tessellation import BaseTessellation
+from .config import Config, Direction
+from .coordinate_helpers import index_1d, index_column, index_row, is_on_board_2d
 from .utilities import inverted
 
 
 class SokobanTessellation(BaseTessellation):
     """
+    Tessellation for Sokoban game variant.
+
     Board is laid out on squares.
 
     Direction <-> character mapping:
@@ -43,19 +46,32 @@ class SokobanTessellation(BaseTessellation):
         _CHR_TO_PUSHER_STEP
     )
 
-    _NEIGHBOR_SHIFT: Final[Dict[Direction, Tuple[int, int]]] = {
-        Direction.LEFT: (0, -1),
-        Direction.RIGHT: (0, 1),
-        Direction.UP: (-1, 0),
-        Direction.DOWN: (1, 0),
-    }
+    _NEIGHBOR_SHIFT: Final[List[Tuple[Optional[int], Optional[int]]]] = [
+        (-1, 0),  # UP
+        (None, None),
+        (0, 1),  # RIGHT
+        (None, None),
+        (1, 0),  # DOWN
+        (None, None),
+        (0, -1),  # LEFT
+        (None, None),
+    ]
 
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
-        row_shift, column_shift = self._NEIGHBOR_SHIFT.get(direction, (None, None))
+    ) -> int:
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
+        if board_width < 0:
+            raise ValueError(f"Board width {board_width} is invalid value!")
+
+        if board_height < 0:
+            raise ValueError(f"Board height {board_height} is invalid value!")
+
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
+        row_shift, column_shift = self._NEIGHBOR_SHIFT[direction.value]
 
         if row_shift is None or column_shift is None:
             raise ValueError(direction)
@@ -66,4 +82,4 @@ class SokobanTessellation(BaseTessellation):
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
 
-        return None
+        return Config.NO_POS

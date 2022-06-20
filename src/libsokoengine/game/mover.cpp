@@ -33,14 +33,13 @@ public:
   HashedBoardManager m_manager;
   SolvingMode m_solving_mode;
   bool m_pulls_boxes = true;
-  piece_id_t m_selected_pusher = Config::DEFAULT_PIECE_ID;
+  piece_id_t m_selected_pusher = Config::DEFAULT_ID;
   size_t m_pull_count = 0;
   PusherSteps m_last_move;
 
   PIMPL(BoardGraph &board, SolvingMode mode)
     : m_initial_board(board), m_manager(board), m_solving_mode(mode) {
     if (!m_manager.is_playable()) { throw NonPlayableBoardError(); }
-
     if (m_solving_mode == SolvingMode::REVERSE) { m_manager.switch_boxes_and_goals(); }
   }
 
@@ -64,7 +63,7 @@ public:
 
     m_last_move.clear();
     for (const Direction &direction : selection_path) {
-      PusherStep pusher_step(direction, false);
+      PusherStep pusher_step(direction, Config::NO_ID);
       pusher_step.set_is_pusher_selection(true);
       m_last_move.push_back(pusher_step);
     }
@@ -94,7 +93,7 @@ public:
       m_manager.board().find_jump_path(old_position, new_position));
     m_last_move.clear();
     for (const Direction &direction : path) {
-      PusherStep pusher_step(direction, false);
+      PusherStep pusher_step(direction, Config::NO_ID);
       pusher_step.set_is_jump(true);
       pusher_step.set_pusher_id(m_selected_pusher);
       m_last_move.push_back(pusher_step);
@@ -106,10 +105,10 @@ public:
     position_t in_front_of_pusher =
       m_manager.board().neighbor(initial_pusher_position, direction);
 
-    if (in_front_of_pusher > Config::MAX_POS) {
+    if (in_front_of_pusher == Config::NO_POS) {
       throw IllegalMoveError(
         "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-        ", direction: " + BaseTessellation::direction_str(direction) + ")");
+        ", direction: " + implementation::direction_str(direction) + ")");
     }
 
     bool is_push = false;
@@ -118,11 +117,11 @@ public:
     if (m_manager.has_box_on(in_front_of_pusher)) {
       is_push = true;
       in_front_of_box = m_manager.board().neighbor(in_front_of_pusher, direction);
-      if (in_front_of_box > Config::MAX_POS) {
+      if (in_front_of_box == Config::NO_POS) {
         throw IllegalMoveError(
           "Can't push box off board (ID: " +
           std::to_string(m_manager.box_id_on(in_front_of_pusher)) +
-          ", direction: " + BaseTessellation::direction_str(direction) + ")");
+          ", direction: " + implementation::direction_str(direction) + ")");
       }
 
       try {
@@ -138,7 +137,7 @@ public:
       throw IllegalMoveError(exc.what());
     }
 
-    PusherStep pusher_step(direction, is_push);
+    PusherStep pusher_step(direction);
     pusher_step.set_pusher_id(m_selected_pusher);
     if (is_push) {
       pusher_step.set_moved_box_id(m_manager.box_id_on(in_front_of_box));
@@ -153,10 +152,10 @@ public:
     position_t in_front_of_pusher =
       m_manager.board().neighbor(initial_pusher_position, direction);
 
-    if (in_front_of_pusher > Config::MAX_POS) {
+    if (in_front_of_pusher == Config::NO_POS) {
       throw IllegalMoveError(
         "Can't move pusher off board! (ID: " + std::to_string(m_selected_pusher) +
-        ", direction: " + BaseTessellation::direction_str(direction) + ")");
+        ", direction: " + implementation::direction_str(direction) + ")");
     }
 
     try {
@@ -171,7 +170,7 @@ public:
       position_t behind_pusher =
         m_manager.board().neighbor(initial_pusher_position, opposite(direction));
 
-      if (behind_pusher <= Config::MAX_POS &&
+      if (behind_pusher != Config::NO_POS &&
           m_manager.board().cell(behind_pusher).has_box()) {
         is_pull = true;
         try {
@@ -183,7 +182,7 @@ public:
       }
     }
 
-    PusherStep pusher_step(direction, is_pull);
+    PusherStep pusher_step(direction);
     pusher_step.set_pusher_id(m_selected_pusher);
     if (is_pull) {
       pusher_step.set_moved_box_id(m_manager.box_id_on(initial_pusher_position));

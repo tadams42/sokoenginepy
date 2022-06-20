@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import groupby
-from typing import Final, Optional, Set
+from typing import Final, Optional
 
 import lark
 

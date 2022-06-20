@@ -1,6 +1,7 @@
 #include "hexoban.hpp"
 
 #include "rle.hpp"
+#include "puzzle_parsing.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <iostream>
@@ -13,8 +14,8 @@ namespace io {
 using game::Config;
 using game::Tessellation;
 using game::index_1d;
-using game::X;
-using game::Y;
+using game::index_x;
+using game::index_y;
 
 namespace implementation {
 
@@ -169,8 +170,8 @@ public:
 
   bool is_type1(const Strings &list) const {
     position_t rmnf = find_rightmost_non_floor(list);
-    if (rmnf <= Config::MAX_POS) {
-      board_size_t y = Y(rmnf, PuzzleParser::calculate_width(list));
+    if (rmnf != Config::NO_POS) {
+      board_size_t y = index_y(rmnf, PuzzleParser::calculate_width(list));
       return y % 2 == 0;
     }
     return false;
@@ -321,9 +322,9 @@ private:
 
     // Calculate parities
     position_t first_cell = find_first_non_floor(parsed);
-    if (first_cell <= Config::MAX_POS) {
-      int8_t first_cell_x_parity = X(first_cell, width) % 2;
-      int8_t first_cell_y_parity = Y(first_cell, width) % 2;
+    if (first_cell != Config::NO_POS) {
+      int8_t first_cell_x_parity = index_x(first_cell, width) % 2;
+      int8_t first_cell_y_parity = index_y(first_cell, width) % 2;
 
       if (first_cell_y_parity == 0) {
         even_row_x_parity = first_cell_x_parity;
@@ -340,7 +341,7 @@ private:
     Strings normalized = HexobanPuzzleParser::normalize_width(list);
     board_size_t height = normalized.size();
     board_size_t width = height > 0 ? normalized.front().size() : 0;
-    if (height == 0 || width == 0) return numeric_limits<position_t>::max();
+    if (height == 0 || width == 0) return Config::NO_POS;
 
     position_t x = 0, y = 0;
     bool non_floor_found = false;
@@ -363,7 +364,7 @@ private:
   position_t find_rightmost_non_floor(const Strings &strings) const {
     auto rightmost_finder = [](const Strings &strings,
                                int8_t row_parity) -> position_t {
-      position_t retv = numeric_limits<position_t>::max();
+      position_t retv = Config::NO_POS;
       bool cell_found = false;
       board_size_t height = strings.size();
       board_size_t width = strings.front().size();
@@ -396,10 +397,10 @@ private:
       return index_1d(0, 0, width);
     }
 
-    position_t odd_x = X(rightmost_in_odd_rows, width);
-    position_t odd_y = Y(rightmost_in_odd_rows, width);
-    position_t even_x = X(rightmost_in_even_rows, width);
-    position_t even_y = Y(rightmost_in_even_rows, width);
+    position_t odd_x = index_x(rightmost_in_odd_rows, width);
+    position_t odd_y = index_y(rightmost_in_odd_rows, width);
+    position_t even_x = index_x(rightmost_in_even_rows, width);
+    position_t even_y = index_y(rightmost_in_even_rows, width);
 
     if (odd_x > even_x) {
       return rightmost_in_odd_rows;

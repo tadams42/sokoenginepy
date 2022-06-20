@@ -22,12 +22,12 @@ position_t OctobanTessellation::neighbor_position(position_t position,
                                                   const Direction &direction,
                                                   board_size_t width,
                                                   board_size_t height) const {
-  position_t row = Y(position, width), column = X(position, width);
+  position_t row = index_y(position, width), column = index_x(position, width);
 
   if (cell_orientation(position, width, height) != CellOrientation::OCTAGON &&
       (direction == Direction::NORTH_EAST || direction == Direction::NORTH_WEST ||
        direction == Direction::SOUTH_EAST || direction == Direction::SOUTH_WEST)) {
-    return Config::MAX_POS + 1;
+    return Config::NO_POS;
   }
 
   switch (direction) {
@@ -63,53 +63,53 @@ position_t OctobanTessellation::neighbor_position(position_t position,
     throw invalid_argument(
       "Unsupported Direction received in OctobanTessellation neighbor_position!");
   }
-  if (ON_BOARD(column, row, width, height))
+  if (is_on_board_2d(column, row, width, height))
     return index_1d(column, row, width);
   else
-    return Config::MAX_POS + 1;
+    return Config::NO_POS;
 }
 
 PusherStep OctobanTessellation::char_to_pusher_step(char rv) const {
   switch (rv) {
   case io::Snapshot::l:
-    return PusherStep(Direction::LEFT, false);
+    return PusherStep(Direction::LEFT, Config::NO_ID);
   case io::Snapshot::L:
-    return PusherStep(Direction::LEFT, true);
+    return PusherStep(Direction::LEFT, Config::DEFAULT_ID);
 
   case io::Snapshot::u:
-    return PusherStep(Direction::UP, false);
+    return PusherStep(Direction::UP, Config::NO_ID);
   case io::Snapshot::U:
-    return PusherStep(Direction::UP, true);
+    return PusherStep(Direction::UP, Config::DEFAULT_ID);
 
   case io::Snapshot::r:
-    return PusherStep(Direction::RIGHT, false);
+    return PusherStep(Direction::RIGHT, Config::NO_ID);
   case io::Snapshot::R:
-    return PusherStep(Direction::RIGHT, true);
+    return PusherStep(Direction::RIGHT, Config::DEFAULT_ID);
 
   case io::Snapshot::d:
-    return PusherStep(Direction::DOWN, false);
+    return PusherStep(Direction::DOWN, Config::NO_ID);
   case io::Snapshot::D:
-    return PusherStep(Direction::DOWN, true);
+    return PusherStep(Direction::DOWN, Config::DEFAULT_ID);
 
   case io::Snapshot::w:
-    return PusherStep(Direction::NORTH_WEST, false);
+    return PusherStep(Direction::NORTH_WEST, Config::NO_ID);
   case io::Snapshot::W:
-    return PusherStep(Direction::NORTH_WEST, true);
+    return PusherStep(Direction::NORTH_WEST, Config::DEFAULT_ID);
 
   case io::Snapshot::e:
-    return PusherStep(Direction::SOUTH_EAST, false);
+    return PusherStep(Direction::SOUTH_EAST, Config::NO_ID);
   case io::Snapshot::E:
-    return PusherStep(Direction::SOUTH_EAST, true);
+    return PusherStep(Direction::SOUTH_EAST, Config::DEFAULT_ID);
 
   case io::Snapshot::n:
-    return PusherStep(Direction::NORTH_EAST, false);
+    return PusherStep(Direction::NORTH_EAST, Config::NO_ID);
   case io::Snapshot::N:
-    return PusherStep(Direction::NORTH_EAST, true);
+    return PusherStep(Direction::NORTH_EAST, Config::DEFAULT_ID);
 
   case io::Snapshot::s:
-    return PusherStep(Direction::SOUTH_WEST, false);
+    return PusherStep(Direction::SOUTH_WEST, Config::NO_ID);
   case io::Snapshot::S:
-    return PusherStep(Direction::SOUTH_WEST, true);
+    return PusherStep(Direction::SOUTH_WEST, Config::DEFAULT_ID);
 
   default:
     throw invalid_argument("Illegal PusherStep direction in SokobanTessellation!");
@@ -142,8 +142,8 @@ char OctobanTessellation::pusher_step_to_char(const PusherStep &rv) const {
 CellOrientation OctobanTessellation::cell_orientation(position_t pos,
                                                       board_size_t width,
                                                       board_size_t height) const {
-  position_t column = COLUMN(pos, width);
-  position_t row = ROW(pos, width);
+  position_t column = index_column(pos, width);
+  position_t row = index_row(pos, width);
   return ((column + (row % 2)) % 2 == 0) ? CellOrientation::OCTAGON
                                          : CellOrientation::DEFAULT;
 }

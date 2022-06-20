@@ -15,7 +15,19 @@ class PuzzlePrinter;
 } // namespace implementation
 
 ///
-/// Game board with accompanying metadata.
+/// Base class for game puzzles.
+///
+/// Game puzzle is representation of game board together with all of its meta data and
+/// snapshots. It implements:
+///
+/// - parsing board data from text
+/// - editing board: setting individual cells, resizing, trimming, ...
+///
+/// All positions used are 1D array indexes.
+///
+/// To convert 2D board coordinates into 1D array indexes, use index_1d(). To convert 1D
+/// array indexes into board 2D coordinates, use one of index_row(), index_x()
+/// index_column() and index_y().
 ///
 class LIBSOKOENGINE_API Puzzle {
 public:
@@ -67,6 +79,12 @@ public:
            is_goal(ch);
   }
 
+  ///
+  /// Checks if line contains only characters legal in textual representation of boards.
+  ///
+  /// Doesn't check if it actually contains legal board, it only checks that there are
+  /// no illegal characters.
+  ///
   static bool is_board(const std::string &line);
   static bool is_sokoban_plus(const std::string &line);
 
@@ -104,13 +122,13 @@ public:
   std::string repr() const;
 
   ///
-  /// Formatted string representation of board.
+  /// Formatted output of parsed and validated board.
   ///
   std::string to_board_str(bool use_visible_floor = false,
                            bool rle_encode = false) const;
 
   ///
-  /// Original, non-parsed board string.
+  /// Original, non-parsed board.
   ///
   const std::string &board() const;
   void set_board(const std::string &board);
@@ -170,70 +188,6 @@ private:
   std::unique_ptr<PIMPL> m_impl;
 };
 
-namespace implementation {
-
-typedef std::vector<char> parsed_board_t;
-
-void LIBSOKOENGINE_LOCAL _copy(parsed_board_t &parsed_board, board_size_t &width,
-                               board_size_t &height, const Strings &strings);
-
-class LIBSOKOENGINE_LOCAL PuzzleResizer {
-public:
-  virtual ~PuzzleResizer() = default;
-
-  virtual void add_row_top(parsed_board_t &parsed_board, board_size_t &width,
-                           board_size_t &height) const;
-  virtual void add_row_bottom(parsed_board_t &parsed_board, board_size_t &width,
-                              board_size_t &height) const;
-  virtual void add_column_left(parsed_board_t &parsed_board, board_size_t &width,
-                               board_size_t &height) const;
-  virtual void add_column_right(parsed_board_t &parsed_board, board_size_t &width,
-                                board_size_t &height) const;
-
-  virtual void remove_row_top(parsed_board_t &parsed_board, board_size_t &width,
-                              board_size_t &height) const;
-  virtual void remove_row_bottom(parsed_board_t &parsed_board, board_size_t &width,
-                                 board_size_t &height) const;
-  virtual void remove_column_left(parsed_board_t &parsed_board, board_size_t &width,
-                                  board_size_t &height) const;
-  virtual void remove_column_right(parsed_board_t &parsed_board, board_size_t &width,
-                                   board_size_t &height) const;
-
-  virtual void trim_left(parsed_board_t &parsed_board, board_size_t &width,
-                         board_size_t &height) const;
-  virtual void trim_right(parsed_board_t &parsed_board, board_size_t &width,
-                          board_size_t &height) const;
-  virtual void trim_top(parsed_board_t &parsed_board, board_size_t &width,
-                        board_size_t &height) const;
-  virtual void trim_bottom(parsed_board_t &parsed_board, board_size_t &width,
-                           board_size_t &height) const;
-
-  virtual void reverse_rows(parsed_board_t &parsed_board, board_size_t &width,
-                            board_size_t &height) const;
-  virtual void reverse_columns(parsed_board_t &parsed_board, board_size_t &width,
-                               board_size_t &height) const;
-};
-
-class LIBSOKOENGINE_LOCAL PuzzleParser {
-public:
-  virtual ~PuzzleParser() = default;
-
-  virtual Strings parse(const std::string &board) const;
-  static size_t calculate_width(const Strings &strings);
-  static Strings normalize_width(const Strings &strings, char fill_chr = ' ');
-  static Strings cleaned_board_lines(const std::string &line);
-};
-
-class LIBSOKOENGINE_LOCAL PuzzlePrinter {
-public:
-  virtual ~PuzzlePrinter() = default;
-
-  virtual std::string print(const parsed_board_t &parsed_board, board_size_t width,
-                            board_size_t height, bool use_visible_floor = false,
-                            bool rle_encode = false) const;
-};
-
-} // namespace implementation
 } // namespace io
 } // namespace sokoengine
 

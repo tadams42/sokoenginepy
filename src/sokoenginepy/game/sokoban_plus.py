@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Final, List, Optional
+from typing import Dict, Final, List
 
 from .config import Config
 
@@ -35,6 +35,11 @@ class SokobanPlus:
     must also contain number 42 twice.
 
     Sokoban+ data parser accepts any positive integer as plus id.
+
+    Arguments:
+        boxorder: Space separated integers describing Sokoban+ IDs for boxes
+        goalorder: Space separated integers describing Sokoban+ IDs for goals
+        pieces_count: Total count of boxes/goals on board
     """
 
     LEGACY_DEFAULT_PLUS_ID: Final[int] = 99
@@ -48,18 +53,10 @@ class SokobanPlus:
     #: transparently.
     DEFAULT_PLUS_ID: Final[int] = 0
 
-    def __init__(
-        self,
-        pieces_count: int,
-        boxorder: Optional[str] = None,
-        goalorder: Optional[str] = None,
-    ):
-        """
-        Args:
-            boxorder: Space separated integers describing Sokoban+ IDs for boxes
-            goalorder: Space separated integers describing Sokoban+ IDs for goals
-            pieces_count: Total count of boxes/goals on board
-        """
+    def __init__(self, pieces_count: int, boxorder: str = "", goalorder: str = ""):
+        if pieces_count < 0:
+            raise ValueError("pieces_count must be >= 0!")
+
         self._is_enabled = False
         self._is_validated = False
         self._errors: List[str] = []
@@ -80,6 +77,8 @@ class SokobanPlus:
 
     @pieces_count.setter
     def pieces_count(self, rv):
+        if rv < 0:
+            raise ValueError("pieces_count must be >= 0!")
         if rv != self._pieces_count:
             self.is_enabled = False
             self._is_validated = False
@@ -140,6 +139,10 @@ class SokobanPlus:
 
     @property
     def is_enabled(self) -> bool:
+        """
+        Raises:
+            :exc:`SokobanPlusDataError`: Trying to enable invalid Sokoban+
+        """
         return self._is_enabled
 
     @property
@@ -148,10 +151,6 @@ class SokobanPlus:
 
     @is_enabled.setter
     def is_enabled(self, value):
-        """
-        Raises:
-            :exc:`SokobanPlusDataError`: Trying to enable invalid Sokoban+
-        """
         if value:
             if not self.is_valid:
                 raise SokobanPlusDataError(self._errors)
@@ -246,7 +245,7 @@ class SokobanPlus:
 
         retv = dict()
         for index, plus_id in enumerate(expanded):
-            retv[Config.DEFAULT_PIECE_ID + index] = plus_id
+            retv[Config.DEFAULT_ID + index] = plus_id
 
         return retv
 
