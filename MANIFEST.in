@@ -2,6 +2,7 @@ prune build
 graft cmake
 graft docs
 prune docs/_build
+prune docs/_doxygen
 prune scratchpad
 graft src
 graft tests
