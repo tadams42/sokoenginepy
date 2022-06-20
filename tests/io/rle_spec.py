@@ -61,3 +61,9 @@ class DescribeRle:
         assert Rle.decode("\n\n\n") == "\n\n\n"
         assert Rle.decode("\n|\n") == "\n\n\n"
         assert Rle.decode("|||") == "\n\n\n"
+
+    def it_correctly_encodes_newlines(self):
+        board = "---#-#-#-#----------\n--#-------#---------\n-#-@-----#----------"
+
+        assert Rle.encode(board) == "3-#-#-#-#10-|2-#7-#9-|-#-@5-#10-"
+        assert Rle.decode(Rle.encode(board)) == board

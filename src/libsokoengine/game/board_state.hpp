@@ -8,12 +8,18 @@
 namespace sokoengine {
 namespace game {
 
-
 ///
-/// State snapshot.
+/// Sample of board state.
+///
+/// @sa
+///   - BoardManager
+///   - HashedBoardManager
 ///
 class LIBSOKOENGINE_API BoardState {
 public:
+  ///
+  /// Integer used for situations where board hash has not been calculated.
+  ///
   static constexpr zobrist_key_t NO_HASH = 0;
 
   BoardState(const Positions &pushers_positions = Positions(),
@@ -28,16 +34,33 @@ public:
   bool operator==(const BoardState &rv) const;
   bool operator!=(const BoardState &rv) const;
 
+  ///
+  /// Positions of pushers sorted by pusher ID.
+  ///
   const Positions &pushers_positions() const;
   Positions &pushers_positions();
 
+  ///
+  /// Positions of boxes sorted by pusher ID.
+  ///
   const Positions &boxes_positions() const;
   Positions &boxes_positions();
 
+  ///
+  /// Zobrist hash of state.
+  ///
+  /// @sa HashedBoardManager
+  ///
   zobrist_key_t zobrist_hash() const;
   zobrist_key_t &zobrist_hash();
 
+  ///
+  /// Pretty print object
+  ///
   std::string str() const;
+  ///
+  /// Pretty print object
+  ///
   std::string repr() const;
 
 private:

@@ -51,8 +51,12 @@ class DescribeHexobanPuzzle:
                 assert not raised, fail_msg
                 assert in_puzzle.board == src, fail_msg
                 assert out_puzzle.board == parsed, fail_msg
-                assert str(in_puzzle) == parsed, fail_msg
-                assert str(in_puzzle) == str(out_puzzle), fail_msg
+                assert (
+                    in_puzzle.to_board_str(use_visible_floor=True) == parsed
+                ), fail_msg
+                assert in_puzzle.to_board_str(
+                    use_visible_floor=True
+                ) == out_puzzle.to_board_str(use_visible_floor=True), fail_msg
                 assert in_puzzle.width == parsed_width, fail_msg
                 assert in_puzzle.height == parsed_height, fail_msg
 
@@ -76,8 +80,12 @@ class DescribeHexobanPuzzle:
                 assert not raised, fail_msg
                 assert in_puzzle.board == src, fail_msg
                 assert out_puzzle.board == parsed, fail_msg
-                assert str(in_puzzle) == parsed, fail_msg
-                assert str(in_puzzle) == str(out_puzzle), fail_msg
+                assert (
+                    in_puzzle.to_board_str(use_visible_floor=True) == parsed
+                ), fail_msg
+                assert in_puzzle.to_board_str(
+                    use_visible_floor=True
+                ) == out_puzzle.to_board_str(use_visible_floor=True), fail_msg
                 assert in_puzzle.width == parsed_width, fail_msg
                 assert in_puzzle.height == parsed_height, fail_msg
 
@@ -98,7 +106,7 @@ class DescribeHexobanPuzzle:
                     raised = True
 
                 assert not raised, fail_msg
-                assert str(puzzle) == result, fail_msg
+                assert puzzle.to_board_str(use_visible_floor=True) == result, fail_msg
                 assert puzzle.width == test_case["result_width"], fail_msg
                 assert puzzle.height == test_case["result_height"], fail_msg
 
@@ -120,7 +128,7 @@ class DescribeHexobanPuzzle:
                     raised = True
 
                 assert not raised, fail_msg
-                assert str(puzzle) == result, fail_msg
+                assert puzzle.to_board_str(use_visible_floor=True) == result, fail_msg
                 assert puzzle.width == test_case["result_width"], fail_msg
                 assert puzzle.height == test_case["result_height"], fail_msg
 

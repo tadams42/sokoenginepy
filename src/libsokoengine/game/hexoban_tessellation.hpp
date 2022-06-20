@@ -7,7 +7,27 @@ namespace sokoengine {
 namespace game {
 
 ///
-/// Tessellation for Hexoban.
+/// Tessellation for Hexoban game variant.
+///
+/// Board space is laid out on vertical hexagons with following coordinate system:
+///
+/// @image html hexoban_coordinates.png
+///
+/// Textual representation uses two characters for each hexagon. This allows different
+/// encoding schemes.
+///
+/// | Scheme 1                 | Scheme 2                 |
+/// | ------------------------ | ------------------------ |
+/// | ![](hexoban_scheme1.png) | ![](hexoban_scheme2.png) |
+///
+/// As long as encoding of single board is consistent, all methods handle any scheme
+/// transparently - parsing of board strings 'Just Works (TM)'
+///
+/// Direction <-> character mapping:
+///
+/// | LEFT | RIGHT | NORTH_WEST | SOUTH_WEST | NORTH_EAST | SOUTH_EAST |
+/// | ---- | ----- | ---------- | ---------- | ---------- | ---------- |
+/// | l, L | r, R  | u, U       | d, D       | n, N       | s, S       |
 ///
 class LIBSOKOENGINE_API HexobanTessellation : public BaseTessellation {
 public:

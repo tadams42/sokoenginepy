@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import enum
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, ClassVar, Mapping, Optional, Tuple, Union
+from multiprocessing.sharedctypes import Value
+from turtle import width
+from typing import TYPE_CHECKING, ClassVar, Mapping, Tuple, Union
 
 from ..io import CellOrientation
-from .config import Direction, GraphType
+from .config import Config, Direction, GraphType
 from .pusher_step import PusherStep
 
 if TYPE_CHECKING:
@@ -16,49 +18,23 @@ if TYPE_CHECKING:
 
 
 class Tessellation(enum.Enum):
+    """Supported game tessellations."""
+
+    #: See Also:
+    #      :class:`.SokobanTessellation`
     SOKOBAN = 0
+
+    #: See Also:
+    #      :class:`.HexobanTessellation`
     HEXOBAN = 1
+
+    #: See Also:
+    #      :class:`.TriobanTessellation`
     TRIOBAN = 2
+
+    #: See Also:
+    #      :class:`.OctobanTessellation`
     OCTOBAN = 3
-
-
-def index_1d(x: int, y: int, board_width: int) -> int:
-    """Converts 2D coordinate to board position index."""
-    return y * board_width + x
-
-
-def X(index: int, board_width: int) -> int:
-    """x component of board position index."""
-    return 0 if board_width == 0 else index % board_width
-
-
-def Y(index: int, board_width: int) -> int:
-    """y component of board position index."""
-    return 0 if board_width == 0 else int(index / board_width)
-
-
-def ROW(index: int, board_width: int) -> int:
-    """x component of board position index."""
-    return Y(index, board_width)
-
-
-def COLUMN(index: int, board_width: int) -> int:
-    """y component of board position index."""
-    return X(index, board_width)
-
-
-def is_on_board_2d(x: int, y: int, board_width: int, board_height: int) -> bool:
-    return x >= 0 and y >= 0 and x < board_width and y < board_height
-
-
-def is_on_board_1d(index: Optional[int], board_width: int, board_height: int) -> bool:
-    return (
-        index is not None
-        and index >= 0
-        and is_on_board_2d(
-            X(index, board_width), Y(index, board_width), board_width, board_height
-        )
-    )
 
 
 class BaseTessellation(metaclass=ABCMeta):
@@ -105,7 +81,7 @@ class BaseTessellation(metaclass=ABCMeta):
     @abstractmethod
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
+    ) -> int:
         """
         Calculates neighbor position in given direction.
 
@@ -113,14 +89,15 @@ class BaseTessellation(metaclass=ABCMeta):
 
         To convert 2D coordinates into vertex index, use :func:`.index_1d` method.
 
-        To convert 1D vertex index into 2D coordinates, use combinations of :func:`.ROW`
-        and :func:`.COLUMN` functions.
+        To convert 1D vertex index into 2D coordinates, use combinations of
+        :func:`.index_row` and :func:`.index_column` functions.
 
         Returns:
-            int: New position or `None` when new position would be off-board.
+            int: New position or `.Config.NO_POS` when new position would be off-board.
 
         Raises:
-            :exc:`ValueError`: ``direction`` is not one of :attr:`legal_directions`
+            :exc:`ValueError`: ``direction`` is not one of :attr:`legal_directions` or
+                ``board_width`` is invalid value or ``board_height`` is invalid value.
         """
         pass
 
@@ -160,7 +137,10 @@ class BaseTessellation(metaclass=ABCMeta):
         except KeyError:
             raise ValueError(input_chr)
 
-        return PusherStep(direction=direction, box_moved=box_moved)
+        return PusherStep(
+            direction=direction,
+            moved_box_id=Config.NO_ID if not box_moved else Config.DEFAULT_ID,
+        )
 
     def cell_orientation(
         self, position: int, board_width: int, board_height: int
@@ -168,4 +148,13 @@ class BaseTessellation(metaclass=ABCMeta):
         """
         Calculates board cell orientation for given coordinate.
         """
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
+        if board_width < 0:
+            raise ValueError(f"Board width {board_width} is invalid value!")
+
+        if board_height < 0:
+            raise ValueError(f"Board height {board_height} is invalid value!")
+
         return CellOrientation.DEFAULT

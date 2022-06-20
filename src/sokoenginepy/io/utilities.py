@@ -7,7 +7,7 @@ _RE_ONLY_DIGITS_AND_SPACES = re.compile(r"^([0-9\s])*$")
 
 
 def is_blank(data: Optional[Union[str, List[str]]]) -> bool:
-    """True if ``line`` is empty or it contains only spaces."""
+    """Line is blank if it is either length 0 or contains only spaces."""
 
     _check = lambda l: l is None or l.strip() == ""
 

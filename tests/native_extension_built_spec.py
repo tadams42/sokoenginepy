@@ -1,5 +1,4 @@
 import glob
-
 import inspect
 import os
 from inspect import getsourcefile
@@ -47,25 +46,21 @@ def io_members_py_only():
 
 @pytest.fixture
 def game_members():
-    return {
+    klasses = {
         "BaseTessellation",
         "BoardCell",
         "BoardGraph",
         "BoardManager",
         "BoardState",
-        "BoxGoalSwitchError",
-        "CellAlreadyOccupiedError",
         "Direction",
+        "Edge",
         "GraphType",
         "HashedBoardManager",
         "HexobanTessellation",
-        "IllegalMoveError",
         "Mover",
-        "NonPlayableBoardError",
         "OctobanTessellation",
         "PusherStep",
         "SokobanPlus",
-        "SokobanPlusDataError",
         "SokobanTessellation",
         "SolvingMode",
         "Tessellation",
@@ -73,15 +68,24 @@ def game_members():
         "Config",
     }
 
+    exceptions = {
+        "BoxGoalSwitchError",
+        "CellAlreadyOccupiedError",
+        "IllegalMoveError",
+        "NonPlayableBoardError",
+        "SokobanPlusDataError",
+    }
+
+    return klasses.union(exceptions)
+
 
 @pytest.fixture
 def game_members_native_only():
     return {
-        # Makes no sense in Python layer because board size is not limited (yet) in
-        # Python
-        "BoardSizeExceededError",
         # Mapped to Python KeyError
-        "ExtKeyError",
+        "PieceNotFoundError",
+        # Mapped to Python IndexError
+        "InvalidPositionError",
     }
 
 
@@ -90,16 +94,16 @@ def game_members_py_only():
     # Stuff that is always used from Python implementation, even when native extension
     # is built and loaded
     return {
-        "COLUMN",
-        "JumpCommand",
-        "MoveCommand",
-        "ROW",
-        "SelectPusherCommand",
-        "X",
-        "Y",
         "index_1d",
+        "index_column",
+        "index_row",
+        "index_x",
+        "index_y",
         "is_on_board_1d",
         "is_on_board_2d",
+        "JumpCommand",
+        "MoveCommand",
+        "SelectPusherCommand",
     }
 
 

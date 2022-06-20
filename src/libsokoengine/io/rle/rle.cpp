@@ -107,12 +107,12 @@ string Rle::encode(const string &line) {
   next_found = to_encode.find_first_not_of(to_encode[found], found);
   while (next_found != string::npos) {
     if (next_found - found > 1) { oss << next_found - found; }
-    oss << to_encode[found];
+    oss << (to_encode[found] == '\n' ? EOL : to_encode[found]);
     found = next_found;
     next_found = to_encode.find_first_not_of(to_encode[found], found);
   }
   if (to_encode.length() - found > 1) { oss << to_encode.length() - found; }
-  oss << to_encode[found];
+  oss << (to_encode[found] == '\n' ? EOL : to_encode[found]);
   to_encode = oss.str();
 
   return to_encode;

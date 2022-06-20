@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
+from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import networkx as nx
@@ -11,10 +12,21 @@ from .board_cell import BoardCell
 from .config import Config, Direction, GraphType
 
 # (1, 0, {'direction': Direction.LEFT})
-Edge = Tuple[int, int, Dict[str, Union[Direction, int]]]
+_InternalEdge = Tuple[int, int, Dict[str, Union[Direction, int]]]
 BoardCellOrStr = Union[BoardCell, str]
 Positions = List[int]
 Directions = List[Direction]
+
+
+@dataclass
+class Edge:
+    """
+    `BoardGraph` edge.
+    """
+
+    u: int
+    v: int
+    direction: Direction
 
 
 class BoardGraph:
@@ -23,6 +35,10 @@ class BoardGraph:
 
     Depending on how ``sokoenginepy`` was installed, it is using either ``NetworkX`` or
     ``Boost.Graph`` under the hood.
+
+    Raises:
+        ValueError: when ``puzzle`` width is greater than `.Config.MAX_WIDTH` or
+            or ``puzzle`` height is greater than `.Config.MAX_HEIGHT`
     """
 
     _KEY_CELL = "cell"
@@ -30,10 +46,13 @@ class BoardGraph:
     _MAX_EDGE_WEIGHT = 100  # must be > len(Direction)
 
     def __init__(self, puzzle: Puzzle):
-        if puzzle.width > Config.MAX_HEIGHT or puzzle.height > Config.MAX_WIDTH:
+        if puzzle.width > Config.MAX_HEIGHT:
             raise ValueError(
-                "Board width and height must be >= 0 and <= MAX_BOARD_WIDTH, "
-                "MAX_BOARD_HEIGHT`!"
+                f"Puzzle width {puzzle.width} must be <= Config.MAX_WIDTH!"
+            )
+        if puzzle.height > Config.MAX_WIDTH:
+            raise ValueError(
+                f"Puzzle height {puzzle.height} must be <= Config.MAX_HEIGHT!"
             )
 
         self._board_width = puzzle.width
@@ -52,30 +71,34 @@ class BoardGraph:
             self._graph.add_node(
                 position, **{self._KEY_CELL: BoardCell(puzzle[position])}
             )
-        self.reconfigure_edges()
+        self._reconfigure_edges()
 
     def __getitem__(self, position: int) -> BoardCell:
+        """
+        Raises:
+            IndexError: ``position`` is off board
+        """
+
         try:
             return self._graph.nodes[position][self._KEY_CELL]
 
         except KeyError as e:
-            if isinstance(position, int) and position >= 0:
-                raise IndexError from e
-            else:
-                raise
+            raise IndexError(f"Board index {position} is out of range!") from e
 
     def __setitem__(self, position: int, board_cell: BoardCellOrStr):
+        """
+        Raises:
+            IndexError: ``position`` is off board
+        """
+
         try:
             if isinstance(board_cell, BoardCell):
                 self._graph.nodes[position][self._KEY_CELL] = board_cell
             else:
                 self._graph.nodes[position][self._KEY_CELL] = BoardCell(board_cell)
 
-        except KeyError as e:
-            if isinstance(position, int) and position >= 0:
-                raise IndexError from e
-            else:
-                raise
+        except (KeyError, IndexError, nx.NetworkXError) as e:
+            raise IndexError(f"Board index {position} is out of range!") from e
 
     def __contains__(self, position: int) -> bool:
         return position in self._graph
@@ -89,17 +112,13 @@ class BoardGraph:
             self._tessellation, self._board_width, self._board_height
         )
 
-        for pos in range(self.vertices_count):
+        for pos in range(self._vertices_count):
             puzzle[pos] = self[pos].to_str()
 
         return puzzle.to_board_str(use_visible_floor, rle_encode)
 
     def __str__(self) -> str:
-        return self.to_board_str(True)
-
-    @property
-    def vertices_count(self) -> int:
-        return self._graph.number_of_nodes()
+        return self.to_board_str(False)
 
     @property
     def size(self) -> int:
@@ -117,98 +136,53 @@ class BoardGraph:
     def board_height(self) -> int:
         return self._board_height
 
-    def has_edge(self, src: int, dst: int, direction: Direction) -> bool:
-        retv = False
-        out_edge: Edge
+    def out_edges(self, src: int) -> List[Edge]:
+        """
+        Edges inspector, for debugging purposes.
+
+        Raises:
+            IndexError: ``src`` is off board
+        """
+        retv = []
+
         try:
-            if src is not None:
-                for out_edge in self._graph.edges(src, data=True):
-                    retv = retv or (
-                        out_edge[1] == dst
-                        and out_edge[2][self._KEY_DIRECTION] == direction
+            for out_edge in self._graph.edges(src, data=True):
+                retv.append(
+                    Edge(
+                        u=src,
+                        v=out_edge[1],
+                        direction=out_edge[2][self._KEY_DIRECTION],
+                        # weight=out_edge[2].get("weight", None),
                     )
-                    if retv:
-                        break
+                )
 
-        except (KeyError, IndexError, nx.NetworkXError):
-            pass
-
-        return retv
-
-    def out_edges_count(self, src: int, dst: int) -> int:
-        """
-        Number of out-edges from ``src`` to ``dst``.
-
-        Returns:
-            Zero when no out edges exist or or any of positions is illegal type or out
-            of bound board index.
-        """
-        try:
-            # retv = self._graph.number_of_edges(src, dst)
-            retv = len(self._graph[src][dst])
-        except (KeyError, IndexError, nx.NetworkXError):
-            retv = 0
+        except (KeyError, IndexError, nx.NetworkXError) as e:
+            raise IndexError(f"Board index {src} is out of range!")
 
         return retv
 
-    def remove_all_edges(self):
-        self._graph.remove_edges_from(list(self._graph.edges.keys()))
-
-    def add_edge(self, src: int, neighbor: int, direction: Direction):
+    def neighbor(self, src: int, direction: Direction) -> int:
         """
-        Adds edges between to existing positions.
-
-        Raises:
-            IndexError: ``src`` or ``neighbor`` off board
-            KeyError: ``src`` or ``neighbor`` illegal values
-        """
-        if self[src] and self[neighbor]:
-            self._graph.add_edge(src, neighbor, direction=direction)
-
-    def out_edge_weight(self, target_position: int) -> int:
-        """
-        Calculates edge weight based on BoardCell on ``target_position``.
-
-        Raises:
-            IndexError: ``target_position`` off board
-            KeyError: ``target_position`` illegal values
-        """
-        target_cell = self[target_position]
-
-        weight = 1
-        if target_cell and (
-            target_cell.is_wall or target_cell.has_box or target_cell.has_pusher
-        ):
-            weight = self._MAX_EDGE_WEIGHT
-
-        return weight
-
-    def neighbor(self, src: int, direction: Direction) -> Optional[int]:
-        """
-        Calculates neighbor position in ``direction``.
+        Neighbor position in ``direction``.
 
         Returns:
-            Target position or `None`.
+            Target position or Config.NO_POS
 
         Raises:
-            IndexError: ``src`` off board
-            KeyError: ``src`` illegal values
+            IndexError: ``src`` is off board
         """
-        out_edge: Edge
+        out_edge: InternalEdge
         if self[src]:
             for out_edge in self._graph.edges(src, data=True):
                 if out_edge[2][self._KEY_DIRECTION] == direction:
                     return out_edge[1]
 
-        return None
+        return Config.NO_POS
 
     def wall_neighbors(self, src: int) -> Positions:
         """
-        Gets a list of all neighboring walls.
-
         Raises:
             IndexError: ``src`` off board
-            KeyError: ``src`` illegal values
         """
         if self[src]:
             return [n for n in self._graph.neighbors(src) if self[n].is_wall]
@@ -217,11 +191,8 @@ class BoardGraph:
 
     def all_neighbors(self, src: int) -> Positions:
         """
-        Gets a list of all neighbors.
-
         Raises:
             IndexError: ``src`` off board
-            KeyError: ``src`` illegal values
         """
 
         if self[src]:
@@ -236,11 +207,10 @@ class BoardGraph:
 
         Raises:
             IndexError: ``src`` or ``dst`` off board
-            KeyError: ``src`` or ``dst`` illegal values
         """
 
         if self[src] and self[dst]:
-            edge: Edge
+            edge: _InternalEdge
             for edge in self._graph.edges(data=True):
                 edge[2]["weight"] = 1
 
@@ -254,16 +224,15 @@ class BoardGraph:
     def dijkstra_path(self, src: int, dst: int) -> Positions:
         """
         Calculates shortest path between two positions not passing through board
-        obstacles (walls, other pushers, etc...).
+        obstacles (walls, boxes, other pushers, etc...).
 
         Raises:
             IndexError: ``src`` or ``dst`` off board
-            KeyError: ``src`` or ``dst`` illegal values
         """
         if self[src] and self[dst]:
-            edge: Edge
+            edge: _InternalEdge
             for edge in self._graph.edges(data=True):
-                edge[2]["weight"] = self.out_edge_weight(edge[1])
+                edge[2]["weight"] = self._out_edge_weight(edge[1])
 
             try:
                 return nx.dijkstra_path(self._graph, src, dst)
@@ -274,24 +243,20 @@ class BoardGraph:
 
     def find_jump_path(self, src: int, dst: int) -> Positions:
         """
-        Returns:
-            List of positions through which pusher must pass when jumping
+        Finds list of positions through which pusher must pass when jumping
 
         Raises:
             IndexError: ``src`` or ``dst`` off board
-            KeyError: ``src`` or ``dst`` illegal values
         """
         return self.shortest_path(src, dst)
 
     def find_move_path(self, src: int, dst: int) -> Positions:
         """
-        Returns:
-            List of positions through which pusher must pass when moving without
-            pushing boxes
+        Finds list of positions through which pusher must pass when moving without
+        pushing boxes
 
         Raises:
             IndexError: ``src`` or ``dst`` off board
-            KeyError: ``src`` or ``dst`` illegal values
         """
         path = self.dijkstra_path(src, dst)
 
@@ -311,7 +276,6 @@ class BoardGraph:
 
         Raises:
             IndexError: Any of positions in ``positions`` off board
-            KeyError: Any of positions in ``positions`` are illegal values
         """
 
         if positions:
@@ -322,7 +286,7 @@ class BoardGraph:
         retv = []
 
         src_position_index = 0
-        out_edge: Edge
+        out_edge: _InternalEdge
         for dst in positions[1:]:
             src_position = positions[src_position_index]
             src_position_index += 1
@@ -340,7 +304,7 @@ class BoardGraph:
         any box or any pusher.
         """
         piece_positions = []
-        for position in range(0, self.vertices_count):
+        for position in range(0, self._vertices_count):
             if self[position].has_box or self[position].has_pusher:
                 self[position].is_in_playable_area = True
                 piece_positions.append(position)
@@ -359,9 +323,14 @@ class BoardGraph:
         self, pusher_position: int, excluded_positions: Optional[Positions] = None
     ) -> Positions:
         """
-        Returns:
-            List of positions that are reachable by pusher standing on
-            ``pusher_position``.
+        Finds all positions that are reachable by pusher standing on
+        ``pusher_position``.
+
+        Doesn't require that ``pusher_position`` actually has pusher.
+
+        Raises:
+            IndexError: when ``pusher_position`` is off board. Doesn't throw if any
+                position in ``excluded_positions`` is off board; it simply ignores those
         """
         return self._reachables(
             root=pusher_position,
@@ -373,8 +342,13 @@ class BoardGraph:
         self, pusher_position: int, excluded_positions: Optional[Positions] = None
     ) -> int:
         """
-        Returns:
-            Top-left position reachable by pusher.
+        Finds top-left position reachable by pusher without pushing any boxes.
+
+        Doesn't require that ``pusher_position`` actually has pusher.
+
+        Raises:
+            IndexError: when ``pusher_position`` is off board. Doesn't throw if any
+                position in ``excluded_positions`` is off board; it simply ignores those
         """
         reachables = self.positions_reachable_by_pusher(
             pusher_position=pusher_position, excluded_positions=excluded_positions
@@ -385,29 +359,75 @@ class BoardGraph:
             return pusher_position
 
     def path_destination(self, src: int, directions: Directions) -> int:
+        """
+        Given movement path ``directions``, calculates position at the end of tha
+        movement.
+
+        If any direction in ``directions`` would've lead off board, stops the
+        search and returns position reached up to that point.
+        """
         if not directions:
             self[src]
 
         retv = src
         for direction in directions:
             next_target = self.neighbor(retv, direction)
-            if next_target:
+            if next_target != Config.NO_POS:
                 retv = next_target
             else:
                 break
         return retv
 
-    def reconfigure_edges(self):
+    def _out_edges_count(self, src: int, dst: int) -> int:
+        """
+        Number of out-edges from ``src`` to ``dst``.
+
+        Returns:
+            Zero when no out edges exist or or any of positions is illegal type or out
+            of board position.
+        """
+        try:
+            # retv = self._graph.number_of_edges(src, dst)
+            retv = len(self._graph[src][dst])
+        except (KeyError, IndexError, nx.NetworkXError):
+            retv = 0
+
+        return retv
+
+    def _remove_all_edges(self):
+        self._graph.remove_edges_from(list(self._graph.edges.keys()))
+
+    def _add_edge(self, src: int, neighbor: int, direction: Direction):
+        if self[src] and self[neighbor]:
+            self._graph.add_edge(src, neighbor, direction=direction)
+
+    def _out_edge_weight(self, target_position: int) -> int:
+        """Calculates edge weight based on BoardCell in ``target_position``."""
+        target_cell = self[target_position]
+
+        weight = 1
+        if target_cell and (
+            target_cell.is_wall or target_cell.has_box or target_cell.has_pusher
+        ):
+            weight = self._MAX_EDGE_WEIGHT
+
+        return weight
+
+    def _reconfigure_edges(self):
         tessellation = BaseTessellation.instance(self.tessellation)
 
-        self.remove_all_edges()
-        for src in range(self.vertices_count):
+        self._remove_all_edges()
+        for src in range(self._vertices_count):
             for direction in tessellation.legal_directions:
                 neighbor_position = tessellation.neighbor_position(
                     src, direction, self.board_width, self.board_height
                 )
-                if neighbor_position is not None:
-                    self.add_edge(src, neighbor_position, direction)
+                if neighbor_position >= 0 and neighbor_position != Config.NO_POS:
+                    self._add_edge(src, neighbor_position, direction)
+
+    @property
+    def _vertices_count(self) -> int:
+        return self._graph.number_of_nodes()
 
     _CurrentReachables = Sequence[int]
     _ToInspectVertices = Sequence[int]
@@ -442,7 +462,7 @@ class BoardGraph:
         reachables = deque()
 
         if self[root]:
-            visited = self.vertices_count * [False]
+            visited = self._vertices_count * [False]
             visited[root] = True
             to_inspect = deque([root])
 

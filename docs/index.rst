@@ -9,6 +9,7 @@ Tables of contents and indices
     install
     tutorial
     api_py
+    sok_file_format
     license
     changelog
 

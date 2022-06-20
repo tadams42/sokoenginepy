@@ -7,7 +7,15 @@ namespace sokoengine {
 namespace game {
 
 ///
-/// Tessellation for Sokoban.
+/// Tessellation for Sokoban game variant.
+///
+/// Board is laid out on squares.
+///
+/// Direction <-> character mapping:
+///
+/// | LEFT | RIGHT | UP   | DOWN |
+/// | ---- | ----- | ---- | ---- |
+/// | l, L | r, R  | u, U | d, D |
 ///
 class LIBSOKOENGINE_API SokobanTessellation : public BaseTessellation {
 public:

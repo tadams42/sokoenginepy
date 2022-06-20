@@ -1,15 +1,18 @@
 from __future__ import annotations
 
-from typing import Dict, Final, Optional, Tuple
+from typing import Dict, Final, Tuple
 
 from ..io import CellOrientation, Snapshot
-from .base_tessellation import COLUMN, ROW, BaseTessellation, index_1d, is_on_board_2d
-from .config import Direction
+from .base_tessellation import BaseTessellation
+from .config import Config, Direction
+from .coordinate_helpers import index_1d, index_column, index_row, is_on_board_2d
 from .utilities import inverted
 
 
 class OctobanTessellation(BaseTessellation):
     """
+    Tessellation for Octoban game variant.
+
     Board space is laid out on alternating squares and octagons with origin of
     coordinate system being octagon. Tessellation allows all 8 directions of movement
     from Direction and depending on current pusher position some of these directions do
@@ -71,7 +74,7 @@ class OctobanTessellation(BaseTessellation):
 
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
-    ) -> Optional[int]:
+    ) -> int:
         if self.cell_orientation(
             position, board_width, board_height
         ) != CellOrientation.OCTAGON and (
@@ -80,10 +83,10 @@ class OctobanTessellation(BaseTessellation):
             or direction == Direction.SOUTH_EAST
             or direction == Direction.SOUTH_WEST
         ):
-            return None
+            return Config.NO_POS
 
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
         row_shift, column_shift = self._NEIGHBOR_SHIFT.get(direction, (None, None))
 
         if row_shift is None or column_shift is None:
@@ -95,13 +98,22 @@ class OctobanTessellation(BaseTessellation):
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)
 
-        return None
+        return Config.NO_POS
 
     def cell_orientation(
         self, position: int, board_width: int, board_height: int
     ) -> CellOrientation:
-        row = ROW(position, board_width)
-        column = COLUMN(position, board_width)
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
+        if board_width < 0:
+            raise ValueError(f"Board width {board_width} is invalid value!")
+
+        if board_height < 0:
+            raise ValueError(f"Board height {board_height} is invalid value!")
+
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
         return (
             CellOrientation.OCTAGON
             if (column + (row % 2)) % 2 == 0

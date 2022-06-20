@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING, List, Optional, Set
+from typing import TYPE_CHECKING, List, Set
 
 from .board_manager import BoardManager
 from .board_state import BoardState
@@ -12,7 +12,8 @@ if TYPE_CHECKING:
 
 
 class HashedBoardManager(BoardManager):
-    """:class:`.BoardManager` with Zobrist hashing
+    """
+    Board manager that also manages Zobrist hashing.
 
     Adds Zobrist hashing on top of :class:`.BoardManager` and keeps it up to date
     when pieces are moved.
@@ -20,36 +21,29 @@ class HashedBoardManager(BoardManager):
     Zobrist hash is 64b integer hash derived from positions of all boxes and pushers
     on board.
 
-    When initialized, :class:`.HashedBoardManager` hashes board using positions and
-    IDs of boxes and pushers and produces 64b integer hash. After that, whenever
-    position of piece changes, this hash is updated. The ``Zobrist`` part means
-    hashing is deterministic which then means that undoing movement will return hash
-    value to previous one. All this allows for creation of position tables that
-    contain many board layouts and can be quickly compared (since we are not
-    comparing positions but only hashes of these positions). Being able to quickly
-    compare and find current board layout in some big table, speeds up searching
-    through game space which is needed for effective solver implementations.
+    This hash is "resistant" to moving board pieces. Moving one pusher and box will
+    change board hash. Undoing that move will return hash to previous value.
 
-    Boxes with same Sokoban+ ID are treated as equal meaning that if two of these
-    boxes switch position, hash will not change. This also means that hash is
-    different when Sokoban+ is enabled from the one when it is disabled
+    This kind of hash is reliable way for identifying board positions. Sokoban solvers
+    might need this to operate.
+
+    When hashing, boxes with same Sokoban+ ID are treated as equal meaning that if two
+    of these boxes switch position, hash will not change. This also means that for the
+    same board, hash is different when Sokoban+ is enabled from the one when it is
+    disabled.
 
     Pushers are all treated equal, meaning that if two pushers switch position, hash
     will not change
 
     Notes:
         - enabling/disabling Sokoban+ rehashes the board state
-        - changing position of pieces only updates existing hash, it doesn't rehash
-          whole board. This means that for example undoing box push would "undo" the
-          hash value to the one that was before move was preformed
+        - moving pieces doesn't need to re-hash whole board, it updates hash
+          incrementally
+        - undoing piece movement also updates hash incrementally with additional feature
+          that returning to previous board state will return to previous hash value
     """
 
-    def __init__(
-        self,
-        board: BoardGraph,
-        boxorder: Optional[str] = None,
-        goalorder: Optional[str] = None,
-    ):
+    def __init__(self, board: BoardGraph, boxorder: str = "", goalorder: str = ""):
         super().__init__(board, boxorder, goalorder)
         self._initial_state_hash = None
         self._state_hash = None
@@ -134,14 +128,12 @@ class HashedBoardManager(BoardManager):
 
     @property
     def initial_state_hash(self) -> int:
-        """
-        Zobrist hash of initial board state (before any movement happened).
-        """
+        """Zobrist hash of initial board state (before any movement happened)."""
         if self._state_hash is None or self._initial_state_hash is None:
             self._zobrist_rehash()
         return self._initial_state_hash
 
-    def external_state_hash(self, board_state) -> Optional[int]:
+    def external_state_hash(self, board_state) -> int:
         """
         Calculates Zobrist hash of given ``board_state`` as if that ``board_state``
         was applied to initial ``board`` (to board where no movement happened).
@@ -152,19 +144,19 @@ class HashedBoardManager(BoardManager):
             and len(board_state.boxes_positions) == self.goals_count
 
         Returns:
-            Value of hash or None if it can't be calculated
+            Value of hash or `BoardState.NO_HASH` if it can't be calculated
         """
         if (
             len(board_state.boxes_positions) != self.boxes_count
             or len(board_state.boxes_positions) != self.goals_count
         ):
-            return None
+            return BoardState.NO_HASH
 
         retv = self.initial_state_hash
         for index, box_position in enumerate(board_state.boxes_positions):
-            retv ^= self._boxes_factors[
-                self.box_plus_id(Config.DEFAULT_PIECE_ID + index)
-            ][box_position]
+            retv ^= self._boxes_factors[self.box_plus_id(Config.DEFAULT_ID + index)][
+                box_position
+            ]
 
         for pusher_position in board_state.pushers_positions:
             retv ^= self._pushers_factors[pusher_position]

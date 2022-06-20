@@ -1,22 +1,21 @@
 #include "sokoenginepyext.hpp"
 
 using namespace std;
+using sokoengine::position_t;
 using sokoengine::game::BoardGraph;
 using sokoengine::game::BoardManager;
 using sokoengine::game::BoardState;
 using sokoengine::game::HashedBoardManager;
+using sokoengine::game::piece_id_t;
+using sokoengine::game::Positions;
+using sokoengine::game::Selectors;
 using sokoengine::game::zobrist_key_t;
 
 void export_board_manager(py::module &m) {
   py::class_<BoardState>(m, "BoardState")
-    .def(py::init([](const py::iterable &pushers_positions,
-                     const py::iterable &boxes_positions, zobrist_key_t zobrist_hash) {
-           return make_unique<BoardState>(
-             py::receive_positions_throw(pushers_positions),
-             py::receive_positions_throw(boxes_positions), zobrist_hash);
-         }),
-         py::arg("pushers_positions") = py::none(),
-         py::arg("boxes_positions") = py::none(),
+    .def(py::init<const Positions &, const Positions &, zobrist_key_t>(),
+         py::arg("pushers_positions") = Positions(),
+         py::arg("boxes_positions") = Positions(),
          py::arg("zobrist_hash") = BoardState::NO_HASH)
 
     // protocols
@@ -26,16 +25,13 @@ void export_board_manager(py::module &m) {
     .def("__repr__", &BoardState::repr)
 
     .def_property(
-      "pushers_positions", [](BoardState &self) { return self.pushers_positions(); },
-      [](BoardState &self, const py::iterable &rv) {
-        self.pushers_positions() = py::receive_positions_throw(rv);
-      })
+      "pushers_positions",
+      [](const BoardState &self) { return self.pushers_positions(); },
+      [](BoardState &self, const Positions &rv) { self.pushers_positions() = rv; })
 
     .def_property(
-      "boxes_positions", [](BoardState &self) { return self.boxes_positions(); },
-      [](BoardState &self, const py::iterable &rv) {
-        self.boxes_positions() = py::receive_positions_throw(rv);
-      })
+      "boxes_positions", [](const BoardState &self) { return self.boxes_positions(); },
+      [](BoardState &self, const Positions &rv) { self.boxes_positions() = rv; })
 
     .def_property(
       "zobrist_hash", [](BoardState &self) { return self.zobrist_hash(); },
@@ -48,76 +44,174 @@ void export_board_manager(py::module &m) {
     // protocols
     .def("__str__", &BoardManager::str)
 
-    .def_property_readonly("board", &BoardManager::board,
-                           py::return_value_policy::reference)
-
+    // --------------------------------------------------------------------------
+    // Pushers
+    // --------------------------------------------------------------------------
     .def_property_readonly("pushers_count", &BoardManager::pushers_count)
     .def_property_readonly("pushers_ids", &BoardManager::pushers_ids)
     .def_property_readonly("pushers_positions", &BoardManager::pushers_positions)
-    .def("pusher_position", &BoardManager::pusher_position, py::arg("pusher_id"))
-    .def("pusher_id_on", &BoardManager::pusher_id_on, py::arg("position"))
-    .def("has_pusher", &BoardManager::has_pusher, py::arg("pusher_id"))
-    .def("has_pusher_on", &BoardManager::has_pusher_on, py::arg("position"))
-    .def("move_pusher_from", &BoardManager::move_pusher_from, py::arg("old_position"),
-         py::arg("to_new_position"))
-    .def("move_pusher", &BoardManager::move_pusher, py::arg("pushers_id"),
-         py::arg("to_new_position"))
+    .def(
+      "pusher_position",
+      [](BoardManager &self, py_int_t pusher_id) {
+        return self.pusher_position(piece_or_throw(Selectors::PUSHERS, pusher_id));
+      },
+      py::arg("pusher_id"))
+    .def(
+      "pusher_id_on",
+      [](BoardManager &self, py_int_t position) {
+        return self.pusher_id_on(position_or_throw(position));
+      },
+      py::arg("position"))
+    .def(
+      "has_pusher",
+      [](BoardManager &self, py_int_t pusher_id) {
+        if (pusher_id < 0 || pusher_id >= std::numeric_limits<piece_id_t>::max())
+          return false;
+        return self.has_pusher(static_cast<piece_id_t>(pusher_id));
+      },
+      py::arg("pusher_id"))
+    .def(
+      "has_pusher_on",
+      [](BoardManager &self, py_int_t position) {
+        if (position < 0 || position >= std::numeric_limits<position_t>::max())
+          return false;
+        return self.has_pusher_on(static_cast<position_t>(position));
+      },
+      py::arg("position"))
+    .def(
+      "move_pusher_from",
+      [](BoardManager &self, py_int_t old_position, py_int_t to_new_position) {
+        return self.move_pusher_from(position_or_throw(old_position),
+                                     position_or_throw(to_new_position));
+      },
+      py::arg("old_position"), py::arg("to_new_position"))
+    .def(
+      "move_pusher",
+      [](BoardManager &self, py_int_t pusher_id, py_int_t to_new_position) {
+        return self.move_pusher(piece_or_throw(Selectors::PUSHERS, pusher_id),
+                                position_or_throw(to_new_position));
+      },
+      py::arg("pusher_id"), py::arg("to_new_position"))
 
+    // --------------------------------------------------------------------------
+    // Boxes
+    // --------------------------------------------------------------------------
     .def_property_readonly("boxes_count", &BoardManager::boxes_count)
     .def_property_readonly("boxes_ids", &BoardManager::boxes_ids)
     .def_property_readonly("boxes_positions", &BoardManager::boxes_positions)
-    .def("box_position", &BoardManager::box_position, py::arg("box_id"))
-    .def("box_id_on", &BoardManager::box_id_on, py::arg("position"))
-    .def("has_box", &BoardManager::has_box, py::arg("box_id"))
-    .def("has_box_on", &BoardManager::has_box_on, py::arg("position"))
-    .def("move_box_from", &BoardManager::move_box_from, py::arg("old_position"),
-         py::arg("to_new_position"))
-    .def("move_box", &BoardManager::move_box, py::arg("boxes_id"),
-         py::arg("to_new_position"))
+    .def(
+      "box_position",
+      [](BoardManager &self, py_int_t box_id) {
+        return self.box_position(piece_or_throw(Selectors::BOXES, box_id));
+      },
+      py::arg("box_id"))
+    .def(
+      "box_id_on",
+      [](BoardManager &self, py_int_t position) {
+        return self.box_id_on(position_or_throw(position));
+      },
+      py::arg("position"))
+    .def(
+      "has_box",
+      [](BoardManager &self, py_int_t box_id) {
+        if (box_id < 0 || box_id >= std::numeric_limits<piece_id_t>::max())
+          return false;
+        return self.has_box(static_cast<piece_id_t>(box_id));
+      },
+      py::arg("box_id"))
+    .def(
+      "has_box_on",
+      [](BoardManager &self, py_int_t position) {
+        if (position < 0 || position >= std::numeric_limits<position_t>::max())
+          return false;
+        return self.has_box_on(static_cast<position_t>(position));
+      },
+      py::arg("position"))
+    .def(
+      "move_box_from",
+      [](BoardManager &self, py_int_t old_position, py_int_t to_new_position) {
+        return self.move_box_from(position_or_throw(old_position),
+                                  position_or_throw(to_new_position));
+      },
+      py::arg("old_position"), py::arg("to_new_position"))
+    .def(
+      "move_box",
+      [](BoardManager &self, py_int_t box_id, py_int_t to_new_position) {
+        return self.move_box(piece_or_throw(Selectors::BOXES, box_id),
+                             position_or_throw(to_new_position));
+      },
+      py::arg("box_id"), py::arg("to_new_position"))
 
+    // --------------------------------------------------------------------------
+    // Goals
+    // --------------------------------------------------------------------------
     .def_property_readonly("goals_count", &BoardManager::goals_count)
     .def_property_readonly("goals_ids", &BoardManager::goals_ids)
     .def_property_readonly("goals_positions", &BoardManager::goals_positions)
-    .def("goal_position", &BoardManager::goal_position, py::arg("goal_id"))
-    .def("goal_id_on", &BoardManager::goal_id_on, py::arg("position"))
-    .def("has_goal", &BoardManager::has_goal, py::arg("goal_id"))
-    .def("has_goal_on", &BoardManager::has_goal_on, py::arg("position"))
+    .def(
+      "goal_position",
+      [](BoardManager &self, py_int_t goal_id) {
+        return self.goal_position(piece_or_throw(Selectors::GOALS, goal_id));
+      },
+      py::arg("goal_id"))
+    .def(
+      "goal_id_on",
+      [](BoardManager &self, py_int_t position) {
+        return self.goal_id_on(position_or_throw(position));
+      },
+      py::arg("position"))
+    .def(
+      "has_goal",
+      [](BoardManager &self, py_int_t goal_id) {
+        if (goal_id < 0 || goal_id >= std::numeric_limits<piece_id_t>::max())
+          return false;
+        return self.has_goal(static_cast<piece_id_t>(goal_id));
+      },
+      py::arg("goal_id"))
+    .def(
+      "has_goal_on",
+      [](BoardManager &self, py_int_t position) {
+        if (position < 0 || position >= std::numeric_limits<position_t>::max())
+          return false;
+        return self.has_goal_on(static_cast<position_t>(position));
+      },
+      py::arg("position"))
 
-    .def_property_readonly("walls_positions", &BoardManager::walls_positions)
+    // --------------------------------------------------------------------------
+    // Sokoban+
+    // --------------------------------------------------------------------------
+    .def(
+      "box_plus_id",
+      [](BoardManager &self, py_int_t box_id) {
+        return self.box_plus_id(piece_or_throw(Selectors::BOXES, box_id));
+      },
+      py::arg("box_id"))
+    .def(
+      "goal_plus_id",
+      [](BoardManager &self, py_int_t goal_id) {
+        return self.goal_plus_id(piece_or_throw(Selectors::GOALS, goal_id));
+      },
+      py::arg("goal_id"))
 
-    .def_property_readonly("state", &BoardManager::state)
-
-    .def("box_plus_id", &BoardManager::box_plus_id, py::arg("box_id"))
-    .def("goal_plus_id", &BoardManager::goal_plus_id, py::arg("goal_id"))
-
-    .def_property("boxorder", &BoardManager::boxorder,
-                  [](BoardManager &self, const py::object &value) {
-                    if (value.is_none())
-                      self.set_boxorder("");
-                    else {
-                      string converted = value.cast<string>();
-                      self.set_boxorder(converted);
-                    }
-                  })
-
-    .def_property("goalorder", &BoardManager::goalorder,
-                  [](BoardManager &self, const py::object &value) {
-                    if (value.is_none())
-                      self.set_goalorder("");
-                    else {
-                      string converted = value.cast<string>();
-                      self.set_goalorder(converted);
-                    }
-                  })
+    .def_property("boxorder", &BoardManager::boxorder, &BoardManager::set_boxorder)
+    .def_property("goalorder", &BoardManager::goalorder, &BoardManager::set_goalorder)
 
     .def_property_readonly("is_sokoban_plus_enabled",
                            &BoardManager::is_sokoban_plus_enabled)
-
     .def_property_readonly("is_sokoban_plus_valid",
                            &BoardManager::is_sokoban_plus_valid)
 
     .def("enable_sokoban_plus", &BoardManager::enable_sokoban_plus)
     .def("disable_sokoban_plus", &BoardManager::disable_sokoban_plus)
+
+    // --------------------------------------------------------------------------
+    // Board state
+    // --------------------------------------------------------------------------
+
+    .def_property_readonly("board", &BoardManager::board,
+                           py::return_value_policy::reference)
+    .def_property_readonly("walls_positions", &BoardManager::walls_positions)
+    .def_property_readonly("state", &BoardManager::state)
 
     .def("solutions", &BoardManager::solutions)
 

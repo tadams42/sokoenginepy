@@ -7,13 +7,36 @@ from typing import Iterable, List, Optional
 
 from .board_graph import BoardGraph
 from .board_manager import CellAlreadyOccupiedError
-from .config import Direction, Config
+from .config import Config, Direction
 from .hashed_board_manager import HashedBoardManager
 from .pusher_step import PusherStep
 
 
 class SolvingMode(enum.Enum):
+    #: Forward solving mode
+    #:
+    #: * pusher is allowed to push single box at the time
+    #: * pusher can't pull boxes
+    #: * pusher can't jump over boxes or walls
     FORWARD = 0
+
+    #: Reverse solving mode
+    #:
+    #: - pusher is allowed to pull single box at the time
+    #:
+    #:   - if position allows pull that pull is optional (pusher is allowed to move
+    #:     without pull even if pull is possible).
+    #:   - default behavior is to always pull boxes but that can be changed any time
+    #:     through `Mover.pulls_boxes`
+    #:
+    #: - pusher can't push boxes
+    #: - pusher is allowed to jump over boxes and walls
+    #:
+    #:   - jumps are allowed only before first pull is done
+    #:
+    #: - board starts in solved state: positions of boxes and goals are switched
+    #: - when boxes and goals are switched, pusher might end up "standing on box".
+    #:   In this situation, fist move in game must be jump.
     REVERSE = 1
 
     def __repr__(self):
@@ -21,8 +44,7 @@ class SolvingMode(enum.Enum):
 
 
 class NonPlayableBoardError(RuntimeError):
-    def __init__(self):
-        super().__init__("Board is not playable!")
+    pass
 
 
 class IllegalMoveError(RuntimeError):
@@ -37,59 +59,35 @@ class MoveWorkerOptions:
 
 
 class Mover:
-    """Implements game rules (on-board movement).
-
-    Supports forward and reverse solving mode.
-
-    **Forward solving mode**
-
-    - pusher is allowed to push single box at the time
-    - pusher can't pull boxes
-    - pusher can't jump over boxes or walls
-
-    **Reverse solving mode:**
-
-    - pusher is allowed to pull single box at the time
-
-        - if position allows pull that pull is optional (pusher is allowed to move
-          without pull even if pull is possible).
-        - default behavior is to always pull boxes but that can be changed any time
-          through `.pulls_boxes`
-
-    - pusher can't push boxes
-
-    - pusher is allowed to jump over boxes and walls
-
-        - jumps are allowed only before first pull is done
-
-    - board starts in solved state: positions of boxes and goals are switched
+    """
+    Implements game rules (on-board movement). Supports forward and reverse game solving
+    mode.
 
     **History management**
 
-    Mover only stores last performed move in history and it doesn't offer redo.
-    Failed moves, undo and non-moves (ie. selecting already selected pusher or
-    jumping on same position pusher is already standing on) clear undo history.
+    Mover only stores last performed move in history and it doesn't offer redo. Failed
+    moves, undo and non-moves (ie. selecting already selected pusher or jumping on same
+    position pusher is already standing on) clear undo history.
 
     Warning:
         :class:`.Mover` operates directly on referenced game board. Because of that,
-        this board should not be edited outside of :class:`.Mover` once
-        :class:`.Mover` instance had been attached to it: editing the board will
-        corrupt :class:`.Mover` internal state. For the same reason, it is not
-        allowed to attach two movers to same game board.
+        this board should not be edited outside of :class:`.Mover` after :class:`.Mover`
+        instance had been attached to it: editing the board will corrupt :class:`.Mover`
+        internal state. For the same reason, there should not be more than one mover
+        attached to the same board.
+
+    Raises:
+        NonPlayableBoardError: when attaching mover to non playable board (see
+            `BoardManager.is_playable`)
     """
 
     def __init__(
         self, board: BoardGraph, solving_mode: SolvingMode = SolvingMode.FORWARD
     ):
-        """
-        Args:
-            board: Instance of :class:`.BoardGraph` subclasses
-            solving_mode: start the game in this solving mode
-        """
         self._manager = HashedBoardManager(board)
         self._solving_mode = solving_mode
         self._pulls_boxes = True
-        self._selected_pusher: int = Config.DEFAULT_PIECE_ID
+        self._selected_pusher: int = Config.DEFAULT_ID
         self._pull_count: int = 0
         self._last_move: List[PusherStep] = []
 
@@ -101,22 +99,20 @@ class Mover:
 
     @property
     def board(self) -> BoardGraph:
-        """Board on which :class:`.Mover` is operating on"""
         return self._manager.board
 
     @property
     def solving_mode(self) -> SolvingMode:
-        """:class:`.Mover` operation mode (:class:`.SolvingMode`)."""
         return self._solving_mode
 
     @property
     def board_manager(self) -> HashedBoardManager:
-        """Current board manager (:class:`.HashedBoardManager`)."""
         return self._manager
 
     @property
     def selected_pusher(self) -> int:
-        """ID of pusher that will perform next move.
+        """
+        ID of pusher that will perform next move.
 
         See Also:
             :meth:`.select_pusher`
@@ -140,7 +136,8 @@ class Mover:
 
     @property
     def last_move(self) -> List[PusherStep]:
-        """Sequence of :class:`.PusherStep` that contains most recent movement.
+        """
+        Sequence of :class:`.PusherStep` that contains most recent movement.
 
         Whenever :class:`.Mover` performs any movement or pusher selection, it puts
         resulting :class:`.PusherStep` into this sequence in order pusher steps
@@ -156,44 +153,44 @@ class Mover:
 
         Example:
 
-            >>> from sokoenginepy.game import Mover, PusherStep, Direction, BoardGraph
-            >>> from sokoenginepy.io import SokobanPuzzle
-            >>> puzzle = SokobanPuzzle(board='\\n'.join([
-            ...     '    #####',
-            ...     '    #  @#',
-            ...     '    #$  #',
-            ...     '  ###  $##',
-            ...     '  #  $ $ #',
-            ...     '### # ## #   ######',
-            ...     '#   # ## #####  ..#',
-            ...     '# $  $          ..#',
-            ...     '##### ### #@##  ..#',
-            ...     '    #     #########',
-            ...     '    #######'
-            ... ]))
-            >>> board = BoardGraph(puzzle)
-            >>> mover = Mover(board)
-            >>> mover.last_move = [PusherStep(Direction.UP), PusherStep(Direction.RIGHT)]
-            >>> mover.undo_last_move()
-            >>> print(mover.board)
-            ----#####----------
-            ----#---#----------
-            ----#$@-#----------
-            --###--$##---------
-            --#--$-$-#---------
-            ###-#-##-#---######
-            #---#-##-#####--..#
-            #-$--$----------..#
-            #####-###-#@##--..#
-            ----#-----#########
-            ----#######--------
-            >>> mover.last_move
-            [PusherStep(Direction.LEFT, box_moved=False), PusherStep(Direction.DOWN, box_moved=False)]
+        >>> from sokoenginepy.game import Mover, PusherStep, Direction, BoardGraph
+        >>> from sokoenginepy.io import SokobanPuzzle
+        >>> puzzle = SokobanPuzzle(board='\\n'.join([
+        ...     '    #####',
+        ...     '    #  @#',
+        ...     '    #$  #',
+        ...     '  ###  $##',
+        ...     '  #  $ $ #',
+        ...     '### # ## #   ######',
+        ...     '#   # ## #####  ..#',
+        ...     '# $  $          ..#',
+        ...     '##### ### #@##  ..#',
+        ...     '    #     #########',
+        ...     '    #######'
+        ... ]))
+        >>> board = BoardGraph(puzzle)
+        >>> mover = Mover(board)
+        >>> mover.last_move = [PusherStep(Direction.UP), PusherStep(Direction.RIGHT)]
+        >>> mover.undo_last_move()
+        >>> print(mover.board.to_board_str())
+            #####
+            #   #
+            #$@ #
+          ###  $##
+          #  $ $ #
+        ### # ## #   ######
+        #   # ## #####  ..#
+        # $  $          ..#
+        ##### ### #@##  ..#
+            #     #########
+            #######
+        >>> mover.last_move
+        [PusherStep(Direction.LEFT), PusherStep(Direction.DOWN)]
 
         Warning:
             Subsequent movement overwrites this meaning that Mover can only undo last
             move performed (it doesn't keep whole history of movement, only the last
-            move).
+            performed move).
         """
         return self._last_move
 
@@ -203,17 +200,22 @@ class Mover:
 
     def select_pusher(self, pusher_id: int):
         """
-        Selects pusher that will perform next move.
+        Selects pusher that will perform next move. If this pusher is already selected,
+        does nothing.
 
-        Mover always selects :data:`Config.DEFAULT_PIECE_ID` before any movements is
-        performed. This means that for single-pusher boards, that single pusher is
-        always automatically selected and this method doesn't need to be called.
+        From current position, generates sequence of steps needed to select pusher_id
+        and stores them into last_move(). Sets internal selected pusher_id to newly
+        selected pusher
 
-        Args:
-            pusher_id: ID of pusher
+        Mover initially always selects :data:`Config.DEFAULT_ID`. This means that for
+        single-pusher boards, single pusher is always automatically selected and this
+        method doesn't need to be called.
 
         See Also:
             `.BoardManager.pushers_ids`
+
+        Raises:
+            KeyError: no pusher with ID ``pusher_id``
         """
 
         if pusher_id == self._selected_pusher:
@@ -227,23 +229,21 @@ class Mover:
 
         self._last_move = []
         for direction in selection_path:
-            pusher_step = PusherStep(direction, False)
+            pusher_step = PusherStep(direction)
             pusher_step.is_pusher_selection = True
             self._last_move.append(pusher_step)
 
         self._selected_pusher = pusher_id
 
     def move(self, direction: Direction):
-        """Moves currently selected pusher in ``direction``.
+        """
+        Moves currently selected pusher in ``direction``.
 
         In `.SolvingMode.FORWARD` mode, pushes the box in front of pusher (if there
         is one).
 
         In `.SolvingMode.REVERSE` mode pulls box together with pusher (if there is
-        one and if ``self.pulls_boxes is True``).
-
-        Args:
-            direction: direction of movement
+        one and if `pulls_boxes` is ``True``).
 
         Raises:
             IllegalMoveError: for illegal moves
@@ -258,7 +258,8 @@ class Mover:
             self._pull_or_move(direction, options)
 
     def jump(self, new_position: int):
-        """Currently selected pusher jumps to ``new_position``.
+        """
+        Currently selected pusher jumps to ``new_position``.
 
         Fails if
 
@@ -268,6 +269,7 @@ class Mover:
 
         Raises:
             IllegalMoveError: for illegal jumps
+            IndexError: ``new_position`` is off board
         """
         if self._pull_count != 0:
             raise IllegalMoveError("Jumps not allowed after first pull")
@@ -289,7 +291,7 @@ class Mover:
         )
 
         def jump_am(direction):
-            pusher_step = PusherStep(direction, False)
+            pusher_step = PusherStep(direction)
             pusher_step.is_jump = True
             pusher_step.pusher_id = self._selected_pusher
             return pusher_step
@@ -298,10 +300,13 @@ class Mover:
 
     def undo_last_move(self):
         """
-        Takes sequence of moves stored in self.last_move and undoes it.
+        Takes sequence of moves stored in `last_move` and tries to undo it.
 
         See Also:
             `.Mover.last_move`
+
+        Raises:
+            IllegalMoveError
         """
         new_last_moves = []
         old_last_moves = self._last_move
@@ -373,20 +378,20 @@ class Mover:
             initial_pusher_position, direction
         )
 
-        if not in_front_of_pusher:
+        if in_front_of_pusher == Config.NO_POS:
             raise IllegalMoveError(
                 "Can't move pusher off board! (ID: "
                 + "{0}, direction: {1})".format(self._selected_pusher, str(direction))
             )
 
         is_push = False
-        in_front_of_box = None
+        in_front_of_box = Config.NO_POS
         if self._manager.has_box_on(in_front_of_pusher):
             is_push = True
             in_front_of_box = self._manager.board.neighbor(
                 in_front_of_pusher, direction
             )
-            if not in_front_of_box:
+            if in_front_of_box == Config.NO_POS:
                 raise IllegalMoveError(
                     "Can't push box off board! (ID: "
                     + "{0}, direction: {1})".format(
@@ -404,7 +409,7 @@ class Mover:
         except CellAlreadyOccupiedError as exc:
             raise IllegalMoveError(str(exc))
 
-        pusher_step = PusherStep(direction, is_push)
+        pusher_step = PusherStep(direction)
         pusher_step.pusher_id = self._selected_pusher
         if is_push:
             pusher_step.moved_box_id = self._manager.box_id_on(in_front_of_box)
@@ -423,7 +428,7 @@ class Mover:
             initial_pusher_position, direction
         )
 
-        if not in_front_of_pusher:
+        if in_front_of_pusher == Config.NO_POS:
             raise IllegalMoveError(
                 "Can't move pusher off board! (ID: "
                 + "{0}, direction: {1})".format(self._selected_pusher, str(direction))
@@ -439,7 +444,10 @@ class Mover:
             behind_pusher = self._manager.board.neighbor(
                 initial_pusher_position, direction.opposite
             )
-            if behind_pusher and self._manager.board[behind_pusher].has_box:
+            if (
+                behind_pusher != Config.NO_POS
+                and self._manager.board[behind_pusher].has_box
+            ):
                 is_pull = True
                 try:
                     self._manager.move_box_from(behind_pusher, initial_pusher_position)
@@ -448,7 +456,7 @@ class Mover:
                 if options.increase_pull_count:
                     self._pull_count += 1
 
-        pusher_step = PusherStep(direction, is_pull)
+        pusher_step = PusherStep(direction)
         pusher_step.pusher_id = self._selected_pusher
         if is_pull:
             pusher_step.moved_box_id = self._manager.box_id_on(initial_pusher_position)

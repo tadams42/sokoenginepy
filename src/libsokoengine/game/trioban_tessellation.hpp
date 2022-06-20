@@ -7,7 +7,20 @@ namespace sokoengine {
 namespace game {
 
 ///
-/// Tessellation for Trioban.
+/// Tessellation for Trioban game variant.
+///
+/// Board is laid out on alternating triangles with origin triangle pointing down.
+///
+/// Direction <-> character mapping:
+///
+/// | LEFT | RIGHT | NORTH_EAST | NORTH_WEST | SOUTH_EAST | SOUTH_WEST |
+/// | ---- | ----- | ---------- | ---------- | ---------- | ---------- |
+/// | l, L | r, R  | n, N       | u, U       | d, D       | s, S       |
+///
+/// Depending on pusher position, not all move directions are allowed on all board
+/// positions:
+///
+/// @image html trioban_am.png
 ///
 class LIBSOKOENGINE_API TriobanTessellation : public BaseTessellation {
 public:

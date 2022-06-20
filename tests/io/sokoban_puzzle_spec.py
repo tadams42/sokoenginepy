@@ -5,46 +5,6 @@ import pytest
 from sokoenginepy.game import Tessellation, index_1d
 from sokoenginepy.io import Puzzle, SokobanPuzzle
 
-from ..fixtures import BoardData
-
-
-@pytest.fixture
-def input_data():
-    data = """
-            #####
-            #   #
-            #$  #
-          ###  $##
-          #  $ $ #
-        ### # ## #   ######
-        #   # ## #####  ..#
-        # $  $          ..#
-        ##### ### #@##  ..#
-            #     #########
-            #######
-    """
-    data = textwrap.dedent(data.lstrip("\n").rstrip())
-    return BoardData(board=data, width=19, height=11)
-
-
-@pytest.fixture
-def parsed_data():
-    data = """
-        ----#####----------
-        ----#---#----------
-        ----#$--#----------
-        --###--$##---------
-        --#--$-$-#---------
-        ###-#-##-#---######
-        #---#-##-#####--..#
-        #-$--$----------..#
-        #####-###-#@##--..#
-        ----#-----#########
-        ----#######--------
-    """
-    data = textwrap.dedent(data.lstrip("\n").rstrip())
-    return BoardData(board=data, width=19, height=11)
-
 
 class DescribeSokobanPuzzle:
     def it_creates_board_of_specified_size_and_tessellation(self):
@@ -60,7 +20,7 @@ class DescribeSokobanPuzzle:
         assert puzzle.width == 10
         assert puzzle.height == 1
         assert puzzle.board == "#        #"
-        assert str(puzzle) == "#--------#"
+        assert puzzle.to_board_str(use_visible_floor=True) == "#--------#"
 
     def it_carries_some_metadata(self):
         puzzle = SokobanPuzzle()
@@ -112,22 +72,56 @@ class DescribeSokobanPuzzle:
         assert puzzle.width == 9
         assert puzzle.height == 1
 
-    def it_provides_conversions_to_string(self):
-        puzzle = SokobanPuzzle(board="#       #")
+    class describe_conversions_to_string:
+        def test_board_returns_original_unparsed_data(self):
+            puzzle = SokobanPuzzle(board="#   -   #")
+            assert puzzle.board == "#   -   #"
 
-        assert puzzle.board == "#       #"
-        assert str(puzzle) == "#-------#"
-        assert puzzle.to_board_str(use_visible_floor=False) == "#       #"
-        assert puzzle.to_board_str(use_visible_floor=True) == "#-------#"
+        def test_str_prints_parsed_board_with_invisible_floors(self):
+            puzzle = SokobanPuzzle(board="#   -   #")
+            assert str(puzzle) == "#       #"
+
+        def test_to_board_str_prints_parsed_board_with_configurable_output(self):
+            puzzle = SokobanPuzzle(board="#   -   #")
+            assert puzzle.to_board_str(use_visible_floor=False) == "#       #"
+            assert puzzle.to_board_str(use_visible_floor=True) == "#-------#"
 
     class describe_parsing_from_string:
-        def it_parses_board_from_string(
-            self, input_data: BoardData, parsed_data: BoardData
-        ):
-            puzzle = SokobanPuzzle(board=input_data.board)
-            assert str(puzzle) == parsed_data.board
-            assert puzzle.width == parsed_data.width
-            assert puzzle.height == parsed_data.height
+        def it_parses_board_from_string(self):
+            data = """
+                #####
+                #   #
+                #$  #
+              ###  $##
+              #  $ $ #
+            ### # ## #   ######
+            #   # ## #####  ..#
+            # $  $          ..#
+            ##### ### #@##  ..#
+                #     #########
+                #######
+            """
+            data = textwrap.dedent(data)
+
+            result = """
+                ----#####----------
+                ----#---#----------
+                ----#$--#----------
+                --###--$##---------
+                --#--$-$-#---------
+                ###-#-##-#---######
+                #---#-##-#####--..#
+                #-$--$----------..#
+                #####-###-#@##--..#
+                ----#-----#########
+                ----#######--------
+            """
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
+
+            puzzle = SokobanPuzzle(board=data)
+            assert puzzle.width == 19
+            assert puzzle.height == 11
+            assert puzzle.to_board_str(use_visible_floor=True) == result
 
         def it_raises_on_illegal_characters_in_board_string(self):
             with pytest.raises(ValueError):
@@ -137,50 +131,86 @@ class DescribeSokobanPuzzle:
                 puzzle = SokobanPuzzle()
                 puzzle.board = "ZOMG!"
 
-        def it_correctly_parses_board_with_blank_rows(self):
-            src = (
-                " ##########\n    \n"
-                " ## @ *   #\n"
-                "##  $ ####\n"
-                "# $.+ #\n"
-                "#######\n"
-            )
-            result = "\n".join(
-                [
-                    "-##########",
-                    "-----------",
-                    "-##-@-*---#",
-                    "##--$-####-",
-                    "#-$.+-#----",
-                    "#######----",
-                    "-----------",
-                ]
-            )
-            puzzle = SokobanPuzzle(board=src)
-            assert str(puzzle) == result
+        def it_correctly_parses_board_with_internal_blank_rows(self):
+            # ::   The first and the last non-empty square in each row  ::
+            # ::   must be a wall or a box on a goal. An empty interior ::
+            # ::   row is written with at least one "-" or "_".         ::
+
+            # Notice that our parser is correct even without that one "-" or "_"
+
+            sources = [
+                (
+                    " ##########\n    \n"
+                    " ## @ *   #\n"
+                    "##  $ ####\n"
+                    "# $.+ #\n"
+                    "#######\n"
+                ),
+                (
+                    " ##########\n  - \n"
+                    " ## @ *   #\n"
+                    "##  $ ####\n"
+                    "# $.+ #\n"
+                    "#######\n"
+                ),
+            ]
+
+            result = """
+                -##########
+                -----------
+                -##-@-*---#
+                ##--$-####-
+                #-$.+-#----
+                #######----
+            """
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
+
+            for data in sources:
+                puzzle = SokobanPuzzle(board=data)
+                assert puzzle.width == 11
+                assert puzzle.height == 6
+                assert puzzle.to_board_str(use_visible_floor=True) == result
 
         def it_parses_RLE_encoded_board(self):
-            src = (
-                " ##########   |"
-                " ## @ *   #|"
-                "##  $ ####|"
-                "# $.+ #|||"
-                "#######   |"
-            )
-            result = "\n".join(
-                [
-                    "-##########---",
-                    "-##-@-*---#---",
-                    "##--$-####----",
-                    "#-$.+-#-------",
-                    "--------------",
-                    "--------------",
-                    "#######-------",
-                    "--------------",
-                ]
-            )
-            puzzle = SokobanPuzzle(board=src)
-            assert str(puzzle) == result
+            # ::   The first and the last non-empty square in each row  ::
+            # ::   must be a wall or a box on a goal. An empty interior ::
+            # ::   row is written with at least one "-" or "_".         ::
+
+            # Notice that our parser can go even without that on "-" or "_"
+
+            sources = [
+                (
+                    " ##########   |"
+                    " ## @ *   #|"
+                    "##  $ ####|"
+                    "# $.+ #|||"
+                    "#######   |"
+                ),
+                (
+                    " ##########   |"
+                    " ## @ *   #|"
+                    "##  $ ####|"
+                    "# $.+ #|||"
+                    "#######   |"
+                ),
+            ]
+
+            result = """
+                -##########---
+                -##-@-*---#---
+                ##--$-####----
+                #-$.+-#-------
+                --------------
+                --------------
+                #######-------
+            """
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
+
+            for src in sources:
+                puzzle = SokobanPuzzle(board=src)
+                assert puzzle.width == 14
+                assert puzzle.height == 7
+                assert puzzle.to_board_str(use_visible_floor=True) == result
 
         def it_carefully_preserves_original_newlines(self):
             src = (
@@ -190,30 +220,43 @@ class DescribeSokobanPuzzle:
                 "# $.+ #\n\n"
                 "#######\n\n"
             )
-            result = "\n".join(
-                [
-                    "-##########",
-                    "-----------",
-                    "-----------",
-                    "-##-@-*---#",
-                    "-----------",
-                    "##--$-####-",
-                    "-----------",
-                    "#-$.+-#----",
-                    "-----------",
-                    "#######----",
-                    "-----------",
-                    "-----------",
-                ]
-            )
+            result = """
+                -##########
+                -----------
+                -----------
+                -##-@-*---#
+                -----------
+                ##--$-####-
+                -----------
+                #-$.+-#----
+                -----------
+                #######----
+            """
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
+
             puzzle = SokobanPuzzle(board=src)
-            assert str(puzzle) == result
+            assert puzzle.width == 11
+            assert puzzle.height == 10
+            assert puzzle.to_board_str(use_visible_floor=True) == result
 
     class describe_resize:
-        def it_adds_right_columns_and_bottom_rows_when_enlarging(
-            self, input_data: BoardData
-        ):
+        def it_adds_right_columns_and_bottom_rows_when_enlarging(self):
             data = """
+                #####
+                #   #
+                #$  #
+              ###  $##
+              #  $ $ #
+            ### # ## #   ######
+            #   # ## #####  ..#
+            # $  $          ..#
+            ##### ### #@##  ..#
+                #     #########
+                #######
+            """
+            data = textwrap.dedent(data)
+
+            result = """
                 ----#####------------
                 ----#---#------------
                 ----#$--#------------
@@ -228,18 +271,31 @@ class DescribeSokobanPuzzle:
                 ---------------------
                 ---------------------
             """
-            data = textwrap.dedent(data.lstrip("\n").rstrip())
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
 
-            puzzle = SokobanPuzzle(board=input_data.board)
+            puzzle = SokobanPuzzle(board=data)
             puzzle.resize(puzzle.width + 2, puzzle.height + 2)
             assert puzzle.width == 21
             assert puzzle.height == 13
-            assert str(puzzle) == data
+            assert puzzle.to_board_str(use_visible_floor=True) == result
 
-        def it_removes_right_columns_and_bottom_rows_when_shrinking(
-            self, input_data: BoardData
-        ):
+        def it_removes_right_columns_and_bottom_rows_when_shrinking(self):
             data = """
+                #####
+                #   #
+                #$  #
+              ###  $##
+              #  $ $ #
+            ### # ## #   ######
+            #   # ## #####  ..#
+            # $  $          ..#
+            ##### ### #@##  ..#
+                #     #########
+                #######
+            """
+            data = textwrap.dedent(data)
+
+            result = """
                 ----#####--------
                 ----#---#--------
                 ----#$--#--------
@@ -250,17 +306,32 @@ class DescribeSokobanPuzzle:
                 #-$--$----------.
                 #####-###-#@##--.
             """
-            data = textwrap.dedent(data.lstrip("\n").rstrip())
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
 
-            puzzle = SokobanPuzzle(board=input_data.board)
+            puzzle = SokobanPuzzle(board=data)
             puzzle.resize(puzzle.width - 2, puzzle.height - 2)
             assert puzzle.width == 17
             assert puzzle.height == 9
-            assert str(puzzle) == data
+            assert puzzle.to_board_str(use_visible_floor=True) == result
 
     class describe_resize_and_center:
-        def it_adds_columns_and_rows_when_enlarging(self, input_data: BoardData):
+        def it_adds_columns_and_rows_when_enlarging(self):
             data = """
+                #####
+                #   #
+                #$  #
+              ###  $##
+              #  $ $ #
+            ### # ## #   ######
+            #   # ## #####  ..#
+            # $  $          ..#
+            ##### ### #@##  ..#
+                #     #########
+                #######
+            """
+            data = textwrap.dedent(data)
+
+            result = """
                 ------------------------
                 ------------------------
                 ------#####-------------
@@ -278,25 +349,53 @@ class DescribeSokobanPuzzle:
                 ------------------------
                 ------------------------
             """
-            data = textwrap.dedent(data.lstrip("\n").rstrip())
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
 
-            puzzle = SokobanPuzzle(board=input_data.board)
+            puzzle = SokobanPuzzle(board=data)
             puzzle.resize_and_center(puzzle.width + 5, puzzle.height + 5)
             assert puzzle.width == 24
             assert puzzle.height == 16
-            assert str(puzzle) == data
+            assert puzzle.to_board_str(use_visible_floor=True) == result
 
-        def it_doesnt_remove_columns_or_rows_when_compacting(
-            self, input_data: BoardData, parsed_data: BoardData
-        ):
-            puzzle = SokobanPuzzle(board=input_data.board)
+        def it_doesnt_remove_columns_or_rows_when_compacting(self):
+            data = """
+                #####
+                #   #
+                #$  #
+              ###  $##
+              #  $ $ #
+            ### # ## #   ######
+            #   # ## #####  ..#
+            # $  $          ..#
+            ##### ### #@##  ..#
+                #     #########
+                #######
+            """
+            data = textwrap.dedent(data)
+
+            result = """
+                ----#####----------
+                ----#---#----------
+                ----#$--#----------
+                --###--$##---------
+                --#--$-$-#---------
+                ###-#-##-#---######
+                #---#-##-#####--..#
+                #-$--$----------..#
+                #####-###-#@##--..#
+                ----#-----#########
+                ----#######--------
+            """
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
+
+            puzzle = SokobanPuzzle(board=data)
             puzzle.resize_and_center(puzzle.width - 2, puzzle.height - 2)
-            assert puzzle.width == parsed_data.width
-            assert puzzle.height == parsed_data.height
-            assert str(puzzle) == parsed_data.board
+            assert puzzle.width == 19
+            assert puzzle.height == 11
+            assert puzzle.to_board_str(use_visible_floor=True) == result
 
     class describe_trim:
-        def it_removes_empty_outer_rows_and_columns(self, parsed_data: BoardData):
+        def it_removes_empty_outer_rows_and_columns(self):
             data = """
                 ------------------------
                 ------------------------
@@ -315,17 +414,47 @@ class DescribeSokobanPuzzle:
                 ------------------------
                 ------------------------
             """
-            data = textwrap.dedent(data.lstrip("\n").rstrip())
+            data = textwrap.dedent(data)
+
+            result = """
+                ----#####----------
+                ----#---#----------
+                ----#$--#----------
+                --###--$##---------
+                --#--$-$-#---------
+                ###-#-##-#---######
+                #---#-##-#####--..#
+                #-$--$----------..#
+                #####-###-#@##--..#
+                ----#-----#########
+                ----#######--------
+            """
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
 
             puzzle = SokobanPuzzle(board=data)
             puzzle.trim()
-            assert puzzle.width == parsed_data.width
-            assert puzzle.height == parsed_data.height
-            assert str(puzzle) == parsed_data.board
+            assert puzzle.width == 19
+            assert puzzle.height == 11
+            assert puzzle.to_board_str(use_visible_floor=True) == result
 
     class describe_reverse_rows:
-        def it_mirrors_board_up_down(self, input_data: BoardData):
+        def it_mirrors_board_up_down(self):
             data = """
+                #####
+                #   #
+                #$  #
+              ###  $##
+              #  $ $ #
+            ### # ## #   ######
+            #   # ## #####  ..#
+            # $  $          ..#
+            ##### ### #@##  ..#
+                #     #########
+                #######
+            """
+            data = textwrap.dedent(data)
+
+            result = """
                 ----#######--------
                 ----#-----#########
                 #####-###-#@##--..#
@@ -338,33 +467,48 @@ class DescribeSokobanPuzzle:
                 ----#---#----------
                 ----#####----------
             """
-            data = textwrap.dedent(data.lstrip("\n").rstrip())
+            result = textwrap.dedent(result.lstrip("\n").rstrip())
 
-            puzzle = SokobanPuzzle(board=input_data.board)
+            puzzle = SokobanPuzzle(board=data)
             puzzle.reverse_rows()
-            assert puzzle.width == input_data.width
-            assert puzzle.height == input_data.height
-            assert str(puzzle) == data
+            assert puzzle.width == 19
+            assert puzzle.height == 11
+            assert puzzle.to_board_str(use_visible_floor=True) == result
 
     class describe_reverse_columns:
-        def it_mirrors_board_left_right(self, input_data: BoardData):
+        def it_mirrors_board_left_right(self):
             data = """
-                ----------#####----
-                ----------#---#----
-                ----------#--$#----
-                ---------##$--###--
-                ---------#-$-$--#--
-                ######---#-##-#-###
-                #..--#####-##-#---#
-                #..----------$--$-#
-                #..--##@#-###-#####
-                #########-----#----
-                --------#######----
+                #####
+                #   #
+                #$  #
+              ###  $##
+              #  $ $ #
+            ### # ## #   ######
+            #   # ## #####  ..#
+            # $  $          ..#
+            ##### ### #@##  ..#
+                #     #########
+                #######
             """
-            data = textwrap.dedent(data.lstrip("\n").rstrip())
+            data = textwrap.dedent(data)
 
-            puzzle = SokobanPuzzle(board=input_data.board)
+            result = """
+            ----------#####----
+            ----------#---#----
+            ----------#--$#----
+            ---------##$--###--
+            ---------#-$-$--#--
+            ######---#-##-#-###
+            #..--#####-##-#---#
+            #..----------$--$-#
+            #..--##@#-###-#####
+            #########-----#----
+            --------#######----
+            """
+            result = textwrap.dedent(result).lstrip("\n").rstrip()
+
+            puzzle = SokobanPuzzle(board=data)
             puzzle.reverse_columns()
-            assert puzzle.width == input_data.width
-            assert puzzle.height == input_data.height
-            assert str(puzzle) == data
+            assert puzzle.width == 19
+            assert puzzle.height == 11
+            assert puzzle.to_board_str(use_visible_floor=True) == result

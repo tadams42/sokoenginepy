@@ -1,10 +1,11 @@
-# import cProfile
+import cProfile
 from textwrap import dedent
 
-from sokoenginepy import Direction, Mover, SokobanBoard
+from sokoenginepy.game import BoardGraph, Direction, Mover
+from sokoenginepy.io import SokobanPuzzle
 
-board = SokobanBoard(
-    board_str=dedent(
+puzzle = SokobanPuzzle(
+    board=dedent(
         """
     ###########
     #       **#
@@ -17,6 +18,7 @@ board = SokobanBoard(
         ]
     )
 )
+board = BoardGraph(puzzle)
 
 mover = Mover(board)
 
@@ -60,10 +62,10 @@ def single_moves_cycle_profile():
         mover.move(d)
 
 
-if __name__ == "__main__":
-    single_moves_cycle_profile()
+# if __name__ == "__main__":
+#     single_moves_cycle_profile()
 
-cProfile.run("main()", "moves_profile.prof")
+cProfile.run("single_moves_cycle_profile()", "moves_profile.prof")
 cProfile.run("mover.move(Direction.LEFT)", "single_move_profile.prof")
 
 # pip install pyprof2calltree

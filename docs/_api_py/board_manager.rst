@@ -26,9 +26,9 @@ HashedBoardManager
 ------------------
 
 .. autoclass:: sokoenginepy.game.HashedBoardManager
+    :show-inheritance:
     :members:
     :undoc-members:
-    :show-inheritance:
 
 
 SokobanPlus

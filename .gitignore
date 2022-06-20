@@ -33,6 +33,7 @@ coverage.xml
 htmlcov
 .pytest_cache/
 .mypy_cache
+*.log
 
 # Sphinx
 docs/_build

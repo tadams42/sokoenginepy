@@ -33,17 +33,16 @@ class Puzzle:
     Base class for game puzzles.
 
     Game puzzle is representation of game board together with all of its meta data and
-    snapshots.
+    snapshots. It implements:
 
-    It implements:
-        - parsing board data from text
-        - editing board: setting individual cells, resizing, trimming, ...
+    - parsing board data from text
+    - editing board: setting individual cells, resizing, trimming, ...
 
     All positions used are 1D array indexes.
 
-    To convert 2D board coordinates into 1D array indexes, use ``game.index_1d``.
-    To convert 1D array indexes into board 2D coordinates, use one of ``game.ROW``,
-    ``game.x`` ``game.COLUMN`` and ``game.y``.
+    To convert 2D board coordinates into 1D array indexes, use `.index_1d`. To convert
+    1D array indexes into board 2D coordinates, use one of `.index_row`, `.index_x`
+    `.index_column` and `.index_y`.
     """
 
     WALL: Final[str] = "#"
@@ -187,6 +186,12 @@ class Puzzle:
     ):
         from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
 
+        if width < 0:
+            raise ValueError(f"Board width {width} is invalid value!")
+
+        if height < 0:
+            raise ValueError(f"Board height {height} is invalid value!")
+
         self.title = ""
         self.author = ""
         self.boxorder = ""
@@ -222,13 +227,13 @@ class Puzzle:
             self._parsed_board = width * height * [self.VISIBLE_FLOOR]
 
         else:
+            if not self.is_board(board):
+                raise ValueError("Invalid characters in board string!")
             self._width = 0
             self._height = 0
             self._was_parsed = False
             self._original_board = board
             self._parsed_board = []
-            if not self.is_board(self._original_board):
-                raise ValueError("Invalid characters in board string!")
 
     @property
     def tessellation(self) -> Tessellation:
@@ -248,13 +253,20 @@ class Puzzle:
         return self._tessellation_obj.cell_orientation(pos, self.width, self.height)
 
     def __getitem__(self, position: int) -> str:
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
         self._reparse_if_not_parsed()
         return self._parsed_board[position]
 
     def __setitem__(self, position: int, c: str):
-        self._reparse_if_not_parsed()
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
         if not self.is_puzzle_element(c):
-            raise ValueError("Invalid characters in board string!")
+            raise ValueError(f"Invalid character '{c}' in board string!")
+
+        self._reparse_if_not_parsed()
         self._parsed_board[position] = c
 
     def __contains__(self, position: int):
@@ -262,17 +274,24 @@ class Puzzle:
         return position < len(self._parsed_board)
 
     def __str__(self):
-        return self.to_board_str(use_visible_floor=True)
+        return self.to_board_str(use_visible_floor=False)
 
     def __repr__(self):
         return "{klass}(board='\\n'.join([\n{board}\n]))".format(
             klass=self.__class__.__name__,
             board=textwrap.indent(
-                ",\n".join(["'{0}'".format(l) for l in str(self).split("\n")]), "    "
+                ",\n".join(
+                    [
+                        "'{0}'".format(l)
+                        for l in self.to_board_str(use_visible_floor=True).split("\n")
+                    ]
+                ),
+                "    ",
             ),
         )
 
     def to_board_str(self, use_visible_floor=False, rle_encode=False) -> str:
+        """Formatted output of parsed and validated board."""
         self._reparse_if_not_parsed()
         return self._printer_cls().print(
             self._parsed_board, self.width, self.height, use_visible_floor, rle_encode
@@ -280,6 +299,7 @@ class Puzzle:
 
     @property
     def board(self) -> str:
+        """Original, unparsed board."""
         return self._original_board
 
     @board.setter
@@ -294,9 +314,7 @@ class Puzzle:
 
     @property
     def internal_board(self) -> str:
-        """
-        Internal, parsed board. For debugging purposes.
-        """
+        """Internal, parsed board. For debugging purposes."""
         self._reparse_if_not_parsed()
         return "".join(self._parsed_board)
 
@@ -451,6 +469,11 @@ class Puzzle:
 
         Adds or removes rows and columns.
         """
+        if new_width < 0:
+            raise ValueError(f"Board width {new_width} is invalid value!")
+        if new_height < 0:
+            raise ValueError(f"Board height {new_height} is invalid value!")
+
         self._reparse_if_not_parsed()
         old_width = self.width
         old_height = self.height
@@ -482,6 +505,11 @@ class Puzzle:
         Adds or removes rows and columns keeping existing board centered inside of new
         one.
         """
+        if new_width < 0:
+            raise ValueError(f"Board width {new_width} is invalid value!")
+        if new_height < 0:
+            raise ValueError(f"Board height {new_height} is invalid value!")
+
         self._reparse_if_not_parsed()
         left = right = top = bottom = 0
 
