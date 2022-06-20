@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.7.0 (unreleased)
+## 1.0.0 (2022-06-20)
 
 - renamed `DEFAULT_PIECE_ID` -> `DEFAULT_ID`
 - renamed index functions
@@ -16,6 +16,11 @@
 - simplified `PusherStep`
   - signaling box movement is now done by single attribute, `moved_box_id`
   - added explicit constant for "no piece ID is present" situations (`Config.NO_ID`)
+- improved docs and tests, mainly on the front of exceptions
+- fix: in many places we now check for negative values and raise early
+  - having ie. negative board width not only makes no sense, but is completely
+    impossible to pass into C++ layer where board with type is strictly defined and
+    is using unsigned integer
 
 ## 0.6.0 (2022-06-16)
 

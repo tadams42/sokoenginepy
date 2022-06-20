@@ -36,7 +36,7 @@ copyright = (
     + ", Tomislav Adamic"
 )
 author = "Tomislav Adamic"
-version = release = "0.6.0"
+version = release = "1.0.0"
 
 
 # -- General configuration ---------------------------------------------------
