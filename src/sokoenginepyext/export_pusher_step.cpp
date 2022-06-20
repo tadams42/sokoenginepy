@@ -18,19 +18,6 @@ constexpr const char *OPPOSITE_NAMES[DIRECTIONS_COUNT] = {
   "DOWN", "SOUTH_WEST", "LEFT",  "NORTH_WEST",
   "UP",   "NORTH_EAST", "RIGHT", "SOUTH_EAST"};
 
-static inline sokoengine::game::piece_id_t no_id_if_invalid(py_int_t piece_id) {
-  if (piece_id < 0 ||
-      piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
-    return Config::NO_ID;
-  return static_cast<sokoengine::game::piece_id_t>(piece_id);
-}
-
-static inline sokoengine::game::piece_id_t default_if_invalid(py_int_t piece_id) {
-  if (piece_id < 0 ||
-      piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
-    return Config::DEFAULT_ID;
-  return static_cast<sokoengine::game::piece_id_t>(piece_id);
-}
 
 void export_pusher_step(py::module &m) {
   auto pyDirection = py::enum_<Direction>(m, "Direction")

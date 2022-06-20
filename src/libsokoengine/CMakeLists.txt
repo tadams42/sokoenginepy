@@ -18,6 +18,8 @@ set(PRIVATE_HEADERS
     io/snapshot/grammar.hpp
     io/snapshot/json_printer.hpp
     io/snapshot/parser.hpp
+
+    io/puzzle_parsing.hpp
 )
 
 set(INSTALL_HEADERS
@@ -78,6 +80,7 @@ set(SELF_SOURCES
     io/hexoban.cpp
     io/octoban.cpp
     io/puzzle.cpp
+    io/puzzle_parsing.cpp
     io/sokoban.cpp
     io/trioban.cpp
 )

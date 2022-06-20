@@ -1,5 +1,7 @@
 #include "trioban.hpp"
 
+#include "puzzle_parsing.hpp"
+
 using namespace std;
 
 namespace sokoengine {

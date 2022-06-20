@@ -2,6 +2,7 @@ from sokoenginepy.game import (
     BaseTessellation,
     Config,
     Direction,
+    OctobanTessellation,
     PusherStep,
     Tessellation,
 )
@@ -65,4 +66,5 @@ class DescribeOctobanTessellation(
         "E",
     ]
 
-    tessellation = BaseTessellation.instance(Tessellation.OCTOBAN)
+    tessellation1 = OctobanTessellation()
+    tessellation2 = BaseTessellation.instance(Tessellation.OCTOBAN)

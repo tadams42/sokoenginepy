@@ -105,7 +105,7 @@ public:
   /// single-pusher boards, single pusher is always automatically selected and this
   /// method doesn't need to be called.
   ///
-  /// @throws PieceNotFoundError no such pusher
+  /// @throws PieceNotFoundError no pusher wih ``pusher_id``
   ///
   virtual void select_pusher(piece_id_t pusher_id);
 
@@ -119,6 +119,7 @@ public:
   /// - first pull had been made
   ///
   /// @throws IllegalMoveError for illegal moves
+  /// @throws InvalidPositionError `new_position` is off board
   ///
   virtual void jump(position_t new_position);
 

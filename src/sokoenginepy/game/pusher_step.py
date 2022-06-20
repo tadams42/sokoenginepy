@@ -1,5 +1,3 @@
-from typing import Optional
-
 from .config import Config, Direction
 
 

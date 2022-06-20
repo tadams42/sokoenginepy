@@ -3,14 +3,9 @@ from __future__ import annotations
 from typing import Dict, Final, List, Optional, Tuple
 
 from ..io import Snapshot
-from .base_tessellation import (
-    BaseTessellation,
-    index_1d,
-    index_column,
-    index_row,
-    is_on_board_2d,
-)
+from .base_tessellation import BaseTessellation
 from .config import Config, Direction
+from .coordinate_helpers import index_1d, index_column, index_row, is_on_board_2d
 from .utilities import inverted
 
 
@@ -65,6 +60,15 @@ class SokobanTessellation(BaseTessellation):
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
     ) -> int:
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
+        if board_width < 0:
+            raise ValueError(f"Board width {board_width} is invalid value!")
+
+        if board_height < 0:
+            raise ValueError(f"Board height {board_height} is invalid value!")
+
         row = index_row(position, board_width)
         column = index_column(position, board_width)
         row_shift, column_shift = self._NEIGHBOR_SHIFT[direction.value]

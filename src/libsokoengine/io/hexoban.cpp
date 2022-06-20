@@ -1,6 +1,7 @@
 #include "hexoban.hpp"
 
 #include "rle.hpp"
+#include "puzzle_parsing.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <iostream>

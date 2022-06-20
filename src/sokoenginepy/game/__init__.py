@@ -74,7 +74,7 @@ else:
         from .sokoban_tessellation import SokobanTessellation
         from .trioban_tessellation import TriobanTessellation
 
-from .base_tessellation import (
+from .coordinate_helpers import (
     index_1d,
     index_column,
     index_row,

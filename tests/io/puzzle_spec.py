@@ -1,4 +1,8 @@
-from sokoenginepy.io import Puzzle
+import pytest
+
+from sokoenginepy import io
+from sokoenginepy.game import Tessellation
+from sokoenginepy.io import Puzzle, SokobanPuzzle
 
 
 class DescribePuzzle:
@@ -9,6 +13,63 @@ class DescribePuzzle:
         assert Puzzle.is_pusher(Puzzle.PUSHER_ON_GOAL)
         assert Puzzle.is_pusher(Puzzle.ALT_PUSHER_ON_GOAL1)
         assert Puzzle.is_pusher(Puzzle.ALT_PUSHER_ON_GOAL2)
+
+    def it_provides_factory_for_subtypes(self):
+        for tessellation in Tessellation.__members__.values():
+            klass = getattr(io, f"{tessellation.name.capitalize()}Puzzle")
+
+            obj = Puzzle.instance_from(tessellation, width=2, height=2)
+            assert isinstance(obj, klass)
+
+            obj = Puzzle.instance_from(tessellation, board="###")
+            assert isinstance(obj, klass)
+
+    def test_init_rises_on_invalid_board_sizes(self):
+        # It is OK to test for Sokoban only, all subtypes call Puzzle.__init__ anyway
+        with pytest.raises(ValueError):
+            SokobanPuzzle(width=-1, height=42)
+
+        with pytest.raises(ValueError):
+            SokobanPuzzle(width=42, height=-1)
+
+        with pytest.raises(ValueError):
+            SokobanPuzzle(width=-1, height=-1)
+
+    def test_getitem_rises_on_invalid_board_sizes(self):
+        # It is OK to test for Sokoban only, all subtypes user super() anyway
+        puzzle = SokobanPuzzle(width=5, height=5)
+
+        with pytest.raises(IndexError):
+            puzzle[-1]
+
+    def test_setitem_rises_on_invalid_board_sizes(self):
+        # It is OK to test for Sokoban only, all subtypes user super() anyway
+        puzzle = SokobanPuzzle(width=5, height=5)
+
+        with pytest.raises(IndexError):
+            puzzle[-1] = " "
+
+    def test_resize_rises_on_invalid_board_sizes(self):
+        # It is OK to test for Sokoban only, all subtypes user super() anyway
+        SokobanPuzzle(width=5, height=5)
+        puzzle = SokobanPuzzle(width=5, height=5)
+
+        with pytest.raises(ValueError):
+            puzzle.resize(-1, 5)
+
+        with pytest.raises(ValueError):
+            puzzle.resize(5, -1)
+
+    def test_resize_and_center_rises_on_invalid_board_sizes(self):
+        # It is OK to test for Sokoban only, all subtypes user super() anyway
+        SokobanPuzzle(width=5, height=5)
+        puzzle = SokobanPuzzle(width=5, height=5)
+
+        with pytest.raises(ValueError):
+            puzzle.resize_and_center(-1, 5)
+
+        with pytest.raises(ValueError):
+            puzzle.resize_and_center(5, -1)
 
     def it_correctly_categorizes_box_characters(self):
         assert Puzzle.is_box(Puzzle.BOX)

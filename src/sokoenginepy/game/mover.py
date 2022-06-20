@@ -213,6 +213,9 @@ class Mover:
 
         See Also:
             `.BoardManager.pushers_ids`
+
+        Raises:
+            KeyError: no pusher with ID ``pusher_id``
         """
 
         if pusher_id == self._selected_pusher:
@@ -266,6 +269,7 @@ class Mover:
 
         Raises:
             IllegalMoveError: for illegal jumps
+            IndexError: ``new_position`` is off board
         """
         if self._pull_count != 0:
             raise IllegalMoveError("Jumps not allowed after first pull")

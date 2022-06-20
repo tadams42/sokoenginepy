@@ -176,6 +176,9 @@ class DescribeMover:
             with pytest.raises(KeyError):
                 forward_mover.select_pusher(Config.DEFAULT_ID + 42)
 
+            with pytest.raises(KeyError):
+                forward_mover.select_pusher(-42)
+
         def it_updates_last_move_with_pusher_selection_sequence(
             self, forward_board, pusher_selections
         ):
@@ -282,6 +285,10 @@ class DescribeMover:
 
             with pytest.raises(IndexError):
                 reverse_mover.jump(off_board_position)
+            assert not reverse_mover.last_move
+
+            with pytest.raises(IndexError):
+                reverse_mover.jump(-42)
             assert not reverse_mover.last_move
 
         def it_updates_last_move_with_jump_sequence(

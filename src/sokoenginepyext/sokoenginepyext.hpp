@@ -65,3 +65,23 @@ piece_or_throw(sokoengine::game::Selectors piece, py_int_t piece_id) {
     throw sokoengine::game::PieceNotFoundError(piece, piece_id);
   return static_cast<sokoengine::game::piece_id_t>(piece_id);
 }
+
+static inline sokoengine::game::piece_id_t no_id_if_invalid(py_int_t piece_id) {
+  if (piece_id < 0 ||
+      piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
+    return sokoengine::game::Config::NO_ID;
+  return static_cast<sokoengine::game::piece_id_t>(piece_id);
+}
+
+static inline sokoengine::game::piece_id_t default_if_invalid(py_int_t piece_id) {
+  if (piece_id < 0 ||
+      piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
+    return sokoengine::game::Config::DEFAULT_ID;
+  return static_cast<sokoengine::game::piece_id_t>(piece_id);
+}
+
+static inline sokoengine::board_size_t size_or_throw(py_int_t size) {
+  if (size < 0 || size >= std::numeric_limits<sokoengine::board_size_t>::max())
+    throw std::invalid_argument("Board size " + std::to_string(size) + " is invalid!");
+  return static_cast<sokoengine::board_size_t>(size);
+}

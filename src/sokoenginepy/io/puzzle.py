@@ -186,6 +186,12 @@ class Puzzle:
     ):
         from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
 
+        if width < 0:
+            raise ValueError(f"Board width {width} is invalid value!")
+
+        if height < 0:
+            raise ValueError(f"Board height {height} is invalid value!")
+
         self.title = ""
         self.author = ""
         self.boxorder = ""
@@ -247,12 +253,19 @@ class Puzzle:
         return self._tessellation_obj.cell_orientation(pos, self.width, self.height)
 
     def __getitem__(self, position: int) -> str:
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
         self._reparse_if_not_parsed()
         return self._parsed_board[position]
 
     def __setitem__(self, position: int, c: str):
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
         if not self.is_puzzle_element(c):
-            raise ValueError("Invalid characters in board string!")
+            raise ValueError(f"Invalid character '{c}' in board string!")
+
         self._reparse_if_not_parsed()
         self._parsed_board[position] = c
 
@@ -456,6 +469,11 @@ class Puzzle:
 
         Adds or removes rows and columns.
         """
+        if new_width < 0:
+            raise ValueError(f"Board width {new_width} is invalid value!")
+        if new_height < 0:
+            raise ValueError(f"Board height {new_height} is invalid value!")
+
         self._reparse_if_not_parsed()
         old_width = self.width
         old_height = self.height
@@ -487,6 +505,11 @@ class Puzzle:
         Adds or removes rows and columns keeping existing board centered inside of new
         one.
         """
+        if new_width < 0:
+            raise ValueError(f"Board width {new_width} is invalid value!")
+        if new_height < 0:
+            raise ValueError(f"Board height {new_height} is invalid value!")
+
         self._reparse_if_not_parsed()
         left = right = top = bottom = 0
 

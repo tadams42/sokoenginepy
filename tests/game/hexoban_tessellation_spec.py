@@ -2,6 +2,7 @@ from sokoenginepy.game import (
     BaseTessellation,
     Config,
     Direction,
+    HexobanTessellation,
     PusherStep,
     Tessellation,
 )
@@ -42,4 +43,5 @@ class DescribeHexobanTessellation(
 
     legal_characters = ["l", "r", "u", "n", "s", "d", "L", "R", "U", "N", "S", "D"]
 
-    tessellation = BaseTessellation.instance(Tessellation.HEXOBAN)
+    tessellation1 = HexobanTessellation()
+    tessellation2 = BaseTessellation.instance(Tessellation.HEXOBAN)

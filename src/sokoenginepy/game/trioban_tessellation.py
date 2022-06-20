@@ -3,16 +3,9 @@ from __future__ import annotations
 from typing import Final, Mapping, Tuple
 
 from ..io import CellOrientation, Snapshot
-from .base_tessellation import (
-    index_column,
-    index_row,
-    BaseTessellation,
-    Direction,
-    GraphType,
-    index_1d,
-    is_on_board_2d,
-)
-from .config import Direction, GraphType, Config
+from .base_tessellation import BaseTessellation
+from .config import Config, Direction, GraphType
+from .coordinate_helpers import index_1d, index_column, index_row, is_on_board_2d
 from .utilities import inverted
 
 
@@ -72,12 +65,12 @@ class TriobanTessellation(BaseTessellation):
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
     ) -> int:
-        row = index_row(position, board_width)
-        column = index_column(position, board_width)
         triangle_points_down = (
             self.cell_orientation(position, board_width, board_height)
             == CellOrientation.TRIANGLE_DOWN
         )
+        row = index_row(position, board_width)
+        column = index_column(position, board_width)
 
         dx, dy = 0, 0
         if direction == Direction.LEFT:
@@ -128,6 +121,15 @@ class TriobanTessellation(BaseTessellation):
     def cell_orientation(
         self, position: int, board_width: int, board_height: int
     ) -> CellOrientation:
+        if position < 0:
+            raise IndexError(f"Position {position} is invalid value!")
+
+        if board_width < 0:
+            raise ValueError(f"Board width {board_width} is invalid value!")
+
+        if board_height < 0:
+            raise ValueError(f"Board height {board_height} is invalid value!")
+
         row = index_row(position, board_width)
         column = index_column(position, board_width)
         return (
