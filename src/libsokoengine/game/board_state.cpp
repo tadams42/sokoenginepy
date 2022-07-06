@@ -2,7 +2,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::io::Strings;
+using sokoengine::implementation::Strings;
 using std::make_unique;
 using std::string;
 using std::to_string;

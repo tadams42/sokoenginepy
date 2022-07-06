@@ -9,7 +9,6 @@ using sokoengine::io::HexobanPuzzle;
 using sokoengine::io::OctobanPuzzle;
 using sokoengine::io::Puzzle;
 using sokoengine::io::SokobanPuzzle;
-using sokoengine::io::Strings;
 using sokoengine::io::TriobanPuzzle;
 using std::make_unique;
 using std::string;
@@ -115,7 +114,7 @@ void export_io_puzzle(py::module &m) {
     [](const Puzzle &self) {
       return self.notes();
     },
-    [](Puzzle &self, const Strings &rv) {
+    [](Puzzle &self, const string &rv) {
       self.notes() = rv;
     }
   );

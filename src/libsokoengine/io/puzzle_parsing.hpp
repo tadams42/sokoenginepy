@@ -12,10 +12,10 @@ namespace implementation {
 typedef std::vector<char> parsed_board_t;
 
 void LIBSOKOENGINE_LOCAL _copy(
-  parsed_board_t &parsed_board,
-  board_size_t   &width,
-  board_size_t   &height,
-  const Strings  &strings
+  parsed_board_t                            &parsed_board,
+  board_size_t                              &width,
+  board_size_t                              &height,
+  const sokoengine::implementation::Strings &strings
 );
 
 class LIBSOKOENGINE_LOCAL PuzzleResizer {
@@ -73,10 +73,13 @@ class LIBSOKOENGINE_LOCAL PuzzleParser {
 public:
   virtual ~PuzzleParser() = default;
 
-  virtual Strings parse(const std::string &board) const;
-  static size_t   calculate_width(const Strings &strings);
-  static Strings  normalize_width(const Strings &strings, char fill_chr = ' ');
-  static Strings  cleaned_board_lines(const std::string &line);
+  virtual sokoengine::implementation::Strings parse(const std::string &board) const;
+  static size_t calculate_width(const sokoengine::implementation::Strings &strings);
+  static sokoengine::implementation::Strings normalize_width(
+    const sokoengine::implementation::Strings &strings, char fill_chr = ' '
+  );
+  static sokoengine::implementation::Strings cleaned_board_lines(const std::string &line
+  );
 };
 
 class LIBSOKOENGINE_LOCAL PuzzlePrinter {

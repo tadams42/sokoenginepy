@@ -11,6 +11,7 @@ using sokoengine::game::index_1d;
 using sokoengine::game::index_x;
 using sokoengine::game::index_y;
 using sokoengine::game::Tessellation;
+using sokoengine::implementation::Strings;
 using std::invalid_argument;
 using std::make_tuple;
 using std::make_unique;

@@ -11,7 +11,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::io::Strings;
+using sokoengine::implementation::Strings;
 using std::find;
 using std::make_unique;
 using std::map;

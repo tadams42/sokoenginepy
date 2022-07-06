@@ -14,6 +14,7 @@
 using sokoengine::game::BaseTessellation;
 using sokoengine::game::index_1d;
 using sokoengine::game::Tessellation;
+using sokoengine::implementation::Strings;
 using std::invalid_argument;
 using std::make_unique;
 using std::string;
@@ -29,11 +30,11 @@ using implementation::PuzzleResizer;
 
 class LIBSOKOENGINE_LOCAL Puzzle::PIMPL {
 public:
-  string  m_title;
-  string  m_author;
-  string  m_boxorder;
-  string  m_goalorder;
-  Strings m_notes;
+  string m_title;
+  string m_author;
+  string m_boxorder;
+  string m_goalorder;
+  string m_notes;
 
   board_size_t   m_width      = 0;
   board_size_t   m_height     = 0;
@@ -161,9 +162,9 @@ const string &Puzzle::goalorder() const { return m_impl->m_goalorder; }
 
 string &Puzzle::goalorder() { return m_impl->m_goalorder; }
 
-const Strings &Puzzle::notes() const { return m_impl->m_notes; }
+const string &Puzzle::notes() const { return m_impl->m_notes; }
 
-Strings &Puzzle::notes() { return m_impl->m_notes; }
+string &Puzzle::notes() { return m_impl->m_notes; }
 
 Tessellation Puzzle::tessellation() const { return m_impl->m_tessellation; }
 

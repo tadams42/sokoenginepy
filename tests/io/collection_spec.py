@@ -39,18 +39,20 @@ class DescribeCollection:
         assert collection.author == "Thinking Rabbit"
         assert collection.created_at == "2022-07-01  01:05:06"
         assert collection.updated_at == "2022-07-02  09:48:22"
-        assert list(collection.notes) == [
-            "Originate from: original.slc",
-            "",
-            "Some collection notes",
-        ]
+        assert collection.notes == "\n".join(
+            [
+                "Originate from: original.slc",
+                "",
+                "Some collection notes",
+            ]
+        )
 
         puzzle = collection.puzzles[0]
         assert puzzle.title == "Level 1"
         assert puzzle.author == "author name"
         assert puzzle.boxorder == "1 2 3 4 5 6"
         assert puzzle.goalorder == "6 5 4 3 2 1"
-        assert list(puzzle.notes) == ["Time: 00:01:00", "", "Some puzzle notes"]
+        assert puzzle.notes == "\n".join(["Time: 00:01:00", "", "Some puzzle notes"])
         assert not is_blank(puzzle.board)
 
         expected_board = textwrap.dedent(
@@ -72,11 +74,13 @@ class DescribeCollection:
         assert puzzle.board == expected_board
 
         snapshot = puzzle.snapshots[0]
-        assert list(snapshot.notes) == [
-            "Some snapshot notes",
-            "Optimizer: YASS 2.86",
-            "Time: 00:00:47",
-        ]
+        assert snapshot.notes == "\n".join(
+            [
+                "Some snapshot notes",
+                "Optimizer: YASS 2.86",
+                "Time: 00:00:47",
+            ]
+        )
         expected_moves_data = "".join(
             _.strip()
             for _ in (
@@ -116,7 +120,7 @@ class DescribeCollection:
         note = "but parser can't know that and should recognize it as heading line"
 
         assert collection.puzzles[1].title == title
-        assert list(collection.puzzles[1].notes) == [note]
+        assert collection.puzzles[1].notes == note
 
     def it_correctly_loads_mixed_tessellations_collection(self, input_files_root):
         collection = Collection()

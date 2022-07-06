@@ -7,8 +7,6 @@
 
 namespace py = pybind11;
 
-PYBIND11_MAKE_OPAQUE(sokoengine::io::Strings);
-
 //
 // pybind11 reduces all integer arguments to this type
 //

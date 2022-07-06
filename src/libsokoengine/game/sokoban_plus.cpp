@@ -9,8 +9,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+using sokoengine::implementation::Strings;
 using sokoengine::io::is_blank;
-using sokoengine::io::Strings;
 using std::errc;
 using std::from_chars;
 using std::invalid_argument;
@@ -272,7 +272,7 @@ bool SokobanPlus::is_enabled() const { return m_impl->m_enabled; }
 
 bool SokobanPlus::is_validated() const { return m_impl->m_validated; }
 
-Strings SokobanPlus::errors() const { return m_impl->m_errors; }
+string SokobanPlus::errors() const { return boost::join(m_impl->m_errors, "\n"); }
 
 void SokobanPlus::enable() {
   if (!is_valid()) {

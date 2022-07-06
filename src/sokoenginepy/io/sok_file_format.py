@@ -110,7 +110,7 @@ class SOKReader:
         self.dest.author = self._data.author or ""
         self.dest.created_at = self._data.created_at or ""
         self.dest.updated_at = self._data.updated_at or ""
-        self.dest.notes = self._data.notes
+        self.dest.notes = "\n".join(self._data.notes)
 
         for puzzle_data in self._data.puzzles:
             if puzzle_data.tessellation == Tessellation.SOKOBAN:
@@ -130,13 +130,15 @@ class SOKReader:
                     f"Missing implementation for {puzzle_data.tessellation}!"
                 )
 
-            for attr in {"title", "author", "boxorder", "goalorder", "notes"}:
+            for attr in {"title", "author", "boxorder", "goalorder"}:
                 setattr(puzzle, attr, getattr(puzzle_data, attr))
+            puzzle.notes = "\n".join(puzzle_data.notes)
 
             for snapshot_data in puzzle_data.snapshots:
                 snapshot = snapshot_klass(moves_data=snapshot_data.moves_data or "")
-                for attr in {"title", "solver", "notes"}:
+                for attr in {"title", "solver"}:
                     setattr(snapshot, attr, getattr(snapshot_data, attr))
+                snapshot.notes = "\n".join(snapshot_data.notes)
                 puzzle.snapshots.append(snapshot)
 
             self.dest.puzzles.append(puzzle)
@@ -575,9 +577,8 @@ class SOKWriter:
         )
         written = SOKTags.write_tagged(self.dest, SOKTags.AUTHOR, src.author) or written
 
-        puzzle_collection_notes = "\n".join(src.notes)
-        if not is_blank(puzzle_collection_notes):
-            self.dest.write(puzzle_collection_notes.rstrip() + "\n")
+        if not is_blank(src.notes):
+            self.dest.write(src.notes.rstrip() + "\n")
             written = True
 
         if written:
@@ -619,9 +620,8 @@ class SOKWriter:
                 SOKTags.write_tagged(self.dest, SOKTags.AUTHOR, src.author) or written
             )
 
-        puzzle_notes = "\n".join(src.notes)
-        if not is_blank(puzzle_notes):
-            self.dest.write(puzzle_notes.rstrip() + "\n")
+        if not is_blank(src.notes):
+            self.dest.write(src.notes.rstrip() + "\n")
             written = True
 
         if written:
@@ -641,9 +641,8 @@ class SOKWriter:
 
         written = SOKTags.write_tagged(self.dest, SOKTags.SOLVER, src.solver)
 
-        snap_notes = "\n".join(src.notes)
-        if not is_blank(snap_notes):
-            self.dest.write(snap_notes.rstrip() + "\n")
+        if not is_blank(src.notes):
+            self.dest.write(src.notes.rstrip() + "\n")
             written = True
 
         if written:

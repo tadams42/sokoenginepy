@@ -5,8 +5,8 @@
 #include <boost/algorithm/string.hpp>
 #include <stdexcept>
 
+using sokoengine::implementation::Strings;
 using sokoengine::io::is_blank;
-using sokoengine::io::Strings;
 using std::invalid_argument;
 using std::runtime_error;
 using std::string;

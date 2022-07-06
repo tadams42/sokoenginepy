@@ -18,6 +18,7 @@ using sokoengine::game::BaseTessellation;
 using sokoengine::game::PusherStep;
 using sokoengine::game::PusherSteps;
 using sokoengine::game::Tessellation;
+using sokoengine::implementation::Strings;
 using std::invalid_argument;
 using std::make_unique;
 using std::string;
@@ -33,9 +34,9 @@ namespace sokoengine {
 
     class LIBSOKOENGINE_LOCAL Snapshot::PIMPL {
     public:
-      string  m_title;
-      string  m_solver;
-      Strings m_notes;
+      string m_title;
+      string m_solver;
+      string m_notes;
 
       Tessellation m_tessellation;
 
@@ -120,9 +121,9 @@ namespace sokoengine {
 
     string &Snapshot::solver() { return m_impl->m_solver; }
 
-    const Strings &Snapshot::notes() const { return m_impl->m_notes; }
+    const string &Snapshot::notes() const { return m_impl->m_notes; }
 
-    Strings &Snapshot::notes() { return m_impl->m_notes; }
+    string &Snapshot::notes() { return m_impl->m_notes; }
 
     string Snapshot::to_str(bool rle_encode) const {
       m_impl->reparse_if_not_parsed();

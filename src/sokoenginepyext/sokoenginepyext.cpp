@@ -7,7 +7,6 @@ using sokoengine::game::InvalidPositionError;
 using sokoengine::game::NonPlayableBoardError;
 using sokoengine::game::PieceNotFoundError;
 using sokoengine::game::SokobanPlusDataError;
-using sokoengine::io::Strings;
 
 void export_pusher_step(py::module &);
 void export_board_cell(py::module &);
@@ -25,8 +24,6 @@ void export_io_rle(py::module &m);
 PYBIND11_MODULE(sokoenginepyext, m) {
   py::module_ m_game = m.def_submodule("game");
   py::module_ m_io   = m.def_submodule("io");
-
-  py::bind_vector<Strings>(m_io, "StringsList");
 
   py::register_exception<CellAlreadyOccupiedError>(
     m_game, "CellAlreadyOccupiedError", PyExc_ValueError

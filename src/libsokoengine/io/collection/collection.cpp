@@ -33,15 +33,15 @@ public:
   string  m_author;
   string  m_created_at;
   string  m_updated_at;
-  Strings m_notes;
+  string  m_notes;
   Puzzles m_puzzles;
 
   PIMPL(
-    const string  &title,
-    const string  &author,
-    const Strings &notes,
-    const string  &created_at,
-    const string  &updated_at
+    const string &title,
+    const string &author,
+    const string &notes,
+    const string &created_at,
+    const string &updated_at
   )
     : m_title(title)
     , m_author(author)
@@ -51,14 +51,28 @@ public:
 };
 
 Collection::Collection(
-  const string  &title,
-  const string  &author,
-  const string  &created_at,
-  const string  &updated_at,
-  const Strings &notes
+  const string &title,
+  const string &author,
+  const string &created_at,
+  const string &updated_at,
+  const string &notes
 )
   : m_impl(make_unique<Collection::PIMPL>(title, author, notes, created_at, updated_at)
   ) {}
+
+Collection::Collection(const Collection &rv)
+  : m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
+
+Collection &Collection::operator=(const Collection &rv) {
+  if (this != &rv) {
+    m_impl = make_unique<PIMPL>(*rv.m_impl);
+  }
+  return *this;
+}
+
+Collection::Collection(Collection &&rv) = default;
+
+Collection &Collection::operator=(Collection &&rv) = default;
 
 Collection::~Collection() = default;
 
@@ -78,9 +92,9 @@ const string &Collection::updated_at() const { return m_impl->m_updated_at; }
 
 string &Collection::updated_at() { return m_impl->m_updated_at; }
 
-const Strings &Collection::notes() const { return m_impl->m_notes; }
+const string &Collection::notes() const { return m_impl->m_notes; }
 
-Strings &Collection::notes() { return m_impl->m_notes; }
+string &Collection::notes() { return m_impl->m_notes; }
 
 const Puzzles &Collection::puzzles() const { return m_impl->m_puzzles; }
 

@@ -196,7 +196,7 @@ class Puzzle:
         self.author = ""
         self.boxorder = ""
         self.goalorder = ""
-        self.notes: List[str] = []
+        self.notes = ""
         self.snapshots: List[Snapshot] = []
 
         self._pushers_count: Optional[int] = None

@@ -9,6 +9,7 @@
 using sokoengine::game::BaseTessellation;
 using sokoengine::game::index_1d;
 using sokoengine::game::Tessellation;
+using sokoengine::implementation::Strings;
 using std::string;
 
 namespace sokoengine {

@@ -300,11 +300,6 @@ public:
 namespace io {
 
 ///
-/// Default type for sequence of strings.
-///
-typedef std::vector<std::string> Strings;
-
-///
 /// For some types of games, individual board cell type depends on board position.
 ///
 enum class LIBSOKOENGINE_API CellOrientation : int {
@@ -319,6 +314,11 @@ enum class LIBSOKOENGINE_API CellOrientation : int {
 bool LIBSOKOENGINE_API is_blank(const std::string &line);
 
 } // namespace io
+
+namespace implementation {
+typedef std::vector<std::string> Strings;
+} // namespace implementation
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD

@@ -12,7 +12,7 @@
 #include <boost/bimap.hpp>
 #include <boost/bimap/set_of.hpp>
 
-using sokoengine::io::Strings;
+using sokoengine::implementation::Strings;
 using std::deque;
 using std::invalid_argument;
 using std::make_pair;

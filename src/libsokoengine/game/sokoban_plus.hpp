@@ -105,7 +105,7 @@ public:
   bool        is_valid() const;
   bool        is_enabled() const;
   bool        is_validated() const;
-  io::Strings errors() const;
+  std::string errors() const;
 
   ///
   /// @throws SokobanPlusDataError Trying to enable invalid Sokoban+

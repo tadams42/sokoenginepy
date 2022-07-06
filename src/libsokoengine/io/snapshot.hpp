@@ -73,8 +73,8 @@ public:
   std::string       &title();
   const std::string &solver() const;
   std::string       &solver();
-  const Strings     &notes() const;
-  Strings           &notes();
+  const std::string &notes() const;
+  std::string       &notes();
 
   game::Tessellation tessellation() const;
 

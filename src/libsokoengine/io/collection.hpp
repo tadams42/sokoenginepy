@@ -32,8 +32,12 @@ public:
     const std::string &author     = "",
     const std::string &created_at = "",
     const std::string &updated_at = "",
-    const Strings     &notes      = Strings()
+    const std::string &notes      = ""
   );
+  Collection(const Collection &rv);
+  Collection &operator=(const Collection &rv);
+  Collection(Collection &&rv);
+  Collection &operator=(Collection &&rv);
   virtual ~Collection();
 
   const std::string &title() const;
@@ -44,8 +48,8 @@ public:
   std::string       &created_at();
   const std::string &updated_at() const;
   std::string       &updated_at();
-  const Strings     &notes() const;
-  Strings           &notes();
+  const std::string &notes() const;
+  std::string       &notes();
   const Puzzles     &puzzles() const;
   Puzzles           &puzzles();
 

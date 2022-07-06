@@ -5,7 +5,6 @@ using sokoengine::io::HexobanSnapshot;
 using sokoengine::io::OctobanSnapshot;
 using sokoengine::io::Snapshot;
 using sokoengine::io::SokobanSnapshot;
-using sokoengine::io::Strings;
 using sokoengine::io::TriobanSnapshot;
 using std::string;
 
@@ -93,7 +92,7 @@ void export_io_snapshot(py::module &m) {
     [](const Snapshot &self) {
       return self.notes();
     },
-    [](Snapshot &self, const Strings &rv) {
+    [](Snapshot &self, const string &rv) {
       self.notes() = rv;
     }
   );

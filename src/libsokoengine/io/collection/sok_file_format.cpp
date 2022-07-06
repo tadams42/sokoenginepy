@@ -11,17 +11,18 @@
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 
-namespace sokoengine {
-namespace io {
-namespace implementation {
-
-using game::Tessellation;
+using sokoengine::game::Tessellation;
+using sokoengine::implementation::Strings;
 using std::endl;
 using std::ios_base;
 using std::istream;
 using std::ostream;
 using std::string;
 using std::vector;
+
+namespace sokoengine {
+namespace io {
+namespace implementation {
 
 struct LIBSOKOENGINE_LOCAL SnapshotData {
   string  moves_data;
@@ -314,13 +315,13 @@ class LIBSOKOENGINE_LOCAL PuzzleConsumeVisitor {
     puzzle.author().swap(m_puzzle_data.author);
     puzzle.boxorder().swap(m_puzzle_data.boxorder);
     puzzle.goalorder().swap(m_puzzle_data.goalorder);
-    puzzle.notes().swap(m_puzzle_data.notes);
+    puzzle.notes() = boost::join(m_puzzle_data.notes, "\n");
   }
 
   void copy_snapshot_metadata(Snapshot &snapshot, SnapshotData &data) {
     snapshot.title().swap(data.title);
     snapshot.solver().swap(data.solver);
-    snapshot.notes().swap(data.notes);
+    snapshot.notes() = boost::join(data.notes, "\n");
   }
 
 public:
@@ -383,7 +384,7 @@ private:
     m_dest.author().swap(m_data.author);
     m_dest.created_at().swap(m_data.created_at);
     m_dest.updated_at().swap(m_data.updated_at);
-    m_dest.notes().swap(m_data.notes);
+    m_dest.notes() = boost::join(m_data.notes, "\n");
 
     for (PuzzleData &puzzle_data : m_data.puzzles) {
       switch (puzzle_data.tessellation) {
@@ -785,16 +786,12 @@ private:
     written =
       SOKTags::write_tagged(m_stream, SOKTags::AUTHOR, puzzle.author()) || written;
 
-    bool non_blank_found = false;
-    for (const string &line : puzzle.notes()) {
-      non_blank_found = non_blank_found || !is_blank(line);
-    }
-    if (non_blank_found) {
-      for (const string &line : puzzle.notes()) {
-        m_stream << boost::trim_copy(line) << endl;
-      }
+    string non_blank = boost::trim_copy(puzzle.notes());
+    if (non_blank.length() > 0) {
+      m_stream << non_blank << endl;
       written = true;
     }
+
     if (written)
       m_stream << endl;
 
@@ -822,16 +819,12 @@ private:
 
     bool written = SOKTags::write_tagged(m_stream, SOKTags::SOLVER, snapshot.solver());
 
-    bool non_blank_found = false;
-    for (const string &line : snapshot.notes()) {
-      non_blank_found = non_blank_found || !is_blank(line);
-    }
-    if (non_blank_found) {
-      for (const string &line : snapshot.notes()) {
-        m_stream << boost::trim_copy(line) << endl;
-      }
+    string non_blank = boost::trim_copy(snapshot.notes());
+    if (non_blank.length() > 0) {
+      m_stream << non_blank << endl;
       written = true;
     }
+
     if (written)
       m_stream << endl;
 
@@ -883,14 +876,9 @@ private:
     written =
       SOKTags::write_tagged(m_stream, SOKTags::AUTHOR, collection.author()) || written;
 
-    bool non_blank_found = false;
-    for (const string &line : collection.notes()) {
-      non_blank_found = non_blank_found || is_blank(line);
-    }
-    if (non_blank_found) {
-      for (const string &line : collection.notes()) {
-        m_stream << boost::trim_copy(line) << endl;
-      }
+    string non_blank = boost::trim_copy(collection.notes());
+    if (non_blank.length() > 0) {
+      m_stream << non_blank << endl;
       written = true;
     }
 

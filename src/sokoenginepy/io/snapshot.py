@@ -91,7 +91,7 @@ class Snapshot:
     def __init__(self, tessellation: Tessellation, moves_data: str = ""):
         self.title: str = ""
         self.solver: str = ""
-        self.notes: List[str] = []
+        self.notes: str = ""
 
         self._tessellation = tessellation
         self._tessellation_obj_val: Optional[BaseTessellation] = None

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import io
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Union
 
 from ..game import Tessellation
 from .puzzle import Puzzle
@@ -27,13 +27,13 @@ class Collection:
         author: str = "",
         created_at: str = "",
         updated_at: str = "",
-        notes: Optional[List[str]] = None,
+        notes: str = "",
     ):
         self.title = title
         self.author = author
         self.created_at = created_at
         self.updated_at = updated_at
-        self.notes: List[str] = notes or []
+        self.notes = notes
         self.puzzles: List[Puzzle] = []
 
     def load(

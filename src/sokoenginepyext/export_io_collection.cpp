@@ -5,7 +5,6 @@
 using sokoengine::game::Tessellation;
 using sokoengine::io::Collection;
 using sokoengine::io::Puzzles;
-using sokoengine::io::Strings;
 using std::istream;
 using std::istringstream;
 using std::ostream;
@@ -20,12 +19,12 @@ void export_io_collection(py::module &m) {
   auto pyCollection = py::class_<Collection>(m, "Collection");
 
   pyCollection.def(
-    py::init<string, string, string, string, Strings>(),
+    py::init<string, string, string, string, string>(),
     py::arg("title")      = "",
     py::arg("author")     = "",
     py::arg("created_at") = "",
     py::arg("updated_at") = "",
-    py::arg("notes")      = Strings()
+    py::arg("notes")      = ""
   );
 
   pyCollection.def_property(
@@ -53,7 +52,7 @@ void export_io_collection(py::module &m) {
     [](const Collection &self) {
       return self.notes();
     },
-    [](Collection &self, const Strings &rv) {
+    [](Collection &self, const string &rv) {
       self.notes() = rv;
     }
   );

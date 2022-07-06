@@ -109,8 +109,8 @@ public:
   std::string       &boxorder();
   const std::string &goalorder() const;
   std::string       &goalorder();
-  const Strings     &notes() const;
-  Strings           &notes();
+  const std::string &notes() const;
+  std::string       &notes();
 
   game::Tessellation tessellation() const;
   CellOrientation    cell_orientation(position_t position) const;
