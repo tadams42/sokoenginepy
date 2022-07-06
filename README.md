@@ -102,18 +102,20 @@ pip install sokoenginepy
 
 or `libsokoengine` C++ library:
 
+You will need [vcpkg](https://vcpkg.io/) and then:
+
 ```sh
-sudo apt install git build-essential libboost-graph-dev cmake doxygen
+sudo apt install git build-essential cmake doxygen
+
 git clone https://github.com/tadams42/sokoenginepy.git
 cd sokoenginepy/
+
+export CMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake
 cmake --preset "debug"
+
 cd build/debug/
 make && make install
 ```
-
-On Linux, installing package via `pip` will also try to build native C++ extension that
-utilizes `libsokoengine` for improved speed. In case it can't build, it will install
-pure Python implementation. On any other OS, `pip` will install pure Python only.
 
 For more elaborate details, see [INSTALL.md](./INSTALL.md)
 

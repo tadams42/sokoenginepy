@@ -13,7 +13,6 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_SHARED_LIBS": "ON",
-        "ENABLE_PYTHON_EXTENSION": "ON",
         "SOKOENGINEPYEXT_DEBUG": "1"
       }
     },
@@ -33,7 +32,6 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "BUILD_SHARED_LIBS": "ON",
-        "ENABLE_PYTHON_EXTENSION": "ON",
         "SOKOENGINEPYEXT_DEBUG": "0"
       }
     },

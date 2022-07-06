@@ -16,6 +16,10 @@ def _get_filtered_members(mdl):
     }
 
 
+def is_trueish(val):
+    return val and str(val).lower() in {"1", "true", "yes", "on"}
+
+
 @pytest.fixture
 def io_members():
     return {
@@ -114,12 +118,12 @@ class DescribeNativeCppExtension:
         if building_on_travis:
             job_name = os.environ.get("TRAVIS_JOB_NAME", None)
 
-            if job_name and "native extension" in job_name:
-                assert os.environ.get("SOKOENGINEPYEXT_BUILD", None) == "true"
+            if job_name and "Python with C++" in job_name:
+                assert not is_trueish(os.environ.get("SOKOENGINEPYEXT_SKIP", None))
                 assert is_using_native
 
             else:
-                assert os.environ.get("SOKOENGINEPYEXT_BUILD", None) == "false"
+                assert is_trueish(os.environ.get("SOKOENGINEPYEXT_SKIP", None))
                 assert not is_using_native
 
         else:

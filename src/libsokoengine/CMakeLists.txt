@@ -96,23 +96,10 @@ set(SELF_INCLUDE_DIRS
 # ..............................................................................
 add_library(sokoengine_obj OBJECT ${INSTALL_HEADERS} ${PRIVATE_HEADERS} ${SELF_SOURCES})
 
-target_include_directories(sokoengine_obj
-    PUBLIC
-    ${SELF_INCLUDE_DIRS}
-    PRIVATE
-    $<TARGET_PROPERTY:CPPITERTOOLS::cppitertools,INTERFACE_INCLUDE_DIRECTORIES>
-)
+target_include_directories(sokoengine_obj PUBLIC ${SELF_INCLUDE_DIRS})
 
-# We link (where necessary) thse dependencies statically, there is no need to expose
-# them to targes consuming sokoengine_obj.
-# As a consequence, consumers of libsokoengine don't need to link against boost.
-# They don't even need to have boost installed, since no libsokoengine public
-# headers include anything from Boost.
-# target_link_libraries(sokoengine_obj
-# PRIVATE
-# "$<BUILD_INTERFACE:Boost::boost>"
-# "$<BUILD_INTERFACE:CPPITERTOOLS::cppitertools>"
-# )
+target_link_libraries(sokoengine_obj PUBLIC cppitertools::cppitertools)
+target_link_libraries(sokoengine_obj PUBLIC Boost::boost)
 target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
 
 if(${BUILD_SHARED_LIBS})

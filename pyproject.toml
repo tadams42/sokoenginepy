@@ -1,5 +1,11 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "pybind11>=2.9.0"]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "pybind11>=2.9.0",
+    "ninja",
+    "cmake >= 3.22",
+]
 build-backend = "setuptools.build_meta"
 
 [tool.isort]
@@ -10,26 +16,26 @@ skip_gitignore = true
 minversion = "6.0"
 norecursedirs = [".git", "tmp*", ".hg", ".venv", ".tox", ".eggs"]
 addopts = [
-	"-rxEfsw",
-	"--strict-markers",
-	"--tb=short",
-	# Enabling --doctest-modules on src/ runs into problems when there is native
-	# extension built. In that case, pytest will still try to import .py files (ie.
-	# hexoban_board.py) to collect tests from them. But, this will fail to import
-	# because that file works only in environments where native extension is NOT
-	# built. We can't use --doctest-modules.
-	# "--doctest-modules",
-	"--doctest-glob=*.rst",
-	"--doctest-glob=tutorial_.md",
-	"--ignore=bin",
-	"--ignore=build",
-	"--ignore=cmake",
-	"--ignore=docs/conf.py",
-	"--ignore=scratchpad",
-	"--ignore=src/libsokoengine",
-	"--ignore=src/sokoenginepyext",
-	"--ignore=tests/fixtures/test_cases",
-	"--ignore=tmp",
+    "-rxEfsw",
+    "--strict-markers",
+    "--tb=short",
+    # Enabling --doctest-modules on src/ runs into problems when there is native
+    # extension built. In that case, pytest will still try to import .py files (ie.
+    # hexoban_board.py) to collect tests from them. But, this will fail to import
+    # because that file works only in environments where native extension is NOT
+    # built. We can't use --doctest-modules.
+    # "--doctest-modules",
+    "--doctest-glob=*.rst",
+    "--doctest-glob=tutorial_.md",
+    "--ignore=bin",
+    "--ignore=build",
+    "--ignore=cmake",
+    "--ignore=docs/conf.py",
+    "--ignore=scratchpad",
+    "--ignore=src/libsokoengine",
+    "--ignore=src/sokoenginepyext",
+    "--ignore=tests/fixtures/test_cases",
+    "--ignore=tmp",
 ]
 python_classes = ["Describe*", "When_*", "describe_*"]
 python_functions = ["it_*", "test_*", "then_*", "when_*"]

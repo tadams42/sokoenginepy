@@ -1,23 +1,46 @@
+os: linux
 dist: focal
+language: python
+
+python:
+  - 3.9
+  - 3.10
 
 env:
   global:
-    - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
-    - SEGFAULT_SIGNALS=all
-    # CODECOV_TOKEN
-    - secure: HlB1/Vtn1I7jBjTFxFvBKep7jfK4c3qLGfv7Ph8iq61sYyPRAEbkrGZOSrpvBRT8O1MEctxJUFGYmYKZSAHA2mhpaj9c29wkBP8Gj0jri71kNavGBzz88a5/Ugs0SYs6FCfE7P/9cm+h6i1eRCbVvnurqPFvgBTICm219wwaHU6vW353zKmxXb6yPxguPNB1UtHyaPNt64CuqV12fT9x7AJlsF6FhMkXl+9lZMeF7lSUHHTLKNCHtMwnBm2NPFZZnfNRvHBSf5cwDvtXPxuUidc5arrKMp2jD8HSNduaiXFOt1KsGpYEQiFsHQRarGnJqgZbwIDB2o4TNfQUwLhFznEfw6dJpOHUWSlQG0v72K8y8lbNapaQUUiKXydkYBnbj1O/mupPUrA2sds9d12jR2qr2BPuCiL6ts9oaZCUKjUYjsVr2L5yQgvMHRa9TN7SlehoiRm8/ALib4xWDp4rKHDMA/cA1iaPrbE6ePEoVG2Vw4+mblQd9tBBwSav+UENQpufWtodtpjTGKaHmwwYwYeIM9ZxX9c1p7uISSWh3ofRv96FCe5MFyN7Fpx6C1mGNQEvKJ3nQkQnmFWy6+lp1w/xv8HWmxYTwoVUub99Gf83eSDUAq7SeFlbpMqwt9LV2C/pxjJJ5wAJxIa0DYLCVZ6T/f61EbNdoA2NW69hhdo=
-    # CODACY_PROJECT_TOKEN
-    - secure: mLuUu6rlIWL/OZeszE216s0i3g9EaNKWMXrFULfNjsdoF3fnsyLg/JJhPua9XCXtRX2xoU4/PkmETPcPXNvU1iL7NDRTV1gjEovboUdr6HaedR9dy+v7EVBH33KZ+UqPKwLd40obI3FvmPHU+tEgKdVJh0pi+luq8aOgz2YPUJj8tLNP6pd0lULEfug702yQWvKWDv4ye8toH3BjBpQDrF4vjp1RKx05JBh8p8BctX9mXimkgCLDPsvZaB6e6NkVjHq03Yt/hF1ogq3BWPJ8lVjHU3rsIjXDP8vFafiFWGg90VviP4KMsX+NOsyM1ZN44/Jd0NrdBWKgf++NaEWMBG30hBnpB73bQbl8Pkq+C7GT86P7MaV0vo2ScgzJfVvg0aOFqDDjGySlr1pWJC7gtQOByZB3uOhcJ34GkmdVOMSB+gYLZCkhXUc7qmU38wjOCsADqEt3ejvPi1cLXi3F/6FnkvgWHicfEwOIfvZkZdTURbq58yomI0ciFKjwvqDkzfUT6T4ulEbExXf9lAxB0hmzFH88obkICDnDdRDkdIVdMABdfy8bUxHH8MLq+ZM8xbmfI1zchjLYviorHKndKTezlg7LPO9qP+KtLgrNRcPxq/NvKsDThF0Vlrrg2Jczv4rvX+nEgctzoIeqe6W1k86rxxjLcqxz8s6vKntZraE=
+    - SOKOENGINEPYEXT_SKIP=true
+
+branches:
+  only:
+    - development
+    - master
+    - feature/better_build
+
+cache:
+  apt: true
+  directories:
+    - /home/travis/.cache/vcpkg
+    - /home/travis/.cache/pip
+    - /home/travis/.cache/cmake
+
+before_install:
+  - python -m pip install --upgrade pip wheel
+
+install:
+  - pip -v install .[tests]
+
+script:
+  - pytest
 
 jobs:
   include:
-    - name: "tests and coverage - Python only"
+    - name: "coverage"
       env:
-        - SOKOENGINEPYEXT_BUILD=false
-      language: python
+        # CODECOV_TOKEN
+        - secure: HlB1/Vtn1I7jBjTFxFvBKep7jfK4c3qLGfv7Ph8iq61sYyPRAEbkrGZOSrpvBRT8O1MEctxJUFGYmYKZSAHA2mhpaj9c29wkBP8Gj0jri71kNavGBzz88a5/Ugs0SYs6FCfE7P/9cm+h6i1eRCbVvnurqPFvgBTICm219wwaHU6vW353zKmxXb6yPxguPNB1UtHyaPNt64CuqV12fT9x7AJlsF6FhMkXl+9lZMeF7lSUHHTLKNCHtMwnBm2NPFZZnfNRvHBSf5cwDvtXPxuUidc5arrKMp2jD8HSNduaiXFOt1KsGpYEQiFsHQRarGnJqgZbwIDB2o4TNfQUwLhFznEfw6dJpOHUWSlQG0v72K8y8lbNapaQUUiKXydkYBnbj1O/mupPUrA2sds9d12jR2qr2BPuCiL6ts9oaZCUKjUYjsVr2L5yQgvMHRa9TN7SlehoiRm8/ALib4xWDp4rKHDMA/cA1iaPrbE6ePEoVG2Vw4+mblQd9tBBwSav+UENQpufWtodtpjTGKaHmwwYwYeIM9ZxX9c1p7uISSWh3ofRv96FCe5MFyN7Fpx6C1mGNQEvKJ3nQkQnmFWy6+lp1w/xv8HWmxYTwoVUub99Gf83eSDUAq7SeFlbpMqwt9LV2C/pxjJJ5wAJxIa0DYLCVZ6T/f61EbNdoA2NW69hhdo=
+        # CODACY_PROJECT_TOKEN
+        - secure: mLuUu6rlIWL/OZeszE216s0i3g9EaNKWMXrFULfNjsdoF3fnsyLg/JJhPua9XCXtRX2xoU4/PkmETPcPXNvU1iL7NDRTV1gjEovboUdr6HaedR9dy+v7EVBH33KZ+UqPKwLd40obI3FvmPHU+tEgKdVJh0pi+luq8aOgz2YPUJj8tLNP6pd0lULEfug702yQWvKWDv4ye8toH3BjBpQDrF4vjp1RKx05JBh8p8BctX9mXimkgCLDPsvZaB6e6NkVjHq03Yt/hF1ogq3BWPJ8lVjHU3rsIjXDP8vFafiFWGg90VviP4KMsX+NOsyM1ZN44/Jd0NrdBWKgf++NaEWMBG30hBnpB73bQbl8Pkq+C7GT86P7MaV0vo2ScgzJfVvg0aOFqDDjGySlr1pWJC7gtQOByZB3uOhcJ34GkmdVOMSB+gYLZCkhXUc7qmU38wjOCsADqEt3ejvPi1cLXi3F/6FnkvgWHicfEwOIfvZkZdTURbq58yomI0ciFKjwvqDkzfUT6T4ulEbExXf9lAxB0hmzFH88obkICDnDdRDkdIVdMABdfy8bUxHH8MLq+ZM8xbmfI1zchjLYviorHKndKTezlg7LPO9qP+KtLgrNRcPxq/NvKsDThF0Vlrrg2Jczv4rvX+nEgctzoIeqe6W1k86rxxjLcqxz8s6vKntZraE=
       python: 3.9
-      before_install:
-        - pip install --upgrade pip wheel
       install:
         - bash <(curl -Ls https://coverage.codacy.com/get.sh) download
         - curl -Os https://uploader.codecov.io/latest/linux/codecov
@@ -31,57 +54,44 @@ jobs:
         - ./codecov
         - bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
 
-    - name: "tests - Python + native extension"
-      language: python
+
+    - name: "Python with C++ extension: 3.9"
       python: 3.9
-      env:
-        - SOKOENGINEPYEXT_BUILD=true
-        - SOKOENGINEPYEXT_DEBUG=true
-      addons:
-        apt:
-          packages:
-            - libboost-graph-dev
       before_install:
-        - pip install --upgrade pip wheel
-      install:
-        - pip -vv install .[tests]
+        - python -m pip install --upgrade pip wheel
+        - git clone https://github.com/Microsoft/vcpkg.git /home/travis/vcpkg_src
+        - /home/travis/vcpkg_src/bootstrap-vcpkg.sh
+      env:
+        - SOKOENGINEPYEXT_SKIP=false
+        - SOKOENGINEPYEXT_DEBUG=true
+        - CMAKE_TOOLCHAIN_FILE=/home/travis/vcpkg_src/scripts/buildsystems/vcpkg.cmake
       script:
         - pytest
 
-    # - name: "tests - pypy"
-    #   language: python
-    #   python: pypy3
-    #   env:
-    #     - SOKOENGINEPYEXT_BUILD=False
-    #   before_script:
-    #     - pip install .[tests]
-    #   script:
-    #     - py.test
+
+    - name: "Python with C++ extension: 3.10"
+      python: 3.10
+      before_install:
+        - python -m pip install --upgrade pip wheel
+        - git clone https://github.com/Microsoft/vcpkg.git /home/travis/vcpkg_src
+        - /home/travis/vcpkg_src/bootstrap-vcpkg.sh
+      env:
+        - SOKOENGINEPYEXT_SKIP=false
+        - SOKOENGINEPYEXT_DEBUG=true
+        - CMAKE_TOOLCHAIN_FILE=/home/travis/vcpkg_src/scripts/buildsystems/vcpkg.cmake
+      script:
+        - pytest
+
 
     - name: "docs build"
-      language: python
       python: 3.9
-      before_install:
-        - pip install --upgrade pip wheel
       install:
         - pip install .[docs]
       script:
         - sphinx-build -E -b html docs dist/docs
 
+
     - name: "packaging checks"
-      language: python
       python: 3.9
-      before_install:
-        - pip install --upgrade pip wheel
-      install:
-        - pip install .[tests]
       script:
         - check-manifest
-        # TODO: Following fails on TravisCI because it can't find pybind11 package which
-        # shouldn't happen. Disabling it for now.
-        # - python setup.py check --strict --metadata
-
-branches:
-  only:
-    - development
-    - master
