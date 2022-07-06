@@ -116,14 +116,12 @@ target_include_directories(sokoengine_obj
 target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
 
 if(${BUILD_SHARED_LIBS})
-    target_compile_definitions(sokoengine_obj
-        PUBLIC
+    target_compile_definitions(sokoengine_obj PUBLIC
         LIBSOKOENGINE_DLL
         PRIVATE
         LIBSOKOENGINE_DLL_EXPORTS
     )
-    target_compile_options(sokoengine_obj
-        PUBLIC
+    target_compile_options(sokoengine_obj PUBLIC
         $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
         -fvisibility=hidden
         -fvisibility-inlines-hidden
@@ -133,8 +131,7 @@ if(${BUILD_SHARED_LIBS})
     )
 endif()
 
-target_compile_options(sokoengine_obj
-    PRIVATE
+target_compile_options(sokoengine_obj PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
     $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>
     -Wno-overloaded-virtual
@@ -151,8 +148,7 @@ target_compile_options(sokoengine_obj
 # TARGETS sokoengine_obj
 # PROPERTIES COMPILE_FEATURES COMPILE_FLAGS COMPILE_OPTIONS
 # )
-set_target_properties(sokoengine_obj
-    PROPERTIES
+set_target_properties(sokoengine_obj PROPERTIES
     POSITION_INDEPENDENT_CODE ON
     INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
     INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON

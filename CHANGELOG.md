@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0 (unreleased)
+
+- changed: `Collection.dump()` can now save to IO streams (previously it could only save
+  to file path)
+- changed: `Collection.load()` can now load from IO streams (previously it could only load
+  from file path)
+- added: `Collection.loads()` and `Collection.dumps()`
+- renamed: `Collection.save()` -> `Collection.dump()`
+
 ## 1.0.0 (2022-06-20)
 
 - renamed `DEFAULT_PIECE_ID` -> `DEFAULT_ID`

@@ -1,7 +1,7 @@
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::         Sokoban (c) by Falcon Co., Ltd., Japan         ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::                    File Format 0.16                    ::
+::                    File Format 0.19                    ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::                                                        ::
 :: File Notes                                  Optional   ::
@@ -37,8 +37,8 @@
 ::                                                        ::
 :: Titles                                                 ::
 ::   A title line is the last non-blank text line before  ::
-::   a puzzle, a saved game, or a solution, provided the  ::
-::   line is preceded  by a blank line or it is the only  ::
+::   a board, a saved game, or a solution, provided the   ::
+::   line is preceded by a blank line or it is the only   ::
 ::   text line at this position in the file.              ::
 ::                                                        ::
 ::   Title lines are optional unless a single or a last   ::
@@ -55,7 +55,7 @@
 ::::::::::::::::::::::::::: Board ::::::::::::::::::::::::::
 :: Legend.................:      :.................Legend ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: Wall...................: #  # :...................Wall ::
+:: Wall...................: W  # :...................Wall ::
 :: Pusher.................: p  @ :.................Pusher ::
 :: Pusher on goal square..: P  + :..Pusher on goal square ::
 :: Box....................: b  $ :....................Box ::
@@ -67,18 +67,18 @@
 :: Remarks:                                               ::
 ::                                                        ::
 ::   The first and the last non-empty square in each row  ::
-::   must be a wall or a box on a goal. A board cannot    ::
-::   have empty rows.                                     ::
+::   must be a wall or a box on a goal. An empty interior ::
+::   row is written with at least one "-" or "_".         ::
 ::                                                        ::
 ::   Boards may be run-length encoded (RLE), e.g.,        ::
 ::   "###----p.#" may be encoded as "3#4-p.#", and        ::
 ::   "#-#-#-##-#-#-#" may be encoded as "2(3(#-)#)".      ::
-::   A row cannot be split over multiple physical lines.  ::
+::   A row cannot be split over multiple lines.           ::
 ::                                                        ::
-::   Rows may be combined on a single physical line by    ::
-::   using "|" as a row separator, e.g.,                  ::
-::   "--3#|3#-#|#pb.#|5#". A "|" at the end of a physical ::
-::   line is optional and may be omitted.                 ::
+::   Rows may be combined on a single line by using "|"   ::
+::   as a row separator, e.g., "--3#|3#-#|#pb.#|5#".      ::
+::   A "|" at the end of a line is optional and may be    ::
+::   omitted.                                             ::
 ::                                                        ::
 ::::::::::::::::::::::::::: Moves ::::::::::::::::::::::::::
 :: Legend.................:      :.................Legend ::
@@ -104,7 +104,7 @@
 ::                                                        ::
 ::   Reverse mode saved games and solutions must begin    ::
 ::   with a jump, even if it is empty. An example:        ::
-::   "[]U[rr]d".                                          ::
+::   "[]Urrd".                                            ::
 ::                                                        ::
 ::   Pusher changes: Only in puzzles with multiple        ::
 ::   pushers, e.g., Multiban. Moves inside the braces     ::
@@ -120,8 +120,8 @@
 ::   position after the last move.                        ::
 ::                                                        ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-Date Created: 2003-01-15 22:01:00
-Date of Last Change: 2011-11-18  18:10:08
+Date Created: 2022-07-01  01:05:06
+Date of Last Change: 2022-07-02  09:48:22
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 In this collection there is no "Game" type specified globally on collection puzzle,

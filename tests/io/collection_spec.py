@@ -1,3 +1,6 @@
+import contextlib
+import io
+import os
 import tempfile
 import textwrap
 from pathlib import Path
@@ -5,12 +8,23 @@ from pathlib import Path
 import pytest
 
 from sokoenginepy.game import Tessellation
-from sokoenginepy.io import Collection, is_blank, snapshot
+from sokoenginepy.io import Collection, is_blank
 
 
 @pytest.fixture
 def input_files_root(resources_root):
     return resources_root / "test_data"
+
+
+@pytest.fixture
+def tmp_writeable_file_path(input_files_root):
+    written_path = input_files_root / "_test_tmp"
+    try:
+        yield written_path
+
+    finally:
+        with contextlib.suppress(FileNotFoundError):
+            os.remove(written_path)
 
 
 class DescribeCollection:
@@ -23,8 +37,8 @@ class DescribeCollection:
 
         assert collection.title == "Original & Extra"
         assert collection.author == "Thinking Rabbit"
-        assert collection.created_at == "2005-03-30  01:05:06"
-        assert collection.updated_at == "2012-10-20  09:48:22"
+        assert collection.created_at == "2022-07-01  01:05:06"
+        assert collection.updated_at == "2022-07-02  09:48:22"
         assert list(collection.notes) == [
             "Originate from: original.slc",
             "",
@@ -185,7 +199,7 @@ class DescribeCollection:
         loaded = Collection()
         with tempfile.TemporaryDirectory() as dir_path:
             file_path = Path(dir_path) / "saved_original_and_extra.sok"
-            original.save(file_path)
+            original.dump(file_path)
             loaded.load(file_path)
 
         assert len(original.puzzles) == len(loaded.puzzles)
@@ -220,3 +234,261 @@ class DescribeCollection:
                         f"Mismatched Snapshot.{attr} for snapshot {original_p.title}: "
                         f"{original_s.title or s_idx}"
                     )
+
+    def it_loads_from_opened_file_r(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        loaded = Collection()
+        with open(path, "r") as f:
+            loaded.load(f)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_loads_from_opened_file_rb(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        loaded = Collection()
+        with open(path, "rb") as f:
+            loaded.load(f)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_loads_from_FileIO(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        for mode in ["r", "rb"]:
+            loaded = Collection()
+            with io.FileIO(str(path), mode=mode) as f:
+                loaded.load(f)
+
+            assert len(loaded.puzzles) == len(expected.puzzles)
+            for _ in range(len(expected.puzzles)):
+                p1 = loaded.puzzles[_]
+                p2 = expected.puzzles[_]
+                assert str(p1) == str(p2)
+
+    def it_loads_from_BytesIO(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        with open(path, "rb") as f:
+            data = f.read()
+
+        loaded = Collection()
+        with io.BytesIO(data) as f:
+            loaded.load(f)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_loads_from_StringIO(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        with open(path, "r") as f:
+            data = f.read()
+
+        loaded = Collection()
+        with io.StringIO(data) as f:
+            loaded.load(f)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_loads_from_TextIOWrapper(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        with open(path, "rb") as f:
+            data = f.read()
+
+        with io.BytesIO(data) as f:
+            with io.TextIOWrapper(f) as g:
+                loaded = Collection()
+                loaded.load(g)
+
+                assert len(loaded.puzzles) == len(expected.puzzles)
+                for _ in range(len(expected.puzzles)):
+                    p1 = loaded.puzzles[_]
+                    p2 = expected.puzzles[_]
+                    assert str(p1) == str(p2)
+
+    def it_loads_from_bytes(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        with open(path, "rb") as f:
+            data = f.read()
+
+        loaded = Collection()
+        loaded.loads(data)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_loads_from_str(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        with open(path, "r") as f:
+            data = f.read()
+
+        loaded = Collection()
+        loaded.loads(data)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_writes_to_opened_file_w(self, input_files_root, tmp_writeable_file_path):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        with open(tmp_writeable_file_path, "w") as f:
+            expected.dump(f)
+
+        loaded = Collection()
+        loaded.load(tmp_writeable_file_path)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_writes_to_opened_file_wb(self, input_files_root, tmp_writeable_file_path):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        with open(tmp_writeable_file_path, "wb") as f:
+            expected.dump(f)
+
+        loaded = Collection()
+        loaded.load(tmp_writeable_file_path)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_writes_to_FileIO(self, input_files_root, tmp_writeable_file_path):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        for mode in ["w", "wb"]:
+            with contextlib.suppress(FileNotFoundError):
+                os.remove(tmp_writeable_file_path)
+
+            with io.FileIO(tmp_writeable_file_path, mode) as f:
+                expected.dump(f)
+
+            loaded = Collection()
+            loaded.load(tmp_writeable_file_path)
+
+            assert len(loaded.puzzles) == len(expected.puzzles)
+            for _ in range(len(expected.puzzles)):
+                p1 = loaded.puzzles[_]
+                p2 = expected.puzzles[_]
+                assert str(p1) == str(p2)
+
+    def it_writes_to_BytesIO(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        stream = io.BytesIO()
+        expected.dump(stream)
+
+        loaded = Collection()
+        loaded.load(stream)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_writes_to_StringIO(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        stream = io.StringIO()
+        expected.dump(stream)
+
+        loaded = Collection()
+        loaded.load(stream)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_writes_to_TextIOWrapper(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        buffer = io.BytesIO()
+        stream = io.TextIOWrapper(buffer)
+        expected.dump(stream)
+
+        loaded = Collection()
+        loaded.load(stream)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)
+
+    def it_dumps_to_str(self, input_files_root):
+        path = input_files_root / "small_collection.sok"
+        expected = Collection()
+        expected.load(path)
+
+        data = expected.dumps()
+
+        loaded = Collection()
+        loaded.loads(data)
+
+        assert len(loaded.puzzles) == len(expected.puzzles)
+        for _ in range(len(expected.puzzles)):
+            p1 = loaded.puzzles[_]
+            p2 = expected.puzzles[_]
+            assert str(p1) == str(p2)

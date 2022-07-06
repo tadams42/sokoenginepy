@@ -124,29 +124,90 @@ Date Created: 2022-07-01  01:05:06
 Date of Last Change: 2022-07-02  09:48:22
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-Game = Sokoban
-In this collection there is "Game" type specified globally on collection puzzle
-but also some maps override global speciffication thus being parsed properly.
+Random collection notes...
 
-#########
-#  # ...#
-#  $$#..#
-#  $  *.#
-##   $$$#
-#     #@#
-#########
+Title: Mixed collection
+Author: ZOMG! Collection author
 
-"dws002"
-              # # #
-       # # # #     #
-      #     $     #
-     #   $ $   $ #
-  # #   #   # $ #
- #     #   # #   # # # #
-#     #   # #   #   . . #
- #   $             . . . #
-  # # $ #   # @ #   . . #
-   # #     # # # # # # #
-      # # #
+Sokoban Level 1
 
-Game = Hexoban
+    #####
+    #   #
+    #$  #
+  ###  $##
+  #  $ $ #
+### # ## #   ######
+#   # ## #####  ..#
+# $  $          ..#
+##### ### #@##  ..#
+    #     #########
+    #######
+
+Level notes
+
+Author: Thinking Rabbit
+
+Time: 00:01:00
+
+First Sokoban snapshot
+
+ullluuuLUllDlldddrRRRRRRRRRRRRlllllllllllllulldRRRRRRRRRRRRRdrUlllllll
+uuululldDDuulldddrRRRRRRRRRRuRRlDllllllluuulLulDDDuulldddrRRRRRRRRRRdR
+RlUllllllluuulluuurDDluulDDDDDuulldddrRRRRRRRRRRRllllllluuuLLulDDDuull
+dddrRRRRRRRRRRuRDldR
+
+Second Sokoban snapshot
+
+ullluuuLUllDlldddrRRRRRRRRRRRRlllllllllllllulldRRRRRRRRRRRRRdrUlllllll
+uuululldDDuulldddrRRRRRRRRRRuRRlDllllllluuulLulDDDuulldddrRRRRRRRRRRdR
+RlUllllllluuulluuurDDluulDDDDDuulldddrRRRRRRRRRRRllllllluuuLLulDDDuull
+dddrRRRRRRRRRRuRDldR
+
+Solver: ZOMG! Snapshot solver
+
+Third Sokoban snapshot
+
+[]ulll[uuululldlldddrrrrrrrrrrrrrlllllllllllllulldrrrrrrrrrrrrrdrulllllll
+uuulu]lldDDuulldddrRRRRRRRRRRuRRlDllllllluuulLulDDDuulldddrRRRRRRRRRRdR
+RlUllllllluuulluuurDDluulDDDDDuulldddrRRRRRRRRRRRllllllluuuLLulDDDuull
+dddrRRRRRRRRRRuRDldR
+
+Solver: ZOMG! Snapshot solver
+
+Sokoban level 3
+
+           ########
+           #  ....#
+############  ....#
+#    #  $ $   ....#
+# $$$#$  $ #  ....#
+#  $     $ #  ....#
+# $$ #$ $ $########
+#  $ #     #
+## #########
+#    #    #
+#     $   ##
+#  $$#$$  @#
+#    #    ##
+###########
+
+boxorder: 1 2 3 4 5
+goalorder: 3 4 5 2 1
+Author: Thinking Rabbit
+
+
+       # #
+      # @ #
+     # . $ #
+    # $ #   #
+ # # .   . $ # #
+#     #   #     #
+ #   # #   #   #
+#               #
+ # # # # #   # #
+          # #
+Title: A
+Difficulty: 5
+Date: Jan.2002
+Game: Hexoban
+Author:       Aymeric du Peloux (Hexocet)

@@ -7,7 +7,9 @@
 
 #include "sok_file_format.hpp"
 
+#include <boost/algorithm/string.hpp>
 #include <fstream>
+#include <sstream>
 
 namespace sokoengine {
 namespace io {
@@ -16,8 +18,12 @@ using game::Tessellation;
 using implementation::SOKFileFormat;
 using std::ifstream;
 using std::ios_base;
+using std::istream;
+using std::istringstream;
 using std::make_unique;
 using std::ofstream;
+using std::ostream;
+using std::ostringstream;
 using std::string;
 using std::filesystem::path;
 
@@ -42,19 +48,6 @@ public:
     , m_created_at(created_at)
     , m_updated_at(updated_at)
     , m_notes(notes) {}
-
-  Tessellation extension_to_tessellation_hint(const string &path) {
-    string file_extension = path.substr(path.length() - 4, 4);
-    if (file_extension == ".sok" || file_extension == ".txt" ||
-        file_extension == ".xsb") {
-      return Tessellation::SOKOBAN;
-    } else if (file_extension == ".tsb") {
-      return Tessellation::TRIOBAN;
-    } else if (file_extension == ".hsb") {
-      return Tessellation::HEXOBAN;
-    }
-    return Tessellation::SOKOBAN;
-  }
 };
 
 Collection::Collection(
@@ -93,31 +86,41 @@ const Puzzles &Collection::puzzles() const { return m_impl->m_puzzles; }
 
 Puzzles &Collection::puzzles() { return m_impl->m_puzzles; }
 
-bool Collection::load(const path &p) {
-  return load(p, m_impl->extension_to_tessellation_hint(p));
+void Collection::load(const path &p, Tessellation tessellation_hint) {
+  load(p.string(), tessellation_hint);
 }
 
-bool Collection::load(const path &p, Tessellation tessellation_hint) {
-  return load(p.string(), tessellation_hint);
+void Collection::load(const string &path, Tessellation tessellation_hint) {
+  ifstream input(path, ios_base::binary);
+  load(input, tessellation_hint);
 }
 
-bool Collection::load(const string &path) {
-  return load(path, m_impl->extension_to_tessellation_hint(path));
-}
-
-bool Collection::load(const string &path, Tessellation tessellation_hint) {
-  ifstream      input(path, ios_base::binary);
+void Collection::load(istream &data, Tessellation tessellation_hint) {
   SOKFileFormat reader;
-  reader.read(input, *this, tessellation_hint);
-  return true;
+  reader.read(data, *this, tessellation_hint);
 }
 
-bool Collection::save(const path &p) const { return save(p.string()); }
+void Collection::loads(const string &data, Tessellation tessellation_hint) {
+  istringstream input(data);
+  load(input, tessellation_hint);
+}
 
-bool Collection::save(const string &path) const {
-  ofstream      output(path, ios_base::binary);
+void Collection::dump(const path &p) const { return dump(p.string()); }
+
+void Collection::dump(const string &path) const {
+  ofstream output(path, ios_base::binary);
+  dump(output);
+}
+
+void Collection::dump(std::ostream &dest) const {
   SOKFileFormat writer;
-  return writer.write(*this, output);
+  writer.write(*this, dest);
+}
+
+string Collection::dumps() const {
+  ostringstream out;
+  dump(out);
+  return out.str();
 }
 
 } // namespace io

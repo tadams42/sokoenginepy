@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import enum
 from abc import ABCMeta, abstractmethod
-from multiprocessing.sharedctypes import Value
-from turtle import width
 from typing import TYPE_CHECKING, ClassVar, Mapping, Tuple, Union
 
-from ..io import CellOrientation
 from .config import Config, Direction, GraphType
 from .pusher_step import PusherStep
 
 if TYPE_CHECKING:
+    from ..io import CellOrientation
     from .hexoban_tessellation import HexobanTessellation
     from .octoban_tessellation import OctobanTessellation
     from .sokoban_tessellation import SokobanTessellation
@@ -154,6 +152,8 @@ class BaseTessellation(metaclass=ABCMeta):
         """
         Calculates board cell orientation for given coordinate.
         """
+        from ..io import CellOrientation
+
         if position < 0:
             raise IndexError(f"Position {position} is invalid value!")
 
