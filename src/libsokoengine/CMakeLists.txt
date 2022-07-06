@@ -23,7 +23,7 @@ set(PRIVATE_HEADERS
 )
 
 set(INSTALL_HEADERS
-    config.hpp
+    sokoengine_config.hpp
     sokoengine.hpp
     benchmarks.hpp
 

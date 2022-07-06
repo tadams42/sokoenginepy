@@ -1,7 +1,7 @@
 #ifndef ERR_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
 #define ERR_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
 
-#include "config.hpp"
+#include "sokoengine_config.hpp"
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>

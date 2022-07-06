@@ -1,7 +1,7 @@
 #ifndef SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "config.hpp"
+#include "sokoengine_config.hpp"
 
 #include <memory>
 

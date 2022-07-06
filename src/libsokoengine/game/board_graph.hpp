@@ -1,7 +1,7 @@
 #ifndef BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "config.hpp"
+#include "sokoengine_config.hpp"
 
 #include <memory>
 #include <stdexcept>

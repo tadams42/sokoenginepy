@@ -132,8 +132,6 @@ For more elaborate details, see [INSTALL.md](./INSTALL.md)
 - Python docs: [Read the Docs](https://sokoenginepy.readthedocs.io/en/latest/)
 - C++ docs: [libsokoengine Doxygen documentation](http://tadams42.github.io/sokoenginepy/)
 
-If you're looking for C++ docs in Doxygen format, they are here:
-
 [Boost.Graph]: https://www.boost.org/doc/libs/1_78_0/libs/graph/doc/index.html
 [Boost.X3]: https://www.boost.org/doc/libs/1_79_0/libs/spirit/doc/x3/html/spirit_x3/preface.html
 [NetworkX]: https://networkx.org/

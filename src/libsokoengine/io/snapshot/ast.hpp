@@ -1,7 +1,7 @@
 #ifndef AST_BDC825C2_4FAB_4173_9B94_185BD7430359
 #define AST_BDC825C2_4FAB_4173_9B94_185BD7430359
 
-#include "config.hpp"
+#include "sokoengine_config.hpp"
 
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <list>
