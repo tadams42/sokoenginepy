@@ -149,6 +149,14 @@ void export_board_graph(py::module &m) {
     )
 
     .def(
+      "wall_neighbor_directions",
+      [](const BoardGraph &self, py_int_t src) {
+        return self.wall_neighbor_directions(position_or_throw(src));
+      },
+      py::arg("src")
+    )
+
+    .def(
       "all_neighbors",
       [](const BoardGraph &self, py_int_t src) {
         return self.all_neighbors(position_or_throw(src));

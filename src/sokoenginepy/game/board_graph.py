@@ -171,7 +171,6 @@ class BoardGraph:
         Raises:
             IndexError: ``src`` is off board
         """
-        out_edge: InternalEdge
         if self[src]:
             for out_edge in self._graph.edges(src, data=True):
                 if out_edge[2][self._KEY_DIRECTION] == direction:
@@ -188,6 +187,16 @@ class BoardGraph:
             return [n for n in self._graph.neighbors(src) if self[n].is_wall]
 
         return []
+
+    def wall_neighbor_directions(self, src: int) -> Directions:
+        retv = []
+
+        if self[src]:
+            for out_edge in self._graph.edges(src, data=True):
+                if self[out_edge[1]].is_wall:
+                    retv.append(out_edge[2][self._KEY_DIRECTION])
+
+        return retv
 
     def all_neighbors(self, src: int) -> Positions:
         """

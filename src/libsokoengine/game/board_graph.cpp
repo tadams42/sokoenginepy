@@ -367,6 +367,23 @@ Positions BoardGraph::wall_neighbors(position_t from_position) const {
   return retv;
 }
 
+Directions BoardGraph::wall_neighbor_directions(position_t src) const {
+  m_impl->is_valid_or_throw(src);
+
+  Directions retv;
+
+  out_edge_iterator_t e_i, e_iend;
+  tie(e_i, e_iend) = boost::out_edges(src, m_impl->m_graph);
+
+  for (; e_i != e_iend; ++e_i) {
+    const BoardCell &c = m_impl->m_graph[boost::target(*e_i, m_impl->m_graph)];
+    if (c.is_wall())
+      retv.push_back(m_impl->m_graph[*e_i].direction);
+  }
+
+  return retv;
+}
+
 Positions BoardGraph::all_neighbors(position_t from_position) const {
   m_impl->is_valid_or_throw(from_position);
 

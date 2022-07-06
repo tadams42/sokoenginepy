@@ -140,6 +140,11 @@ public:
   ///
   /// @throws InvalidPositionError when `src` is off board
   ///
+  Directions wall_neighbor_directions(position_t src) const;
+
+  ///
+  /// @throws InvalidPositionError when `src` is off board
+  ///
   Positions all_neighbors(position_t src) const;
 
   ///

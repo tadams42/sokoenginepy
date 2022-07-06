@@ -2,6 +2,7 @@
 
 ## 1.1.0 (unreleased)
 
+- added: `BoardGraph.wall_neighbor_directions()`
 - added: `Puzzle.has_sokoban_plus`
 - changed: `Collection.notes`, `Puzzle.notes` and `Snapshot.notes` are now ordinary
   strings (instead of list of strings)
