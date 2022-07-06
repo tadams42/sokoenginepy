@@ -11,30 +11,40 @@
 
 #include <boost/algorithm/string.hpp>
 
-using namespace std;
+using sokoengine::io::Strings;
+using std::find;
+using std::make_unique;
+using std::map;
+using std::mt19937_64;
+using std::set;
+using std::string;
+using std::to_string;
+using std::uniform_int_distribution;
+using std::unordered_set;
+using std::vector;
+using std::chrono::system_clock;
 
 namespace sokoengine {
 namespace game {
 
-using io::Strings;
-
 class LIBSOKOENGINE_LOCAL HashedBoardManager::PIMPL {
 public:
-  bool m_hash_invalidated = true;
+  bool          m_hash_invalidated   = true;
   zobrist_key_t m_initial_state_hash = BoardState::NO_HASH;
-  zobrist_key_t m_state_hash = BoardState::NO_HASH;
+  zobrist_key_t m_state_hash         = BoardState::NO_HASH;
 
   typedef vector<zobrist_key_t> hash_vector_t;
 
-  map<piece_id_t, hash_vector_t> m_boxes_factors;
-  hash_vector_t m_pushers_factors;
+  map<piece_id_t, hash_vector_t>         m_boxes_factors;
+  hash_vector_t                          m_pushers_factors;
   HashedBoardManager::solutions_hashes_t m_solutions_hashes;
 
   PIMPL() {}
-  PIMPL(PIMPL &&rv) = default;
+
+  PIMPL(PIMPL &&rv)            = default;
   PIMPL &operator=(PIMPL &&rv) = default;
 
-  static std::string to_str(const hash_vector_t &v, int add_indent = 0) {
+  static string to_str(const hash_vector_t &v, int add_indent = 0) {
     string indent(add_indent, ' ');
 
     auto converter = [&]() {
@@ -42,13 +52,15 @@ public:
 
       Strings tmp;
       for (auto id : v) {
-        tmp.push_back(std::to_string(id));
+        tmp.push_back(to_string(id));
         if (tmp.size() == 5) {
           retv.push_back(indent + "    " + boost::join(tmp, ", "));
           tmp.clear();
         }
       }
-      if (!tmp.empty()) { retv.push_back(indent + "    " + boost::join(tmp, ", ")); }
+      if (!tmp.empty()) {
+        retv.push_back(indent + "    " + boost::join(tmp, ", "));
+      }
 
       return retv;
     };
@@ -56,14 +68,14 @@ public:
     return string("[\n") + boost::join(converter(), ",\n") + "\n" + indent + "]";
   }
 
-  static std::string to_str(const map<piece_id_t, hash_vector_t> &m,
-                            int add_indent = 0) {
+  static string to_str(const map<piece_id_t, hash_vector_t> &m, int add_indent = 0) {
     string indent(add_indent, ' ');
-    auto converter = [&]() {
+    auto   converter = [&]() {
       Strings retv;
       for (auto p : m) {
-        retv.push_back(indent + "    " + std::to_string(p.first) + ": " +
-                       to_str(p.second, 4 + add_indent));
+        retv.push_back(
+          indent + "    " + to_string(p.first) + ": " + to_str(p.second, 4 + add_indent)
+        );
       }
       return retv;
     };
@@ -73,11 +85,11 @@ public:
 
   hash_vector_t unique_random_keys(size_t of_size) const {
     unordered_set<zobrist_key_t> random_pool_set;
-    mt19937_64 generator;
+    mt19937_64                   generator;
 
-    generator.seed(chrono::system_clock::now().time_since_epoch().count());
+    generator.seed(system_clock::now().time_since_epoch().count());
     uniform_int_distribution<zobrist_key_t> distribution;
-    auto random_key = bind(distribution, generator);
+    auto                                    random_key = bind(distribution, generator);
 
     while (random_pool_set.size() != of_size) {
       random_pool_set.insert(random_key());
@@ -87,7 +99,8 @@ public:
   }
 
   void zobrist_rehash(const HashedBoardManager &parent) {
-    if (!m_hash_invalidated) return;
+    if (!m_hash_invalidated)
+      return;
     m_hash_invalidated = false;
 
     set<piece_id_t> distinct_box_plus_ids;
@@ -98,20 +111,20 @@ public:
     board_size_t board_without_walls_size =
       parent.board().size() - parent.walls_positions().size();
 
-    size_t random_pool_size = board_without_walls_size +
-                              distinct_box_plus_ids.size() * board_without_walls_size +
-                              1;
+    size_t random_pool_size = board_without_walls_size
+                            + distinct_box_plus_ids.size() * board_without_walls_size
+                            + 1;
 
     hash_vector_t random_pool = unique_random_keys(random_pool_size);
 
-    size_t index = 0;
+    size_t index         = 0;
     m_initial_state_hash = m_state_hash = random_pool[index++];
 
     m_boxes_factors = map<piece_id_t, hash_vector_t>();
     for (auto box_plus_id : distinct_box_plus_ids) {
       m_boxes_factors[box_plus_id] = hash_vector_t();
       for (board_size_t i = 0; i < parent.board().size(); i++) {
-        if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
+        if (find(parent.walls_positions().begin(), parent.walls_positions().end(),
                       i) != parent.walls_positions().end())
           m_boxes_factors[box_plus_id].push_back(0);
         else
@@ -119,7 +132,7 @@ public:
       }
     }
     for (board_size_t i = 0; i < parent.board().size(); i++) {
-      if (std::find(parent.walls_positions().begin(), parent.walls_positions().end(),
+      if (find(parent.walls_positions().begin(), parent.walls_positions().end(),
                     i) != parent.walls_positions().end())
         m_pushers_factors.push_back(0);
       else
@@ -138,9 +151,11 @@ public:
   }
 }; // HashedBoardManager::PIMPL
 
-HashedBoardManager::HashedBoardManager(BoardGraph &board, const string &boxorder,
-                                       const string &goalorder)
-  : BoardManager(board, boxorder, goalorder), m_impl(std::make_unique<PIMPL>()) {}
+HashedBoardManager::HashedBoardManager(
+  BoardGraph &board, const string &boxorder, const string &goalorder
+)
+  : BoardManager(board, boxorder, goalorder)
+  , m_impl(make_unique<PIMPL>()) {}
 
 HashedBoardManager::HashedBoardManager(HashedBoardManager &&) = default;
 
@@ -190,8 +205,9 @@ zobrist_key_t HashedBoardManager::external_state_hash(BoardState &board_state) c
   return retv;
 }
 
-void HashedBoardManager::pusher_moved(position_t old_position,
-                                      position_t to_new_position) {
+void HashedBoardManager::pusher_moved(
+  position_t old_position, position_t to_new_position
+) {
   if (old_position != to_new_position) {
     const_cast<HashedBoardManager *>(this)->m_impl->zobrist_rehash(*this);
     m_impl->m_state_hash ^= m_impl->m_pushers_factors[old_position];
@@ -199,8 +215,9 @@ void HashedBoardManager::pusher_moved(position_t old_position,
   }
 }
 
-void HashedBoardManager::box_moved(position_t old_position,
-                                   position_t to_new_position) {
+void HashedBoardManager::box_moved(
+  position_t old_position, position_t to_new_position
+) {
   if (old_position != to_new_position) {
     const_cast<HashedBoardManager *>(this)->m_impl->zobrist_rehash(*this);
     auto b_plus_id = box_plus_id(box_id_on(to_new_position));
@@ -209,7 +226,7 @@ void HashedBoardManager::box_moved(position_t old_position,
   }
 }
 
-void HashedBoardManager::set_boxorder(const std::string &rv) {
+void HashedBoardManager::set_boxorder(const string &rv) {
   bool old_plus_enabled = is_sokoban_plus_enabled();
   BoardManager::set_boxorder(rv);
   if (is_sokoban_plus_enabled() != old_plus_enabled) {
@@ -218,7 +235,7 @@ void HashedBoardManager::set_boxorder(const std::string &rv) {
   }
 }
 
-void HashedBoardManager::set_goalorder(const std::string &rv) {
+void HashedBoardManager::set_goalorder(const string &rv) {
   bool old_plus_enabled = is_sokoban_plus_enabled();
   BoardManager::set_goalorder(rv);
   if (is_sokoban_plus_enabled() != old_plus_enabled) {
@@ -254,7 +271,8 @@ HashedBoardManager::solutions_hashes() const {
     auto slns = solutions();
     for (auto solution : slns) {
       const_cast<HashedBoardManager *>(this)->m_impl->m_solutions_hashes.insert(
-        external_state_hash(solution));
+        external_state_hash(solution)
+      );
     }
   }
 
@@ -263,19 +281,14 @@ HashedBoardManager::solutions_hashes() const {
 
 string HashedBoardManager::str() const {
   string retv = BoardManager::str();
-  boost::replace_all(retv, "<BoardManager pushers:", "<HashedBoardManager pushers:");
-  boost::replace_all(retv, "              boxes:", "                    boxes:");
-  boost::replace_all(retv, "              goals:", "                    goals:");
-  boost::replace_all(retv, "              walls:", "                    walls:");
-  boost::replace_all(retv, "              boxorder:", "                    boxorder:");
-  boost::replace_all(retv,
-                     "              goalorder:", "                    goalorder:");
-  boost::replace_all(retv, "              board:", "                    board:");
+  boost::replace_all(retv, "BoardManager", "HashedBoardManager");
+  retv = string(retv.cbegin(), retv.cend() - 1)
+       + ", state_hash=" + to_string(state_hash()) + ")";
   return retv;
 }
 
 BoardState HashedBoardManager::state() const {
-  auto retv = BoardManager::state();
+  auto retv           = BoardManager::state();
   retv.zobrist_hash() = state_hash();
   return retv;
 }

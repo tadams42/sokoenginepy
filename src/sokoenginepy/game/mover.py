@@ -43,11 +43,11 @@ class SolvingMode(enum.Enum):
         return "SolvingMode." + self.name
 
 
-class NonPlayableBoardError(RuntimeError):
+class NonPlayableBoardError(ValueError):
     pass
 
 
-class IllegalMoveError(RuntimeError):
+class IllegalMoveError(ValueError):
     pass
 
 
@@ -381,7 +381,7 @@ class Mover:
         if in_front_of_pusher == Config.NO_POS:
             raise IllegalMoveError(
                 "Can't move pusher off board! (ID: "
-                + "{0}, direction: {1})".format(self._selected_pusher, str(direction))
+                + f"{self._selected_pusher}, direction: {direction})"
             )
 
         is_push = False
@@ -394,9 +394,8 @@ class Mover:
             if in_front_of_box == Config.NO_POS:
                 raise IllegalMoveError(
                     "Can't push box off board! (ID: "
-                    + "{0}, direction: {1})".format(
-                        self._manager.box_id_on(in_front_of_pusher), str(direction)
-                    )
+                    f"{self._manager.box_id_on(in_front_of_pusher)}, "
+                    f"direction: {direction})"
                 )
 
             try:

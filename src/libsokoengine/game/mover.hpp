@@ -44,13 +44,13 @@ enum class LIBSOKOENGINE_API SolvingMode : uint8_t {
   REVERSE,
 };
 
-class LIBSOKOENGINE_API NonPlayableBoardError : public std::runtime_error {
+class LIBSOKOENGINE_API NonPlayableBoardError : public std::invalid_argument {
 public:
   NonPlayableBoardError();
   virtual ~NonPlayableBoardError();
 };
 
-class LIBSOKOENGINE_API IllegalMoveError : public std::runtime_error {
+class LIBSOKOENGINE_API IllegalMoveError : public std::invalid_argument {
 public:
   explicit IllegalMoveError(const std::string &mess);
   virtual ~IllegalMoveError();
@@ -62,14 +62,14 @@ public:
 typedef std::vector<PusherStep> PusherSteps;
 
 ///
-/// Implements game rules (on-board movement). Supports forward and reverse game solving
-/// mode.
+/// Implements game rules (on-board movement). Supports forward and reverse game
+/// solving mode.
 ///
 /// **History management**
 ///
 /// Mover only stores last performed move in history and it doesn't offer redo. Failed
-/// moves, undo and non-moves (ie. selecting already selected pusher or jumping on same
-/// position pusher is already standing on) clear undo history.
+/// moves, undo and non-moves (ie. selecting already selected pusher or jumping on
+/// same position pusher is already standing on) clear undo history.
 ///
 class LIBSOKOENGINE_API Mover {
 public:
@@ -84,8 +84,8 @@ public:
   Mover &operator=(Mover &&rv);
   virtual ~Mover();
 
-  const BoardGraph &board() const;
-  SolvingMode solving_mode() const;
+  const BoardGraph         &board() const;
+  SolvingMode               solving_mode() const;
   const HashedBoardManager &board_manager() const;
 
   ///
@@ -139,16 +139,16 @@ public:
   ///
   /// Sequence of PusherStep that contains most recent movement.
   ///
-  /// Whenever Mover performs any movement or pusher selection, it puts resulting PusherStep
-  /// into this sequence in order pusher steps happened.
+  /// Whenever Mover performs any movement or pusher selection, it puts resulting
+  /// PusherStep into this sequence in order pusher steps happened.
   ///
-  /// This is useful for movement animation in GUI. After Mover performs movement, GUI has
-  /// enough information to know what was performed and to choose which animations to render
-  /// for that.
+  /// This is useful for movement animation in GUI. After Mover performs movement, GUI
+  /// has enough information to know what was performed and to choose which animations
+  /// to render for that.
   ///
-  /// It is also possible to set this to some external sequence of moves. In that case,
-  /// calling undo_last_move() will cause Mover to try to undo that external sequence of
-  /// pusher steps.
+  /// It is also possible to set this to some external sequence of moves. In that
+  /// case, calling undo_last_move() will cause Mover to try to undo that external
+  /// sequence of pusher steps.
   ///
   /// Example:
   ///
@@ -180,8 +180,8 @@ public:
   ///   BoardGraph board(puzzle);
   ///   Mover mover(board);
   ///
-  ///   PusherSteps last_move {PusherStep(Direction::UP), PusherStep(Direction::RIGHT)};
-  ///   mover.set_last_move(last_move);
+  ///   PusherSteps last_move {PusherStep(Direction::UP),
+  ///   PusherStep(Direction::RIGHT)}; mover.set_last_move(last_move);
   ///   mover.undo_last_move();
   ///
   ///   cout << mover.board().to_board_str(false) << endl;
@@ -198,8 +198,8 @@ public:
   ///   //     #######
   ///
   ///   cout << '{' << endl;
-  ///   for (auto step : mover.last_move()) { cout << "    " << step.repr() << ',' << endl; }
-  ///   cout << '}' << endl;
+  ///   for (auto step : mover.last_move()) { cout << "    " << step.repr() << ',' <<
+  ///   endl; } cout << '}' << endl;
   ///   // {
   ///   //     PusherStep(Direction.LEFT)
   ///   //     PusherStep(Direction.DOWN)
@@ -211,10 +211,11 @@ public:
   ///
   /// @warning
   /// Subsequent movement overwrites this, meaning that Mover can only undo last move
-  /// performed (it doesn't keep whole history of movement, only the last performed move).
+  /// performed (it doesn't keep whole history of movement, only the last performed
+  /// move).
   ///
   virtual const PusherSteps &last_move() const;
-  void set_last_move(const PusherSteps &rv);
+  void                       set_last_move(const PusherSteps &rv);
 
   ///
   /// Takes sequence of moves stored in last_move() and tries to undo it.
@@ -224,7 +225,8 @@ public:
   virtual void undo_last_move();
 
   ///
-  /// Select behavior in SolvingMode::REVERSE mode when pusher is moving away from box.
+  /// Select behavior in SolvingMode::REVERSE mode when pusher is moving away from
+  /// box.
   ///
   void set_pulls_boxes(bool value);
   bool pulls_boxes() const;

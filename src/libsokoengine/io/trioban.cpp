@@ -2,13 +2,12 @@
 
 #include "puzzle_parsing.hpp"
 
-using namespace std;
+using sokoengine::game::Tessellation;
+using std::make_unique;
+using std::string;
 
 namespace sokoengine {
 namespace io {
-
-using game::Tessellation;
-
 namespace implementation {
 
 LIBSOKOENGINE_LOCAL const PuzzleResizer &tb_static_resizer() {
@@ -28,27 +27,38 @@ LIBSOKOENGINE_LOCAL const PuzzlePrinter &tb_static_printer() {
 
 } // namespace implementation
 
-using namespace implementation;
-
 class LIBSOKOENGINE_LOCAL TriobanPuzzle::PIMPL {
 public:
   Snapshots m_snapshots;
 };
 
-TriobanPuzzle::TriobanPuzzle() : TriobanPuzzle(0, 0) {}
+TriobanPuzzle::TriobanPuzzle()
+  : TriobanPuzzle(0, 0) {}
 
 TriobanPuzzle::TriobanPuzzle(board_size_t width, board_size_t height)
-  : Puzzle(Tessellation::TRIOBAN, tb_static_resizer(), tb_static_parser(),
-           tb_static_printer(), width, height),
-    m_impl(make_unique<PIMPL>()) {}
+  : Puzzle(
+    Tessellation::TRIOBAN,
+    implementation::tb_static_resizer(),
+    implementation::tb_static_parser(),
+    implementation::tb_static_printer(),
+    width,
+    height
+  )
+  , m_impl(make_unique<PIMPL>()) {}
 
 TriobanPuzzle::TriobanPuzzle(const string &src)
-  : Puzzle(Tessellation::TRIOBAN, tb_static_resizer(), tb_static_parser(),
-           tb_static_printer(), src),
-    m_impl(make_unique<PIMPL>()) {}
+  : Puzzle(
+    Tessellation::TRIOBAN,
+    implementation::tb_static_resizer(),
+    implementation::tb_static_parser(),
+    implementation::tb_static_printer(),
+    src
+  )
+  , m_impl(make_unique<PIMPL>()) {}
 
 TriobanPuzzle::TriobanPuzzle(const TriobanPuzzle &rv)
-  : Puzzle(rv), m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
+  : Puzzle(rv)
+  , m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
 
 TriobanPuzzle &TriobanPuzzle::operator=(const TriobanPuzzle &rv) {
   if (this != &rv) {
@@ -71,17 +81,22 @@ TriobanPuzzle::unique_ptr_t TriobanPuzzle::clone() const {
 const TriobanPuzzle::Snapshots &TriobanPuzzle::snapshots() const {
   return m_impl->m_snapshots;
 }
+
 TriobanPuzzle::Snapshots &TriobanPuzzle::snapshots() { return m_impl->m_snapshots; }
 
-TriobanSnapshot::TriobanSnapshot() : Snapshot(Tessellation::TRIOBAN, "") {}
+TriobanSnapshot::TriobanSnapshot()
+  : Snapshot(Tessellation::TRIOBAN, "") {}
 
 TriobanSnapshot::TriobanSnapshot(const string &moves_data)
   : Snapshot(Tessellation::TRIOBAN, moves_data) {}
 
-TriobanSnapshot::TriobanSnapshot(const TriobanSnapshot &rv) : Snapshot(rv) {}
+TriobanSnapshot::TriobanSnapshot(const TriobanSnapshot &rv)
+  : Snapshot(rv) {}
 
 TriobanSnapshot &TriobanSnapshot::operator=(const TriobanSnapshot &rv) {
-  if (this != &rv) { Snapshot::operator=(rv); }
+  if (this != &rv) {
+    Snapshot::operator=(rv);
+  }
   return *this;
 }
 

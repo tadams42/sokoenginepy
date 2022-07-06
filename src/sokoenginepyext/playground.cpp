@@ -1,7 +1,7 @@
 #include <sokoengine.hpp>
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 using namespace sokoengine::game;
@@ -24,8 +24,12 @@ void is_everyone_here() {
   OctobanSnapshot os;
 }
 
+Edge get_one() { return Edge(); }
+
 int main() {
-  is_everyone_here();
+  std::vector<Edge> ev;
+
+  Edge e = get_one();
 
   return 0;
 }

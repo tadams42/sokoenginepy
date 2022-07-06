@@ -1,6 +1,5 @@
 #include "sokoenginepyext.hpp"
 
-using namespace std;
 using sokoengine::game::Config;
 using sokoengine::game::Direction;
 using sokoengine::game::DIRECTIONS_COUNT;
@@ -9,15 +8,27 @@ using sokoengine::game::piece_id_t;
 using sokoengine::game::PusherStep;
 using sokoengine::game::Selectors;
 using sokoengine::game::Tessellation;
+using std::make_unique;
 
 constexpr const char *NAMES[DIRECTIONS_COUNT] = {
-  "UP",   "NORTH_EAST", "RIGHT", "SOUTH_EAST",
-  "DOWN", "SOUTH_WEST", "LEFT",  "NORTH_WEST"};
+  "UP",
+  "NORTH_EAST",
+  "RIGHT",
+  "SOUTH_EAST",
+  "DOWN",
+  "SOUTH_WEST",
+  "LEFT",
+  "NORTH_WEST"};
 
 constexpr const char *OPPOSITE_NAMES[DIRECTIONS_COUNT] = {
-  "DOWN", "SOUTH_WEST", "LEFT",  "NORTH_WEST",
-  "UP",   "NORTH_EAST", "RIGHT", "SOUTH_EAST"};
-
+  "DOWN",
+  "SOUTH_WEST",
+  "LEFT",
+  "NORTH_WEST",
+  "UP",
+  "NORTH_EAST",
+  "RIGHT",
+  "SOUTH_EAST"};
 
 void export_pusher_step(py::module &m) {
   auto pyDirection = py::enum_<Direction>(m, "Direction")
@@ -29,7 +40,10 @@ void export_pusher_step(py::module &m) {
                        .value("SOUTH_WEST", Direction::SOUTH_WEST)
                        .value("NORTH_EAST", Direction::NORTH_EAST)
                        .value("NORTH_WEST", Direction::NORTH_WEST)
-                       .def_static("__len__", []() { return DIRECTIONS_COUNT; });
+                       .def_static("__len__", []() {
+                         return DIRECTIONS_COUNT;
+                       });
+
   pyDirection.def_property_readonly("opposite", [pyDirection](const Direction &self) {
     return pyDirection.attr(OPPOSITE_NAMES[static_cast<uint8_t>(self)]);
   });
@@ -37,15 +51,30 @@ void export_pusher_step(py::module &m) {
   auto pyPusherStep = py::class_<PusherStep>(m, "PusherStep");
 
   pyPusherStep.def(
-    py::init([](const Direction &direction, py_int_t moved_box_id, bool is_jump,
-                bool is_pusher_selection, py_int_t pusher_id, bool is_current_pos) {
-      return make_unique<PusherStep>(direction, no_id_if_invalid(moved_box_id), is_jump,
-                                     is_pusher_selection, default_if_invalid(pusher_id),
-                                     is_current_pos);
+    py::init([](
+               const Direction &direction,
+               py_int_t         moved_box_id,
+               bool             is_jump,
+               bool             is_pusher_selection,
+               py_int_t         pusher_id,
+               bool             is_current_pos
+             ) {
+      return make_unique<PusherStep>(
+        direction,
+        no_id_if_invalid(moved_box_id),
+        is_jump,
+        is_pusher_selection,
+        default_if_invalid(pusher_id),
+        is_current_pos
+      );
     }),
-    py::arg("direction") = Direction::LEFT, py::arg("moved_box_id") = Config::NO_ID,
-    py::arg("is_jump") = false, py::arg("is_pusher_selection") = false,
-    py::arg("pusher_id") = Config::DEFAULT_ID, py::arg("is_current_pos") = false);
+    py::arg("direction")           = Direction::LEFT,
+    py::arg("moved_box_id")        = Config::NO_ID,
+    py::arg("is_jump")             = false,
+    py::arg("is_pusher_selection") = false,
+    py::arg("pusher_id")           = Config::DEFAULT_ID,
+    py::arg("is_current_pos")      = false
+  );
 
   // protocols
   pyPusherStep.def("__eq__", &PusherStep::operator==);
@@ -58,22 +87,35 @@ void export_pusher_step(py::module &m) {
     [pyDirection](const PusherStep &self) {
       return pyDirection.attr(NAMES[static_cast<uint8_t>(self.direction())]);
     },
-    &PusherStep::set_direction);
+    &PusherStep::set_direction
+  );
 
   pyPusherStep.def_property(
-    "moved_box_id", &PusherStep::moved_box_id,
-    [](PusherStep &self, py_int_t rv) { self.set_moved_box_id(no_id_if_invalid(rv)); });
+    "moved_box_id",
+    &PusherStep::moved_box_id,
+    [](PusherStep &self, py_int_t rv) {
+      self.set_moved_box_id(no_id_if_invalid(rv));
+    }
+  );
   pyPusherStep.def_property(
-    "pusher_id", &PusherStep::pusher_id,
-    [](PusherStep &self, py_int_t rv) { self.set_pusher_id(default_if_invalid(rv)); });
+    "pusher_id",
+    &PusherStep::pusher_id,
+    [](PusherStep &self, py_int_t rv) {
+      self.set_pusher_id(default_if_invalid(rv));
+    }
+  );
 
   pyPusherStep.def_property_readonly("is_move", &PusherStep::is_move);
   pyPusherStep.def_property_readonly("is_push_or_pull", &PusherStep::is_push_or_pull);
-  pyPusherStep.def_property("is_pusher_selection", &PusherStep::is_pusher_selection,
-                            &PusherStep::set_is_pusher_selection);
+  pyPusherStep.def_property(
+    "is_pusher_selection",
+    &PusherStep::is_pusher_selection,
+    &PusherStep::set_is_pusher_selection
+  );
   pyPusherStep.def_property("is_jump", &PusherStep::is_jump, &PusherStep::set_is_jump);
-  pyPusherStep.def_property("is_current_pos", &PusherStep::is_current_pos,
-                            &PusherStep::set_is_current_pos);
+  pyPusherStep.def_property(
+    "is_current_pos", &PusherStep::is_current_pos, &PusherStep::set_is_current_pos
+  );
 
   // clang-format off
   pyPusherStep.def(py::pickle(

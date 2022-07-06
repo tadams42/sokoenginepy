@@ -1,6 +1,5 @@
 #include "sokoenginepyext.hpp"
 
-using namespace std;
 using sokoengine::game::PusherSteps;
 using sokoengine::io::HexobanSnapshot;
 using sokoengine::io::OctobanSnapshot;
@@ -8,6 +7,7 @@ using sokoengine::io::Snapshot;
 using sokoengine::io::SokobanSnapshot;
 using sokoengine::io::Strings;
 using sokoengine::io::TriobanSnapshot;
+using std::string;
 
 void export_io_snapshot(py::module &m) {
   auto pySnapshot = py::class_<Snapshot>(m, "Snapshot", py::is_final());
@@ -49,24 +49,54 @@ void export_io_snapshot(py::module &m) {
   pySnapshot.def_property_readonly("tessellation", &Snapshot::tessellation);
 
   pySnapshot.def_property(
-    "moves_data", [](const Snapshot &self) { return self.moves_data(); },
-    [](Snapshot &self, const string &rv) { self.set_moves_data(rv); });
+    "moves_data",
+    [](const Snapshot &self) {
+      return self.moves_data();
+    },
+    [](Snapshot &self, const string &rv) {
+      self.set_moves_data(rv);
+    }
+  );
 
   pySnapshot.def_property(
-    "pusher_steps", [](const Snapshot &self) { return self.pusher_steps(); },
-    [](Snapshot &self, const PusherSteps &rv) { self.set_pusher_steps(rv); });
+    "pusher_steps",
+    [](const Snapshot &self) {
+      return self.pusher_steps();
+    },
+    [](Snapshot &self, const PusherSteps &rv) {
+      self.set_pusher_steps(rv);
+    }
+  );
 
   pySnapshot.def_property(
-    "title", [](const Snapshot &self) { return self.title(); },
-    [](Snapshot &self, const string &rv) { self.title() = rv; });
+    "title",
+    [](const Snapshot &self) {
+      return self.title();
+    },
+    [](Snapshot &self, const string &rv) {
+      self.title() = rv;
+    }
+  );
 
   pySnapshot.def_property(
-    "solver", [](const Snapshot &self) { return self.solver(); },
-    [](Snapshot &self, const string &rv) { self.solver() = rv; });
+    "solver",
+    [](const Snapshot &self) {
+      return self.solver();
+    },
+    [](Snapshot &self, const string &rv) {
+      self.solver() = rv;
+    }
+  );
 
   pySnapshot.def_property(
-    "notes", [](const Snapshot &self) { return self.notes(); },
-    [](Snapshot &self, const Strings &rv) { self.notes() = rv; });
+    "notes",
+    [](const Snapshot &self) {
+      return self.notes();
+    },
+    [](Snapshot &self, const Strings &rv) {
+      self.notes() = rv;
+    }
+  );
 
   pySnapshot.def_property_readonly("pushes_count", &Snapshot::pushes_count);
   pySnapshot.def_property_readonly("moves_count", &Snapshot::moves_count);
@@ -75,17 +105,17 @@ void export_io_snapshot(py::module &m) {
 
   auto pySokobanSnapshot =
     py::class_<SokobanSnapshot, Snapshot>(m, "SokobanSnapshot", py::is_final())
-      .def(py::init<std::string>(), py::arg("moves_data") = "");
+      .def(py::init<string>(), py::arg("moves_data") = "");
 
   auto pyHexobanSnapshot =
     py::class_<HexobanSnapshot, Snapshot>(m, "HexobanSnapshot", py::is_final())
-      .def(py::init<std::string>(), py::arg("moves_data") = "");
+      .def(py::init<string>(), py::arg("moves_data") = "");
 
   auto pyTriobanSnapshot =
     py::class_<TriobanSnapshot, Snapshot>(m, "TriobanSnapshot", py::is_final())
-      .def(py::init<std::string>(), py::arg("moves_data") = "");
+      .def(py::init<string>(), py::arg("moves_data") = "");
 
   auto pyOctobanSnapshot =
     py::class_<OctobanSnapshot, Snapshot>(m, "OctobanSnapshot", py::is_final())
-      .def(py::init<std::string>(), py::arg("moves_data") = "");
+      .def(py::init<string>(), py::arg("moves_data") = "");
 }

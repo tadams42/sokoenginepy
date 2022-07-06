@@ -11,6 +11,11 @@
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 
+namespace sokoengine {
+namespace io {
+namespace implementation {
+
+using game::Tessellation;
 using std::endl;
 using std::ios_base;
 using std::istream;
@@ -18,42 +23,37 @@ using std::ostream;
 using std::string;
 using std::vector;
 
-namespace sokoengine {
-namespace io {
-
-using game::Tessellation;
-
-namespace implementation {
-
 struct LIBSOKOENGINE_LOCAL SnapshotData {
-  string moves_data;
-  string title;
-  string solver;
+  string  moves_data;
+  string  title;
+  string  solver;
   Strings notes;
 };
+
 typedef vector<SnapshotData> SnapshotsData;
 
 struct LIBSOKOENGINE_LOCAL PuzzleData {
-  string board;
-  Tessellation tessellation = Tessellation::SOKOBAN;
-  string title;
-  string author;
-  string boxorder;
-  string goalorder;
-  Strings notes;
+  string        board;
+  Tessellation  tessellation = Tessellation::SOKOBAN;
+  string        title;
+  string        author;
+  string        boxorder;
+  string        goalorder;
+  Strings       notes;
   SnapshotsData snapshots;
 };
+
 typedef vector<PuzzleData> PuzzlesData;
 
 struct LIBSOKOENGINE_LOCAL CollectionData {
-  string title;
-  string author;
-  string created_at;
-  string updated_at;
-  Strings notes;
-  Tessellation header_tessellation_hint = Tessellation::SOKOBAN;
-  bool was_tessellation_hint_in_header = false;
-  PuzzlesData puzzles;
+  string       title;
+  string       author;
+  string       created_at;
+  string       updated_at;
+  Strings      notes;
+  Tessellation header_tessellation_hint        = Tessellation::SOKOBAN;
+  bool         was_tessellation_hint_in_header = false;
+  PuzzlesData  puzzles;
 };
 
 class LIBSOKOENGINE_LOCAL SOKTags {
@@ -87,35 +87,41 @@ public:
     }
   }
 
-  static Strings extract_collection_attributes(CollectionData &dest,
-                                               const Strings &notes) {
+  static Strings
+  extract_collection_attributes(CollectionData &dest, const Strings &notes) {
     Strings remaining_lines;
-    string tessellation;
-    bool tessellation_found = false;
+    string  tessellation;
+    bool    tessellation_found = false;
 
     for (const string &line : notes) {
-      bool was_tagged = is_raw_file_notes_line(line);
+      bool   was_tagged = is_raw_file_notes_line(line);
       string value;
 
       if (!was_tagged) {
         value = get_tag_data(TITLE, line, was_tagged);
-        if (was_tagged) { dest.title = value; }
+        if (was_tagged) {
+          dest.title = value;
+        }
       }
 
       if (!was_tagged) {
         value = get_tag_data(AUTHOR, line, was_tagged);
-        if (was_tagged) { dest.author = value; }
+        if (was_tagged) {
+          dest.author = value;
+        }
       }
 
       if (!was_tagged) {
         value = get_tag_data(COLLECTION, line, was_tagged);
-        if (was_tagged) { dest.title = value; }
+        if (was_tagged) {
+          dest.title = value;
+        }
       }
 
       if (!was_tagged) {
         value = get_tag_data(VARIANT, line, was_tagged);
         if (was_tagged) {
-          tessellation = value;
+          tessellation       = value;
           tessellation_found = true;
           break;
         }
@@ -123,51 +129,65 @@ public:
 
       if (!was_tagged) {
         value = get_tag_data(DATE_CREATED, line, was_tagged);
-        if (was_tagged) { dest.created_at = value; }
+        if (was_tagged) {
+          dest.created_at = value;
+        }
       }
 
       if (!was_tagged) {
         value = get_tag_data(DATE_OF_LAST_CHANGE, line, was_tagged);
-        if (was_tagged) { dest.updated_at = value; }
+        if (was_tagged) {
+          dest.updated_at = value;
+        }
       }
 
-      if (!was_tagged) { remaining_lines.push_back(line); }
+      if (!was_tagged) {
+        remaining_lines.push_back(line);
+      }
     }
 
     if (tessellation_found && !is_blank(tessellation)) {
       dest.was_tessellation_hint_in_header = tessellation_found;
-      dest.header_tessellation_hint = tessellation_from_string(tessellation);
+      dest.header_tessellation_hint        = tessellation_from_string(tessellation);
     }
 
     return remaining_lines;
   }
 
   static Strings extract_puzzle_attributes(
-    PuzzleData &dest, const Strings &notes, bool has_tessellation_header,
-    Tessellation collection_header_tessellation_hint, bool has_supplied_tessellation,
-    Tessellation supplied_tessellation) {
+    PuzzleData    &dest,
+    const Strings &notes,
+    bool           has_tessellation_header,
+    Tessellation   collection_header_tessellation_hint,
+    bool           has_supplied_tessellation,
+    Tessellation   supplied_tessellation
+  ) {
     Strings remaining_lines;
-    string tessellation;
-    bool tessellation_found = false;
+    string  tessellation;
+    bool    tessellation_found = false;
 
     for (const string &line : notes) {
-      bool was_tagged = false;
+      bool   was_tagged = false;
       string value;
 
       if (!was_tagged) {
         value = get_tag_data(TITLE, line, was_tagged);
-        if (was_tagged) { dest.title = value; }
+        if (was_tagged) {
+          dest.title = value;
+        }
       }
 
       if (!was_tagged) {
         value = get_tag_data(AUTHOR, line, was_tagged);
-        if (was_tagged) { dest.author = value; }
+        if (was_tagged) {
+          dest.author = value;
+        }
       }
 
       if (!was_tagged) {
         value = get_tag_data(VARIANT, line, was_tagged);
         if (was_tagged) {
-          tessellation = value;
+          tessellation       = value;
           tessellation_found = true;
           break;
         }
@@ -175,15 +195,21 @@ public:
 
       if (!was_tagged) {
         value = get_tag_data(BOXORDER, line, was_tagged);
-        if (was_tagged) { dest.boxorder = value; }
+        if (was_tagged) {
+          dest.boxorder = value;
+        }
       }
 
       if (!was_tagged) {
         value = get_tag_data(GOALORDER, line, was_tagged);
-        if (was_tagged) { dest.goalorder = value; }
+        if (was_tagged) {
+          dest.goalorder = value;
+        }
       }
 
-      if (!was_tagged) { remaining_lines.push_back(line); }
+      if (!was_tagged) {
+        remaining_lines.push_back(line);
+      }
     }
 
     if (tessellation_found && !is_blank(tessellation)) {
@@ -203,25 +229,33 @@ public:
     Strings remaining_lines;
 
     for (const string &line : notes) {
-      bool was_tagged = false;
+      bool   was_tagged = false;
       string value;
 
       if (!was_tagged) {
         value = get_tag_data(TITLE, line, was_tagged);
-        if (was_tagged) { dest.title = value; }
+        if (was_tagged) {
+          dest.title = value;
+        }
       }
 
       if (!was_tagged) {
         value = get_tag_data(AUTHOR, line, was_tagged);
-        if (was_tagged) { dest.solver = value; }
+        if (was_tagged) {
+          dest.solver = value;
+        }
       }
 
       if (!was_tagged) {
         value = get_tag_data(SOLVER, line, was_tagged);
-        if (was_tagged) { dest.solver = value; }
+        if (was_tagged) {
+          dest.solver = value;
+        }
       }
 
-      if (!was_tagged) { remaining_lines.push_back(line); }
+      if (!was_tagged) {
+        remaining_lines.push_back(line);
+      }
     }
 
     return remaining_lines;
@@ -260,17 +294,17 @@ public:
   }
 };
 
-const string SOKTags::AUTHOR = "Author";
-const string SOKTags::TITLE = "Title";
-const string SOKTags::COLLECTION = "Collection";
-const string SOKTags::GOALORDER = "goalorder";
-const string SOKTags::BOXORDER = "boxorder";
-const string SOKTags::SOLVER = "Solver";
-const string SOKTags::VARIANT = "Game";
-const string SOKTags::DATE_CREATED = "Date Created";
+const string SOKTags::AUTHOR              = "Author";
+const string SOKTags::TITLE               = "Title";
+const string SOKTags::COLLECTION          = "Collection";
+const string SOKTags::GOALORDER           = "goalorder";
+const string SOKTags::BOXORDER            = "boxorder";
+const string SOKTags::SOLVER              = "Solver";
+const string SOKTags::VARIANT             = "Game";
+const string SOKTags::DATE_CREATED        = "Date Created";
 const string SOKTags::DATE_OF_LAST_CHANGE = "Date of Last Change";
-const string SOKTags::RAW_FILE_NOTES = "::";
-const string SOKTags::TAG_DELIMITERS = "=:";
+const string SOKTags::RAW_FILE_NOTES      = "::";
+const string SOKTags::TAG_DELIMITERS      = "=:";
 
 class LIBSOKOENGINE_LOCAL PuzzleConsumeVisitor {
   PuzzleData &m_puzzle_data;
@@ -290,7 +324,8 @@ class LIBSOKOENGINE_LOCAL PuzzleConsumeVisitor {
   }
 
 public:
-  PuzzleConsumeVisitor(PuzzleData &puzzle_data) : m_puzzle_data(puzzle_data) {}
+  PuzzleConsumeVisitor(PuzzleData &puzzle_data)
+    : m_puzzle_data(puzzle_data) {}
 
   void operator()(SokobanPuzzle &puzzle) {
     copy_puzzle_metadata(puzzle);
@@ -326,14 +361,16 @@ public:
 };
 
 class LIBSOKOENGINE_LOCAL SOKReader {
-  istream &m_src;
-  Collection &m_dest;
-  Tessellation m_supplied_tessellation_hint;
+  istream       &m_src;
+  Collection    &m_dest;
+  Tessellation   m_supplied_tessellation_hint;
   CollectionData m_data;
 
 public:
   SOKReader(istream &src, Collection &dest, Tessellation tessellation_hint)
-    : m_src(src), m_dest(dest), m_supplied_tessellation_hint(tessellation_hint) {}
+    : m_src(src)
+    , m_dest(dest)
+    , m_supplied_tessellation_hint(tessellation_hint) {}
 
   void read() {
     parse();
@@ -350,20 +387,20 @@ private:
 
     for (PuzzleData &puzzle_data : m_data.puzzles) {
       switch (puzzle_data.tessellation) {
-      case Tessellation::SOKOBAN:
-        m_dest.puzzles().emplace_back(SokobanPuzzle(puzzle_data.board));
-        break;
-      case Tessellation::HEXOBAN:
-        m_dest.puzzles().emplace_back(HexobanPuzzle(puzzle_data.board));
-        break;
-      case Tessellation::TRIOBAN:
-        m_dest.puzzles().emplace_back(TriobanPuzzle(puzzle_data.board));
-        break;
-      case Tessellation::OCTOBAN:
-        m_dest.puzzles().emplace_back(OctobanPuzzle(puzzle_data.board));
-        break;
-        // Do not handle default, let compiler generate warning if another tessellation
-        // is added...
+        case Tessellation::SOKOBAN:
+          m_dest.puzzles().emplace_back(SokobanPuzzle(puzzle_data.board));
+          break;
+        case Tessellation::HEXOBAN:
+          m_dest.puzzles().emplace_back(HexobanPuzzle(puzzle_data.board));
+          break;
+        case Tessellation::TRIOBAN:
+          m_dest.puzzles().emplace_back(TriobanPuzzle(puzzle_data.board));
+          break;
+        case Tessellation::OCTOBAN:
+          m_dest.puzzles().emplace_back(OctobanPuzzle(puzzle_data.board));
+          break;
+          // Do not handle default, let compiler generate warning if another
+          // tessellation is added...
       }
 
       auto &puzzle_variant = m_dest.puzzles().back();
@@ -372,7 +409,9 @@ private:
   }
 
   void parse() {
-    if (m_src.fail()) { throw std::runtime_error("Unknown input stream error!"); }
+    if (m_src.fail()) {
+      throw std::runtime_error("Unknown input stream error!");
+    }
     m_data = CollectionData();
     m_src.clear();
     m_src.seekg(0, ios_base::beg);
@@ -382,15 +421,16 @@ private:
   }
 
   void split_input() {
-    string line;
+    string  line;
     Strings lines;
     while (getline(m_src, line)) {
       lines.push_back(line + '\n');
     }
 
     auto first_board_line =
-      std::find_if(lines.cbegin(), lines.cend(),
-                   [](const string &line) { return Puzzle::is_board(line); });
+      std::find_if(lines.cbegin(), lines.cend(), [](const string &line) {
+        return Puzzle::is_board(line);
+      });
 
     Strings remaining_lines;
     if (first_board_line != lines.cend()) {
@@ -410,9 +450,13 @@ private:
       m_data.puzzles.push_back(PuzzleData());
       PuzzleData &puzzle = m_data.puzzles.back();
 
-      auto first_note_line =
-        std::find_if(remaining_lines.cbegin(), remaining_lines.cend(),
-                     [](const string &line) { return !Puzzle::is_board(line); });
+      auto first_note_line = std::find_if(
+        remaining_lines.cbegin(),
+        remaining_lines.cend(),
+        [](const string &line) {
+          return !Puzzle::is_board(line);
+        }
+      );
 
       if (first_note_line != remaining_lines.cend()) {
         Strings board;
@@ -425,13 +469,18 @@ private:
       }
 
       if (remaining_lines.size() > 0) {
-        auto first_board_line =
-          std::find_if(remaining_lines.cbegin(), remaining_lines.cend(),
-                       [](const string &line) { return Puzzle::is_board(line); });
+        auto first_board_line = std::find_if(
+          remaining_lines.cbegin(),
+          remaining_lines.cend(),
+          [](const string &line) {
+            return Puzzle::is_board(line);
+          }
+        );
 
         if (first_board_line != remaining_lines.cend()) {
-          std::copy(remaining_lines.cbegin(), first_board_line,
-                    std::back_inserter(puzzle.notes));
+          std::copy(
+            remaining_lines.cbegin(), first_board_line, std::back_inserter(puzzle.notes)
+          );
           remaining_lines.erase(remaining_lines.cbegin(), first_board_line);
         } else {
           puzzle.notes.swap(remaining_lines);
@@ -445,12 +494,17 @@ private:
       Strings remaining_lines;
       remaining_lines.swap(puzzle.notes);
 
-      auto first_moves_line =
-        std::find_if(remaining_lines.cbegin(), remaining_lines.cend(),
-                     [](const string &line) { return Snapshot::is_snapshot(line); });
+      auto first_moves_line = std::find_if(
+        remaining_lines.cbegin(),
+        remaining_lines.cend(),
+        [](const string &line) {
+          return Snapshot::is_snapshot(line);
+        }
+      );
       if (first_moves_line != remaining_lines.cend()) {
-        std::copy(remaining_lines.cbegin(), first_moves_line,
-                  std::back_inserter(puzzle.notes));
+        std::copy(
+          remaining_lines.cbegin(), first_moves_line, std::back_inserter(puzzle.notes)
+        );
         remaining_lines.erase(remaining_lines.cbegin(), first_moves_line);
       } else {
         remaining_lines.swap(puzzle.notes);
@@ -462,14 +516,19 @@ private:
         puzzle.snapshots.push_back(SnapshotData());
         SnapshotData &snapshot = puzzle.snapshots.back();
 
-        auto first_note_line =
-          std::find_if(remaining_lines.cbegin(), remaining_lines.cend(),
-                       [](const string &line) { return !Snapshot::is_snapshot(line); });
+        auto first_note_line = std::find_if(
+          remaining_lines.cbegin(),
+          remaining_lines.cend(),
+          [](const string &line) {
+            return !Snapshot::is_snapshot(line);
+          }
+        );
 
         if (first_note_line != remaining_lines.cend()) {
           Strings moves_lines;
-          std::copy(remaining_lines.cbegin(), first_note_line,
-                    std::back_inserter(moves_lines));
+          std::copy(
+            remaining_lines.cbegin(), first_note_line, std::back_inserter(moves_lines)
+          );
           for (string &ln : moves_lines) {
             boost::trim(ln);
           }
@@ -485,12 +544,19 @@ private:
 
         if (remaining_lines.size() > 0) {
           auto first_moves_line = std::find_if(
-            remaining_lines.cbegin(), remaining_lines.cend(),
-            [](const string &line) { return Snapshot::is_snapshot(line); });
+            remaining_lines.cbegin(),
+            remaining_lines.cend(),
+            [](const string &line) {
+              return Snapshot::is_snapshot(line);
+            }
+          );
 
           if (first_moves_line != remaining_lines.cend()) {
-            std::copy(remaining_lines.cbegin(), first_moves_line,
-                      std::back_inserter(snapshot.notes));
+            std::copy(
+              remaining_lines.cbegin(),
+              first_moves_line,
+              std::back_inserter(snapshot.notes)
+            );
             remaining_lines.erase(remaining_lines.cbegin(), first_moves_line);
           } else {
             snapshot.notes.swap(remaining_lines);
@@ -501,7 +567,9 @@ private:
   }
 
   Strings &notes_before_puzzle(size_t puzzle_index) {
-    if (puzzle_index == 0) { return m_data.notes; }
+    if (puzzle_index == 0) {
+      return m_data.notes;
+    }
     PuzzleData &previous_puzzle = m_data.puzzles[puzzle_index - 1];
     if (previous_puzzle.snapshots.size() > 0) {
       return previous_puzzle.snapshots.back().notes;
@@ -511,7 +579,9 @@ private:
 
   Strings &notes_before_snapshot(size_t puzzle_index, size_t snapshot_index) {
     PuzzleData &puzzle = m_data.puzzles[puzzle_index];
-    if (snapshot_index == 0) { return puzzle.notes; }
+    if (snapshot_index == 0) {
+      return puzzle.notes;
+    }
     return puzzle.snapshots[snapshot_index - 1].notes;
   }
 
@@ -533,19 +603,25 @@ private:
     // auto f = [](const string &s) { return !is_blank(s); };
     // Strings::const_reverse_iterator candidate = find_if(b, e, f);
 
-    Strings::const_reverse_iterator candidate = find_if(
-      notes.rbegin(), notes.rend(), [](const string &s) { return !is_blank(s); });
+    Strings::const_reverse_iterator candidate =
+      find_if(notes.rbegin(), notes.rend(), [](const string &s) {
+        return !is_blank(s);
+      });
 
-    if (candidate == notes.rend()) { return ""; }
+    if (candidate == notes.rend()) {
+      return "";
+    }
 
     Strings::const_reverse_iterator preceding_line = candidate;
-    if (preceding_line != notes.rend()) ++preceding_line;
+    if (preceding_line != notes.rend())
+      ++preceding_line;
     Strings::const_reverse_iterator following_line = candidate;
-    if (following_line != notes.rbegin()) --following_line;
+    if (following_line != notes.rbegin())
+      --following_line;
 
     bool preceding_ok =
       preceding_line == notes.rend() ? true : is_blank(*preceding_line);
-    bool following_ok = following_line == candidate ? true : is_blank(*following_line);
+    bool following_ok  = following_line == candidate ? true : is_blank(*following_line);
     bool is_title_line = preceding_ok && following_ok;
 
     if (is_title_line) {
@@ -560,15 +636,15 @@ private:
   void parse_title_lines() {
     for (size_t puzzle_index = 0; puzzle_index < m_data.puzzles.size();
          puzzle_index++) {
-      PuzzleData &puzzle = m_data.puzzles[puzzle_index];
-      Strings &notes_bp = notes_before_puzzle(puzzle_index);
-      puzzle.title = get_and_remove_title_line(notes_bp);
+      PuzzleData &puzzle   = m_data.puzzles[puzzle_index];
+      Strings    &notes_bp = notes_before_puzzle(puzzle_index);
+      puzzle.title         = get_and_remove_title_line(notes_bp);
 
       for (size_t snapshot_index = 0; snapshot_index < puzzle.snapshots.size();
            snapshot_index++) {
         SnapshotData &snapshot = puzzle.snapshots[snapshot_index];
-        Strings &notes_bs = notes_before_snapshot(puzzle_index, snapshot_index);
-        snapshot.title = get_and_remove_title_line(notes_bs);
+        Strings      &notes_bs = notes_before_snapshot(puzzle_index, snapshot_index);
+        snapshot.title         = get_and_remove_title_line(notes_bs);
       }
     }
   }
@@ -580,8 +656,13 @@ private:
 
     for (PuzzleData &puzzle : m_data.puzzles) {
       remaining_lines = SOKTags::extract_puzzle_attributes(
-        puzzle, puzzle.notes, m_data.was_tessellation_hint_in_header,
-        m_data.header_tessellation_hint, true, m_supplied_tessellation_hint);
+        puzzle,
+        puzzle.notes,
+        m_data.was_tessellation_hint_in_header,
+        m_data.header_tessellation_hint,
+        true,
+        m_supplied_tessellation_hint
+      );
       puzzle.notes.swap(cleanup_whitespace(remaining_lines));
 
       for (SnapshotData &snapshot : puzzle.snapshots) {
@@ -599,8 +680,10 @@ private:
     });
     notes.erase(tit, notes.end());
 
-    if (notes.size() > 0 && is_blank(notes.back())) notes.pop_back();
-    if (notes.size() > 0 && is_blank(notes.front())) notes.erase(notes.begin());
+    if (notes.size() > 0 && is_blank(notes.back()))
+      notes.pop_back();
+    if (notes.size() > 0 && is_blank(notes.front()))
+      notes.erase(notes.begin());
 
     for (string &line : notes) {
       boost::trim_right(line);
@@ -612,59 +695,73 @@ private:
 
 LIBSOKOENGINE_LOCAL string to_str(Tessellation tessellation) {
   switch (tessellation) {
-  case Tessellation::SOKOBAN:
-    return "sokoban";
-    break;
-  case Tessellation::HEXOBAN:
-    return "hexoban";
-    break;
-  case Tessellation::TRIOBAN:
-    return "trioban";
-    break;
-  case Tessellation::OCTOBAN:
-    return "octoban";
-    break;
-    // Do not handle default, let compiler generate warning when another tessellation
-    // is added...
+    case Tessellation::SOKOBAN:
+      return "sokoban";
+      break;
+    case Tessellation::HEXOBAN:
+      return "hexoban";
+      break;
+    case Tessellation::TRIOBAN:
+      return "trioban";
+      break;
+    case Tessellation::OCTOBAN:
+      return "octoban";
+      break;
+      // Do not handle default, let compiler generate warning when another
+      // tessellation is added...
   }
   throw std::invalid_argument("Unknown tessellation!");
 }
 
 class LIBSOKOENGINE_LOCAL PuzzleWriteVisitor {
 public:
-  PuzzleWriteVisitor(ostream &dest, bool &success) : m_stream(dest), retv(success) {}
+  PuzzleWriteVisitor(ostream &dest, bool &success)
+    : m_stream(dest)
+    , retv(success) {}
 
   void operator()(const SokobanPuzzle &puzzle) {
     retv = write_puzzle(puzzle);
     for (const auto &snapshot : puzzle.snapshots()) {
-      if (retv) { retv = write_snapshot(snapshot); }
+      if (retv) {
+        retv = write_snapshot(snapshot);
+      }
     }
   }
+
   void operator()(const TriobanPuzzle &puzzle) {
     retv = write_puzzle(puzzle);
     for (const auto &snapshot : puzzle.snapshots()) {
-      if (retv) { retv = write_snapshot(snapshot); }
+      if (retv) {
+        retv = write_snapshot(snapshot);
+      }
     }
   }
+
   void operator()(const OctobanPuzzle &puzzle) {
     retv = write_puzzle(puzzle);
     for (const auto &snapshot : puzzle.snapshots()) {
-      if (retv) { retv = write_snapshot(snapshot); }
+      if (retv) {
+        retv = write_snapshot(snapshot);
+      }
     }
   }
+
   void operator()(const HexobanPuzzle &puzzle) {
     retv = write_puzzle(puzzle);
     for (const auto &snapshot : puzzle.snapshots()) {
-      if (retv) { retv = write_snapshot(snapshot); }
+      if (retv) {
+        retv = write_snapshot(snapshot);
+      }
     }
   }
 
 private:
   ostream &m_stream;
-  bool &retv;
+  bool    &retv;
 
   bool write_puzzle(const Puzzle &puzzle) {
-    if (is_blank(puzzle.board())) return true;
+    if (is_blank(puzzle.board()))
+      return true;
 
     if (!is_blank(puzzle.title()))
       m_stream << boost::trim_copy(puzzle.title()) << endl << endl;
@@ -674,16 +771,15 @@ private:
     bool written = false;
 
     if (puzzle.tessellation() != Tessellation::SOKOBAN)
-      written = SOKTags::write_tagged(m_stream, SOKTags::VARIANT,
-                                      to_str(puzzle.tessellation())) ||
-                written;
+      written =
+        SOKTags::write_tagged(m_stream, SOKTags::VARIANT, to_str(puzzle.tessellation()))
+        || written;
 
     if (!is_blank(puzzle.boxorder()) && !is_blank(puzzle.goalorder())) {
-      written = SOKTags::write_tagged(m_stream, SOKTags::BOXORDER, puzzle.boxorder()) ||
-                written;
-      written =
-        SOKTags::write_tagged(m_stream, SOKTags::GOALORDER, puzzle.goalorder()) ||
-        written;
+      written = SOKTags::write_tagged(m_stream, SOKTags::BOXORDER, puzzle.boxorder())
+             || written;
+      written = SOKTags::write_tagged(m_stream, SOKTags::GOALORDER, puzzle.goalorder())
+             || written;
     }
 
     written =
@@ -699,24 +795,28 @@ private:
       }
       written = true;
     }
-    if (written) m_stream << endl;
+    if (written)
+      m_stream << endl;
 
     return (bool)m_stream;
   }
 
   bool write_snapshot(const Snapshot &snapshot) {
-    if (is_blank(snapshot.moves_data())) return true;
+    if (is_blank(snapshot.moves_data()))
+      return true;
 
     if (!is_blank(snapshot.title()))
       m_stream << boost::trim_copy(snapshot.title()) << endl;
 
     // TODO: wrap at 70
-    string moves_data = boost::trim_copy(snapshot.moves_data());
+    string moves_data  = boost::trim_copy(snapshot.moves_data());
     size_t write_count = 0;
-    for (auto c: moves_data) {
+    for (auto c : moves_data) {
       m_stream << c;
       write_count++;
-      if (write_count % 70 == 0) { m_stream << endl; }
+      if (write_count % 70 == 0) {
+        m_stream << endl;
+      }
     }
     m_stream << endl << endl;
 
@@ -732,7 +832,8 @@ private:
       }
       written = true;
     }
-    if (written) m_stream << endl;
+    if (written)
+      m_stream << endl;
 
     return (bool)m_stream;
   }
@@ -742,14 +843,19 @@ class LIBSOKOENGINE_LOCAL SOKWriter {
   ostream &m_stream;
 
 public:
-  SOKWriter(ostream &dest) : m_stream(dest) {
-    if (dest.fail()) { throw std::runtime_error("Unknown output stream error!"); }
+  SOKWriter(ostream &dest)
+    : m_stream(dest) {
+    if (dest.fail()) {
+      throw std::runtime_error("Unknown output stream error!");
+    }
   }
 
   bool write(const Collection &collection) {
     bool retv = write_collection_header(collection);
     for (const auto &puzzle_variant : collection.puzzles()) {
-      if (retv) { std::visit(PuzzleWriteVisitor(m_stream, retv), puzzle_variant); }
+      if (retv) {
+        std::visit(PuzzleWriteVisitor(m_stream, retv), puzzle_variant);
+      }
     }
     return retv;
   }
@@ -761,7 +867,8 @@ private:
     bool write_created_at =
       SOKTags::write_tagged(m_stream, SOKTags::DATE_CREATED, collection.created_at());
     bool write_updated_at = SOKTags::write_tagged(
-      m_stream, SOKTags::DATE_OF_LAST_CHANGE, collection.updated_at());
+      m_stream, SOKTags::DATE_OF_LAST_CHANGE, collection.updated_at()
+    );
 
     if (write_created_at || write_updated_at) {
       m_stream << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl
@@ -771,9 +878,8 @@ private:
     }
 
     bool written = false;
-    written =
-      SOKTags::write_tagged(m_stream, SOKTags::COLLECTION, collection.title()) ||
-      written;
+    written = SOKTags::write_tagged(m_stream, SOKTags::COLLECTION, collection.title())
+           || written;
     written =
       SOKTags::write_tagged(m_stream, SOKTags::AUTHOR, collection.author()) || written;
 
@@ -788,7 +894,8 @@ private:
       written = true;
     }
 
-    if (written) m_stream << endl;
+    if (written)
+      m_stream << endl;
 
     return (bool)m_stream;
   }
@@ -796,8 +903,9 @@ private:
 
 SOKFileFormat::~SOKFileFormat() {}
 
-void SOKFileFormat::read(istream &src, Collection &dest,
-                         Tessellation tessellation_hint) {
+void SOKFileFormat::read(
+  istream &src, Collection &dest, Tessellation tessellation_hint
+) {
   SOKReader reader(src, dest, tessellation_hint);
   reader.read();
 }

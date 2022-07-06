@@ -27,7 +27,8 @@ public:
 };
 
 ///
-/// Puzzle implementation for game::Tessellation::SOKOBAN and game::SokobanTessellation
+/// Puzzle implementation for game::Tessellation::SOKOBAN and
+/// game::SokobanTessellation
 ///
 class LIBSOKOENGINE_API SokobanPuzzle : public Puzzle {
 public:
@@ -49,8 +50,8 @@ public:
   virtual unique_ptr_t clone() const override;
 
   typedef std::vector<SokobanSnapshot> Snapshots;
-  const Snapshots &snapshots() const;
-  Snapshots &snapshots();
+  const Snapshots                     &snapshots() const;
+  Snapshots                           &snapshots();
 
 private:
   class PIMPL;

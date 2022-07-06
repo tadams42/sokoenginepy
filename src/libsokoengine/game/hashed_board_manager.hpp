@@ -14,8 +14,8 @@ namespace game {
 /// Adds Zobrist hashing on top of BoardManager and keeps it up to date when
 /// pieces are moved.
 ///
-/// Zobrist hash is 64b integer hash derived from positions of all boxes and pushers on
-/// board.
+/// Zobrist hash is 64b integer hash derived from positions of all boxes and pushers
+/// on board.
 ///
 /// This hash is "resistant" to moving board pieces. Moving one pusher and box will
 /// change board hash. Undoing that move will return hash to previous value.
@@ -39,8 +39,11 @@ namespace game {
 ///
 class LIBSOKOENGINE_API HashedBoardManager : public BoardManager {
 public:
-  explicit HashedBoardManager(BoardGraph &board, const std::string &boxorder = "",
-                              const std::string &goalorder = "");
+  explicit HashedBoardManager(
+    BoardGraph        &board,
+    const std::string &boxorder  = "",
+    const std::string &goalorder = ""
+  );
   HashedBoardManager(const HashedBoardManager &) = delete;
   HashedBoardManager(HashedBoardManager &&rv);
   HashedBoardManager &operator=(const HashedBoardManager &) = delete;
@@ -95,8 +98,8 @@ public:
   virtual std::string str() const override;
 
 protected:
-  virtual void pusher_moved(position_t old_position,
-                            position_t to_new_position) override;
+  virtual void
+  pusher_moved(position_t old_position, position_t to_new_position) override;
   virtual void box_moved(position_t old_position, position_t to_new_position) override;
 
 private:

@@ -2,13 +2,12 @@
 
 #include "puzzle_parsing.hpp"
 
-using namespace std;
+using sokoengine::game::Tessellation;
+using std::make_unique;
+using std::string;
 
 namespace sokoengine {
 namespace io {
-
-using game::Tessellation;
-
 namespace implementation {
 
 LIBSOKOENGINE_LOCAL const PuzzleResizer &ob_static_resizer() {
@@ -28,27 +27,38 @@ LIBSOKOENGINE_LOCAL const PuzzlePrinter &ob_static_printer() {
 
 } // namespace implementation
 
-using namespace implementation;
-
 class LIBSOKOENGINE_LOCAL OctobanPuzzle::PIMPL {
 public:
   Snapshots m_snapshots;
 };
 
-OctobanPuzzle::OctobanPuzzle() : OctobanPuzzle(0, 0) {}
+OctobanPuzzle::OctobanPuzzle()
+  : OctobanPuzzle(0, 0) {}
 
 OctobanPuzzle::OctobanPuzzle(board_size_t width, board_size_t height)
-  : Puzzle(Tessellation::OCTOBAN, ob_static_resizer(), ob_static_parser(),
-           ob_static_printer(), width, height),
-    m_impl(make_unique<PIMPL>()) {}
+  : Puzzle(
+    Tessellation::OCTOBAN,
+    implementation::ob_static_resizer(),
+    implementation::ob_static_parser(),
+    implementation::ob_static_printer(),
+    width,
+    height
+  )
+  , m_impl(make_unique<PIMPL>()) {}
 
 OctobanPuzzle::OctobanPuzzle(const string &src)
-  : Puzzle(Tessellation::OCTOBAN, ob_static_resizer(), ob_static_parser(),
-           ob_static_printer(), src),
-    m_impl(make_unique<PIMPL>()) {}
+  : Puzzle(
+    Tessellation::OCTOBAN,
+    implementation::ob_static_resizer(),
+    implementation::ob_static_parser(),
+    implementation::ob_static_printer(),
+    src
+  )
+  , m_impl(make_unique<PIMPL>()) {}
 
 OctobanPuzzle::OctobanPuzzle(const OctobanPuzzle &rv)
-  : Puzzle(rv), m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
+  : Puzzle(rv)
+  , m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
 
 OctobanPuzzle &OctobanPuzzle::operator=(const OctobanPuzzle &rv) {
   if (this != &rv) {
@@ -71,17 +81,22 @@ OctobanPuzzle::unique_ptr_t OctobanPuzzle::clone() const {
 const OctobanPuzzle::Snapshots &OctobanPuzzle::snapshots() const {
   return m_impl->m_snapshots;
 }
+
 OctobanPuzzle::Snapshots &OctobanPuzzle::snapshots() { return m_impl->m_snapshots; }
 
-OctobanSnapshot::OctobanSnapshot() : Snapshot(Tessellation::OCTOBAN, "") {}
+OctobanSnapshot::OctobanSnapshot()
+  : Snapshot(Tessellation::OCTOBAN, "") {}
 
 OctobanSnapshot::OctobanSnapshot(const string &moves_data)
   : Snapshot(Tessellation::OCTOBAN, moves_data) {}
 
-OctobanSnapshot::OctobanSnapshot(const OctobanSnapshot &rv) : Snapshot(rv) {}
+OctobanSnapshot::OctobanSnapshot(const OctobanSnapshot &rv)
+  : Snapshot(rv) {}
 
 OctobanSnapshot &OctobanSnapshot::operator=(const OctobanSnapshot &rv) {
-  if (this != &rv) { Snapshot::operator=(rv); }
+  if (this != &rv) {
+    Snapshot::operator=(rv);
+  }
   return *this;
 }
 

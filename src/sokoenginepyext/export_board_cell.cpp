@@ -1,8 +1,8 @@
 #include "sokoenginepyext.hpp"
 
-using namespace std;
 using sokoengine::game::BoardCell;
 using sokoengine::io::Puzzle;
+using std::make_unique;
 
 void export_board_cell(py::module &m) {
   py::class_<BoardCell> pyBoardCell(m, "BoardCell");
@@ -11,12 +11,30 @@ void export_board_cell(py::module &m) {
     .def(py::init<char>(), py::arg("character") = Puzzle::FLOOR)
 
     // protocols
-    .def("__eq__",
-         [](const BoardCell &self, const BoardCell &rv) -> bool { return self == rv; })
-    .def("__ne__",
-         [](const BoardCell &self, const BoardCell &rv) -> bool { return self != rv; })
-    .def("__eq__", [](const BoardCell &self, char rv) -> bool { return self == rv; })
-    .def("__ne__", [](const BoardCell &self, char rv) -> bool { return self != rv; })
+    .def(
+      "__eq__",
+      [](const BoardCell &self, const BoardCell &rv) -> bool {
+        return self == rv;
+      }
+    )
+    .def(
+      "__ne__",
+      [](const BoardCell &self, const BoardCell &rv) -> bool {
+        return self != rv;
+      }
+    )
+    .def(
+      "__eq__",
+      [](const BoardCell &self, char rv) -> bool {
+        return self == rv;
+      }
+    )
+    .def(
+      "__ne__",
+      [](const BoardCell &self, char rv) -> bool {
+        return self != rv;
+      }
+    )
 
     .def("__str__", &BoardCell::str)
     .def("__repr__", &BoardCell::repr)
@@ -31,7 +49,8 @@ void export_board_cell(py::module &m) {
         auto retv = make_unique<BoardCell>(t[0].cast<char>());
         retv->set_is_in_playable_area(t[1].cast<bool>());
         return retv;
-      }))
+      }
+    ))
 
     // instance methods and properties
     .def("to_str", &BoardCell::to_str, py::arg("use_visible_floor") = false)
@@ -50,6 +69,9 @@ void export_board_cell(py::module &m) {
     .def("put_pusher", &BoardCell::put_pusher)
     .def("remove_pusher", &BoardCell::remove_pusher)
     .def_property("is_wall", &BoardCell::is_wall, &BoardCell::set_is_wall)
-    .def_property("is_in_playable_area", &BoardCell::is_in_playable_area,
-                  &BoardCell::set_is_in_playable_area);
+    .def_property(
+      "is_in_playable_area",
+      &BoardCell::is_in_playable_area,
+      &BoardCell::set_is_in_playable_area
+    );
 }

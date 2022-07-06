@@ -27,7 +27,8 @@ public:
 };
 
 ///
-/// Puzzle implementation for game::Tessellation::HEXOBAN and game::HexobanTessellation
+/// Puzzle implementation for game::Tessellation::HEXOBAN and
+/// game::HexobanTessellation
 ///
 class LIBSOKOENGINE_API HexobanPuzzle : public Puzzle {
 public:
@@ -50,8 +51,8 @@ public:
   virtual unique_ptr_t clone() const override;
 
   typedef std::vector<HexobanSnapshot> Snapshots;
-  const Snapshots &snapshots() const;
-  Snapshots &snapshots();
+  const Snapshots                     &snapshots() const;
+  Snapshots                           &snapshots();
 
 private:
   class PIMPL;

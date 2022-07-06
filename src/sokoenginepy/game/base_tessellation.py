@@ -120,7 +120,10 @@ class BaseTessellation(metaclass=ABCMeta):
                 (pusher_step.direction, pusher_step.is_push_or_pull)
             ]
         except KeyError:
-            raise ValueError(pusher_step)
+            raise ValueError(
+                f"Illegal PusherStep direction {pusher_step.direction} in "
+                f"{self.__class__.__name__}!"
+            )
 
         return retv
 
@@ -135,7 +138,10 @@ class BaseTessellation(metaclass=ABCMeta):
         try:
             direction, box_moved = self._CHR_TO_PUSHER_STEP[input_chr]
         except KeyError:
-            raise ValueError(input_chr)
+            raise ValueError(
+                f"Illegal PusherStep character '{input_chr}' in "
+                f"{self.__class__.__name__}!"
+            )
 
         return PusherStep(
             direction=direction,

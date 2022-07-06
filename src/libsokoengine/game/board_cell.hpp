@@ -10,9 +10,10 @@ namespace game {
 /// Stores properties of one cell in board layout.
 ///
 /// @note
-/// There is no game logic encoded in this class. It is perfectly fine to put pusher on
-/// wall cell (in which case wall will be replaced by pusher). This is by design:
+/// There is no game logic encoded in this class. It is perfectly fine to put pusher
+/// on wall cell (in which case wall will be replaced by pusher). This is by design:
 /// BoardCell is a value class, not game logic class.
+///
 class LIBSOKOENGINE_API BoardCell {
 public:
   explicit BoardCell(char rv = ' ');
@@ -87,11 +88,11 @@ public:
   void set_is_in_playable_area(bool rv);
 
 private:
-  bool m_box : 1;      // Does it contain box?
-  bool m_pusher : 1;   // Does it contain pusher?
-  bool m_goal : 1;     // Does it contain goal?
-  bool m_wall : 1;     // Does it contain wall?
-  bool m_playable : 1; // Is in playable area?
+  bool m_box     : 1; // Does it contain box?
+  bool m_pusher  : 1; // Does it contain pusher?
+  bool m_goal    : 1; // Does it contain goal?
+  bool m_wall    : 1; // Does it contain wall?
+  bool m_playable: 1; // Is in playable area?
 };
 
 } // namespace game

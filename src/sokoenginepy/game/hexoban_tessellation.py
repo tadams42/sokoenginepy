@@ -102,7 +102,9 @@ class HexobanTessellation(BaseTessellation):
             column -= (row + 1) % 2
             row += 1
         else:
-            raise ValueError(direction)
+            raise ValueError(
+                f"Unsupported direction {direction} for {self.__class__.__name__}"
+            )
 
         if is_on_board_2d(column, row, board_width, board_height):
             return index_1d(column, row, board_width)

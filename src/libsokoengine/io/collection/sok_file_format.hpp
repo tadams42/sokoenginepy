@@ -18,8 +18,11 @@ class LIBSOKOENGINE_LOCAL SOKFileFormat {
 public:
   virtual ~SOKFileFormat();
 
-  void read(std::istream &src, Collection &dest,
-            game::Tessellation tessellation_hint = game::Tessellation::SOKOBAN);
+  void read(
+    std::istream      &src,
+    Collection        &dest,
+    game::Tessellation tessellation_hint = game::Tessellation::SOKOBAN
+  );
   bool write(const Collection &collection, std::ostream &dest);
 };
 

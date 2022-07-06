@@ -14,7 +14,8 @@ class HexobanPuzzle;
 class TriobanPuzzle;
 class OctobanPuzzle;
 
-typedef std::variant<SokobanPuzzle, HexobanPuzzle, TriobanPuzzle, OctobanPuzzle> AnyPuzzle;
+typedef std::variant<SokobanPuzzle, HexobanPuzzle, TriobanPuzzle, OctobanPuzzle>
+  AnyPuzzle;
 
 ///
 /// Default type for sequence of Puzzle
@@ -26,24 +27,27 @@ typedef std::vector<AnyPuzzle> Puzzles;
 ///
 class LIBSOKOENGINE_API Collection {
 public:
-  explicit Collection(const std::string &title = "", const std::string &author = "",
-                      const std::string &created_at = "",
-                      const std::string &updated_at = "",
-                      const Strings &notes = Strings());
+  explicit Collection(
+    const std::string &title      = "",
+    const std::string &author     = "",
+    const std::string &created_at = "",
+    const std::string &updated_at = "",
+    const Strings     &notes      = Strings()
+  );
   virtual ~Collection();
 
   const std::string &title() const;
-  std::string &title();
+  std::string       &title();
   const std::string &author() const;
-  std::string &author();
+  std::string       &author();
   const std::string &created_at() const;
-  std::string &created_at();
+  std::string       &created_at();
   const std::string &updated_at() const;
-  std::string &updated_at();
-  const Strings &notes() const;
-  Strings &notes();
-  const Puzzles &puzzles() const;
-  Puzzles &puzzles();
+  std::string       &updated_at();
+  const Strings     &notes() const;
+  Strings           &notes();
+  const Puzzles     &puzzles() const;
+  Puzzles           &puzzles();
 
   ///
   /// Loads collection from ``path``.
@@ -61,7 +65,8 @@ public:
   /// `.hsb`).
   ///
   /// @param path source file path
-  /// @param tessellation_hint If puzzles in file don't specify their game tessellation
+  /// @param tessellation_hint If puzzles in file don't specify their game
+  /// tessellation
   ///        assume this value.
   ///
   bool load(const std::filesystem::path &path, game::Tessellation tessellation_hint);
@@ -81,7 +86,8 @@ public:
   /// `.hsb`).
   ///
   /// @param path source file path
-  /// @param tessellation_hint If puzzles in file don't specify their game tessellation
+  /// @param tessellation_hint If puzzles in file don't specify their game
+  /// tessellation
   ///        assume this value.
   ///
   bool load(const std::string &path, game::Tessellation tessellation_hint);

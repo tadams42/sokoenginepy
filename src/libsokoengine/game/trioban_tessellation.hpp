@@ -25,14 +25,18 @@ namespace game {
 class LIBSOKOENGINE_API TriobanTessellation : public BaseTessellation {
 public:
   virtual const Directions &legal_directions() const override;
-  virtual position_t neighbor_position(position_t position, const Direction &direction,
-                                       board_size_t width,
-                                       board_size_t height) const override;
+  virtual position_t        neighbor_position(
+           position_t       position,
+           const Direction &direction,
+           board_size_t     width,
+           board_size_t     height
+         ) const override;
   virtual PusherStep char_to_pusher_step(char input_chr) const override;
-  virtual char pusher_step_to_char(const PusherStep &pusher_step) const override;
-  virtual GraphType graph_type() const override;
-  virtual io::CellOrientation cell_orientation(position_t position, board_size_t width,
-                                               board_size_t height) const override;
+  virtual char       pusher_step_to_char(const PusherStep &pusher_step) const override;
+  virtual GraphType  graph_type() const override;
+  virtual io::CellOrientation cell_orientation(
+    position_t position, board_size_t width, board_size_t height
+  ) const override;
 };
 
 } // namespace game

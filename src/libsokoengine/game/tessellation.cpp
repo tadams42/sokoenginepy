@@ -7,7 +7,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-using namespace std;
+using std::invalid_argument;
 
 namespace sokoengine {
 namespace game {
@@ -21,29 +21,29 @@ const BaseTessellation &BaseTessellation::instance(const Tessellation &tessellat
   static const OctobanTessellation OCTOBAN;
 
   switch (tessellation) {
-  case Tessellation::SOKOBAN:
-    return SOKOBAN;
-    break;
-  case Tessellation::HEXOBAN:
-    return HEXOBAN;
-    break;
-  case Tessellation::TRIOBAN:
-    return TRIOBAN;
-    break;
-  case Tessellation::OCTOBAN:
-    return OCTOBAN;
-    break;
-    // Do not handle default, let compiler generate warning when another tessellation
-    // is added...
+    case Tessellation::SOKOBAN:
+      return SOKOBAN;
+      break;
+    case Tessellation::HEXOBAN:
+      return HEXOBAN;
+      break;
+    case Tessellation::TRIOBAN:
+      return TRIOBAN;
+      break;
+    case Tessellation::OCTOBAN:
+      return OCTOBAN;
+      break;
+      // Do not handle default, let compiler generate warning when another
+      // tessellation is added...
   }
   throw invalid_argument("Unknown tessellation!");
 }
 
 GraphType BaseTessellation::graph_type() const { return GraphType::DIRECTED; }
 
-CellOrientation BaseTessellation::cell_orientation(position_t position,
-                                                   board_size_t width,
-                                                   board_size_t height) const {
+CellOrientation BaseTessellation::cell_orientation(
+  position_t position, board_size_t width, board_size_t height
+) const {
   return CellOrientation::DEFAULT;
 }
 

@@ -26,15 +26,13 @@ struct LIBSOKOENGINE_API Edge {
 public:
   position_t u;
   position_t v;
-  Direction direction;
+  Direction  direction;
 
-  explicit Edge(position_t u = Config::NO_POS, position_t v = Config::NO_POS,
-                Direction direction = Direction::LEFT);
-  Edge(const Edge &rv);
-  Edge(Edge &&rv);
-  Edge &operator=(const Edge &rv);
-  Edge &operator=(Edge &&rv);
-  ~Edge();
+  explicit Edge(
+    position_t u         = Config::NO_POS,
+    position_t v         = Config::NO_POS,
+    Direction  direction = Direction::LEFT
+  );
 
   bool operator==(const Edge &rv) const;
   bool operator!=(const Edge &rv) const;
@@ -95,15 +93,15 @@ public:
   ///
   /// Formatted string representation of board.
   ///
-  std::string to_board_str(bool use_visible_floor = false,
-                           bool rle_encode = false) const;
+  std::string
+  to_board_str(bool use_visible_floor = false, bool rle_encode = false) const;
 
   ///
   /// Same as to_board_str() but with hardcoded defaults.
   ///
   std::string str() const;
 
-  bool contains(position_t position) const;
+  bool         contains(position_t position) const;
   board_size_t size() const;
   board_size_t edges_count() const;
   board_size_t board_width() const;
@@ -153,16 +151,16 @@ public:
   Positions shortest_path(position_t src, position_t dst) const;
 
   ///
-  /// Calculates shortest path between two positions not passing through board obstacles
-  /// (walls, boxes, other pushers, etc...).
+  /// Calculates shortest path between two positions not passing through board
+  /// obstacles (walls, boxes, other pushers, etc...).
   ///
   /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
   Positions dijkstra_path(position_t src, position_t dst) const;
 
   ///
-  /// Finds list of positions through which pusher must pass when moving without pushing
-  /// boxes
+  /// Finds list of positions through which pusher must pass when moving without
+  /// pushing boxes
   ///
   /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
@@ -198,30 +196,32 @@ public:
   ///
   /// Doesn't require that ``pusher_position`` actually has pusher.
   ///
-  /// @throws InvalidPositionError when `pusher_position` is off board. Doesn't throw if
+  /// @throws InvalidPositionError when `pusher_position` is off board. Doesn't throw
+  /// if
   ///         any position in `excluded_positions` is off board; it simply ignores
   ///         those
   ///
   Positions positions_reachable_by_pusher(
-    position_t pusher_position,
-    const Positions &excluded_positions = Positions()) const;
+    position_t pusher_position, const Positions &excluded_positions = Positions()
+  ) const;
 
   ///
   /// Finds top-left position reachable by pusher without pushing any boxes.
   ///
   /// Doesn't require that ``pusher_position`` actually has pusher.
   ///
-  /// @throws InvalidPositionError when `pusher_position` is off board. Doesn't throw if
+  /// @throws InvalidPositionError when `pusher_position` is off board. Doesn't throw
+  /// if
   ///         any position in `excluded_positions` is off board; it simply ignores
   ///         those
   ///
-  position_t
-  normalized_pusher_position(position_t pusher_position,
-                             const Positions &excluded_positions = Positions()) const;
+  position_t normalized_pusher_position(
+    position_t pusher_position, const Positions &excluded_positions = Positions()
+  ) const;
 
   ///
-  /// Sets flag on all BoardCell in graph that are playable: reachable by any box or any
-  /// pusher.
+  /// Sets flag on all BoardCell in graph that are playable: reachable by any box or
+  /// any pusher.
   ///
   void mark_play_area();
 

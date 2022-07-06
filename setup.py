@@ -12,7 +12,7 @@ class SokoenginepyextOptions:
 
     On ``Linux``, ``pip install sokoenginepy`` will try to configure and build native
     extension. If build fails, ``sokoenginepy`` will be installed without native
-    extension. To succeed, boost header have to be in system include path.
+    extension. To succeed, boost headers have to be in system include path.
 
     On all other systems, native extension will not be installed.
     """
