@@ -2,6 +2,9 @@
 
 ## 1.1.0 (unreleased)
 
+- added: `Puzzle.has_sokoban_plus`
+- changed: `Collection.notes`, `Puzzle.notes` and `Snapshot.notes` are now ordinary
+  strings (instead of list of strings)
 - changed: `Collection.dump()` can now save to IO streams (previously it could only save
   to file path)
 - changed: `Collection.load()` can now load from IO streams (previously it could only load

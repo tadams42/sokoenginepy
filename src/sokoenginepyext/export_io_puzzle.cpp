@@ -130,6 +130,7 @@ void export_io_puzzle(py::module &m) {
   );
 
   pyPuzzle.def_property_readonly("tessellation", &Puzzle::tessellation);
+  pyPuzzle.def_property_readonly("has_sokoban_plus", &Puzzle::has_sokoban_plus);
 
   pyPuzzle.def(
     "cell_orientation",

@@ -256,6 +256,10 @@ string Puzzle::repr() const {
        + "\n]))";
 }
 
+bool Puzzle::has_sokoban_plus() const {
+  return (!is_blank(m_impl->m_boxorder) || !is_blank(m_impl->m_goalorder));
+}
+
 board_size_t Puzzle::width() const {
   m_impl->reparse_if_not_parsed();
   return m_impl->m_width;

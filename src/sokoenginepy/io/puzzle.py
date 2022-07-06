@@ -240,6 +240,10 @@ class Puzzle:
         return self._tessellation
 
     @property
+    def has_sokoban_plus(self) -> bool:
+        return not is_blank(self.boxorder) or not is_blank(self.goalorder)
+
+    @property
     def _tessellation_obj(self):
         from ..game import BaseTessellation
 

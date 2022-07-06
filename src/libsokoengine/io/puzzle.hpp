@@ -112,6 +112,8 @@ public:
   const std::string &notes() const;
   std::string       &notes();
 
+  bool has_sokoban_plus() const;
+
   game::Tessellation tessellation() const;
   CellOrientation    cell_orientation(position_t position) const;
 
