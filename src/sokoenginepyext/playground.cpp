@@ -24,12 +24,4 @@ void is_everyone_here() {
   OctobanSnapshot os;
 }
 
-Edge get_one() { return Edge(); }
-
-int main() {
-  std::vector<Edge> ev;
-
-  Edge e = get_one();
-
-  return 0;
-}
+int main() { return 0; }

@@ -2,7 +2,9 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 
+import pybind11
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
@@ -99,13 +101,16 @@ class CMakeBuild(build_ext):
         # Can be set with Conda-Build, for example.
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
-        if not SokoenginepyextCMakeExtension.vcpkg_toolchain_file():
-            raise RuntimeError("ZOMG!")
-
-        # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
             f"-DPython3_EXECUTABLE={sys.executable}",
+            # We need to inject this into cmake config because `pip install` creates
+            # separate, clean build environment (ie. /tmp/pip-build-env-HASH) which is
+            # impossible to detect by cmake
+            # Luckily, in cmake we don't need whole pip environment, only location of
+            # Find_pybind11 cmake module. Also luckily, pybind11 provides helper just
+            # for that purpose.
+            f"-DPYBIND11_CMAKE_DIR={pybind11.get_cmake_dir()}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
             "-DBUILD_SHARED_LIBS=ON",
             f"-DCMAKE_TOOLCHAIN_FILE={SokoenginepyextCMakeExtension.vcpkg_toolchain_file()}",

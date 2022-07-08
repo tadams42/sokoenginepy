@@ -208,17 +208,13 @@ src/sokoenginepyext.cpython-XX-YYY_ZZZ-linux-gnu.so
 ### Build using cmake
 
 When building through `pip`, most of the time whole source tree will be recompiled. This
-is slow and inconvenient for development environments. We can use `cmake` instead.
-
-Assuming again that `libsokoengine` build is OK, we can:
+is slow and inconvenient for development environments. We can use `cmake` instead. We
+still need Python virtual environment though:
 
 ```sh
 python3.9 -m venv .venv
 source .venv/bin/activate
-# Install regular python package, without pip compiling C++ extension
-export SOKOFILEPYEXT_SKIP=1
-pip install -e ".[dev]"
-export SOKOFILEPYEXT_SKIP=0
+pip install pybind11
 ```
 
 and then build C++ extension using cmake
