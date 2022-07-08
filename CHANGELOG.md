@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 (unreleased)
+## 1.0.1 (2022-07-08)
 
 - added: `BoardGraph.wall_neighbor_directions()`
 - added: `Puzzle.has_sokoban_plus`
