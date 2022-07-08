@@ -14,7 +14,6 @@ branches:
   only:
     - development
     - master
-    - feature/better_build
 
 cache:
   apt: true

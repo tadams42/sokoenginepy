@@ -1,12 +1,78 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=63",
     "wheel",
     "pybind11>=2.9.0",
     "ninja",
     "cmake >= 3.22",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "sokoenginepy"
+version = "1.0.0"
+description = "Sokoban and variants game utilities"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Tomislav Adamic", email = "tomislav.adamic@gmail.com" }]
+keywords = ["sokoban", "hexoban", "octoban", "trioban", "sokoban+", "multiban"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: 3 :: Only",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Games/Entertainment :: Puzzle Games",
+]
+dependencies = ["arrow", "networkx > 2.5", "lark >= 1.1.2"]
+
+[project.urls]
+Homepage = "https://github.com/tadams42/sokoenginepy"
+Source = "https://github.com/tadams42/sokoenginepy"
+Documentation = "https://sokoenginepy.readthedocs.io/en/latest/"
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "bump2version",
+    "ipython",
+    "isort",
+    "pytest-spec",
+    "twine",
+    "check-manifest",
+    "coverage",
+    "factory-boy",
+    "faker",
+    "pytest >= 3.0.0",
+    "m2r2",
+    "sphinx >= 1.4",
+    "sphinx_rtd_theme",
+]
+docs = ["m2r2", "sphinx >= 1.4", "sphinx_rtd_theme"]
+tests = [
+    "check-manifest",
+    "coverage",
+    "factory-boy",
+    "faker",
+    "pytest >= 3.0.0",
+    "pytest-spec",
+]
+
+[tool.setuptools]
+zip-safe = false
+platforms = ["any"]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["sokoenginepy*"]
+exclude = ["sokoenginepyext*"]
 
 [tool.isort]
 profile = "black"
