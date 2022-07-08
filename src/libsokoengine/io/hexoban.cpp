@@ -1,36 +1,46 @@
 #include "hexoban.hpp"
 
-#include "rle.hpp"
 #include "puzzle_parsing.hpp"
+#include "rle.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 
-using namespace std;
+using sokoengine::game::Config;
+using sokoengine::game::index_1d;
+using sokoengine::game::index_x;
+using sokoengine::game::index_y;
+using sokoengine::game::Tessellation;
+using sokoengine::implementation::Strings;
+using std::invalid_argument;
+using std::make_tuple;
+using std::make_unique;
+using std::numeric_limits;
+using std::pair;
+using std::string;
+using std::tie;
+using std::tuple;
 
 namespace sokoengine {
 namespace io {
-
-using game::Config;
-using game::Tessellation;
-using game::index_1d;
-using game::index_x;
-using game::index_y;
-
 namespace implementation {
 
 class LIBSOKOENGINE_LOCAL HexobanPuzzleResizer : public PuzzleResizer {
 public:
   virtual ~HexobanPuzzleResizer() = default;
 
-  virtual void add_row_top(parsed_board_t &parsed_board, board_size_t &width,
-                           board_size_t &height) const override;
-  virtual void remove_row_top(parsed_board_t &parsed_board, board_size_t &width,
-                              board_size_t &height) const override;
-  virtual void remove_row_bottom(parsed_board_t &parsed_board, board_size_t &width,
-                                 board_size_t &height) const override;
-  virtual void reverse_columns(parsed_board_t &parsed_board, board_size_t &width,
-                               board_size_t &height) const override;
+  virtual void add_row_top(
+    parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
+  ) const override;
+  virtual void remove_row_top(
+    parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
+  ) const override;
+  virtual void remove_row_bottom(
+    parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
+  ) const override;
+  virtual void reverse_columns(
+    parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
+  ) const override;
 };
 
 class LIBSOKOENGINE_LOCAL HexobanPuzzleParser : public PuzzleParser {
@@ -42,9 +52,13 @@ public:
 class LIBSOKOENGINE_LOCAL HexobanPuzzlePrinter : public PuzzlePrinter {
 public:
   virtual ~HexobanPuzzlePrinter() = default;
-  virtual string print(const parsed_board_t &parsed_board, board_size_t width,
-                       board_size_t height, bool use_visible_floor = false,
-                       bool rle_encode = false) const override;
+  virtual string print(
+    const parsed_board_t &parsed_board,
+    board_size_t          width,
+    board_size_t          height,
+    bool                  use_visible_floor = false,
+    bool                  rle_encode        = false
+  ) const override;
 };
 
 LIBSOKOENGINE_LOCAL const HexobanPuzzleResizer &hb_static_resizer() {
@@ -64,27 +78,38 @@ LIBSOKOENGINE_LOCAL const HexobanPuzzlePrinter &hb_static_printer() {
 
 } // namespace implementation
 
-using namespace implementation;
-
 class LIBSOKOENGINE_LOCAL HexobanPuzzle::PIMPL {
 public:
   Snapshots m_snapshots;
 };
 
-HexobanPuzzle::HexobanPuzzle() : HexobanPuzzle(0, 0) {}
+HexobanPuzzle::HexobanPuzzle()
+  : HexobanPuzzle(0, 0) {}
 
 HexobanPuzzle::HexobanPuzzle(board_size_t width, board_size_t height)
-  : Puzzle(Tessellation::HEXOBAN, hb_static_resizer(), hb_static_parser(),
-           hb_static_printer(), width, height),
-    m_impl(make_unique<PIMPL>()) {}
+  : Puzzle(
+    Tessellation::HEXOBAN,
+    implementation::hb_static_resizer(),
+    implementation::hb_static_parser(),
+    implementation::hb_static_printer(),
+    width,
+    height
+  )
+  , m_impl(make_unique<PIMPL>()) {}
 
 HexobanPuzzle::HexobanPuzzle(const string &src)
-  : Puzzle(Tessellation::HEXOBAN, hb_static_resizer(), hb_static_parser(),
-           hb_static_printer(), src),
-    m_impl(make_unique<PIMPL>()) {}
+  : Puzzle(
+    Tessellation::HEXOBAN,
+    implementation::hb_static_resizer(),
+    implementation::hb_static_parser(),
+    implementation::hb_static_printer(),
+    src
+  )
+  , m_impl(make_unique<PIMPL>()) {}
 
 HexobanPuzzle::HexobanPuzzle(const HexobanPuzzle &rv)
-  : Puzzle(rv), m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
+  : Puzzle(rv)
+  , m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
 
 HexobanPuzzle &HexobanPuzzle::operator=(const HexobanPuzzle &rv) {
   if (this != &rv) {
@@ -107,17 +132,22 @@ HexobanPuzzle::unique_ptr_t HexobanPuzzle::clone() const {
 const HexobanPuzzle::Snapshots &HexobanPuzzle::snapshots() const {
   return m_impl->m_snapshots;
 }
+
 HexobanPuzzle::Snapshots &HexobanPuzzle::snapshots() { return m_impl->m_snapshots; }
 
-HexobanSnapshot::HexobanSnapshot() : Snapshot(Tessellation::HEXOBAN, "") {}
+HexobanSnapshot::HexobanSnapshot()
+  : Snapshot(Tessellation::HEXOBAN, "") {}
 
 HexobanSnapshot::HexobanSnapshot(const string &moves_data)
   : Snapshot(Tessellation::HEXOBAN, moves_data) {}
 
-HexobanSnapshot::HexobanSnapshot(const HexobanSnapshot &rv) : Snapshot(rv) {}
+HexobanSnapshot::HexobanSnapshot(const HexobanSnapshot &rv)
+  : Snapshot(rv) {}
 
 HexobanSnapshot &HexobanSnapshot::operator=(const HexobanSnapshot &rv) {
-  if (this != &rv) { Snapshot::operator=(rv); }
+  if (this != &rv) {
+    Snapshot::operator=(rv);
+  }
   return *this;
 }
 
@@ -136,12 +166,16 @@ namespace implementation {
 class LIBSOKOENGINE_LOCAL HexobanTextConverter {
   typedef tuple<Strings, board_size_t, board_size_t, int8_t, int8_t> preparse_results_t;
   typedef tuple<char, board_size_t, board_size_t, int8_t, int8_t>
-    text_cell_position_data_t;
+                            text_cell_position_data_t;
   typedef tuple<bool, bool> text_cell_position_status_t;
 
 public:
-  string convert_to_string(const parsed_board_t &parsed_board, board_size_t width,
-                           board_size_t height, bool use_visible_floor = false) {
+  string convert_to_string(
+    const parsed_board_t &parsed_board,
+    board_size_t          width,
+    board_size_t          height,
+    bool                  use_visible_floor = false
+  ) {
     char floor = use_visible_floor ? Puzzle::VISIBLE_FLOOR : Puzzle::FLOOR;
 
     Strings retv_list;
@@ -163,7 +197,9 @@ public:
       retv_list.push_back(line);
     }
     retv_list = PuzzleParser::normalize_width(retv_list, floor);
-    if (is_type1(retv_list)) { remove_column_right(retv_list); }
+    if (is_type1(retv_list)) {
+      remove_column_right(retv_list);
+    }
 
     return boost::join(retv_list, "\n");
   }
@@ -178,9 +214,9 @@ public:
   }
 
   pair<Strings, bool> convert_to_internal(const string &board) const {
-    Strings parsed;
+    Strings      parsed;
     board_size_t height, width;
-    int8_t even_row_x_parity, odd_row_x_parity;
+    int8_t       even_row_x_parity, odd_row_x_parity;
 
     tie(parsed, width, height, even_row_x_parity, odd_row_x_parity) =
       preparse_board(board);
@@ -205,11 +241,14 @@ public:
         bool should_copy_cell;
 
         tie(layout_ok, should_copy_cell) = analyze_text_cell_position(
-          make_tuple(parsed[y][x], x, y, odd_row_x_parity, even_row_x_parity));
+          make_tuple(parsed[y][x], x, y, odd_row_x_parity, even_row_x_parity)
+        );
 
-        if (layout_ok && should_copy_cell) internal_line += parsed[y][x];
+        if (layout_ok && should_copy_cell)
+          internal_line += parsed[y][x];
       }
-      if (layout_ok) internal_list.push_back(internal_line);
+      if (layout_ok)
+        internal_list.push_back(internal_line);
     }
 
     if (layout_ok)
@@ -240,7 +279,7 @@ public:
 
   void reverse_columns(Strings &list) const {
     for (string &line : list)
-      std::reverse(line.begin(), line.end());
+      reverse(line.begin(), line.end());
   }
 
   void remove_row_top(Strings &list) const { list.erase(list.begin()); }
@@ -250,9 +289,9 @@ public:
 private:
   text_cell_position_status_t
   analyze_text_cell_position(text_cell_position_data_t position) const {
-    char cell;
+    char         cell;
     board_size_t x, y;
-    int8_t odd_row_x_parity, even_row_x_parity;
+    int8_t       odd_row_x_parity, even_row_x_parity;
     tie(cell, x, y, odd_row_x_parity, even_row_x_parity) = position;
 
     int8_t y_parity = y % 2;
@@ -263,29 +302,29 @@ private:
     bool is_cell_for_layout;
     bool should_copy_cell;
 
-    // Check if textual encoding (layout) is legal. Positions of all board elements in
-    // textual layout depend on position of first non floor element. If that element is
-    // (odd column, even row) than all other elements in even rows must be in odd
-    // columns. Other cells in even rows must be empty cells and their purpose is to
-    // define board textual layout (they are not board elements).
+    // Check if textual encoding (layout) is legal. Positions of all board elements
+    // in textual layout depend on position of first non floor element. If that
+    // element is (odd column, even row) than all other elements in even rows must
+    // be in odd columns. Other cells in even rows must be empty cells and their
+    // purpose is to define board textual layout (they are not board elements).
     if (y_parity == 0) { // even rows
       if (x_parity == even_row_x_parity) {
         is_cell_for_layout = false;
       } else {
         // Cell is part of layout, it must be empty
-        layout_ok = Puzzle::is_empty_floor(cell);
+        layout_ok          = Puzzle::is_empty_floor(cell);
         is_cell_for_layout = true;
       }
     } else {        // odd rows
       if (x == 0) { // row start half hexes are always layout cells
-        layout_ok = Puzzle::is_empty_floor(cell);
+        layout_ok          = Puzzle::is_empty_floor(cell);
         is_cell_for_layout = true;
       } else {
         if (x_parity == odd_row_x_parity) {
           is_cell_for_layout = false;
         } else {
           // Cell is part of layout, it must be empty
-          layout_ok = Puzzle::is_empty_floor(cell);
+          layout_ok          = Puzzle::is_empty_floor(cell);
           is_cell_for_layout = true;
         }
       }
@@ -297,12 +336,12 @@ private:
   }
 
   preparse_results_t preparse_board(const string &board) const {
-    Strings parsed;
+    Strings      parsed;
     board_size_t height = 0, width = 0;
 
-    parsed = PuzzleParser::cleaned_board_lines(board);
-    height = parsed.size();
-    width = height > 0 ? parsed.front().size() : 0;
+    parsed                   = PuzzleParser::cleaned_board_lines(board);
+    height                   = parsed.size();
+    width                    = height > 0 ? parsed.front().size() : 0;
     int8_t even_row_x_parity = -1, odd_row_x_parity = -1;
 
     if (height == 0 || width == 0)
@@ -312,8 +351,8 @@ private:
     bool has_non_floor_left_in_odd_row = false;
     for (board_size_t i = 0; i < height && !has_non_floor_left_in_odd_row; ++i) {
       has_non_floor_left_in_odd_row =
-        has_non_floor_left_in_odd_row ||
-        (i % 2 == 1 && !Puzzle::is_empty_floor(parsed[i][0]));
+        has_non_floor_left_in_odd_row
+        || (i % 2 == 1 && !Puzzle::is_empty_floor(parsed[i][0]));
     }
     if (has_non_floor_left_in_odd_row) {
       add_column_left(parsed);
@@ -338,18 +377,19 @@ private:
   }
 
   position_t find_first_non_floor(const Strings &list) const {
-    Strings normalized = HexobanPuzzleParser::normalize_width(list);
-    board_size_t height = normalized.size();
-    board_size_t width = height > 0 ? normalized.front().size() : 0;
-    if (height == 0 || width == 0) return Config::NO_POS;
+    Strings      normalized = HexobanPuzzleParser::normalize_width(list);
+    board_size_t height     = normalized.size();
+    board_size_t width      = height > 0 ? normalized.front().size() : 0;
+    if (height == 0 || width == 0)
+      return Config::NO_POS;
 
     position_t x = 0, y = 0;
-    bool non_floor_found = false;
+    bool       non_floor_found = false;
     for (position_t row = 0; row < height && !non_floor_found; row++) {
       for (position_t col = 0; col < width && !non_floor_found; col++) {
         if (!Puzzle::is_empty_floor(normalized[row][col]) && (col > x || row > y)) {
-          x = col;
-          y = row;
+          x               = col;
+          y               = row;
           non_floor_found = true;
         }
       }
@@ -362,13 +402,13 @@ private:
   }
 
   position_t find_rightmost_non_floor(const Strings &strings) const {
-    auto rightmost_finder = [](const Strings &strings,
-                               int8_t row_parity) -> position_t {
-      position_t retv = Config::NO_POS;
-      bool cell_found = false;
-      board_size_t height = strings.size();
-      board_size_t width = strings.front().size();
-      position_t x = 0, y = 0;
+    auto rightmost_finder =
+      [](const Strings &strings, int8_t row_parity) -> position_t {
+      position_t   retv       = Config::NO_POS;
+      bool         cell_found = false;
+      board_size_t height     = strings.size();
+      board_size_t width      = strings.front().size();
+      position_t   x = 0, y = 0;
       for (position_t row = row_parity % 2; row < height; row += 2) {
         for (position_t col = 0; col < width; col++) {
           if (!Puzzle::is_empty_floor(strings[row][col])) {
@@ -380,25 +420,28 @@ private:
           }
         }
       }
-      if (cell_found) { retv = index_1d(x, y, width); }
+      if (cell_found) {
+        retv = index_1d(x, y, width);
+      }
       return retv;
     };
 
-    Strings normalized = HexobanPuzzleParser::normalize_width(strings);
-    board_size_t height = normalized.size();
-    board_size_t width = height > 0 ? normalized.front().size() : 0;
-    if (height == 0 || width == 0) { return numeric_limits<position_t>::max(); }
+    Strings      normalized = HexobanPuzzleParser::normalize_width(strings);
+    board_size_t height     = normalized.size();
+    board_size_t width      = height > 0 ? normalized.front().size() : 0;
+    if (height == 0 || width == 0) {
+      return numeric_limits<position_t>::max();
+    }
 
     position_t rightmost_in_even_rows = rightmost_finder(normalized, 0);
-    position_t rightmost_in_odd_rows = rightmost_finder(normalized, 1);
+    position_t rightmost_in_odd_rows  = rightmost_finder(normalized, 1);
 
-    if (rightmost_in_even_rows == numeric_limits<position_t>::max() ||
-        rightmost_in_odd_rows == numeric_limits<position_t>::max()) { // Empty board
+    if (rightmost_in_even_rows == numeric_limits<position_t>::max() || rightmost_in_odd_rows == numeric_limits<position_t>::max()) { // Empty board
       return index_1d(0, 0, width);
     }
 
-    position_t odd_x = index_x(rightmost_in_odd_rows, width);
-    position_t odd_y = index_y(rightmost_in_odd_rows, width);
+    position_t odd_x  = index_x(rightmost_in_odd_rows, width);
+    position_t odd_y  = index_y(rightmost_in_odd_rows, width);
     position_t even_x = index_x(rightmost_in_even_rows, width);
     position_t even_y = index_y(rightmost_in_even_rows, width);
 
@@ -414,15 +457,17 @@ private:
   bool is_type2(const Strings &strings) const { return !is_type1(strings); }
 };
 
-void HexobanPuzzleResizer::reverse_columns(parsed_board_t &parsed_board,
-                                           board_size_t &width,
-                                           board_size_t &height) const {
+void HexobanPuzzleResizer::reverse_columns(
+  parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
+) const {
   HexobanTextConverter converter;
 
   Strings printed_board;
-  boost::split(printed_board,
-               converter.convert_to_string(parsed_board, width, height, true),
-               boost::is_any_of("\n"));
+  boost::split(
+    printed_board,
+    converter.convert_to_string(parsed_board, width, height, true),
+    boost::is_any_of("\n")
+  );
 
   if (converter.is_type1(printed_board))
     converter.add_column_left(printed_board);
@@ -437,15 +482,17 @@ void HexobanPuzzleResizer::reverse_columns(parsed_board_t &parsed_board,
   _copy(parsed_board, width, height, new_parsed_board);
 }
 
-void HexobanPuzzleResizer::add_row_top(parsed_board_t &parsed_board,
-                                       board_size_t &width,
-                                       board_size_t &height) const {
+void HexobanPuzzleResizer::add_row_top(
+  parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
+) const {
   HexobanTextConverter converter;
 
   Strings printed_board;
-  boost::split(printed_board,
-               converter.convert_to_string(parsed_board, width, height, true),
-               boost::is_any_of("\n"));
+  boost::split(
+    printed_board,
+    converter.convert_to_string(parsed_board, width, height, true),
+    boost::is_any_of("\n")
+  );
 
   converter.add_row_top(printed_board);
 
@@ -454,15 +501,17 @@ void HexobanPuzzleResizer::add_row_top(parsed_board_t &parsed_board,
   _copy(parsed_board, width, height, new_parsed_board);
 }
 
-void HexobanPuzzleResizer::remove_row_top(parsed_board_t &parsed_board,
-                                          board_size_t &width,
-                                          board_size_t &height) const {
+void HexobanPuzzleResizer::remove_row_top(
+  parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
+) const {
   HexobanTextConverter converter;
 
   Strings printed_board;
-  boost::split(printed_board,
-               converter.convert_to_string(parsed_board, width, height, true),
-               boost::is_any_of("\n"));
+  boost::split(
+    printed_board,
+    converter.convert_to_string(parsed_board, width, height, true),
+    boost::is_any_of("\n")
+  );
 
   converter.remove_row_top(printed_board);
 
@@ -471,15 +520,17 @@ void HexobanPuzzleResizer::remove_row_top(parsed_board_t &parsed_board,
   _copy(parsed_board, width, height, new_parsed_board);
 }
 
-void HexobanPuzzleResizer::remove_row_bottom(parsed_board_t &parsed_board,
-                                             board_size_t &width,
-                                             board_size_t &height) const {
+void HexobanPuzzleResizer::remove_row_bottom(
+  parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
+) const {
   HexobanTextConverter converter;
 
   Strings printed_board;
-  boost::split(printed_board,
-               converter.convert_to_string(parsed_board, width, height, true),
-               boost::is_any_of("\n"));
+  boost::split(
+    printed_board,
+    converter.convert_to_string(parsed_board, width, height, true),
+    boost::is_any_of("\n")
+  );
 
   converter.remove_row_bottom(printed_board);
 
@@ -491,21 +542,30 @@ void HexobanPuzzleResizer::remove_row_bottom(parsed_board_t &parsed_board,
 Strings HexobanPuzzleParser::parse(const string &board) const {
   auto result = HexobanTextConverter().convert_to_internal(board);
 
-  if (result.second) return result.first;
+  if (result.second)
+    return result.first;
 
   throw invalid_argument(
     "String can't be parsed to HexobanPuzzle. Probable cause is invalid "
-    "text layout meaning either missing or misaligned filler floor "
-    "characters.");
+    "text layout - there are either missing or misaligned filler floor "
+    "characters."
+  );
 }
 
-string HexobanPuzzlePrinter::print(const parsed_board_t &parsed_board,
-                                   board_size_t width, board_size_t height,
-                                   bool use_visible_floor, bool rle_encode) const {
-  string retv = HexobanTextConverter().convert_to_string(parsed_board, width, height,
-                                                         use_visible_floor);
+string HexobanPuzzlePrinter::print(
+  const parsed_board_t &parsed_board,
+  board_size_t          width,
+  board_size_t          height,
+  bool                  use_visible_floor,
+  bool                  rle_encode
+) const {
+  string retv = HexobanTextConverter().convert_to_string(
+    parsed_board, width, height, use_visible_floor
+  );
 
-  if (rle_encode) { retv = Rle::encode(retv); }
+  if (rle_encode) {
+    retv = Rle::encode(retv);
+  }
 
   return retv;
 }

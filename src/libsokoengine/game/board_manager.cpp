@@ -6,44 +6,34 @@
 #include "hashed_board_manager.hpp"
 #include "sokoban_plus.hpp"
 
-#include <algorithm>
 #include <charconv>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/bimap.hpp>
 #include <boost/bimap/set_of.hpp>
 
-using namespace boost;
-using namespace boost::bimaps;
-using namespace std;
+using sokoengine::implementation::Strings;
+using std::deque;
+using std::invalid_argument;
+using std::make_pair;
+using std::make_unique;
+using std::min;
+using std::next_permutation;
+using std::out_of_range;
+using std::pair;
+using std::string;
+using std::to_string;
+using std::vector;
 
 namespace sokoengine {
 namespace game {
-
-PieceNotFoundError::PieceNotFoundError(Selectors piece, long id)
-  : invalid_argument(string(piece == Selectors::PUSHERS ? "Pusher"
-                            : piece == Selectors::BOXES ? "Box"
-                                                        : "Goal") +
-                     " with ID: " + std::to_string(id) + " not found!") {}
-
-PieceNotFoundError::PieceNotFoundError(Selectors piece, long position,
-                                       char ignored)
-  : invalid_argument(string(piece == Selectors::PUSHERS ? "Pusher"
-                            : piece == Selectors::BOXES ? "Box"
-                                                        : "Goal") +
-                     " on position " + std::to_string(position) + " not found!") {}
-
-PieceNotFoundError::~PieceNotFoundError() = default;
-
-using io::Strings;
-
 namespace implementation {
 
 LIBSOKOENGINE_LOCAL string to_str(const BoardManager::positions_by_id_t &m) {
   auto converter = [&]() {
     Strings retv;
     for (auto p : m) {
-      retv.push_back(std::to_string(p.first) + ": " + std::to_string(p.second));
+      retv.push_back(to_string(p.first) + ": " + to_string(p.second));
     }
     return retv;
   };
@@ -53,28 +43,51 @@ LIBSOKOENGINE_LOCAL string to_str(const BoardManager::positions_by_id_t &m) {
 
 } // namespace implementation
 
+PieceNotFoundError::PieceNotFoundError(Selectors piece, long id)
+  : invalid_argument(
+    string(
+      piece == Selectors::PUSHERS ? "Pusher"
+      : piece == Selectors::BOXES ? "Box"
+                                  : "Goal"
+    )
+    + " with ID: " + to_string(id) + " not found!"
+  ) {}
+
+PieceNotFoundError::PieceNotFoundError(Selectors piece, long position, char ignored)
+  : invalid_argument(
+    string(
+      piece == Selectors::PUSHERS ? "Pusher"
+      : piece == Selectors::BOXES ? "Box"
+                                  : "Goal"
+    )
+    + " on position " + to_string(position) + " not found!"
+  ) {}
+
+PieceNotFoundError::~PieceNotFoundError() = default;
+
 CellAlreadyOccupiedError::CellAlreadyOccupiedError(const string &mess)
-  : runtime_error(mess) {}
+  : invalid_argument(mess) {}
 
 CellAlreadyOccupiedError::~CellAlreadyOccupiedError() = default;
 
-BoxGoalSwitchError::BoxGoalSwitchError(const string &mess) : runtime_error(mess) {}
+BoxGoalSwitchError::BoxGoalSwitchError(const string &mess)
+  : invalid_argument(mess) {}
 
 BoxGoalSwitchError::~BoxGoalSwitchError() = default;
 
-using namespace implementation;
-
 class LIBSOKOENGINE_LOCAL BoardManager::PIMPL {
 public:
-  typedef boost::bimap<set_of<piece_id_t>, set_of<position_t>> ids_to_positions_map_t;
+  typedef boost::
+    bimap<boost::bimaps::set_of<piece_id_t>, boost::bimaps::set_of<position_t>>
+      ids_to_positions_map_t;
 
-  typedef ids_to_positions_map_t::left_iterator left_iterator;
+  typedef ids_to_positions_map_t::left_iterator  left_iterator;
   typedef ids_to_positions_map_t::right_iterator right_iterator;
 
   ids_to_positions_map_t m_pushers;
   ids_to_positions_map_t m_boxes;
   ids_to_positions_map_t m_goals;
-  Positions m_walls;
+  Positions              m_walls;
 
   BoardGraph &m_board;
   SokobanPlus m_plus;
@@ -97,7 +110,8 @@ public:
         m_goals.insert(ids_to_positions_map_t::value_type(goal_id++, curent_pos));
       }
 
-      if (cell.is_wall()) m_walls.push_back(curent_pos);
+      if (cell.is_wall())
+        m_walls.push_back(curent_pos);
     }
 
     m_plus = SokobanPlus(m_boxes.size(), boxorder, goalorder);
@@ -106,54 +120,50 @@ public:
   position_t position_by_id(piece_id_t id, const Selectors &which) const {
     try {
       return which == Selectors::PUSHERS ? m_pushers.left.at(id)
-             : which == Selectors::BOXES ? m_boxes.left.at(id)
+           : which == Selectors::BOXES   ? m_boxes.left.at(id)
                                          : m_goals.left.at(id);
-    } catch (const out_of_range &) {
-      throw PieceNotFoundError(which, id);
-    }
+    } catch (const out_of_range &) { throw PieceNotFoundError(which, id); }
   }
 
   piece_id_t id_by_position(position_t position, const Selectors &which) const {
     try {
       return which == Selectors::PUSHERS ? m_pushers.right.at(position)
-             : which == Selectors::BOXES ? m_boxes.right.at(position)
+           : which == Selectors::BOXES   ? m_boxes.right.at(position)
                                          : m_goals.right.at(position);
-    } catch (const out_of_range &) {
-      throw PieceNotFoundError(which, position, ' ');
-    }
+    } catch (const out_of_range &) { throw PieceNotFoundError(which, position, ' '); }
   }
 
   bool has_piece(piece_id_t id, const Selectors &which) const {
     return which == Selectors::PUSHERS ? m_pushers.left.find(id) != m_pushers.left.end()
-           : which == Selectors::BOXES ? m_boxes.left.find(id) != m_boxes.left.end()
+         : which == Selectors::BOXES   ? m_boxes.left.find(id) != m_boxes.left.end()
                                        : m_goals.left.find(id) != m_goals.left.end();
   }
 
   bool has_piece_on_position(position_t on_position, const Selectors &which) const {
     return which == Selectors::PUSHERS
-             ? m_pushers.right.find(on_position) != m_pushers.right.end()
-           : which == Selectors::BOXES
-             ? m_boxes.right.find(on_position) != m_boxes.right.end()
-             : m_goals.right.find(on_position) != m_goals.right.end();
+           ? m_pushers.right.find(on_position) != m_pushers.right.end()
+         : which == Selectors::BOXES
+           ? m_boxes.right.find(on_position) != m_boxes.right.end()
+           : m_goals.right.find(on_position) != m_goals.right.end();
   }
 
   piece_ids_vector_t pieces_ids(const Selectors &which) const {
     piece_ids_vector_t retv;
 
     switch (which) {
-    case Selectors::PUSHERS:
-      for (auto pusher : m_pushers.left)
-        retv.push_back(pusher.first);
-      break;
-    case Selectors::BOXES:
-      for (auto box : m_boxes.left)
-        retv.push_back(box.first);
-      break;
-    case Selectors::GOALS:
-    default:
-      for (auto goal : m_goals.left)
-        retv.push_back(goal.first);
-      break;
+      case Selectors::PUSHERS:
+        for (auto pusher : m_pushers.left)
+          retv.push_back(pusher.first);
+        break;
+      case Selectors::BOXES:
+        for (auto box : m_boxes.left)
+          retv.push_back(box.first);
+        break;
+      case Selectors::GOALS:
+      default:
+        for (auto goal : m_goals.left)
+          retv.push_back(goal.first);
+        break;
     };
 
     return retv;
@@ -163,68 +173,73 @@ public:
     positions_by_id_t retv;
 
     switch (which) {
-    case Selectors::PUSHERS:
-      for (auto pusher : m_pushers.left)
-        retv[pusher.first] = pusher.second;
-      break;
-    case Selectors::BOXES:
-      for (auto box : m_boxes.left)
-        retv[box.first] = box.second;
-      break;
-    case Selectors::GOALS:
-    default:
-      for (auto goal : m_goals.left)
-        retv[goal.first] = goal.second;
-      break;
+      case Selectors::PUSHERS:
+        for (auto pusher : m_pushers.left)
+          retv[pusher.first] = pusher.second;
+        break;
+      case Selectors::BOXES:
+        for (auto box : m_boxes.left)
+          retv[box.first] = box.second;
+        break;
+      case Selectors::GOALS:
+      default:
+        for (auto goal : m_goals.left)
+          retv[goal.first] = goal.second;
+        break;
     };
 
     return retv;
   }
 
-  void update_position(piece_id_t for_id, const Selectors &which,
-                       position_t to_new_position) {
+  void update_position(
+    piece_id_t for_id, const Selectors &which, position_t to_new_position
+  ) {
     switch (which) {
-    case Selectors::PUSHERS:
-      m_pushers.left.replace_data(m_pushers.left.find(for_id), to_new_position);
-      break;
-    case Selectors::BOXES:
-      m_boxes.left.replace_data(m_boxes.left.find(for_id), to_new_position);
-      break;
-    case Selectors::GOALS:
-    default:
-      m_boxes.left.replace_data(m_boxes.left.find(for_id), to_new_position);
-      break;
+      case Selectors::PUSHERS:
+        m_pushers.left.replace_data(m_pushers.left.find(for_id), to_new_position);
+        break;
+      case Selectors::BOXES:
+        m_boxes.left.replace_data(m_boxes.left.find(for_id), to_new_position);
+        break;
+      case Selectors::GOALS:
+      default:
+        m_boxes.left.replace_data(m_boxes.left.find(for_id), to_new_position);
+        break;
     }
   }
 
-  void update_position_on(position_t old_position, const Selectors &which,
-                          position_t to_new_position) {
+  void update_position_on(
+    position_t old_position, const Selectors &which, position_t to_new_position
+  ) {
     switch (which) {
-    case Selectors::PUSHERS:
-      m_pushers.right.replace_key(m_pushers.right.find(old_position), to_new_position);
-      break;
-    case Selectors::BOXES:
-      m_boxes.right.replace_key(m_boxes.right.find(old_position), to_new_position);
-      break;
-    case Selectors::GOALS:
-    default:
-      m_goals.right.replace_key(m_goals.right.find(old_position), to_new_position);
-      break;
+      case Selectors::PUSHERS:
+        m_pushers.right.replace_key(
+          m_pushers.right.find(old_position), to_new_position
+        );
+        break;
+      case Selectors::BOXES:
+        m_boxes.right.replace_key(m_boxes.right.find(old_position), to_new_position);
+        break;
+      case Selectors::GOALS:
+      default:
+        m_goals.right.replace_key(m_goals.right.find(old_position), to_new_position);
+        break;
     }
   }
 
   typedef pair<piece_id_t, position_t> Piece;
-  typedef pair<Piece, Piece> BoxGoalPair;
-  typedef deque<BoxGoalPair> BoxGoalPairs;
+  typedef pair<Piece, Piece>           BoxGoalPair;
+  typedef deque<BoxGoalPair>           BoxGoalPairs;
 
   BoxGoalPairs find_box_goal_pairs() const {
-    auto b_count = m_boxes.size();
-    auto g_count = m_goals.size();
+    auto b_count         = m_boxes.size();
+    auto g_count         = m_goals.size();
     bool is_plus_enabled = m_plus.is_enabled();
 
     BoxGoalPairs retv;
 
-    if (g_count != b_count) return retv;
+    if (g_count != b_count)
+      return retv;
 
     auto boxes_todo = m_boxes;
 
@@ -235,8 +250,9 @@ public:
             return m_plus.box_plus_id(box.first) == m_plus.goal_plus_id(goal.first);
           return box.first == goal.first;
         });
-      retv.push_back(make_pair(make_pair(box_iter->first, box_iter->second),
-                               make_pair(goal.first, goal.second)));
+      retv.push_back(make_pair(
+        make_pair(box_iter->first, box_iter->second), make_pair(goal.first, goal.second)
+      ));
       boxes_todo.left.erase(box_iter);
     }
 
@@ -244,8 +260,9 @@ public:
   }
 }; // BoardManager::PIMPL
 
-BoardManager::BoardManager(BoardGraph &board, const string &boxorder,
-                           const string &goalorder)
+BoardManager::BoardManager(
+  BoardGraph &board, const string &boxorder, const string &goalorder
+)
   : m_impl(make_unique<PIMPL>(board, boxorder, goalorder)) {}
 
 BoardManager::BoardManager(BoardManager &&) = default;
@@ -255,8 +272,8 @@ BoardManager &BoardManager::operator=(BoardManager &&) = default;
 BoardManager::~BoardManager() = default;
 
 bool BoardManager::operator==(const BoardManager &rv) const {
-  return m_impl->m_pushers == rv.m_impl->m_pushers &&
-         m_impl->m_boxes == rv.m_impl->m_boxes && m_impl->m_goals == rv.m_impl->m_goals;
+  return m_impl->m_pushers == rv.m_impl->m_pushers
+      && m_impl->m_boxes == rv.m_impl->m_boxes && m_impl->m_goals == rv.m_impl->m_goals;
 }
 
 bool BoardManager::operator!=(const BoardManager &rv) const { return !(*this == rv); }
@@ -291,16 +308,19 @@ bool BoardManager::has_pusher_on(position_t position) const {
 
 void BoardManager::pusher_moved(position_t old_position, position_t o_new_position) {}
 
-void BoardManager::move_pusher_from(position_t old_position,
-                                    position_t to_new_position) {
-  if (old_position == to_new_position) return;
+void BoardManager::move_pusher_from(
+  position_t old_position, position_t to_new_position
+) {
+  if (old_position == to_new_position)
+    return;
 
   BoardCell &dest_cell = m_impl->m_board.cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {
     throw CellAlreadyOccupiedError(
-      string("Pusher ID: ") + to_string(pusher_id_on(old_position)) +
-      " can't be placed in position " + to_string(to_new_position) + " occupied by '" +
-      dest_cell.to_str() + "'");
+      string("Pusher ID: ") + to_string(pusher_id_on(old_position))
+      + " can't be placed in position " + to_string(to_new_position) + " occupied by '"
+      + dest_cell.to_str() + "'"
+    );
   }
 
   m_impl->m_board.cell_at(old_position).remove_pusher();
@@ -342,14 +362,16 @@ bool BoardManager::has_box_on(position_t position) const {
 void BoardManager::box_moved(position_t old_position, position_t o_new_position) {}
 
 void BoardManager::move_box_from(position_t old_position, position_t to_new_position) {
-  if (old_position == to_new_position) return;
+  if (old_position == to_new_position)
+    return;
 
   BoardCell &dest_cell = m_impl->m_board.cell_at(to_new_position);
   if (!dest_cell.can_put_pusher_or_box()) {
     throw CellAlreadyOccupiedError(
-      string("Box ID: ") + to_string(box_id_on(old_position)) +
-      " can't be placed in position " + to_string(to_new_position) + " occupied by '" +
-      dest_cell.to_str() + "'");
+      string("Box ID: ") + to_string(box_id_on(old_position))
+      + " can't be placed in position " + to_string(to_new_position) + " occupied by '"
+      + dest_cell.to_str() + "'"
+    );
   }
 
   m_impl->m_board.cell_at(old_position).remove_box();
@@ -423,22 +445,24 @@ void BoardManager::disable_sokoban_plus() { return m_impl->m_plus.disable(); }
 BoardManager::solutions_vector_t BoardManager::solutions() const {
   solutions_vector_t retv;
 
-  if (boxes_count() != goals_count()) return retv;
+  if (boxes_count() != goals_count())
+    return retv;
 
   typedef vector<position_t> positions_vector_t;
 
   auto is_valid_solution = [&](const positions_vector_t &b_positions) -> bool {
     piece_id_t index = 0;
-    bool retv = true;
+    bool       retv  = true;
     for (auto box_position : b_positions) {
-      auto b_id = index + Config::DEFAULT_ID;
+      auto b_id      = index + Config::DEFAULT_ID;
       auto b_plus_id = box_plus_id(b_id);
-      auto g_id = goal_id_on(box_position);
+      auto g_id      = goal_id_on(box_position);
       auto g_plus_id = goal_plus_id(g_id);
       index++;
 
       retv = retv && (b_plus_id == g_plus_id);
-      if (!retv) break;
+      if (!retv)
+        break;
     }
     return retv;
   };
@@ -452,7 +476,7 @@ BoardManager::solutions_vector_t BoardManager::solutions() const {
     if (is_valid_solution(g_positions)) {
       retv.push_back(BoardState(Positions(), g_positions));
     }
-  } while (std::next_permutation(g_positions.begin(), g_positions.end()));
+  } while (next_permutation(g_positions.begin(), g_positions.end()));
 
   return retv;
 }
@@ -460,11 +484,12 @@ BoardManager::solutions_vector_t BoardManager::solutions() const {
 void BoardManager::switch_boxes_and_goals() {
   if (boxes_count() != goals_count()) {
     throw BoxGoalSwitchError(
-      "Unable to switch boxes and goals - counts are not the same");
+      "Unable to switch boxes and goals - counts are not the same"
+    );
   }
 
   for (const auto &bg_pair : m_impl->find_box_goal_pairs()) {
-    auto old_box_position = box_position(bg_pair.first.first);
+    auto old_box_position  = box_position(bg_pair.first.first);
     auto old_goal_position = goal_position(bg_pair.second.first);
 
     if (old_box_position != old_goal_position) {
@@ -494,30 +519,32 @@ void BoardManager::switch_boxes_and_goals() {
 }
 
 bool BoardManager::is_solved() const {
-  if (boxes_count() != goals_count()) return false;
+  if (boxes_count() != goals_count())
+    return false;
 
   bool retv = true;
 
   for (auto box : m_impl->m_boxes.left) {
-    retv = retv && has_goal_on(box.second) &&
-           box_plus_id(box.first) == goal_plus_id(goal_id_on(box.second));
-    if (!retv) break;
+    retv = retv && has_goal_on(box.second)
+        && box_plus_id(box.first) == goal_plus_id(goal_id_on(box.second));
+    if (!retv)
+      break;
   }
 
   return retv;
 }
 
 bool BoardManager::is_playable() const {
-  return pushers_count() > 0 && boxes_count() > 0 && goals_count() > 0 &&
-         boxes_count() == goals_count();
+  return pushers_count() > 0 && boxes_count() > 0 && goals_count() > 0
+      && boxes_count() == goals_count();
 }
 
 string BoardManager::str() const {
   auto converter = [](const Positions &positions) {
-    size_t max_members = 10;
+    size_t  max_members = 5;
     Strings tmp;
     for (size_t i = 0; i < min(positions.size(), max_members); ++i) {
-      tmp.push_back(std::to_string(positions[i]));
+      tmp.push_back(to_string(positions[i]));
     }
 
     if (positions.size() <= max_members)
@@ -526,12 +553,11 @@ string BoardManager::str() const {
       return string("[") + boost::join(tmp, ", ") + ", ...]";
   };
 
-  return "<BoardManager pushers: " + to_str(pushers_positions()) + ",\n" +
-         "              boxes: " + to_str(boxes_positions()) + ",\n" +
-         "              goals: " + to_str(goals_positions()) + ",\n" +
-         "              walls: " + converter(walls_positions()) + ",\n" +
-         "              boxorder: '" + boxorder() + "',\n" +
-         "              goalorder: '" + boxorder() + "',\n>";
+  return "BoardManager(pushers: " + implementation::to_str(pushers_positions())
+       + ", boxes: " + implementation::to_str(boxes_positions())
+       + ", goals: " + implementation::to_str(goals_positions())
+       + ", walls: " + converter(walls_positions()) + ", boxorder: \"" + boxorder()
+       + "\"" + ", goalorder: \"" + boxorder() + "\")";
 }
 
 BoardState BoardManager::state() const {

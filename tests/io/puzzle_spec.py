@@ -126,3 +126,19 @@ class DescribePuzzle:
             assert not Puzzle.is_sokoban_plus("")
             assert not Puzzle.is_sokoban_plus("    ")
             assert not Puzzle.is_sokoban_plus("   \r\n \t")
+
+    class describe_has_sokoban_plus:
+        def it_returns_true_when_either_boxorder_or_goalorder_is_not_blank(self):
+            s = SokobanPuzzle(5, 5)
+
+            s.boxorder = "1 2 3"
+            assert s.has_sokoban_plus
+
+            s.goalorder = "1 2 3"
+            assert s.has_sokoban_plus
+
+            s.boxorder = ""
+            assert s.has_sokoban_plus
+
+            s.goalorder = ""
+            assert not s.has_sokoban_plus

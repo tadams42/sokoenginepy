@@ -1,8 +1,7 @@
-cmake_minimum_required(VERSION 3.15.1)
+cmake_minimum_required(VERSION 3.22.0)
 
-project(libsokoengine VERSION 1.0.0 LANGUAGES CXX)
+project(libsokoengine VERSION 1.0.1 LANGUAGES CXX)
 
-# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 include(libsokoengine_configure)

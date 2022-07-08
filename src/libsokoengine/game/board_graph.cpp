@@ -6,18 +6,25 @@
 #include "puzzle.hpp"
 #include "tessellation.hpp"
 
-#include <algorithm>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
-#include <deque>
+
+using sokoengine::io::Puzzle;
+using std::deque;
+using std::make_unique;
+using std::out_of_range;
+using std::range_error;
+using std::string;
+using std::tie;
+using std::to_string;
+using std::vector;
 
 namespace sokoengine {
 namespace game {
 
 InvalidPositionError::InvalidPositionError(long position)
-  : std::out_of_range("Board index " + std::to_string(position) + " is out of range!") {
-}
+  : out_of_range("Board position " + to_string(position) + " is out of range!") {}
 
 InvalidPositionError::~InvalidPositionError() = default;
 
@@ -26,9 +33,12 @@ namespace implementation {
 typedef uint8_t edge_weight_t;
 
 struct graph_edge_property_t {
-  graph_edge_property_t() : weight(1), direction(Direction::LEFT) {}
+  graph_edge_property_t()
+    : weight(1)
+    , direction(Direction::LEFT) {}
+
   edge_weight_t weight;
-  Direction direction;
+  Direction     direction;
 };
 
 //
@@ -42,20 +52,21 @@ struct graph_edge_property_t {
 // Generally there is no edge adding or removal once graph is constructed (thus,
 // no speed improvement in choosing listS instead of vecS).
 //
-typedef boost::adjacency_list<boost::vecS,           // OutEdgeList
-                              boost::vecS,           // VertexList
-                              boost::directedS,      // Directed
-                              BoardCell,             // VertexProperties
-                              graph_edge_property_t, // EdgeProperties
-                              boost::no_property,    // GraphProperties
-                              boost::vecS>           // EdgeList
+typedef boost::adjacency_list<
+  boost::vecS,           // OutEdgeList
+  boost::vecS,           // VertexList
+  boost::directedS,      // Directed
+  BoardCell,             // VertexProperties
+  graph_edge_property_t, // EdgeProperties
+  boost::no_property,    // GraphProperties
+  boost::vecS>           // EdgeList
   graph_t;
 
 typedef graph_t::vertex_descriptor vertex_descriptor_t;
-typedef graph_t::edge_descriptor edge_descriptor_t;
-typedef graph_t::vertex_iterator vertex_iterator_t;
+typedef graph_t::edge_descriptor   edge_descriptor_t;
+typedef graph_t::vertex_iterator   vertex_iterator_t;
 typedef graph_t::out_edge_iterator out_edge_iterator_t;
-typedef graph_t::in_edge_iterator in_edge_iterator_t;
+typedef graph_t::in_edge_iterator  in_edge_iterator_t;
 
 } // namespace implementation
 
@@ -65,10 +76,6 @@ using implementation::in_edge_iterator_t;
 using implementation::out_edge_iterator_t;
 using implementation::vertex_descriptor_t;
 using implementation::vertex_iterator_t;
-using io::Puzzle;
-using std::deque;
-using std::string;
-using std::vector;
 
 class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
   bool has_edge(position_t u, position_t v, const Direction &direction) const {
@@ -78,10 +85,11 @@ class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
     // - edge doesn't exist
     // - `src` or `dst` is off board position
     //
-    if (!contains(u) || !contains(v)) return false;
+    if (!contains(u) || !contains(v))
+      return false;
 
     out_edge_iterator_t e_i, e_iend;
-    std::tie(e_i, e_iend) = boost::out_edges(u, m_graph);
+    tie(e_i, e_iend) = boost::out_edges(u, m_graph);
     return e_iend != find_if(e_i, e_iend, [&](const edge_descriptor_t &e) {
              return m_graph[e].direction == direction;
            });
@@ -91,7 +99,7 @@ class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
 
   edge_weight_t out_edge_weight(position_t v) const {
     const BoardCell &target_cell = m_graph[v];
-    edge_weight_t weight = 1;
+    edge_weight_t    weight      = 1;
     if (target_cell.is_wall() || target_cell.has_box() || target_cell.has_pusher())
       weight = MAX_EDGE_WEIGHT;
     return weight;
@@ -99,7 +107,7 @@ class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
 
   void remove_all_edges() {
     vertex_iterator_t v_i, v_iend;
-    for (std::tie(v_i, v_iend) = boost::vertices(m_graph); v_i != v_iend; ++v_i) {
+    for (tie(v_i, v_iend) = boost::vertices(m_graph); v_i != v_iend; ++v_i) {
       boost::clear_vertex(*v_i, m_graph);
     }
   }
@@ -108,30 +116,36 @@ class LIBSOKOENGINE_LOCAL BoardGraph::PIMPL {
     is_valid_or_throw(u);
     is_valid_or_throw(v);
 
-    board_size_t retv = 0;
+    board_size_t        retv = 0;
     out_edge_iterator_t e_i, e_iend;
-    std::tie(e_i, e_iend) = boost::out_edges(u, m_graph);
+    tie(e_i, e_iend) = boost::out_edges(u, m_graph);
     for (; e_i != e_iend; ++e_i) {
-      if (boost::target(*e_i, m_graph) == v) retv += 1;
+      if (boost::target(*e_i, m_graph) == v)
+        retv += 1;
     }
     return retv;
   }
 
 public:
   typedef std::function<bool(position_t)> IsObstacleFunctor;
-  implementation::graph_t m_graph;
-  Tessellation m_tessellation;
-  board_size_t m_board_width;
-  board_size_t m_board_height;
+  implementation::graph_t                 m_graph;
+  Tessellation                            m_tessellation;
+  board_size_t                            m_board_width;
+  board_size_t                            m_board_height;
 
   PIMPL(board_size_t width, board_size_t height, const Tessellation &tessellation)
-    : m_graph(width * height),
-      m_tessellation(tessellation),
-      m_board_width(width),
-      m_board_height(height) {
-    if (width > Config::MAX_WIDTH) throw std::range_error("width must be <= MAX_WIDTH");
+    : m_graph(width * height)
+    , m_tessellation(tessellation)
+    , m_board_width(width)
+    , m_board_height(height) {
+    if (width > Config::MAX_WIDTH)
+      throw range_error(
+        "Puzzle width " + to_string(width) + "must be <= Config.MAX_WIDTH!"
+      );
     if (height > Config::MAX_HEIGHT)
-      throw std::range_error("height must be <= MAX_HEIGHT");
+      throw range_error(
+        "Puzzle height " + to_string(height) + "must be <= Config.MAX_HEIGHT!"
+      );
   }
 
   board_size_t vertices_count() const { return m_board_width * m_board_height; }
@@ -139,33 +153,36 @@ public:
   bool contains(position_t v) const { return v < vertices_count(); }
 
   void is_valid_or_throw(position_t v) const {
-    if (!contains(v)) throw InvalidPositionError(v);
+    if (!contains(v))
+      throw InvalidPositionError(v);
   }
 
   void set_weights_to_edges() {
     vertex_iterator_t v_i, v_iend;
-    for (std::tie(v_i, v_iend) = boost::vertices(m_graph); v_i != v_iend; ++v_i) {
+    for (tie(v_i, v_iend) = boost::vertices(m_graph); v_i != v_iend; ++v_i) {
       out_edge_iterator_t e_i, e_iend;
-      for (std::tie(e_i, e_iend) = boost::out_edges(*v_i, m_graph); e_i != e_iend;
-           ++e_i) {
+      for (tie(e_i, e_iend) = boost::out_edges(*v_i, m_graph); e_i != e_iend; ++e_i) {
         m_graph[*e_i].weight = out_edge_weight(boost::target(*e_i, m_graph));
       }
     }
   }
 
-  Positions reachables(position_t root, const Positions &excluded,
-                       IsObstacleFunctor is_obstacle) const {
+  Positions reachables(
+    position_t root, const Positions &excluded, IsObstacleFunctor is_obstacle
+  ) const {
     Positions reachables;
 
     auto is_excluded = [&](const Positions &lp, position_t lv) {
-      return any_of(lp.cbegin(), lp.cend(), [&lv](position_t rv) { return lv == rv; });
+      return any_of(lp.cbegin(), lp.cend(), [&lv](position_t rv) {
+        return lv == rv;
+      });
     };
 
     vector<bool> visited(vertices_count(), false);
     visited[root] = true;
 
     typedef deque<position_t> PositionsQueue;
-    PositionsQueue to_inspect;
+    PositionsQueue            to_inspect;
     to_inspect.push_back(root);
 
     while (!to_inspect.empty()) {
@@ -176,12 +193,13 @@ public:
         reachables.push_back(current_position);
 
       out_edge_iterator_t e_i, e_iend;
-      std::tie(e_i, e_iend) = boost::out_edges(current_position, m_graph);
+      tie(e_i, e_iend) = boost::out_edges(current_position, m_graph);
       for (; e_i != e_iend; ++e_i) {
         position_t neighbor =
           get(boost::vertex_index, m_graph, boost::target(*e_i, m_graph));
         if (visited[neighbor] == false) {
-          if (!is_obstacle(neighbor)) to_inspect.push_back(neighbor);
+          if (!is_obstacle(neighbor))
+            to_inspect.push_back(neighbor);
           visited[neighbor] = true;
         }
       }
@@ -193,7 +211,7 @@ public:
     remove_all_edges();
 
     const BaseTessellation &tessellation = BaseTessellation::instance(m_tessellation);
-    GraphType graph_type = tessellation.graph_type();
+    GraphType               graph_type   = tessellation.graph_type();
 
     board_size_t size = vertices_count();
     for (board_size_t u = 0; u < size; ++u) {
@@ -218,9 +236,8 @@ public:
   }
 };
 
-BoardGraph::BoardGraph(const io::Puzzle &puzzle)
-  : m_impl(
-      std::make_unique<PIMPL>(puzzle.width(), puzzle.height(), puzzle.tessellation())) {
+BoardGraph::BoardGraph(const Puzzle &puzzle)
+  : m_impl(make_unique<PIMPL>(puzzle.width(), puzzle.height(), puzzle.tessellation())) {
   board_size_t s = puzzle.size();
   for (position_t pos = 0; pos < s; ++pos) {
     m_impl->m_graph[pos] = BoardCell(puzzle[pos]);
@@ -229,10 +246,11 @@ BoardGraph::BoardGraph(const io::Puzzle &puzzle)
 }
 
 BoardGraph::BoardGraph(const BoardGraph &rv)
-  : m_impl(std::make_unique<PIMPL>(*rv.m_impl)) {}
+  : m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
 
 BoardGraph &BoardGraph::operator=(const BoardGraph &rv) {
-  if (this != &rv) m_impl = std::make_unique<PIMPL>(*rv.m_impl);
+  if (this != &rv)
+    m_impl = make_unique<PIMPL>(*rv.m_impl);
   return *this;
 }
 
@@ -269,7 +287,8 @@ Tessellation BoardGraph::tessellation() const { return m_impl->m_tessellation; }
 
 string BoardGraph::to_board_str(bool use_visible_floor, bool rle_encode) const {
   Puzzle::unique_ptr_t puzzle = Puzzle::instance_from(
-    m_impl->m_tessellation, m_impl->m_board_width, m_impl->m_board_height);
+    m_impl->m_tessellation, m_impl->m_board_width, m_impl->m_board_height
+  );
 
   for (position_t pos = 0; pos < size(); pos++) {
     puzzle->set(pos, (*this)[pos].str());
@@ -298,32 +317,33 @@ Edges BoardGraph::out_edges(position_t src) const {
   Edges retv;
 
   out_edge_iterator_t e_i, e_iend;
-  std::tie(e_i, e_iend) = boost::out_edges(src, m_impl->m_graph);
+  tie(e_i, e_iend) = boost::out_edges(src, m_impl->m_graph);
   for (; e_i != e_iend; ++e_i) {
-    retv.emplace_back(src, boost::target(*e_i, m_impl->m_graph),
-                      m_impl->m_graph[*e_i].direction
-                      // , m_impl->m_graph[*e_i].weight
+    retv.emplace_back(
+      src, boost::target(*e_i, m_impl->m_graph), m_impl->m_graph[*e_i].direction
+      // , m_impl->m_graph[*e_i].weight
     );
   }
 
   return retv;
 }
 
-position_t BoardGraph::neighbor(position_t from_position,
-                                const Direction &direction) const {
-  vertex_descriptor_t v = boost::vertex(from_position, m_impl->m_graph);
-  const auto edges = boost::out_edges(v, m_impl->m_graph);
+position_t
+BoardGraph::neighbor(position_t from_position, const Direction &direction) const {
+  vertex_descriptor_t v     = boost::vertex(from_position, m_impl->m_graph);
+  const auto          edges = boost::out_edges(v, m_impl->m_graph);
   auto edge = find_if(edges.first, edges.second, [&](const edge_descriptor_t &e) {
     return m_impl->m_graph[e].direction == direction;
   });
   if (edge != edges.second)
-    return get(boost::vertex_index, m_impl->m_graph,
-               boost::target(*edge, m_impl->m_graph));
+    return get(
+      boost::vertex_index, m_impl->m_graph, boost::target(*edge, m_impl->m_graph)
+    );
   return Config::NO_POS;
 }
 
-position_t BoardGraph::neighbor_at(position_t from_position,
-                                   const Direction &direction) const {
+position_t
+BoardGraph::neighbor_at(position_t from_position, const Direction &direction) const {
   m_impl->is_valid_or_throw(from_position);
   return neighbor(from_position, direction);
 }
@@ -336,11 +356,29 @@ Positions BoardGraph::wall_neighbors(position_t from_position) const {
   auto index = boost::get(boost::vertex_index, m_impl->m_graph);
 
   out_edge_iterator_t e_i, e_iend;
-  std::tie(e_i, e_iend) = boost::out_edges(from_position, m_impl->m_graph);
+  tie(e_i, e_iend) = boost::out_edges(from_position, m_impl->m_graph);
 
   for (; e_i != e_iend; ++e_i) {
     const BoardCell &c = m_impl->m_graph[boost::source(*e_i, m_impl->m_graph)];
-    if (c.is_wall()) retv.push_back(index[boost::target(*e_i, m_impl->m_graph)]);
+    if (c.is_wall())
+      retv.push_back(index[boost::target(*e_i, m_impl->m_graph)]);
+  }
+
+  return retv;
+}
+
+Directions BoardGraph::wall_neighbor_directions(position_t src) const {
+  m_impl->is_valid_or_throw(src);
+
+  Directions retv;
+
+  out_edge_iterator_t e_i, e_iend;
+  tie(e_i, e_iend) = boost::out_edges(src, m_impl->m_graph);
+
+  for (; e_i != e_iend; ++e_i) {
+    const BoardCell &c = m_impl->m_graph[boost::target(*e_i, m_impl->m_graph)];
+    if (c.is_wall())
+      retv.push_back(m_impl->m_graph[*e_i].direction);
   }
 
   return retv;
@@ -352,37 +390,43 @@ Positions BoardGraph::all_neighbors(position_t from_position) const {
   Positions retv;
 
   out_edge_iterator_t e_i, e_iend;
-  std::tie(e_i, e_iend) = boost::out_edges(from_position, m_impl->m_graph);
+  tie(e_i, e_iend) = boost::out_edges(from_position, m_impl->m_graph);
   for (; e_i != e_iend; ++e_i) {
     retv.push_back(
-      get(boost::vertex_index, m_impl->m_graph, boost::target(*e_i, m_impl->m_graph)));
+      get(boost::vertex_index, m_impl->m_graph, boost::target(*e_i, m_impl->m_graph))
+    );
   }
 
   return retv;
 }
 
-Positions BoardGraph::shortest_path(position_t start_position,
-                                    position_t end_position) const {
+Positions
+BoardGraph::shortest_path(position_t start_position, position_t end_position) const {
   m_impl->is_valid_or_throw(start_position);
   m_impl->is_valid_or_throw(end_position);
 
   deque<vertex_descriptor_t> predecesors(m_impl->vertices_count());
-  auto predecessors_map = make_iterator_property_map(
-    predecesors.begin(), get(boost::vertex_index, m_impl->m_graph));
+  auto                       predecessors_map = make_iterator_property_map(
+    predecesors.begin(), get(boost::vertex_index, m_impl->m_graph)
+  );
 
   vertex_descriptor_t start = vertex(start_position, m_impl->m_graph);
-  vertex_descriptor_t end = vertex(end_position, m_impl->m_graph);
+  vertex_descriptor_t end   = vertex(end_position, m_impl->m_graph);
 
-  breadth_first_search(m_impl->m_graph, start,
-                       visitor(make_bfs_visitor(record_predecessors(
-                         predecessors_map, boost::on_tree_edge()))));
+  breadth_first_search(
+    m_impl->m_graph,
+    start,
+    visitor(
+      make_bfs_visitor(record_predecessors(predecessors_map, boost::on_tree_edge()))
+    )
+  );
 
   // Backtracking to source
   Positions path;
   // Start by setting 'u' to the destination node's predecessor
   predecessors_map[start] = start;
-  vertex_descriptor_t u = predecessors_map[end];
-  vertex_descriptor_t v = end;
+  vertex_descriptor_t u   = predecessors_map[end];
+  vertex_descriptor_t v   = end;
   for (;
        // Keep tracking the path until we get to the source
        u != v;
@@ -396,36 +440,41 @@ Positions BoardGraph::shortest_path(position_t start_position,
   return path;
 }
 
-Positions BoardGraph::dijkstra_path(position_t start_position,
-                                    position_t end_position) const {
+Positions
+BoardGraph::dijkstra_path(position_t start_position, position_t end_position) const {
   m_impl->is_valid_or_throw(start_position);
   m_impl->is_valid_or_throw(end_position);
 
   const_cast<BoardGraph *>(this)->m_impl->set_weights_to_edges();
 
-  deque<double> distances(m_impl->vertices_count());
+  deque<double>              distances(m_impl->vertices_count());
   deque<vertex_descriptor_t> predecesors(m_impl->vertices_count());
 
   auto weightmap = get(&implementation::graph_edge_property_t::weight, m_impl->m_graph);
   auto distances_map = make_iterator_property_map(
-    distances.begin(), get(boost::vertex_index, m_impl->m_graph));
+    distances.begin(), get(boost::vertex_index, m_impl->m_graph)
+  );
   auto predecessors_map = make_iterator_property_map(
-    predecesors.begin(), get(boost::vertex_index, m_impl->m_graph));
+    predecesors.begin(), get(boost::vertex_index, m_impl->m_graph)
+  );
 
   vertex_descriptor_t start = vertex(start_position, m_impl->m_graph);
-  vertex_descriptor_t end = vertex(end_position, m_impl->m_graph); // destination
+  vertex_descriptor_t end   = vertex(end_position, m_impl->m_graph); // destination
 
-  boost::dijkstra_shortest_paths(m_impl->m_graph, start,
-                                 boost::weight_map(weightmap)
-                                   .distance_map(distances_map)
-                                   .predecessor_map(predecessors_map));
+  boost::dijkstra_shortest_paths(
+    m_impl->m_graph,
+    start,
+    boost::weight_map(weightmap)
+      .distance_map(distances_map)
+      .predecessor_map(predecessors_map)
+  );
 
   // Backtracking to source
   Positions path;
   // Start by setting 'u' to the destination node's predecessor
   predecessors_map[start] = start;
-  vertex_descriptor_t u = predecessors_map[end];
-  vertex_descriptor_t v = end;
+  vertex_descriptor_t u   = predecessors_map[end];
+  vertex_descriptor_t v   = end;
   for (;
        // Keep tracking the path until we get to the source
        u != v;
@@ -439,13 +488,13 @@ Positions BoardGraph::dijkstra_path(position_t start_position,
   return path;
 }
 
-Positions BoardGraph::find_move_path(position_t start_position,
-                                     position_t end_position) const {
+Positions
+BoardGraph::find_move_path(position_t start_position, position_t end_position) const {
   Positions path = dijkstra_path(start_position, end_position);
 
   Positions retv;
 
-  auto i = path.cbegin();
+  auto i   = path.cbegin();
   auto end = path.cend();
 
   if (i != end) {
@@ -460,17 +509,18 @@ Positions BoardGraph::find_move_path(position_t start_position,
       break;
   }
 
-  if (retv != path) return Positions();
+  if (retv != path)
+    return Positions();
   return path;
 }
 
-Positions BoardGraph::find_jump_path(position_t start_position,
-                                     position_t end_position) const {
+Positions
+BoardGraph::find_jump_path(position_t start_position, position_t end_position) const {
   return shortest_path(start_position, end_position);
 }
 
-Directions
-BoardGraph::positions_path_to_directions_path(const Positions &positions_path) const {
+Directions BoardGraph::positions_path_to_directions_path(const Positions &positions_path
+) const {
   position_t src_vertex_index = 0;
 
   if (positions_path.size() > 0)
@@ -478,12 +528,13 @@ BoardGraph::positions_path_to_directions_path(const Positions &positions_path) c
 
   Directions retv;
 
-  if (positions_path.size() <= 1) return retv;
+  if (positions_path.size() <= 1)
+    return retv;
 
   auto i = positions_path.begin();
   i++;
   for (; i != positions_path.end(); ++i) {
-    position_t src_position = positions_path[src_vertex_index];
+    position_t src_position    = positions_path[src_vertex_index];
     position_t target_position = *i;
     src_vertex_index += 1;
 
@@ -491,7 +542,7 @@ BoardGraph::positions_path_to_directions_path(const Positions &positions_path) c
     m_impl->is_valid_or_throw(target_position);
 
     out_edge_iterator_t e_i, e_iend;
-    std::tie(e_i, e_iend) = boost::out_edges(src_position, m_impl->m_graph);
+    tie(e_i, e_iend) = boost::out_edges(src_position, m_impl->m_graph);
     for (; e_i != e_iend; ++e_i) {
       if (boost::target(*e_i, m_impl->m_graph) == target_position)
         retv.push_back(m_impl->m_graph[*e_i].direction);
@@ -501,8 +552,9 @@ BoardGraph::positions_path_to_directions_path(const Positions &positions_path) c
   return retv;
 }
 
-position_t BoardGraph::path_destination(position_t start_position,
-                                        const Directions &directions_path) const {
+position_t BoardGraph::path_destination(
+  position_t start_position, const Directions &directions_path
+) const {
   m_impl->is_valid_or_throw(start_position);
 
   position_t retv = start_position, next_target;
@@ -517,9 +569,9 @@ position_t BoardGraph::path_destination(position_t start_position,
   return retv;
 }
 
-Positions
-BoardGraph::positions_reachable_by_pusher(position_t pusher_position,
-                                          const Positions &excluded_positions) const {
+Positions BoardGraph::positions_reachable_by_pusher(
+  position_t pusher_position, const Positions &excluded_positions
+) const {
   m_impl->is_valid_or_throw(pusher_position);
 
   PIMPL::IsObstacleFunctor is_obstacle = [&](position_t pos) {
@@ -529,9 +581,9 @@ BoardGraph::positions_reachable_by_pusher(position_t pusher_position,
   return m_impl->reachables(pusher_position, excluded_positions, is_obstacle);
 }
 
-position_t
-BoardGraph::normalized_pusher_position(position_t pusher_position,
-                                       const Positions &excluded_positions) const {
+position_t BoardGraph::normalized_pusher_position(
+  position_t pusher_position, const Positions &excluded_positions
+) const {
   Positions reachables_pos =
     positions_reachable_by_pusher(pusher_position, excluded_positions);
   if (reachables_pos.size() > 0)
@@ -540,7 +592,7 @@ BoardGraph::normalized_pusher_position(position_t pusher_position,
 }
 
 void BoardGraph::mark_play_area() {
-  Positions piece_positions;
+  Positions    piece_positions;
   board_size_t vertice_count = m_impl->vertices_count();
 
   for (position_t i = 0; i < vertice_count; ++i) {
@@ -566,12 +618,9 @@ void BoardGraph::mark_play_area() {
 }
 
 Edge::Edge(position_t u, position_t v, Direction direction)
-  : u(u), v(v), direction(direction) {}
-Edge::Edge(const Edge &rv) = default;
-Edge::Edge(Edge &&rv) = default;
-Edge &Edge::operator=(const Edge &rv) = default;
-Edge &Edge::operator=(Edge &&rv) = default;
-Edge::~Edge() = default;
+  : u(u)
+  , v(v)
+  , direction(direction) {}
 
 bool Edge::operator==(const Edge &rv) const {
   return u == rv.u && v == rv.v && direction == rv.direction;
@@ -580,8 +629,10 @@ bool Edge::operator==(const Edge &rv) const {
 bool Edge::operator!=(const Edge &rv) const { return !(*this == rv); }
 
 string Edge::repr() const {
-  return (string("Edge(") + "u=" + std::to_string(u) + ", " + "v=" + std::to_string(v) +
-          ", " + "direction=" + implementation::direction_repr(direction) + ")");
+  return (
+    string("Edge(") + "u=" + to_string(u) + ", " + "v=" + to_string(v) + ", "
+    + "direction=" + implementation::direction_str(direction) + ")"
+  );
 }
 
 string Edge::str() const { return repr(); }

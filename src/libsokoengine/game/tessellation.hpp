@@ -1,7 +1,7 @@
 #ifndef TESSELLATION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TESSELLATION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "config.hpp"
+#include "sokoengine_config.hpp"
 
 namespace sokoengine {
 namespace game {
@@ -37,9 +37,12 @@ public:
   ///
   /// @throws std::invalid_argument direction is not one of legal_directions()
   ///
-  virtual position_t neighbor_position(position_t position, const Direction &direction,
-                                       board_size_t width,
-                                       board_size_t height) const = 0;
+  virtual position_t neighbor_position(
+    position_t       position,
+    const Direction &direction,
+    board_size_t     width,
+    board_size_t     height
+  ) const = 0;
 
   ///
   /// Converts movement character to PusherStep
@@ -65,8 +68,8 @@ public:
   ///
   /// Calculates board cell orientation for given coordinate.
   ///
-  virtual io::CellOrientation cell_orientation(position_t position, board_size_t width,
-                                               board_size_t height) const;
+  virtual io::CellOrientation
+  cell_orientation(position_t position, board_size_t width, board_size_t height) const;
 };
 
 } // namespace game

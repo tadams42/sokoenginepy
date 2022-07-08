@@ -1,7 +1,7 @@
 #ifndef RLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define RLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "config.hpp"
+#include "sokoengine_config.hpp"
 
 namespace sokoengine {
 namespace io {
@@ -12,8 +12,8 @@ namespace io {
 class LIBSOKOENGINE_API Rle {
 public:
   static constexpr char GROUP_START = '(';
-  static constexpr char GROUP_END = ')';
-  static constexpr char EOL = '|';
+  static constexpr char GROUP_END   = ')';
+  static constexpr char EOL         = '|';
 
   ///
   /// RLE encodes string, ie "aaabbbb" becomes "3a4b".

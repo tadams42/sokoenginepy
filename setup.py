@@ -1,105 +1,193 @@
 import os
+import re
+import subprocess
+import sys
 
-import setuptools
-
-# Available at setup time due to pyproject.toml
-from pybind11.setup_helpers import ParallelCompile, Pybind11Extension, naive_recompile
+from setuptools import Extension, setup
+from setuptools.command.build_ext import build_ext
 
 
-class SokoenginepyextOptions:
+class SokoenginepyextCMakeExtension(Extension):
     """
-    Describes ``sokoenginepyext`` native C++ extension for ``sokoenginepy``.
+    A CMakeExtension needs a sourcedir instead of a file list.
 
-    On ``Linux``, ``pip install sokoenginepy`` will try to configure and build native
-    extension. If build fails, ``sokoenginepy`` will be installed without native
-    extension. To succeed, boost header have to be in system include path.
+    The name must be the _single_ output extension from the CMake build.
 
-    On all other systems, native extension will not be installed.
+    Adapted from https://github.com/pybind/cmake_example
+
+    Environment variables affecting the build:
+
+    - ``READTHEDOCS``           - if set, extension is not built
+    - ``SOKOENGINEPYEXT_SKIP``  - if set to true-ish value, extension is not built
+    - ``SOKOENGINEPYEXT_DEBUG`` - if set to true-ish value, compilation produces non
+                                  optimized binary
+    - ``CMAKE_TOOLCHAIN_FILE``  - if it is not set to ``vcpkg.cmake`` path, extension is
+                                  not built
     """
-
-    NAME = "sokoenginepyext"
-
-    SHOULD_TRY_BUILD = (
-        # We support building only on Linux...
-        os.name == "posix"
-        # ... and not on Read The Docs
-        and os.environ.get("READTHEDOCS", "false").lower()
-        not in ["yes", "true", "y", "1"]
-        # ... and allow build to be controlled by SOKOENGINEPYEXT_BUILD
-        # environment variable
-        and os.environ.get("SOKOENGINEPYEXT_BUILD", "true").lower()
-        in ["yes", "true", "y", "1"]
-    )
-
-    IS_DEBUG = os.environ.get("SOKOENGINEPYEXT_DEBUG", "false").lower() in [
-        "yes",
-        "true",
-        "y",
-        "1",
-    ]
-
-    CXXFLAGS_RELEASE = ["-O3", "-flto", "-UDEBUG", "-DNDEBUG"]
-    CXXFLAGS_DEBUG = ["-g3", "-O0", "-UNDEBUG", "-DDEBUG"]
-    CXXFLAGS = [
-        "-fPIC",
-        "-DBOOST_BIND_NO_PLACEHOLDERS",
-        "-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION",
-        "-DLIBSOKOENGINE_DLL",
-    ] + (CXXFLAGS_DEBUG if IS_DEBUG else CXXFLAGS_RELEASE)
-
-    LDFLAGS = ["-flto"] if not IS_DEBUG else []
-
-    SOURCES = sorted(
-        [
-            os.path.join(dir_path, file_name)
-            for _ in ["src/libsokoengine", "src/sokoenginepyext"]
-            for dir_path, directories, files in os.walk(_)
-            for file_name in files
-            if (
-                file_name.endswith(".cpp")
-                and file_name not in {"playground.cpp", "benchmarks.cpp"}
-            )
-        ]
-    )
-
-    INCLUDE_DIRS = ["/tmp/cmake_cache"] + [
-        "src/libsokoengine",
-        "src/libsokoengine/game",
-        "src/libsokoengine/io",
-        "src/sokoenginepyext",
-    ]
-
-    CPPITERTOOLS_DIR = os.path.abspath("/tmp/cmake_cache/cppitertools")
 
     @classmethod
-    def fetch_cppitertools(cls):
-        if not os.path.exists(cls.CPPITERTOOLS_DIR):
-            print("Cloning cppitertools...")
-            os.system(
-                'git clone --branch v1.0 https://github.com/ryanhaining/cppitertools.git "{}"'.format(
-                    cls.CPPITERTOOLS_DIR
-                )
-            )
-        return True
+    def is_trueish(cls, val):
+        return val and str(val).lower() in {"1", "true", "yes", "on"}
+
+    @classmethod
+    def is_on_readthedocs(cls):
+        return os.environ.get("READTHEDOCS", None) is not None
+
+    @classmethod
+    def env_skips_build(cls):
+        return cls.is_trueish(os.environ.get("SOKOENGINEPYEXT_SKIP", None))
+
+    @classmethod
+    def is_env_debug_build(cls):
+        return cls.is_trueish(os.environ.get("SOKOENGINEPYEXT_DEBUG", None))
+
+    @classmethod
+    def is_posix(cls):
+        return os.name == "posix"
+
+    @classmethod
+    def is_vcpkg_configured(cls):
+        val = cls.vcpkg_toolchain_file()
+        return val and val.endswith("vcpkg.cmake") and os.path.exists(val)
+
+    @classmethod
+    def vcpkg_toolchain_file(cls):
+        return os.environ.get("CMAKE_TOOLCHAIN_FILE", None)
+
+    @classmethod
+    def should_try_build(cls):
+        return (
+            cls.is_posix()
+            and not cls.is_on_readthedocs()
+            and not cls.env_skips_build()
+            and cls.is_vcpkg_configured()
+        )
+
+    def __init__(self, name, sourcedir=""):
+        Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
 
 
-if SokoenginepyextOptions.SHOULD_TRY_BUILD:
-    SokoenginepyextOptions.fetch_cppitertools()
-    ParallelCompile(
-        "SOKOENGINEPYEXT_NUM_BUILD_JOBS", needs_recompile=naive_recompile
-    ).install()
-    ext = Pybind11Extension(
-        name=SokoenginepyextOptions.NAME,
-        sources=SokoenginepyextOptions.SOURCES,
-        include_dirs=SokoenginepyextOptions.INCLUDE_DIRS,
-        optional=True,
-        cxx_std=17,
-        extra_compile_args=SokoenginepyextOptions.CXXFLAGS,
-        extra_link_args=SokoenginepyextOptions.LDFLAGS,
-        # Example: passing in the version to the compiled code
-        # define_macros=[("VERSION_INFO", __version__)],
+class CMakeBuild(build_ext):
+    """
+    Adapted from https://github.com/pybind/cmake_example
+    """
+
+    # Convert distutils Windows platform specifiers to CMake -A arguments
+    PLAT_TO_CMAKE = {
+        "win32": "Win32",
+        "win-amd64": "x64",
+        "win-arm32": "ARM",
+        "win-arm64": "ARM64",
+    }
+
+    def build_extension(self, ext):
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+
+        # required for auto-detection & inclusion of auxiliary "native" libs
+        if not extdir.endswith(os.path.sep):
+            extdir += os.path.sep
+
+        debug = (
+            SokoenginepyextCMakeExtension.is_env_debug_build()
+            if self.debug is None
+            else self.debug
+        )
+        cfg = "Debug" if debug else "Release"
+
+        # CMake lets you override the generator - we need to check this.
+        # Can be set with Conda-Build, for example.
+        cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
+
+        if not SokoenginepyextCMakeExtension.vcpkg_toolchain_file():
+            raise RuntimeError("ZOMG!")
+
+        # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
+        cmake_args = [
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
+            f"-DPython3_EXECUTABLE={sys.executable}",
+            f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
+            "-DBUILD_SHARED_LIBS=ON",
+            f"-DCMAKE_TOOLCHAIN_FILE={SokoenginepyextCMakeExtension.vcpkg_toolchain_file()}",
+        ]
+        build_args = []
+        # Adding CMake arguments set as environment variable
+        # (needed e.g. to build for ARM OSx on conda-forge)
+        if "CMAKE_ARGS" in os.environ:
+            cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
+
+        # In this example, we pass in the version to C++. You might not need to.
+        # cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]
+
+        if self.compiler.compiler_type != "msvc":
+            # Using Ninja-build since it a) is available as a wheel and b)
+            # multithreads automatically. MSVC would require all variables be
+            # exported for Ninja to pick it up, which is a little tricky to do.
+            # Users can override the generator with CMAKE_GENERATOR in CMake
+            # 3.15+.
+            if not cmake_generator or cmake_generator == "Ninja":
+                try:
+                    import ninja  # noqa: F401
+
+                    ninja_executable_path = os.path.join(ninja.BIN_DIR, "ninja")
+                    cmake_args += [
+                        "-GNinja",
+                        f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
+                    ]
+                except ImportError:
+                    pass
+
+        else:
+            # Single config generators are handled "normally"
+            single_config = any(x in cmake_generator for x in {"NMake", "Ninja"})
+
+            # CMake allows an arch-in-generator style for backward compatibility
+            contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
+
+            # Specify the arch if using MSVC generator, but only if it doesn't
+            # contain a backward-compatibility arch spec already in the
+            # generator name.
+            if not single_config and not contains_arch:
+                cmake_args += ["-A", self.PLAT_TO_CMAKE[self.plat_name]]
+
+            # Multi-config generators have a different way to specify configs
+            if not single_config:
+                cmake_args += [
+                    f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}"
+                ]
+                build_args += ["--config", cfg]
+
+        if sys.platform.startswith("darwin"):
+            # Cross-compile support for macOS - respect ARCHFLAGS if set
+            archs = re.findall(r"-arch (\S+)", os.environ.get("ARCHFLAGS", ""))
+            if archs:
+                cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
+
+        # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
+        # across all generators.
+        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
+            # self.parallel is a Python 3 only way to set parallel jobs by hand
+            # using -j in the build_ext call, not supported by pip or PyPA-build.
+            if hasattr(self, "parallel") and self.parallel:
+                # CMake 3.12+ only.
+                build_args += [f"-j{self.parallel}"]
+
+        build_temp = os.path.join(self.build_temp, ext.name)
+        if not os.path.exists(build_temp):
+            os.makedirs(build_temp)
+
+        # Needed because target sokoenginepyext is excluded from default build
+        build_args += ["--", "sokoenginepyext"]
+
+        subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=build_temp)
+        subprocess.check_call(["cmake", "--build", "."] + build_args, cwd=build_temp)
+
+
+if SokoenginepyextCMakeExtension.should_try_build():
+    setup(
+        ext_modules=[SokoenginepyextCMakeExtension("sokoenginepyext")],
+        cmdclass={"build_ext": CMakeBuild},
     )
-    setuptools.setup(ext_modules=[ext])
 
 else:
-    setuptools.setup()
+    setup()

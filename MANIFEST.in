@@ -9,14 +9,27 @@ graft tests
 prune tmp
 prune src/sokoenginepy.egg-info
 
-include .bumpversion.cfg .gitignore .readthedocs.yml .travis.yaml .clang-format
-include CMakeLists.txt CMakePresets.json
-include CHANGELOG.md INSTALL.md LICENSE MANIFEST.in README.md setup.cfg setup.py
-include bin/encode_SOK_format_specification.py bin/mover_profiling.py
-
 prune .vscode
 prune .benchmarks
 prune .venv
+
+include bin/encode_SOK_format_specification.py bin/mover_profiling.py
+include .bumpversion.cfg
+include .clang-format
+include .gitignore
+include .readthedocs.yml
+include .travis.yml
+include CHANGELOG.md
+include CMakeLists.txt
+include CMakePresets.json
+include INSTALL.md
+include LICENSE
+include MANIFEST.in
+include pyproject.toml
+include README.md
+include setup.cfg
+include setup.py
+include vcpkg.json
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib *.kdev4 .directory
 global-exclude .ipynb_checkpoints/*

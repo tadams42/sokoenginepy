@@ -1,7 +1,7 @@
 #ifndef SOKOBAN_PLUS_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define SOKOBAN_PLUS_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "config.hpp"
+#include "sokoengine_config.hpp"
 
 #include <memory>
 #include <stdexcept>
@@ -65,8 +65,11 @@ public:
   /// @param goalorder Space separated integers describing Sokoban+ IDs for goals
   /// @param pieces_count Total count of boxes/goals on board
   ///
-  explicit SokobanPlus(piece_id_t pieces_count = 0, const std::string &boxorder = "",
-                       const std::string &goalorder = "");
+  explicit SokobanPlus(
+    piece_id_t         pieces_count = 0,
+    const std::string &boxorder     = "",
+    const std::string &goalorder    = ""
+  );
   SokobanPlus(const SokobanPlus &rv);
   SokobanPlus &operator=(const SokobanPlus &rv);
   SokobanPlus(SokobanPlus &&rv);
@@ -77,7 +80,7 @@ public:
   bool operator!=(const SokobanPlus &rv) const;
 
   piece_id_t pieces_count() const;
-  void set_pieces_count(piece_id_t rv);
+  void       set_pieces_count(piece_id_t rv);
 
   ///
   /// Space separated integers describing Sokoban+ IDs for boxes
@@ -94,15 +97,15 @@ public:
   ///
   std::string goalorder() const;
   ///
-  /// If rv is different from existing `goalorder`, disables Sokoban+ and sets goalorder
-  /// to new value.
+  /// If rv is different from existing `goalorder`, disables Sokoban+ and sets
+  /// goalorder to new value.
   ///
   void set_goalorder(const std::string &rv);
 
-  bool is_valid() const;
-  bool is_enabled() const;
-  bool is_validated() const;
-  io::Strings errors() const;
+  bool        is_valid() const;
+  bool        is_enabled() const;
+  bool        is_validated() const;
+  std::string errors() const;
 
   ///
   /// @throws SokobanPlusDataError Trying to enable invalid Sokoban+

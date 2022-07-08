@@ -23,7 +23,7 @@ set(PRIVATE_HEADERS
 )
 
 set(INSTALL_HEADERS
-    config.hpp
+    sokoengine_config.hpp
     sokoengine.hpp
     benchmarks.hpp
 
@@ -96,34 +96,19 @@ set(SELF_INCLUDE_DIRS
 # ..............................................................................
 add_library(sokoengine_obj OBJECT ${INSTALL_HEADERS} ${PRIVATE_HEADERS} ${SELF_SOURCES})
 
-target_include_directories(sokoengine_obj
-    PUBLIC
-    ${SELF_INCLUDE_DIRS}
-    PRIVATE
-    $<TARGET_PROPERTY:CPPITERTOOLS::cppitertools,INTERFACE_INCLUDE_DIRECTORIES>
-)
+target_include_directories(sokoengine_obj PUBLIC ${SELF_INCLUDE_DIRS})
 
-# We link (where necessary) thse dependencies statically, there is no need to expose
-# them to targes consuming sokoengine_obj.
-# As a consequence, consumers of libsokoengine don't need to link against boost.
-# They don't even need to have boost installed, since no libsokoengine public
-# headers include anything from Boost.
-# target_link_libraries(sokoengine_obj
-# PRIVATE
-# "$<BUILD_INTERFACE:Boost::boost>"
-# "$<BUILD_INTERFACE:CPPITERTOOLS::cppitertools>"
-# )
+target_link_libraries(sokoengine_obj PUBLIC cppitertools::cppitertools)
+target_link_libraries(sokoengine_obj PUBLIC Boost::boost)
 target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
 
 if(${BUILD_SHARED_LIBS})
-    target_compile_definitions(sokoengine_obj
-        PUBLIC
+    target_compile_definitions(sokoengine_obj PUBLIC
         LIBSOKOENGINE_DLL
         PRIVATE
         LIBSOKOENGINE_DLL_EXPORTS
     )
-    target_compile_options(sokoengine_obj
-        PUBLIC
+    target_compile_options(sokoengine_obj PUBLIC
         $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
         -fvisibility=hidden
         -fvisibility-inlines-hidden
@@ -133,8 +118,7 @@ if(${BUILD_SHARED_LIBS})
     )
 endif()
 
-target_compile_options(sokoengine_obj
-    PRIVATE
+target_compile_options(sokoengine_obj PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
     $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>
     -Wno-overloaded-virtual
@@ -151,8 +135,7 @@ target_compile_options(sokoengine_obj
 # TARGETS sokoengine_obj
 # PROPERTIES COMPILE_FEATURES COMPILE_FLAGS COMPILE_OPTIONS
 # )
-set_target_properties(sokoengine_obj
-    PROPERTIES
+set_target_properties(sokoengine_obj PROPERTIES
     POSITION_INDEPENDENT_CODE ON
     INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
     INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON

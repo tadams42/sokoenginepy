@@ -2,13 +2,12 @@
 
 #include "puzzle_parsing.hpp"
 
-using namespace std;
+using sokoengine::game::Tessellation;
+using std::make_unique;
+using std::string;
 
 namespace sokoengine {
 namespace io {
-
-using game::Tessellation;
-
 namespace implementation {
 
 LIBSOKOENGINE_LOCAL const PuzzleResizer &sb_static_resizer() {
@@ -28,27 +27,38 @@ LIBSOKOENGINE_LOCAL const PuzzlePrinter &sb_static_printer() {
 
 } // namespace implementation
 
-using namespace implementation;
-
 class LIBSOKOENGINE_LOCAL SokobanPuzzle::PIMPL {
 public:
   Snapshots m_snapshots;
 };
 
-SokobanPuzzle::SokobanPuzzle() : SokobanPuzzle(0, 0) {}
+SokobanPuzzle::SokobanPuzzle()
+  : SokobanPuzzle(0, 0) {}
 
 SokobanPuzzle::SokobanPuzzle(board_size_t width, board_size_t height)
-  : Puzzle(Tessellation::SOKOBAN, sb_static_resizer(), sb_static_parser(),
-           sb_static_printer(), width, height),
-    m_impl(make_unique<PIMPL>()) {}
+  : Puzzle(
+    Tessellation::SOKOBAN,
+    implementation::sb_static_resizer(),
+    implementation::sb_static_parser(),
+    implementation::sb_static_printer(),
+    width,
+    height
+  )
+  , m_impl(make_unique<PIMPL>()) {}
 
 SokobanPuzzle::SokobanPuzzle(const string &src)
-  : Puzzle(Tessellation::SOKOBAN, sb_static_resizer(), sb_static_parser(),
-           sb_static_printer(), src),
-    m_impl(make_unique<PIMPL>()) {}
+  : Puzzle(
+    Tessellation::SOKOBAN,
+    implementation::sb_static_resizer(),
+    implementation::sb_static_parser(),
+    implementation::sb_static_printer(),
+    src
+  )
+  , m_impl(make_unique<PIMPL>()) {}
 
 SokobanPuzzle::SokobanPuzzle(const SokobanPuzzle &rv)
-  : Puzzle(rv), m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
+  : Puzzle(rv)
+  , m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
 
 SokobanPuzzle &SokobanPuzzle::operator=(const SokobanPuzzle &rv) {
   if (this != &rv) {
@@ -71,17 +81,22 @@ SokobanPuzzle::unique_ptr_t SokobanPuzzle::clone() const {
 const SokobanPuzzle::Snapshots &SokobanPuzzle::snapshots() const {
   return m_impl->m_snapshots;
 }
+
 SokobanPuzzle::Snapshots &SokobanPuzzle::snapshots() { return m_impl->m_snapshots; }
 
-SokobanSnapshot::SokobanSnapshot() : Snapshot(Tessellation::SOKOBAN, "") {}
+SokobanSnapshot::SokobanSnapshot()
+  : Snapshot(Tessellation::SOKOBAN, "") {}
 
 SokobanSnapshot::SokobanSnapshot(const string &moves_data)
   : Snapshot(Tessellation::SOKOBAN, moves_data) {}
 
-SokobanSnapshot::SokobanSnapshot(const SokobanSnapshot &rv) : Snapshot(rv) {}
+SokobanSnapshot::SokobanSnapshot(const SokobanSnapshot &rv)
+  : Snapshot(rv) {}
 
 SokobanSnapshot &SokobanSnapshot::operator=(const SokobanSnapshot &rv) {
-  if (this != &rv) { Snapshot::operator=(rv); }
+  if (this != &rv) {
+    Snapshot::operator=(rv);
+  }
   return *this;
 }
 

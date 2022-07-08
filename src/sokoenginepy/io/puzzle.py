@@ -172,7 +172,7 @@ class Puzzle:
             ):
                 return klass(width=width, height=height, board=board)
 
-        raise ValueError(tessellation)
+        raise ValueError(f"Unknown tessellation {tessellation}!")
 
     def __init__(
         self,
@@ -196,7 +196,7 @@ class Puzzle:
         self.author = ""
         self.boxorder = ""
         self.goalorder = ""
-        self.notes: List[str] = []
+        self.notes = ""
         self.snapshots: List[Snapshot] = []
 
         self._pushers_count: Optional[int] = None
@@ -240,6 +240,10 @@ class Puzzle:
         return self._tessellation
 
     @property
+    def has_sokoban_plus(self) -> bool:
+        return not is_blank(self.boxorder) or not is_blank(self.goalorder)
+
+    @property
     def _tessellation_obj(self):
         from ..game import BaseTessellation
 
@@ -264,7 +268,7 @@ class Puzzle:
             raise IndexError(f"Position {position} is invalid value!")
 
         if not self.is_puzzle_element(c):
-            raise ValueError(f"Invalid character '{c}' in board string!")
+            raise ValueError(f"'{c}' is not a board character!")
 
         self._reparse_if_not_parsed()
         self._parsed_board[position] = c

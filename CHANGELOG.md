@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.1 (2022-07-08)
+
+- added: `BoardGraph.wall_neighbor_directions()`
+- added: `Puzzle.has_sokoban_plus`
+- renamed: `Collection.save()` -> `Collection.dump()`
+- changed: `Collection.dump()` can now save to IO streams (previously it could only save
+  to file path)
+- changed: `Collection.load()` can now load from IO streams (previously it could only load
+  from file path)
+- added: `Collection.loads()` and `Collection.dumps()`
+- changed: `Collection.notes`, `Puzzle.notes` and `Snapshot.notes` are now ordinary
+  strings (instead of list of strings)
+- build: `pip` and `python -m build` now use `cmake` instead of `distutils`
+- build: `vcpkg` is used for all C++ dependencies
+
 ## 1.0.0 (2022-06-20)
 
 - renamed `DEFAULT_PIECE_ID` -> `DEFAULT_ID`

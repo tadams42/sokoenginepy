@@ -13,11 +13,11 @@ if TYPE_CHECKING:
     from .board_graph import BoardGraph
 
 
-class CellAlreadyOccupiedError(RuntimeError):
+class CellAlreadyOccupiedError(ValueError):
     pass
 
 
-class BoxGoalSwitchError(RuntimeError):
+class BoxGoalSwitchError(ValueError):
     pass
 
 
@@ -140,25 +140,28 @@ class BoardManager:
         )
 
     def __str__(self):
-        prefix = (len(self.__class__.__name__) + 2) * " "
-        return "\n".join(
-            [
-                "<{} pushers: {},".format(
-                    self.__class__.__name__, self.pushers_positions
-                ),
-                prefix + "boxes: {},".format(self.boxes_positions),
-                prefix + "goals: {},".format(self.goals_positions),
-                prefix
-                + "walls: {},".format(
-                    self.walls_positions
-                    if len(self.walls_positions) <= 10
-                    else "[{}, ...]".format(
-                        ", ".join(str(w) for w in self.walls_positions[:10])
-                    )
-                ),
-                prefix + "boxorder: '{}',".format(self.boxorder or ""),
-                prefix + "goalorder: '{}',".format(self.goalorder or "") + ">",
-            ]
+        walls = ", ".join(str(_) for _ in self.walls_positions[:5])
+        if len(self.walls_positions) > 5:
+            walls = f"[{walls}, ...]"
+        else:
+            walls = f"[{walls}]"
+
+        go = self.goalorder or ""
+        bo = self.boxorder or ""
+
+        return (
+            f"{self.__class__.__name__}("
+            + ", ".join(
+                [
+                    f"pushers={self.pushers_positions}",
+                    f"boxes={self.boxes_positions}",
+                    f"goals={self.goals_positions}",
+                    f"walls={walls}",
+                    f"boxorder={self.boxorder}" if self.boxorder else 'boxorder=""',
+                    f"goalorder={self.goalorder}" if self.goalorder else 'goalorder=""',
+                ]
+            )
+            + ")"
         )
 
     @property
@@ -586,7 +589,7 @@ class BoardManager:
 
         Raises:
             BoxGoalSwitchError: when board can't be switched. These kinds of boards
-                are usualy also not `is_playable`.
+                are usually also not `is_playable`.
         """
 
         if self.boxes_count != self.goals_count:

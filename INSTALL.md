@@ -1,103 +1,130 @@
 <!-- omit in toc -->
 # Install
 
-- [1. Python package](#1-python-package)
-  - [1.1. Running tests and benchmarks](#11-running-tests-and-benchmarks)
-  - [1.2. Python native extension](#12-python-native-extension)
-- [2. libsokoengine C++ library](#2-libsokoengine-c-library)
-  - [2.1. Build and install from source](#21-build-and-install-from-source)
-  - [2.2. Integrating into other CMake projects](#22-integrating-into-other-cmake-projects)
-  - [2.3. Other make targets](#23-other-make-targets)
+- [Python package - sokoenginepy](#python-package---sokoenginepy)
+  - [Install from PyPi](#install-from-pypi)
+  - [Install from source](#install-from-source)
+- [C++ library - libsokoengine](#c-library---libsokoengine)
+  - [Build from source](#build-from-source)
+  - [Install from source](#install-from-source-1)
+  - [Integrating into other CMake projects](#integrating-into-other-cmake-projects)
+  - [Other make targets](#other-make-targets)
+- [Python C++ extension](#python-c-extension)
+  - [Build using pip](#build-using-pip)
+  - [Build using cmake](#build-using-cmake)
 
-## 1. Python package
+## Python package - sokoenginepy
+
+### Install from PyPi
 
 ```sh
 pip install sokoenginepy
 ```
 
-### 1.1. Running tests and benchmarks
+### Install from source
+
+```sh
+python3.9 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+Running tests:
 
 ```sh
 py.test
-```
-
-or to get more verbose output
-
-```sh
 py.test --spec
 ```
 
-We can also run some built-in, rudimentary benchmarks:
+Built-in, rudimentary benchmarks:
 
 ```sh
 python -m sokoenginepy
 ```
 
-### 1.2. Python native extension
-
-When installing from source, `pip` will try to build native C++ extension. If build
-fails for whatever reason, `pip` will fallback to installing pure Python implementation.
-
-This native extension needs:
+Local copy of documentation:
 
 ```sh
-sudo apt install python3-dev libboost-graph-dev
+cd docs/
+make html
 ```
 
-Following environment variables control building of this native extension:
+## C++ library - libsokoengine
 
-- `SOKOENGINEPYEXT_BUILD` (default: `true`)
-  - should native extension be built?
-- `SOKOENGINEPYEXT_DEBUG` (default: `false`)
-  - should we build non-optimized native extension?
+### Build from source
 
-If built, native extension is used automatically - Python code calling stuff from
-`sokoenginepy` doesn't need to change at all.
+1. Install C++ compiler, `cmake` and `doxygen` (YMMV may vary, depending on your OS):
 
-In short, to ensure that `pip` will always try to build native extension in development
-environment:
+   ```sh
+   sudo apt install git build-essential cmake doxygen
+   ```
+
+2. Install [vcpkg](https://vcpkg.io/) and then:
+
+   ```sh
+   export CMAKE_TOOLCHAIN_FILE=[vcpkg root]/scripts/buildsystems/vcpkg.cmake
+   ```
+
+3. Get `libsokoengine` sources
+
+   ```sh
+   git clone https://github.com/tadams42/sokoenginepy.git
+   ```
+
+4. Configure C++ sources
+
+   ```sh
+   cd sokoenginepy/
+   cmake --preset "debug"
+   ```
+
+5. Build the library
+
+   ```sh
+   cd build/debug
+   make
+   ```
+
+### Install from source
 
 ```sh
-export SOKOFILEPYEXT_BUILD=1
-export SOKOENGINEPYEXT_BUILD=1
-pip install -e ".[dev]"
-```
-
-## 2. libsokoengine C++ library
-
-```sh
-sudo apt install git build-essential libboost-graph-dev cmake doxygen
-```
-
-### 2.1. Build and install from source
-
-```sh
-git clone https://github.com/tadams42/sokoenginepy.git
-cmake --preset "debug"
 cd build/debug
-make && make install
+make install
 ```
 
-uninstall:
+To later uninstall:
 
 ```sh
 xargs rm < install_manifest.txt
 ```
 
-### 2.2. Integrating into other CMake projects
+### Integrating into other CMake projects
 
-When `libsokoengine` is installed, it can be found by `cmake`'s `find_package`:
+`libsokoengine` is fully `cmake` enabled - it exports `cmake` targets that can be used
+by other `cmake` projects:
 
 ```cmake
-find_package(libsokoengine 0.5.0 REQUIRED)
+find_package(libsokoengine 1.0.0 REQUIRED)
 add_executable(sokoban_app main.cpp)
 target_link_libraries(sokoban_app PUBLIC libsokoengine::sokoengine)
 ```
 
-It is also possible to use `libsokoengine` directly from built sources. In this case,
-`find_package` needs `PATHS` argument. Assuming we'd built `libsokoengine` in
-`/home/foo/development/sokoenginepy/build/debug`, we can use it (without installing it)
-in other project like this:
+It is also possible to integrate `libsokoengine` that was built (locally) but not
+installed. Assuming we have following dir structure:
+
+```log
+projects
+├── myapp
+│   └── CMakeLists.txt
+└── sokoenginepy
+    └── CMakeLists.txt
+```
+
+We first build `libsokoengine` in `projects/sokoenginepy/` as described in previous
+sections. After that, we can use that built library directly from `projects/myapp`
+(without running `make install` in `projects/sokoenginepy/`).
+
+To do that add following in `myapp/CMakeLists.txt`:
 
 ```cmake
 set(DEV_PATH_HINT1 "../sokoenginepy/build/debug")
@@ -105,14 +132,24 @@ set(DEV_PATH_HINT2 "../sokoenginepy/build/release")
 cmake_path(ABSOLUTE_PATH DEV_PATH_HINT1 BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
 cmake_path(ABSOLUTE_PATH DEV_PATH_HINT2 BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
 find_package(
-    libsokoengine 0.5.0 REQUIRED
-    CONFIG
-    PATHS ${DEV_PATH_HINT1}
-          ${DEV_PATH_HINT2}
+  libsokoengine 1.0.0 REQUIRED
+  CONFIG
+  PATHS ${DEV_PATH_HINT1}
+        ${DEV_PATH_HINT2}
 )
 ```
 
-### 2.3. Other make targets
+The `PATHS` argument to `find_package` serves as a list of hints on where to find
+requested package.
+
+### Other make targets
+
+- `docs` - Doxygen documentation
+
+  ```sh
+  cd docs
+  doxygen
+  ```
 
 - `benchmarks` - a suite of benchmarks for `Mover`
 
@@ -129,14 +166,81 @@ find_package(
   kcachegrind playground_dump.pid
   ```
 
-- Python extension
+## Python C++ extension
 
-  It is possible to re-build Python extension via cmake (usually faster than going
-  through `pip install`). This can be useful for development environments.
+### Build using pip
 
-  ```sh
-  cd build/debug
-  make sokoenginepyext
-  cd ../../src
-  ln -sf ../build/debug/src/sokoenginepyext/sokoenginepyext.cpython-39-x86_64-linux-gnu.so
-  ```
+When installing `sokoenginepy` from source, `pip` will try to build native C++
+extension. If build fails for whatever reason, `pip` will fallback to installing pure
+Python implementation.
+
+If C++ extension is installed, it is utilized automatically: Python code importing and
+using `sokoenginepy` package doesn't need to change in any way.
+
+It is possible to circumvent this automatic build via 2 environment variables:
+
+- `SOKOENGINEPYEXT_SKIP`  - if set to true-ish value, C++ extension is not built
+- `SOKOENGINEPYEXT_DEBUG` - if set to true-ish value, C++ extension compilation produces
+  non optimized binary
+
+Prerequisites for `pip` build of C++ extension:
+
+- OS is Linux
+- C++ library build via `cmake` must've succeed (meaning C++ compiler and `vcpkg` are
+correctly set up)
+
+Prerequisites for `pip` build of C+
+When all requirements are met, you can build C++ extension:
+
+```sh
+sudo apt install python3-dev
+python3.9 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+To verify, following file should've been created:
+
+```sh
+src/sokoenginepyext.cpython-XX-YYY_ZZZ-linux-gnu.so
+```
+
+### Build using cmake
+
+When building through `pip`, most of the time whole source tree will be recompiled. This
+is slow and inconvenient for development environments. We can use `cmake` instead.
+
+Assuming again that `libsokoengine` build is OK, we can:
+
+```sh
+python3.9 -m venv .venv
+source .venv/bin/activate
+# Install regular python package, without pip compiling C++ extension
+export SOKOFILEPYEXT_BUILD=0
+pip install -e ".[dev]"
+```
+
+and then build C++ extension using cmake
+
+```sh
+cd build/debug
+make sokoenginepyext
+cd ../../src
+ln -sf ../build/debug/src/sokoenginepyext/sokoenginepyext.cpython-39-x86_64-linux-gnu.so
+cd ..
+```
+
+After this, we can re-build using just `cmake` giving us full control:
+
+```sh
+cd build/debug
+make sokoenginepyext
+```
+
+Notice that we don't use `vcpkg` for `pybind11` and `Python3` headers. This is
+intentional.
+
+C++ extension should be build in requested Python virtual environment. If `python` was
+managed via `vcpkg`, then Python version would've been pinned to whatever `vcpkg`
+defines making it impossible to build ie. Python wheels for different Python versions
+from the same source tree.

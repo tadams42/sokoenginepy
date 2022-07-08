@@ -7,8 +7,6 @@
 
 namespace py = pybind11;
 
-PYBIND11_MAKE_OPAQUE(sokoengine::io::Strings);
-
 //
 // pybind11 reduces all integer arguments to this type
 //
@@ -29,6 +27,7 @@ PYBIND11_MAKE_OPAQUE(sokoengine::io::Strings);
 // TypeError: foo(): incompatible function arguments. The following argument types are
 // supported:
 //     1. (bar: int) -> None
+//
 typedef int py_int_t;
 
 typedef std::vector<py_int_t> py_int_vect_t;
@@ -60,22 +59,19 @@ positions_no_throw(const py_int_vect_t &positions) {
 
 static inline sokoengine::game::piece_id_t
 piece_or_throw(sokoengine::game::Selectors piece, py_int_t piece_id) {
-  if (piece_id < 0 ||
-      piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
+  if (piece_id < 0 || piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
     throw sokoengine::game::PieceNotFoundError(piece, piece_id);
   return static_cast<sokoengine::game::piece_id_t>(piece_id);
 }
 
 static inline sokoengine::game::piece_id_t no_id_if_invalid(py_int_t piece_id) {
-  if (piece_id < 0 ||
-      piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
+  if (piece_id < 0 || piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
     return sokoengine::game::Config::NO_ID;
   return static_cast<sokoengine::game::piece_id_t>(piece_id);
 }
 
 static inline sokoengine::game::piece_id_t default_if_invalid(py_int_t piece_id) {
-  if (piece_id < 0 ||
-      piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
+  if (piece_id < 0 || piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
     return sokoengine::game::Config::DEFAULT_ID;
   return static_cast<sokoengine::game::piece_id_t>(piece_id);
 }

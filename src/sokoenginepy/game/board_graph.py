@@ -83,7 +83,7 @@ class BoardGraph:
             return self._graph.nodes[position][self._KEY_CELL]
 
         except KeyError as e:
-            raise IndexError(f"Board index {position} is out of range!") from e
+            raise IndexError(f"Board position {position} is out of range!") from e
 
     def __setitem__(self, position: int, board_cell: BoardCellOrStr):
         """
@@ -98,7 +98,7 @@ class BoardGraph:
                 self._graph.nodes[position][self._KEY_CELL] = BoardCell(board_cell)
 
         except (KeyError, IndexError, nx.NetworkXError) as e:
-            raise IndexError(f"Board index {position} is out of range!") from e
+            raise IndexError(f"Board position {position} is out of range!") from e
 
     def __contains__(self, position: int) -> bool:
         return position in self._graph
@@ -157,7 +157,7 @@ class BoardGraph:
                 )
 
         except (KeyError, IndexError, nx.NetworkXError) as e:
-            raise IndexError(f"Board index {src} is out of range!")
+            raise IndexError(f"Board position {src} is out of range!")
 
         return retv
 
@@ -171,7 +171,6 @@ class BoardGraph:
         Raises:
             IndexError: ``src`` is off board
         """
-        out_edge: InternalEdge
         if self[src]:
             for out_edge in self._graph.edges(src, data=True):
                 if out_edge[2][self._KEY_DIRECTION] == direction:
@@ -188,6 +187,16 @@ class BoardGraph:
             return [n for n in self._graph.neighbors(src) if self[n].is_wall]
 
         return []
+
+    def wall_neighbor_directions(self, src: int) -> Directions:
+        retv = []
+
+        if self[src]:
+            for out_edge in self._graph.edges(src, data=True):
+                if self[out_edge[1]].is_wall:
+                    retv.append(out_edge[2][self._KEY_DIRECTION])
+
+        return retv
 
     def all_neighbors(self, src: int) -> Positions:
         """
@@ -329,7 +338,7 @@ class BoardGraph:
         Doesn't require that ``pusher_position`` actually has pusher.
 
         Raises:
-            IndexError: when ``pusher_position`` is off board. Doesn't throw if any
+            IndexError: when ``pusher_position`` is off board. Doesn't raise if any
                 position in ``excluded_positions`` is off board; it simply ignores those
         """
         return self._reachables(
@@ -347,7 +356,7 @@ class BoardGraph:
         Doesn't require that ``pusher_position`` actually has pusher.
 
         Raises:
-            IndexError: when ``pusher_position`` is off board. Doesn't throw if any
+            IndexError: when ``pusher_position`` is off board. Doesn't raise if any
                 position in ``excluded_positions`` is off board; it simply ignores those
         """
         reachables = self.positions_reachable_by_pusher(

@@ -273,6 +273,21 @@ class DescribeBoardGraph:
             with pytest.raises(IndexError):
                 board_graph.wall_neighbors(-1)
 
+    class describe_wall_neighbor_directions:
+        def it_returns_directions_of_walls_around_given_vertice(self, board_graph):
+            pusher_position = 163
+            assert set(board_graph.wall_neighbor_directions(pusher_position)) == {
+                Direction.DOWN,
+                Direction.LEFT,
+                Direction.RIGHT,
+            }
+
+        def it_raises_if_starting_position_is_off_board(self, board_graph):
+            with pytest.raises(IndexError):
+                board_graph.wall_neighbor_directions(42000)
+            with pytest.raises(IndexError):
+                board_graph.wall_neighbor_directions(-1)
+
     class describe_all_neighbors:
         def it_returns_positions_of_all_neighbor_positions_for_given_vertice(
             self, board_graph

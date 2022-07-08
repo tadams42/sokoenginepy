@@ -52,6 +52,10 @@ class HashedBoardManager(BoardManager):
         self._solutions_hashes = None
         self._zobrist_rehash()
 
+    def __str__(self):
+        retv = super().__str__()
+        return retv[:-1] + f", state_hash={self.state_hash})"
+
     def _zobrist_rehash(self):
         """Recalculates Zobrist hash of board position from scratch."""
         distinct_box_plus_ids = set(

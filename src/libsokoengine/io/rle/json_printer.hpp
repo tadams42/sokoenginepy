@@ -6,92 +6,95 @@
 #include <ostream>
 
 namespace sokoengine {
-namespace io {
-namespace sok_rle {
-namespace ast {
+  namespace io {
+    namespace sok_rle {
+      namespace ast {
 
-struct LIBSOKOENGINE_LOCAL JsonPrinter {
-  typedef void result_type;
-  std::ostream &out;
+        struct LIBSOKOENGINE_LOCAL JsonPrinter {
+          typedef void  result_type;
+          std::ostream &out;
 
-  JsonPrinter(std::ostream &out) : out(out) {}
+          JsonPrinter(std::ostream &out)
+            : out(out) {}
 
-  // void operator()(expression const &o) const { boost::apply_visitor(*this, o); }
+          // void operator()(expression const &o) const { boost::apply_visitor(*this,
+          // o);
+          // }
 
-  void operator()(char c) const {
-    if (c == '\n' || c == '\r' || c == '|')
-      out << "\\n";
-    else
-      out << c;
-  }
+          void operator()(char c) const {
+            if (c == '\n' || c == '\r' || c == '|')
+              out << "\\n";
+            else
+              out << c;
+          }
 
-  std::string quoted(const std::string &src) const { return '"' + src + '"'; }
+          std::string quoted(const std::string &src) const { return '"' + src + '"'; }
 
-  void operator()(Atom const &o) const { (*this)(o.data); }
+          void operator()(const Atom &o) const { (*this)(o.data); }
 
-  void operator()(Atoms const &o) const {
-    out << '{' << quoted("type") << ':' << quoted("atoms") << ',' << quoted("data")
-        << ':';
+          void operator()(const Atoms &o) const {
+            out << '{' << quoted("type") << ':' << quoted("atoms") << ','
+                << quoted("data") << ':';
 
-    out << '"';
-    for (char c : o.data) {
-      (*this)(c);
-    }
-    out << '"' << '}';
-  }
+            out << '"';
+            for (char c : o.data) {
+              (*this)(c);
+            }
+            out << '"' << '}';
+          }
 
-  void operator()(Group const &o) const {
-    out << '{' << quoted("type") << ':' << quoted("group") << ',' << quoted("data")
-        << ":[";
+          void operator()(const Group &o) const {
+            out << '{' << quoted("type") << ':' << quoted("group") << ','
+                << quoted("data") << ":[";
 
-    auto actual_delim = ",";
-    auto delim = "";
+            auto actual_delim = ",";
+            auto delim        = "";
 
-    for (auto const &expr : o.data) {
-      out << delim;
-      boost::apply_visitor(*this, expr);
-      delim = actual_delim;
-    }
+            for (const auto &expr : o.data) {
+              out << delim;
+              boost::apply_visitor(*this, expr);
+              delim = actual_delim;
+            }
 
-    out << ']' << '}';
-  }
+            out << ']' << '}';
+          }
 
-  void operator()(RleChunk const &o) const {
-    out << '{' << quoted("type") << ':' << quoted("rle_chunk") << ',' << quoted("count")
-        << ':' << o.cnt << ',' << quoted("data") << ':';
+          void operator()(const RleChunk &o) const {
+            out << '{' << quoted("type") << ':' << quoted("rle_chunk") << ','
+                << quoted("count") << ':' << o.cnt << ',' << quoted("data") << ':';
 
-    const Atom *a = boost::get<Atom>(&o.data);
-    if (a) {
-      out << '"';
-      boost::apply_visitor(*this, o.data);
-      out << '"';
-    } else {
-      boost::apply_visitor(*this, o.data);
-    }
+            const Atom *a = boost::get<Atom>(&o.data);
+            if (a) {
+              out << '"';
+              boost::apply_visitor(*this, o.data);
+              out << '"';
+            } else {
+              boost::apply_visitor(*this, o.data);
+            }
 
-    out << '}';
-  }
+            out << '}';
+          }
 
-  void operator()(RleData const &o) const {
-    out << '{' << quoted("type") << ':' << quoted("sok_rle") << ',' << quoted("data")
-        << ':' << '[';
+          void operator()(const RleData &o) const {
+            out << '{' << quoted("type") << ':' << quoted("sok_rle") << ','
+                << quoted("data") << ':' << '[';
 
-    auto actual_delim = ",";
-    auto delim = "";
+            auto actual_delim = ",";
+            auto delim        = "";
 
-    for (auto const &expr : o.data) {
-      out << delim;
-      boost::apply_visitor(*this, expr);
-      delim = actual_delim;
-    }
+            for (const auto &expr : o.data) {
+              out << delim;
+              boost::apply_visitor(*this, expr);
+              delim = actual_delim;
+            }
 
-    out << ']' << '}';
-  }
-};
+            out << ']' << '}';
+          }
+        };
 
-} // namespace ast
-} // namespace sok_rle
-} // namespace io
+      } // namespace ast
+    }   // namespace sok_rle
+  }     // namespace io
 } // namespace sokoengine
 
 #endif // HEADER_GUARD

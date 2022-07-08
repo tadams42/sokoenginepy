@@ -29,27 +29,61 @@ class SOKFileFormat:
     @classmethod
     def read(
         cls,
-        src: Union[io.StringIO, io.TextIOWrapper],
+        src: Union[
+            io.BufferedReader, io.TextIOWrapper, io.FileIO, io.StringIO, io.BytesIO
+        ],
         dest: Collection,
         tessellation_hint: Optional[Tessellation] = None,
     ):
         from ..game import Tessellation
 
-        SOKReader(src, dest, tessellation_hint or Tessellation.SOKOBAN).read()
+        reader = SOKReader(src, dest, tessellation_hint or Tessellation.SOKOBAN)
+        reader.read()
+        reader.close()
 
     @classmethod
-    def write(cls, src: Collection, dest: Union[io.StringIO, io.TextIOWrapper]):
-        SOKWriter(dest).write(src)
+    def write(
+        cls,
+        src: Collection,
+        dest: Union[
+            io.BufferedWriter, io.TextIOWrapper, io.FileIO, io.StringIO, io.BytesIO
+        ],
+    ):
+        writer = SOKWriter(dest)
+        writer.write(src)
+        writer.close()
 
 
 class SOKReader:
     def __init__(
         self,
-        src: Union[io.StringIO, io.TextIOWrapper],
+        src: Union[
+            io.BufferedReader, io.TextIOWrapper, io.FileIO, io.StringIO, io.BytesIO
+        ],
         dest: Collection,
         tessellation_hint: Tessellation,
     ):
-        self.src = src
+        self._stream_was_wrapped = False
+        self.src: Union[io.TextIOWrapper, io.StringIO]
+        if isinstance(src, io.StringIO):
+            self.src = src
+        elif isinstance(src, io.BytesIO):
+            self.src = io.TextIOWrapper(src, "utf-8")
+            self._stream_was_wrapped = True
+        elif isinstance(src, io.FileIO):
+            self.src = io.TextIOWrapper(src, "utf-8")
+            self._stream_was_wrapped = True
+        elif not isinstance(src, io.TextIOWrapper) and isinstance(
+            src, io.BufferedReader
+        ):
+            # file opened via open(path, "rb")
+            self.src = io.TextIOWrapper(src, "utf-8")
+            self._stream_was_wrapped = True
+        else:
+            # file opened via open(path, "r")
+            # or
+            # isinstance(src, io.TextIOWrapper) == True
+            self.src = src
         self.dest = dest
         self.supplied_tessellation_hint = tessellation_hint
         self._data: CollectionData
@@ -57,6 +91,10 @@ class SOKReader:
     def read(self):
         self._parse()
         self._copy()
+
+    def close(self):
+        if self._stream_was_wrapped:
+            self.src.detach()
 
     def _parse(self):
         self.src.seek(0, 0)
@@ -72,7 +110,7 @@ class SOKReader:
         self.dest.author = self._data.author or ""
         self.dest.created_at = self._data.created_at or ""
         self.dest.updated_at = self._data.updated_at or ""
-        self.dest.notes = self._data.notes
+        self.dest.notes = "\n".join(self._data.notes)
 
         for puzzle_data in self._data.puzzles:
             if puzzle_data.tessellation == Tessellation.SOKOBAN:
@@ -92,13 +130,15 @@ class SOKReader:
                     f"Missing implementation for {puzzle_data.tessellation}!"
                 )
 
-            for attr in {"title", "author", "boxorder", "goalorder", "notes"}:
+            for attr in {"title", "author", "boxorder", "goalorder"}:
                 setattr(puzzle, attr, getattr(puzzle_data, attr))
+            puzzle.notes = "\n".join(puzzle_data.notes)
 
             for snapshot_data in puzzle_data.snapshots:
                 snapshot = snapshot_klass(moves_data=snapshot_data.moves_data or "")
-                for attr in {"title", "solver", "notes"}:
+                for attr in {"title", "solver"}:
                     setattr(snapshot, attr, getattr(snapshot_data, attr))
+                snapshot.notes = "\n".join(snapshot_data.notes)
                 puzzle.snapshots.append(snapshot)
 
             self.dest.puzzles.append(puzzle)
@@ -475,8 +515,37 @@ class SOKTags:
 
 
 class SOKWriter:
-    def __init__(self, dest: Union[io.StringIO, io.TextIOWrapper]):
-        self.dest = dest
+    def __init__(
+        self,
+        dest: Union[
+            io.BufferedWriter, io.TextIOWrapper, io.FileIO, io.StringIO, io.BytesIO
+        ],
+    ):
+        self._stream_was_wrapped = False
+        self.dest: Union[io.TextIOWrapper, io.StringIO]
+        if isinstance(dest, io.StringIO):
+            self.dest = dest
+        elif isinstance(dest, io.BytesIO):
+            self.dest = io.TextIOWrapper(dest, "utf-8")
+            self._stream_was_wrapped = True
+        elif isinstance(dest, io.FileIO):
+            self.dest = io.TextIOWrapper(dest, "utf-8")
+            self._stream_was_wrapped = True
+        elif not isinstance(dest, io.TextIOWrapper) and isinstance(
+            dest, io.BufferedWriter
+        ):
+            # file opened via open(path, "wb")
+            self.dest = io.TextIOWrapper(dest, "utf-8")
+            self._stream_was_wrapped = True
+        else:
+            # file opened via open(path, "w")
+            # or
+            # isinstance(src, io.TextIOWrapper) == True
+            self.dest = dest
+
+    def close(self):
+        if self._stream_was_wrapped:
+            self.dest.detach()
 
     def write(self, src: Collection):
         self._write_collection_header(src)
@@ -508,9 +577,8 @@ class SOKWriter:
         )
         written = SOKTags.write_tagged(self.dest, SOKTags.AUTHOR, src.author) or written
 
-        puzzle_collection_notes = "\n".join(src.notes)
-        if not is_blank(puzzle_collection_notes):
-            self.dest.write(puzzle_collection_notes.rstrip() + "\n")
+        if not is_blank(src.notes):
+            self.dest.write(src.notes.rstrip() + "\n")
             written = True
 
         if written:
@@ -532,7 +600,7 @@ class SOKWriter:
         if src.tessellation != Tessellation.SOKOBAN:
             written = (
                 SOKTags.write_tagged(
-                    self.dest, SOKTags.VARIANT, str(src.tessellation.value).lower()
+                    self.dest, SOKTags.VARIANT, str(src.tessellation.name).capitalize()
                 )
                 or written
             )
@@ -552,9 +620,8 @@ class SOKWriter:
                 SOKTags.write_tagged(self.dest, SOKTags.AUTHOR, src.author) or written
             )
 
-        puzzle_notes = "\n".join(src.notes)
-        if not is_blank(puzzle_notes):
-            self.dest.write(puzzle_notes.rstrip() + "\n")
+        if not is_blank(src.notes):
+            self.dest.write(src.notes.rstrip() + "\n")
             written = True
 
         if written:
@@ -574,9 +641,8 @@ class SOKWriter:
 
         written = SOKTags.write_tagged(self.dest, SOKTags.SOLVER, src.solver)
 
-        snap_notes = "\n".join(src.notes)
-        if not is_blank(snap_notes):
-            self.dest.write(snap_notes.rstrip() + "\n")
+        if not is_blank(src.notes):
+            self.dest.write(src.notes.rstrip() + "\n")
             written = True
 
         if written:

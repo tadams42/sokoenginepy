@@ -108,7 +108,9 @@ class TriobanTessellation(BaseTessellation):
                 dy = 1
                 dx = 0
         else:
-            raise ValueError(direction)
+            raise ValueError(
+                f"Unsupported direction {direction} for {self.__class__.__name__}"
+            )
 
         row += dy
         column += dx

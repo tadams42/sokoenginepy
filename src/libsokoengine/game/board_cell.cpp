@@ -4,41 +4,47 @@
 
 #include <stdexcept>
 
-using namespace std;
-using namespace sokoengine;
+using std::invalid_argument;
+using std::string;
 
 namespace sokoengine {
 namespace game {
 
 BoardCell::BoardCell(char rv)
-  : m_box(false), m_pusher(false), m_goal(false), m_wall(false), m_playable(false) {
+  : m_box(false)
+  , m_pusher(false)
+  , m_goal(false)
+  , m_wall(false)
+  , m_playable(false) {
   if (!io::Puzzle::is_empty_floor(rv)) {
     if (io::Puzzle::is_wall(rv)) {
       set_is_wall(true);
     } else if (io::Puzzle::is_pusher(rv)) {
       set_has_pusher(true);
-      if (io::Puzzle::is_goal(rv)) set_has_goal(true);
+      if (io::Puzzle::is_goal(rv))
+        set_has_goal(true);
     } else if (io::Puzzle::is_box(rv)) {
       set_has_box(true);
-      if (io::Puzzle::is_goal(rv)) set_has_goal(true);
+      if (io::Puzzle::is_goal(rv))
+        set_has_goal(true);
     } else if (io::Puzzle::is_goal(rv)) {
       set_has_goal(true);
     } else {
-      throw invalid_argument("Invalid character in BoardCell constructor!");
+      throw invalid_argument(string("Illegal character '") + rv + "' for BoardCell!");
     }
   }
 }
 
 bool BoardCell::operator==(const BoardCell &rv) const {
-  return m_wall == rv.m_wall && m_pusher == rv.m_pusher && m_box == rv.m_box &&
-         m_goal == rv.m_goal;
+  return m_wall == rv.m_wall && m_pusher == rv.m_pusher && m_box == rv.m_box
+      && m_goal == rv.m_goal;
 }
 
 bool BoardCell::operator!=(const BoardCell &rv) const { return !(*this == rv); }
 
 bool BoardCell::operator==(char rv) const {
-  return m_wall == io::Puzzle::is_wall(rv) && m_pusher == io::Puzzle::is_pusher(rv) &&
-         m_box == io::Puzzle::is_box(rv) && m_goal == io::Puzzle::is_goal(rv);
+  return m_wall == io::Puzzle::is_wall(rv) && m_pusher == io::Puzzle::is_pusher(rv)
+      && m_box == io::Puzzle::is_box(rv) && m_goal == io::Puzzle::is_goal(rv);
 }
 
 bool BoardCell::operator!=(char rv) const { return !(*this == rv); }
@@ -85,8 +91,8 @@ bool BoardCell::has_box() const { return m_box; }
 
 void BoardCell::set_has_box(bool rv) {
   if (rv == true) {
-    m_box = true;
-    m_wall = false;
+    m_box    = true;
+    m_wall   = false;
     m_pusher = false;
   } else {
     m_box = false;
@@ -117,8 +123,8 @@ bool BoardCell::has_pusher() const { return m_pusher; }
 void BoardCell::set_has_pusher(bool rv) {
   if (rv == true) {
     m_pusher = true;
-    m_box = false;
-    m_wall = false;
+    m_box    = false;
+    m_wall   = false;
   } else {
     m_pusher = false;
   }
@@ -140,6 +146,7 @@ void BoardCell::set_is_wall(bool rv) {
 }
 
 bool BoardCell::is_in_playable_area() const { return m_playable; }
+
 void BoardCell::set_is_in_playable_area(bool rv) { m_playable = rv; }
 
 } // namespace game

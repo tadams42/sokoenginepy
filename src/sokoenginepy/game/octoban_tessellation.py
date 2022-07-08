@@ -90,7 +90,9 @@ class OctobanTessellation(BaseTessellation):
         row_shift, column_shift = self._NEIGHBOR_SHIFT.get(direction, (None, None))
 
         if row_shift is None or column_shift is None:
-            raise ValueError(direction)
+            raise ValueError(
+                f"Unsupported direction {direction} for {self.__class__.__name__}"
+            )
 
         row += row_shift
         column += column_shift

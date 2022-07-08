@@ -40,7 +40,7 @@ class BoardCell:
             elif Puzzle.is_goal(character):
                 self.has_goal = True
             else:
-                raise ValueError("Illegal characters found in board string")
+                raise ValueError(f"Illegal characters '{character}' for BoardCell!")
 
     def __eq__(self, rv):
         return (

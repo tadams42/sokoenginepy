@@ -1,7 +1,7 @@
 #ifndef BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "config.hpp"
+#include "sokoengine_config.hpp"
 
 #include <map>
 #include <memory>
@@ -13,13 +13,13 @@ namespace game {
 class BoardGraph;
 class BoardState;
 
-class LIBSOKOENGINE_API CellAlreadyOccupiedError : public std::runtime_error {
+class LIBSOKOENGINE_API CellAlreadyOccupiedError : public std::invalid_argument {
 public:
   explicit CellAlreadyOccupiedError(const std::string &mess);
   virtual ~CellAlreadyOccupiedError();
 };
 
-class LIBSOKOENGINE_API BoxGoalSwitchError : public std::runtime_error {
+class LIBSOKOENGINE_API BoxGoalSwitchError : public std::invalid_argument {
 public:
   explicit BoxGoalSwitchError(const std::string &mess);
   virtual ~BoxGoalSwitchError();
@@ -52,13 +52,14 @@ public:
 ///
 /// How are piece IDs assigned? Start scanning game board from top left corner, going
 /// row by row, from left to the right.  First encountered box will get `box.id =
-/// Config::DEFAULT_ID`, second one `box.id = Config::DEFAULT_ID + 1`, etc... Same goes
-/// for pushers and goals.
+/// Config::DEFAULT_ID`, second one `box.id = Config::DEFAULT_ID + 1`, etc... Same
+/// goes for pushers and goals.
 ///
 /// @image html assigning_ids.png
 ///
 /// BoardManager also ensures that piece IDs remain unchanged when pieces are moved
-/// on board. This is best illustrated by example. Let's construct a board with 2 boxes.
+/// on board. This is best illustrated by example. Let's construct a board with 2
+/// boxes.
 ///
 /// ```cpp
 ///   string data = string() +
@@ -83,9 +84,9 @@ public:
 ///   // {1: 14, 2: 21, }
 /// ```
 ///
-/// We can edit the board (simulating movement of box ID 2) directly, without using the
-/// manager. If we attach manager to that board after edit, we get expected but wrong ID
-/// assigned to the box we'd just "moved":
+/// We can edit the board (simulating movement of box ID 2) directly, without using
+/// the manager. If we attach manager to that board after edit, we get expected but
+/// wrong ID assigned to the box we'd just "moved":
 ///
 /// ```cpp
 ///   board[21] = BoardCell(' ');
@@ -111,8 +112,8 @@ public:
 ///   // {1: 9, 2: 14, }
 /// ```
 ///
-/// Moving box through manager (via move_box_from()) would've preserved ID of moved box.
-/// Same goes for pushers.
+/// Moving box through manager (via move_box_from()) would've preserved ID of moved
+/// box. Same goes for pushers.
 ///
 /// | Initial board                  | Box edited without manager     | Box moved
 /// through manager      | | ------------------------------ |
@@ -121,8 +122,8 @@ public:
 /// ![](movement_vs_transfer3.png) |
 ///
 /// @note
-/// Movement methods in BoardManager only implement board updates. They don't implement
-/// full game logic. For game logic see Mover.
+/// Movement methods in BoardManager only implement board updates. They don't
+/// implement full game logic. For game logic see Mover.
 ///
 /// @sa
 ///   - Mover
@@ -136,11 +137,14 @@ public:
   /// @param boxorder Sokoban+ data (see SokobanPlus)
   /// @param goalorder Sokoban+ data (see SokobanPlus)
   ///
-  explicit BoardManager(BoardGraph &board, const std::string &boxorder = "",
-                        const std::string &goalorder = "");
-  BoardManager(const BoardManager &) = delete;
-  BoardManager(BoardManager &&rv);
+  explicit BoardManager(
+    BoardGraph        &board,
+    const std::string &boxorder  = "",
+    const std::string &goalorder = ""
+  );
+  BoardManager(const BoardManager &)            = delete;
   BoardManager &operator=(const BoardManager &) = delete;
+  BoardManager(BoardManager &&rv);
   BoardManager &operator=(BoardManager &&rv);
   virtual ~BoardManager();
 
@@ -160,7 +164,7 @@ public:
   // Pushers
   // --------------------------------------------------------------------------
 
-  board_size_t pushers_count() const;
+  board_size_t       pushers_count() const;
   piece_ids_vector_t pushers_ids() const;
   ///
   /// Mapping of pushers' IDs to the corresponding board positions, ie.
@@ -176,13 +180,14 @@ public:
   /// @throws PieceNotFoundError No pusher on `position`
   ///
   piece_id_t pusher_id_on(position_t position) const;
-  bool has_pusher(piece_id_t pusher_id) const;
-  bool has_pusher_on(position_t position) const;
+  bool       has_pusher(piece_id_t pusher_id) const;
+  bool       has_pusher_on(position_t position) const;
   ///
   /// Updates board state and board cells with changed pusher position.
   ///
   /// @throws PieceNotFoundError there is no pusher on `old_position`
-  /// @throws CellAlreadyOccupiedError there is an obstacle (wall/box/another pusher) on
+  /// @throws CellAlreadyOccupiedError there is an obstacle (wall/box/another pusher)
+  /// on
   ///         `to_new_position`
   /// @throws InvalidPositionError `old_position` or `to_new_position` is of board
   ///
@@ -191,15 +196,16 @@ public:
   /// Updates board state and board cells with changed pusher position.
   ///
   /// @throws PieceNotFoundError there is no pusher on `old_position`
-  /// @throws CellAlreadyOccupiedError there is an obstacle (wall/box/another pusher) on
+  /// @throws CellAlreadyOccupiedError there is an obstacle (wall/box/another pusher)
+  /// on
   ///         `to_new_position`
   /// @throws InvalidPositionError `to_new_position` is of board
   ///
   /// @note
   /// Allows placing a pusher onto position occupied by box. This is for cases when we
-  /// switch box/goals positions in reverse solving mode. In this situation it is legal
-  /// for pusher to end up standing on top of the box. Game rules say that for these
-  /// situations, first move(s) must be jumps.
+  /// switch box/goals positions in reverse solving mode. In this situation it is
+  /// legal for pusher to end up standing on top of the box. Game rules say that for
+  /// these situations, first move(s) must be jumps.
   ///
   /// @warning
   /// It doesn't verify if `to_new_position` is valid on-board position.
@@ -210,7 +216,7 @@ public:
   // Boxes
   // --------------------------------------------------------------------------
 
-  board_size_t boxes_count() const;
+  board_size_t       boxes_count() const;
   piece_ids_vector_t boxes_ids() const;
   ///
   /// Mapping of boxes' IDs to the corresponding board positions, ie.
@@ -226,8 +232,8 @@ public:
   /// @throws PieceNotFoundError No box on `position`
   ///
   piece_id_t box_id_on(position_t position) const;
-  bool has_box(piece_id_t box_id) const;
-  bool has_box_on(position_t position) const;
+  bool       has_box(piece_id_t box_id) const;
+  bool       has_box_on(position_t position) const;
   ///
   /// Updates board state and board cells with changed box position.
   ///
@@ -251,7 +257,7 @@ public:
   // Goals
   // --------------------------------------------------------------------------
 
-  board_size_t goals_count() const;
+  board_size_t       goals_count() const;
   piece_ids_vector_t goals_ids() const;
   ///
   /// Mapping of goals' IDs to the corresponding board positions, ie.
@@ -267,8 +273,8 @@ public:
   /// @throws PieceNotFoundError No goal on `position`
   ///
   piece_id_t goal_id_on(position_t position) const;
-  bool has_goal(piece_id_t goal_id) const;
-  bool has_goal_on(position_t position) const;
+  bool       has_goal(piece_id_t goal_id) const;
+  bool       has_goal_on(position_t position) const;
 
   // --------------------------------------------------------------------------
   // Sokoban+
@@ -309,8 +315,8 @@ public:
   ///
   std::string goalorder() const;
   ///
-  /// If `rv` is different from existing `boxorder`, disables Sokoban+ and sets boxorder
-  /// to new value.
+  /// If `rv` is different from existing `boxorder`, disables Sokoban+ and sets
+  /// boxorder to new value.
   ///
   /// @sa SokobanPlus::set_boxorder()
   ///
@@ -364,7 +370,7 @@ public:
   // --------------------------------------------------------------------------
 
   const BoardGraph &board() const;
-  const Positions &walls_positions() const;
+  const Positions  &walls_positions() const;
 
   ///
   /// All boxes configurations that are solution to board.
@@ -381,7 +387,8 @@ public:
   ///
   /// Checks for game victory.
   ///
-  /// 1. `Classic` victory is any board position in which each box is positioned on top
+  /// 1. `Classic` victory is any board position in which each box is positioned on
+  /// top
   ///    of each goal
   /// 2. `Sokoban+` victory is board position where each box is positioned on top of
   ///    each goal with the same Sokoban+ ID as that box

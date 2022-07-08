@@ -15,7 +15,7 @@
 #if __GNUC__ >= 4 || defined __clang__
 #define LIBSOKOENGINE_HELPER_DLL_IMPORT __attribute__((visibility("default")))
 #define LIBSOKOENGINE_HELPER_DLL_EXPORT __attribute__((visibility("default")))
-#define LIBSOKOENGINE_HELPER_DLL_LOCAL __attribute__((visibility("hidden")))
+#define LIBSOKOENGINE_HELPER_DLL_LOCAL  __attribute__((visibility("hidden")))
 #else
 #define LIBSOKOENGINE_HELPER_DLL_IMPORT
 #define LIBSOKOENGINE_HELPER_DLL_EXPORT
@@ -129,8 +129,8 @@ constexpr position_t index_column(position_t index, board_size_t width) {
 ///
 /// Is position on given board?
 ///
-constexpr bool is_on_board_2d(position_t x, position_t y, board_size_t width,
-                              board_size_t height) {
+constexpr bool
+is_on_board_2d(position_t x, position_t y, board_size_t width, board_size_t height) {
   return x < width && y < height;
 }
 
@@ -192,15 +192,27 @@ static constexpr uint8_t DIRECTIONS_COUNT = direction_pack(Direction::NORTH_WEST
 /// Opposite Direction lookup.
 ///
 static constexpr const Direction DIRECTIONS[DIRECTIONS_COUNT] = {
-  Direction::UP,   Direction::NORTH_EAST, Direction::RIGHT, Direction::SOUTH_EAST,
-  Direction::DOWN, Direction::SOUTH_WEST, Direction::LEFT,  Direction::NORTH_WEST};
+  Direction::UP,
+  Direction::NORTH_EAST,
+  Direction::RIGHT,
+  Direction::SOUTH_EAST,
+  Direction::DOWN,
+  Direction::SOUTH_WEST,
+  Direction::LEFT,
+  Direction::NORTH_WEST};
 
 ///
 /// Opposite directions lookup
 ///
 static constexpr const Direction OPPOSITE_DIRECTIONS[DIRECTIONS_COUNT] = {
-  Direction::DOWN, Direction::SOUTH_WEST, Direction::LEFT,  Direction::NORTH_WEST,
-  Direction::UP,   Direction::NORTH_EAST, Direction::RIGHT, Direction::SOUTH_EAST};
+  Direction::DOWN,
+  Direction::SOUTH_WEST,
+  Direction::LEFT,
+  Direction::NORTH_WEST,
+  Direction::UP,
+  Direction::NORTH_EAST,
+  Direction::RIGHT,
+  Direction::SOUTH_EAST};
 
 ///
 /// Reverse operation from direction_pack().
@@ -230,9 +242,9 @@ enum class LIBSOKOENGINE_API GraphType : int {
 };
 
 ///
-/// Various constants used across game namespace. Since they are needed by many modules
-/// it made more sense to place them here in their own class, than into one or more
-/// other classes.
+/// Various constants used across game namespace. Since they are needed by many
+/// modules it made more sense to place them here in their own class, than into one or
+/// more other classes.
 ///
 class LIBSOKOENGINE_API Config {
 public:
@@ -246,16 +258,20 @@ public:
   ///
   static constexpr board_size_t MAX_HEIGHT = 4096;
 
-  static_assert(MAX_WIDTH * MAX_HEIGHT < std::numeric_limits<board_size_t>::max(),
-                "MAX_HEIGHT * MAX_HEIGHT must be smaller than maximal representable "
-                "board position!");
+  static_assert(
+    MAX_WIDTH * MAX_HEIGHT < std::numeric_limits<board_size_t>::max(),
+    "MAX_HEIGHT * MAX_HEIGHT must be smaller than maximal representable "
+    "board position!"
+  );
 
   ///
   /// Value that represents invalid or unknown board position
   ///
   static constexpr position_t NO_POS = std::numeric_limits<position_t>::max();
-  static_assert(NO_POS > MAX_WIDTH * MAX_HEIGHT,
-                "NO_POS must be greater than any valid board position!");
+  static_assert(
+    NO_POS > MAX_WIDTH * MAX_HEIGHT,
+    "NO_POS must be greater than any valid board position!"
+  );
 
   ///
   /// Default ID for pieces for situations whe one is needed and **must** be provided.
@@ -284,11 +300,6 @@ public:
 namespace io {
 
 ///
-/// Default type for sequence of strings.
-///
-typedef std::vector<std::string> Strings;
-
-///
 /// For some types of games, individual board cell type depends on board position.
 ///
 enum class LIBSOKOENGINE_API CellOrientation : int {
@@ -303,6 +314,11 @@ enum class LIBSOKOENGINE_API CellOrientation : int {
 bool LIBSOKOENGINE_API is_blank(const std::string &line);
 
 } // namespace io
+
+namespace implementation {
+typedef std::vector<std::string> Strings;
+} // namespace implementation
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
