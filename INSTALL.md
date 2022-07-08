@@ -147,8 +147,9 @@ requested package.
 - `docs` - Doxygen documentation
 
   ```sh
-  cd docs
-  doxygen
+  cd build/debug
+  make docs
+  ls docs/libsokoengine-v1.0.1/html/index.html
   ```
 
 - `benchmarks` - a suite of benchmarks for `Mover`
@@ -189,7 +190,6 @@ Prerequisites for `pip` build of C++ extension:
 - C++ library build via `cmake` must've succeed (meaning C++ compiler and `vcpkg` are
 correctly set up)
 
-Prerequisites for `pip` build of C+
 When all requirements are met, you can build C++ extension:
 
 ```sh
@@ -216,8 +216,9 @@ Assuming again that `libsokoengine` build is OK, we can:
 python3.9 -m venv .venv
 source .venv/bin/activate
 # Install regular python package, without pip compiling C++ extension
-export SOKOFILEPYEXT_BUILD=0
+export SOKOFILEPYEXT_SKIP=1
 pip install -e ".[dev]"
+export SOKOFILEPYEXT_SKIP=0
 ```
 
 and then build C++ extension using cmake
