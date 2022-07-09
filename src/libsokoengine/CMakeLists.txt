@@ -92,59 +92,65 @@ set(SELF_INCLUDE_DIRS
 )
 
 # ..............................................................................
-# sokoengine OBJECT library
+# sokoengine OBJECT library with all sybmbols hidden
+#
+# This object library doesn't define "LIBSOKOENGINE_DLL" so all symbols in it
+# will get default visibility. Later it sets compile option "-fvisibility=hidden"
+# with net result of all symbols in this object library being hidden.
+# ..............................................................................
+add_library(sokoengine_obj_hidden OBJECT ${INSTALL_HEADERS} ${PRIVATE_HEADERS} ${SELF_SOURCES})
+
+# ..............................................................................
+# sokoengine OBJECT library with some sybmbols visible
+#
+# This object library defines "LIBSOKOENGINE_DLL" so symbols in it marked as
+# "LIBSOKOENGINE_API" will remain visible even though it later defines
+# "-fvisibility=hidden" compile option.
 # ..............................................................................
 add_library(sokoengine_obj OBJECT ${INSTALL_HEADERS} ${PRIVATE_HEADERS} ${SELF_SOURCES})
+target_compile_definitions(sokoengine_obj PUBLIC
+    LIBSOKOENGINE_DLL
+    PRIVATE
+    LIBSOKOENGINE_DLL_EXPORTS
+)
 
+# ..............................................................................
+# options common to both sokoengine OBJECT libraries
+# ..............................................................................
 target_include_directories(sokoengine_obj PUBLIC ${SELF_INCLUDE_DIRS})
+target_include_directories(sokoengine_obj_hidden PUBLIC ${SELF_INCLUDE_DIRS})
 
 target_link_libraries(sokoengine_obj PUBLIC cppitertools::cppitertools)
-target_link_libraries(sokoengine_obj PUBLIC Boost::boost)
-target_compile_features(sokoengine_obj PUBLIC cxx_std_17)
+target_link_libraries(sokoengine_obj_hidden PUBLIC cppitertools::cppitertools)
 
-if(${BUILD_SHARED_LIBS})
-    target_compile_definitions(sokoengine_obj PUBLIC
-        LIBSOKOENGINE_DLL
-        PRIVATE
-        LIBSOKOENGINE_DLL_EXPORTS
-    )
-    target_compile_options(sokoengine_obj PUBLIC
-        $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
+target_link_libraries(sokoengine_obj PUBLIC Boost::boost)
+target_link_libraries(sokoengine_obj_hidden PUBLIC Boost::boost)
+
+set_target_properties(sokoengine_obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(sokoengine_obj_hidden PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    target_compile_options(sokoengine_obj
+        PUBLIC
         -fvisibility=hidden
         -fvisibility-inlines-hidden
-        >
-
-        # $<$<CXX_COMPILER_ID:MSVC>: ...>
+    )
+    target_compile_options(sokoengine_obj_hidden
+        PUBLIC
+        -fvisibility=hidden
+        -fvisibility-inlines-hidden
+    )
+    target_compile_options(sokoengine_obj PRIVATE
+        $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>
+        -Wno-overloaded-virtual
+        -Wno-unused-parameter
     )
 endif()
-
-target_compile_options(sokoengine_obj PRIVATE
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
-    $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>
-    -Wno-overloaded-virtual
-    -Wno-unused-parameter
-
-    # -Wno-attributes
-    >
-
-    # $<$<CXX_COMPILER_ID:MSVC>: ...>
-)
-
-# include(CMakePrintHelpers)
-# cmake_print_properties(
-# TARGETS sokoengine_obj
-# PROPERTIES COMPILE_FEATURES COMPILE_FLAGS COMPILE_OPTIONS
-# )
-set_target_properties(sokoengine_obj PROPERTIES
-    POSITION_INDEPENDENT_CODE ON
-    INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
-    INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON
-)
 
 # ..............................................................................
 # sokoengine library
 # ..............................................................................
-add_library(sokoengine sokoengine.hpp)
+add_library(sokoengine SHARED sokoengine.hpp)
 
 target_link_libraries(sokoengine PRIVATE sokoengine_obj)
 
@@ -159,17 +165,13 @@ set_target_properties(sokoengine
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
     POSITION_INDEPENDENT_CODE ON
-    INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
-    INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON
 )
 
-if(${BUILD_SHARED_LIBS})
-    # generate_export_header(sokoengine)
-    set_property(TARGET sokoengine
-        PROPERTY INTERFACE_sokoengine_MAJOR_VERSION 3)
-    set_property(TARGET sokoengine
-        APPEND PROPERTY COMPATIBLE_INTERFACE_STRING sokoengine_MAJOR_VERSION)
-endif()
+# generate_export_header(sokoengine)
+set_property(TARGET sokoengine
+    PROPERTY INTERFACE_sokoengine_MAJOR_VERSION 3)
+set_property(TARGET sokoengine
+    APPEND PROPERTY COMPATIBLE_INTERFACE_STRING sokoengine_MAJOR_VERSION)
 
 # ..............................................................................
 # install

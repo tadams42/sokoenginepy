@@ -112,7 +112,6 @@ class CMakeBuild(build_ext):
             # for that purpose.
             f"-DPYBIND11_CMAKE_DIR={pybind11.get_cmake_dir()}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
-            "-DBUILD_SHARED_LIBS=ON",
             f"-DCMAKE_TOOLCHAIN_FILE={SokoenginepyextCMakeExtension.vcpkg_toolchain_file()}",
         ]
         build_args = []
@@ -120,9 +119,6 @@ class CMakeBuild(build_ext):
         # (needed e.g. to build for ARM OSx on conda-forge)
         if "CMAKE_ARGS" in os.environ:
             cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
-
-        # In this example, we pass in the version to C++. You might not need to.
-        # cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]
 
         if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -181,7 +177,7 @@ class CMakeBuild(build_ext):
         if not os.path.exists(build_temp):
             os.makedirs(build_temp)
 
-        # Needed because target sokoenginepyext is excluded from default build
+        # Avoid building ALL targets
         build_args += ["--", "sokoenginepyext"]
 
         subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=build_temp)

@@ -61,7 +61,6 @@ jobs:
         - /home/travis/vcpkg_src/bootstrap-vcpkg.sh
       env:
         - SOKOENGINEPYEXT_SKIP=false
-        - SOKOENGINEPYEXT_DEBUG=true
         - CMAKE_TOOLCHAIN_FILE=/home/travis/vcpkg_src/scripts/buildsystems/vcpkg.cmake
 
 
@@ -73,7 +72,6 @@ jobs:
         - /home/travis/vcpkg_src/bootstrap-vcpkg.sh
       env:
         - SOKOENGINEPYEXT_SKIP=false
-        - SOKOENGINEPYEXT_DEBUG=true
         - CMAKE_TOOLCHAIN_FILE=/home/travis/vcpkg_src/scripts/buildsystems/vcpkg.cmake
 
 
