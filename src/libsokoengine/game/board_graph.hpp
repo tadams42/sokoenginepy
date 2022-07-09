@@ -88,7 +88,8 @@ public:
   ///
   BoardCell &operator[](position_t position);
 
-  Tessellation tessellation() const;
+  Tessellation        tessellation() const;
+  io::CellOrientation cell_orientation(position_t position) const;
 
   ///
   /// Formatted string representation of board.

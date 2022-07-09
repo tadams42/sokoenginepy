@@ -11,9 +11,7 @@
       "description": "Base preset for debug configurations.",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "BUILD_SHARED_LIBS": "ON",
-        "SOKOENGINEPYEXT_DEBUG": "1"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -30,9 +28,7 @@
       "description": "Base preset for release configurations.",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "BUILD_SHARED_LIBS": "ON",
-        "SOKOENGINEPYEXT_DEBUG": "0"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
     {

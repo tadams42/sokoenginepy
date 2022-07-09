@@ -20,7 +20,6 @@ cache:
   directories:
     - /home/travis/.cache/vcpkg
     - /home/travis/.cache/pip
-    - /home/travis/.cache/cmake
 
 before_install:
   - python -m pip install --upgrade pip wheel
@@ -62,10 +61,7 @@ jobs:
         - /home/travis/vcpkg_src/bootstrap-vcpkg.sh
       env:
         - SOKOENGINEPYEXT_SKIP=false
-        - SOKOENGINEPYEXT_DEBUG=true
         - CMAKE_TOOLCHAIN_FILE=/home/travis/vcpkg_src/scripts/buildsystems/vcpkg.cmake
-      script:
-        - pytest
 
 
     - name: "Python with C++ extension: 3.10"
@@ -76,10 +72,7 @@ jobs:
         - /home/travis/vcpkg_src/bootstrap-vcpkg.sh
       env:
         - SOKOENGINEPYEXT_SKIP=false
-        - SOKOENGINEPYEXT_DEBUG=true
         - CMAKE_TOOLCHAIN_FILE=/home/travis/vcpkg_src/scripts/buildsystems/vcpkg.cmake
-      script:
-        - pytest
 
 
     - name: "docs build"

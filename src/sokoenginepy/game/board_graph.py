@@ -6,7 +6,7 @@ from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import networkx as nx
 
-from ..io import Puzzle
+from ..io import CellOrientation, Puzzle
 from .base_tessellation import BaseTessellation, Tessellation
 from .board_cell import BoardCell
 from .config import Config, Direction, GraphType
@@ -106,6 +106,11 @@ class BoardGraph:
     @property
     def tessellation(self) -> Tessellation:
         return self._tessellation
+
+    def cell_orientation(self, position: int) -> CellOrientation:
+        return BaseTessellation.instance(self._tessellation).cell_orientation(
+            position, self.board_width, self.board_height
+        )
 
     def to_board_str(self, use_visible_floor=False, rle_encode=False) -> str:
         puzzle = Puzzle.instance_from(

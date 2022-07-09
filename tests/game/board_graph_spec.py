@@ -13,7 +13,7 @@ from sokoenginepy.game import (
     Tessellation,
     index_1d,
 )
-from sokoenginepy.io import Puzzle, SokobanPuzzle, TriobanPuzzle
+from sokoenginepy.io import CellOrientation, Puzzle, SokobanPuzzle, TriobanPuzzle
 
 
 @pytest.fixture
@@ -225,6 +225,9 @@ class DescribeBoardGraph:
 
     def it_provides_underlying_tessellation(self, board_graph):
         assert board_graph.tessellation == Tessellation.SOKOBAN
+
+    def it_calculates_cell_orientation(self, board_graph):
+        assert board_graph.cell_orientation(42) == CellOrientation.DEFAULT
 
     def it_provides_number_of_graph_edges(self, board_graph):
         assert board_graph.edges_count == 776

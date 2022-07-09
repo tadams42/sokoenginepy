@@ -10,11 +10,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sokoenginepy"
-version = "1.0.1"
+version = "1.0.2"
 description = "Sokoban and variants game utilities"
 readme = "README.md"
 requires-python = ">=3.9"
-license = { file = "LICENSE" }
+license = { text = "GNU General Public License v3 or later (GPLv3+)" }
 authors = [{ name = "Tomislav Adamic", email = "tomislav.adamic@gmail.com" }]
 keywords = ["sokoban", "hexoban", "octoban", "trioban", "sokoban+", "multiban"]
 classifiers = [

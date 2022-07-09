@@ -114,6 +114,14 @@ void export_board_graph(py::module &m) {
     .def_property_readonly("tessellation", &BoardGraph::tessellation)
 
     .def(
+      "cell_orientation",
+      [](const BoardGraph &self, py_int_t position) {
+        return self.cell_orientation(position_or_throw(position));
+      },
+      py::arg("position")
+    )
+
+    .def(
       "out_edges",
       [](const BoardGraph &self, py_int_t src) {
         return self.out_edges(position_or_throw(src));

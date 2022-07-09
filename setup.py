@@ -2,7 +2,9 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 
+import pybind11
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
@@ -99,15 +101,17 @@ class CMakeBuild(build_ext):
         # Can be set with Conda-Build, for example.
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
-        if not SokoenginepyextCMakeExtension.vcpkg_toolchain_file():
-            raise RuntimeError("ZOMG!")
-
-        # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
             f"-DPython3_EXECUTABLE={sys.executable}",
+            # We need to inject this into cmake config because `pip install` creates
+            # separate, clean build environment (ie. /tmp/pip-build-env-HASH) which is
+            # impossible to detect by cmake
+            # Luckily, in cmake we don't need whole pip environment, only location of
+            # Find_pybind11 cmake module. Also luckily, pybind11 provides helper just
+            # for that purpose.
+            f"-DPYBIND11_CMAKE_DIR={pybind11.get_cmake_dir()}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
-            "-DBUILD_SHARED_LIBS=ON",
             f"-DCMAKE_TOOLCHAIN_FILE={SokoenginepyextCMakeExtension.vcpkg_toolchain_file()}",
         ]
         build_args = []
@@ -115,9 +119,6 @@ class CMakeBuild(build_ext):
         # (needed e.g. to build for ARM OSx on conda-forge)
         if "CMAKE_ARGS" in os.environ:
             cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
-
-        # In this example, we pass in the version to C++. You might not need to.
-        # cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]
 
         if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -176,7 +177,7 @@ class CMakeBuild(build_ext):
         if not os.path.exists(build_temp):
             os.makedirs(build_temp)
 
-        # Needed because target sokoenginepyext is excluded from default build
+        # Avoid building ALL targets
         build_args += ["--", "sokoenginepyext"]
 
         subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=build_temp)

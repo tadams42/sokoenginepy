@@ -10,6 +10,7 @@
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
+using sokoengine::io::CellOrientation;
 using sokoengine::io::Puzzle;
 using std::deque;
 using std::make_unique;
@@ -284,6 +285,11 @@ BoardCell &BoardGraph::operator[](position_t position) {
 }
 
 Tessellation BoardGraph::tessellation() const { return m_impl->m_tessellation; }
+
+CellOrientation BoardGraph::cell_orientation(position_t position) const {
+  return BaseTessellation::instance(m_impl->m_tessellation)
+    .cell_orientation(position, m_impl->m_board_width, m_impl->m_board_height);
+}
 
 string BoardGraph::to_board_str(bool use_visible_floor, bool rle_encode) const {
   Puzzle::unique_ptr_t puzzle = Puzzle::instance_from(
