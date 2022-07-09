@@ -2,7 +2,7 @@
 # Python native extension - sokoenginepyext
 # ..............................................................................
 
-find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+find_package(Python3 COMPONENTS Interpreter Development)
 
 if(Python3_FOUND)
     find_package(
