@@ -1,13 +1,13 @@
 # sokoenginepy - Sokoban and variants
 
 [![version](https://img.shields.io/pypi/v/sokoenginepy.svg)](https://pypi.org/project/sokoenginepy/)
-[![license](https://img.shields.io/pypi/l/sokoenginepy.svg)](https://opensource.org/licenses/GPL-3.0)
 [![python_versions](https://img.shields.io/pypi/pyversions/sokoenginepy.svg)](https://pypi.org/project/sokoenginepy/)
-[![python_implementations](https://img.shields.io/pypi/implementation/sokoenginepy.svg)](https://pypi.org/project/sokoenginepy/)
-[![travis](https://app.travis-ci.com/tadams42/sokoenginepy.svg)](https://app.travis-ci.com/tadams42/sokoenginepy)
+![cpp](https://img.shields.io/badge/C%2B%2B-17-blue)
+![GitHub CI](https://github.com/tadams42/sokoenginepy/actions/workflows/tests.yaml/badge.svg?branch=github_actions)
 [![docs](https://readthedocs.org/projects/sokoenginepy/badge/?style=flat)](http://sokoenginepy.readthedocs.io/en/latest/)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3dd265ede6bd4c38a2cd1250738a1bfa)](https://app.codacy.com/gh/tadams42/sokoenginepy/dashboard)
 [![codecov](https://codecov.io/gh/tadams42/sokoenginepy/branch/development/graph/badge.svg?token=nnJAZHQyz9)](https://codecov.io/gh/tadams42/sokoenginepy)
+[![license](https://img.shields.io/github/license/tadams42/sokoenginepy)](https://opensource.org/licenses/GPL-3.0)
 
 This project implements various utilities for Sokoban:
 
@@ -20,6 +20,12 @@ It provides two implementations:
 
 - `sokoenginepy` - pure Python implementation
 - `libsokoengine` - C++ library
+
+## Documentation
+
+- Tutorial: [Read the Docs - Tutorial](https://sokoenginepy.readthedocs.io/en/latest/tutorial.html)
+- Python docs: [Read the Docs](https://sokoenginepy.readthedocs.io/en/latest/)
+- C++ docs: [libsokoengine Doxygen documentation](http://tadams42.github.io/sokoenginepy/)
 
 ## Example
 
@@ -127,12 +133,6 @@ For more elaborate details, see [INSTALL.md](./INSTALL.md)
 - experimenting with [pybind11]
 - playing with [SokobanYASC] `.sok` file format and providing fully compatible
   implementation for it in both, Python and C++
-
-## Documentation
-
-- Tutorial: [Read the Docs - Tutorial](https://sokoenginepy.readthedocs.io/en/latest/tutorial.html)
-- Python docs: [Read the Docs](https://sokoenginepy.readthedocs.io/en/latest/)
-- C++ docs: [libsokoengine Doxygen documentation](http://tadams42.github.io/sokoenginepy/)
 
 [Boost.Graph]: https://www.boost.org/doc/libs/1_78_0/libs/graph/doc/index.html
 [Boost.X3]: https://www.boost.org/doc/libs/1_79_0/libs/spirit/doc/x3/html/spirit_x3/preface.html
