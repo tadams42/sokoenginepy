@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 (unreleased)
+
+- added: `BoardGraph.cell_orientation()`
+
 ## 1.0.1 (2022-07-08)
 
 - added: `BoardGraph.wall_neighbor_directions()`

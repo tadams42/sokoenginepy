@@ -3,9 +3,7 @@
   "builtin-baseline": "4826ede84084395b0f87476e48ff6d4070eba0e4",
   "version-string": "1.0.0",
   "dependencies": [
-    "cxxopts",
     "fmt",
-    "range-v3",
     "cppitertools",
     "boost-algorithm",
     "boost-bimap",
