@@ -3,6 +3,7 @@
 ## 1.0.2 (unreleased)
 
 - added: `BoardGraph.cell_orientation()`
+- build: optimized Python C++ extension binary size
 
 ## 1.0.1 (2022-07-08)
 
