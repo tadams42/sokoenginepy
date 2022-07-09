@@ -28,13 +28,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: pyproject.toml
+          cache-dependency-path: src/sokoenginepy/game/coordinate_helpers.py
 
       - name: ensure pip and wheel are at latest version
         run: pip install --upgrade pip wheel
 
       - name: install sokoenginepy
-        run: pip -v install .[tests]
+        run: pip -v install -e .[tests]
 
       - name: run tests
         run: pytest
@@ -57,14 +57,14 @@ jobs:
         with:
           vcpkgDirectory: "${{ github.workspace }}/vcpkg"
           vcpkgGitCommitId: "4826ede84084395b0f87476e48ff6d4070eba0e4"
-          appendedCacheKey: pip_build
+          appendedCacheKey: "pip_build_${{ matrix.python-version }}"
 
       - name: set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: pyproject.toml
+          cache-dependency-path: src/sokoenginepy/game/mover.py
 
       - name: ensure pip and wheel are at latest version
         run: pip install --upgrade pip wheel
@@ -72,7 +72,7 @@ jobs:
       - name: install sokoenginepy with C++ extension
         env:
           CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-        run: pip -v install .[tests]
+        run: pip -v install -e .[tests]
 
       - name: run tests
         run: pytest
@@ -94,16 +94,22 @@ jobs:
         with:
           python-version: "3.10"
           cache: 'pip'
-          cache-dependency-path: pyproject.toml
+          cache-dependency-path: src/sokoenginepy/game/pusher_step.py
 
       - name: ensure pip and wheel are at latest version
         run: pip install --upgrade pip wheel
 
       - name: install sokoenginepy
-        run: pip install .[tests]
+        run: pip install -e .[tests]
+
+      - name: generate coverage data
+        run: coverage run -m pytest
+
+      - name: generate coverage xml
+        run: coverage xml
 
       - name: generate coverage report
-        run: pytest --cov=./ --cov-report=xml
+        run: coverage report
 
       - name: upload coverage to codecov.io
         uses: codecov/codecov-action@v3

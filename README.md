@@ -3,7 +3,7 @@
 [![version](https://img.shields.io/pypi/v/sokoenginepy.svg)](https://pypi.org/project/sokoenginepy/)
 [![python_versions](https://img.shields.io/pypi/pyversions/sokoenginepy.svg)](https://pypi.org/project/sokoenginepy/)
 ![cpp](https://img.shields.io/badge/C%2B%2B-17-blue)
-![GitHub CI](https://github.com/tadams42/sokoenginepy/actions/workflows/tests.yaml/badge.svg?branch=github_actions)
+![GitHub CI](https://github.com/tadams42/sokoenginepy/actions/workflows/tests.yaml/badge.svg?branch=development)
 [![docs](https://readthedocs.org/projects/sokoenginepy/badge/?style=flat)](http://sokoenginepy.readthedocs.io/en/latest/)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3dd265ede6bd4c38a2cd1250738a1bfa)](https://app.codacy.com/gh/tadams42/sokoenginepy/dashboard)
 [![codecov](https://codecov.io/gh/tadams42/sokoenginepy/branch/development/graph/badge.svg?token=nnJAZHQyz9)](https://codecov.io/gh/tadams42/sokoenginepy)

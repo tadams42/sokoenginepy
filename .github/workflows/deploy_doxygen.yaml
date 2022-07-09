@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - development
+    paths:
+      - '**.hpp'
+
 
 jobs:
   deploy:
