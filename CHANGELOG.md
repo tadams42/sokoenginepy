@@ -1,6 +1,11 @@
 # Changelog
 
-## 1.0.2 (unreleased)
+## 1.0.3 (2022-07-10)
+
+- maintenance release, switch from TravisCI to GitHub Actions
+- fully automated deployment of C++ docs based on `development` branch
+
+## 1.0.2 (2022-07-09)
 
 - added: `BoardGraph.cell_orientation()`
 - build: optimized Python C++ extension binary size
