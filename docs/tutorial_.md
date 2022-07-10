@@ -323,7 +323,7 @@ snapshot = collection.puzzles[0].snapshots[0]
 # Edit game board, add more boards to collection.puzzles and more solutions to
 # puzzle.snapshots...
 
-collection.save("~/sokoban/collections/some_other_file.sok")
+collection.dump("~/sokoban/collections/some_other_file.sok")
 ```
 
 [SokobanYASC]: (https://sourceforge.net/projects/sokobanyasc/)
