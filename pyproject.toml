@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sokoenginepy"
-version = "1.0.2"
+version = "1.0.3"
 description = "Sokoban and variants game utilities"
 readme = "README.md"
 requires-python = ">=3.9"
