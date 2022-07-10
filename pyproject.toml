@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sokoenginepy"
-version = "1.0.2"
+version = "1.0.3"
 description = "Sokoban and variants game utilities"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -62,6 +62,7 @@ tests = [
     "faker",
     "pytest >= 3.0.0",
     "pytest-spec",
+    "coverage",
 ]
 
 [tool.setuptools]
@@ -102,6 +103,7 @@ addopts = [
     "--ignore=src/sokoenginepyext",
     "--ignore=tests/fixtures/test_cases",
     "--ignore=tmp",
+    "--ignore=vcpkg",
 ]
 python_classes = ["Describe*", "When_*", "describe_*"]
 python_functions = ["it_*", "test_*", "then_*", "when_*"]

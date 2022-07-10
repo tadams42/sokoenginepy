@@ -1,0 +1,42 @@
+name: Deploy Doxygen docs
+
+on:
+  push:
+    branches:
+      - development
+    paths:
+      - '**.hpp'
+
+
+jobs:
+  deploy:
+    name: Build Doxygen and deploy to gh-pages
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    env:
+      SOKOENGINE_ONLY_DOCS: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install build utilities
+        run: sudo apt install -y cmake doxygen graphviz
+
+      - name: configure
+        run: cmake --preset debug
+
+      - name: make
+        working-directory: ./build/debug
+        run: make docs
+
+      - name: deploy
+        uses: peaceiris/actions-gh-pages@v3
+        # If you're changing the branch from main, also change the `main` in
+        # `refs/heads/main` below accordingly.
+        # if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/debug/doxygen/html
+          destination_dir: docs
+          force_orphan: true

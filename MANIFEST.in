@@ -8,6 +8,8 @@ graft src
 graft tests
 prune tmp
 prune src/sokoenginepy.egg-info
+graft .github
+prune vcpkg
 
 prune .vscode
 prune .benchmarks

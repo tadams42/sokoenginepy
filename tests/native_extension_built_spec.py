@@ -111,15 +111,30 @@ def game_members_py_only():
     }
 
 
+def is_CI_cpp_job(job_name):
+    return
+
+
 class DescribeNativeCppExtension:
     def it_is_build_and_loaded_if_environment_required_it(self, is_using_native):
-        building_on_travis = os.environ.get("TRAVIS", None)
+        running_on_ci = (
+            os.environ.get("TRAVIS", None) is not None
+            or os.environ.get("GITHUB_ACTIONS", None) is not None
+        )
 
-        if building_on_travis:
-            job_name = os.environ.get("TRAVIS_JOB_NAME", None)
+        ci_job_name = os.environ.get("TRAVIS_JOB_NAME", None) or os.environ.get(
+            "GITHUB_JOB", None
+        )
 
-            if job_name and "Python with C++" in job_name:
-                assert not is_trueish(os.environ.get("SOKOENGINEPYEXT_SKIP", None))
+        is_CI_cpp_job = ci_job_name and any(
+            ["with C++ extension" in ci_job_name, "with_cpp_extension" in ci_job_name]
+        )
+
+        if running_on_ci:
+            if is_CI_cpp_job:
+                assert not is_trueish(
+                    os.environ.get("SOKOENGINEPYEXT_SKIP", None)
+                ), f"SOKOENGINEPYEXT_SKIP should be false-ish or not set (for job {ci_job_name})"
                 assert is_using_native
 
             else:

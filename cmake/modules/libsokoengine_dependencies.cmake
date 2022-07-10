@@ -1,6 +1,5 @@
 find_program(GIT_FOUND git REQUIRED)
 find_program(GZIP_FOUND gzip REQUIRED)
-find_package(Doxygen COMPONENTS dot OPTIONAL_COMPONENTS mscgen dia)
 
 # cmake --help-module FindBoost
 set(Boost_USE_STATIC_LIBS ON)

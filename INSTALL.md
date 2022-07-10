@@ -56,7 +56,7 @@ make html
 1. Install C++ compiler, `cmake` and `doxygen` (YMMV may vary, depending on your OS):
 
    ```sh
-   sudo apt install git build-essential cmake doxygen
+   sudo apt install git build-essential cmake doxygen graphviz
    ```
 
 2. Install [vcpkg](https://vcpkg.io/) and then:
