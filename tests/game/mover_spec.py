@@ -12,14 +12,15 @@ from sokoenginepy.game import (
     NonPlayableBoardError,
     PusherStep,
     SolvingMode,
+    Tessellation,
     index_1d,
 )
-from sokoenginepy.io import SokobanPuzzle
+from sokoenginepy.io import Puzzle
 
 
 @pytest.fixture
 def non_playable_board():
-    return BoardGraph(SokobanPuzzle(5, 5))
+    return BoardGraph(Puzzle(Tessellation.SOKOBAN, 5, 5))
 
 
 @pytest.fixture
@@ -39,7 +40,7 @@ def forward_board():
             "#########",  # 4
         ]
     )
-    return BoardGraph(SokobanPuzzle(board=data))
+    return BoardGraph(Puzzle(Tessellation.SOKOBAN, board=data))
 
 
 @pytest.fixture
@@ -54,7 +55,7 @@ def reverse_board():
             "#########",  # 4
         ]
     )
-    return BoardGraph(SokobanPuzzle(board=data))
+    return BoardGraph(Puzzle(Tessellation.SOKOBAN, board=data))
 
 
 @pytest.fixture
@@ -349,7 +350,8 @@ class DescribeMover:
     class DescribeForwardMovement:
         def it_forward_moves_pusher_in_requested_direction(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -359,7 +361,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(3, 2, board.board_width)
@@ -378,7 +380,8 @@ class DescribeMover:
 
         def when_forward_moving_pusher_doesnt_pull_box_behind_it(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -388,7 +391,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(3, 2, board.board_width)
@@ -407,7 +410,8 @@ class DescribeMover:
 
         def it_refuses_to_forward_move_pusher_into_obstacles_or_off_board(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -417,7 +421,7 @@ class DescribeMover:
                             "@       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(0, 2, board.board_width)
@@ -435,7 +439,8 @@ class DescribeMover:
 
         def it_undoes_forward_move(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -445,7 +450,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(3, 2, board.board_width)
@@ -465,7 +470,8 @@ class DescribeMover:
 
         def when_undoing_forward_move_doesnt_pull_box_from_behind_pusher(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -475,7 +481,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(3, 2, board.board_width)
@@ -498,7 +504,8 @@ class DescribeMover:
             self,
         ):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -508,7 +515,7 @@ class DescribeMover:
                             "@       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(0, 2, board.board_width)
@@ -534,7 +541,8 @@ class DescribeMover:
 
         def it_pushes_box_in_front_of_pusher(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -544,7 +552,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             box_src = index_1d(5, 2, board.board_width)
@@ -571,7 +579,8 @@ class DescribeMover:
 
         def when_pushing_box_doesnt_pull_box_from_behind_pusher(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -581,7 +590,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             box_src = index_1d(5, 2, board.board_width)
@@ -609,7 +618,8 @@ class DescribeMover:
 
         def it_refuses_to_push_box_into_obstacles_or_off_board(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -619,7 +629,7 @@ class DescribeMover:
                             "#... @  #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             pusher_src = index_1d(5, 1, board.board_width)
@@ -647,7 +657,8 @@ class DescribeMover:
 
         def it_undoes_push(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -657,7 +668,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             box_src = index_1d(5, 2, board.board_width)
@@ -687,7 +698,8 @@ class DescribeMover:
 
         def it_refuses_to_undo_push_moving_pusher_into_obstacles_or_off_board(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -697,7 +709,7 @@ class DescribeMover:
                             "$    $..#",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             pusher_src = index_1d(0, 2, board.board_width)
@@ -771,7 +783,8 @@ class DescribeMover:
 
         def it_refuses_to_undo_push_if_there_is_no_box_behind_pusher(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -781,7 +794,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             mover = Mover(board)
@@ -800,7 +813,8 @@ class DescribeMover:
     class DescribeReverseMovement:
         def it_moves_pusher_in_requested_direction(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -810,7 +824,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(3, 2, board.board_width)
@@ -829,7 +843,8 @@ class DescribeMover:
 
         def when_reverse_moving_it_doesnt_pull_box_behind_pusher(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -839,7 +854,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(3, 2, board.board_width)
@@ -859,7 +874,8 @@ class DescribeMover:
 
         def it_refuses_to_reverse_move_pusher_into_obstacles_or_off_board(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -869,7 +885,7 @@ class DescribeMover:
                             "@       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(0, 2, board.board_width)
@@ -892,7 +908,8 @@ class DescribeMover:
 
         def it_undoes_reverse_move(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -902,7 +919,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             src = index_1d(3, 2, board.board_width)
@@ -933,7 +950,7 @@ class DescribeMover:
             )
 
             # pulls_boxes == False
-            board = BoardGraph(SokobanPuzzle(board=board_str))
+            board = BoardGraph(Puzzle(Tessellation.SOKOBAN, board=board_str))
             src = index_1d(3, 2, board.board_width)
             dest = index_1d(2, 2, board.board_width)
             selected_pusher = Config.DEFAULT_ID + 1
@@ -953,7 +970,7 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == Config.NO_ID
 
             # pulls_boxes == True
-            board = BoardGraph(SokobanPuzzle(board=board_str))
+            board = BoardGraph(Puzzle(Tessellation.SOKOBAN, board=board_str))
             src = index_1d(3, 2, board.board_width)
             dest = index_1d(2, 2, board.board_width)
             selected_pusher = Config.DEFAULT_ID + 1
@@ -974,7 +991,8 @@ class DescribeMover:
 
         def it_pulls_box_behind_pusher_if_pulls_boxes_is_set(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -984,7 +1002,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             pusher_src = index_1d(3, 2, board.board_width)
@@ -1014,7 +1032,8 @@ class DescribeMover:
             self,
         ):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -1024,7 +1043,7 @@ class DescribeMover:
                             ".  $  .$#",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             pusher_src = index_1d(3, 2, board.board_width)
@@ -1054,7 +1073,8 @@ class DescribeMover:
 
         def it_undoes_pull(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -1064,7 +1084,7 @@ class DescribeMover:
                             "#       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             pusher_src = index_1d(3, 2, board.board_width)
@@ -1105,7 +1125,7 @@ class DescribeMover:
             )
 
             # pulls_boxes == False
-            board = BoardGraph(SokobanPuzzle(board=board_str))
+            board = BoardGraph(Puzzle(Tessellation.SOKOBAN, board=board_str))
             pusher_src = index_1d(3, 2, board.board_width)
             pusher_dest = index_1d(4, 2, board.board_width)
             box_src = pusher_dest
@@ -1136,7 +1156,7 @@ class DescribeMover:
             assert mover.last_move[0].moved_box_id == Config.DEFAULT_ID + 1
 
             # pulls_boxes == True
-            board = BoardGraph(SokobanPuzzle(board=board_str))
+            board = BoardGraph(Puzzle(Tessellation.SOKOBAN, board=board_str))
             pusher_src = index_1d(3, 2, board.board_width)
             pusher_dest = index_1d(4, 2, board.board_width)
             box_src = pusher_dest
@@ -1168,7 +1188,8 @@ class DescribeMover:
 
         def it_refuses_to_undo_pull_moving_into_obstacles_or_off_board(self):
             board = BoardGraph(
-                SokobanPuzzle(
+                Puzzle(
+                    Tessellation.SOKOBAN,
                     board="\n".join(
                         [
                             # 12345678
@@ -1178,7 +1199,7 @@ class DescribeMover:
                             ".       #",  # 3
                             "#########",  # 4
                         ]
-                    )
+                    ),
                 )
             )
             mover = Mover(board, SolvingMode.REVERSE)

@@ -3,7 +3,8 @@ import os
 
 import pytest
 
-from sokoenginepy.io import HexobanPuzzle
+from sokoenginepy.game import Tessellation
+from sokoenginepy.io import Puzzle
 
 
 @pytest.fixture(scope="session")
@@ -19,13 +20,13 @@ def tests_data(resources_root):
 class DescribeHexobanPuzzle:
     def it_raises_on_illegal_scheme(self, tests_data):
         board = "\n".join(tests_data["illegal_scheme1"])
-        puzzle = HexobanPuzzle(board=board)
+        puzzle = Puzzle(Tessellation.HEXOBAN, board=board)
         with pytest.raises(ValueError):
             # Trigger parsing
             puzzle.width
 
         board = "\n".join(tests_data["illegal_scheme2"])
-        puzzle = HexobanPuzzle(board=board)
+        puzzle = Puzzle(Tessellation.HEXOBAN, board=board)
         with pytest.raises(ValueError):
             # Trigger parsing
             puzzle.width
@@ -41,9 +42,9 @@ class DescribeHexobanPuzzle:
 
                 raised = False
                 try:
-                    in_puzzle = HexobanPuzzle(board=src)
+                    in_puzzle = Puzzle(Tessellation.HEXOBAN, board=src)
                     in_puzzle.width
-                    out_puzzle = HexobanPuzzle(board=parsed)
+                    out_puzzle = Puzzle(Tessellation.HEXOBAN, board=parsed)
                     out_puzzle.width
                 except ValueError:
                     raised = True
@@ -70,9 +71,9 @@ class DescribeHexobanPuzzle:
 
                 raised = False
                 try:
-                    in_puzzle = HexobanPuzzle(board=src)
+                    in_puzzle = Puzzle(Tessellation.HEXOBAN, board=src)
                     in_puzzle.width
-                    out_puzzle = HexobanPuzzle(board=parsed)
+                    out_puzzle = Puzzle(Tessellation.HEXOBAN, board=parsed)
                     out_puzzle.width
                 except ValueError:
                     raised = True
@@ -100,7 +101,7 @@ class DescribeHexobanPuzzle:
 
                 raised = False
                 try:
-                    puzzle = HexobanPuzzle(board=board)
+                    puzzle = Puzzle(Tessellation.HEXOBAN, board=board)
                     getattr(puzzle, method_name)()
                 except ValueError:
                     raised = True
@@ -121,7 +122,7 @@ class DescribeHexobanPuzzle:
 
                 raised = False
                 try:
-                    puzzle = HexobanPuzzle(board=board)
+                    puzzle = Puzzle(Tessellation.HEXOBAN, board=board)
                     puzzle.width
                     getattr(puzzle, method_name)()
                 except ValueError:
@@ -134,7 +135,7 @@ class DescribeHexobanPuzzle:
 
         def test_resizes_board_to_bigger(self, tests_data):
             board = "\n".join(tests_data[_PARSING_SCHEMES_KEY]["scheme1_type1"]["src"])
-            puzzle = HexobanPuzzle(board=board)
+            puzzle = Puzzle(Tessellation.HEXOBAN, board=board)
             old_width = puzzle.width
             old_height = puzzle.height
             puzzle.resize(puzzle.width + 5, puzzle.height + 5)
@@ -143,7 +144,7 @@ class DescribeHexobanPuzzle:
 
         def test_resizes_board_to_smaller(self, tests_data):
             board = "\n".join(tests_data[_PARSING_SCHEMES_KEY]["scheme1_type1"]["src"])
-            puzzle = HexobanPuzzle(board=board)
+            puzzle = Puzzle(Tessellation.HEXOBAN, board=board)
             old_height = puzzle.height
             puzzle.resize(puzzle.width - 3, puzzle.height - 3)
             assert puzzle.width == 7

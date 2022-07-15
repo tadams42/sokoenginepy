@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-using sokoengine::game::BaseTessellation;
+using sokoengine::game::implementation::BaseTessellation;
 using std::string;
 
 namespace sokoengine {

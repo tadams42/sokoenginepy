@@ -9,6 +9,7 @@ using std::string;
 
 namespace sokoengine {
 namespace game {
+namespace implementation {
 
 const Directions &OctobanTessellation::legal_directions() const {
   static const Directions retv = {
@@ -170,5 +171,6 @@ CellOrientation OctobanTessellation::cell_orientation(
                                          : CellOrientation::DEFAULT;
 }
 
+} // namespace implementation
 } // namespace game
 } // namespace sokoengine

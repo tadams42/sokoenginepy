@@ -8,20 +8,23 @@
 namespace sokoengine {
 namespace io {
 
-namespace implementation {
-class PuzzleResizer;
-class PuzzleParser;
-class PuzzlePrinter;
-} // namespace implementation
+class Snapshot;
 
 ///
-/// Base class for game puzzles.
+/// Default type for sequence of Snapshot
 ///
-/// Game puzzle is representation of game board together with all of its meta data and
-/// snapshots. It implements:
+typedef std::vector<Snapshot> Snapshots;
+
+///
+/// Game board and accompanying metadata.
+///
+/// Puzzle is parametrized by game::Tessellation.
+///
+/// It implements:
 ///
 /// - parsing board data from text
 /// - editing board: setting individual cells, resizing, trimming, ...
+/// - editing board metadata
 ///
 /// All positions used are 1D array indexes.
 ///
@@ -89,17 +92,24 @@ public:
   static bool is_board(const std::string &line);
   static bool is_sokoban_plus(const std::string &line);
 
-  virtual ~Puzzle();
-
-  typedef std::unique_ptr<Puzzle> unique_ptr_t;
-
-  static unique_ptr_t instance_from(
-    game::Tessellation tessellation, board_size_t width, board_size_t height
+  ///
+  /// @param width number of columns
+  /// @param height number of rows
+  ///
+  Puzzle(
+    const game::Tessellation &tessellation,
+    board_size_t              width  = 0,
+    board_size_t              height = 0
   );
-  static unique_ptr_t
-  instance_from(game::Tessellation tessellation, const std::string &board);
-
-  virtual unique_ptr_t clone() const = 0;
+  ///
+  /// @param board game board in textual representation.
+  ///
+  Puzzle(const game::Tessellation &tessellation, const std::string &board = "");
+  Puzzle(const Puzzle &rv);
+  Puzzle &operator=(const Puzzle &rv);
+  Puzzle(Puzzle &&rv);
+  Puzzle &operator=(Puzzle &&rv);
+  virtual ~Puzzle();
 
   const std::string &title() const;
   std::string       &title();
@@ -124,6 +134,16 @@ public:
 
   std::string str() const;
   std::string repr() const;
+
+  ///
+  /// Collection of Snapshot related to this puzzle.
+  ///
+  const Snapshots &snapshots() const;
+
+  ///
+  /// Collection of Snapshot related to this puzzle.
+  ///
+  Snapshots &snapshots();
 
   ///
   /// Formatted output of parsed and validated board.
@@ -172,31 +192,14 @@ public:
   void resize_and_center(board_size_t new_width, board_size_t new_height);
   void trim();
 
-protected:
-  Puzzle(
-    const game::Tessellation            &tessellation,
-    const implementation::PuzzleResizer &resizer,
-    const implementation::PuzzleParser  &parser,
-    const implementation::PuzzlePrinter &printer,
-    board_size_t                         width  = 0,
-    board_size_t                         height = 0
-  );
-  Puzzle(
-    const game::Tessellation            &tessellation,
-    const implementation::PuzzleResizer &resizer,
-    const implementation::PuzzleParser  &parser,
-    const implementation::PuzzlePrinter &printer,
-    const std::string                   &board = ""
-  );
-  Puzzle(const Puzzle &rv);
-  Puzzle &operator=(const Puzzle &rv);
-  Puzzle(Puzzle &&rv);
-  Puzzle &operator=(Puzzle &&rv);
-
 private:
   class PIMPL;
   std::unique_ptr<PIMPL> m_impl;
 };
+
+namespace implementation {
+LIBSOKOENGINE_LOCAL std::string to_str(game::Tessellation tessellation);
+} // namespace implementation
 
 } // namespace io
 } // namespace sokoengine

@@ -6,7 +6,8 @@ from .rle import Rle
 from .utilities import contains_only_digits_and_spaces, is_blank
 
 if TYPE_CHECKING:
-    from ..game import BaseTessellation, PusherStep, Tessellation
+    from ..game import PusherStep, Tessellation
+    from ..game.base_tessellation import BaseTessellation
     from .snapshot_parsing import MovementTokens
 
 
@@ -131,7 +132,10 @@ class Snapshot:
 
     def __repr__(self):
         klass = self.__class__.__name__
-        return f'{klass}(moves_data="{self.to_str(rle_encode=False)}")'
+        return (
+            f"{klass}(Tessellation.{self._tessellation.name.upper()}, "
+            f'moves_data="{self.to_str(rle_encode=False)}")'
+        )
 
     @property
     def tessellation(self) -> Tessellation:
@@ -139,7 +143,7 @@ class Snapshot:
 
     @property
     def _tessellation_obj(self):
-        from ..game import BaseTessellation
+        from ..game.base_tessellation import BaseTessellation
 
         if self._tessellation_obj_val is None:
             self._tessellation_obj_val = BaseTessellation.instance(self._tessellation)

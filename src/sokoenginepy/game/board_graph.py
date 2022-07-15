@@ -113,9 +113,7 @@ class BoardGraph:
         )
 
     def to_board_str(self, use_visible_floor=False, rle_encode=False) -> str:
-        puzzle = Puzzle.instance_from(
-            self._tessellation, self._board_width, self._board_height
-        )
+        puzzle = Puzzle(self._tessellation, self._board_width, self._board_height)
 
         for pos in range(self._vertices_count):
             puzzle[pos] = self[pos].to_str()

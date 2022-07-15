@@ -10,26 +10,6 @@ from .utilities import inverted
 
 
 class TriobanTessellation(BaseTessellation):
-    """
-    Tessellation for Trioban game variant.
-
-    Board is laid out on alternating triangles with origin triangle pointing down.
-
-    Direction <-> character mapping:
-
-    ====  =====  ==========  ==========  ==========  ==========
-    LEFT  RIGHT  NORTH_EAST  NORTH_WEST  SOUTH_EAST  SOUTH_WEST
-    ====  =====  ==========  ==========  ==========  ==========
-    l, L  r, R   n, N        u, U        d, D        s, S
-    ====  =====  ==========  ==========  ==========  ==========
-
-    Depending on pusher position, not all move directions are allowed on all board
-    positions:
-
-    .. image:: /images/trioban_am.png
-        :alt: Trioban movement
-    """
-
     _LEGAL_DIRECTIONS: Final[Tuple[Direction, ...]] = (
         Direction.LEFT,
         Direction.RIGHT,

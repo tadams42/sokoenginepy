@@ -10,6 +10,7 @@
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
+using sokoengine::game::implementation::BaseTessellation;
 using sokoengine::io::CellOrientation;
 using sokoengine::io::Puzzle;
 using std::deque;
@@ -255,11 +256,9 @@ BoardGraph &BoardGraph::operator=(const BoardGraph &rv) {
   return *this;
 }
 
-BoardGraph::BoardGraph(BoardGraph &&) = default;
-
+BoardGraph::BoardGraph(BoardGraph &&)            = default;
 BoardGraph &BoardGraph::operator=(BoardGraph &&) = default;
-
-BoardGraph::~BoardGraph() = default;
+BoardGraph::~BoardGraph()                        = default;
 
 const BoardCell &BoardGraph::cell_at(position_t position) const {
   return const_cast<BoardGraph *>(this)->cell_at(position);
@@ -292,15 +291,13 @@ CellOrientation BoardGraph::cell_orientation(position_t position) const {
 }
 
 string BoardGraph::to_board_str(bool use_visible_floor, bool rle_encode) const {
-  Puzzle::unique_ptr_t puzzle = Puzzle::instance_from(
-    m_impl->m_tessellation, m_impl->m_board_width, m_impl->m_board_height
-  );
+  Puzzle puzzle(m_impl->m_tessellation, m_impl->m_board_width, m_impl->m_board_height);
 
   for (position_t pos = 0; pos < size(); pos++) {
-    puzzle->set(pos, (*this)[pos].str());
+    puzzle.set(pos, (*this)[pos].str());
   }
 
-  return puzzle->to_board_str(use_visible_floor, rle_encode);
+  return puzzle.to_board_str(use_visible_floor, rle_encode);
 }
 
 string BoardGraph::str() const { return to_board_str(false); }

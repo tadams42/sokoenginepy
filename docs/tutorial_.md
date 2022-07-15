@@ -10,19 +10,19 @@ These differ by plane tessellation on which game board is laid out:
 - Trioban boards consist of adjacent triangles
 - Octoban boards consist of interchanging octagons and squares
 
-For each game tessellation there is :
+All types in `sokoenginepy` are parametrized by their `Tessellation`. For example,
+class `Puzzle` is instantiated like this:
 
-- a class that implements tessellation speciffics (ie. `SokobanTessellation`,
-  `HexobanTesselation`, etc...)
-- a class that implements puzzle (ie. `SokobanPuzzle`, `HexobanPuzzle`, etc...)
-- a class that implements snapshot (ie. `SokobanSnapshot`, `HexobanSnapshot`, etc...)
+```python
+>>> from sokoenginepy.io import Puzzle
+>>> from sokoenginepy.game import Tessellation
+>>>
+>>> puzzle = Puzzle(Tessellation.SOKOBAN, 20, 30)
 
-Tessellation class determines available moves for game pieces in . In general there are
-8 supported movement directions: left, right, up, down, north west, north east, south
-west and south east. Not all tessellations support all directions and some directions
-have different meaning in different tessellations.
+```
 
-All this is abstracted by before mentioned `Puzzle` and `Snapshot` classes.
+Depending on chosen `Tessellation` game engine selects available move directions for
+game pieces, calculates neighboring positions, etc...
 
 ## Game puzzle
 
@@ -30,7 +30,6 @@ Game puzzle can be instantiated like this:
 
 ```python
 >>> import textwrap
->>> from sokoenginepy.io import SokobanPuzzle
 >>> data = """
 ...         #####
 ...         #  @#
@@ -45,9 +44,9 @@ Game puzzle can be instantiated like this:
 ...         #######
 ... """
 >>> data = textwrap.dedent(data.lstrip("\n").rstrip())
->>> puzzle = SokobanPuzzle(board=data)
+>>> puzzle = Puzzle(Tessellation.SOKOBAN, board=data)
 >>> print(repr(puzzle))
-SokobanPuzzle(board='\n'.join([
+Puzzle(Tessellation.SOKOBAN, board='\n'.join([
     '----#####----------',
     '----#--@#----------',
     '----#$--#----------',
@@ -67,8 +66,6 @@ or for `Hexoban`:
 
 ```python
 >>> import textwrap
->>> from sokoenginepy.io import HexobanPuzzle
->>>
 >>> data = """
 ...     ---#-#-#-#----------
 ...     --#-------#---------
@@ -79,9 +76,9 @@ or for `Hexoban`:
 ...     ---#-#-#-#-#-#-#-#--
 ... """
 >>> data = textwrap.dedent(data.lstrip("\n").rstrip())
->>> hexoban_puzzle = HexobanPuzzle(board=data)
+>>> hexoban_puzzle = Puzzle(Tessellation.HEXOBAN, board=data)
 >>> print(repr(hexoban_puzzle))
-HexobanPuzzle(board='\n'.join([
+Puzzle(Tessellation.HEXOBAN, board='\n'.join([
     '---#-#-#-#----------',
     '--#-------#---------',
     '-#-@-----#----------',
@@ -173,7 +170,7 @@ And to play in reverse mode:
 
 ```python
 >>> # reverse solving mode
->>> puzzle2 = SokobanPuzzle(board=textwrap.dedent("""
+>>> puzzle2 = Puzzle(Tessellation.SOKOBAN, board=textwrap.dedent("""
 ...         #####
 ...         #  @#
 ...         #$  #

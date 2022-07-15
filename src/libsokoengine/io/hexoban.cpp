@@ -1,5 +1,6 @@
 #include "hexoban.hpp"
 
+#include "puzzle.hpp"
 #include "puzzle_parsing.hpp"
 #include "rle.hpp"
 
@@ -61,107 +62,20 @@ public:
   ) const override;
 };
 
-LIBSOKOENGINE_LOCAL const HexobanPuzzleResizer &hb_static_resizer() {
+const PuzzleResizer &Hexoban::resizer() {
   static const HexobanPuzzleResizer the_one;
   return the_one;
 }
 
-LIBSOKOENGINE_LOCAL const HexobanPuzzleParser &hb_static_parser() {
+const PuzzleParser &Hexoban::parser() {
   static const HexobanPuzzleParser the_one;
   return the_one;
 }
 
-LIBSOKOENGINE_LOCAL const HexobanPuzzlePrinter &hb_static_printer() {
-  static const implementation::HexobanPuzzlePrinter the_one;
+const PuzzlePrinter &Hexoban::printer() {
+  static const HexobanPuzzlePrinter the_one;
   return the_one;
 }
-
-} // namespace implementation
-
-class LIBSOKOENGINE_LOCAL HexobanPuzzle::PIMPL {
-public:
-  Snapshots m_snapshots;
-};
-
-HexobanPuzzle::HexobanPuzzle()
-  : HexobanPuzzle(0, 0) {}
-
-HexobanPuzzle::HexobanPuzzle(board_size_t width, board_size_t height)
-  : Puzzle(
-    Tessellation::HEXOBAN,
-    implementation::hb_static_resizer(),
-    implementation::hb_static_parser(),
-    implementation::hb_static_printer(),
-    width,
-    height
-  )
-  , m_impl(make_unique<PIMPL>()) {}
-
-HexobanPuzzle::HexobanPuzzle(const string &src)
-  : Puzzle(
-    Tessellation::HEXOBAN,
-    implementation::hb_static_resizer(),
-    implementation::hb_static_parser(),
-    implementation::hb_static_printer(),
-    src
-  )
-  , m_impl(make_unique<PIMPL>()) {}
-
-HexobanPuzzle::HexobanPuzzle(const HexobanPuzzle &rv)
-  : Puzzle(rv)
-  , m_impl(make_unique<PIMPL>(*rv.m_impl)) {}
-
-HexobanPuzzle &HexobanPuzzle::operator=(const HexobanPuzzle &rv) {
-  if (this != &rv) {
-    Puzzle::operator=(rv);
-    m_impl = make_unique<PIMPL>(*rv.m_impl);
-  }
-  return *this;
-}
-
-HexobanPuzzle::HexobanPuzzle(HexobanPuzzle &&rv) = default;
-
-HexobanPuzzle &HexobanPuzzle::operator=(HexobanPuzzle &&rv) = default;
-
-HexobanPuzzle::~HexobanPuzzle() = default;
-
-HexobanPuzzle::unique_ptr_t HexobanPuzzle::clone() const {
-  return make_unique<HexobanPuzzle>(*this);
-}
-
-const HexobanPuzzle::Snapshots &HexobanPuzzle::snapshots() const {
-  return m_impl->m_snapshots;
-}
-
-HexobanPuzzle::Snapshots &HexobanPuzzle::snapshots() { return m_impl->m_snapshots; }
-
-HexobanSnapshot::HexobanSnapshot()
-  : Snapshot(Tessellation::HEXOBAN, "") {}
-
-HexobanSnapshot::HexobanSnapshot(const string &moves_data)
-  : Snapshot(Tessellation::HEXOBAN, moves_data) {}
-
-HexobanSnapshot::HexobanSnapshot(const HexobanSnapshot &rv)
-  : Snapshot(rv) {}
-
-HexobanSnapshot &HexobanSnapshot::operator=(const HexobanSnapshot &rv) {
-  if (this != &rv) {
-    Snapshot::operator=(rv);
-  }
-  return *this;
-}
-
-HexobanSnapshot::HexobanSnapshot(HexobanSnapshot &&) = default;
-
-HexobanSnapshot &HexobanSnapshot::operator=(HexobanSnapshot &&) = default;
-
-HexobanSnapshot::~HexobanSnapshot() = default;
-
-HexobanSnapshot::unique_ptr_t HexobanSnapshot::clone() const {
-  return make_unique<HexobanSnapshot>(*this);
-}
-
-namespace implementation {
 
 class LIBSOKOENGINE_LOCAL HexobanTextConverter {
   typedef tuple<Strings, board_size_t, board_size_t, int8_t, int8_t> preparse_results_t;

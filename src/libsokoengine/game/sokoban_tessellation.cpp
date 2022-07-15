@@ -11,8 +11,7 @@ using std::string;
 
 namespace sokoengine {
 namespace game {
-
-using implementation::direction_str;
+namespace implementation {
 
 const Directions &SokobanTessellation::legal_directions() const {
   static const Directions retv = {
@@ -97,5 +96,6 @@ PusherStep SokobanTessellation::char_to_pusher_step(char rv) const {
   }
 }
 
+} // namespace implementation
 } // namespace game
 } // namespace sokoengine

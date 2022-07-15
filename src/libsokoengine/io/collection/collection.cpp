@@ -1,10 +1,6 @@
 #include "collection.hpp"
 
-#include "hexoban.hpp"
-#include "octoban.hpp"
-#include "sokoban.hpp"
-#include "trioban.hpp"
-
+#include "puzzle.hpp"
 #include "sok_file_format.hpp"
 
 #include <boost/algorithm/string.hpp>

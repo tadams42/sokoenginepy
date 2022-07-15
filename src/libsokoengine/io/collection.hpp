@@ -9,18 +9,12 @@
 namespace sokoengine {
 namespace io {
 
-class SokobanPuzzle;
-class HexobanPuzzle;
-class TriobanPuzzle;
-class OctobanPuzzle;
-
-typedef std::variant<SokobanPuzzle, HexobanPuzzle, TriobanPuzzle, OctobanPuzzle>
-  AnyPuzzle;
+class Puzzle;
 
 ///
 /// Default type for sequence of Puzzle
 ///
-typedef std::vector<AnyPuzzle> Puzzles;
+typedef std::vector<Puzzle> Puzzles;
 
 ///
 /// Collection of one or more game puzzles.

@@ -3,8 +3,8 @@ from copy import deepcopy
 
 import pytest
 
-from sokoenginepy.game import BoardGraph, Config, HashedBoardManager
-from sokoenginepy.io import SokobanPuzzle
+from sokoenginepy.game import BoardGraph, Config, HashedBoardManager, Tessellation
+from sokoenginepy.io import Puzzle
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def puzzle():
         ----#######--------
     """
     data = textwrap.dedent(data)
-    return SokobanPuzzle(board=data)
+    return Puzzle(Tessellation.SOKOBAN, board=data)
 
 
 @pytest.fixture

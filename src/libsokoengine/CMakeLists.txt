@@ -19,6 +19,16 @@ set(PRIVATE_HEADERS
     io/snapshot/parser.hpp
 
     io/puzzle_parsing.hpp
+
+    game/hexoban_tessellation.hpp
+    game/octoban_tessellation.hpp
+    game/sokoban_tessellation.hpp
+    game/trioban_tessellation.hpp
+
+    io/sokoban.hpp
+    io/trioban.hpp
+    io/hexoban.hpp
+    io/octoban.hpp
 )
 
 set(INSTALL_HEADERS
@@ -35,19 +45,10 @@ set(INSTALL_HEADERS
     game/pusher_step.hpp
     game/sokoban_plus.hpp
     game/tessellation.hpp
-    game/hexoban_tessellation.hpp
-    game/octoban_tessellation.hpp
-    game/sokoban_tessellation.hpp
-    game/trioban_tessellation.hpp
 
     io/collection.hpp
-    io/hexoban.hpp
-    io/octoban.hpp
     io/puzzle.hpp
     io/rle.hpp
-    io/snapshot.hpp
-    io/sokoban.hpp
-    io/trioban.hpp
 )
 
 set(SELF_SOURCES

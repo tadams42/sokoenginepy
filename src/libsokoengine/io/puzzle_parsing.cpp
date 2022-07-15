@@ -6,9 +6,9 @@
 
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::game::BaseTessellation;
 using sokoengine::game::index_1d;
 using sokoengine::game::Tessellation;
+using sokoengine::game::implementation::BaseTessellation;
 using sokoengine::implementation::Strings;
 using std::string;
 

@@ -12,17 +12,9 @@
 #include "mover.hpp"
 #include "pusher_step.hpp"
 
-#include "hexoban_tessellation.hpp"
-#include "octoban_tessellation.hpp"
-#include "sokoban_tessellation.hpp"
-#include "trioban_tessellation.hpp"
-
-#include "hexoban.hpp"
-#include "octoban.hpp"
-#include "sokoban.hpp"
-#include "trioban.hpp"
-
 #include "collection.hpp"
+#include "puzzle.hpp"
+#include "snapshot.hpp"
 
 #include "benchmarks.hpp"
 

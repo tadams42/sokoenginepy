@@ -9,8 +9,7 @@ using std::string;
 
 namespace sokoengine {
 namespace game {
-
-using implementation::direction_str;
+namespace implementation {
 
 const Directions &TriobanTessellation::legal_directions() const {
   static const Directions retv{
@@ -168,5 +167,6 @@ CellOrientation TriobanTessellation::cell_orientation(
 
 GraphType TriobanTessellation::graph_type() const { return GraphType::DIRECTED_MULTI; }
 
+} // namespace implementation
 } // namespace game
 } // namespace sokoengine

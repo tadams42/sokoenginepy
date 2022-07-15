@@ -18,20 +18,83 @@ if TYPE_CHECKING:
 class Tessellation(enum.Enum):
     """Supported game tessellations."""
 
-    #: See Also:
-    #      :class:`.SokobanTessellation`
+    #: Tessellation for Sokoban game variant.
+    #:
+    #: Board is laid out on squares.
+    #:
+    #: Direction <-> character mapping:
+    #:
+    #: ====  =====  ====  ====
+    #: LEFT  RIGHT  UP    DOWN
+    #: ====  =====  ====  ====
+    #: l, L  r, R   u, U  d, D
+    #: ====  =====  ====  ====
     SOKOBAN = 0
 
-    #: See Also:
-    #      :class:`.HexobanTessellation`
+    #: Tessellation for Hexoban game variant.
+    #:
+    #: Board space is laid out on vertical hexagons with following coordinate system:
+    #:
+    #: .. image:: /images/hexoban_coordinates.png
+    #:    :alt: Hexoban coordinates
+    #:
+    #: Textual representation uses two characters for each hexagon. This allows different
+    #: encoding schemes.
+    #:
+    #: .. |img1| image:: /images/hexoban_scheme1.png
+    #: .. |img2| image:: /images/hexoban_scheme2.png
+    #:
+    #: +----------+----------+
+    #: | Scheme 1 | Scheme 2 |
+    #: +==========+==========+
+    #: |  |img1|  |  |img2|  |
+    #: +----------+----------+
+    #:
+    #: As long as encoding of single board is consistent, all methods handle any scheme
+    #: transparently - parsing of board strings 'Just Works (TM)'
+    #:
+    #: Direction <-> character mapping:
+    #:
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #: LEFT  RIGHT  NORTH_WEST  SOUTH_WEST  NORTH_EAST  SOUTH_EAST
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #: l, L  r, R   u, U        d, D        n, N        s, S
+    #: ====  =====  ==========  ==========  ==========  ==========
     HEXOBAN = 1
 
-    #: See Also:
-    #      :class:`.TriobanTessellation`
+    #: Tessellation for Trioban game variant.
+    #:
+    #: Board is laid out on alternating triangles with origin triangle pointing down.
+    #:
+    #: Direction <-> character mapping:
+    #:
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #: LEFT  RIGHT  NORTH_EAST  NORTH_WEST  SOUTH_EAST  SOUTH_WEST
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #: l, L  r, R   n, N        u, U        d, D        s, S
+    #: ====  =====  ==========  ==========  ==========  ==========
+    #:
+    #: Depending on pusher position, not all move directions are allowed on all board
+    #: positions:
+    #:
+    #: .. image:: /images/trioban_am.png
+    #:     :alt: Trioban movement
     TRIOBAN = 2
 
-    #: See Also:
-    #      :class:`.OctobanTessellation`
+    #: Tessellation for Octoban game variant.
+    #:
+    #: Board space is laid out on alternating squares and octagons with origin of
+    #: coordinate system being octagon. Tessellation allows all 8 directions of movement
+    #: from Direction and depending on current pusher position some of these directions do
+    #: not result in successful move.
+    #:
+    #: Direction <-> character mapping:
+    #:
+    #: ====  ==========  =====  ==========  ====  ==========  ====  ==========
+    #: UP    NORTH_EAST  RIGHT  SOUTH_EAST  DOWN  SOUTH_WEST  LEFT  NORTH_WEST
+    #: ====  ==========  =====  ==========  ====  ==========  ====  ==========
+    #: u, U  n, N        r, R   e, E        d, D  s, S        l, L  w, W
+    #: ====  ==========  =====  ==========  ====  ==========  ====  ==========
     OCTOBAN = 3
 
 

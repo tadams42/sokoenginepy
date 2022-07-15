@@ -13,7 +13,7 @@ from sokoenginepy.game import (
     Tessellation,
     index_1d,
 )
-from sokoenginepy.io import CellOrientation, Puzzle, SokobanPuzzle, TriobanPuzzle
+from sokoenginepy.io import CellOrientation, Puzzle
 
 
 @pytest.fixture
@@ -32,7 +32,7 @@ def puzzle():
             #######
     """
     data = textwrap.dedent(data)
-    return SokobanPuzzle(board=data)
+    return Puzzle(Tessellation.SOKOBAN, board=data)
 
 
 @pytest.fixture
@@ -51,7 +51,7 @@ def solved_puzzle():
             #######
     """
     data = textwrap.dedent(data)
-    return SokobanPuzzle(board=data)
+    return Puzzle(Tessellation.SOKOBAN, board=data)
 
 
 @pytest.fixture
@@ -89,7 +89,7 @@ def _sorted(edges: List[Edge]):
 class DescribeBoardGraph:
     class describe_init:
         def it_configures_all_edges_in_board(self):
-            graph = BoardGraph(SokobanPuzzle(width=2, height=2))
+            graph = BoardGraph(Puzzle(Tessellation.SOKOBAN, width=2, height=2))
 
             assert graph.edges_count == 8
 
@@ -122,7 +122,7 @@ class DescribeBoardGraph:
                 graph.out_edges(4)
 
         def it_configures_trioban_edges_without_duplicates(self):
-            graph = BoardGraph(TriobanPuzzle(width=2, height=2))
+            graph = BoardGraph(Puzzle(Tessellation.TRIOBAN, width=2, height=2))
 
             assert _sorted(graph.out_edges(0)) == _sorted(
                 [
@@ -159,15 +159,17 @@ class DescribeBoardGraph:
             assert graph.edges_count == 12
 
         def it_raises_if_width_or_height_is_too_large(self):
-            puzzle = SokobanPuzzle(Config.MAX_WIDTH + 1, 42)
+            puzzle = Puzzle(Tessellation.SOKOBAN, Config.MAX_WIDTH + 1, 42)
             with pytest.raises(ValueError):
                 BoardGraph(puzzle)
 
-            puzzle = SokobanPuzzle(42, Config.MAX_HEIGHT + 1)
+            puzzle = Puzzle(Tessellation.SOKOBAN, 42, Config.MAX_HEIGHT + 1)
             with pytest.raises(ValueError):
                 BoardGraph(puzzle)
 
-            puzzle = SokobanPuzzle(Config.MAX_WIDTH + 1, Config.MAX_HEIGHT)
+            puzzle = Puzzle(
+                Tessellation.SOKOBAN, Config.MAX_WIDTH + 1, Config.MAX_HEIGHT
+            )
             with pytest.raises(ValueError):
                 BoardGraph(puzzle)
 
@@ -226,8 +228,20 @@ class DescribeBoardGraph:
     def it_provides_underlying_tessellation(self, board_graph):
         assert board_graph.tessellation == Tessellation.SOKOBAN
 
-    def it_calculates_cell_orientation(self, board_graph):
-        assert board_graph.cell_orientation(42) == CellOrientation.DEFAULT
+    class describe_cell_orientation:
+        def it_calculates_cell_orientation(self, board_graph):
+            assert board_graph.cell_orientation(42) == CellOrientation.DEFAULT
+
+        def it_raises_on_invalid_position(self):
+            for puzzle in [
+                Puzzle(Tessellation.SOKOBAN, 5, 5),
+                Puzzle(Tessellation.TRIOBAN, 5, 5),
+                Puzzle(Tessellation.OCTOBAN, 5, 5),
+                Puzzle(Tessellation.HEXOBAN, 5, 5),
+            ]:
+                board_graph = BoardGraph(puzzle)
+                with pytest.raises(IndexError):
+                    board_graph.cell_orientation(-1)
 
     def it_provides_number_of_graph_edges(self, board_graph):
         assert board_graph.edges_count == 776
@@ -264,7 +278,7 @@ class DescribeBoardGraph:
                 #######
                 """
             )
-            board_graph = BoardGraph(SokobanPuzzle(board=board_str))
+            board_graph = BoardGraph(Puzzle(Tessellation.SOKOBAN, board=board_str))
             wall_neighbors = board_graph.wall_neighbors(0)
 
             assert index_1d(0, 1, 7) in wall_neighbors
@@ -432,7 +446,7 @@ class DescribeBoardGraph:
                 #######
                 """
             )
-            board_graph = BoardGraph(SokobanPuzzle(board=board_str))
+            board_graph = BoardGraph(Puzzle(Tessellation.SOKOBAN, board=board_str))
 
             expected_playable_cells = [
                 index_1d(1, 1, 7),
@@ -459,7 +473,7 @@ class DescribeBoardGraph:
                 "#####  ",  # 4
             ]
         )
-        board_graph = BoardGraph(SokobanPuzzle(board=board_str))
+        board_graph = BoardGraph(Puzzle(Tessellation.SOKOBAN, board=board_str))
 
         def it_returns_list_of_positions_reachable_by_pusher_movement_only(self):
             expected = [
@@ -559,7 +573,7 @@ class DescribeBoardGraph:
                 "#####  ",  # 4
             ]
         )
-        board_graph = BoardGraph(SokobanPuzzle(board=board_str))
+        board_graph = BoardGraph(Puzzle(Tessellation.SOKOBAN, board=board_str))
 
         def it_returns_top_left_position_of_pusher_in_his_reachable_area(self):
             assert self.board_graph.normalized_pusher_position(
@@ -628,7 +642,7 @@ class DescribeBoardGraph:
     #         #     #
     #         #######
     #     """
-    #     board_graph = BoardGraph(SokobanPuzzle(board=board))
+    #     board_graph = BoardGraph(Puzzle(Tessellation.SOKOBAN, board=board))
 
     #     def it_calculates_all_positions_reachable_from_root(self):
     #         root = index_1d(5, 1, 7)

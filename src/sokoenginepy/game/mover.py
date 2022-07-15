@@ -153,9 +153,9 @@ class Mover:
 
         Example:
 
-        >>> from sokoenginepy.game import Mover, PusherStep, Direction, BoardGraph
-        >>> from sokoenginepy.io import SokobanPuzzle
-        >>> puzzle = SokobanPuzzle(board='\\n'.join([
+        >>> from sokoenginepy.game import Mover, PusherStep, Direction, BoardGraph, Tessellation
+        >>> from sokoenginepy.io import Puzzle
+        >>> puzzle = Puzzle(Tessellation.SOKOBAN, board='\\n'.join([
         ...     '    #####',
         ...     '    #  @#',
         ...     '    #$  #',

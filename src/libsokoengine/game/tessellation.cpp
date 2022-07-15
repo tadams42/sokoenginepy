@@ -11,6 +11,7 @@ using std::invalid_argument;
 
 namespace sokoengine {
 namespace game {
+namespace implementation {
 
 using io::CellOrientation;
 
@@ -47,5 +48,6 @@ CellOrientation BaseTessellation::cell_orientation(
   return CellOrientation::DEFAULT;
 }
 
+} // namespace implementation
 } // namespace game
 } // namespace sokoengine

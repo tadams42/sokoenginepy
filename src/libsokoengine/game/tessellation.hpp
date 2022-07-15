@@ -8,10 +8,12 @@ namespace game {
 
 class PusherStep;
 
+namespace implementation {
+
 ///
 /// Base class for all tessellation implementations.
 ///
-class LIBSOKOENGINE_API BaseTessellation {
+class LIBSOKOENGINE_LOCAL BaseTessellation {
 public:
   virtual ~BaseTessellation() = default;
 
@@ -72,8 +74,8 @@ public:
   cell_orientation(position_t position, board_size_t width, board_size_t height) const;
 };
 
+} // namespace implementation
 } // namespace game
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

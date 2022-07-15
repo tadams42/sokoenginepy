@@ -22,13 +22,11 @@ TESSELLATION_TESTS_DIR = TESTS_DIR / "game"
 
 
 class SpecGenerator:
-    VARIANTS = ["sokoban", "trioban", "hexoban", "octoban"]
-    TEST_TYPES = ["tessellation"]
-
-    DIRECTIONS = ["l", "r", "u", "d", "nw", "sw", "ne", "se"]
-    DIRECTIONS_HASH = dict(
+    TESSELLATIONS = ["sokoban", "trioban", "hexoban", "octoban"]
+    DIRECTION_NAMES = ["l", "r", "u", "d", "nw", "sw", "ne", "se"]
+    DIRECTIONS = dict(
         zip(
-            DIRECTIONS,
+            DIRECTION_NAMES,
             [
                 "Direction.LEFT",
                 "Direction.RIGHT",
@@ -41,65 +39,65 @@ class SpecGenerator:
             ],
         )
     )
-    RESULTS_HASH = dict(zip(DIRECTIONS, ["result_{0}".format(d) for d in DIRECTIONS]))
+    RESULTS = dict(
+        zip(DIRECTION_NAMES, ["result_{0}".format(d) for d in DIRECTION_NAMES])
+    )
 
     def generate(self):
-        self.write_header()
+        for tessellation in self.TESSELLATIONS:
+            print(f"Generating test cases for {tessellation}...")
 
-        for variant in type(self).VARIANTS:
-            print("Generating test cases for {0}...".format(variant))
-            test_cases = self.get_test_cases(variant)
+            self.write_header(tessellation)
 
-            for test_type in self.TEST_TYPES:
-                self.output = []
-                self.generate_test_class(variant, test_type)
-                for test_case in test_cases:
-                    test_case["test_type"] = test_type
-                    self.generate_test_case_output(test_case)
+            test_cases = self.get_test_cases(tessellation)
 
-                if test_type == "tessellation":
-                    with open(str(self.tessellation_output_file_path), "a") as f:
-                        for line in self.output:
-                            f.write(line)
-                        f.write("\n")
-                else:
-                    raise RuntimeError(f"Unknown TEST_TYPES {test_type}")
+            self.output = []
+            self.generate_test_class(tessellation)
+            for test_case in test_cases:
+                self.generate_test_case_output(test_case)
 
-    def write_header(self):
+            with open(str(self.output_file_path(tessellation)), "a") as f:
+                for line in self.output:
+                    f.write(line)
+                f.write("\n")
+
+    def write_header(self, tessellation: str):
         s = """
-            import pytest
+        import pytest
 
-            from sokoenginepy.game import (
-                BaseTessellation,
-                Direction,
-                OctobanTessellation,
-                Tessellation,
-                TriobanTessellation,
-                index_1d,
-                is_on_board_1d,
-            )
-            from sokoenginepy.io import CellOrientation
-
-
-            def triangle_points_down(position, board_width, board_height):
-                return (
-                    TriobanTessellation().cell_orientation(position, board_width, board_height)
-                    == CellOrientation.TRIANGLE_DOWN
-                )
-
-
-            def is_octagon(position, board_width, board_height):
-                return (
-                    OctobanTessellation().cell_orientation(position, board_width, board_height)
-                    == CellOrientation.OCTAGON
-                )
+        from sokoenginepy.game import (
+            BoardGraph,
+            Config,
+            Direction,
+            Tessellation,
+            index_1d,
+            is_on_board_1d,
+        )
+        from sokoenginepy.io import CellOrientation, Puzzle
         """
 
-        with open(str(self.tessellation_output_file_path), "w") as f:
+        trio = """
+        def triangle_points_down(board_graph, position):
+            return (
+                board_graph.cell_orientation(position) == CellOrientation.TRIANGLE_DOWN
+            )
+        """
+
+        octo = """
+        def is_octagon(board_graph, position):
+            return board_graph.cell_orientation(position) == CellOrientation.OCTAGON
+        """
+
+        if tessellation == "trioban":
+            s += trio
+        elif tessellation == "octoban":
+            s += octo
+
+        with open(str(self.output_file_path(tessellation)), "w") as f:
             f.write(textwrap.dedent(s).strip() + "\n\n\n")
 
-    def get_test_cases(self, variant):
-        data = get_data(str(self.input_file_path(variant)))
+    def get_test_cases(self, tessellation):
+        data = get_data(str(self.input_file_path(tessellation)))
         sheet1 = data[list(data.keys())[0]]
         rows = [row[:12] for row in sheet1 if len(row) > 0 and len(row[0]) > 0]
         header = rows[0]
@@ -107,7 +105,7 @@ class SpecGenerator:
 
         cases = []
         for case in raw_cases:
-            case["variant"] = variant
+            case["tessellation"] = tessellation
             case["width"] = int(case["board_dimensions"].split(",")[0].strip())
             case["height"] = int(case["board_dimensions"].split(",")[1].strip())
             case["row"] = int(case["test_position"].split(",")[1].strip())
@@ -116,49 +114,33 @@ class SpecGenerator:
 
         return cases
 
-    def generate_test_class(self, variant, test_type):
-        s = """
-            class {0}{1}AutogeneratedSpecMixin:
-                class Describe_neighbor_position:
-        """.format(
-            variant.capitalize(), test_type.capitalize()
-        )
+    def generate_test_class(self, tessellation: str):
+        s = f"""
+        class Describe{tessellation.capitalize()}BoardGraph:
+            class describe_neighbor_position:
+        """
         self.output.append(textwrap.dedent(s).strip() + "\n")
 
     def generate_test_case_output(self, test_case):
-        s = Template(
-            """
-            def test_autogenerated_$test_name(self):
-                width = $width
-                height = $height
-                row = $row
-                column = $column
-                index = index_1d(column, row, width)
+        s = f"""
+        def test_generated_{test_case['test_name']}(self):
+            width = {test_case['width']}
+            height = {test_case['height']}
+            row = {test_case['row']}
+            column = {test_case['column']}
+            puzzle = Puzzle(Tessellation.{test_case['tessellation'].upper()}, width, height)
+            g = BoardGraph(puzzle)
+            index = index_1d(column, row, width)
         """
-        ).substitute(
-            test_name=test_case["test_name"],
-            width=test_case["width"],
-            height=test_case["height"],
-            row=test_case["row"],
-            column=test_case["column"],
-        )
         self.output.append(
             textwrap.indent(textwrap.dedent(s).strip() + "\n", prefix="        ")
         )
 
-        if test_case["test_type"] == "tessellation":
-            self.output.append(
-                f'            t = BaseTessellation.instance(Tessellation.{test_case["variant"].upper()})'
-            )
-        else:
-            raise RuntimeError(f'Unknown TEST_TYPES {test_case["test_type"]}')
-        self.output.append("\n")
-
-        if test_case["test_position_requrement"] != "nil":
+        if test_case["test_position_requirement"] != "nil":
             self.output.append("\n")
             self.output.append(
                 "            assert {0}".format(
-                    test_case["test_position_requrement"]
+                    test_case["test_position_requirement"]
                     .replace("&&", "and")
                     .replace("||", "or")
                     .replace("!", "not ")
@@ -168,45 +150,16 @@ class SpecGenerator:
         else:
             self.output.append("\n")
 
-        for direction in self.DIRECTIONS:
-            if test_case["test_type"] == "tessellation":
-                if self.is_result_illegal_position(test_case, direction):
-                    s = """
-                        assert not is_on_board_1d(t.neighbor_position(index, {0}, width, height), width, height)
-                    """.format(
-                        self.DIRECTIONS_HASH[direction]
-                    )
-
-                elif self.is_result_illegal_direction(test_case, direction):
-                    s = """
-                        with pytest.raises(ValueError):
-                            t.neighbor_position(index, {0}, width, height)
-                    """.format(
-                        self.DIRECTIONS_HASH[direction]
-                    )
-                else:
-                    s = """
-                        assert t.neighbor_position(index, {0}, width, height) == index_1d({1}, width)
-                    """.format(
-                        self.DIRECTIONS_HASH[direction],
-                        test_case[self.RESULTS_HASH[direction]],
-                    )
+        for direction in self.DIRECTION_NAMES:
+            if self.is_result_illegal_position(test_case, direction):
+                s = f"assert not is_on_board_1d(g.neighbor(index, {self.DIRECTIONS[direction]}), width, height)"
+            elif self.is_result_illegal_direction(test_case, direction):
+                s = f"assert g.neighbor(index, {self.DIRECTIONS[direction]}) == Config.NO_POS"
             else:
-                if self.is_result_illegal_position(
-                    test_case, direction
-                ) or self.is_result_illegal_direction(test_case, direction):
-                    s = """
-                        assert not is_on_board_1d(b.neighbor(index, {0}), width, height)
-                    """.format(
-                        self.DIRECTIONS_HASH[direction]
-                    )
-                else:
-                    s = """
-                        assert b.neighbor(index, {0}) == index_1d({1}, width)
-                    """.format(
-                        self.DIRECTIONS_HASH[direction],
-                        test_case[self.RESULTS_HASH[direction]],
-                    )
+                s = (
+                    f"assert g.neighbor(index, {self.DIRECTIONS[direction]}) == "
+                    f"index_1d({test_case[self.RESULTS[direction]]}, width)"
+                )
 
             self.output.append(
                 textwrap.indent(
@@ -216,24 +169,19 @@ class SpecGenerator:
 
         self.output.append("\n")
 
-    def input_file_path(self, variant):
+    def input_file_path(self, tessellation):
+        return os.path.join(TEST_CASES_DIR, f"{tessellation}_test_cases.ods")
+
+    def output_file_path(self, tessellation: str):
         return os.path.join(
-            TEST_CASES_DIR, "{0}_test_cases.ods".format(variant.strip().lower())
+            TESSELLATION_TESTS_DIR, f"generated_{tessellation}_graph_spec.py"
         )
 
-    @property
-    def board_output_file_path(self):
-        return os.path.join(BOARD_TESTS_DIR, "autogenerated_puzzle.py")
-
-    @property
-    def tessellation_output_file_path(self):
-        return os.path.join(TESSELLATION_TESTS_DIR, "autogenerated_tessellation.py")
-
     def is_result_illegal_direction(self, test_case, direction):
-        return test_case[self.RESULTS_HASH[direction]] == "IllegalDirection"
+        return test_case[self.RESULTS[direction]] == "IllegalDirection"
 
     def is_result_illegal_position(self, test_case, direction):
-        return test_case[self.RESULTS_HASH[direction]] == "OfBoardPosition"
+        return test_case[self.RESULTS[direction]] == "OfBoardPosition"
 
 
 def main():

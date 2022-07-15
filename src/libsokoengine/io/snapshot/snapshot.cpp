@@ -3,21 +3,17 @@
 #include "ast.hpp"
 #include "parser.hpp"
 #include "pusher_step.hpp"
+#include "puzzle.hpp"
 #include "rle.hpp"
 #include "tessellation.hpp"
-
-#include "hexoban.hpp"
-#include "octoban.hpp"
-#include "sokoban.hpp"
-#include "trioban.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::game::BaseTessellation;
 using sokoengine::game::PusherStep;
 using sokoengine::game::PusherSteps;
 using sokoengine::game::Tessellation;
+using sokoengine::game::implementation::BaseTessellation;
 using sokoengine::implementation::Strings;
 using std::invalid_argument;
 using std::make_unique;
@@ -157,18 +153,12 @@ namespace sokoengine {
 
     string Snapshot::repr() const {
       string klass_name = "Snapshot";
-      if (typeid(*this) == typeid(const SokobanSnapshot &))
-        klass_name = "SokobanSnapshot";
-      if (typeid(*this) == typeid(const TriobanSnapshot &))
-        klass_name = "TriobanSnapshot";
-      if (typeid(*this) == typeid(const OctobanSnapshot &))
-        klass_name = "OctobanSnapshot";
-      if (typeid(*this) == typeid(const HexobanSnapshot &))
-        klass_name = "HexobanSnapshot";
 
       string moves = to_str(false);
 
-      return klass_name + "(moves_data=\"" + moves + "\")";
+      return klass_name + "(Tessellation."
+           + boost::to_upper_copy(implementation::to_str(m_impl->m_tessellation))
+           + ", moves_data=\"" + moves + "\")";
     }
 
     const string &Snapshot::moves_data() const {

@@ -10,38 +10,6 @@ from .utilities import inverted
 
 
 class HexobanTessellation(BaseTessellation):
-    """
-    Tessellation for Hexoban game variant.
-
-    Board space is laid out on vertical hexagons with following coordinate system:
-
-    .. image:: /images/hexoban_coordinates.png
-        :alt: Hexoban coordinates
-
-    Textual representation uses two characters for each hexagon. This allows different
-    encoding schemes.
-
-    .. |img1| image:: /images/hexoban_scheme1.png
-    .. |img2| image:: /images/hexoban_scheme2.png
-
-    +----------+----------+
-    | Scheme 1 | Scheme 2 |
-    +==========+==========+
-    |  |img1|  |  |img2|  |
-    +----------+----------+
-
-    As long as encoding of single board is consistent, all methods handle any scheme
-    transparently - parsing of board strings 'Just Works (TM)'
-
-    Direction <-> character mapping:
-
-    ====  =====  ==========  ==========  ==========  ==========
-    LEFT  RIGHT  NORTH_WEST  SOUTH_WEST  NORTH_EAST  SOUTH_EAST
-    ====  =====  ==========  ==========  ==========  ==========
-    l, L  r, R   u, U        d, D        n, N        s, S
-    ====  =====  ==========  ==========  ==========  ==========
-    """
-
     _LEGAL_DIRECTIONS: Final[Tuple[Direction, ...]] = (
         Direction.LEFT,
         Direction.RIGHT,

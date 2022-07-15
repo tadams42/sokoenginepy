@@ -33,8 +33,8 @@ In Python:
 
 ```python
 import textwrap
-from sokoenginepy.io import SokobanPuzzle
-from sokoenginepy.game import BoardGraph, Mover, Direction, Config
+from sokoenginepy.io import Puzzle
+from sokoenginepy.game import BoardGraph, Mover, Direction, Config, Tessellation
 
 data = textwrap.dedent("""
         #####
@@ -49,7 +49,7 @@ data = textwrap.dedent("""
         #     #########
         #######
 """)
-puzzle = SokobanPuzzle(board=data)
+puzzle = Puzzle(Tessellation.SOKOBAN, board=data)
 board = BoardGraph(puzzle)
 mover = Mover(board)
 mover.select_pusher(Config.DEFAULT_ID + 1)
@@ -65,10 +65,11 @@ or in C++:
 #include <iostream>
 
 using sokoengine::game::BoardGraph;
+using sokoengine::game::Config;
 using sokoengine::game::Direction;
 using sokoengine::game::Mover;
-using sokoengine::game::Config;
-using sokoengine::io::SokobanPuzzle;
+using sokoengine::game::Tessellation;
+using sokoengine::io::Puzzle;
 using std::string;
 
 int main() {
@@ -86,7 +87,7 @@ int main() {
     #######
 )""";
 
-  SokobanPuzzle puzzle(data);
+  Puzzle puzzle(Tessellation::SOKOBAN, data);
   BoardGraph board(puzzle);
   Mover mover(board);
   mover.select_pusher(Config::DEFAULT_ID + 1);

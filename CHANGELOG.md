@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.0.0 (unreleased)
+
+- breaking change: collapsed many types to base type. This was done because all types
+  had to be parametrized by Tessellation anyway so having rich inheritance tree was just
+  cluttering API. Concretely, these types have changed or removed:
+  - `SokobanPuzzle(...)` --> `Puzzle(Tessellation.SOKOBAN, ...)`
+  - `HexobanPuzzle(...)` --> `Puzzle(Tessellation.HEXOBAN, ...)`
+  - `TriobanPuzzle(...)` --> `Puzzle(Tessellation.TRIOBAN, ...)`
+  - `OctobanPuzzle(...)` --> `Puzzle(Tessellation.OCTOBAN, ...)`
+  - `SokobanSnapshot(...)` --> `Snapshot(Tessellation.SOKOBAN, ...)`
+  - `HexobanSnapshot(...)` --> `Snapshot(Tessellation.HEXOBAN, ...)`
+  - `TriobanSnapshot(...)` --> `Snapshot(Tessellation.TRIOBAN, ...)`
+  - `OctobanSnapshot(...)` --> `Snapshot(Tessellation.OCTOBAN, ...)`
+  - `SokobanTessellation(...)` --> no longer available in public API
+  - `HexobanTessellation(...)` --> no longer available in public API
+  - `TriobanTessellation(...)` --> no longer available in public API
+  - `OctobanTessellation(...)` --> no longer available in public API
+
 ## 1.0.3 (2022-07-10)
 
 - maintenance release, switch from TravisCI to GitHub Actions

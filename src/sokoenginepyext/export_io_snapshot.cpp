@@ -1,15 +1,18 @@
 #include "sokoenginepyext.hpp"
 
 using sokoengine::game::PusherSteps;
-using sokoengine::io::HexobanSnapshot;
-using sokoengine::io::OctobanSnapshot;
+using sokoengine::game::Tessellation;
 using sokoengine::io::Snapshot;
-using sokoengine::io::SokobanSnapshot;
-using sokoengine::io::TriobanSnapshot;
 using std::string;
 
 void export_io_snapshot(py::module &m) {
   auto pySnapshot = py::class_<Snapshot>(m, "Snapshot", py::is_final());
+
+  pySnapshot.def(
+    py::init<Tessellation, string>(),
+    py::arg("tessellation"),
+    py::arg("moves_data") = ""
+  );
 
   pySnapshot.def_readonly_static("l", &Snapshot::l);
   pySnapshot.def_readonly_static("u", &Snapshot::u);
@@ -101,20 +104,4 @@ void export_io_snapshot(py::module &m) {
   pySnapshot.def_property_readonly("moves_count", &Snapshot::moves_count);
   pySnapshot.def_property_readonly("jumps_count", &Snapshot::jumps_count);
   pySnapshot.def_property_readonly("is_reverse", &Snapshot::is_reverse);
-
-  auto pySokobanSnapshot =
-    py::class_<SokobanSnapshot, Snapshot>(m, "SokobanSnapshot", py::is_final())
-      .def(py::init<string>(), py::arg("moves_data") = "");
-
-  auto pyHexobanSnapshot =
-    py::class_<HexobanSnapshot, Snapshot>(m, "HexobanSnapshot", py::is_final())
-      .def(py::init<string>(), py::arg("moves_data") = "");
-
-  auto pyTriobanSnapshot =
-    py::class_<TriobanSnapshot, Snapshot>(m, "TriobanSnapshot", py::is_final())
-      .def(py::init<string>(), py::arg("moves_data") = "");
-
-  auto pyOctobanSnapshot =
-    py::class_<OctobanSnapshot, Snapshot>(m, "OctobanSnapshot", py::is_final())
-      .def(py::init<string>(), py::arg("moves_data") = "");
 }

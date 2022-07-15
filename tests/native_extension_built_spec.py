@@ -22,21 +22,7 @@ def is_trueish(val):
 
 @pytest.fixture
 def io_members():
-    return {
-        "CellOrientation",
-        "Collection",
-        "HexobanPuzzle",
-        "HexobanSnapshot",
-        "OctobanPuzzle",
-        "OctobanSnapshot",
-        "Puzzle",
-        "Rle",
-        "Snapshot",
-        "SokobanPuzzle",
-        "SokobanSnapshot",
-        "TriobanPuzzle",
-        "TriobanSnapshot",
-    }
+    return {"CellOrientation", "Collection", "Puzzle", "Rle", "Snapshot"}
 
 
 @pytest.fixture
@@ -51,7 +37,6 @@ def io_members_py_only():
 @pytest.fixture
 def game_members():
     klasses = {
-        "BaseTessellation",
         "BoardCell",
         "BoardGraph",
         "BoardManager",
@@ -60,15 +45,11 @@ def game_members():
         "Edge",
         "GraphType",
         "HashedBoardManager",
-        "HexobanTessellation",
         "Mover",
-        "OctobanTessellation",
         "PusherStep",
         "SokobanPlus",
-        "SokobanTessellation",
         "SolvingMode",
         "Tessellation",
-        "TriobanTessellation",
         "Config",
     }
 

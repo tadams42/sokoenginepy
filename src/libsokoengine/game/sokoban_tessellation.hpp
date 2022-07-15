@@ -5,19 +5,9 @@
 
 namespace sokoengine {
 namespace game {
+namespace implementation {
 
-///
-/// Tessellation for Sokoban game variant.
-///
-/// Board is laid out on squares.
-///
-/// Direction <-> character mapping:
-///
-/// | LEFT | RIGHT | UP   | DOWN |
-/// | ---- | ----- | ---- | ---- |
-/// | l, L | r, R  | u, U | d, D |
-///
-class LIBSOKOENGINE_API SokobanTessellation : public BaseTessellation {
+class LIBSOKOENGINE_LOCAL SokobanTessellation : public BaseTessellation {
 public:
   virtual const Directions &legal_directions() const override;
   virtual position_t        neighbor_position(
@@ -30,8 +20,8 @@ public:
   virtual char       pusher_step_to_char(const PusherStep &pusher_step) const override;
 };
 
+} // namespace implementation
 } // namespace game
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

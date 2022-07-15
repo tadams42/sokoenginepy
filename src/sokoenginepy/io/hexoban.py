@@ -5,43 +5,20 @@ from typing import List, Optional, Tuple
 from .puzzle import Puzzle
 from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
 from .rle import Rle
-from .snapshot import Snapshot
 
 
-class HexobanSnapshot(Snapshot):
-    """
-    `Snapshot` implementation for `.Tessellation.HEXOBAN` and `.HexobanTessellation`.
-    """
+class Hexoban:
+    @classmethod
+    def parser(cls):
+        return HexobanPuzzleParser()
 
-    def __init__(self, moves_data: str = ""):
-        from ..game import Tessellation
+    @classmethod
+    def printer(cls):
+        return HexobanPuzzlePrinter()
 
-        super().__init__(tessellation=Tessellation.HEXOBAN, moves_data=moves_data)
-
-
-class HexobanPuzzle(Puzzle):
-    """
-    `Puzzle` implementation for `.Tessellation.HEXOBAN` and `.HexobanTessellation`.
-
-    Arguments:
-        width: number of columns
-        height: number of rows
-        board: If not blank, it will be parsed and board will be created from it,
-            ignoring ``width`` and ``height``.
-    """
-
-    def __init__(self, width: int = 0, height: int = 0, board: Optional[str] = None):
-        from ..game import Tessellation
-
-        super().__init__(
-            tessellation=Tessellation.HEXOBAN,
-            width=width,
-            height=height,
-            board=board,
-            resizer_cls=HexobanPuzzleResizer,
-            parser_cls=HexobanPuzzleParser,
-            printer_cls=HexobanPuzzlePrinter,
-        )
+    @classmethod
+    def resizer(cls):
+        return HexobanPuzzleResizer()
 
 
 class HexobanTextConverter:

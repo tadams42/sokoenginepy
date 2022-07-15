@@ -14,8 +14,8 @@ using sokoengine::game::BoardManager;
 using sokoengine::game::Direction;
 using sokoengine::game::Mover;
 using sokoengine::game::SolvingMode;
+using sokoengine::game::Tessellation;
 using sokoengine::io::Puzzle;
-using sokoengine::io::SokobanPuzzle;
 using std::cout;
 using std::endl;
 using std::fixed;
@@ -40,10 +40,11 @@ public:
   explicit BoardType(EBoardType which)
     : m_board_type(which) {}
 
-  SokobanPuzzle board() const {
+  Puzzle board() const {
     if (m_board_type == SMALL) {
       // clang-format off
-      return SokobanPuzzle(
+      return Puzzle(
+        Tessellation::SOKOBAN,
         string()
         + "##########\n"
         + "#      **#\n"
@@ -55,7 +56,8 @@ public:
       // clang-format on
     } else {
       // clang-format off
-      return SokobanPuzzle(
+      return Puzzle(
+        Tessellation::SOKOBAN,
         string()
         + "######################################\n"
         + "#************************************#\n"
@@ -124,7 +126,7 @@ class LIBSOKOENGINE_LOCAL MovementBenchmark {
   BoardType     m_board_type;
   BenchmarkType m_benchmark_type;
   size_t        m_moves_count = 0;
-  SokobanPuzzle m_puzzle      = m_board_type.board();
+  Puzzle        m_puzzle      = m_board_type.board();
   BoardGraph    m_board;
   Mover         m_mover;
 
@@ -185,7 +187,7 @@ public:
     , m_moves_per_run_count(moves_per_run_count) {}
 
   string board_header(const BoardType &board_type) const {
-    SokobanPuzzle board = board_type.board();
+    Puzzle        board = board_type.board();
     BoardGraph    graph(board);
     BoardManager  manager(graph);
     ostringstream ss;

@@ -5,22 +5,9 @@
 
 namespace sokoengine {
 namespace game {
+namespace implementation {
 
-///
-/// Tessellation for Octoban game variant.
-///
-/// Board space is laid out on alternating squares and octagons with origin of
-/// coordinate system being octagon. Tessellation allows all 8 directions of movement
-/// from Direction and depending on current pusher position some of these directions
-/// do not result in successful move.
-///
-/// Direction <-> character mapping:
-///
-/// | UP   | NORTH_EAST | RIGHT | SOUTH_EAST | DOWN | SOUTH_WEST | LEFT | NORTH_WEST |
-/// | ---- | ---------- | ----- | ---------- | ---- | ---------- | ---- | ---------- |
-/// | u, U | n, N       | r, R  | e, E       | d, D | s, S       | l, L | w, W       |
-///
-class LIBSOKOENGINE_API OctobanTessellation : public BaseTessellation {
+class LIBSOKOENGINE_LOCAL OctobanTessellation : public BaseTessellation {
 public:
   virtual const Directions &legal_directions() const override;
   virtual position_t        neighbor_position(
@@ -36,8 +23,8 @@ public:
   ) const override;
 };
 
+} // namespace implementation
 } // namespace game
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

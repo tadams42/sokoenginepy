@@ -8,6 +8,10 @@ Collection
     :undoc-members:
 
 
+Rle
+---
+
+
 .. autoclass:: sokoenginepy.io.Rle
     :members:
     :undoc-members:

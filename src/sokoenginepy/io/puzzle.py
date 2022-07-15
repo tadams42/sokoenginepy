@@ -5,14 +5,15 @@ import re
 import textwrap
 from functools import reduce
 from operator import add
-from typing import TYPE_CHECKING, Final, List, Optional, Set, Type
+from typing import TYPE_CHECKING, Final, List, Optional, Set
 
 from .rle import Rle
 from .snapshot import Snapshot
 from .utilities import contains_only_digits_and_spaces, is_blank
 
 if TYPE_CHECKING:
-    from ..game import BaseTessellation, Tessellation
+    from ..game import Tessellation
+    from ..game.base_tessellation import BaseTessellation
     from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
 
 
@@ -43,6 +44,12 @@ class Puzzle:
     To convert 2D board coordinates into 1D array indexes, use `.index_1d`. To convert
     1D array indexes into board 2D coordinates, use one of `.index_row`, `.index_x`
     `.index_column` and `.index_y`.
+
+    Arguments:
+        width: number of columns
+        height: number of rows
+        board: If not blank, it will be parsed and board will be created from it,
+            ignoring ``width`` and ``height``.
     """
 
     WALL: Final[str] = "#"
@@ -144,48 +151,13 @@ class Puzzle:
     def is_sokoban_plus(cls, line: str) -> bool:
         return contains_only_digits_and_spaces(line) and not is_blank(line)
 
-    @classmethod
-    def instance_from(
-        cls,
-        tessellation: Tessellation,
-        width: int = 0,
-        height: int = 0,
-        board: Optional[str] = None,
-    ) -> Puzzle:
-        """
-        Factory method. Produces instance of one of the subclasses.
-        """
-        from ..game import BaseTessellation
-        from .hexoban import HexobanPuzzle
-        from .octoban import OctobanPuzzle
-        from .sokoban import SokobanPuzzle
-        from .trioban import TriobanPuzzle
-
-        tessellation_instance = BaseTessellation.instance(tessellation)
-
-        for klass in [HexobanPuzzle, OctobanPuzzle, SokobanPuzzle, TriobanPuzzle]:
-            if (
-                tessellation_instance.__class__.__name__.replace(
-                    "Tessellation", ""
-                ).lower()
-                in klass.__name__.lower()
-            ):
-                return klass(width=width, height=height, board=board)
-
-        raise ValueError(f"Unknown tessellation {tessellation}!")
-
     def __init__(
         self,
         tessellation: Tessellation,
         width: int = 0,
         height: int = 0,
         board: Optional[str] = None,
-        resizer_cls: Optional[Type[PuzzleResizer]] = None,
-        parser_cls: Optional[Type[PuzzleParser]] = None,
-        printer_cls: Optional[Type[PuzzlePrinter]] = None,
     ):
-        from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
-
         if width < 0:
             raise ValueError(f"Board width {width} is invalid value!")
 
@@ -205,9 +177,6 @@ class Puzzle:
 
         self._tessellation: Tessellation = tessellation
         self._tessellation_obj_val: Optional[BaseTessellation] = None
-        self._resizer_cls: Type[PuzzleResizer] = resizer_cls or PuzzleResizer
-        self._parser_cls: Type[PuzzleParser] = parser_cls or PuzzleParser
-        self._printer_cls: Type[PuzzlePrinter] = printer_cls or PuzzlePrinter
 
         self._width: int
         self._height: int
@@ -245,7 +214,7 @@ class Puzzle:
 
     @property
     def _tessellation_obj(self):
-        from ..game import BaseTessellation
+        from ..game.base_tessellation import BaseTessellation
 
         if self._tessellation_obj_val is None:
             self._tessellation_obj_val = BaseTessellation.instance(self._tessellation)
@@ -281,23 +250,24 @@ class Puzzle:
         return self.to_board_str(use_visible_floor=False)
 
     def __repr__(self):
-        return "{klass}(board='\\n'.join([\n{board}\n]))".format(
-            klass=self.__class__.__name__,
-            board=textwrap.indent(
-                ",\n".join(
-                    [
-                        "'{0}'".format(l)
-                        for l in self.to_board_str(use_visible_floor=True).split("\n")
-                    ]
-                ),
-                "    ",
+        board = textwrap.indent(
+            ",\n".join(
+                [
+                    "'{0}'".format(l)
+                    for l in self.to_board_str(use_visible_floor=True).split("\n")
+                ]
             ),
+            "    ",
         )
+        klass = self.__class__.__name__
+        tess = self._tessellation
+
+        return f"{klass}({tess}, board='\\n'.join([\n{board}\n]))"
 
     def to_board_str(self, use_visible_floor=False, rle_encode=False) -> str:
         """Formatted output of parsed and validated board."""
         self._reparse_if_not_parsed()
-        return self._printer_cls().print(
+        return self._printer.print(
             self._parsed_board, self.width, self.height, use_visible_floor, rle_encode
         )
 
@@ -547,7 +517,7 @@ class Puzzle:
 
     def _reparse(self):
         if not is_blank(self._original_board):
-            board_rows = self._parser_cls().parse(self._original_board)
+            board_rows = self._parser.parse(self._original_board)
             self._height = len(board_rows)
             self._width = len(board_rows[0]) if self._height else 0
             self._parsed_board = sum((list(_) for _ in board_rows), [])
@@ -562,8 +532,61 @@ class Puzzle:
             self._reparse()
 
     @property
-    def _resizer(self) -> PuzzleResizer:
-        return self._resizer_cls()
+    def _resizer(self):
+        from ..game import Tessellation
+        from .hexoban import Hexoban
+        from .octoban import Octoban
+        from .sokoban import Sokoban
+        from .trioban import Trioban
+
+        if self._tessellation == Tessellation.SOKOBAN:
+            return Sokoban.resizer()
+        elif self._tessellation == Tessellation.TRIOBAN:
+            return Trioban.resizer()
+        elif self._tessellation == Tessellation.HEXOBAN:
+            return Hexoban.resizer()
+        elif self._tessellation == Tessellation.OCTOBAN:
+            return Octoban.resizer()
+        else:
+            raise ValueError(f"Unknown tessellation {self._tessellation}")
+
+    @property
+    def _parser(self):
+        from ..game import Tessellation
+        from .hexoban import Hexoban
+        from .octoban import Octoban
+        from .sokoban import Sokoban
+        from .trioban import Trioban
+
+        if self._tessellation == Tessellation.SOKOBAN:
+            return Sokoban.parser()
+        elif self._tessellation == Tessellation.TRIOBAN:
+            return Trioban.parser()
+        elif self._tessellation == Tessellation.HEXOBAN:
+            return Hexoban.parser()
+        elif self._tessellation == Tessellation.OCTOBAN:
+            return Octoban.parser()
+        else:
+            raise ValueError(f"Unknown tessellation {self._tessellation}")
+
+    @property
+    def _printer(self):
+        from ..game import Tessellation
+        from .hexoban import Hexoban
+        from .octoban import Octoban
+        from .sokoban import Sokoban
+        from .trioban import Trioban
+
+        if self._tessellation == Tessellation.SOKOBAN:
+            return Sokoban.printer()
+        elif self._tessellation == Tessellation.TRIOBAN:
+            return Trioban.printer()
+        elif self._tessellation == Tessellation.HEXOBAN:
+            return Hexoban.printer()
+        elif self._tessellation == Tessellation.OCTOBAN:
+            return Octoban.printer()
+        else:
+            raise ValueError(f"Unknown tessellation {self._tessellation}")
 
 
 _CHARACTERS: Set[str] = {

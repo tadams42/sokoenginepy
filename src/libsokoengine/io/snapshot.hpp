@@ -15,7 +15,9 @@ typedef std::vector<PusherStep> PusherSteps;
 namespace io {
 
 ///
-/// Recording of pusher movement with accompanying metadata.
+/// Pusher steps and accompanying metadata.
+///
+/// Snapshot is parametrized by game::Tessellation.
 ///
 class LIBSOKOENGINE_API Snapshot {
 public:
@@ -64,9 +66,14 @@ public:
   static bool        is_snapshot(const std::string &line);
   static std::string ast_json(const std::string &line);
 
-  typedef std::unique_ptr<Snapshot> unique_ptr_t;
-  virtual unique_ptr_t              clone() const = 0;
-
+  ///
+  /// @param moves_data pusher steps in textual representation.
+  ///
+  Snapshot(const game::Tessellation &tessellation, const std::string &moves_data);
+  Snapshot(const Snapshot &rv);
+  Snapshot &operator=(const Snapshot &rv);
+  Snapshot(Snapshot &&rv);
+  Snapshot &operator=(Snapshot &&rv);
   virtual ~Snapshot();
 
   const std::string &title() const;
@@ -91,13 +98,6 @@ public:
   size_t moves_count() const;
   size_t jumps_count() const;
   bool   is_reverse() const;
-
-protected:
-  Snapshot(const game::Tessellation &tessellation, const std::string &moves_data);
-  Snapshot(const Snapshot &rv);
-  Snapshot &operator=(const Snapshot &rv);
-  Snapshot(Snapshot &&rv);
-  Snapshot &operator=(Snapshot &&rv);
 
 private:
   class PIMPL;

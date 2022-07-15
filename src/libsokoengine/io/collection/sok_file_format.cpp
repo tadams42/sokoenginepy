@@ -2,11 +2,8 @@
 
 #include "SOK_format_specification.h"
 #include "collection.hpp"
-
-#include "hexoban.hpp"
-#include "octoban.hpp"
-#include "sokoban.hpp"
-#include "trioban.hpp"
+#include "puzzle.hpp"
+#include "snapshot.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
@@ -307,60 +304,6 @@ const string SOKTags::DATE_OF_LAST_CHANGE = "Date of Last Change";
 const string SOKTags::RAW_FILE_NOTES      = "::";
 const string SOKTags::TAG_DELIMITERS      = "=:";
 
-class LIBSOKOENGINE_LOCAL PuzzleConsumeVisitor {
-  PuzzleData &m_puzzle_data;
-
-  void copy_puzzle_metadata(Puzzle &puzzle) {
-    puzzle.title().swap(m_puzzle_data.title);
-    puzzle.author().swap(m_puzzle_data.author);
-    puzzle.boxorder().swap(m_puzzle_data.boxorder);
-    puzzle.goalorder().swap(m_puzzle_data.goalorder);
-    puzzle.notes() = boost::join(m_puzzle_data.notes, "\n");
-  }
-
-  void copy_snapshot_metadata(Snapshot &snapshot, SnapshotData &data) {
-    snapshot.title().swap(data.title);
-    snapshot.solver().swap(data.solver);
-    snapshot.notes() = boost::join(data.notes, "\n");
-  }
-
-public:
-  PuzzleConsumeVisitor(PuzzleData &puzzle_data)
-    : m_puzzle_data(puzzle_data) {}
-
-  void operator()(SokobanPuzzle &puzzle) {
-    copy_puzzle_metadata(puzzle);
-    for (auto &snapshot_data : m_puzzle_data.snapshots) {
-      puzzle.snapshots().push_back(SokobanSnapshot(snapshot_data.moves_data));
-      copy_snapshot_metadata(puzzle.snapshots().back(), snapshot_data);
-    }
-  }
-
-  void operator()(TriobanPuzzle &puzzle) {
-    copy_puzzle_metadata(puzzle);
-    for (auto &snapshot_data : m_puzzle_data.snapshots) {
-      puzzle.snapshots().push_back(TriobanSnapshot(snapshot_data.moves_data));
-      copy_snapshot_metadata(puzzle.snapshots().back(), snapshot_data);
-    }
-  }
-
-  void operator()(OctobanPuzzle &puzzle) {
-    copy_puzzle_metadata(puzzle);
-    for (auto &snapshot_data : m_puzzle_data.snapshots) {
-      puzzle.snapshots().push_back(OctobanSnapshot(snapshot_data.moves_data));
-      copy_snapshot_metadata(puzzle.snapshots().back(), snapshot_data);
-    }
-  }
-
-  void operator()(HexobanPuzzle &puzzle) {
-    copy_puzzle_metadata(puzzle);
-    for (auto &snapshot_data : m_puzzle_data.snapshots) {
-      puzzle.snapshots().push_back(HexobanSnapshot(snapshot_data.moves_data));
-      copy_snapshot_metadata(puzzle.snapshots().back(), snapshot_data);
-    }
-  }
-};
-
 class LIBSOKOENGINE_LOCAL SOKReader {
   istream       &m_src;
   Collection    &m_dest;
@@ -387,25 +330,23 @@ private:
     m_dest.notes() = boost::join(m_data.notes, "\n");
 
     for (PuzzleData &puzzle_data : m_data.puzzles) {
-      switch (puzzle_data.tessellation) {
-        case Tessellation::SOKOBAN:
-          m_dest.puzzles().emplace_back(SokobanPuzzle(puzzle_data.board));
-          break;
-        case Tessellation::HEXOBAN:
-          m_dest.puzzles().emplace_back(HexobanPuzzle(puzzle_data.board));
-          break;
-        case Tessellation::TRIOBAN:
-          m_dest.puzzles().emplace_back(TriobanPuzzle(puzzle_data.board));
-          break;
-        case Tessellation::OCTOBAN:
-          m_dest.puzzles().emplace_back(OctobanPuzzle(puzzle_data.board));
-          break;
-          // Do not handle default, let compiler generate warning if another
-          // tessellation is added...
-      }
+      Puzzle &puzzle =
+        m_dest.puzzles().emplace_back(puzzle_data.tessellation, puzzle_data.board);
 
-      auto &puzzle_variant = m_dest.puzzles().back();
-      std::visit(PuzzleConsumeVisitor(puzzle_data), puzzle_variant);
+      puzzle.title().swap(puzzle_data.title);
+      puzzle.author().swap(puzzle_data.author);
+      puzzle.boxorder().swap(puzzle_data.boxorder);
+      puzzle.goalorder().swap(puzzle_data.goalorder);
+      puzzle.notes() = boost::join(puzzle_data.notes, "\n");
+
+      for (auto &snapshot_data : puzzle_data.snapshots) {
+        Snapshot &snapshot = puzzle.snapshots().emplace_back(
+          puzzle_data.tessellation, snapshot_data.moves_data
+        );
+        snapshot.title().swap(snapshot_data.title);
+        snapshot.solver().swap(snapshot_data.solver);
+        snapshot.notes() = boost::join(snapshot_data.notes, "\n");
+      }
     }
   }
 
@@ -694,72 +635,34 @@ private:
   }
 };
 
-LIBSOKOENGINE_LOCAL string to_str(Tessellation tessellation) {
-  switch (tessellation) {
-    case Tessellation::SOKOBAN:
-      return "sokoban";
-      break;
-    case Tessellation::HEXOBAN:
-      return "hexoban";
-      break;
-    case Tessellation::TRIOBAN:
-      return "trioban";
-      break;
-    case Tessellation::OCTOBAN:
-      return "octoban";
-      break;
-      // Do not handle default, let compiler generate warning when another
-      // tessellation is added...
-  }
-  throw std::invalid_argument("Unknown tessellation!");
-}
+class LIBSOKOENGINE_LOCAL SOKWriter {
+  ostream &m_stream;
 
-class LIBSOKOENGINE_LOCAL PuzzleWriteVisitor {
 public:
-  PuzzleWriteVisitor(ostream &dest, bool &success)
-    : m_stream(dest)
-    , retv(success) {}
-
-  void operator()(const SokobanPuzzle &puzzle) {
-    retv = write_puzzle(puzzle);
-    for (const auto &snapshot : puzzle.snapshots()) {
-      if (retv) {
-        retv = write_snapshot(snapshot);
-      }
+  SOKWriter(ostream &dest)
+    : m_stream(dest) {
+    if (dest.fail()) {
+      throw std::runtime_error("Unknown output stream error!");
     }
   }
 
-  void operator()(const TriobanPuzzle &puzzle) {
-    retv = write_puzzle(puzzle);
-    for (const auto &snapshot : puzzle.snapshots()) {
+  bool write(const Collection &collection) {
+    bool retv = write_collection_header(collection);
+    for (const auto &puzzle : collection.puzzles()) {
       if (retv) {
-        retv = write_snapshot(snapshot);
+        retv = write_puzzle(puzzle);
+        for (size_t i = 0; i < puzzle.snapshots().size(); ++i) {
+          if (retv) {
+            const Snapshot &snapshot = puzzle.snapshots()[i];
+            retv                     = write_snapshot(snapshot);
+          }
+        }
       }
     }
-  }
-
-  void operator()(const OctobanPuzzle &puzzle) {
-    retv = write_puzzle(puzzle);
-    for (const auto &snapshot : puzzle.snapshots()) {
-      if (retv) {
-        retv = write_snapshot(snapshot);
-      }
-    }
-  }
-
-  void operator()(const HexobanPuzzle &puzzle) {
-    retv = write_puzzle(puzzle);
-    for (const auto &snapshot : puzzle.snapshots()) {
-      if (retv) {
-        retv = write_snapshot(snapshot);
-      }
-    }
+    return retv;
   }
 
 private:
-  ostream &m_stream;
-  bool    &retv;
-
   bool write_puzzle(const Puzzle &puzzle) {
     if (is_blank(puzzle.board()))
       return true;
@@ -830,30 +733,7 @@ private:
 
     return (bool)m_stream;
   }
-};
 
-class LIBSOKOENGINE_LOCAL SOKWriter {
-  ostream &m_stream;
-
-public:
-  SOKWriter(ostream &dest)
-    : m_stream(dest) {
-    if (dest.fail()) {
-      throw std::runtime_error("Unknown output stream error!");
-    }
-  }
-
-  bool write(const Collection &collection) {
-    bool retv = write_collection_header(collection);
-    for (const auto &puzzle_variant : collection.puzzles()) {
-      if (retv) {
-        std::visit(PuzzleWriteVisitor(m_stream, retv), puzzle_variant);
-      }
-    }
-    return retv;
-  }
-
-private:
   bool write_collection_header(const Collection &collection) {
     m_stream << SOK_format_specification << endl;
 

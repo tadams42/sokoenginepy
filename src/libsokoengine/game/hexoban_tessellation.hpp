@@ -5,31 +5,9 @@
 
 namespace sokoengine {
 namespace game {
+namespace implementation {
 
-///
-/// Tessellation for Hexoban game variant.
-///
-/// Board space is laid out on vertical hexagons with following coordinate system:
-///
-/// @image html hexoban_coordinates.png
-///
-/// Textual representation uses two characters for each hexagon. This allows different
-/// encoding schemes.
-///
-/// | Scheme 1                 | Scheme 2                 |
-/// | ------------------------ | ------------------------ |
-/// | ![](hexoban_scheme1.png) | ![](hexoban_scheme2.png) |
-///
-/// As long as encoding of single board is consistent, all methods handle any scheme
-/// transparently - parsing of board strings 'Just Works (TM)'
-///
-/// Direction <-> character mapping:
-///
-/// | LEFT | RIGHT | NORTH_WEST | SOUTH_WEST | NORTH_EAST | SOUTH_EAST |
-/// | ---- | ----- | ---------- | ---------- | ---------- | ---------- |
-/// | l, L | r, R  | u, U       | d, D       | n, N       | s, S       |
-///
-class LIBSOKOENGINE_API HexobanTessellation : public BaseTessellation {
+class LIBSOKOENGINE_LOCAL HexobanTessellation : public BaseTessellation {
 public:
   virtual const Directions &legal_directions() const override;
   virtual position_t        neighbor_position(
@@ -42,8 +20,8 @@ public:
   virtual char       pusher_step_to_char(const PusherStep &pusher_step) const override;
 };
 
+} // namespace implementation
 } // namespace game
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

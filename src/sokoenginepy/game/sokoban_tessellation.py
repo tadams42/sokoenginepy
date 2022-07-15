@@ -10,20 +10,6 @@ from .utilities import inverted
 
 
 class SokobanTessellation(BaseTessellation):
-    """
-    Tessellation for Sokoban game variant.
-
-    Board is laid out on squares.
-
-    Direction <-> character mapping:
-
-    ====  =====  ====  ====
-    LEFT  RIGHT  UP    DOWN
-    ====  =====  ====  ====
-    l, L  r, R   u, U  d, D
-    ====  =====  ====  ====
-    """
-
     _LEGAL_DIRECTIONS: Final[Tuple[Direction, ...]] = (
         Direction.LEFT,
         Direction.RIGHT,

@@ -10,9 +10,10 @@ from sokoenginepy.game import (
     CellAlreadyOccupiedError,
     Config,
     SokobanPlus,
+    Tessellation,
     index_1d,
 )
-from sokoenginepy.io import SokobanPuzzle
+from sokoenginepy.io import Puzzle
 
 
 @pytest.fixture
@@ -32,7 +33,7 @@ def puzzle():
         ----#######--------
     """
     data = textwrap.dedent(data)
-    return SokobanPuzzle(board=data)
+    return Puzzle(Tessellation.SOKOBAN, board=data)
 
 
 @pytest.fixture
@@ -57,7 +58,7 @@ def switched_puzzle():
         ----#######--------
     """
     data = textwrap.dedent(data)
-    return SokobanPuzzle(board=data)
+    return Puzzle(Tessellation.SOKOBAN, board=data)
 
 
 @pytest.fixture
@@ -593,7 +594,7 @@ class DescribeBoardManager:
         """
         switched_board = textwrap.dedent(switched_board)
 
-        puzzle = SokobanPuzzle(board=board)
+        puzzle = Puzzle(Tessellation.SOKOBAN, board=board)
         graph = BoardGraph(puzzle)
         board_manager = BoardManager(graph)
 

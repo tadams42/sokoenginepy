@@ -17,7 +17,7 @@ class Collection:
         author (str): Collection author
         created_at (str): datetime string of unspecified format (it is not parsed)
         updated_at (str): datetime string of unspecified format (it is not parsed)
-        notes (List[str]): collection notes
+        notes (str): collection notes
         puzzles (List[Puzzle]): collection puzzles
     """
 
@@ -29,11 +29,11 @@ class Collection:
         updated_at: str = "",
         notes: str = "",
     ):
-        self.title = title
-        self.author = author
-        self.created_at = created_at
-        self.updated_at = updated_at
-        self.notes = notes
+        self.title: str = title
+        self.author: str = author
+        self.created_at: str = created_at
+        self.updated_at: str = updated_at
+        self.notes: str = notes
         self.puzzles: List[Puzzle] = []
 
     def load(

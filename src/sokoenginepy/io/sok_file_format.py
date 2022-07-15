@@ -10,12 +10,8 @@ from typing import TYPE_CHECKING, Dict, Final, List, Optional, Pattern, Tuple, U
 import arrow
 
 from .collection import Collection
-from .hexoban import HexobanPuzzle, HexobanSnapshot
-from .octoban import OctobanPuzzle, OctobanSnapshot
 from .puzzle import Puzzle
 from .snapshot import Snapshot
-from .sokoban import SokobanPuzzle, SokobanSnapshot
-from .trioban import TriobanPuzzle, TriobanSnapshot
 from .utilities import is_blank
 
 if TYPE_CHECKING:
@@ -113,29 +109,19 @@ class SOKReader:
         self.dest.notes = "\n".join(self._data.notes)
 
         for puzzle_data in self._data.puzzles:
-            if puzzle_data.tessellation == Tessellation.SOKOBAN:
-                puzzle = SokobanPuzzle(board=puzzle_data.board)
-                snapshot_klass = SokobanSnapshot
-            elif puzzle_data.tessellation == Tessellation.HEXOBAN:
-                puzzle = HexobanPuzzle(board=puzzle_data.board)
-                snapshot_klass = HexobanSnapshot
-            elif puzzle_data.tessellation == Tessellation.TRIOBAN:
-                puzzle = TriobanPuzzle(board=puzzle_data.board)
-                snapshot_klass = TriobanSnapshot
-            elif puzzle_data.tessellation == Tessellation.OCTOBAN:
-                puzzle = OctobanPuzzle(board=puzzle_data.board)
-                snapshot_klass = OctobanSnapshot
-            else:
-                raise ValueError(
-                    f"Missing implementation for {puzzle_data.tessellation}!"
-                )
+            puzzle = Puzzle(
+                tessellation=puzzle_data.tessellation, board=puzzle_data.board
+            )
 
             for attr in {"title", "author", "boxorder", "goalorder"}:
                 setattr(puzzle, attr, getattr(puzzle_data, attr))
             puzzle.notes = "\n".join(puzzle_data.notes)
 
             for snapshot_data in puzzle_data.snapshots:
-                snapshot = snapshot_klass(moves_data=snapshot_data.moves_data or "")
+                snapshot = Snapshot(
+                    tessellation=puzzle_data.tessellation,
+                    moves_data=snapshot_data.moves_data or "",
+                )
                 for attr in {"title", "solver"}:
                     setattr(snapshot, attr, getattr(snapshot_data, attr))
                 snapshot.notes = "\n".join(snapshot_data.notes)
