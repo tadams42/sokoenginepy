@@ -22,8 +22,9 @@ void PuzzleResizer::add_row_top(
   parsed_board_t old_body   = parsed_board;
   board_size_t   old_height = height;
 
-  height       = height + 1;
-  parsed_board = parsed_board_t(width * height, Puzzle::VISIBLE_FLOOR);
+  height = height + 1;
+  parsed_board =
+    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < old_height; y++)
@@ -36,8 +37,9 @@ void PuzzleResizer::add_row_bottom(
   parsed_board_t old_body   = parsed_board;
   board_size_t   old_height = height;
 
-  height       = height + 1;
-  parsed_board = parsed_board_t(width * height, Puzzle::VISIBLE_FLOOR);
+  height = height + 1;
+  parsed_board =
+    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < old_height; y++)
@@ -50,8 +52,9 @@ void PuzzleResizer::add_column_left(
   parsed_board_t old_body  = parsed_board;
   board_size_t   old_width = width;
 
-  width        = width + 1;
-  parsed_board = parsed_board_t(width * height, Puzzle::VISIBLE_FLOOR);
+  width = width + 1;
+  parsed_board =
+    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < old_width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -64,8 +67,9 @@ void PuzzleResizer::add_column_right(
   parsed_board_t old_body  = parsed_board;
   board_size_t   old_width = width;
 
-  width        = width + 1;
-  parsed_board = parsed_board_t(width * height, Puzzle::VISIBLE_FLOOR);
+  width = width + 1;
+  parsed_board =
+    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < old_width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -77,8 +81,9 @@ void PuzzleResizer::remove_row_top(
 ) const {
   parsed_board_t old_body = parsed_board;
 
-  height       = height - 1;
-  parsed_board = parsed_board_t(width * height, Puzzle::VISIBLE_FLOOR);
+  height = height - 1;
+  parsed_board =
+    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -90,8 +95,9 @@ void PuzzleResizer::remove_row_bottom(
 ) const {
   parsed_board_t old_body = parsed_board;
 
-  height       = height - 1;
-  parsed_board = parsed_board_t(width * height, Puzzle::VISIBLE_FLOOR);
+  height = height - 1;
+  parsed_board =
+    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -104,8 +110,9 @@ void PuzzleResizer::remove_column_left(
   parsed_board_t old_body  = parsed_board;
   board_size_t   old_width = width;
 
-  width        = width - 1;
-  parsed_board = parsed_board_t(width * height, Puzzle::VISIBLE_FLOOR);
+  width = width - 1;
+  parsed_board =
+    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -118,8 +125,9 @@ void PuzzleResizer::remove_column_right(
   parsed_board_t old_body  = parsed_board;
   board_size_t   old_width = width;
 
-  width        = width - 1;
-  parsed_board = parsed_board_t(width * height, Puzzle::VISIBLE_FLOOR);
+  width = width - 1;
+  parsed_board =
+    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -298,7 +306,7 @@ void LIBSOKOENGINE_LOCAL _copy(
 ) {
   width  = strings.size() > 0 ? strings.front().size() : 0;
   height = strings.size();
-  parsed_board.resize(width * height);
+  parsed_board.resize(static_cast<size_t>(width) * height);
   size_t i = 0;
   for (auto row : strings) {
     for (auto c : row) {

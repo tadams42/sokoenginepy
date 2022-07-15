@@ -116,9 +116,10 @@ public:
       Strings board_rows = m_parser->parse(m_original_board);
       _copy(m_parsed_board, m_width, m_height, board_rows);
     } else {
-      m_height       = 0;
-      m_width        = 0;
-      m_parsed_board = parsed_board_t(m_height * m_width, Puzzle::VISIBLE_FLOOR);
+      m_height = 0;
+      m_width  = 0;
+      m_parsed_board =
+        parsed_board_t(static_cast<size_t>(m_height) * m_width, Puzzle::VISIBLE_FLOOR);
     }
     m_was_parsed = true;
   }
