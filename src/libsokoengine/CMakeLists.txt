@@ -1,36 +1,3 @@
-set(PRIVATE_HEADERS
-    io/collection/sok_file_format.hpp
-    io/collection/SOK_format_specification.h
-
-    io/rle/ast.hpp
-    io/rle/ast_adapted.hpp
-    io/rle/rle_config.hpp
-    io/rle/error_handler.hpp
-    io/rle/evaluator.hpp
-    io/rle/grammar.hpp
-    io/rle/json_printer.hpp
-
-    io/snapshot/ast.hpp
-    io/snapshot/snapshot_config.hpp
-    io/snapshot/error_handler.hpp
-    io/snapshot/evaluator.hpp
-    io/snapshot/grammar.hpp
-    io/snapshot/json_printer.hpp
-    io/snapshot/parser.hpp
-
-    io/puzzle_parsing.hpp
-
-    game/hexoban_tessellation.hpp
-    game/octoban_tessellation.hpp
-    game/sokoban_tessellation.hpp
-    game/trioban_tessellation.hpp
-
-    io/sokoban.hpp
-    io/trioban.hpp
-    io/hexoban.hpp
-    io/octoban.hpp
-)
-
 set(INSTALL_HEADERS
     sokoengine_config.hpp
     sokoengine.hpp
@@ -38,51 +5,74 @@ set(INSTALL_HEADERS
 
     game/board_cell.hpp
     game/board_graph.hpp
-    game/board_state.hpp
     game/board_manager.hpp
+    game/board_state.hpp
     game/hashed_board_manager.hpp
     game/mover.hpp
     game/pusher_step.hpp
     game/sokoban_plus.hpp
-    game/tessellation.hpp
 
     io/collection.hpp
     io/puzzle.hpp
     io/rle.hpp
+    io/snapshot.hpp
 )
 
 set(SELF_SOURCES
-    benchmarks.cpp
-
     game/board_cell.cpp
     game/board_graph.cpp
     game/board_manager.cpp
     game/board_state.cpp
     game/hashed_board_manager.cpp
+    game/hexoban_tessellation.cpp
+    game/hexoban_tessellation.hpp
     game/mover.cpp
+    game/octoban_tessellation.cpp
+    game/octoban_tessellation.hpp
     game/pusher_step.cpp
     game/sokoban_plus.cpp
-    game/tessellation.cpp
-    game/hexoban_tessellation.cpp
-    game/octoban_tessellation.cpp
     game/sokoban_tessellation.cpp
+    game/sokoban_tessellation.hpp
+    game/tessellation.cpp
+    game/tessellation.hpp
     game/trioban_tessellation.cpp
+    game/trioban_tessellation.hpp
 
     io/collection/collection.cpp
     io/collection/sok_file_format.cpp
-
-    io/rle/rle.cpp
-
-    io/snapshot/ast.cpp
-    io/snapshot/parser.cpp
-    io/snapshot/snapshot.cpp
-
+    io/collection/sok_file_format.hpp
+    io/collection/SOK_format_specification.h
     io/hexoban.cpp
+    io/hexoban.hpp
     io/octoban.cpp
-    io/puzzle.cpp
+    io/octoban.hpp
     io/puzzle_parsing.cpp
+    io/puzzle_parsing.hpp
+    io/puzzle.cpp
+    io/rle/ast_adapted.hpp
+    io/rle/ast.hpp
+    io/rle/error_handler.hpp
+    io/rle/evaluator.hpp
+    io/rle/grammar.hpp
+    io/rle/json_printer.hpp
+    io/rle/rle_config.hpp
+    io/rle/rle.cpp
+    io/snapshot/ast.cpp
+    io/snapshot/ast.hpp
+    io/snapshot/error_handler.hpp
+    io/snapshot/evaluator.hpp
+    io/snapshot/grammar.hpp
+    io/snapshot/json_printer.hpp
+    io/snapshot/parser.cpp
+    io/snapshot/parser.hpp
+    io/snapshot/snapshot_config.hpp
+    io/snapshot/snapshot.cpp
     io/sokoban.cpp
+    io/sokoban.hpp
     io/trioban.cpp
+    io/trioban.hpp
+
+    benchmarks.cpp
 )
 
 set(SELF_INCLUDE_DIRS
@@ -98,7 +88,7 @@ set(SELF_INCLUDE_DIRS
 # will get default visibility. Later it sets compile option "-fvisibility=hidden"
 # with net result of all symbols in this object library being hidden.
 # ..............................................................................
-add_library(sokoengine_obj_hidden OBJECT ${INSTALL_HEADERS} ${PRIVATE_HEADERS} ${SELF_SOURCES})
+add_library(sokoengine_obj_hidden OBJECT ${INSTALL_HEADERS} ${SELF_SOURCES})
 
 # ..............................................................................
 # sokoengine OBJECT library with some sybmbols visible
@@ -107,7 +97,7 @@ add_library(sokoengine_obj_hidden OBJECT ${INSTALL_HEADERS} ${PRIVATE_HEADERS} $
 # "LIBSOKOENGINE_API" will remain visible even though it later defines
 # "-fvisibility=hidden" compile option.
 # ..............................................................................
-add_library(sokoengine_obj OBJECT ${INSTALL_HEADERS} ${PRIVATE_HEADERS} ${SELF_SOURCES})
+add_library(sokoengine_obj OBJECT ${INSTALL_HEADERS} ${SELF_SOURCES})
 target_compile_definitions(sokoengine_obj PUBLIC
     LIBSOKOENGINE_DLL
     PRIVATE

@@ -3,7 +3,6 @@
 #include "tessellation.hpp"
 
 #include <boost/algorithm/string.hpp>
-#include <stdexcept>
 
 using sokoengine::implementation::Strings;
 using sokoengine::io::is_blank;

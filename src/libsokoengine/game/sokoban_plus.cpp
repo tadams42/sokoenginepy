@@ -2,12 +2,8 @@
 
 #include "board_manager.hpp"
 
-#include <charconv>
-#include <map>
-#include <set>
-#include <vector>
-
 #include <boost/algorithm/string.hpp>
+#include <charconv>
 
 using sokoengine::implementation::Strings;
 using sokoengine::io::is_blank;

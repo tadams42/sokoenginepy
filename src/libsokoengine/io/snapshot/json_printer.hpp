@@ -3,8 +3,6 @@
 
 #include "ast.hpp"
 
-#include <ostream>
-
 namespace sokoengine {
   namespace io {
     namespace snapshot_parsing {

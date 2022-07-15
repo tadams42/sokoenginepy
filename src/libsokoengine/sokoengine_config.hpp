@@ -48,7 +48,13 @@
 // #############################################################################
 
 #include <cstdint>
+#include <filesystem>
+#include <iostream>
 #include <limits>
+#include <map>
+#include <memory>
+#include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
 

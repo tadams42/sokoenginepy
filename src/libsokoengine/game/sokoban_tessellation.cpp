@@ -3,9 +3,6 @@
 #include "pusher_step.hpp"
 #include "snapshot.hpp"
 
-#include <map>
-#include <memory>
-
 using std::invalid_argument;
 using std::string;
 

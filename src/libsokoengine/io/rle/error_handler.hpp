@@ -5,8 +5,6 @@
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
-#include <map>
-#include <string>
 
 namespace sokoengine {
   namespace io {

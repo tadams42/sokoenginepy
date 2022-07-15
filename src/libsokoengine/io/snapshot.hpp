@@ -3,8 +3,6 @@
 
 #include "sokoengine_config.hpp"
 
-#include <memory>
-
 namespace sokoengine {
 
 namespace game {

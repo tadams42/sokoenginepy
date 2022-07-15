@@ -3,8 +3,6 @@
 
 #include "board_manager.hpp"
 
-#include <set>
-
 namespace sokoengine {
 namespace game {
 

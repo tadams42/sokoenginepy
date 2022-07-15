@@ -3,9 +3,6 @@
 
 #include "sokoengine_config.hpp"
 
-#include <memory>
-#include <stdexcept>
-
 namespace sokoengine {
 
 namespace io {

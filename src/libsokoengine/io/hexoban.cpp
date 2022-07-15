@@ -5,7 +5,6 @@
 #include "rle.hpp"
 
 #include <boost/algorithm/string.hpp>
-#include <iostream>
 
 using sokoengine::game::Config;
 using sokoengine::game::index_1d;

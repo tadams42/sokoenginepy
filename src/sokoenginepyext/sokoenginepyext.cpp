@@ -11,7 +11,6 @@ using sokoengine::game::SokobanPlusDataError;
 void export_pusher_step(py::module &);
 void export_board_cell(py::module &);
 void export_board_graph(py::module &);
-void export_tessellations(py::module &);
 void export_boards(py::module &m);
 void export_sokoban_plus(py::module &m);
 void export_board_manager(py::module &m);
@@ -56,7 +55,6 @@ PYBIND11_MODULE(sokoenginepyext, m) {
   export_pusher_step(m_game);
   export_board_cell(m_game);
   export_board_graph(m_game);
-  export_tessellations(m_game);
   export_sokoban_plus(m_game);
   export_board_manager(m_game);
   export_mover(m_game);

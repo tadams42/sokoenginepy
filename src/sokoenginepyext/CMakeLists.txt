@@ -15,20 +15,17 @@ if(Python3_FOUND)
 
     if(pybind11_FOUND)
         pybind11_add_module(sokoenginepyext
-            sokoenginepyext.cpp
-            export_pusher_step.cpp
             export_board_cell.cpp
             export_board_graph.cpp
-            export_tessellations.cpp
             export_board_manager.cpp
-            export_mover.cpp
-            export_sokoban_plus.cpp
-
-            export_io_puzzle.cpp
-            export_io_snapshot.cpp
             export_io_collection.cpp
+            export_io_puzzle.cpp
             export_io_rle.cpp
-
+            export_io_snapshot.cpp
+            export_mover.cpp
+            export_pusher_step.cpp
+            export_sokoban_plus.cpp
+            sokoenginepyext.cpp
             sokoenginepyext.hpp
         )
 

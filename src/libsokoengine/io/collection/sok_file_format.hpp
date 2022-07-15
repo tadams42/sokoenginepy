@@ -3,8 +3,6 @@
 
 #include "sokoengine_config.hpp"
 
-#include <iostream>
-
 namespace sokoengine {
 
 namespace io {

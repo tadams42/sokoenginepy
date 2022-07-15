@@ -2,8 +2,6 @@
 
 #include "puzzle.hpp"
 
-#include <stdexcept>
-
 using std::invalid_argument;
 using std::string;
 

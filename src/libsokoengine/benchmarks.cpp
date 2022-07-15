@@ -4,10 +4,8 @@
 #include <chrono>
 #include <deque>
 #include <iomanip>
-#include <iostream>
 #include <numeric>
 #include <sstream>
-#include <string>
 
 using sokoengine::game::BoardGraph;
 using sokoengine::game::BoardManager;

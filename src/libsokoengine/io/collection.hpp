@@ -1,10 +1,7 @@
 #ifndef COLLECTION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define COLLECTION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "tessellation.hpp"
-
-#include <filesystem>
-#include <variant>
+#include "sokoengine_config.hpp"
 
 namespace sokoengine {
 namespace io {
