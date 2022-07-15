@@ -1,6 +1,6 @@
 # Test various ways to build to make sure everything (setuptools, cmake, vcpkg, ...) is
 # correctly integrated
-name: build simulations
+name: every-build
 on:
   push:
     branches:
@@ -12,7 +12,7 @@ jobs:
 
   # Build sdist and wheel through "python -m build" without C++ extension
   sdist_and_wheel:
-    name: sdist and wheel
+    name: "sdist, wheel"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -58,7 +58,7 @@ jobs:
 
   # Build sdist and wheel through "python -m build" with C++ extension
   sdist_and_wheel_with_cpp:
-    name: sdist and wheel with C++ extension
+    name: "sdist, wheel, C++"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -112,7 +112,7 @@ jobs:
   # Build directly through cmake, without setuptools
   # We still need Python environment to build C++ Python module
   cpp_build:
-    name: C++ build directly with cmake
+    name: "cmake C++"
     runs-on: ubuntu-latest
 
     steps:
@@ -177,7 +177,7 @@ jobs:
 
   # Replicate build of Sphinx docs on ReadTheDocs so we get early fail if we broke it
   sphinx_docs:
-    name: Sphinx documentation
+    name: "Sphinx docs"
     runs-on: ubuntu-latest
     env:
       SOKOENGINEPYEXT_SKIP: true

@@ -1,0 +1,8 @@
+name: "My CodeQL config"
+
+paths:
+  - src
+
+paths-ignore:
+  - '**/vcpkg_installed'
+  - '**/tests'
