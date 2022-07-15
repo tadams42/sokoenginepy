@@ -13,13 +13,27 @@ namespace sokoengine {
       namespace x3 = boost::spirit::x3;
 
       namespace ast {
+        // clang-format off
+        // Beware of single-member-is-container AST structs
+        //
+        // https://github.com/boostorg/spirit/issues/463
+        // https://github.com/boostorg/spirit/pull/178
+        // https://stackoverflow.com/questions/50252680/boost-spirit-x3-parser-no-type-named-type-in
+        //
+        // When making an AST type, I'm always going into 1 of these:
+        //
+        // AST type of 1 member T: overload operator=(T)
+        // AST type of 2+ members: BOOST_FUSION_ADAPT_STRUCT
+        // AST type that inherits from some container (no further code required but must not contain members)
+        // AST type that inherits from x3::variant: add using base_type::base_type;, using base_type::operator=, must not contain members
+        // Other mixes of AST types end in various (long long) compilation errors.
+        // clang-format on
 
-        struct LIBSOKOENGINE_LOCAL Atom {
-          char data;
-        };
+        typedef char Atom;
 
-        struct LIBSOKOENGINE_LOCAL Atoms {
-          std::string data;
+        struct LIBSOKOENGINE_LOCAL Atoms : std::vector<char> {
+          using std::vector<char>::vector;
+          using std::vector<char>::operator=;
         };
 
         struct Group;
@@ -41,12 +55,14 @@ namespace sokoengine {
           using base_type::operator=;
         };
 
-        struct LIBSOKOENGINE_LOCAL Group {
-          std::list<AtomsOrRleOrGroup> data;
+        struct LIBSOKOENGINE_LOCAL Group : std::list<AtomsOrRleOrGroup> {
+          using std::list<AtomsOrRleOrGroup>::list;
+          using std::list<AtomsOrRleOrGroup>::operator=;
         };
 
-        struct LIBSOKOENGINE_LOCAL RleData {
-          std::list<AtomsOrRleOrGroup> data;
+        struct LIBSOKOENGINE_LOCAL RleData : std::list<AtomsOrRleOrGroup> {
+          using std::list<AtomsOrRleOrGroup>::list;
+          using std::list<AtomsOrRleOrGroup>::operator=;
         };
 
       } // namespace ast

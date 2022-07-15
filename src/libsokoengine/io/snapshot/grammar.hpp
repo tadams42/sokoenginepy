@@ -2,7 +2,6 @@
 #define GRAMMAR_BDC825C2_4FAB_4173_9B94_185BD7430359
 
 #include "ast.hpp"
-#include "ast_adapted.hpp"
 #include "error_handler.hpp"
 #include "snapshot.hpp"
 

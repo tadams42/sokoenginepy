@@ -30,11 +30,11 @@ namespace sokoengine {
         // we pass our error handler to the parser so we can access it later on in our
         // on_error and on_success handlers
         // clang-format off
-    auto const parser =
-      with<x3::error_handler_tag>(std::ref(error_handler))
-      [
-          snapshot_parsing::grammar
-      ];
+        auto const parser =
+          with<x3::error_handler_tag>(std::ref(error_handler))
+          [
+              snapshot_parsing::grammar
+          ];
         // clang-format on
 
         return x3::phrase_parse(iter, end, parser, x3::ascii::space, into);

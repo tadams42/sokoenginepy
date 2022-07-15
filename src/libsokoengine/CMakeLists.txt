@@ -11,7 +11,6 @@ set(PRIVATE_HEADERS
     io/rle/json_printer.hpp
 
     io/snapshot/ast.hpp
-    io/snapshot/ast_adapted.hpp
     io/snapshot/snapshot_config.hpp
     io/snapshot/error_handler.hpp
     io/snapshot/evaluator.hpp

@@ -27,16 +27,14 @@ namespace sokoengine {
               dest.push_back(c);
           }
 
-          void operator()(const Atom &o) const { (*this)(o.data); }
-
           void operator()(const Atoms &o) const {
-            for (char c : o.data) {
+            for (char c : o) {
               (*this)(c);
             }
           }
 
           void operator()(const Group &o) const {
-            for (const auto &expr : o.data) {
+            for (const auto &expr : o) {
               boost::apply_visitor(*this, expr);
             }
           }
@@ -48,7 +46,7 @@ namespace sokoengine {
           }
 
           void operator()(const RleData &o) const {
-            for (const auto &expr : o.data) {
+            for (const auto &expr : o) {
               boost::apply_visitor(*this, expr);
             }
           }

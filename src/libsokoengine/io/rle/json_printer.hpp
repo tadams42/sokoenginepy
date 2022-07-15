@@ -30,14 +30,12 @@ namespace sokoengine {
 
           std::string quoted(const std::string &src) const { return '"' + src + '"'; }
 
-          void operator()(const Atom &o) const { (*this)(o.data); }
-
           void operator()(const Atoms &o) const {
             out << '{' << quoted("type") << ':' << quoted("atoms") << ','
                 << quoted("data") << ':';
 
             out << '"';
-            for (char c : o.data) {
+            for (char c : o) {
               (*this)(c);
             }
             out << '"' << '}';
@@ -50,7 +48,7 @@ namespace sokoengine {
             auto actual_delim = ",";
             auto delim        = "";
 
-            for (const auto &expr : o.data) {
+            for (const auto &expr : o) {
               out << delim;
               boost::apply_visitor(*this, expr);
               delim = actual_delim;
@@ -82,7 +80,7 @@ namespace sokoengine {
             auto actual_delim = ",";
             auto delim        = "";
 
-            for (const auto &expr : o.data) {
+            for (const auto &expr : o) {
               out << delim;
               boost::apply_visitor(*this, expr);
               delim = actual_delim;

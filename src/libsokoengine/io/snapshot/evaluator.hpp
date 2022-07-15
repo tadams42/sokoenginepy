@@ -23,19 +23,21 @@ namespace sokoengine {
           // void operator()(expression const &o) const { boost::apply_visitor(*this,
           // o);
           // }
+          void operator()(const std::string &o) const {
+            string &buff = const_cast<string &>(steps_buffer);
+            buff += o;
+          }
 
           void operator()(const Moves &o) const {
-            string &buff = const_cast<string &>(steps_buffer);
-            buff += o.data;
+            (*this)(std::string(o.cbegin(), o.cend()));
           }
 
           void operator()(const Pushes &o) const {
-            string &buff = const_cast<string &>(steps_buffer);
-            buff += o.data;
+            (*this)(std::string(o.cbegin(), o.cend()));
           }
 
           void operator()(const Steps &o) const {
-            for (const auto &expr : o.data) {
+            for (const auto &expr : o) {
               boost::apply_visitor(*this, expr);
             }
             evaluated_ast::Steps evaluated;
@@ -45,7 +47,7 @@ namespace sokoengine {
           }
 
           void operator()(const Jump &o) const {
-            (*this)(o.data);
+            (*this)(std::string(o.cbegin(), o.cend()));
             evaluated_ast::Jump evaluated;
             string             &buff = const_cast<string &>(steps_buffer);
             std::swap(buff, evaluated.data);
@@ -53,7 +55,7 @@ namespace sokoengine {
           }
 
           void operator()(const PusherSelection &o) const {
-            (*this)(o.data);
+            (*this)(std::string(o.cbegin(), o.cend()));
             evaluated_ast::PusherSelection evaluated;
             string                        &buff = const_cast<string &>(steps_buffer);
             std::swap(buff, evaluated.data);
@@ -61,7 +63,7 @@ namespace sokoengine {
           }
 
           void operator()(const Snapshot &o) const {
-            for (const auto &expr : o.data) {
+            for (const auto &expr : o) {
               boost::apply_visitor(*this, expr);
             }
           }

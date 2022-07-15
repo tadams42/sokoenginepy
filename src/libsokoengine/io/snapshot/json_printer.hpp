@@ -22,12 +22,14 @@ namespace sokoengine {
 
           void operator()(const Moves &o) const {
             out << '{' << quoted("type") << ':' << quoted("moves") << ','
-                << quoted("data") << ':' << quoted(o.data) << "}";
+                << quoted("data") << ':' << quoted(std::string(o.cbegin(), o.cend()))
+                << "}";
           }
 
           void operator()(const Pushes &o) const {
             out << '{' << quoted("type") << ':' << quoted("pushes") << ','
-                << quoted("data") << ':' << quoted(o.data) << "}";
+                << quoted("data") << ':' << quoted(std::string(o.cbegin(), o.cend()))
+                << "}";
           }
 
           void operator()(const Steps &o) const {
@@ -37,7 +39,7 @@ namespace sokoengine {
             auto actual_delim = ",";
             auto delim        = "";
 
-            for (const auto &expr : o.data) {
+            for (const auto &expr : o) {
               out << delim;
               boost::apply_visitor(*this, expr);
               delim = actual_delim;
@@ -48,15 +50,13 @@ namespace sokoengine {
 
           void operator()(const Jump &o) const {
             out << '{' << quoted("type") << ':' << quoted("jump") << ','
-                << quoted("data") << ':';
-            (*this)(o.data);
+                << quoted("data") << ':' << quoted(std::string(o.cbegin(), o.cend()));
             out << '}';
           }
 
           void operator()(const PusherSelection &o) const {
             out << '{' << quoted("type") << ':' << quoted("pusher_selection") << ','
-                << quoted("data") << ':';
-            (*this)(o.data);
+                << quoted("data") << ':' << quoted(std::string(o.cbegin(), o.cend()));
             out << '}';
           }
 
@@ -67,7 +67,7 @@ namespace sokoengine {
             auto actual_delim = ",";
             auto delim        = "";
 
-            for (const auto &expr : o.data) {
+            for (const auto &expr : o) {
               out << delim;
               boost::apply_visitor(*this, expr);
               delim = actual_delim;
