@@ -64,7 +64,7 @@ class BoardCell:
         return self.to_str(use_visible_floor=False)
 
     def __repr__(self):
-        return "BoardCell('{0}')".format(str(self))
+        return f"BoardCell('{str(self)}')"
 
     def to_str(self, use_visible_floor: bool = False) -> str:
         retv = Puzzle.FLOOR

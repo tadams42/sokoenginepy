@@ -117,9 +117,8 @@ class HashedBoardManager(BoardManager):
             nonlocal src_index
             if position in self.walls_positions:
                 return None
-            else:
-                src_index += 1
-                return lst[src_index - 1]
+            src_index += 1
+            return lst[src_index - 1]
 
         return [choose(pos) for pos in range(self.board.size)]
 

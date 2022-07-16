@@ -252,7 +252,7 @@ static constexpr uint8_t DIRECTIONS_COUNT = direction_pack(Direction::NORTH_WEST
 ///
 /// Opposite Direction lookup.
 ///
-static constexpr const Direction DIRECTIONS[DIRECTIONS_COUNT] = {
+static constexpr Direction DIRECTIONS[DIRECTIONS_COUNT] = {
   Direction::UP,
   Direction::NORTH_EAST,
   Direction::RIGHT,
@@ -265,7 +265,7 @@ static constexpr const Direction DIRECTIONS[DIRECTIONS_COUNT] = {
 ///
 /// Opposite directions lookup
 ///
-static constexpr const Direction OPPOSITE_DIRECTIONS[DIRECTIONS_COUNT] = {
+static constexpr Direction OPPOSITE_DIRECTIONS[DIRECTIONS_COUNT] = {
   Direction::DOWN,
   Direction::SOUTH_WEST,
   Direction::LEFT,

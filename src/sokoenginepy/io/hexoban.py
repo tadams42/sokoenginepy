@@ -64,11 +64,11 @@ class HexobanTextConverter:
 
         if rmnf is None:
             return False
-        elif rmnf > 0:
+        if rmnf > 0:
             y = index_y(rmnf, PuzzleParser.calculate_width(strings))
             return y % 2 == 0
-        else:  # rmnf == 0
-            return True
+        # else:  rmnf == 0
+        return True
 
     @staticmethod
     def _find_rightmost_non_floor(strings: List[str]) -> Optional[int]:
@@ -113,7 +113,7 @@ class HexobanTextConverter:
 
         if odd_x > even_x:
             return rightmost_in_odd_rows
-        elif even_x > odd_x:
+        if even_x > odd_x:
             return rightmost_in_even_rows
 
         return rightmost_in_odd_rows if odd_y > even_y else rightmost_in_even_rows
@@ -132,7 +132,7 @@ class HexobanTextConverter:
         if width == 0 or height == 0:
             return [], True
 
-        elif even_row_x_parity < 0 or odd_row_x_parity < 0:
+        if even_row_x_parity < 0 or odd_row_x_parity < 0:
             internal = height * [int(width / 2) * Puzzle.VISIBLE_FLOOR]
             return internal, True
 
@@ -356,9 +356,7 @@ class HexobanPuzzleResizer(PuzzleResizer):
         printed_board = converter.reverse_columns(printed_board)
         printed_board = converter.remove_column_right(printed_board)
 
-        new_parsed_board, layout_ok = converter.convert_to_internal(
-            "\n".join(printed_board)
-        )
+        new_parsed_board, _ = converter.convert_to_internal("\n".join(printed_board))
         new_width = len(new_parsed_board[0]) if new_parsed_board else 0
         new_height = len(new_parsed_board)
 
@@ -375,9 +373,7 @@ class HexobanPuzzleResizer(PuzzleResizer):
 
         printed_board = converter.add_row_top(printed_board)
 
-        new_parsed_board, layout_ok = converter.convert_to_internal(
-            "\n".join(printed_board)
-        )
+        new_parsed_board, _ = converter.convert_to_internal("\n".join(printed_board))
         new_width = len(new_parsed_board[0]) if new_parsed_board else 0
         new_height = len(new_parsed_board)
 
@@ -394,9 +390,7 @@ class HexobanPuzzleResizer(PuzzleResizer):
 
         printed_board = converter.remove_row_top(printed_board)
 
-        new_parsed_board, layout_ok = converter.convert_to_internal(
-            "\n".join(printed_board)
-        )
+        new_parsed_board, _ = converter.convert_to_internal("\n".join(printed_board))
         new_width = len(new_parsed_board[0]) if new_parsed_board else 0
         new_height = len(new_parsed_board)
 
@@ -413,9 +407,7 @@ class HexobanPuzzleResizer(PuzzleResizer):
 
         printed_board = converter.remove_row_bottom(printed_board)
 
-        new_parsed_board, layout_ok = converter.convert_to_internal(
-            "\n".join(printed_board)
-        )
+        new_parsed_board, _ = converter.convert_to_internal("\n".join(printed_board))
         new_width = len(new_parsed_board[0]) if new_parsed_board else 0
         new_height = len(new_parsed_board)
 

@@ -159,7 +159,7 @@ class BoardGraph:
                     )
                 )
 
-        except (KeyError, IndexError, nx.NetworkXError) as e:
+        except (KeyError, IndexError, nx.NetworkXError):
             raise IndexError(f"Board position {src} is out of range!")
 
         return retv
@@ -367,8 +367,7 @@ class BoardGraph:
         )
         if reachables:
             return min(reachables)
-        else:
-            return pusher_position
+        return pusher_position
 
     def path_destination(self, src: int, directions: Directions) -> int:
         """
@@ -478,7 +477,7 @@ class BoardGraph:
             visited[root] = True
             to_inspect = deque([root])
 
-            while len(to_inspect) > 0:
+            while to_inspect:
                 current_position = to_inspect.popleft()
 
                 if current_position == root or current_position not in excluded:
@@ -497,5 +496,4 @@ class BoardGraph:
 
         if root in excluded:
             return [pos for pos in reachables if pos != root]
-        else:
-            return list(reachables)
+        return list(reachables)

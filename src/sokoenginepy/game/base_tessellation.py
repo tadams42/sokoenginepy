@@ -123,14 +123,13 @@ class BaseTessellation(metaclass=ABCMeta):
 
         if tessellation == Tessellation.SOKOBAN:
             return SokobanTessellation()
-        elif tessellation == Tessellation.HEXOBAN:
+        if tessellation == Tessellation.HEXOBAN:
             return HexobanTessellation()
-        elif tessellation == Tessellation.TRIOBAN:
+        if tessellation == Tessellation.TRIOBAN:
             return TriobanTessellation()
-        elif tessellation == Tessellation.OCTOBAN:
+        if tessellation == Tessellation.OCTOBAN:
             return OctobanTessellation()
-        else:
-            raise ValueError("Unknown tessellation!")
+        raise ValueError("Unknown tessellation!")
 
     @property
     def legal_directions(self) -> Tuple[Direction, ...]:

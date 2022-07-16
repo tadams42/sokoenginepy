@@ -15,12 +15,12 @@ namespace implementation {
 
 using io::CellOrientation;
 
-const BaseTessellation &BaseTessellation::instance(const Tessellation &tessellation) {
-  static const SokobanTessellation SOKOBAN;
-  static const HexobanTessellation HEXOBAN;
-  static const TriobanTessellation TRIOBAN;
-  static const OctobanTessellation OCTOBAN;
+static constexpr SokobanTessellation SOKOBAN;
+static constexpr HexobanTessellation HEXOBAN;
+static constexpr TriobanTessellation TRIOBAN;
+static constexpr OctobanTessellation OCTOBAN;
 
+const BaseTessellation &BaseTessellation::instance(const Tessellation &tessellation) {
   switch (tessellation) {
     case Tessellation::SOKOBAN:
       return SOKOBAN;

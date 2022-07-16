@@ -18,7 +18,7 @@ void LIBSOKOENGINE_LOCAL _copy(
 
 class LIBSOKOENGINE_LOCAL PuzzleResizer {
 public:
-  virtual ~PuzzleResizer() = default;
+  constexpr inline PuzzleResizer() {}
 
   virtual void add_row_top(
     parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
@@ -69,7 +69,7 @@ public:
 
 class LIBSOKOENGINE_LOCAL PuzzleParser {
 public:
-  virtual ~PuzzleParser() = default;
+  constexpr inline PuzzleParser() {}
 
   virtual sokoengine::implementation::Strings parse(const std::string &board) const;
   static size_t calculate_width(const sokoengine::implementation::Strings &strings);
@@ -82,7 +82,7 @@ public:
 
 class LIBSOKOENGINE_LOCAL PuzzlePrinter {
 public:
-  virtual ~PuzzlePrinter() = default;
+  constexpr inline PuzzlePrinter() {}
 
   virtual std::string print(
     const parsed_board_t &parsed_board,

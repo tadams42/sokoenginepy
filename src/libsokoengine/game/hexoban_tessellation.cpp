@@ -10,15 +10,16 @@ namespace sokoengine {
 namespace game {
 namespace implementation {
 
+static const Directions HEX_LEGAL_DIRECTIONS = {
+  Direction::LEFT,
+  Direction::RIGHT,
+  Direction::NORTH_EAST,
+  Direction::NORTH_WEST,
+  Direction::SOUTH_EAST,
+  Direction::SOUTH_WEST};
+
 const Directions &HexobanTessellation::legal_directions() const {
-  static const Directions retv = {
-    Direction::LEFT,
-    Direction::RIGHT,
-    Direction::NORTH_EAST,
-    Direction::NORTH_WEST,
-    Direction::SOUTH_EAST,
-    Direction::SOUTH_WEST};
-  return retv;
+  return HEX_LEGAL_DIRECTIONS;
 }
 
 position_t HexobanTessellation::neighbor_position(

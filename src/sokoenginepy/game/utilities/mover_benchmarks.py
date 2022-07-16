@@ -4,19 +4,18 @@ import enum
 import operator
 import textwrap
 import time
-from enum import IntEnum
 from functools import reduce
 
-from sokoenginepy.game import BoardGraph, Direction, Mover, SolvingMode
-from sokoenginepy.io import SokobanPuzzle
+from sokoenginepy.game import BoardGraph, Direction, Mover, SolvingMode, Tessellation
+from sokoenginepy.io import Puzzle
 
 
-class BoardType(IntEnum):
+class BoardType(enum.Enum):
     SMALL = 1
     LARGE = 2
 
     @property
-    def puzzle(self) -> SokobanPuzzle:
+    def puzzle(self) -> Puzzle:
         if self == self.SMALL:
             data = """
                 ##########
@@ -27,36 +26,36 @@ class BoardType(IntEnum):
                 ##########
             """
             data = textwrap.dedent(data.lstrip("\n").rstrip())
-            return SokobanPuzzle(board=data)
-        else:
-            data = """
-                ######################################
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #*************          *************#
-                #*************          *************#
-                #*************          *************#
-                #*************    *@    *************#
-                #*************          *************#
-                #*************          *************#
-                #*************          *************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                #************************************#
-                ######################################
-            """
-            return SokobanPuzzle(board=data)
+            return Puzzle(Tessellation.SOKOBAN, board=data)
+
+        data = """
+            ######################################
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #*************          *************#
+            #*************          *************#
+            #*************          *************#
+            #*************    *@    *************#
+            #*************          *************#
+            #*************          *************#
+            #*************          *************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            #************************************#
+            ######################################
+        """
+        return Puzzle(Tessellation.SOKOBAN, board=data)
 
 
 class BenchmarkType(enum.Enum):
@@ -100,7 +99,7 @@ class MovementBenchmark:
     def run(self):
         total_time = 0
         undo_move = False
-        for i in range(0, int(self.moves_count)):
+        for _ in range(0, int(self.moves_count)):
             if undo_move:
                 start_time = time.perf_counter()
                 self.mover.undo_last_move()
@@ -146,7 +145,7 @@ class MovementBenchmarkPrinter:
 
         print("{:<20}: ".format(benchmark_type.title), end="", flush=True)
 
-        for i in range(0, self.runs_count):
+        for _ in range(0, self.runs_count):
             benchmarker = MovementBenchmark(
                 board_type, benchmark_type, self.moves_per_run_count
             )

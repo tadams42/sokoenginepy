@@ -60,11 +60,11 @@ class OctobanTessellation(BaseTessellation):
     ) -> int:
         if self.cell_orientation(
             position, board_width, board_height
-        ) != CellOrientation.OCTAGON and (
-            direction == Direction.NORTH_EAST
-            or direction == Direction.NORTH_WEST
-            or direction == Direction.SOUTH_EAST
-            or direction == Direction.SOUTH_WEST
+        ) != CellOrientation.OCTAGON and direction in (
+            Direction.NORTH_EAST,
+            Direction.NORTH_WEST,
+            Direction.SOUTH_EAST,
+            Direction.SOUTH_WEST,
         ):
             return Config.NO_POS
 

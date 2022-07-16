@@ -1,10 +1,11 @@
 import cProfile
 from textwrap import dedent
 
-from sokoenginepy.game import BoardGraph, Direction, Mover
-from sokoenginepy.io import SokobanPuzzle
+from sokoenginepy.game import BoardGraph, Direction, Mover, Tessellation
+from sokoenginepy.io import Puzzle
 
-puzzle = SokobanPuzzle(
+puzzle = Puzzle(
+    Tessellation.SOKOBAN,
     board=dedent(
         """
     ###########
@@ -16,7 +17,7 @@ puzzle = SokobanPuzzle(
 """[
             1:-1
         ]
-    )
+    ),
 )
 board = BoardGraph(puzzle)
 
@@ -46,18 +47,6 @@ def single_move_profile():
 
 
 def single_moves_cycle_profile():
-    moves_cycle = [
-        Direction.LEFT,
-        Direction.DOWN,
-        Direction.LEFT,
-        Direction.LEFT,
-        Direction.UP,
-        Direction.RIGHT,
-        Direction.DOWN,
-        Direction.RIGHT,
-        Direction.RIGHT,
-        Direction.UP,
-    ]
     for d in moves_cycle:
         mover.move(d)
 

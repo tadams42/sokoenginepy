@@ -11,17 +11,18 @@ namespace sokoengine {
 namespace game {
 namespace implementation {
 
+static const Directions OCT_LEGAL_DIRECTIONS = {
+  Direction::LEFT,
+  Direction::RIGHT,
+  Direction::UP,
+  Direction::DOWN,
+  Direction::NORTH_EAST,
+  Direction::NORTH_WEST,
+  Direction::SOUTH_EAST,
+  Direction::SOUTH_WEST};
+
 const Directions &OctobanTessellation::legal_directions() const {
-  static const Directions retv = {
-    Direction::LEFT,
-    Direction::RIGHT,
-    Direction::UP,
-    Direction::DOWN,
-    Direction::NORTH_EAST,
-    Direction::NORTH_WEST,
-    Direction::SOUTH_EAST,
-    Direction::SOUTH_WEST};
-  return retv;
+  return OCT_LEGAL_DIRECTIONS;
 }
 
 position_t OctobanTessellation::neighbor_position(

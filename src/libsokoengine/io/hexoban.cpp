@@ -27,7 +27,8 @@ namespace implementation {
 
 class LIBSOKOENGINE_LOCAL HexobanPuzzleResizer : public PuzzleResizer {
 public:
-  virtual ~HexobanPuzzleResizer() = default;
+  constexpr inline HexobanPuzzleResizer()
+    : PuzzleResizer() {}
 
   virtual void add_row_top(
     parsed_board_t &parsed_board, board_size_t &width, board_size_t &height
@@ -45,13 +46,17 @@ public:
 
 class LIBSOKOENGINE_LOCAL HexobanPuzzleParser : public PuzzleParser {
 public:
-  virtual ~HexobanPuzzleParser() = default;
+  constexpr inline HexobanPuzzleParser()
+    : PuzzleParser() {}
+
   virtual Strings parse(const string &board) const override;
 };
 
 class LIBSOKOENGINE_LOCAL HexobanPuzzlePrinter : public PuzzlePrinter {
 public:
-  virtual ~HexobanPuzzlePrinter() = default;
+  constexpr inline HexobanPuzzlePrinter()
+    : PuzzlePrinter() {}
+
   virtual string print(
     const parsed_board_t &parsed_board,
     board_size_t          width,
@@ -61,20 +66,15 @@ public:
   ) const override;
 };
 
-const PuzzleResizer &Hexoban::resizer() {
-  static const HexobanPuzzleResizer the_one;
-  return the_one;
-}
+static constexpr HexobanPuzzleResizer HEX_RESIZER;
+static constexpr HexobanPuzzleParser  HEX_PARSER;
+static constexpr HexobanPuzzlePrinter HEX_PRINTER;
 
-const PuzzleParser &Hexoban::parser() {
-  static const HexobanPuzzleParser the_one;
-  return the_one;
-}
+const PuzzleResizer &Hexoban::resizer() { return HEX_RESIZER; }
 
-const PuzzlePrinter &Hexoban::printer() {
-  static const HexobanPuzzlePrinter the_one;
-  return the_one;
-}
+const PuzzleParser &Hexoban::parser() { return HEX_PARSER; }
+
+const PuzzlePrinter &Hexoban::printer() { return HEX_PRINTER; }
 
 class LIBSOKOENGINE_LOCAL HexobanTextConverter {
   typedef tuple<Strings, board_size_t, board_size_t, int8_t, int8_t> preparse_results_t;

@@ -9,6 +9,9 @@ namespace implementation {
 
 class LIBSOKOENGINE_LOCAL HexobanTessellation : public BaseTessellation {
 public:
+  constexpr inline HexobanTessellation()
+    : BaseTessellation() {}
+
   virtual const Directions &legal_directions() const override;
   virtual position_t        neighbor_position(
            position_t       position,

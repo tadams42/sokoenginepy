@@ -168,11 +168,9 @@ public:
       bool   was_tagged = false;
       string value;
 
-      if (!was_tagged) {
-        value = get_tag_data(TITLE, line, was_tagged);
-        if (was_tagged) {
-          dest.title = value;
-        }
+      value = get_tag_data(TITLE, line, was_tagged);
+      if (was_tagged) {
+        dest.title = value;
       }
 
       if (!was_tagged) {
@@ -230,11 +228,9 @@ public:
       bool   was_tagged = false;
       string value;
 
-      if (!was_tagged) {
-        value = get_tag_data(TITLE, line, was_tagged);
-        if (was_tagged) {
-          dest.title = value;
-        }
+      value = get_tag_data(TITLE, line, was_tagged);
+      if (was_tagged) {
+        dest.title = value;
       }
 
       if (!was_tagged) {
@@ -485,7 +481,7 @@ private:
         }
 
         if (remaining_lines.size() > 0) {
-          auto first_moves_line = std::find_if(
+          first_moves_line = std::find_if(
             remaining_lines.cbegin(),
             remaining_lines.cend(),
             [](const string &line) {
@@ -639,7 +635,7 @@ class LIBSOKOENGINE_LOCAL SOKWriter {
   ostream &m_stream;
 
 public:
-  SOKWriter(ostream &dest)
+  explicit SOKWriter(ostream &dest)
     : m_stream(dest) {
     if (dest.fail()) {
       throw std::runtime_error("Unknown output stream error!");

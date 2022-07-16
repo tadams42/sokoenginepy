@@ -71,42 +71,42 @@ class Puzzle:
 
     @classmethod
     def is_pusher(cls, character: str) -> bool:
-        return (
-            character == cls.PUSHER
-            or character == cls.ALT_PUSHER1
-            or character == cls.ALT_PUSHER2
-            or character == cls.PUSHER_ON_GOAL
-            or character == cls.ALT_PUSHER_ON_GOAL1
-            or character == cls.ALT_PUSHER_ON_GOAL2
+        return character in (
+            cls.PUSHER,
+            cls.ALT_PUSHER1,
+            cls.ALT_PUSHER2,
+            cls.PUSHER_ON_GOAL,
+            cls.ALT_PUSHER_ON_GOAL1,
+            cls.ALT_PUSHER_ON_GOAL2,
         )
 
     @classmethod
     def is_box(cls, character: str) -> bool:
-        return (
-            character == cls.BOX
-            or character == cls.ALT_BOX1
-            or character == cls.BOX_ON_GOAL
-            or character == cls.ALT_BOX_ON_GOAL1
+        return character in (
+            cls.BOX,
+            cls.ALT_BOX1,
+            cls.BOX_ON_GOAL,
+            cls.ALT_BOX_ON_GOAL1,
         )
 
     @classmethod
     def is_goal(cls, character: str) -> bool:
-        return (
-            character == cls.GOAL
-            or character == cls.ALT_GOAL1
-            or character == cls.BOX_ON_GOAL
-            or character == cls.ALT_BOX_ON_GOAL1
-            or character == cls.PUSHER_ON_GOAL
-            or character == cls.ALT_PUSHER_ON_GOAL1
-            or character == cls.ALT_PUSHER_ON_GOAL2
+        return character in (
+            cls.GOAL,
+            cls.ALT_GOAL1,
+            cls.BOX_ON_GOAL,
+            cls.ALT_BOX_ON_GOAL1,
+            cls.PUSHER_ON_GOAL,
+            cls.ALT_PUSHER_ON_GOAL1,
+            cls.ALT_PUSHER_ON_GOAL2,
         )
 
     @classmethod
     def is_empty_floor(cls, character: str) -> bool:
-        return (
-            character == cls.FLOOR
-            or character == cls.VISIBLE_FLOOR
-            or character == cls.ALT_VISIBLE_FLOOR1
+        return character in (
+            cls.FLOOR,
+            cls.VISIBLE_FLOOR,
+            cls.ALT_VISIBLE_FLOOR1,
         )
 
     @classmethod
@@ -115,10 +115,10 @@ class Puzzle:
 
     @classmethod
     def is_border_element(cls, character: str) -> bool:
-        return (
-            character == cls.WALL
-            or character == cls.BOX_ON_GOAL
-            or character == cls.ALT_BOX_ON_GOAL1
+        return character in (
+            cls.WALL,
+            cls.BOX_ON_GOAL,
+            cls.ALT_BOX_ON_GOAL1,
         )
 
     @classmethod
@@ -280,7 +280,7 @@ class Puzzle:
     def board(self, rv: str):
         if not self.is_board(rv):
             raise ValueError("Invalid characters in board string!")
-        self._board = rv
+        self._original_board = rv
         self._was_parsed = False
         self._pushers_count = None
         self._boxes_count = None
@@ -532,7 +532,7 @@ class Puzzle:
             self._reparse()
 
     @property
-    def _resizer(self):
+    def _resizer(self) -> PuzzleResizer:
         from ..game import Tessellation
         from .hexoban import Hexoban
         from .octoban import Octoban
@@ -541,17 +541,16 @@ class Puzzle:
 
         if self._tessellation == Tessellation.SOKOBAN:
             return Sokoban.resizer()
-        elif self._tessellation == Tessellation.TRIOBAN:
+        if self._tessellation == Tessellation.TRIOBAN:
             return Trioban.resizer()
-        elif self._tessellation == Tessellation.HEXOBAN:
+        if self._tessellation == Tessellation.HEXOBAN:
             return Hexoban.resizer()
-        elif self._tessellation == Tessellation.OCTOBAN:
+        if self._tessellation == Tessellation.OCTOBAN:
             return Octoban.resizer()
-        else:
-            raise ValueError(f"Unknown tessellation {self._tessellation}")
+        raise ValueError(f"Unknown tessellation {self._tessellation}")
 
     @property
-    def _parser(self):
+    def _parser(self) -> PuzzleParser:
         from ..game import Tessellation
         from .hexoban import Hexoban
         from .octoban import Octoban
@@ -560,17 +559,16 @@ class Puzzle:
 
         if self._tessellation == Tessellation.SOKOBAN:
             return Sokoban.parser()
-        elif self._tessellation == Tessellation.TRIOBAN:
+        if self._tessellation == Tessellation.TRIOBAN:
             return Trioban.parser()
-        elif self._tessellation == Tessellation.HEXOBAN:
+        if self._tessellation == Tessellation.HEXOBAN:
             return Hexoban.parser()
-        elif self._tessellation == Tessellation.OCTOBAN:
+        if self._tessellation == Tessellation.OCTOBAN:
             return Octoban.parser()
-        else:
-            raise ValueError(f"Unknown tessellation {self._tessellation}")
+        raise ValueError(f"Unknown tessellation {self._tessellation}")
 
     @property
-    def _printer(self):
+    def _printer(self) -> PuzzlePrinter:
         from ..game import Tessellation
         from .hexoban import Hexoban
         from .octoban import Octoban
@@ -579,14 +577,13 @@ class Puzzle:
 
         if self._tessellation == Tessellation.SOKOBAN:
             return Sokoban.printer()
-        elif self._tessellation == Tessellation.TRIOBAN:
+        if self._tessellation == Tessellation.TRIOBAN:
             return Trioban.printer()
-        elif self._tessellation == Tessellation.HEXOBAN:
+        if self._tessellation == Tessellation.HEXOBAN:
             return Hexoban.printer()
-        elif self._tessellation == Tessellation.OCTOBAN:
+        if self._tessellation == Tessellation.OCTOBAN:
             return Octoban.printer()
-        else:
-            raise ValueError(f"Unknown tessellation {self._tessellation}")
+        raise ValueError(f"Unknown tessellation {self._tessellation}")
 
 
 _CHARACTERS: Set[str] = {

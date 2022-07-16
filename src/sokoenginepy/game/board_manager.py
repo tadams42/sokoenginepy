@@ -146,9 +146,6 @@ class BoardManager:
         else:
             walls = f"[{walls}]"
 
-        go = self.goalorder or ""
-        bo = self.boxorder or ""
-
         return (
             f"{self.__class__.__name__}("
             + ", ".join(

@@ -39,11 +39,6 @@ public:
   hash_vector_t                          m_pushers_factors;
   HashedBoardManager::solutions_hashes_t m_solutions_hashes;
 
-  PIMPL() {}
-
-  PIMPL(PIMPL &&rv)            = default;
-  PIMPL &operator=(PIMPL &&rv) = default;
-
   static string to_str(const hash_vector_t &v, int add_indent = 0) {
     string indent(add_indent, ' ');
 

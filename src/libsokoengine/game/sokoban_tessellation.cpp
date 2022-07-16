@@ -10,10 +10,11 @@ namespace sokoengine {
 namespace game {
 namespace implementation {
 
+static const Directions SOK_LEGAL_DIRECTIONS = {
+  Direction::LEFT, Direction::RIGHT, Direction::UP, Direction::DOWN};
+
 const Directions &SokobanTessellation::legal_directions() const {
-  static const Directions retv = {
-    Direction::LEFT, Direction::RIGHT, Direction::UP, Direction::DOWN};
-  return retv;
+  return SOK_LEGAL_DIRECTIONS;
 }
 
 position_t SokobanTessellation::neighbor_position(

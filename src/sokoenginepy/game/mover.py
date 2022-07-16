@@ -430,7 +430,7 @@ class Mover:
         if in_front_of_pusher == Config.NO_POS:
             raise IllegalMoveError(
                 "Can't move pusher off board! (ID: "
-                + "{0}, direction: {1})".format(self._selected_pusher, str(direction))
+                + f"{self._selected_pusher}, direction: {direction})"
             )
 
         try:

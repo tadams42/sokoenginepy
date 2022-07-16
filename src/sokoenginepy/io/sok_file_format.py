@@ -100,8 +100,6 @@ class SOKReader:
         self._parse_notes()
 
     def _copy(self):
-        from ..game import Tessellation
-
         self.dest.title = self._data.title or ""
         self.dest.author = self._data.author or ""
         self.dest.created_at = self._data.created_at or ""

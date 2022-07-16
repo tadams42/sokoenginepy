@@ -15,7 +15,7 @@ namespace implementation {
 ///
 class LIBSOKOENGINE_LOCAL BaseTessellation {
 public:
-  virtual ~BaseTessellation() = default;
+  constexpr inline BaseTessellation() {}
 
   static const BaseTessellation &instance(const Tessellation &tessellation);
 

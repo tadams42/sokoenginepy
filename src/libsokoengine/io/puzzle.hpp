@@ -94,7 +94,7 @@ public:
   /// @param width number of columns
   /// @param height number of rows
   ///
-  Puzzle(
+  explicit Puzzle(
     const game::Tessellation &tessellation,
     board_size_t              width  = 0,
     board_size_t              height = 0
@@ -102,7 +102,9 @@ public:
   ///
   /// @param board game board in textual representation.
   ///
-  Puzzle(const game::Tessellation &tessellation, const std::string &board = "");
+  explicit Puzzle(
+    const game::Tessellation &tessellation, const std::string &board = ""
+  );
   Puzzle(const Puzzle &rv);
   Puzzle &operator=(const Puzzle &rv);
   Puzzle(Puzzle &&rv);

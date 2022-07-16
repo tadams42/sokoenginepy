@@ -15,7 +15,7 @@ class BoardCell;
 
 class LIBSOKOENGINE_API InvalidPositionError : public std::out_of_range {
 public:
-  InvalidPositionError(long position);
+  explicit InvalidPositionError(long position);
   virtual ~InvalidPositionError();
 };
 

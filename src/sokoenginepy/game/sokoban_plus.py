@@ -90,8 +90,7 @@ class SokobanPlus:
             return self._rstrip_default_plus_ids(
                 " ".join(str(i) for i in self._box_plus_ids.values())
             )
-        else:
-            return self._boxorder
+        return self._boxorder
 
     @boxorder.setter
     def boxorder(self, rv):
@@ -106,8 +105,7 @@ class SokobanPlus:
             return self._rstrip_default_plus_ids(
                 " ".join(str(i) for i in self._goal_plus_ids.values())
             )
-        else:
-            return self._goalorder
+        return self._goalorder
 
     @goalorder.setter
     def goalorder(self, rv):
@@ -200,14 +198,12 @@ class SokobanPlus:
             return plus_ids_str.rstrip(
                 str(self.DEFAULT_PLUS_ID) + " " + str(self.LEGACY_DEFAULT_PLUS_ID)
             )
-        else:
-            return plus_ids_str.rstrip(str(self.DEFAULT_PLUS_ID) + " ")
+        return plus_ids_str.rstrip(str(self.DEFAULT_PLUS_ID) + " ")
 
     def _get_plus_id(self, for_id: int, from_where: Dict[int, int]):
         if not self.is_enabled:
             return self.DEFAULT_PLUS_ID
-        else:
-            return from_where[for_id]
+        return from_where[for_id]
 
     def _parse_and_clean_ids_string(self, plus_ids_str) -> Dict[int, int]:
         """

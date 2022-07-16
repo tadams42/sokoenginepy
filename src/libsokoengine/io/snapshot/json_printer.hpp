@@ -13,7 +13,7 @@ namespace sokoengine {
 
           std::ostream &out;
 
-          JsonPrinter(std::ostream &out)
+          explicit JsonPrinter(std::ostream &out)
             : out(out) {}
 
           std::string quoted(const std::string &src) const { return '"' + src + '"'; }

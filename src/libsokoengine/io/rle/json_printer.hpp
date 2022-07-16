@@ -12,7 +12,7 @@ namespace sokoengine {
           typedef void  result_type;
           std::ostream &out;
 
-          JsonPrinter(std::ostream &out)
+          explicit JsonPrinter(std::ostream &out)
             : out(out) {}
 
           // void operator()(expression const &o) const { boost::apply_visitor(*this,

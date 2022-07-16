@@ -6,20 +6,15 @@ namespace sokoengine {
 namespace io {
 namespace implementation {
 
-const PuzzleResizer &Trioban::resizer() {
-  static const PuzzleResizer the_one;
-  return the_one;
-}
+static constexpr PuzzleResizer TRI_RESIZER;
+static constexpr PuzzleParser  TRI_PARSER;
+static constexpr PuzzlePrinter TRI_PRINTER;
 
-const PuzzleParser &Trioban::parser() {
-  static const PuzzleParser the_one;
-  return the_one;
-}
+const PuzzleResizer &Trioban::resizer() { return TRI_RESIZER; }
 
-const PuzzlePrinter &Trioban::printer() {
-  static const PuzzlePrinter the_one;
-  return the_one;
-}
+const PuzzleParser &Trioban::parser() { return TRI_PARSER; }
+
+const PuzzlePrinter &Trioban::printer() { return TRI_PRINTER; }
 
 } // namespace implementation
 } // namespace io

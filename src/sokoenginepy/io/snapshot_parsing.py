@@ -11,7 +11,7 @@ from .snapshot import Snapshot
 from .utilities import is_blank
 
 if TYPE_CHECKING:
-    from ..game import PusherStep, Tessellation
+    from ..game import PusherStep
     from ..game.base_tessellation import BaseTessellation
 
 

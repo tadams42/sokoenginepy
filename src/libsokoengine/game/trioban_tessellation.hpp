@@ -9,6 +9,9 @@ namespace implementation {
 
 class LIBSOKOENGINE_LOCAL TriobanTessellation : public BaseTessellation {
 public:
+  constexpr inline TriobanTessellation()
+    : BaseTessellation() {}
+
   virtual const Directions &legal_directions() const override;
   virtual position_t        neighbor_position(
            position_t       position,

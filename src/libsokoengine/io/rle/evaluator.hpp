@@ -13,7 +13,7 @@ namespace sokoengine {
 
           std::string &dest;
 
-          Evaluator(std::string &dest)
+          explicit Evaluator(std::string &dest)
             : dest(dest) {}
 
           // void operator()(expression const &o) const { boost::apply_visitor(*this,

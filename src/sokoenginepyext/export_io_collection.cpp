@@ -162,8 +162,6 @@ void stream_load(Collection &self, py::object &stream, Tessellation tessellation
 }
 
 void stream_dump(const Collection &self, py::object &stream) {
-  string data;
-
   ostringstream conv;
   self.dump(conv);
 

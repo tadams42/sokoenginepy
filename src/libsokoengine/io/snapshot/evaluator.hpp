@@ -17,7 +17,7 @@ namespace sokoengine {
           SnapshotData &dest;
           string        steps_buffer;
 
-          Evaluator(SnapshotData &dest)
+          explicit Evaluator(SnapshotData &dest)
             : dest(dest) {}
 
           // void operator()(expression const &o) const { boost::apply_visitor(*this,

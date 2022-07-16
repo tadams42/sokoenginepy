@@ -6,20 +6,15 @@ namespace sokoengine {
 namespace io {
 namespace implementation {
 
-const PuzzleResizer &Sokoban::resizer() {
-  static const PuzzleResizer the_one;
-  return the_one;
-}
+static constexpr PuzzleResizer SOK_RESIZER;
+static constexpr PuzzleParser  SOK_PARSER;
+static constexpr PuzzlePrinter SOK_PRINTER;
 
-const PuzzleParser &Sokoban::parser() {
-  static const PuzzleParser the_one;
-  return the_one;
-}
+const PuzzleResizer &Sokoban::resizer() { return SOK_RESIZER; }
 
-const PuzzlePrinter &Sokoban::printer() {
-  static const PuzzlePrinter the_one;
-  return the_one;
-}
+const PuzzleParser &Sokoban::parser() { return SOK_PARSER; }
+
+const PuzzlePrinter &Sokoban::printer() { return SOK_PRINTER; }
 
 } // namespace implementation
 } // namespace io
