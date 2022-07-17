@@ -1,13 +1,15 @@
 #include "sokoenginepyext.hpp"
 
-using sokoengine::game::Config;
-using sokoengine::game::Direction;
-using sokoengine::game::DIRECTIONS_COUNT;
-using sokoengine::game::OPPOSITE_DIRECTIONS;
-using sokoengine::game::piece_id_t;
-using sokoengine::game::PusherStep;
-using sokoengine::game::Selectors;
-using sokoengine::game::Tessellation;
+using sokoengine::Config;
+using sokoengine::Direction;
+using sokoengine::piece_id_t;
+using sokoengine::Tessellation;
+using sokoengine::PusherStep;
+using sokoengine::Selectors;
+using sokoengine::implementation::direction_pack;
+using sokoengine::implementation::direction_unpack;
+using sokoengine::implementation::DIRECTIONS_COUNT;
+using sokoengine::implementation::OPPOSITE_DIRECTIONS;
 using std::make_unique;
 
 constexpr const char *NAMES[DIRECTIONS_COUNT] = {
@@ -121,7 +123,7 @@ void export_pusher_step(py::module &m) {
   pyPusherStep.def(py::pickle(
     [](const PusherStep &self) { // __getstate__
       return py::make_tuple(
-        sokoengine::game::direction_pack(self.direction()),
+        direction_pack(self.direction()),
         self.moved_box_id(),
         self.is_jump(),
         self.is_pusher_selection(),
@@ -133,7 +135,7 @@ void export_pusher_step(py::module &m) {
       if (t.size() != 6)
         throw std::runtime_error("Invalid pickle state for PusherStep!");
       return make_unique<PusherStep>(
-        sokoengine::game::direction_unpack(t[0].cast<uint8_t>()),
+        direction_unpack(t[0].cast<uint8_t>()),
         t[1].cast<piece_id_t>(),
         t[2].cast<bool>(),
         t[3].cast<bool>(),

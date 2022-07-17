@@ -33,8 +33,7 @@ In Python:
 
 ```python
 import textwrap
-from sokoenginepy.io import Puzzle
-from sokoenginepy.game import BoardGraph, Mover, Direction, Config, Tessellation
+from sokoenginepy import Config, Direction, Tessellation, Puzzle, BoardGraph, Mover
 
 data = textwrap.dedent("""
         #####
@@ -64,12 +63,12 @@ or in C++:
 
 #include <iostream>
 
-using sokoengine::game::BoardGraph;
-using sokoengine::game::Config;
-using sokoengine::game::Direction;
-using sokoengine::game::Mover;
-using sokoengine::game::Tessellation;
-using sokoengine::io::Puzzle;
+using sokoengine::BoardGraph;
+using sokoengine::Config;
+using sokoengine::Direction;
+using sokoengine::Mover;
+using sokoengine::Tessellation;
+using sokoengine::Puzzle;
 using std::string;
 
 int main() {

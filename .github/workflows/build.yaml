@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: src/sokoenginepy/game/base_tessellation.py
+          cache-dependency-path: src/sokoenginepy/game/sokoban_plus.py
 
       - name: ensure pip and wheel are at latest version
         run: pip install --upgrade pip wheel

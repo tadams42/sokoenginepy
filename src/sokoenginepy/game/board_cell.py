@@ -1,4 +1,4 @@
-from ..io import Puzzle
+from ..common import Characters
 
 
 class BoardCell:
@@ -19,25 +19,25 @@ class BoardCell:
         "is_in_playable_area",
     ]
 
-    def __init__(self, character: str = Puzzle.FLOOR):
+    def __init__(self, character: str = Characters.FLOOR):
         self._has_box: bool = False
         self._has_pusher: bool = False
         self._has_goal: bool = False
         self._is_wall: bool = False
         self.is_in_playable_area: bool = False
 
-        if not Puzzle.is_empty_floor(character):
-            if Puzzle.is_wall(character):
+        if not Characters.is_empty_floor(character):
+            if Characters.is_wall(character):
                 self.is_wall = True
-            elif Puzzle.is_pusher(character):
+            elif Characters.is_pusher(character):
                 self.has_pusher = True
-                if Puzzle.is_goal(character):
+                if Characters.is_goal(character):
                     self.has_goal = True
-            elif Puzzle.is_box(character):
+            elif Characters.is_box(character):
                 self.has_box = True
-                if Puzzle.is_goal(character):
+                if Characters.is_goal(character):
                     self.has_goal = True
-            elif Puzzle.is_goal(character):
+            elif Characters.is_goal(character):
                 self.has_goal = True
             else:
                 raise ValueError(f"Illegal characters '{character}' for BoardCell!")
@@ -51,10 +51,10 @@ class BoardCell:
             and self.has_goal == rv.has_goal
         ) or (
             isinstance(rv, str)
-            and self.is_wall == Puzzle.is_wall(rv)
-            and self.has_pusher == Puzzle.is_pusher(rv)
-            and self.has_box == Puzzle.is_box(rv)
-            and self.has_goal == Puzzle.is_goal(rv)
+            and self.is_wall == Characters.is_wall(rv)
+            and self.has_pusher == Characters.is_pusher(rv)
+            and self.has_box == Characters.is_box(rv)
+            and self.has_goal == Characters.is_goal(rv)
         )
 
     def __ne__(self, rv):
@@ -67,23 +67,25 @@ class BoardCell:
         return f"BoardCell('{str(self)}')"
 
     def to_str(self, use_visible_floor: bool = False) -> str:
-        retv = Puzzle.FLOOR
+        retv = Characters.FLOOR
 
         if not self.has_piece:
             if self.is_wall:
-                retv = Puzzle.WALL
+                retv = Characters.WALL
             else:
-                retv = Puzzle.VISIBLE_FLOOR if use_visible_floor else Puzzle.FLOOR
+                retv = (
+                    Characters.VISIBLE_FLOOR if use_visible_floor else Characters.FLOOR
+                )
         elif not self.has_box and not self.has_goal and self.has_pusher:
-            retv = Puzzle.PUSHER
+            retv = Characters.PUSHER
         elif not self.has_box and self.has_goal and not self.has_pusher:
-            retv = Puzzle.GOAL
+            retv = Characters.GOAL
         elif not self.has_box and self.has_goal and self.has_pusher:
-            retv = Puzzle.PUSHER_ON_GOAL
+            retv = Characters.PUSHER_ON_GOAL
         elif self.has_box and not self.has_goal and not self.has_pusher:
-            retv = Puzzle.BOX
+            retv = Characters.BOX
         else:
-            retv = Puzzle.BOX_ON_GOAL
+            retv = Characters.BOX_ON_GOAL
 
         return retv
 

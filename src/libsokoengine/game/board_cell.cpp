@@ -1,7 +1,9 @@
+/// @file
 #include "board_cell.hpp"
 
-#include "puzzle.hpp"
+#include "characters.hpp"
 
+using sokoengine::implementation::Characters;
 using std::invalid_argument;
 using std::string;
 
@@ -14,18 +16,18 @@ BoardCell::BoardCell(char rv)
   , m_goal(false)
   , m_wall(false)
   , m_playable(false) {
-  if (!io::Puzzle::is_empty_floor(rv)) {
-    if (io::Puzzle::is_wall(rv)) {
+  if (!Characters::is_empty_floor(rv)) {
+    if (Characters::is_wall(rv)) {
       set_is_wall(true);
-    } else if (io::Puzzle::is_pusher(rv)) {
+    } else if (Characters::is_pusher(rv)) {
       set_has_pusher(true);
-      if (io::Puzzle::is_goal(rv))
+      if (Characters::is_goal(rv))
         set_has_goal(true);
-    } else if (io::Puzzle::is_box(rv)) {
+    } else if (Characters::is_box(rv)) {
       set_has_box(true);
-      if (io::Puzzle::is_goal(rv))
+      if (Characters::is_goal(rv))
         set_has_goal(true);
-    } else if (io::Puzzle::is_goal(rv)) {
+    } else if (Characters::is_goal(rv)) {
       set_has_goal(true);
     } else {
       throw invalid_argument(string("Illegal character '") + rv + "' for BoardCell!");
@@ -41,8 +43,8 @@ bool BoardCell::operator==(const BoardCell &rv) const {
 bool BoardCell::operator!=(const BoardCell &rv) const { return !(*this == rv); }
 
 bool BoardCell::operator==(char rv) const {
-  return m_wall == io::Puzzle::is_wall(rv) && m_pusher == io::Puzzle::is_pusher(rv)
-      && m_box == io::Puzzle::is_box(rv) && m_goal == io::Puzzle::is_goal(rv);
+  return m_wall == Characters::is_wall(rv) && m_pusher == Characters::is_pusher(rv)
+      && m_box == Characters::is_box(rv) && m_goal == Characters::is_goal(rv);
 }
 
 bool BoardCell::operator!=(char rv) const { return !(*this == rv); }
@@ -51,20 +53,20 @@ char BoardCell::to_str(bool use_visible_floor) const {
   char retv;
   if (!has_piece()) {
     if (is_wall()) {
-      retv = io::Puzzle::WALL;
+      retv = Characters::WALL;
     } else {
-      retv = use_visible_floor ? io::Puzzle::VISIBLE_FLOOR : io::Puzzle::FLOOR;
+      retv = use_visible_floor ? Characters::VISIBLE_FLOOR : Characters::FLOOR;
     }
   } else if (!has_box() && !has_goal() && has_pusher())
-    retv = io::Puzzle::PUSHER;
+    retv = Characters::PUSHER;
   else if (!has_box() && has_goal() && !has_pusher())
-    retv = io::Puzzle::GOAL;
+    retv = Characters::GOAL;
   else if (!has_box() && has_goal() && has_pusher())
-    retv = io::Puzzle::PUSHER_ON_GOAL;
+    retv = Characters::PUSHER_ON_GOAL;
   else if (has_box() && !has_goal() && !has_pusher())
-    retv = io::Puzzle::BOX;
+    retv = Characters::BOX;
   else // if (has_box() && has_goal() && !has_pusher())
-    retv = io::Puzzle::BOX_ON_GOAL;
+    retv = Characters::BOX_ON_GOAL;
 
   return retv;
 }

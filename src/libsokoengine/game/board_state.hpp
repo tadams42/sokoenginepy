@@ -1,7 +1,8 @@
 #ifndef BOARD_STATE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_STATE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+/// @file
 
-#include "sokoengine_config.hpp"
+#include "numeric_types.hpp"
 
 namespace sokoengine {
 namespace game {
@@ -69,7 +70,9 @@ private:
 };
 
 } // namespace game
+
+using game::BoardState;
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

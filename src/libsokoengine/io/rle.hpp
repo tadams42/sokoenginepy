@@ -1,5 +1,6 @@
 #ifndef RLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define RLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+/// @file
 
 #include "sokoengine_config.hpp"
 
@@ -34,7 +35,9 @@ public:
 };
 
 } // namespace io
+
+using io::Rle;
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

@@ -1,8 +1,8 @@
 #include "sokoenginepyext.hpp"
 
-using sokoengine::game::PusherSteps;
-using sokoengine::game::Tessellation;
-using sokoengine::io::Snapshot;
+using sokoengine::PusherSteps;
+using sokoengine::Snapshot;
+using sokoengine::Tessellation;
 using std::string;
 
 void export_io_snapshot(py::module &m) {
@@ -37,11 +37,6 @@ void export_io_snapshot(py::module &m) {
   pySnapshot.def_readonly_static("PUSHER_CHANGE_END", &Snapshot::PUSHER_CHANGE_END);
   pySnapshot.def_readonly_static("CURRENT_POSITION_CH", &Snapshot::CURRENT_POSITION_CH);
 
-  pySnapshot.def_static("is_move_step", &Snapshot::is_pusher_step);
-  pySnapshot.def_static("is_push_step", &Snapshot::is_pusher_step);
-  pySnapshot.def_static("is_pusher_step", &Snapshot::is_pusher_step);
-  pySnapshot.def_static("is_marker", &Snapshot::is_pusher_step);
-  pySnapshot.def_static("is_snapshot", &Snapshot::is_snapshot);
   pySnapshot.def_static("ast_json", &Snapshot::ast_json);
 
   pySnapshot.def("to_str", &Snapshot::to_str, py::arg("rle_encode") = false);

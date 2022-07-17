@@ -4,7 +4,7 @@ Board
 BoardGraph
 ----------
 
-.. autoclass:: sokoenginepy.game.BoardGraph
+.. autoclass:: sokoenginepy.BoardGraph
     :members:
     :undoc-members:
     :inherited-members:
@@ -12,18 +12,10 @@ BoardGraph
     :special-members: __init__, __getitem__, __setitem__, __contains__
 
 
-GraphType
----------
-
-.. autoclass:: sokoenginepy.game.GraphType
-    :members:
-    :undoc-members:
-
-
 BoardCell
 ---------
 
-.. autoclass:: sokoenginepy.game.BoardCell
+.. autoclass:: sokoenginepy.BoardCell
     :members:
     :undoc-members:
 
@@ -31,6 +23,6 @@ BoardCell
 Edge
 ----
 
-.. autoclass:: sokoenginepy.game.Edge
+.. autoclass:: sokoenginepy.Edge
     :members:
     :undoc-members:

@@ -2,8 +2,7 @@ import textwrap
 
 import pytest
 
-from sokoenginepy.game import Tessellation, index_1d
-from sokoenginepy.io import Puzzle
+from sokoenginepy import Puzzle, Tessellation, index_1d
 
 
 class DescribeSokobanPuzzle:

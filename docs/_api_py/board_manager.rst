@@ -4,7 +4,7 @@ Board manager
 BoardState
 ----------
 
-.. autoclass:: sokoenginepy.game.BoardState
+.. autoclass:: sokoenginepy.BoardState
     :members:
     :undoc-members:
 
@@ -12,11 +12,11 @@ BoardState
 BoardManager
 ------------
 
-.. autoexception:: sokoenginepy.game.BoxGoalSwitchError
+.. autoexception:: sokoenginepy.BoxGoalSwitchError
 
-.. autoexception:: sokoenginepy.game.CellAlreadyOccupiedError
+.. autoexception:: sokoenginepy.CellAlreadyOccupiedError
 
-.. autoclass:: sokoenginepy.game.BoardManager
+.. autoclass:: sokoenginepy.BoardManager
     :members:
     :undoc-members:
     :inherited-members:
@@ -25,7 +25,7 @@ BoardManager
 HashedBoardManager
 ------------------
 
-.. autoclass:: sokoenginepy.game.HashedBoardManager
+.. autoclass:: sokoenginepy.HashedBoardManager
     :show-inheritance:
     :members:
     :undoc-members:
@@ -34,9 +34,9 @@ HashedBoardManager
 SokobanPlus
 -----------
 
-.. autoexception:: sokoenginepy.game.SokobanPlusDataError
+.. autoexception:: sokoenginepy.SokobanPlusDataError
 
-.. autoclass:: sokoenginepy.game.SokobanPlus
+.. autoclass:: sokoenginepy.SokobanPlus
     :members:
     :undoc-members:
     :inherited-members:

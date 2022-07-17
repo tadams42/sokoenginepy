@@ -1,12 +1,14 @@
+/// @file
 #include "sokoban_plus.hpp"
 
 #include "board_manager.hpp"
+#include "characters.hpp"
+#include "game_config.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <charconv>
 
 using sokoengine::implementation::Strings;
-using sokoengine::io::is_blank;
 using std::errc;
 using std::from_chars;
 using std::invalid_argument;

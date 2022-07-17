@@ -1,7 +1,8 @@
 #ifndef COLLECTION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define COLLECTION_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+/// @file
 
-#include "sokoengine_config.hpp"
+#include "tessellation.hpp"
 
 namespace sokoengine {
 namespace io {
@@ -56,7 +57,7 @@ public:
   ///
   void load(
     const std::filesystem::path &path,
-    game::Tessellation           tessellation_hint = game::Tessellation::SOKOBAN
+    Tessellation                 tessellation_hint = Tessellation::SOKOBAN
   );
 
   ///
@@ -69,10 +70,8 @@ public:
   /// @param tessellation_hint If puzzles in file don't specify their game
   ///   tessellation assume this value.
   ///
-  void load(
-    const std::string &path,
-    game::Tessellation tessellation_hint = game::Tessellation::SOKOBAN
-  );
+  void
+  load(const std::string &path, Tessellation tessellation_hint = Tessellation::SOKOBAN);
 
   ///
   /// Loads collection from `data`.
@@ -84,10 +83,7 @@ public:
   /// @param tessellation_hint If puzzles in source don't specify their game
   ///   tessellation assume this value.
   ///
-  void load(
-    std::istream      &data,
-    game::Tessellation tessellation_hint = game::Tessellation::SOKOBAN
-  );
+  void load(std::istream &data, Tessellation tessellation_hint = Tessellation::SOKOBAN);
 
   ///
   /// Loads collection from `data`.
@@ -100,8 +96,7 @@ public:
   ///   tessellation assume this value.
   ///
   void loads(
-    const std::string &data,
-    game::Tessellation tessellation_hint = game::Tessellation::SOKOBAN
+    const std::string &data, Tessellation tessellation_hint = Tessellation::SOKOBAN
   );
 
   ///
@@ -136,10 +131,13 @@ private:
 };
 
 } // namespace io
+
+using io::Collection;
+using io::Puzzles;
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file
 
 ///
 /// @page sok_fileformat SokobanYASC .sok file format

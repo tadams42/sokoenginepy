@@ -1,11 +1,14 @@
+/// @file
 #include "pusher_step.hpp"
 
-#include "tessellation.hpp"
+#include "characters.hpp"
 
 #include <boost/algorithm/string.hpp>
 
+using sokoengine::implementation::direction_pack;
+using sokoengine::implementation::direction_unpack;
 using sokoengine::implementation::Strings;
-using sokoengine::io::is_blank;
+using sokoengine::implementation::to_str;
 using std::invalid_argument;
 using std::runtime_error;
 using std::string;
@@ -13,41 +16,6 @@ using std::to_string;
 
 namespace sokoengine {
 namespace game {
-namespace implementation {
-
-string direction_str(Direction d) {
-  switch (d) {
-    case Direction::UP:
-      return "Direction.UP";
-      break;
-    case Direction::DOWN:
-      return "Direction.DOWN";
-      break;
-    case Direction::LEFT:
-      return "Direction.LEFT";
-      break;
-    case Direction::RIGHT:
-      return "Direction.RIGHT";
-      break;
-    case Direction::NORTH_EAST:
-      return "Direction.NORTH_EAST";
-      break;
-    case Direction::NORTH_WEST:
-      return "Direction.NORTH_WEST";
-      break;
-    case Direction::SOUTH_EAST:
-      return "Direction.SOUTH_EAST";
-      break;
-    case Direction::SOUTH_WEST:
-      return "Direction.SOUTH_WEST";
-      break;
-  }
-  throw runtime_error("Unhandled direction!");
-}
-
-} // namespace implementation
-
-using implementation::direction_str;
 
 PusherStep::PusherStep(
   const Direction &direction,
@@ -116,7 +84,7 @@ string PusherStep::repr() const {
     curr_pos = "is_current_pos=True";
 
   Strings args;
-  args.push_back(direction_str(direction()));
+  args.push_back(to_str(direction()));
   if (!is_blank(s_box_id))
     args.push_back(s_box_id);
   if (!is_blank(s_jump))

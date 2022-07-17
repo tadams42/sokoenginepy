@@ -1,7 +1,11 @@
 #ifndef BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+/// @file
 
-#include "sokoengine_config.hpp"
+#include "cell_orientation.hpp"
+#include "direction.hpp"
+#include "game_config.hpp"
+#include "tessellation.hpp"
 
 namespace sokoengine {
 
@@ -85,8 +89,8 @@ public:
   ///
   BoardCell &operator[](position_t position);
 
-  Tessellation        tessellation() const;
-  io::CellOrientation cell_orientation(position_t position) const;
+  Tessellation    tessellation() const;
+  CellOrientation cell_orientation(position_t position) const;
 
   ///
   /// Formatted string representation of board.
@@ -234,7 +238,12 @@ private:
 };
 
 } // namespace game
+
+using game::InvalidPositionError;
+using game::Edge;
+using game::Edges;
+using game::BoardGraph;
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

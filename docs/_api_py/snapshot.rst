@@ -1,7 +1,7 @@
 Snapshot
 ========
 
-.. autoclass:: sokoenginepy.io.Snapshot
+.. autoclass:: sokoenginepy.Snapshot
     :members:
     :undoc-members:
     :special-members: __init__

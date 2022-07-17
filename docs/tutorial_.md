@@ -14,8 +14,7 @@ All types in `sokoenginepy` are parametrized by their `Tessellation`. For exampl
 class `Puzzle` is instantiated like this:
 
 ```python
->>> from sokoenginepy.io import Puzzle
->>> from sokoenginepy.game import Tessellation
+>>> from sokoenginepy import Puzzle, Tessellation
 >>>
 >>> puzzle = Puzzle(Tessellation.SOKOBAN, 20, 30)
 
@@ -95,7 +94,7 @@ board. One important note about this is that all board positions in API are spec
 as 1D coordinates. To convert from 2D to 1D coordinates, use `index_1d()` function.
 
 ```python
->>> from sokoenginepy.game import index_1d
+>>> from sokoenginepy import index_1d
 >>> position = index_1d(11, 8, puzzle.width)
 >>> puzzle[position]
 '@'
@@ -142,8 +141,7 @@ representing game puzzle when playing it is `BoardGraph`.
 This is how to play game in regular, forward solving mode:
 
 ```python
->>> from sokoenginepy.game import Mover, SolvingMode, IllegalMoveError, Direction
->>> from sokoenginepy.game import Config, BoardGraph
+>>> from sokoenginepy import Direction, Config, BoardGraph, Mover, SolvingMode, IllegalMoveError
 >>>
 >>> board = BoardGraph(puzzle)
 >>>
@@ -233,7 +231,8 @@ Config.DEFAULT_ID + 1`, etc... Same goes for pushers and goals.
 `mover.board_manager` also implements [Zobrist hashing] of board state:
 
 ```python
->>> from sokoenginepy.game import Mover, Direction, BoardGraph
+>>> from sokoenginepy import Direction, Mover, BoardGraph
+>>>
 >>> board = BoardGraph(puzzle)
 >>> mover = Mover(board)
 >>> initial_hash = mover.board_manager.state_hash
@@ -306,7 +305,7 @@ puzzle collections and game solutions for all implemented game variants and
 tessellations.
 
 ```python
-from sokoenginepy.io import Collection
+from sokoenginepy import Collection
 
 collection = Collection()
 collection.load("~/sokoban/collections/fabulous_sokoban_problems.sok")

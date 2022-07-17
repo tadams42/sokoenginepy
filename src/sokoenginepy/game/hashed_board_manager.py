@@ -3,9 +3,9 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING, List, Set
 
+from ..common import Config
 from .board_manager import BoardManager
 from .board_state import BoardState
-from .config import Config
 
 if TYPE_CHECKING:
     from .board_graph import BoardGraph

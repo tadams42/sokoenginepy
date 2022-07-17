@@ -2,6 +2,13 @@
 
 ## 2.0.0 (unreleased)
 
+- breaking change: removed all parsing methods from `Puzzle` and `Snapshot`
+  - parsing in now fully private implementation detail handled by constructors of these
+    classes
+  - example of removed methods: `Puzzle.is_pusher(c)`, `Snapshot.is_snapshot(str)`, ...
+- refactor: it is no longer required to use sub `io` and `game` packages/namespaces:
+  everything is now available in `sokoenginepy`
+- removed: `GraphType`
 - breaking change: collapsed many types to base type. This was done because all types
   had to be parametrized by Tessellation anyway so having rich inheritance tree was just
   cluttering API. Concretely, these types have changed or removed:
@@ -13,10 +20,10 @@
   - `HexobanSnapshot(...)` --> `Snapshot(Tessellation.HEXOBAN, ...)`
   - `TriobanSnapshot(...)` --> `Snapshot(Tessellation.TRIOBAN, ...)`
   - `OctobanSnapshot(...)` --> `Snapshot(Tessellation.OCTOBAN, ...)`
-  - `SokobanTessellation(...)` --> no longer available in public API
-  - `HexobanTessellation(...)` --> no longer available in public API
-  - `TriobanTessellation(...)` --> no longer available in public API
-  - `OctobanTessellation(...)` --> no longer available in public API
+  - `SokobanTessellation(...)` --> no longer available
+  - `HexobanTessellation(...)` --> no longer available
+  - `TriobanTessellation(...)` --> no longer available
+  - `OctobanTessellation(...)` --> no longer available
 
 ## 1.0.3 (2022-07-10)
 

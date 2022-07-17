@@ -1,5 +1,6 @@
 #ifndef HASHED_BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define HASHED_BOARD_MANAGER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+/// @file
 
 #include "board_manager.hpp"
 
@@ -106,7 +107,9 @@ private:
 };
 
 } // namespace game
+
+using game::HashedBoardManager;
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

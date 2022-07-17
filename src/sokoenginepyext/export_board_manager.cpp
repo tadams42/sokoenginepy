@@ -1,14 +1,14 @@
 #include "sokoenginepyext.hpp"
 
+using sokoengine::BoardGraph;
+using sokoengine::BoardManager;
+using sokoengine::BoardState;
+using sokoengine::HashedBoardManager;
+using sokoengine::piece_id_t;
 using sokoengine::position_t;
-using sokoengine::game::BoardGraph;
-using sokoengine::game::BoardManager;
-using sokoengine::game::BoardState;
-using sokoengine::game::HashedBoardManager;
-using sokoengine::game::piece_id_t;
-using sokoengine::game::Positions;
-using sokoengine::game::Selectors;
-using sokoengine::game::zobrist_key_t;
+using sokoengine::Positions;
+using sokoengine::Selectors;
+using sokoengine::zobrist_key_t;
 using std::string;
 
 void export_board_manager(py::module &m) {

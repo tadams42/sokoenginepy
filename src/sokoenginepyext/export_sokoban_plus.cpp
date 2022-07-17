@@ -1,10 +1,10 @@
 #include "sokoenginepyext.hpp"
 
-using sokoengine::game::Config;
-using sokoengine::game::piece_id_t;
-using sokoengine::game::PieceNotFoundError;
-using sokoengine::game::Selectors;
-using sokoengine::game::SokobanPlus;
+using sokoengine::Config;
+using sokoengine::piece_id_t;
+using sokoengine::PieceNotFoundError;
+using sokoengine::Selectors;
+using sokoengine::SokobanPlus;
 using std::make_unique;
 
 void export_sokoban_plus(py::module &m) {

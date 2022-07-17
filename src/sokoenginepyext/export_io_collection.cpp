@@ -2,9 +2,9 @@
 
 #include <sstream>
 
-using sokoengine::game::Tessellation;
-using sokoengine::io::Collection;
-using sokoengine::io::Puzzles;
+using sokoengine::Collection;
+using sokoengine::Puzzles;
+using sokoengine::Tessellation;
 using std::istream;
 using std::istringstream;
 using std::ostream;

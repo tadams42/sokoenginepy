@@ -5,7 +5,7 @@ from inspect import getsourcefile
 
 import pytest
 
-from sokoenginepy import game, io
+import sokoenginepy
 
 
 def _get_filtered_members(mdl):
@@ -21,64 +21,38 @@ def is_trueish(val):
 
 
 @pytest.fixture
-def io_members():
-    return {"CellOrientation", "Collection", "Puzzle", "Rle", "Snapshot"}
-
-
-@pytest.fixture
-def io_members_py_only():
-    # Stuff that is always used from Python implementation, even when native extension
-    # is built and loaded
+def ext_members():
     return {
-        "is_blank",
-    }
-
-
-@pytest.fixture
-def game_members():
-    klasses = {
         "BoardCell",
         "BoardGraph",
         "BoardManager",
         "BoardState",
-        "Direction",
-        "Edge",
-        "GraphType",
-        "HashedBoardManager",
-        "Mover",
-        "PusherStep",
-        "SokobanPlus",
-        "SolvingMode",
-        "Tessellation",
-        "Config",
-    }
-
-    exceptions = {
         "BoxGoalSwitchError",
         "CellAlreadyOccupiedError",
+        "CellOrientation",
+        "Collection",
+        "Config",
+        "Direction",
+        "Edge",
+        "HashedBoardManager",
         "IllegalMoveError",
+        "Mover",
         "NonPlayableBoardError",
+        "PusherStep",
+        "Puzzle",
+        "Rle",
+        "Snapshot",
+        "SokobanPlus",
         "SokobanPlusDataError",
-    }
-
-    return klasses.union(exceptions)
-
-
-@pytest.fixture
-def game_members_native_only():
-    return {
-        # Mapped to Python KeyError
-        "PieceNotFoundError",
-        # Mapped to Python IndexError
-        "InvalidPositionError",
+        "SolvingMode",
+        "Tessellation",
     }
 
 
 @pytest.fixture
-def game_members_py_only():
-    # Stuff that is always used from Python implementation, even when native extension
-    # is built and loaded
+def py_only_members():
     return {
+        "is_blank",
         "index_1d",
         "index_column",
         "index_row",
@@ -92,8 +66,14 @@ def game_members_py_only():
     }
 
 
-def is_CI_cpp_job(job_name):
-    return
+@pytest.fixture
+def ext_only_members():
+    return {
+        # Mapped to Python KeyError
+        "PieceNotFoundError",
+        # Mapped to Python IndexError
+        "InvalidPositionError",
+    }
 
 
 class DescribeNativeCppExtension:
@@ -134,69 +114,42 @@ class DescribeNativeCppExtension:
                 assert not is_using_native
 
     def it_is_correctly_imported_if_built(
-        self, is_using_native, io_members, game_members, game_members_native_only
+        self, is_using_native, ext_members, ext_only_members
     ):
         if not is_using_native:
             return
 
-        for member in io_members:
-            assert getattr(io, member).__module__.startswith(
-                "sokoenginepyext.io"
+        for member in ext_members:
+            assert getattr(sokoenginepy, member).__module__.startswith(
+                "sokoenginepyext"
             ), f"{member} should've been imported from C++ implementation!"
 
-        for member in game_members:
-            assert getattr(game, member).__module__.startswith(
-                "sokoenginepyext.game"
-            ), f"{member} should've been imported from C++ implementation!"
+        import sokoenginepyext
 
-        from sokoenginepyext import game as native_game
-
-        for member in game_members_native_only:
+        for member in ext_only_members:
             assert hasattr(
-                native_game, member
+                sokoenginepyext, member
             ), f"C++ extension should export {member}. Did you change sokoenginepyext code?"
 
-    def it_is_not_imported_if_not_built(
-        self, is_using_native, io_members, game_members
-    ):
+    def it_is_not_imported_if_not_built(self, is_using_native, ext_members):
         if is_using_native:
             return
 
-        for member in io_members:
-            assert getattr(io, member).__module__.startswith(
-                "sokoenginepy.io"
-            ), f"{member} should've been imported from Python implementation!"
-
-        for member in game_members:
-            assert getattr(game, member).__module__.startswith(
-                "sokoenginepy.game"
+        for member in ext_members:
+            assert getattr(sokoenginepy, member).__module__.startswith(
+                "sokoenginepy."
             ), f"{member} should've been imported from Python implementation!"
 
     def test_some_things_are_always_used_from_python_implementation(
-        self, game_members_py_only, io_members_py_only
+        self, py_only_members
     ):
-        for member in game_members_py_only:
+        for member in py_only_members:
             assert hasattr(
-                game, member
-            ), f"'sokoenginepy.game' package should have {member}!"
+                sokoenginepy, member
+            ), f"'sokoenginepy' package should have {member}!"
 
-            module_name = getattr(game, member).__module__
-            assert (
-                module_name.startswith("sokoenginepy.game") or module_name == "typing"
-            ), (
-                f"{member} should be imported from Python implementation even if "
-                "C++ extension is used!"
-            )
-
-        for member in io_members_py_only:
-            assert hasattr(
-                io, member
-            ), f"'sokoenginepy.io' package should have {member}!"
-
-            module_name = getattr(io, member).__module__
-            assert (
-                module_name.startswith("sokoenginepy.io") or module_name == "typing"
-            ), (
+            module_name = getattr(sokoenginepy, member).__module__
+            assert module_name.startswith("sokoenginepy.") or module_name == "typing", (
                 f"{member} should be imported from Python implementation even if "
                 "C++ extension is used!"
             )

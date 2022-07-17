@@ -1,3 +1,4 @@
+/// @file
 #include "collection.hpp"
 
 #include "puzzle.hpp"
@@ -10,7 +11,6 @@
 namespace sokoengine {
 namespace io {
 
-using game::Tessellation;
 using implementation::SOKFileFormat;
 using std::ifstream;
 using std::ios_base;

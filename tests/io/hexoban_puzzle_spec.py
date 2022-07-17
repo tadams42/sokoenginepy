@@ -3,8 +3,7 @@ import os
 
 import pytest
 
-from sokoenginepy.game import Tessellation
-from sokoenginepy.io import Puzzle
+from sokoenginepy import Puzzle, Tessellation
 
 
 @pytest.fixture(scope="session")

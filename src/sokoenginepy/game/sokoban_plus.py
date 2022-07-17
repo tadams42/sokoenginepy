@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Final, List
 
-from .config import Config
+from ..common import Config
 
 
 class SokobanPlusDataError(ValueError):

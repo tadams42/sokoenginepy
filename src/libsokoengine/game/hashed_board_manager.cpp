@@ -1,8 +1,10 @@
+/// @file
 #include "hashed_board_manager.hpp"
 
 #include "board_cell.hpp"
 #include "board_graph.hpp"
 #include "board_state.hpp"
+#include "characters.hpp"
 #include "sokoban_plus.hpp"
 
 #include <chrono>

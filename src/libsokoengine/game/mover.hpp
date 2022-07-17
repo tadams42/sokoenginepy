@@ -1,7 +1,9 @@
 #ifndef MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define MOVER_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+/// @file
 
-#include "sokoengine_config.hpp"
+#include "direction.hpp"
+#include "numeric_types.hpp"
 
 namespace sokoengine {
 namespace game {
@@ -237,7 +239,13 @@ private:
 };
 
 } // namespace game
+
+using game::IllegalMoveError;
+using game::Mover;
+using game::NonPlayableBoardError;
+using game::PusherSteps;
+using game::SolvingMode;
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

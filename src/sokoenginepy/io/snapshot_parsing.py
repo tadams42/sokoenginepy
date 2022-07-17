@@ -1,62 +1,15 @@
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Final, List, Set, Union
+from typing import TYPE_CHECKING, List, Union
 
 import lark
 
+from ..common import Characters, TessellationImpl, is_blank
 from .rle import Rle
-from .snapshot import Snapshot
-from .utilities import is_blank
 
 if TYPE_CHECKING:
     from ..game import PusherStep
-    from ..game.base_tessellation import BaseTessellation
-
-
-class Constants:
-    l: Final[str] = Snapshot.l
-    u: Final[str] = Snapshot.u
-    r: Final[str] = Snapshot.r
-    d: Final[str] = Snapshot.d
-    L: Final[str] = Snapshot.L
-    U: Final[str] = Snapshot.U
-    R: Final[str] = Snapshot.R
-    D: Final[str] = Snapshot.D
-    w: Final[str] = Snapshot.w
-    W: Final[str] = Snapshot.W
-    e: Final[str] = Snapshot.e
-    E: Final[str] = Snapshot.E
-    n: Final[str] = Snapshot.n
-    N: Final[str] = Snapshot.N
-    s: Final[str] = Snapshot.s
-    S: Final[str] = Snapshot.S
-
-    JUMP_BEGIN: Final[str] = Snapshot.JUMP_BEGIN
-    JUMP_END: Final[str] = Snapshot.JUMP_END
-    PUSHER_CHANGE_BEGIN: Final[str] = Snapshot.PUSHER_CHANGE_BEGIN
-    PUSHER_CHANGE_END: Final[str] = Snapshot.PUSHER_CHANGE_END
-    CURRENT_POSITION_CH: Final[str] = Snapshot.CURRENT_POSITION_CH
-
-    MOVE_CHARACTERS: Final[Set[str]] = {l, u, r, d, n, s, e, w}
-    PUSH_CHARACTERS: Final[Set[str]] = {L, U, R, D, N, S, E, W}
-    MARKERS: Final[Set[str]] = {
-        JUMP_BEGIN,
-        JUMP_END,
-        PUSHER_CHANGE_BEGIN,
-        PUSHER_CHANGE_END,
-        CURRENT_POSITION_CH,
-    }
-
-    RE_SNAPSHOT_STRING = re.compile(
-        r"^([0-9\s"
-        + re.escape("".join(MOVE_CHARACTERS))
-        + re.escape("".join(PUSH_CHARACTERS))
-        + re.escape("".join(MARKERS))
-        + re.escape("".join({Rle.GROUP_START, Rle.GROUP_END, Rle.EOL}))
-        + "])*$"
-    )
 
 
 @dataclass
@@ -65,20 +18,20 @@ class Steps:
 
     @property
     def pushes_count(self):
-        return sum(1 for _ in self.data if _ in Constants.PUSH_CHARACTERS)
+        return sum(1 for _ in self.data if _ in Characters.PUSH_CHARACTERS)
 
     @property
     def moves_count(self):
-        return sum(1 for _ in self.data if _ in Constants.MOVE_CHARACTERS)
+        return sum(1 for _ in self.data if _ in Characters.MOVE_CHARACTERS)
 
     def __str__(self):
         return self.data
 
     @classmethod
-    def converted(cls, data: str, tessellation: BaseTessellation) -> List[PusherStep]:
+    def converted(cls, data: str, tessellation: TessellationImpl) -> List[PusherStep]:
         retv: List[PusherStep] = []
         for _ in data:
-            if _ == Constants.CURRENT_POSITION_CH:
+            if _ == Characters.CURRENT_POSITION_CH:
                 if retv:
                     retv[-1].is_current_pos = True
             else:
@@ -87,7 +40,7 @@ class Steps:
 
         return retv
 
-    def pusher_steps(self, tessellation: BaseTessellation) -> List[PusherStep]:
+    def pusher_steps(self, tessellation: TessellationImpl) -> List[PusherStep]:
         return self.converted(self.data, tessellation)
 
 
@@ -98,12 +51,12 @@ class Jump:
 
     @property
     def moves_count(self):
-        return sum(1 for _ in self.data if _ in Constants.MOVE_CHARACTERS)
+        return sum(1 for _ in self.data if _ in Characters.MOVE_CHARACTERS)
 
     def __str__(self):
-        return Constants.JUMP_BEGIN + self.data + Constants.JUMP_END
+        return Characters.JUMP_BEGIN + self.data + Characters.JUMP_END
 
-    def pusher_steps(self, tessellation: BaseTessellation) -> List[PusherStep]:
+    def pusher_steps(self, tessellation: TessellationImpl) -> List[PusherStep]:
         retv = Steps.converted(self.data, tessellation)
         for _ in retv:
             _.is_jump = True
@@ -117,9 +70,9 @@ class PusherSelection:
     moves_count: int = field(init=False, repr=False, default=0)
 
     def __str__(self):
-        return Constants.PUSHER_CHANGE_BEGIN + self.data + Constants.PUSHER_CHANGE_END
+        return Characters.PUSHER_CHANGE_BEGIN + self.data + Characters.PUSHER_CHANGE_END
 
-    def pusher_steps(self, tessellation: BaseTessellation) -> List[PusherStep]:
+    def pusher_steps(self, tessellation: TessellationImpl) -> List[PusherStep]:
         retv = Steps.converted(self.data, tessellation)
         for _ in retv:
             _.is_pusher_selection = True
@@ -137,13 +90,13 @@ class Parser:
         pusher_selection: pusher_change_begin moves pusher_change_end
         steps: (moves | pushes)+
 
-        jump_begin: "{Constants.JUMP_BEGIN}"
-        jump_end: "{Constants.JUMP_END}"
-        pusher_change_begin: "{Constants.PUSHER_CHANGE_BEGIN}"
-        pusher_change_end: "{Constants.PUSHER_CHANGE_END}"
+        jump_begin: "{Characters.JUMP_BEGIN}"
+        jump_end: "{Characters.JUMP_END}"
+        pusher_change_begin: "{Characters.PUSHER_CHANGE_BEGIN}"
+        pusher_change_end: "{Characters.PUSHER_CHANGE_END}"
 
-        moves: /[{''.join(Constants.MOVE_CHARACTERS)}\\{Constants.CURRENT_POSITION_CH}]+/
-        pushes: /[{''.join(Constants.PUSH_CHARACTERS)}]+/
+        moves: /[{''.join(Characters.MOVE_CHARACTERS)}\\{Characters.CURRENT_POSITION_CH}]+/
+        pushes: /[{''.join(Characters.PUSH_CHARACTERS)}]+/
 
         %import common.WS
         %ignore WS

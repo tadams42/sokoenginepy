@@ -3,8 +3,6 @@
 
 #include "error_handler.hpp"
 
-#include <boost/spirit/home/x3.hpp>
-
 namespace sokoengine {
   namespace io {
     namespace sok_rle {

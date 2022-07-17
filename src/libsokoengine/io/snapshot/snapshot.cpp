@@ -1,20 +1,17 @@
+/// @file
 #include "snapshot.hpp"
 
-#include "ast.hpp"
+#include "characters.hpp"
 #include "parser.hpp"
 #include "pusher_step.hpp"
-#include "puzzle.hpp"
-#include "rle.hpp"
-#include "tessellation.hpp"
+#include "tessellation_impl.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::game::PusherStep;
-using sokoengine::game::PusherSteps;
-using sokoengine::game::Tessellation;
-using sokoengine::game::implementation::BaseTessellation;
+using sokoengine::implementation::Characters;
 using sokoengine::implementation::Strings;
+using sokoengine::implementation::TessellationImpl;
 using std::invalid_argument;
 using std::make_unique;
 using std::string;
@@ -81,7 +78,7 @@ namespace sokoengine {
 
     Snapshot::Snapshot(const Tessellation &tessellation, const string &moves_data)
       : m_impl(make_unique<Snapshot::PIMPL>(tessellation, moves_data)) {
-      if (!is_blank(moves_data) && !Snapshot::is_snapshot(moves_data)) {
+      if (!is_blank(moves_data) && !Characters::is_snapshot(moves_data)) {
         throw invalid_argument("Invalid characters in snapshot string!");
       }
     }
@@ -138,8 +135,8 @@ namespace sokoengine {
       // Reverse snapshots must start with jump, even if it is empty one
       if (m_impl->m_is_reverse &&
       (m_impl->m_parsed_moves.size() == 0 ||
-       (m_impl->m_parsed_moves.size() != 0 && retv[0] != Snapshot::JUMP_BEGIN))) {
-        retv = string(1, Snapshot::JUMP_BEGIN) + Snapshot::JUMP_END + retv;
+       (m_impl->m_parsed_moves.size() != 0 && retv[0] != Characters::JUMP_BEGIN))) {
+        retv = string(1, Characters::JUMP_BEGIN) + Characters::JUMP_END + retv;
       }
 
       if (rle_encode) {
@@ -156,8 +153,7 @@ namespace sokoengine {
 
       string moves = to_str(false);
 
-      return klass_name + "(Tessellation."
-           + boost::to_upper_copy(implementation::to_str(m_impl->m_tessellation))
+      return klass_name + "(" + implementation::to_str(m_impl->m_tessellation)
            + ", moves_data=\"" + moves + "\")";
     }
 
@@ -167,7 +163,7 @@ namespace sokoengine {
     }
 
     void Snapshot::set_moves_data(const string &rv) {
-      if (!is_blank(rv) && !Snapshot::is_snapshot(rv)) {
+      if (!is_blank(rv) && !Characters::is_snapshot(rv)) {
         throw invalid_argument("Invalid characters in snapshot string!");
       }
       m_impl->m_moves_data = rv;
@@ -178,8 +174,8 @@ namespace sokoengine {
       m_impl->reparse_if_not_parsed();
 
       PusherSteps             retv;
-      const BaseTessellation &tessellation =
-        BaseTessellation::instance(m_impl->m_tessellation);
+      const TessellationImpl &tessellation =
+        TessellationImpl::instance(m_impl->m_tessellation);
 
       for (const auto &part_variant : m_impl->m_parsed_moves) {
         std::visit(
@@ -205,8 +201,8 @@ namespace sokoengine {
       m_impl->m_is_reverse   = false;
       m_impl->m_was_parsed   = true;
 
-      const BaseTessellation &tessellation =
-        BaseTessellation::instance(m_impl->m_tessellation);
+      const TessellationImpl &tessellation =
+        TessellationImpl::instance(m_impl->m_tessellation);
 
       while (i < iend) {
         if (rv[i].is_jump()) {
@@ -272,18 +268,6 @@ namespace sokoengine {
     bool Snapshot::is_reverse() const {
       m_impl->reparse_if_not_parsed();
       return m_impl->m_is_reverse;
-    }
-
-    bool Snapshot::is_snapshot(const string &line) {
-      bool only_digits_and_spaces =
-        all_of(line.cbegin(), line.cend(), [](char c) -> bool {
-          return (isdigit(c) != 0) || (isspace(c) != 0);
-        });
-      return !only_digits_and_spaces
-          && all_of(line.begin(), line.end(), [](char c) -> bool {
-               return isdigit(c) || isspace(c) || Snapshot::is_pusher_step(c)
-                   || Snapshot::is_marker(c);
-             });
     }
 
     ///

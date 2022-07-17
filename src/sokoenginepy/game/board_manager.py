@@ -4,10 +4,10 @@ from functools import cached_property, partial
 from itertools import permutations
 from typing import TYPE_CHECKING, Dict, Iterable, List, Tuple
 
-from . import utilities
+from ..common import Config
 from .board_state import BoardState
-from .config import Config
 from .sokoban_plus import SokobanPlus
+from .utilities import Flipdict
 
 if TYPE_CHECKING:
     from .board_graph import BoardGraph
@@ -110,9 +110,9 @@ class BoardManager:
 
     def __init__(self, board: BoardGraph, boxorder: str = "", goalorder: str = ""):
         self._board = board
-        self._boxes = utilities.Flipdict()
-        self._goals = utilities.Flipdict()
-        self._pushers = utilities.Flipdict()
+        self._boxes = Flipdict()
+        self._goals = Flipdict()
+        self._pushers = Flipdict()
         self._walls: List[int] = []
 
         pusher_id = box_id = goal_id = Config.DEFAULT_ID

@@ -1,4 +1,4 @@
-from .config import Config, Direction
+from ..common import Config, Direction
 
 
 class PusherStep:

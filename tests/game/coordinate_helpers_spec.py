@@ -1,4 +1,4 @@
-from sokoenginepy.game import index_x, index_y, index_1d, is_on_board_1d, is_on_board_2d
+from sokoenginepy import index_1d, index_x, index_y, is_on_board_1d, is_on_board_2d
 
 
 class Describe_INDEX:

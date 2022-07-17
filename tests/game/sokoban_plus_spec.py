@@ -1,6 +1,6 @@
 import pytest
 
-from sokoenginepy.game import SokobanPlus, SokobanPlusDataError
+from sokoenginepy import SokobanPlus, SokobanPlusDataError
 
 
 @pytest.fixture

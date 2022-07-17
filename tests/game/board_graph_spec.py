@@ -4,16 +4,17 @@ from typing import List
 
 import pytest
 
-from sokoenginepy.game import (
+from sokoenginepy import (
     BoardCell,
     BoardGraph,
+    CellOrientation,
     Config,
     Direction,
     Edge,
+    Puzzle,
     Tessellation,
     index_1d,
 )
-from sokoenginepy.io import CellOrientation, Puzzle
 
 
 @pytest.fixture

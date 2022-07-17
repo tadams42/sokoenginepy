@@ -1,11 +1,11 @@
 #include "sokoenginepyext.hpp"
 
-using sokoengine::game::BoardGraph;
-using sokoengine::game::Mover;
-using sokoengine::game::PusherStep;
-using sokoengine::game::PusherSteps;
-using sokoengine::game::Selectors;
-using sokoengine::game::SolvingMode;
+using sokoengine::BoardGraph;
+using sokoengine::Mover;
+using sokoengine::PusherStep;
+using sokoengine::PusherSteps;
+using sokoengine::Selectors;
+using sokoengine::SolvingMode;
 
 void export_mover(py::module &m) {
   py::enum_<SolvingMode>(m, "SolvingMode")

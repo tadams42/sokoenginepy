@@ -9,13 +9,13 @@ from typing import TYPE_CHECKING, Dict, Final, List, Optional, Pattern, Tuple, U
 
 import arrow
 
-from .collection import Collection
+from ..common import Tessellation, is_blank, Characters
 from .puzzle import Puzzle
+from .puzzle_parsing import PuzzleParser
 from .snapshot import Snapshot
-from .utilities import is_blank
 
 if TYPE_CHECKING:
-    from ..game import Tessellation
+    from .collection import Collection
 
 _SELF_DIR = Path(__file__).absolute().resolve().parent
 _SOK_FORMAT_SPEC_PATH = _SELF_DIR / "SOK_format_specification.txt"
@@ -31,8 +31,6 @@ class SOKFileFormat:
         dest: Collection,
         tessellation_hint: Optional[Tessellation] = None,
     ):
-        from ..game import Tessellation
-
         reader = SOKReader(src, dest, tessellation_hint or Tessellation.SOKOBAN)
         reader.read()
         reader.close()
@@ -128,7 +126,7 @@ class SOKReader:
             self.dest.puzzles.append(puzzle)
 
     def _split_input(self, input_lines: List[str]):
-        first_board_line = first_index_of(input_lines, Puzzle.is_board)
+        first_board_line = first_index_of(input_lines, Characters.is_board)
         if first_board_line is not None:
             self._data.notes = input_lines[:first_board_line]
             remaining_lines = input_lines[first_board_line:]
@@ -145,7 +143,7 @@ class SOKReader:
             puzzle = PuzzleData()
 
             first_note_line = first_index_of(
-                remaining_lines, lambda x: not Puzzle.is_board(x)
+                remaining_lines, lambda x: not Characters.is_board(x)
             )
             if first_note_line is not None:
                 puzzle.board = "".join(remaining_lines[:first_note_line])
@@ -155,7 +153,7 @@ class SOKReader:
                 remaining_lines = []
 
             if len(remaining_lines) > 0:
-                first_board_line = first_index_of(remaining_lines, Puzzle.is_board)
+                first_board_line = first_index_of(remaining_lines, Characters.is_board)
 
                 if first_board_line is not None:
                     puzzle.notes = remaining_lines[:first_board_line]
@@ -172,7 +170,7 @@ class SOKReader:
         for puzzle in self._data.puzzles:
             remaining_lines = puzzle.notes
 
-            first_moves_line = first_index_of(remaining_lines, Snapshot.is_snapshot)
+            first_moves_line = first_index_of(remaining_lines, Characters.is_snapshot)
             if first_moves_line is not None:
                 puzzle.notes = remaining_lines[:first_moves_line]
                 remaining_lines = remaining_lines[first_moves_line:]
@@ -186,7 +184,7 @@ class SOKReader:
                 snapshot = SnapshotData()
 
                 first_note_line = first_index_of(
-                    remaining_lines, lambda x: not Snapshot.is_snapshot(x)
+                    remaining_lines, lambda x: not Characters.is_snapshot(x)
                 )
                 if first_note_line is not None:
                     snapshot.moves_data = "".join(
@@ -202,7 +200,7 @@ class SOKReader:
 
                 if len(remaining_lines) > 0:
                     first_moves_line = first_index_of(
-                        remaining_lines, Snapshot.is_snapshot
+                        remaining_lines, Characters.is_snapshot
                     )
 
                     if first_moves_line is not None:
@@ -385,8 +383,6 @@ class SOKTags:
     def extract_collection_attributes(
         cls, dest: CollectionData, notes: List[str]
     ) -> List[str]:
-        from ..game import Tessellation
-
         remaining_lines = []
         tessellation = None
         for line in notes:
@@ -420,8 +416,6 @@ class SOKTags:
         collection_header_tessellation_hint: Optional[Tessellation],
         supplied_tessellation_hint: Optional[Tessellation],
     ) -> List[str]:
-        from ..game import Tessellation
-
         remaining_lines = []
         tessellation = None
         for line in notes:
@@ -569,8 +563,6 @@ class SOKWriter:
             self.dest.write("\n")
 
     def _write_puzzle(self, src: Puzzle):
-        from ..game import Tessellation
-
         if is_blank(src.board):
             return
 

@@ -1,9 +1,13 @@
 #ifndef BOARD_CELL_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define BOARD_CELL_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+/// @file
 
 #include "sokoengine_config.hpp"
 
 namespace sokoengine {
+///
+/// Namespace for game engine part of sokoengine
+///
 namespace game {
 
 ///
@@ -96,7 +100,9 @@ private:
 };
 
 } // namespace game
+
+using game::BoardCell;
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

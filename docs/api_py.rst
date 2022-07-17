@@ -1,10 +1,8 @@
 API reference
 =============
 
-sokoenginepy.io
----------------
-
-.. automodule:: sokoenginepy.io
+I/O
+---
 
 .. toctree::
     :maxdepth: 4
@@ -14,10 +12,8 @@ sokoenginepy.io
     _api_py/collection
 
 
-sokoenginepy.game
------------------
-
-.. automodule:: sokoenginepy.game
+Game
+----
 
 .. toctree::
     :maxdepth: 4

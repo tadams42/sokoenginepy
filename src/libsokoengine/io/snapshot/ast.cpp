@@ -1,12 +1,14 @@
+/// @file
 #include "ast.hpp"
 
+#include "characters.hpp"
 #include "pusher_step.hpp"
-#include "snapshot.hpp"
-#include "tessellation.hpp"
+#include "tessellation_impl.hpp"
 
 #include <algorithm>
 
-using sokoengine::game::implementation::BaseTessellation;
+using sokoengine::implementation::Characters;
+using sokoengine::implementation::TessellationImpl;
 using std::string;
 
 namespace sokoengine {
@@ -15,11 +17,11 @@ namespace sokoengine {
       namespace evaluated_ast {
 
         LIBSOKOENGINE_LOCAL Converted
-        converted(const string &data, const BaseTessellation &tessellation) {
+        converted(const string &data, const TessellationImpl &tessellation) {
           Converted retv;
 
           for (char c : data) {
-            if (c == Snapshot::CURRENT_POSITION_CH) {
+            if (c == Characters::CURRENT_POSITION_CH) {
               if (retv.size() > 0)
                 retv.back().set_is_current_pos(true);
             } else {
@@ -32,19 +34,19 @@ namespace sokoengine {
 
         size_t Steps::pushes_count() const {
           return count_if(data.cbegin(), data.cend(), [](char c) {
-            return Snapshot::is_push_step(c);
+            return Characters::is_push_step(c);
           });
         }
 
         size_t Steps::moves_count() const {
           return count_if(data.cbegin(), data.cend(), [](char c) {
-            return Snapshot::is_move_step(c);
+            return Characters::is_move_step(c);
           });
         }
 
         const string &Steps::to_str() const { return data; }
 
-        Converted Steps::pusher_steps(const BaseTessellation &tessellation) const {
+        Converted Steps::pusher_steps(const TessellationImpl &tessellation) const {
           return converted(data, tessellation);
         }
 
@@ -52,15 +54,15 @@ namespace sokoengine {
 
         size_t Jump::moves_count() const {
           return count_if(data.cbegin(), data.cend(), [](char c) {
-            return Snapshot::is_move_step(c);
+            return Characters::is_move_step(c);
           });
         }
 
         string Jump::to_str() const {
-          return string(1, Snapshot::JUMP_BEGIN) + data + Snapshot::JUMP_END;
+          return string(1, Characters::JUMP_BEGIN) + data + Characters::JUMP_END;
         }
 
-        Converted Jump::pusher_steps(const BaseTessellation &tessellation) const {
+        Converted Jump::pusher_steps(const TessellationImpl &tessellation) const {
           Converted retv = converted(data, tessellation);
           for (auto &s : retv)
             s.set_is_jump(true);
@@ -72,11 +74,11 @@ namespace sokoengine {
         size_t PusherSelection::moves_count() const { return 0; }
 
         string PusherSelection::to_str() const {
-          return string(1, Snapshot::PUSHER_CHANGE_BEGIN) + data
-               + Snapshot::PUSHER_CHANGE_END;
+          return string(1, Characters::PUSHER_CHANGE_BEGIN) + data
+               + Characters::PUSHER_CHANGE_END;
         }
 
-        Converted PusherSelection::pusher_steps(const BaseTessellation &tessellation
+        Converted PusherSelection::pusher_steps(const TessellationImpl &tessellation
         ) const {
           Converted retv = converted(data, tessellation);
           for (auto &s : retv)

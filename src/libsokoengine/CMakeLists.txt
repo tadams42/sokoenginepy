@@ -3,6 +3,12 @@ set(INSTALL_HEADERS
     sokoengine.hpp
     benchmarks.hpp
 
+    common/cell_orientation.hpp
+    common/direction.hpp
+    common/game_config.hpp
+    common/numeric_types.hpp
+    common/tessellation.hpp
+
     game/board_cell.hpp
     game/board_graph.hpp
     game/board_manager.hpp
@@ -19,33 +25,37 @@ set(INSTALL_HEADERS
 )
 
 set(SELF_SOURCES
+    common/characters.cpp
+    common/characters.hpp
+    common/direction.cpp
+    common/hexoban_tessellation.cpp
+    common/hexoban_tessellation.hpp
+    common/octoban_tessellation.cpp
+    common/octoban_tessellation.hpp
+    common/sokoban_tessellation.cpp
+    common/sokoban_tessellation.hpp
+    common/tessellation_impl.cpp
+    common/tessellation_impl.hpp
+    common/trioban_tessellation.cpp
+    common/trioban_tessellation.hpp
+
     game/board_cell.cpp
     game/board_graph.cpp
     game/board_manager.cpp
     game/board_state.cpp
     game/hashed_board_manager.cpp
-    game/hexoban_tessellation.cpp
-    game/hexoban_tessellation.hpp
     game/mover.cpp
-    game/octoban_tessellation.cpp
-    game/octoban_tessellation.hpp
     game/pusher_step.cpp
     game/sokoban_plus.cpp
-    game/sokoban_tessellation.cpp
-    game/sokoban_tessellation.hpp
-    game/tessellation.cpp
-    game/tessellation.hpp
-    game/trioban_tessellation.cpp
-    game/trioban_tessellation.hpp
 
     io/collection/collection.cpp
     io/collection/sok_file_format.cpp
     io/collection/sok_file_format.hpp
     io/collection/SOK_format_specification.h
-    io/hexoban.cpp
-    io/hexoban.hpp
-    io/octoban.cpp
-    io/octoban.hpp
+    io/hexoban_io.cpp
+    io/hexoban_io.hpp
+    io/octoban_io.cpp
+    io/octoban_io.hpp
     io/puzzle_parsing.cpp
     io/puzzle_parsing.hpp
     io/puzzle.cpp
@@ -67,16 +77,17 @@ set(SELF_SOURCES
     io/snapshot/parser.hpp
     io/snapshot/snapshot_config.hpp
     io/snapshot/snapshot.cpp
-    io/sokoban.cpp
-    io/sokoban.hpp
-    io/trioban.cpp
-    io/trioban.hpp
+    io/sokoban_io.cpp
+    io/sokoban_io.hpp
+    io/trioban_io.cpp
+    io/trioban_io.hpp
 
     benchmarks.cpp
 )
 
 set(SELF_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/game
     ${CMAKE_CURRENT_SOURCE_DIR}/io
 )

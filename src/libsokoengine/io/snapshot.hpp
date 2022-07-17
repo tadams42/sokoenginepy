@@ -1,7 +1,8 @@
 #ifndef SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define SNAPSHOT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+/// @file
 
-#include "sokoengine_config.hpp"
+#include "tessellation.hpp"
 
 namespace sokoengine {
 
@@ -42,32 +43,12 @@ public:
   static constexpr char PUSHER_CHANGE_END   = '}';
   static constexpr char CURRENT_POSITION_CH = '*';
 
-  static constexpr bool is_move_step(char ch) {
-    return ch == l || ch == u || ch == r || ch == d || ch == w || ch == e || ch == n
-        || ch == s;
-  }
-
-  static constexpr bool is_push_step(char ch) {
-    return ch == L || ch == U || ch == R || ch == D || ch == W || ch == E || ch == N
-        || ch == S;
-  }
-
-  static constexpr bool is_pusher_step(char ch) {
-    return is_move_step(ch) || is_push_step(ch);
-  }
-
-  static constexpr bool is_marker(char ch) {
-    return ch == JUMP_BEGIN || ch == JUMP_END || ch == PUSHER_CHANGE_BEGIN
-        || ch == PUSHER_CHANGE_END || ch == CURRENT_POSITION_CH;
-  }
-
-  static bool        is_snapshot(const std::string &line);
   static std::string ast_json(const std::string &line);
 
   ///
   /// @param moves_data pusher steps in textual representation.
   ///
-  Snapshot(const game::Tessellation &tessellation, const std::string &moves_data);
+  Snapshot(const Tessellation &tessellation, const std::string &moves_data);
   Snapshot(const Snapshot &rv);
   Snapshot &operator=(const Snapshot &rv);
   Snapshot(Snapshot &&rv);
@@ -81,7 +62,7 @@ public:
   const std::string &notes() const;
   std::string       &notes();
 
-  game::Tessellation tessellation() const;
+  Tessellation tessellation() const;
 
   std::string to_str(bool rle_encode = false) const;
   std::string str() const;
@@ -103,7 +84,10 @@ private:
 };
 
 } // namespace io
+
+using game::PusherSteps;
+using io::Snapshot;
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

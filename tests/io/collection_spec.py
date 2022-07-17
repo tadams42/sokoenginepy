@@ -7,8 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from sokoenginepy.game import Tessellation
-from sokoenginepy.io import Collection, is_blank
+from sokoenginepy import Collection, Tessellation, is_blank
 
 
 @pytest.fixture

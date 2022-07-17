@@ -1,19 +1,18 @@
 #ifndef PUZZLE_PARSING_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define PUZZLE_PARSING_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "sokoengine_config.hpp"
+#include "characters.hpp"
 
 namespace sokoengine {
-namespace io {
 namespace implementation {
 
 typedef std::vector<char> parsed_board_t;
 
 void LIBSOKOENGINE_LOCAL _copy(
-  parsed_board_t                            &parsed_board,
-  board_size_t                              &width,
-  board_size_t                              &height,
-  const sokoengine::implementation::Strings &strings
+  parsed_board_t &parsed_board,
+  board_size_t   &width,
+  board_size_t   &height,
+  const Strings  &strings
 );
 
 class LIBSOKOENGINE_LOCAL PuzzleResizer {
@@ -71,13 +70,10 @@ class LIBSOKOENGINE_LOCAL PuzzleParser {
 public:
   constexpr inline PuzzleParser() {}
 
-  virtual sokoengine::implementation::Strings parse(const std::string &board) const;
-  static size_t calculate_width(const sokoengine::implementation::Strings &strings);
-  static sokoengine::implementation::Strings normalize_width(
-    const sokoengine::implementation::Strings &strings, char fill_chr = ' '
-  );
-  static sokoengine::implementation::Strings cleaned_board_lines(const std::string &line
-  );
+  virtual Strings parse(const std::string &board) const;
+  static size_t   calculate_width(const Strings &strings);
+  static Strings  normalize_width(const Strings &strings, char fill_chr = ' ');
+  static Strings  cleaned_board_lines(const std::string &line);
 };
 
 class LIBSOKOENGINE_LOCAL PuzzlePrinter {
@@ -94,7 +90,6 @@ public:
 };
 
 } // namespace implementation
-} // namespace io
 } // namespace sokoengine
 
 #endif // HEADER_GUARD

@@ -5,15 +5,17 @@ from typing import Final, Optional
 
 import lark
 
+from ..common import Characters
+
 
 class Rle:
     """
     Rle encoding and decoding.
     """
 
-    GROUP_START: Final[str] = "("
-    GROUP_END: Final[str] = ")"
-    EOL: Final[str] = "|"
+    GROUP_START: Final[str] = Characters.RLE_GROUP_START
+    GROUP_END: Final[str] = Characters.RLE_GROUP_END
+    EOL: Final[str] = Characters.RLE_EOL
 
     @classmethod
     def encode(cls, line: str) -> str:

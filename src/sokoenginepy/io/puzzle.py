@@ -1,32 +1,23 @@
 from __future__ import annotations
 
-import enum
-import re
 import textwrap
 from functools import reduce
 from operator import add
-from typing import TYPE_CHECKING, Final, List, Optional, Set
+from typing import Final, List, Optional
 
-from .rle import Rle
+from ..common import (
+    CellOrientation,
+    Characters,
+    Tessellation,
+    TessellationImpl,
+    is_blank,
+)
+from .hexoban_io import HexobanIo
+from .octoban_io import OctobanIo
+from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
 from .snapshot import Snapshot
-from .utilities import contains_only_digits_and_spaces, is_blank
-
-if TYPE_CHECKING:
-    from ..game import Tessellation
-    from ..game.base_tessellation import BaseTessellation
-    from .puzzle_parsing import PuzzleParser, PuzzlePrinter, PuzzleResizer
-
-
-class CellOrientation(enum.Enum):
-    """
-    Dynamic board cell property that depends on cell position in some tessellations.
-    ie. in Trioban, origin of coordinate system is triangle pointing upwards. This means
-    that orientation of all other triangles depends on orientation of origin.
-    """
-
-    DEFAULT = 0
-    TRIANGLE_DOWN = 1
-    OCTAGON = 2
+from .sokoban_io import SokobanIo
+from .trioban_io import TriobanIo
 
 
 class Puzzle:
@@ -52,104 +43,14 @@ class Puzzle:
             ignoring ``width`` and ``height``.
     """
 
-    WALL: Final[str] = "#"
-    PUSHER: Final[str] = "@"
-    PUSHER_ON_GOAL: Final[str] = "+"
-    BOX: Final[str] = "$"
-    BOX_ON_GOAL: Final[str] = "*"
-    GOAL: Final[str] = "."
-    FLOOR: Final[str] = " "
-    VISIBLE_FLOOR: Final[str] = "-"
-    ALT_PUSHER1: Final[str] = "p"
-    ALT_PUSHER2: Final[str] = "m"
-    ALT_PUSHER_ON_GOAL1: Final[str] = "P"
-    ALT_PUSHER_ON_GOAL2: Final[str] = "M"
-    ALT_BOX1: Final[str] = "b"
-    ALT_BOX_ON_GOAL1: Final[str] = "B"
-    ALT_GOAL1: Final[str] = "o"
-    ALT_VISIBLE_FLOOR1: Final[str] = "_"
-
-    @classmethod
-    def is_pusher(cls, character: str) -> bool:
-        return character in (
-            cls.PUSHER,
-            cls.ALT_PUSHER1,
-            cls.ALT_PUSHER2,
-            cls.PUSHER_ON_GOAL,
-            cls.ALT_PUSHER_ON_GOAL1,
-            cls.ALT_PUSHER_ON_GOAL2,
-        )
-
-    @classmethod
-    def is_box(cls, character: str) -> bool:
-        return character in (
-            cls.BOX,
-            cls.ALT_BOX1,
-            cls.BOX_ON_GOAL,
-            cls.ALT_BOX_ON_GOAL1,
-        )
-
-    @classmethod
-    def is_goal(cls, character: str) -> bool:
-        return character in (
-            cls.GOAL,
-            cls.ALT_GOAL1,
-            cls.BOX_ON_GOAL,
-            cls.ALT_BOX_ON_GOAL1,
-            cls.PUSHER_ON_GOAL,
-            cls.ALT_PUSHER_ON_GOAL1,
-            cls.ALT_PUSHER_ON_GOAL2,
-        )
-
-    @classmethod
-    def is_empty_floor(cls, character: str) -> bool:
-        return character in (
-            cls.FLOOR,
-            cls.VISIBLE_FLOOR,
-            cls.ALT_VISIBLE_FLOOR1,
-        )
-
-    @classmethod
-    def is_wall(cls, character: str) -> bool:
-        return character == cls.WALL
-
-    @classmethod
-    def is_border_element(cls, character: str) -> bool:
-        return character in (
-            cls.WALL,
-            cls.BOX_ON_GOAL,
-            cls.ALT_BOX_ON_GOAL1,
-        )
-
-    @classmethod
-    def is_puzzle_element(cls, character: str) -> bool:
-        return (
-            cls.is_empty_floor(character)
-            or cls.is_wall(character)
-            or cls.is_pusher(character)
-            or cls.is_box(character)
-            or cls.is_goal(character)
-        )
-
-    @classmethod
-    def is_board(cls, line: Optional[str]) -> bool:
-        """
-        Checks if line contains only characters legal in textual representation of
-        boards.
-
-        Note:
-            Doesn't check if it actually contains legal board, it only checks that
-            there are no illegal characters.
-        """
-        return not contains_only_digits_and_spaces(line) and reduce(
-            lambda x, y: x and y,
-            [True if _RE_BOARD_STRING.match(l) else False for l in line.splitlines()],
-            True,
-        )
-
-    @classmethod
-    def is_sokoban_plus(cls, line: str) -> bool:
-        return contains_only_digits_and_spaces(line) and not is_blank(line)
+    WALL: Final[str] = Characters.WALL
+    PUSHER: Final[str] = Characters.PUSHER
+    PUSHER_ON_GOAL: Final[str] = Characters.PUSHER_ON_GOAL
+    BOX: Final[str] = Characters.BOX
+    BOX_ON_GOAL: Final[str] = Characters.BOX_ON_GOAL
+    GOAL: Final[str] = Characters.GOAL
+    FLOOR: Final[str] = Characters.FLOOR
+    VISIBLE_FLOOR: Final[str] = Characters.VISIBLE_FLOOR
 
     def __init__(
         self,
@@ -176,7 +77,7 @@ class Puzzle:
         self._goals_count: Optional[int] = None
 
         self._tessellation: Tessellation = tessellation
-        self._tessellation_obj_val: Optional[BaseTessellation] = None
+        self._tessellation_obj_val: Optional[TessellationImpl] = None
 
         self._width: int
         self._height: int
@@ -196,7 +97,7 @@ class Puzzle:
             self._parsed_board = width * height * [self.VISIBLE_FLOOR]
 
         else:
-            if not self.is_board(board):
+            if not Characters.is_board(board):
                 raise ValueError("Invalid characters in board string!")
             self._width = 0
             self._height = 0
@@ -214,10 +115,8 @@ class Puzzle:
 
     @property
     def _tessellation_obj(self):
-        from ..game.base_tessellation import BaseTessellation
-
         if self._tessellation_obj_val is None:
-            self._tessellation_obj_val = BaseTessellation.instance(self._tessellation)
+            self._tessellation_obj_val = TessellationImpl.instance(self._tessellation)
 
         return self._tessellation_obj_val
 
@@ -236,7 +135,7 @@ class Puzzle:
         if position < 0:
             raise IndexError(f"Position {position} is invalid value!")
 
-        if not self.is_puzzle_element(c):
+        if not Characters.is_puzzle_element(c):
             raise ValueError(f"'{c}' is not a board character!")
 
         self._reparse_if_not_parsed()
@@ -278,7 +177,7 @@ class Puzzle:
 
     @board.setter
     def board(self, rv: str):
-        if not self.is_board(rv):
+        if not Characters.is_board(rv):
             raise ValueError("Invalid characters in board string!")
         self._original_board = rv
         self._was_parsed = False
@@ -310,7 +209,7 @@ class Puzzle:
     def pushers_count(self) -> int:
         if self._pushers_count is None:
             self._pushers_count = reduce(
-                add, [1 if self.is_pusher(chr) else 0 for chr in self.board], 0
+                add, [1 if Characters.is_pusher(c) else 0 for c in self.board], 0
             )
         return self._pushers_count
 
@@ -318,7 +217,7 @@ class Puzzle:
     def boxes_count(self) -> int:
         if self._boxes_count is None:
             self._boxes_count = reduce(
-                add, [1 if self.is_box(chr) else 0 for chr in self.board], 0
+                add, [1 if Characters.is_box(c) else 0 for c in self.board], 0
             )
 
         return self._boxes_count
@@ -327,7 +226,7 @@ class Puzzle:
     def goals_count(self) -> int:
         if self._goals_count is None:
             self._goals_count = reduce(
-                add, [1 if self.is_goal(chr) else 0 for chr in self.board], 0
+                add, [1 if Characters.is_goal(c) else 0 for c in self.board], 0
             )
         return self._goals_count
 
@@ -533,80 +432,36 @@ class Puzzle:
 
     @property
     def _resizer(self) -> PuzzleResizer:
-        from ..game import Tessellation
-        from .hexoban import Hexoban
-        from .octoban import Octoban
-        from .sokoban import Sokoban
-        from .trioban import Trioban
-
         if self._tessellation == Tessellation.SOKOBAN:
-            return Sokoban.resizer()
+            return SokobanIo.resizer()
         if self._tessellation == Tessellation.TRIOBAN:
-            return Trioban.resizer()
+            return TriobanIo.resizer()
         if self._tessellation == Tessellation.HEXOBAN:
-            return Hexoban.resizer()
+            return HexobanIo.resizer()
         if self._tessellation == Tessellation.OCTOBAN:
-            return Octoban.resizer()
+            return OctobanIo.resizer()
         raise ValueError(f"Unknown tessellation {self._tessellation}")
 
     @property
     def _parser(self) -> PuzzleParser:
-        from ..game import Tessellation
-        from .hexoban import Hexoban
-        from .octoban import Octoban
-        from .sokoban import Sokoban
-        from .trioban import Trioban
-
         if self._tessellation == Tessellation.SOKOBAN:
-            return Sokoban.parser()
+            return SokobanIo.parser()
         if self._tessellation == Tessellation.TRIOBAN:
-            return Trioban.parser()
+            return TriobanIo.parser()
         if self._tessellation == Tessellation.HEXOBAN:
-            return Hexoban.parser()
+            return HexobanIo.parser()
         if self._tessellation == Tessellation.OCTOBAN:
-            return Octoban.parser()
+            return OctobanIo.parser()
         raise ValueError(f"Unknown tessellation {self._tessellation}")
 
     @property
     def _printer(self) -> PuzzlePrinter:
-        from ..game import Tessellation
-        from .hexoban import Hexoban
-        from .octoban import Octoban
-        from .sokoban import Sokoban
-        from .trioban import Trioban
-
         if self._tessellation == Tessellation.SOKOBAN:
-            return Sokoban.printer()
+            return SokobanIo.printer()
         if self._tessellation == Tessellation.TRIOBAN:
-            return Trioban.printer()
+            return TriobanIo.printer()
         if self._tessellation == Tessellation.HEXOBAN:
-            return Hexoban.printer()
+            return HexobanIo.printer()
         if self._tessellation == Tessellation.OCTOBAN:
-            return Octoban.printer()
+            return OctobanIo.printer()
         raise ValueError(f"Unknown tessellation {self._tessellation}")
-
-
-_CHARACTERS: Set[str] = {
-    Puzzle.WALL,
-    Puzzle.PUSHER,
-    Puzzle.PUSHER_ON_GOAL,
-    Puzzle.BOX,
-    Puzzle.BOX_ON_GOAL,
-    Puzzle.GOAL,
-    Puzzle.FLOOR,
-    Puzzle.VISIBLE_FLOOR,
-    Puzzle.ALT_PUSHER1,
-    Puzzle.ALT_PUSHER2,
-    Puzzle.ALT_PUSHER_ON_GOAL1,
-    Puzzle.ALT_PUSHER_ON_GOAL2,
-    Puzzle.ALT_BOX1,
-    Puzzle.ALT_BOX_ON_GOAL1,
-    Puzzle.ALT_GOAL1,
-    Puzzle.ALT_VISIBLE_FLOOR1,
-}
-_RE_BOARD_STRING = re.compile(
-    r"^([0-9\s"
-    + re.escape("".join(_CHARACTERS))
-    + re.escape("".join({Rle.GROUP_START, Rle.GROUP_END, Rle.EOL}))
-    + "])*$"
-)

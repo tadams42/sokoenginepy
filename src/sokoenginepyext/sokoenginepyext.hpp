@@ -34,22 +34,20 @@ typedef std::vector<py_int_t> py_int_vect_t;
 
 static inline sokoengine::position_t position_or_throw(py_int_t position) {
   if (position < 0 || position >= std::numeric_limits<sokoengine::position_t>::max())
-    throw sokoengine::game::InvalidPositionError(position);
+    throw sokoengine::InvalidPositionError(position);
   return static_cast<sokoengine::position_t>(position);
 }
 
-static inline sokoengine::game::Positions
-positions_or_throw(const py_int_vect_t &positions) {
-  sokoengine::game::Positions retv;
+static inline sokoengine::Positions positions_or_throw(const py_int_vect_t &positions) {
+  sokoengine::Positions retv;
   for (auto p : positions) {
     retv.push_back(position_or_throw(p));
   }
   return retv;
 }
 
-static inline sokoengine::game::Positions
-positions_no_throw(const py_int_vect_t &positions) {
-  sokoengine::game::Positions retv;
+static inline sokoengine::Positions positions_no_throw(const py_int_vect_t &positions) {
+  sokoengine::Positions retv;
   for (auto p : positions) {
     if (p >= 0 || p < std::numeric_limits<sokoengine::position_t>::max())
       retv.push_back(static_cast<sokoengine::position_t>(p));
@@ -57,23 +55,23 @@ positions_no_throw(const py_int_vect_t &positions) {
   return retv;
 }
 
-static inline sokoengine::game::piece_id_t
-piece_or_throw(sokoengine::game::Selectors piece, py_int_t piece_id) {
-  if (piece_id < 0 || piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
-    throw sokoengine::game::PieceNotFoundError(piece, piece_id);
-  return static_cast<sokoengine::game::piece_id_t>(piece_id);
+static inline sokoengine::piece_id_t
+piece_or_throw(sokoengine::Selectors piece, py_int_t piece_id) {
+  if (piece_id < 0 || piece_id >= std::numeric_limits<sokoengine::piece_id_t>::max())
+    throw sokoengine::PieceNotFoundError(piece, piece_id);
+  return static_cast<sokoengine::piece_id_t>(piece_id);
 }
 
-static inline sokoengine::game::piece_id_t no_id_if_invalid(py_int_t piece_id) {
-  if (piece_id < 0 || piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
-    return sokoengine::game::Config::NO_ID;
-  return static_cast<sokoengine::game::piece_id_t>(piece_id);
+static inline sokoengine::piece_id_t no_id_if_invalid(py_int_t piece_id) {
+  if (piece_id < 0 || piece_id >= std::numeric_limits<sokoengine::piece_id_t>::max())
+    return sokoengine::Config::NO_ID;
+  return static_cast<sokoengine::piece_id_t>(piece_id);
 }
 
-static inline sokoengine::game::piece_id_t default_if_invalid(py_int_t piece_id) {
-  if (piece_id < 0 || piece_id >= std::numeric_limits<sokoengine::game::piece_id_t>::max())
-    return sokoengine::game::Config::DEFAULT_ID;
-  return static_cast<sokoengine::game::piece_id_t>(piece_id);
+static inline sokoengine::piece_id_t default_if_invalid(py_int_t piece_id) {
+  if (piece_id < 0 || piece_id >= std::numeric_limits<sokoengine::piece_id_t>::max())
+    return sokoengine::Config::DEFAULT_ID;
+  return static_cast<sokoengine::piece_id_t>(piece_id);
 }
 
 static inline sokoengine::board_size_t size_or_throw(py_int_t size) {

@@ -2,20 +2,39 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+)
 
 import networkx as nx
 
-from ..io import CellOrientation, Puzzle
-from .base_tessellation import BaseTessellation, Tessellation
+from ..common import (
+    CellOrientation,
+    Config,
+    Direction,
+    GraphType,
+    Tessellation,
+    TessellationImpl,
+)
+from ..io import Puzzle
 from .board_cell import BoardCell
-from .config import Config, Direction, GraphType
 
 # (1, 0, {'direction': Direction.LEFT})
 _InternalEdge = Tuple[int, int, Dict[str, Union[Direction, int]]]
 BoardCellOrStr = Union[BoardCell, str]
 Positions = List[int]
 Directions = List[Direction]
+
+if TYPE_CHECKING:
+    from ..io import Puzzle
 
 
 @dataclass
@@ -59,7 +78,7 @@ class BoardGraph:
         self._board_height = puzzle.height
         self._tessellation = puzzle.tessellation
 
-        tessellation = BaseTessellation.instance(self._tessellation)
+        tessellation = TessellationImpl.instance(self._tessellation)
         if tessellation.graph_type == GraphType.DIRECTED:
             self._graph = nx.DiGraph()
         elif tessellation.graph_type == GraphType.DIRECTED_MULTI:
@@ -108,7 +127,7 @@ class BoardGraph:
         return self._tessellation
 
     def cell_orientation(self, position: int) -> CellOrientation:
-        return BaseTessellation.instance(self._tessellation).cell_orientation(
+        return TessellationImpl.instance(self._tessellation).cell_orientation(
             position, self.board_width, self.board_height
         )
 
@@ -425,7 +444,7 @@ class BoardGraph:
         return weight
 
     def _reconfigure_edges(self):
-        tessellation = BaseTessellation.instance(self.tessellation)
+        tessellation = TessellationImpl.instance(self.tessellation)
 
         self._remove_all_edges()
         for src in range(self._vertices_count):

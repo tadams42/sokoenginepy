@@ -1,5 +1,6 @@
 import pytest
-from sokoenginepy.io import Rle
+
+from sokoenginepy import Rle
 
 
 class DescribeRle:

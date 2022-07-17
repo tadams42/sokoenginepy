@@ -1,3 +1,90 @@
-from . import game, io
+from typing import TYPE_CHECKING
 
 __version__ = "1.0.3"
+
+if TYPE_CHECKING:
+    from .common import CellOrientation, Config, Direction, Tessellation
+    from .game import (
+        BoardCell,
+        BoardGraph,
+        BoardManager,
+        BoardState,
+        BoxGoalSwitchError,
+        CellAlreadyOccupiedError,
+        Edge,
+        HashedBoardManager,
+        IllegalMoveError,
+        Mover,
+        NonPlayableBoardError,
+        PusherStep,
+        SokobanPlus,
+        SokobanPlusDataError,
+        SolvingMode,
+    )
+    from .io import Collection, Puzzle, Rle, Snapshot
+
+else:
+    try:
+        from sokoenginepyext import (
+            BoardCell,
+            BoardGraph,
+            BoardManager,
+            BoardState,
+            BoxGoalSwitchError,
+            CellAlreadyOccupiedError,
+            CellOrientation,
+            Collection,
+            Config,
+            Direction,
+            Edge,
+            HashedBoardManager,
+            IllegalMoveError,
+            Mover,
+            NonPlayableBoardError,
+            PusherStep,
+            Puzzle,
+            Rle,
+            Snapshot,
+            SokobanPlus,
+            SokobanPlusDataError,
+            SolvingMode,
+            Tessellation,
+        )
+
+    except ImportError:
+        from .common import (
+            CellOrientation,
+            Config,
+            Direction,
+            Tessellation,
+        )
+        from .game import (
+            BoardCell,
+            BoardGraph,
+            BoardManager,
+            BoardState,
+            BoxGoalSwitchError,
+            CellAlreadyOccupiedError,
+            Edge,
+            HashedBoardManager,
+            IllegalMoveError,
+            Mover,
+            NonPlayableBoardError,
+            PusherStep,
+            SokobanPlus,
+            SokobanPlusDataError,
+            SolvingMode,
+        )
+        from .io import Collection, Puzzle, Rle, Snapshot
+
+from .common import (
+    index_1d,
+    index_column,
+    index_row,
+    index_x,
+    index_y,
+    is_blank,
+    is_on_board_1d,
+    is_on_board_2d,
+)
+from .game import JumpCommand, MoveCommand, SelectPusherCommand

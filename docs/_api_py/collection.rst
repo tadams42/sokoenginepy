@@ -1,9 +1,9 @@
 Collection
 ==========
 
-.. autofunction:: sokoenginepy.io.is_blank
+.. autofunction:: sokoenginepy.is_blank
 
-.. autoclass:: sokoenginepy.io.Collection
+.. autoclass:: sokoenginepy.Collection
     :members:
     :undoc-members:
 
@@ -11,7 +11,6 @@ Collection
 Rle
 ---
 
-
-.. autoclass:: sokoenginepy.io.Rle
+.. autoclass:: sokoenginepy.Rle
     :members:
     :undoc-members:

@@ -1,17 +1,16 @@
 #include "sokoenginepyext.hpp"
 
+using sokoengine::Config;
+using sokoengine::Direction;
+using sokoengine::Directions;
 using sokoengine::position_t;
-using sokoengine::game::BoardCell;
-using sokoengine::game::BoardGraph;
-using sokoengine::game::Config;
-using sokoengine::game::Direction;
-using sokoengine::game::Directions;
-using sokoengine::game::Edge;
-using sokoengine::game::Edges;
-using sokoengine::game::GraphType;
-using sokoengine::game::Positions;
-using sokoengine::game::Tessellation;
-using sokoengine::io::Puzzle;
+using sokoengine::Positions;
+using sokoengine::Tessellation;
+using sokoengine::BoardCell;
+using sokoengine::BoardGraph;
+using sokoengine::Edge;
+using sokoengine::Edges;
+using sokoengine::Puzzle;
 
 void export_board_graph(py::module &m) {
   py::enum_<Tessellation>(m, "Tessellation")
@@ -19,10 +18,6 @@ void export_board_graph(py::module &m) {
     .value("HEXOBAN", Tessellation::HEXOBAN)
     .value("TRIOBAN", Tessellation::TRIOBAN)
     .value("OCTOBAN", Tessellation::OCTOBAN);
-
-  py::enum_<GraphType>(m, "GraphType")
-    .value("DIRECTED", GraphType::DIRECTED)
-    .value("DIRECTED_MULTI", GraphType::DIRECTED_MULTI);
 
   py::class_<Config>(m, "Config")
     .def_readonly_static("MAX_WIDTH", &Config::MAX_WIDTH)

@@ -1,6 +1,6 @@
 #include "sokoenginepyext.hpp"
 
-using sokoengine::io::Rle;
+using sokoengine::Rle;
 
 void export_io_rle(py::module &m) {
   auto pyRle = py::class_<Rle>(m, "Rle");

@@ -1,11 +1,11 @@
 #include "sokoenginepyext.hpp"
 
 using sokoengine::board_size_t;
+using sokoengine::CellOrientation;
 using sokoengine::position_t;
-using sokoengine::game::Tessellation;
-using sokoengine::io::CellOrientation;
-using sokoengine::io::Puzzle;
-using sokoengine::io::Snapshots;
+using sokoengine::Tessellation;
+using sokoengine::Puzzle;
+using sokoengine::Snapshots;
 using std::make_unique;
 using std::string;
 
@@ -45,24 +45,6 @@ void export_io_puzzle(py::module &m) {
   pyPuzzle.def_readonly_static("GOAL", &Puzzle::GOAL);
   pyPuzzle.def_readonly_static("FLOOR", &Puzzle::FLOOR);
   pyPuzzle.def_readonly_static("VISIBLE_FLOOR", &Puzzle::VISIBLE_FLOOR);
-  pyPuzzle.def_readonly_static("ALT_PUSHER1", &Puzzle::ALT_PUSHER1);
-  pyPuzzle.def_readonly_static("ALT_PUSHER2", &Puzzle::ALT_PUSHER2);
-  pyPuzzle.def_readonly_static("ALT_PUSHER_ON_GOAL1", &Puzzle::ALT_PUSHER_ON_GOAL1);
-  pyPuzzle.def_readonly_static("ALT_PUSHER_ON_GOAL2", &Puzzle::ALT_PUSHER_ON_GOAL2);
-  pyPuzzle.def_readonly_static("ALT_BOX1", &Puzzle::ALT_BOX1);
-  pyPuzzle.def_readonly_static("ALT_BOX_ON_GOAL1", &Puzzle::ALT_BOX_ON_GOAL1);
-  pyPuzzle.def_readonly_static("ALT_GOAL1", &Puzzle::ALT_GOAL1);
-  pyPuzzle.def_readonly_static("ALT_VISIBLE_FLOOR1", &Puzzle::ALT_VISIBLE_FLOOR1);
-
-  pyPuzzle.def_static("is_pusher", &Puzzle::is_pusher);
-  pyPuzzle.def_static("is_box", &Puzzle::is_box);
-  pyPuzzle.def_static("is_goal", &Puzzle::is_goal);
-  pyPuzzle.def_static("is_empty_floor", &Puzzle::is_empty_floor);
-  pyPuzzle.def_static("is_wall", &Puzzle::is_wall);
-  pyPuzzle.def_static("is_border_element", &Puzzle::is_border_element);
-  pyPuzzle.def_static("is_puzzle_element", &Puzzle::is_puzzle_element);
-  pyPuzzle.def_static("is_board", &Puzzle::is_board);
-  pyPuzzle.def_static("is_sokoban_plus", &Puzzle::is_sokoban_plus);
 
   pyPuzzle.def_property(
     "title",

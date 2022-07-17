@@ -1,4 +1,4 @@
-from sokoenginepy.game import Direction
+from sokoenginepy import Direction
 
 
 class DescribeDirection_opposite:

@@ -1,4 +1,4 @@
-from sokoenginepy.game import (
+from sokoenginepy import (
     Config,
     Direction,
     JumpCommand,

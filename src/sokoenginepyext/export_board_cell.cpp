@@ -1,7 +1,7 @@
 #include "sokoenginepyext.hpp"
 
-using sokoengine::game::BoardCell;
-using sokoengine::io::Puzzle;
+using sokoengine::BoardCell;
+using sokoengine::Puzzle;
 using std::make_unique;
 
 void export_board_cell(py::module &m) {

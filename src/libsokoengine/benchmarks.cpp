@@ -1,3 +1,4 @@
+/// @file
 #include "sokoengine.hpp"
 
 #include <algorithm>
@@ -7,13 +8,13 @@
 #include <numeric>
 #include <sstream>
 
-using sokoengine::game::BoardGraph;
-using sokoengine::game::BoardManager;
-using sokoengine::game::Direction;
-using sokoengine::game::Mover;
-using sokoengine::game::SolvingMode;
-using sokoengine::game::Tessellation;
-using sokoengine::io::Puzzle;
+using sokoengine::BoardGraph;
+using sokoengine::BoardManager;
+using sokoengine::Direction;
+using sokoengine::Mover;
+using sokoengine::Puzzle;
+using sokoengine::SolvingMode;
+using sokoengine::Tessellation;
 using std::cout;
 using std::endl;
 using std::fixed;

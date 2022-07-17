@@ -3,23 +3,20 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import List, Tuple
 
-from .puzzle import Puzzle
+from ..common import Characters, index_1d, is_blank
 from .rle import Rle
-from .utilities import is_blank
 
 
 class PuzzleResizer:
     def add_row_top(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = parsed_board
         old_height = height
 
         new_height = height + 1
         new_width = width
-        new_body = new_height * new_width * [Puzzle.VISIBLE_FLOOR]
+        new_body = new_height * new_width * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, new_width):
             for y in range(0, old_height):
@@ -32,14 +29,12 @@ class PuzzleResizer:
     def add_row_bottom(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = parsed_board
         old_height = height
 
         new_height = height + 1
         new_width = width
-        new_body = new_height * new_width * [Puzzle.VISIBLE_FLOOR]
+        new_body = new_height * new_width * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, new_width):
             for y in range(0, old_height):
@@ -52,14 +47,12 @@ class PuzzleResizer:
     def add_column_left(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = parsed_board
         old_width = width
 
         new_height = height
         new_width = width + 1
-        new_body = new_height * new_width * [Puzzle.VISIBLE_FLOOR]
+        new_body = new_height * new_width * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, old_width):
             for y in range(0, new_height):
@@ -72,14 +65,12 @@ class PuzzleResizer:
     def add_column_right(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = parsed_board
         old_width = width
 
         new_height = height
         new_width = width + 1
-        new_body = new_height * new_width * [Puzzle.VISIBLE_FLOOR]
+        new_body = new_height * new_width * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, old_width):
             for y in range(0, new_height):
@@ -92,15 +83,13 @@ class PuzzleResizer:
     def remove_row_top(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = parsed_board
 
         new_height = height - 1
         new_width = width
         if new_height <= 0:
             return [], 0, 0
-        new_body = new_height * new_width * [Puzzle.VISIBLE_FLOOR]
+        new_body = new_height * new_width * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, new_width):
             for y in range(0, new_height):
@@ -113,15 +102,13 @@ class PuzzleResizer:
     def remove_row_bottom(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = parsed_board
 
         new_height = height - 1
         new_width = width
         if new_height <= 0:
             return [], 0, 0
-        new_body = new_height * new_width * [Puzzle.VISIBLE_FLOOR]
+        new_body = new_height * new_width * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, new_width):
             for y in range(0, new_height):
@@ -134,8 +121,6 @@ class PuzzleResizer:
     def remove_column_left(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = parsed_board
         old_width = width
 
@@ -143,7 +128,7 @@ class PuzzleResizer:
         new_width = width - 1
         if new_width <= 0:
             return [], 0, 0
-        new_body = new_height * new_width * [Puzzle.VISIBLE_FLOOR]
+        new_body = new_height * new_width * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, new_width):
             for y in range(0, new_height):
@@ -156,8 +141,6 @@ class PuzzleResizer:
     def remove_column_right(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = parsed_board
         old_width = width
 
@@ -165,7 +148,7 @@ class PuzzleResizer:
         new_width = width - 1
         if new_width <= 0:
             return [], 0, 0
-        new_body = new_height * new_width * [Puzzle.VISIBLE_FLOOR]
+        new_body = new_height * new_width * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, new_width):
             for y in range(0, new_height):
@@ -178,13 +161,11 @@ class PuzzleResizer:
     def trim_left(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         amount = width
         for y in range(0, height):
             border_found = False
             for x in range(0, width):
-                border_found = Puzzle.is_border_element(
+                border_found = Characters.is_border_element(
                     parsed_board[index_1d(x, y, width)]
                 )
                 if border_found and x < amount:
@@ -223,13 +204,11 @@ class PuzzleResizer:
     def trim_top(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         amount = height
         for x in range(0, width):
             border_found = False
             for y in range(0, height):
-                border_found = Puzzle.is_border_element(
+                border_found = Characters.is_border_element(
                     parsed_board[index_1d(x, y, width)]
                 )
                 if border_found:
@@ -268,11 +247,9 @@ class PuzzleResizer:
     def reverse_rows(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = deepcopy(parsed_board)
 
-        new_body = width * height * [Puzzle.VISIBLE_FLOOR]
+        new_body = width * height * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, width):
             for y in range(0, height):
@@ -285,11 +262,9 @@ class PuzzleResizer:
     def reverse_columns(
         self, parsed_board: List[str], width: int, height: int
     ) -> Tuple[List[str], int, int]:
-        from ..game import index_1d
-
         old_body = deepcopy(parsed_board)
 
-        new_body = width * height * [Puzzle.VISIBLE_FLOOR]
+        new_body = width * height * [Characters.VISIBLE_FLOOR]
 
         for x in range(0, width):
             for y in range(0, height):
@@ -333,7 +308,7 @@ class PuzzleParser:
         if is_blank(line):
             return []
 
-        if not Puzzle.is_board(line):
+        if not Characters.is_board(line):
             raise ValueError("Illegal characters found in board string")
 
         return cls.normalize_width(Rle.decode(line).lstrip("\n").rstrip().split("\n"))
@@ -348,16 +323,18 @@ class PuzzlePrinter:
         use_visible_floor: bool,
         rle_encode: bool,
     ) -> str:
-        from ..game import index_1d
-
         retv_list: List[str] = []
 
         for y in range(height):
             tmp: str = ""
             for x in range(width):
                 c = parsed_board[index_1d(x, y, width)]
-                if Puzzle.is_empty_floor(c):
-                    c = Puzzle.VISIBLE_FLOOR if use_visible_floor else Puzzle.FLOOR
+                if Characters.is_empty_floor(c):
+                    c = (
+                        Characters.VISIBLE_FLOOR
+                        if use_visible_floor
+                        else Characters.FLOOR
+                    )
                 tmp += c
 
             retv_list.append(tmp)

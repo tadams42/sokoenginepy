@@ -1,20 +1,18 @@
+/// @file
 #include "puzzle.hpp"
 
-#include "hexoban.hpp"
-#include "octoban.hpp"
+#include "hexoban_io.hpp"
+#include "octoban_io.hpp"
 #include "puzzle_parsing.hpp"
-#include "rle.hpp"
-#include "snapshot.hpp"
-#include "sokoban.hpp"
-#include "tessellation.hpp"
-#include "trioban.hpp"
+#include "sokoban_io.hpp"
+#include "tessellation_impl.hpp"
+#include "trioban_io.hpp"
 
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::game::index_1d;
-using sokoengine::game::Tessellation;
-using sokoengine::game::implementation::BaseTessellation;
+using sokoengine::implementation::Characters;
 using sokoengine::implementation::Strings;
+using sokoengine::implementation::TessellationImpl;
 using std::invalid_argument;
 using std::make_unique;
 using std::string;
@@ -23,14 +21,14 @@ namespace sokoengine {
 namespace io {
 
 using implementation::_copy;
-using implementation::Hexoban;
-using implementation::Octoban;
+using implementation::HexobanIo;
+using implementation::OctobanIo;
 using implementation::parsed_board_t;
 using implementation::PuzzleParser;
 using implementation::PuzzlePrinter;
 using implementation::PuzzleResizer;
-using implementation::Sokoban;
-using implementation::Trioban;
+using implementation::SokobanIo;
+using implementation::TriobanIo;
 
 class LIBSOKOENGINE_LOCAL Puzzle::PIMPL {
 public:
@@ -65,27 +63,27 @@ public:
     bool tessellation_found = false;
     switch (m_tessellation) {
       case Tessellation::SOKOBAN:
-        m_resizer          = (&Sokoban::resizer());
-        m_parser           = (&Sokoban::parser());
-        m_printer          = (&Sokoban::printer());
+        m_resizer          = (&SokobanIo::resizer());
+        m_parser           = (&SokobanIo::parser());
+        m_printer          = (&SokobanIo::printer());
         tessellation_found = true;
         break;
       case Tessellation::TRIOBAN:
-        m_resizer          = (&Trioban::resizer());
-        m_parser           = (&Trioban::parser());
-        m_printer          = (&Trioban::printer());
+        m_resizer          = (&TriobanIo::resizer());
+        m_parser           = (&TriobanIo::parser());
+        m_printer          = (&TriobanIo::printer());
         tessellation_found = true;
         break;
       case Tessellation::HEXOBAN:
-        m_resizer          = (&Hexoban::resizer());
-        m_parser           = (&Hexoban::parser());
-        m_printer          = (&Hexoban::printer());
+        m_resizer          = (&HexobanIo::resizer());
+        m_parser           = (&HexobanIo::parser());
+        m_printer          = (&HexobanIo::printer());
         tessellation_found = true;
         break;
       case Tessellation::OCTOBAN:
-        m_resizer          = (&Octoban::resizer());
-        m_parser           = (&Octoban::parser());
-        m_printer          = (&Octoban::printer());
+        m_resizer          = (&OctobanIo::resizer());
+        m_parser           = (&OctobanIo::parser());
+        m_printer          = (&OctobanIo::printer());
         tessellation_found = true;
         break;
         // Don't handle default here so we get compiler warning if some new Tessellation
@@ -100,7 +98,7 @@ public:
     : PIMPL(tessellation, 0, 0) {
     m_was_parsed     = false;
     m_original_board = board;
-    if (!Puzzle::is_board(m_original_board)) {
+    if (!Characters::is_board(m_original_board)) {
       throw invalid_argument("Invalid characters in board string!");
     }
   }
@@ -180,7 +178,7 @@ Snapshots &Puzzle::snapshots() { return m_impl->m_snapshots; }
 Tessellation Puzzle::tessellation() const { return m_impl->m_tessellation; }
 
 CellOrientation Puzzle::cell_orientation(position_t position) const {
-  return BaseTessellation::instance(m_impl->m_tessellation)
+  return TessellationImpl::instance(m_impl->m_tessellation)
     .cell_orientation(position, width(), height());
 }
 
@@ -190,7 +188,7 @@ char Puzzle::at(position_t position) const {
 }
 
 void Puzzle::set_at(position_t position, char c) {
-  if (!is_puzzle_element(c)) {
+  if (!Characters::is_puzzle_element(c)) {
     throw invalid_argument(string("Not a board character: '") + c + "'!");
   }
   m_impl->reparse_if_not_parsed();
@@ -203,7 +201,7 @@ char Puzzle::operator[](position_t position) const {
 }
 
 void Puzzle::set(position_t position, char c) {
-  if (!is_puzzle_element(c)) {
+  if (!Characters::is_puzzle_element(c)) {
     throw invalid_argument(string("Not a board character: '") + c + "'!");
   }
   m_impl->reparse_if_not_parsed();
@@ -224,7 +222,7 @@ string Puzzle::to_board_str(bool use_visible_floor, bool rle_encode) const {
 const string &Puzzle::board() const { return m_impl->m_original_board; }
 
 void Puzzle::set_board(const string &board) {
-  if (!is_board(board))
+  if (!Characters::is_board(board))
     throw invalid_argument("Invalid characters in board string!");
   m_impl->m_original_board = board;
   m_impl->m_was_parsed     = false;
@@ -247,8 +245,7 @@ string Puzzle::repr() const {
   for (string &line : board_lines)
     line = "    '" + line + "'";
 
-  return klass_name + "(Tessellation."
-       + boost::to_upper_copy(implementation::to_str(m_impl->m_tessellation))
+  return klass_name + "(" + sokoengine::implementation::to_str(m_impl->m_tessellation)
        + ", board='\\n'.join([\n" + boost::join(board_lines, ",\n") + "\n]))";
 }
 
@@ -276,7 +273,7 @@ size_t Puzzle::pushers_count() const {
     m_impl->m_original_board.begin(),
     m_impl->m_original_board.end(),
     [](char c) {
-      return Puzzle::is_pusher(c);
+      return Characters::is_pusher(c);
     }
   );
 }
@@ -286,7 +283,7 @@ size_t Puzzle::boxes_count() const {
     m_impl->m_original_board.begin(),
     m_impl->m_original_board.end(),
     [](char c) {
-      return Puzzle::is_box(c);
+      return Characters::is_box(c);
     }
   );
 }
@@ -296,7 +293,7 @@ size_t Puzzle::goals_count() const {
     m_impl->m_original_board.begin(),
     m_impl->m_original_board.end(),
     [](char c) {
-      return Puzzle::is_goal(c);
+      return Characters::is_goal(c);
     }
   );
 }
@@ -481,54 +478,11 @@ void Puzzle::trim() {
   );
 }
 
-bool Puzzle::is_board(const string &line) {
-  bool only_digits_and_spaces = all_of(line.cbegin(), line.cend(), [](char c) -> bool {
-    return (isdigit(c) != 0) || (isspace(c) != 0);
-  });
-
-  return !only_digits_and_spaces
-      && all_of(line.begin(), line.end(), [](char c) -> bool {
-           return isspace(c) || isdigit(c) || Puzzle::is_pusher(c) || Puzzle::is_box(c)
-               || Puzzle::is_goal(c) || Puzzle::is_empty_floor(c) || Puzzle::is_wall(c)
-               || c == Rle::EOL || c == Rle::GROUP_START || c == Rle::GROUP_END;
-         });
-}
-
-bool Puzzle::is_sokoban_plus(const string &line) {
-  bool only_digits_and_spaces = all_of(line.cbegin(), line.cend(), [](char c) -> bool {
-    return (isdigit(c) != 0) || (isspace(c) != 0);
-  });
-
-  return only_digits_and_spaces && !is_blank(line);
-}
-
 bool is_blank(const std::string &line) {
   return line.empty() || all_of(line.begin(), line.end(), [](char c) -> bool {
            return isspace(c) != 0;
          });
 }
-
-namespace implementation {
-LIBSOKOENGINE_LOCAL string to_str(Tessellation tessellation) {
-  switch (tessellation) {
-    case Tessellation::SOKOBAN:
-      return "sokoban";
-      break;
-    case Tessellation::HEXOBAN:
-      return "hexoban";
-      break;
-    case Tessellation::TRIOBAN:
-      return "trioban";
-      break;
-    case Tessellation::OCTOBAN:
-      return "octoban";
-      break;
-      // Do not handle default, let compiler generate warning when another
-      // tessellation is added...
-  }
-  throw std::invalid_argument("Unknown tessellation!");
-}
-} // namespace implementation
 
 } // namespace io
 } // namespace sokoengine

@@ -1,8 +1,7 @@
 import cProfile
 from textwrap import dedent
 
-from sokoenginepy.game import BoardGraph, Direction, Mover, Tessellation
-from sokoenginepy.io import Puzzle
+from sokoenginepy import BoardGraph, Direction, Mover, Puzzle, Tessellation
 
 puzzle = Puzzle(
     Tessellation.SOKOBAN,

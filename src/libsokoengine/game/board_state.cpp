@@ -1,4 +1,7 @@
+/// @file
 #include "board_state.hpp"
+
+#include "characters.hpp"
 
 #include <boost/algorithm/string.hpp>
 

@@ -1,6 +1,6 @@
 import pytest
 
-from sokoenginepy.game import Config, Direction, PusherStep
+from sokoenginepy import Config, Direction, PusherStep
 
 
 class DescribePusherStep:

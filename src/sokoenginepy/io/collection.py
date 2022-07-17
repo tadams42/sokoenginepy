@@ -4,8 +4,9 @@ import io
 from pathlib import Path
 from typing import List, Union
 
-from ..game import Tessellation
+from ..common import Tessellation
 from .puzzle import Puzzle
+from .sok_file_format import SOKFileFormat
 
 
 class Collection:
@@ -61,8 +62,6 @@ class Collection:
             tessellation_hint: If puzzles in file don't specify their game tessellation
                 assume this value.
         """
-        from .sok_file_format import SOKFileFormat
-
         if isinstance(src, (str, Path)):
             with open(src, "r") as f:
                 SOKFileFormat.read(f, self, tessellation_hint)
@@ -108,8 +107,6 @@ class Collection:
         Arguments:
             dst: Path to destination file or destination stream object.
         """
-        from .sok_file_format import SOKFileFormat
-
         if isinstance(dst, (str, Path)):
             with open(dst, "w") as f:
                 SOKFileFormat.write(self, f)

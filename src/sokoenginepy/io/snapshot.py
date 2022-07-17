@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Final
 
+from ..common import Characters, Tessellation, TessellationImpl, is_blank
 from .rle import Rle
-from .utilities import contains_only_digits_and_spaces, is_blank
+from .snapshot_parsing import Jump, MovementTokens, Parser, PusherSelection, Steps
 
 if TYPE_CHECKING:
-    from ..game import PusherStep, Tessellation
-    from ..game.base_tessellation import BaseTessellation
-    from .snapshot_parsing import MovementTokens
+    from ..game import PusherStep
 
 
 class Snapshot:
@@ -23,71 +22,28 @@ class Snapshot:
     # use all characters. Also, for different game variants, same character may have
     # different meaning (represent different direction of movement).
 
-    l: Final[str] = "l"
-    u: Final[str] = "u"
-    r: Final[str] = "r"
-    d: Final[str] = "d"
-    L: Final[str] = "L"
-    U: Final[str] = "U"
-    R: Final[str] = "R"
-    D: Final[str] = "D"
-    w: Final[str] = "w"
-    W: Final[str] = "W"
-    e: Final[str] = "e"
-    E: Final[str] = "E"
-    n: Final[str] = "n"
-    N: Final[str] = "N"
-    s: Final[str] = "s"
-    S: Final[str] = "S"
+    l: Final[str] = Characters.l
+    u: Final[str] = Characters.u
+    r: Final[str] = Characters.r
+    d: Final[str] = Characters.d
+    L: Final[str] = Characters.L
+    U: Final[str] = Characters.U
+    R: Final[str] = Characters.R
+    D: Final[str] = Characters.D
+    w: Final[str] = Characters.w
+    W: Final[str] = Characters.W
+    e: Final[str] = Characters.e
+    E: Final[str] = Characters.E
+    n: Final[str] = Characters.n
+    N: Final[str] = Characters.N
+    s: Final[str] = Characters.s
+    S: Final[str] = Characters.S
 
-    JUMP_BEGIN: Final[str] = "["
-    JUMP_END: Final[str] = "]"
-    PUSHER_CHANGE_BEGIN: Final[str] = "{"
-    PUSHER_CHANGE_END: Final[str] = "}"
-    CURRENT_POSITION_CH: Final[str] = "*"
-
-    @classmethod
-    def is_move_step(cls, character: str) -> bool:
-        from .snapshot_parsing import Constants
-
-        return character in Constants.MOVE_CHARACTERS
-
-    @classmethod
-    def is_push_step(cls, character: str) -> bool:
-        from .snapshot_parsing import Constants
-
-        return character in Constants.PUSH_CHARACTERS
-
-    @classmethod
-    def is_pusher_step(cls, character: str) -> bool:
-        return cls.is_move_step(character) or cls.is_push_step(character)
-
-    @classmethod
-    def is_marker(cls, character: str) -> bool:
-        from .snapshot_parsing import Constants
-
-        return character in Constants.MARKERS
-
-    @classmethod
-    def is_snapshot(cls, line: str) -> bool:
-        """
-        True if ``line`` contains only:
-
-        - movement characters
-        - other snapshot characters (ie. jump markers)
-        - Rle characters
-        - spaces and newlines
-        """
-        from .snapshot_parsing import Constants
-
-        return (
-            not is_blank(line)
-            and not contains_only_digits_and_spaces(line)
-            and all(
-                True if Constants.RE_SNAPSHOT_STRING.match(l) else False
-                for l in line.splitlines()
-            )
-        )
+    JUMP_BEGIN: Final[str] = Characters.JUMP_BEGIN
+    JUMP_END: Final[str] = Characters.JUMP_END
+    PUSHER_CHANGE_BEGIN: Final[str] = Characters.PUSHER_CHANGE_BEGIN
+    PUSHER_CHANGE_END: Final[str] = Characters.PUSHER_CHANGE_END
+    CURRENT_POSITION_CH: Final[str] = Characters.CURRENT_POSITION_CH
 
     def __init__(self, tessellation: Tessellation, moves_data: str = ""):
         self.title: str = ""
@@ -95,9 +51,9 @@ class Snapshot:
         self.notes: str = ""
 
         self._tessellation = tessellation
-        self._tessellation_obj_val: Optional[BaseTessellation] = None
+        self._tessellation_obj_val: Optional[TessellationImpl] = None
 
-        if not is_blank(moves_data) and not self.is_snapshot(moves_data):
+        if not is_blank(moves_data) and not Characters.is_snapshot(moves_data):
             raise ValueError("Invalid characters in snapshot string!")
         self._moves_data: str = moves_data or ""
 
@@ -110,7 +66,6 @@ class Snapshot:
 
     def to_str(self, rle_encode=False) -> str:
         """Formatted output of parsed and validated moves data."""
-
         self._reparse_if_not_parsed()
 
         retv = "".join(str(_) for _ in self._parsed_moves)
@@ -118,9 +73,9 @@ class Snapshot:
         # Reverse snapshots must start with jump, even if it is empty one
         if self.is_reverse and (
             not self._parsed_moves
-            or (self._parsed_moves and retv[0] != self.JUMP_BEGIN)
+            or (self._parsed_moves and retv[0] != Characters.JUMP_BEGIN)
         ):
-            retv = self.JUMP_BEGIN + self.JUMP_END + retv
+            retv = Characters.JUMP_BEGIN + Characters.JUMP_END + retv
 
         if rle_encode:
             retv = Rle.encode(retv)
@@ -133,7 +88,7 @@ class Snapshot:
     def __repr__(self):
         klass = self.__class__.__name__
         return (
-            f"{klass}(Tessellation.{self._tessellation.name.upper()}, "
+            f"{klass}({self._tessellation}, "
             f'moves_data="{self.to_str(rle_encode=False)}")'
         )
 
@@ -143,10 +98,8 @@ class Snapshot:
 
     @property
     def _tessellation_obj(self):
-        from ..game.base_tessellation import BaseTessellation
-
         if self._tessellation_obj_val is None:
-            self._tessellation_obj_val = BaseTessellation.instance(self._tessellation)
+            self._tessellation_obj_val = TessellationImpl.instance(self._tessellation)
 
         return self._tessellation_obj_val
 
@@ -156,7 +109,7 @@ class Snapshot:
 
     @moves_data.setter
     def moves_data(self, rv: str):
-        if not is_blank(rv) and not self.is_snapshot(rv):
+        if not is_blank(rv) and not Characters.is_snapshot(rv):
             raise ValueError("Invalid characters in snapshot string!")
         self._moves_data = rv or ""
         self._was_parsed = False
@@ -176,8 +129,6 @@ class Snapshot:
 
     @pusher_steps.setter
     def pusher_steps(self, rv: List[PusherStep]):
-        from .snapshot_parsing import Jump, PusherSelection, Steps
-
         i = 0
         iend = len(rv)
 
@@ -194,7 +145,7 @@ class Snapshot:
                 while i < iend and rv[i].is_jump:
                     jump.data += self._tessellation_obj.pusher_step_to_char(rv[i])
                     if rv[i].is_current_pos:
-                        jump.data += self.CURRENT_POSITION_CH
+                        jump.data += Characters.CURRENT_POSITION_CH
                     i += 1
                 self._parsed_moves.append(jump)
                 self._jumps_count += 1
@@ -208,7 +159,7 @@ class Snapshot:
                         rv[i]
                     )
                     if rv[i].is_current_pos:
-                        pusher_selection.data += self.CURRENT_POSITION_CH
+                        pusher_selection.data += Characters.CURRENT_POSITION_CH
                     i += 1
                 self._parsed_moves.append(pusher_selection)
 
@@ -217,7 +168,7 @@ class Snapshot:
                 while i < iend and not rv[i].is_jump and not rv[i].is_pusher_selection:
                     steps.data += self._tessellation_obj.pusher_step_to_char(rv[i])
                     if rv[i].is_current_pos:
-                        steps.data += self.CURRENT_POSITION_CH
+                        steps.data += Characters.CURRENT_POSITION_CH
                     i += 1
                 self._parsed_moves.append(steps)
                 self._pushes_count += steps.pushes_count
@@ -259,8 +210,6 @@ class Snapshot:
             self._reparse()
 
     def _reparse(self):
-        from .snapshot_parsing import Jump, Parser
-
         self._parsed_moves = []
         self._pushes_count = 0
         self._moves_count = 0

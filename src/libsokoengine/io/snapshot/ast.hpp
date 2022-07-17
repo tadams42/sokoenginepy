@@ -9,10 +9,11 @@
 
 namespace sokoengine {
 
+  namespace implementation {
+    class TessellationImpl;
+  } // namespace implementation
+
   namespace game {
-    namespace implementation {
-      class BaseTessellation;
-    } // namespace implementation
     class PusherStep;
   } // namespace game
 
@@ -30,8 +31,7 @@ namespace sokoengine {
           size_t             pushes_count() const;
           size_t             moves_count() const;
           const std::string &to_str() const;
-          Converted
-          pusher_steps(const game::implementation::BaseTessellation &tessellation
+          Converted pusher_steps(const implementation::TessellationImpl &tessellation
           ) const;
         };
 
@@ -43,9 +43,8 @@ namespace sokoengine {
           size_t      pushes_count() const;
           size_t      moves_count() const;
           std::string to_str() const;
-          Converted
-          pusher_steps(const game::implementation::BaseTessellation &tessellation
-          ) const;
+          Converted   pusher_steps(const implementation::TessellationImpl &tessellation
+            ) const;
         };
 
         class LIBSOKOENGINE_LOCAL PusherSelection {
@@ -56,9 +55,8 @@ namespace sokoengine {
           size_t      pushes_count() const;
           size_t      moves_count() const;
           std::string to_str() const;
-          Converted
-          pusher_steps(const game::implementation::BaseTessellation &tessellation
-          ) const;
+          Converted   pusher_steps(const implementation::TessellationImpl &tessellation
+            ) const;
         };
 
         typedef std::variant<Steps, PusherSelection, Jump> parsed_type_t;

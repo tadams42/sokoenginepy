@@ -1,3 +1,4 @@
+/// @file
 #include "mover.hpp"
 
 #include "board_cell.hpp"
@@ -5,13 +6,11 @@
 #include "hashed_board_manager.hpp"
 #include "pusher_step.hpp"
 #include "puzzle.hpp"
-#include "tessellation.hpp"
 
 #include "cppitertools/groupby.hpp"
 
 #include <algorithm>
 
-using sokoengine::io::Puzzle;
 using std::invalid_argument;
 using std::make_unique;
 using std::numeric_limits;
@@ -21,7 +20,7 @@ using std::to_string;
 namespace sokoengine {
 namespace game {
 
-using implementation::direction_str;
+using implementation::to_str;
 
 NonPlayableBoardError::NonPlayableBoardError()
   : invalid_argument("Board is not playable!") {}
@@ -125,7 +124,7 @@ public:
     if (in_front_of_pusher == Config::NO_POS) {
       throw IllegalMoveError(
         "Can't move pusher off board! (ID: " + to_string(m_selected_pusher)
-        + ", direction: " + direction_str(direction) + ")"
+        + ", direction: " + to_str(direction) + ")"
       );
     }
 
@@ -139,7 +138,7 @@ public:
         throw IllegalMoveError(
           "Can't push box off board (ID: "
           + to_string(m_manager.box_id_on(in_front_of_pusher))
-          + ", direction: " + direction_str(direction) + ")"
+          + ", direction: " + to_str(direction) + ")"
         );
       }
 
@@ -176,7 +175,7 @@ public:
     if (in_front_of_pusher == Config::NO_POS) {
       throw IllegalMoveError(
         "Can't move pusher off board! (ID: " + to_string(m_selected_pusher)
-        + ", direction: " + direction_str(direction) + ")"
+        + ", direction: " + to_str(direction) + ")"
       );
     }
 

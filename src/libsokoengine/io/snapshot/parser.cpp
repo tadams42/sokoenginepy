@@ -1,6 +1,6 @@
+/// @file
 #include "parser.hpp"
 
-#include "error_handler.hpp"
 #include "evaluator.hpp"
 #include "grammar.hpp"
 #include "json_printer.hpp"

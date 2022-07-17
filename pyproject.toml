@@ -53,6 +53,7 @@ dev = [
     "m2r2",
     "sphinx >= 1.4",
     "sphinx_rtd_theme",
+    "pyexcel-ods3",
 ]
 docs = ["m2r2", "sphinx >= 1.4", "sphinx_rtd_theme"]
 tests = [

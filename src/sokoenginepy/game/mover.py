@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from itertools import groupby
 from typing import Iterable, List, Optional
 
+from ..common import Config, Direction
 from .board_graph import BoardGraph
 from .board_manager import CellAlreadyOccupiedError
-from .config import Config, Direction
 from .hashed_board_manager import HashedBoardManager
 from .pusher_step import PusherStep
 
@@ -153,8 +153,7 @@ class Mover:
 
         Example:
 
-        >>> from sokoenginepy.game import Mover, PusherStep, Direction, BoardGraph, Tessellation
-        >>> from sokoenginepy.io import Puzzle
+        >>> from sokoenginepy import Direction, Tessellation, Mover, PusherStep, BoardGraph, Puzzle
         >>> puzzle = Puzzle(Tessellation.SOKOBAN, board='\\n'.join([
         ...     '    #####',
         ...     '    #  @#',

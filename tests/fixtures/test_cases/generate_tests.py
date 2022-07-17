@@ -1,18 +1,13 @@
 #!/usr/bin/env python
 
-# Requires: 'pyexcel-ods3 >= 0.2.0',
-
 import os
 import textwrap
 from collections import OrderedDict
 from pathlib import Path
-from string import Template
 
 from pyexcel_ods3 import get_data
 
-# Directory where this file is found
 _SELF_DIR = Path(__file__).parent.absolute().resolve()
-
 SOURCE_ROOT = (_SELF_DIR / ".." / ".." / "..").resolve()
 TESTS_DIR = SOURCE_ROOT / "tests"
 RES_DIR = TESTS_DIR / "fixtures"
@@ -63,17 +58,16 @@ class SpecGenerator:
 
     def write_header(self, tessellation: str):
         s = """
-        import pytest
-
-        from sokoenginepy.game import (
+        from sokoenginepy import (
             BoardGraph,
+            CellOrientation,
             Config,
             Direction,
+            Puzzle,
             Tessellation,
             index_1d,
             is_on_board_1d,
         )
-        from sokoenginepy.io import CellOrientation, Puzzle
         """
 
         trio = """

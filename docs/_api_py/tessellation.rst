@@ -1,5 +1,5 @@
 Tessellation
 ============
 
-.. autoclass:: sokoenginepy.game.Tessellation
+.. autoclass:: sokoenginepy.Tessellation
     :members:

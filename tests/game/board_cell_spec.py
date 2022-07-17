@@ -2,8 +2,7 @@ import copy
 
 import pytest
 
-from sokoenginepy.game import BoardCell
-from sokoenginepy.io import Puzzle
+from sokoenginepy import BoardCell, Puzzle
 
 
 @pytest.fixture

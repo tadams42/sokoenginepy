@@ -1,18 +1,19 @@
+/// @file
 #include "board_graph.hpp"
 
 #include "board_cell.hpp"
 #include "board_state.hpp"
 #include "pusher_step.hpp"
 #include "puzzle.hpp"
-#include "tessellation.hpp"
+#include "tessellation_impl.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
-using sokoengine::game::implementation::BaseTessellation;
-using sokoengine::io::CellOrientation;
-using sokoengine::io::Puzzle;
+using sokoengine::implementation::GraphType;
+using sokoengine::implementation::TessellationImpl;
+using sokoengine::implementation::to_str;
 using std::deque;
 using std::make_unique;
 using std::out_of_range;
@@ -212,7 +213,7 @@ public:
   void reconfigure_edges() {
     remove_all_edges();
 
-    const BaseTessellation &tessellation = BaseTessellation::instance(m_tessellation);
+    const TessellationImpl &tessellation = TessellationImpl::instance(m_tessellation);
     GraphType               graph_type   = tessellation.graph_type();
 
     board_size_t size = vertices_count();
@@ -286,7 +287,7 @@ BoardCell &BoardGraph::operator[](position_t position) {
 Tessellation BoardGraph::tessellation() const { return m_impl->m_tessellation; }
 
 CellOrientation BoardGraph::cell_orientation(position_t position) const {
-  return BaseTessellation::instance(m_impl->m_tessellation)
+  return TessellationImpl::instance(m_impl->m_tessellation)
     .cell_orientation(position, m_impl->m_board_width, m_impl->m_board_height);
 }
 
@@ -634,7 +635,7 @@ bool Edge::operator!=(const Edge &rv) const { return !(*this == rv); }
 string Edge::repr() const {
   return (
     string("Edge(") + "u=" + to_string(u) + ", " + "v=" + to_string(v) + ", "
-    + "direction=" + implementation::direction_str(direction) + ")"
+    + "direction=" + to_str(direction) + ")"
   );
 }
 

@@ -1,3 +1,4 @@
+/// @file
 #include "rle.hpp"
 
 #include "evaluator.hpp"

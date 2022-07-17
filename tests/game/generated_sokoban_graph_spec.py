@@ -1,14 +1,13 @@
-import pytest
-
-from sokoenginepy.game import (
+from sokoenginepy import (
     BoardGraph,
+    CellOrientation,
     Config,
     Direction,
+    Puzzle,
     Tessellation,
     index_1d,
     is_on_board_1d,
 )
-from sokoenginepy.io import CellOrientation, Puzzle
 
 
 class DescribeSokobanBoardGraph:

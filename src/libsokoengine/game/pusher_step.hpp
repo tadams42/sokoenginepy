@@ -1,7 +1,9 @@
 #ifndef PUSHER_STEP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define PUSHER_STEP_0FEA723A_C86F_6753_04ABD475F6FCA5FB
+/// @file
 
-#include "sokoengine_config.hpp"
+#include "direction.hpp"
+#include "game_config.hpp"
 
 namespace sokoengine {
 namespace game {
@@ -121,12 +123,10 @@ private:
   piece_id_t m_moved_box_id;
 };
 
-namespace implementation {
-LIBSOKOENGINE_LOCAL std::string direction_str(Direction d);
-} // namespace implementation
-
 } // namespace game
+
+using game::PusherStep;
+
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-/// @file

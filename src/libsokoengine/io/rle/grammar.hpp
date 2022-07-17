@@ -1,17 +1,17 @@
 #ifndef GRAMMAR_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
 #define GRAMMAR_78FAAA5B_FC6F_4891_8173_B2B3C2BFA410
 
-#include "ast.hpp"
 #include "ast_adapted.hpp"
+#include "characters.hpp"
 #include "error_handler.hpp"
-#include "puzzle.hpp"
-#include "snapshot.hpp"
 
 namespace sokoengine {
   namespace io {
     namespace sok_rle {
       namespace parser {
         namespace ascii = boost::spirit::x3::ascii;
+
+        using sokoengine::implementation::Characters;
 
         ///////////////////////////////////////////////////////////////////////////
         // Boost::X3 rule tags
@@ -66,28 +66,28 @@ auto const atoms_or_rle_or_group_def = (atoms | rle_chunk | group);
 auto const atom_or_group_def         = (atom | group);
 auto const rle_chunk_def             = (x3::uint_ > atom_or_group);
 auto const group_def                 = (
-                                         x3::lit(Rle::GROUP_START)
+                                         x3::lit(Characters::RLE_GROUP_START)
                                          > (+atoms_or_rle_or_group)
-                                         > x3::lit(Rle::GROUP_END)
+                                         > x3::lit(Characters::RLE_GROUP_END)
                                        );
 auto const atoms_def                 = (+atom);
 auto const atom_def                  = ascii::space
                                        | ascii::alpha
-                                       | ascii::char_(Rle::EOL)
-                                       | ascii::char_(Puzzle::WALL)
-                                       | ascii::char_(Puzzle::PUSHER)
-                                       | ascii::char_(Puzzle::PUSHER_ON_GOAL)
-                                       | ascii::char_(Puzzle::BOX)
-                                       | ascii::char_(Puzzle::BOX_ON_GOAL)
-                                       | ascii::char_(Puzzle::GOAL)
-                                       | ascii::char_(Puzzle::FLOOR)
-                                       | ascii::char_(Puzzle::VISIBLE_FLOOR)
-                                       | ascii::char_(Puzzle::ALT_VISIBLE_FLOOR1)
-                                       | ascii::char_(Snapshot::JUMP_BEGIN)
-                                       | ascii::char_(Snapshot::JUMP_END)
-                                       | ascii::char_(Snapshot::PUSHER_CHANGE_BEGIN)
-                                       | ascii::char_(Snapshot::PUSHER_CHANGE_END)
-                                       | ascii::char_(Snapshot::CURRENT_POSITION_CH)
+                                       | ascii::char_(Characters::RLE_EOL)
+                                       | ascii::char_(Characters::WALL)
+                                       | ascii::char_(Characters::PUSHER)
+                                       | ascii::char_(Characters::PUSHER_ON_GOAL)
+                                       | ascii::char_(Characters::BOX)
+                                       | ascii::char_(Characters::BOX_ON_GOAL)
+                                       | ascii::char_(Characters::GOAL)
+                                       | ascii::char_(Characters::FLOOR)
+                                       | ascii::char_(Characters::VISIBLE_FLOOR)
+                                       | ascii::char_(Characters::ALT_VISIBLE_FLOOR1)
+                                       | ascii::char_(Characters::JUMP_BEGIN)
+                                       | ascii::char_(Characters::JUMP_END)
+                                       | ascii::char_(Characters::PUSHER_CHANGE_BEGIN)
+                                       | ascii::char_(Characters::PUSHER_CHANGE_END)
+                                       | ascii::char_(Characters::CURRENT_POSITION_CH)
                                      ;
         // clang-format on
 

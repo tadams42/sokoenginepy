@@ -3,8 +3,7 @@ from typing import List
 
 import pytest
 
-from sokoenginepy.game import Config, Direction, PusherStep, Tessellation
-from sokoenginepy.io import Snapshot
+from sokoenginepy import Config, Direction, PusherStep, Snapshot, Tessellation
 
 
 @dataclass

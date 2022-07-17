@@ -1,14 +1,14 @@
+/// @file
 #include "sok_file_format.hpp"
 
 #include "SOK_format_specification.h"
+#include "characters.hpp"
 #include "collection.hpp"
-#include "puzzle.hpp"
-#include "snapshot.hpp"
+#include "tessellation_impl.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::game::Tessellation;
 using sokoengine::implementation::Strings;
 using std::endl;
 using std::ios_base;
@@ -18,7 +18,6 @@ using std::string;
 using std::vector;
 
 namespace sokoengine {
-namespace io {
 namespace implementation {
 
 struct LIBSOKOENGINE_LOCAL SnapshotData {
@@ -367,7 +366,7 @@ private:
 
     auto first_board_line =
       std::find_if(lines.cbegin(), lines.cend(), [](const string &line) {
-        return Puzzle::is_board(line);
+        return Characters::is_board(line);
       });
 
     Strings remaining_lines;
@@ -392,7 +391,7 @@ private:
         remaining_lines.cbegin(),
         remaining_lines.cend(),
         [](const string &line) {
-          return !Puzzle::is_board(line);
+          return !Characters::is_board(line);
         }
       );
 
@@ -411,7 +410,7 @@ private:
           remaining_lines.cbegin(),
           remaining_lines.cend(),
           [](const string &line) {
-            return Puzzle::is_board(line);
+            return Characters::is_board(line);
           }
         );
 
@@ -436,7 +435,7 @@ private:
         remaining_lines.cbegin(),
         remaining_lines.cend(),
         [](const string &line) {
-          return Snapshot::is_snapshot(line);
+          return Characters::is_snapshot(line);
         }
       );
       if (first_moves_line != remaining_lines.cend()) {
@@ -458,7 +457,7 @@ private:
           remaining_lines.cbegin(),
           remaining_lines.cend(),
           [](const string &line) {
-            return !Snapshot::is_snapshot(line);
+            return !Characters::is_snapshot(line);
           }
         );
 
@@ -485,7 +484,7 @@ private:
             remaining_lines.cbegin(),
             remaining_lines.cend(),
             [](const string &line) {
-              return Snapshot::is_snapshot(line);
+              return Characters::is_snapshot(line);
             }
           );
 
@@ -659,6 +658,26 @@ public:
   }
 
 private:
+  string to_str(Tessellation tessellation) {
+    switch (tessellation) {
+      case Tessellation::SOKOBAN:
+        return "sokoban";
+        break;
+      case Tessellation::HEXOBAN:
+        return "hexoban";
+        break;
+      case Tessellation::TRIOBAN:
+        return "trioban";
+        break;
+      case Tessellation::OCTOBAN:
+        return "octoban";
+        break;
+        // Do not handle default, let compiler generate warning when another
+        // tessellation is added...
+    }
+    throw std::invalid_argument("Unknown tessellation!");
+  }
+
   bool write_puzzle(const Puzzle &puzzle) {
     if (is_blank(puzzle.board()))
       return true;
@@ -780,5 +799,4 @@ bool SOKFileFormat::write(const Collection &collection, std::ostream &dest) {
 }
 
 } // namespace implementation
-} // namespace io
 } // namespace sokoengine

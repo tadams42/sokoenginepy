@@ -3,8 +3,7 @@ from copy import deepcopy
 
 import pytest
 
-from sokoenginepy.game import BoardGraph, Config, HashedBoardManager, Tessellation
-from sokoenginepy.io import Puzzle
+from sokoenginepy import BoardGraph, Config, HashedBoardManager, Puzzle, Tessellation
 
 
 @pytest.fixture

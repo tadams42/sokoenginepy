@@ -1,19 +1,15 @@
+/// @file
 #include "puzzle_parsing.hpp"
 
-#include "puzzle.hpp"
-#include "rle.hpp"
-#include "tessellation.hpp"
+#include "tessellation_impl.hpp"
 
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::game::index_1d;
-using sokoengine::game::Tessellation;
-using sokoengine::game::implementation::BaseTessellation;
 using sokoengine::implementation::Strings;
+using sokoengine::implementation::TessellationImpl;
 using std::string;
 
 namespace sokoengine {
-namespace io {
 namespace implementation {
 
 void PuzzleResizer::add_row_top(
@@ -24,7 +20,7 @@ void PuzzleResizer::add_row_top(
 
   height = height + 1;
   parsed_board =
-    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
+    parsed_board_t(static_cast<size_t>(width) * height, Characters::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < old_height; y++)
@@ -39,7 +35,7 @@ void PuzzleResizer::add_row_bottom(
 
   height = height + 1;
   parsed_board =
-    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
+    parsed_board_t(static_cast<size_t>(width) * height, Characters::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < old_height; y++)
@@ -54,7 +50,7 @@ void PuzzleResizer::add_column_left(
 
   width = width + 1;
   parsed_board =
-    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
+    parsed_board_t(static_cast<size_t>(width) * height, Characters::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < old_width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -69,7 +65,7 @@ void PuzzleResizer::add_column_right(
 
   width = width + 1;
   parsed_board =
-    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
+    parsed_board_t(static_cast<size_t>(width) * height, Characters::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < old_width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -83,7 +79,7 @@ void PuzzleResizer::remove_row_top(
 
   height = height - 1;
   parsed_board =
-    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
+    parsed_board_t(static_cast<size_t>(width) * height, Characters::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -97,7 +93,7 @@ void PuzzleResizer::remove_row_bottom(
 
   height = height - 1;
   parsed_board =
-    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
+    parsed_board_t(static_cast<size_t>(width) * height, Characters::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -112,7 +108,7 @@ void PuzzleResizer::remove_column_left(
 
   width = width - 1;
   parsed_board =
-    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
+    parsed_board_t(static_cast<size_t>(width) * height, Characters::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -127,7 +123,7 @@ void PuzzleResizer::remove_column_right(
 
   width = width - 1;
   parsed_board =
-    parsed_board_t(static_cast<size_t>(width) * height, Puzzle::VISIBLE_FLOOR);
+    parsed_board_t(static_cast<size_t>(width) * height, Characters::VISIBLE_FLOOR);
 
   for (board_size_t x = 0; x < width; x++)
     for (board_size_t y = 0; y < height; y++)
@@ -141,7 +137,7 @@ void PuzzleResizer::trim_left(
   for (board_size_t y = 0; y < height; y++) {
     for (board_size_t x = 0; x < width; x++) {
       bool border_found =
-        Puzzle::is_border_element(parsed_board[index_1d(x, y, width)]);
+        Characters::is_border_element(parsed_board[index_1d(x, y, width)]);
       if (border_found) {
         if (x < amount)
           amount = x;
@@ -169,7 +165,7 @@ void PuzzleResizer::trim_top(
   for (board_size_t x = 0; x < width; x++) {
     bool border_found = false;
     for (board_size_t y = 0; y < height && !border_found; y++) {
-      border_found = Puzzle::is_border_element(parsed_board[index_1d(x, y, width)]);
+      border_found = Characters::is_border_element(parsed_board[index_1d(x, y, width)]);
       if (border_found && y < amount)
         amount = y;
     }
@@ -247,7 +243,7 @@ Strings PuzzleParser::cleaned_board_lines(const std::string &line) {
   if (is_blank(line)) {
     return Strings();
   }
-  if (!io::Puzzle::is_board(line)) {
+  if (!Characters::is_board(line)) {
     throw std::invalid_argument("Illegal characters found in board string");
   }
   string data = io::Rle::decode(line);
@@ -274,13 +270,13 @@ string PuzzlePrinter::print(
   bool                  rle_encode
 ) const {
   Strings retv_list;
-  char    floor = use_visible_floor ? Puzzle::VISIBLE_FLOOR : Puzzle::FLOOR;
+  char    floor = use_visible_floor ? Characters::VISIBLE_FLOOR : Characters::FLOOR;
 
   for (position_t y = 0; y < height; ++y) {
     string tmp;
     for (position_t x = 0; x != width; ++x) {
       char c = parsed_board[index_1d(x, y, width)];
-      if (Puzzle::is_empty_floor(c)) {
+      if (Characters::is_empty_floor(c)) {
         tmp += floor;
       } else {
         tmp += c;
@@ -292,7 +288,7 @@ string PuzzlePrinter::print(
   string retv = boost::join(retv_list, "\n");
 
   if (rle_encode) {
-    retv = Rle::encode(retv);
+    retv = io::Rle::encode(retv);
   }
 
   return retv;
@@ -310,11 +306,10 @@ void LIBSOKOENGINE_LOCAL _copy(
   size_t i = 0;
   for (auto row : strings) {
     for (auto c : row) {
-      parsed_board[i++] = Puzzle::is_empty_floor(c) ? Puzzle::VISIBLE_FLOOR : c;
+      parsed_board[i++] = Characters::is_empty_floor(c) ? Characters::VISIBLE_FLOOR : c;
     }
   }
 }
 
 } // namespace implementation
-} // namespace io
 } // namespace sokoengine

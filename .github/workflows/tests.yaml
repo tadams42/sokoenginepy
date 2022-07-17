@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: src/sokoenginepy/game/coordinate_helpers.py
+          cache-dependency-path: src/sokoenginepy/game/hashed_board_manager.py
 
       - name: ensure pip and wheel are at latest version
         run: pip install --upgrade pip wheel

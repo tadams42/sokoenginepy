@@ -3,17 +3,17 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy.game import (
+from sokoenginepy import (
     BoardGraph,
     BoardManager,
     BoardState,
     CellAlreadyOccupiedError,
     Config,
+    Puzzle,
     SokobanPlus,
     Tessellation,
     index_1d,
 )
-from sokoenginepy.io import Puzzle
 
 
 @pytest.fixture

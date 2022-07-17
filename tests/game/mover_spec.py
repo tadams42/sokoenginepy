@@ -3,7 +3,7 @@ from itertools import permutations
 
 import pytest
 
-from sokoenginepy.game import (
+from sokoenginepy import (
     BoardGraph,
     Config,
     Direction,
@@ -11,11 +11,11 @@ from sokoenginepy.game import (
     Mover,
     NonPlayableBoardError,
     PusherStep,
+    Puzzle,
     SolvingMode,
     Tessellation,
     index_1d,
 )
-from sokoenginepy.io import Puzzle
 
 
 @pytest.fixture
