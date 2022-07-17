@@ -10,6 +10,7 @@
 #include <boost/algorithm/string.hpp>
 
 using sokoengine::implementation::Characters;
+using sokoengine::implementation::is_blank;
 using sokoengine::implementation::Strings;
 using sokoengine::implementation::TessellationImpl;
 using std::invalid_argument;

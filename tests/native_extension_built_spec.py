@@ -52,7 +52,6 @@ def ext_members():
 @pytest.fixture
 def py_only_members():
     return {
-        "is_blank",
         "index_1d",
         "index_column",
         "index_row",

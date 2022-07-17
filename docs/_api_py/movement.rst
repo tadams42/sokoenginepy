@@ -1,10 +1,5 @@
-Mover
-=====
-
-.. autoexception:: sokoenginepy.IllegalMoveError
-
-.. autoexception:: sokoenginepy.NonPlayableBoardError
-
+Movement
+========
 
 Direction
 ---------
@@ -22,6 +17,14 @@ SolvingMode
     :undoc-members:
 
 
+PusherStep
+----------
+
+.. autoclass:: sokoenginepy.PusherStep
+    :members:
+    :undoc-members:
+
+
 Mover
 -----
 
@@ -31,10 +34,6 @@ Mover
     :inherited-members:
     :member-order: bysource
 
+.. autoexception:: sokoenginepy.IllegalMoveError
 
-PusherStep
-----------
-
-.. autoclass:: sokoenginepy.PusherStep
-    :members:
-    :undoc-members:
+.. autoexception:: sokoenginepy.NonPlayableBoardError

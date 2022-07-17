@@ -165,7 +165,7 @@ class MovementBenchmarkPrinter:
         )
 
         if pivot_speed:
-            print("  {0:.2f}%".format(mean_speed / pivot_speed * 100))
+            print(f"  {mean_speed / pivot_speed * 100:.2f}%")
         else:
             print("  100.00%")
 

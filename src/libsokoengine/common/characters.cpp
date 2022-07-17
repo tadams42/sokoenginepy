@@ -44,5 +44,11 @@ bool Characters::is_snapshot(const string &line) {
          });
 }
 
+bool is_blank(const std::string &line) {
+  return line.empty() || all_of(line.begin(), line.end(), [](char c) -> bool {
+           return isspace(c) != 0;
+         });
+}
+
 } // namespace implementation
 } // namespace sokoengine

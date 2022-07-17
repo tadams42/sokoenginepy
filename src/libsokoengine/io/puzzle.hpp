@@ -151,14 +151,8 @@ private:
   std::unique_ptr<PIMPL> m_impl;
 };
 
-///
-/// Test if line is zero length or contains only spaces.
-///
-bool LIBSOKOENGINE_API is_blank(const std::string &line);
-
 } // namespace io
 
-using io::is_blank;
 using io::Puzzle;
 using io::Snapshots;
 

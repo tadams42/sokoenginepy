@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Final
+from typing import TYPE_CHECKING, Final, List, Optional
 
 from ..common import Characters, Tessellation, TessellationImpl, is_blank
 from .rle import Rle
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 class Snapshot:
     """
-    Base class for game snapshots and accompanying metadata.
+    Game snapshots and accompanying metadata.
 
     Game snapshot is a sequence of pusher steps representing actual steps, jumps (in
     reverse solving mode) and pusher selections (in Multiban variant).

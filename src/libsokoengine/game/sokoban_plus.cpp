@@ -8,6 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include <charconv>
 
+using sokoengine::implementation::is_blank;
 using sokoengine::implementation::Strings;
 using std::errc;
 using std::from_chars;

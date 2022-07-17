@@ -2,6 +2,7 @@
 
 ## 2.0.0 (unreleased)
 
+- breaking change: removed `is_blank()`
 - breaking change: removed all parsing methods from `Puzzle` and `Snapshot`
   - parsing in now fully private implementation detail handled by constructors of these
     classes

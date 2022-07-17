@@ -10,25 +10,25 @@
 
 #include <boost/algorithm/string.hpp>
 
+using sokoengine::implementation::_copy;
 using sokoengine::implementation::Characters;
+using sokoengine::implementation::HexobanIo;
+using sokoengine::implementation::is_blank;
+using sokoengine::implementation::OctobanIo;
+using sokoengine::implementation::parsed_board_t;
+using sokoengine::implementation::PuzzleParser;
+using sokoengine::implementation::PuzzlePrinter;
+using sokoengine::implementation::PuzzleResizer;
+using sokoengine::implementation::SokobanIo;
 using sokoengine::implementation::Strings;
 using sokoengine::implementation::TessellationImpl;
+using sokoengine::implementation::TriobanIo;
 using std::invalid_argument;
 using std::make_unique;
 using std::string;
 
 namespace sokoengine {
 namespace io {
-
-using implementation::_copy;
-using implementation::HexobanIo;
-using implementation::OctobanIo;
-using implementation::parsed_board_t;
-using implementation::PuzzleParser;
-using implementation::PuzzlePrinter;
-using implementation::PuzzleResizer;
-using implementation::SokobanIo;
-using implementation::TriobanIo;
 
 class LIBSOKOENGINE_LOCAL Puzzle::PIMPL {
 public:
@@ -476,12 +476,6 @@ void Puzzle::trim() {
   m_impl->m_resizer->trim_right(
     m_impl->m_parsed_board, m_impl->m_width, m_impl->m_height
   );
-}
-
-bool is_blank(const std::string &line) {
-  return line.empty() || all_of(line.begin(), line.end(), [](char c) -> bool {
-           return isspace(c) != 0;
-         });
 }
 
 } // namespace io

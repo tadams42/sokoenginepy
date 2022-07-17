@@ -7,6 +7,7 @@
 
 using sokoengine::implementation::direction_pack;
 using sokoengine::implementation::direction_unpack;
+using sokoengine::implementation::is_blank;
 using sokoengine::implementation::Strings;
 using sokoengine::implementation::to_str;
 using std::invalid_argument;

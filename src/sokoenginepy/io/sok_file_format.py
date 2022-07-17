@@ -9,9 +9,8 @@ from typing import TYPE_CHECKING, Dict, Final, List, Optional, Pattern, Tuple, U
 
 import arrow
 
-from ..common import Tessellation, is_blank, Characters
+from ..common import Characters, Tessellation, is_blank
 from .puzzle import Puzzle
-from .puzzle_parsing import PuzzleParser
 from .snapshot import Snapshot
 
 if TYPE_CHECKING:

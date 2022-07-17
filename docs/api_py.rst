@@ -10,6 +10,7 @@ I/O
     _api_py/puzzle
     _api_py/snapshot
     _api_py/collection
+    _api_py/rle
 
 
 Game
@@ -20,6 +21,5 @@ Game
 
     _api_py/game_config
     _api_py/tessellation
-    _api_py/board_graph
-    _api_py/board_manager
-    _api_py/mover
+    _api_py/board
+    _api_py/movement

@@ -83,7 +83,6 @@ from .common import (
     index_row,
     index_x,
     index_y,
-    is_blank,
     is_on_board_1d,
     is_on_board_2d,
 )

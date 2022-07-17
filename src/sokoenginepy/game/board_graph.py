@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass
 from typing import (
-    TYPE_CHECKING,
     Callable,
     Dict,
     List,
@@ -32,9 +31,6 @@ _InternalEdge = Tuple[int, int, Dict[str, Union[Direction, int]]]
 BoardCellOrStr = Union[BoardCell, str]
 Positions = List[int]
 Directions = List[Direction]
-
-if TYPE_CHECKING:
-    from ..io import Puzzle
 
 
 @dataclass

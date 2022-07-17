@@ -8,6 +8,11 @@
 namespace sokoengine {
 namespace implementation {
 
+///
+/// Test if line is zero length or contains only spaces.
+///
+bool LIBSOKOENGINE_API is_blank(const std::string &line);
+
 typedef std::vector<std::string> Strings;
 
 class LIBSOKOENGINE_LOCAL Characters {

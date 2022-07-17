@@ -1,6 +1,7 @@
 /// @file
 #include "collection.hpp"
 
+#include "characters.hpp"
 #include "puzzle.hpp"
 #include "sok_file_format.hpp"
 
@@ -11,6 +12,7 @@
 namespace sokoengine {
 namespace io {
 
+using implementation::is_blank;
 using implementation::SOKFileFormat;
 using std::ifstream;
 using std::ios_base;

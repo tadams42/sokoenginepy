@@ -1,3 +1,6 @@
+Game config and utilities
+=========================
+
 Config
 ------
 
@@ -5,7 +8,7 @@ Config
     :members:
     :undoc-members:
 
-Functions
+Utilities
 ---------
 
 .. autofunction:: sokoenginepy.index_1d

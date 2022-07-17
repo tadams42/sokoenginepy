@@ -152,7 +152,7 @@ class Puzzle:
         board = textwrap.indent(
             ",\n".join(
                 [
-                    "'{0}'".format(l)
+                    f"'{l}'"
                     for l in self.to_board_str(use_visible_floor=True).split("\n")
                 ]
             ),
