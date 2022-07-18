@@ -155,8 +155,7 @@ public:
   /// include <sokoengine.hpp>
   /// #include <iostream>
   ///
-  /// using namespace sokoengine::game;
-  /// using namespace sokoengine::io;
+  /// using namespace sokoengine;
   /// using namespace std;
   ///
   /// int main() {
@@ -175,7 +174,7 @@ public:
   ///     "    #######\n"
   ///   ;
   ///
-  ///   SokobanPuzzle puzzle(data);
+  ///   Puzzle puzzle(Tessellation::SOKOBAN, data);
   ///   BoardGraph board(puzzle);
   ///   Mover mover(board);
   ///

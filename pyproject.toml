@@ -50,12 +50,12 @@ dev = [
     "factory-boy",
     "faker",
     "pytest >= 3.0.0",
-    "m2r2",
+    "myst-parser",
     "sphinx >= 1.4",
     "sphinx_rtd_theme",
     "pyexcel-ods3",
 ]
-docs = ["m2r2", "sphinx >= 1.4", "sphinx_rtd_theme"]
+docs = ["myst-parser", "sphinx >= 1.4", "sphinx_rtd_theme"]
 tests = [
     "check-manifest",
     "coverage",

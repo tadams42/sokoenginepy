@@ -26,10 +26,10 @@ jobs:
         run: sudo apt install -y cmake doxygen graphviz
 
       - name: configure
-        run: cmake --preset debug
+        run: cmake --preset docs
 
       - name: make
-        working-directory: ./build/debug
+        working-directory: ./build/docs
         run: make docs
 
       - name: deploy
@@ -39,6 +39,6 @@ jobs:
         # if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/debug/doxygen/html
+          publish_dir: ./build/docs/doxygen/html
           destination_dir: docs
           force_orphan: true

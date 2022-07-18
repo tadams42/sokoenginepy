@@ -53,15 +53,13 @@
       "name": "_make",
       "description": "Base preset for Make generator.",
       "hidden": true,
-      "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build/${presetName}"
+      "generator": "Unix Makefiles"
     },
     {
       "name": "_ninja",
       "description": "Base preset for Ninja generator.",
       "hidden": true,
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}"
+      "generator": "Ninja"
     },
     {
       "name": "debug",
@@ -69,17 +67,29 @@
       "inherits": ["_gcc", "_debug", "_make"],
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/dev_installs/${presetName}"
-      }
+      },
+      "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
       "name": "release",
       "description": "Generate release build with gcc and ninja",
-      "inherits": ["_gcc", "_release", "_ninja"]
+      "inherits": ["_gcc", "_release", "_ninja"],
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "docs",
+      "description": "Build only Doxygen docs",
+      "environment": {
+        "SOKOENGINE_ONLY_DOCS": "1",
+        "CMAKE_TOOLCHAIN_FILE": ""
+      },
+      "binaryDir": "${sourceDir}/build/docs"
     },
     {
       "name": "vscode",
       "description": "Generate VSCode debug build with clang and ninja",
-      "inherits": ["_clang", "_debug_clang", "_ninja"]
+      "inherits": ["_clang", "_debug_clang", "_ninja"],
+      "binaryDir": "${sourceDir}/build/${presetName}"
     }
   ]
 }

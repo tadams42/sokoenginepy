@@ -1,4 +1,4 @@
 SokobanYASC .sok file format
 ============================
 
-.. literalinclude:: images/SOK_format_specification.txt
+.. literalinclude:: ../src/sokoenginepy/io/SOK_format_specification.txt

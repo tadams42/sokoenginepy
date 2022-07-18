@@ -322,6 +322,6 @@ snapshot = collection.puzzles[0].snapshots[0]
 collection.dump("~/sokoban/collections/some_other_file.sok")
 ```
 
-[SokobanYASC]: (https://sourceforge.net/projects/sokobanyasc/)
-[Wikipedia-Sokoban rules]: (https://en.wikipedia.org/wiki/Sokoban#Rules)
-[Zobrist hashing]: (https://en.wikipedia.org/wiki/Zobrist_hashing)
+[SokobanYASC]: https://sourceforge.net/projects/sokobanyasc/
+[Wikipedia-Sokoban rules]: https://en.wikipedia.org/wiki/Sokoban#Rules
+[Zobrist hashing]: https://en.wikipedia.org/wiki/Zobrist_hashing

@@ -51,7 +51,7 @@ extensions = [
     # "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
-    "m2r2",
+    "myst_parser",
     # "breathe",
 ]
 

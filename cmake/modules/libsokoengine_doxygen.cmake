@@ -7,8 +7,23 @@ if(DOXYGEN_FOUND)
     set(DOCS_OUT "${CMAKE_BINARY_DIR}/doxygen")
     file(MAKE_DIRECTORY "${DOCS_OUT}")
 
-    # set(DOXYGEN_PROJECT_NAME "libsokoengine")
-    # set(DOXYGEN_PROJECT_NUMBER "libsokoengine")
+    set(PAGES_DIR "${DOCS_OUT}/generated_pages")
+    file(MAKE_DIRECTORY "${PAGES_DIR}")
+    set(PAGES_DOX "${PAGES_DIR}/pages.dox")
+    file(
+        WRITE
+        ${PAGES_DOX} "\
+        /// @file\n \
+        \n \
+        /// @page sok_fileformat SokobanYASC .sok file format\n \
+        /// @include SOK_format_specification.txt\n \
+        \n \
+        /// @page license LICENSE\n \
+        /// @include LICENSE\n \
+    ")
+    file(COPY "${CMAKE_SOURCE_DIR}/LICENSE" DESTINATION ${PAGES_DIR})
+    file(COPY "${CMAKE_SOURCE_DIR}/src/sokoenginepy/io/SOK_format_specification.txt" DESTINATION ${PAGES_DIR})
+
     set(DOXYGEN_OUTPUT_DIRECTORY "${DOCS_OUT}")
     set(DOXYGEN_BRIEF_MEMBER_DESC "NO")
     set(DOXYGEN_ALWAYS_DETAILED_SEC "YES")
@@ -27,14 +42,13 @@ if(DOXYGEN_FOUND)
     set(DOXYGEN_GENERATE_TESTLIST "NO")
     set(DOXYGEN_GENERATE_BUGLIST "NO")
     set(DOXYGEN_WARN_IF_UNDOCUMENTED "NO")
+    set(DOXYGEN_RECURSIVE "YES")
 
     set(DOXYGEN_FILE_PATTERNS
         "*.hpp"
         "*.h"
-
-        # "*.cpp"
     )
-    set(DOXYGEN_RECURSIVE "YES")
+
     set(DOXYGEN_EXCLUDE_PATTERNS
         "*/SOK_format_specification.h"
     )
@@ -47,8 +61,16 @@ if(DOXYGEN_FOUND)
         "snapshot_parsing"
         "benchmarks"
     )
-    set(DOXYGEN_EXAMPLE_PATH "${CMAKE_SOURCE_DIR}/docs/images")
-    set(DOXYGEN_IMAGE_PATH "${CMAKE_SOURCE_DIR}/docs/images")
+
+    set(DOXYGEN_EXAMPLE_PATH
+        "${PAGES_DIR}"
+    )
+
+    set(DOXYGEN_IMAGE_PATH
+        "${CMAKE_SOURCE_DIR}/docs/images"
+        "${CMAKE_SOURCE_DIR}/docs/skin_format"
+    )
+
     set(DOXYGEN_VERBATIM_HEADERS "NO")
     set(DOXYGEN_GENERATE_TREEVIEW "YES")
     set(DOXYGEN_GENERATE_LATEX "NO")
@@ -67,6 +89,11 @@ if(DOXYGEN_FOUND)
 
     doxygen_add_docs(
         docs
-        ${CMAKE_SOURCE_DIR}/src/libsokoengine
+        "${CMAKE_SOURCE_DIR}/src/libsokoengine"
+        "${CMAKE_SOURCE_DIR}/INSTALL.md"
+        "${CMAKE_SOURCE_DIR}/README.md"
+        "${CMAKE_SOURCE_DIR}/docs/tutorial.md"
+        "${CMAKE_SOURCE_DIR}/CHANGELOG.md"
+        "${PAGES_DOX}"
     )
 endif(DOXYGEN_FOUND)

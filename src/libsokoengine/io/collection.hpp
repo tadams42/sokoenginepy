@@ -138,9 +138,3 @@ using io::Puzzles;
 } // namespace sokoengine
 
 #endif // HEADER_GUARD
-
-///
-/// @page sok_fileformat SokobanYASC .sok file format
-///
-/// @include SOK_format_specification.txt
-///

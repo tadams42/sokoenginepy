@@ -1,17 +1,4 @@
-<!-- omit in toc -->
 # Install
-
-- [Python package - sokoenginepy](#python-package---sokoenginepy)
-  - [Install from PyPi](#install-from-pypi)
-  - [Install from source](#install-from-source)
-- [C++ library - libsokoengine](#c-library---libsokoengine)
-  - [Build from source](#build-from-source)
-  - [Install from source](#install-from-source-1)
-  - [Integrating into other CMake projects](#integrating-into-other-cmake-projects)
-  - [Other make targets](#other-make-targets)
-- [Python C++ extension](#python-c-extension)
-  - [Build using pip](#build-using-pip)
-  - [Build using cmake](#build-using-cmake)
 
 ## Python package - sokoenginepy
 
@@ -112,7 +99,8 @@ target_link_libraries(sokoban_app PUBLIC libsokoengine::sokoengine)
 It is also possible to integrate `libsokoengine` that was built (locally) but not
 installed. Assuming we have following dir structure:
 
-```log
+```sh
+$ tree projects/
 projects
 ├── myapp
 │   └── CMakeLists.txt
