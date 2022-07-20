@@ -290,6 +290,10 @@ export(
 # ..............................................................................
 # Development utilities
 # ..............................................................................
+
+# ..................
+# benchmarks utility
+# ..................
 file(WRITE
     "${CMAKE_BINARY_DIR}/benchmarks.cpp"
     "#include <sokoengine.hpp>\n\nint main() { return sokoengine::run_benchmarks(); }\n"
@@ -300,6 +304,22 @@ target_link_libraries(benchmarks PUBLIC sokoengine)
 # add_callgrind_target(benchmarks)
 # add_memcheck_target(benchmarks)
 set_target_properties(benchmarks
+    PROPERTIES
+    EXCLUDE_FROM_DEFAULT_BUILD 1
+    EXCLUDE_FROM_ALL 1
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
+
+# ..................
+# skindump utility
+# ..................
+add_executable(skindump skindump.cpp)
+target_link_libraries(skindump PRIVATE sokoengine_obj)
+target_link_libraries(skindump PRIVATE CLI11::CLI11)
+
+# add_valgrind_profile_dump_target(playground)
+set_target_properties(
+    skindump
     PROPERTIES
     EXCLUDE_FROM_DEFAULT_BUILD 1
     EXCLUDE_FROM_ALL 1
