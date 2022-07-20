@@ -1,0 +1,620 @@
+D typeinfo for boost::bad_function_call
+D typeinfo for boost::bad_graph
+D typeinfo for boost::detail::sp_counted_base
+D typeinfo for boost::exception
+D typeinfo for boost::exception_detail::clone_base
+D typeinfo for boost::negative_edge
+D typeinfo for boost::spirit::x3::expectation_failure<__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >
+D typeinfo for boost::wrapexcept<boost::bad_function_call>
+D typeinfo for boost::wrapexcept<boost::negative_edge>
+D typeinfo for boost::wrapexcept<boost::spirit::x3::expectation_failure<__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >
+D typeinfo for boost::wrapexcept<std::out_of_range>
+D typeinfo for sokoengine::game::BoardGraph
+D typeinfo for sokoengine::game::BoardManager
+D typeinfo for sokoengine::game::BoxGoalSwitchError
+D typeinfo for sokoengine::game::CellAlreadyOccupiedError
+D typeinfo for sokoengine::game::HashedBoardManager
+D typeinfo for sokoengine::game::IllegalMoveError
+D typeinfo for sokoengine::game::InvalidPositionError
+D typeinfo for sokoengine::game::Mover
+D typeinfo for sokoengine::game::NonPlayableBoardError
+D typeinfo for sokoengine::game::PieceNotFoundError
+D typeinfo for sokoengine::game::SokobanPlus
+D typeinfo for sokoengine::game::SokobanPlusDataError
+D typeinfo for sokoengine::io::Collection
+D typeinfo for sokoengine::io::Puzzle
+D typeinfo for sokoengine::io::Snapshot
+D typeinfo for std::bad_variant_access
+D vtable for sokoengine::game::BoardGraph
+D vtable for sokoengine::game::BoardManager
+D vtable for sokoengine::game::BoxGoalSwitchError
+D vtable for sokoengine::game::CellAlreadyOccupiedError
+D vtable for sokoengine::game::HashedBoardManager
+D vtable for sokoengine::game::IllegalMoveError
+D vtable for sokoengine::game::InvalidPositionError
+D vtable for sokoengine::game::Mover
+D vtable for sokoengine::game::NonPlayableBoardError
+D vtable for sokoengine::game::PieceNotFoundError
+D vtable for sokoengine::game::SokobanPlus
+D vtable for sokoengine::game::SokobanPlusDataError
+D vtable for sokoengine::io::Collection
+D vtable for sokoengine::io::Puzzle
+D vtable for sokoengine::io::Snapshot
+R std::piecewise_construct
+R typeinfo name for boost::bad_function_call
+R typeinfo name for boost::bad_graph
+R typeinfo name for boost::detail::sp_counted_base
+R typeinfo name for boost::exception
+R typeinfo name for boost::exception_detail::clone_base
+R typeinfo name for boost::negative_edge
+R typeinfo name for boost::spirit::x3::expectation_failure<__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >
+R typeinfo name for boost::wrapexcept<boost::bad_function_call>
+R typeinfo name for boost::wrapexcept<boost::negative_edge>
+R typeinfo name for boost::wrapexcept<boost::spirit::x3::expectation_failure<__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >
+R typeinfo name for boost::wrapexcept<std::out_of_range>
+R typeinfo name for sokoengine::game::BoardGraph
+R typeinfo name for sokoengine::game::BoardManager
+R typeinfo name for sokoengine::game::BoxGoalSwitchError
+R typeinfo name for sokoengine::game::CellAlreadyOccupiedError
+R typeinfo name for sokoengine::game::HashedBoardManager
+R typeinfo name for sokoengine::game::IllegalMoveError
+R typeinfo name for sokoengine::game::InvalidPositionError
+R typeinfo name for sokoengine::game::Mover
+R typeinfo name for sokoengine::game::NonPlayableBoardError
+R typeinfo name for sokoengine::game::PieceNotFoundError
+R typeinfo name for sokoengine::game::SokobanPlus
+R typeinfo name for sokoengine::game::SokobanPlusDataError
+R typeinfo name for sokoengine::io::Collection
+R typeinfo name for sokoengine::io::Puzzle
+R typeinfo name for sokoengine::io::Snapshot
+R typeinfo name for std::bad_variant_access
+T sokoengine::game::BoardCell::BoardCell(char)
+T sokoengine::game::BoardCell::BoardCell(char)
+T sokoengine::game::BoardCell::can_put_pusher_or_box() const
+T sokoengine::game::BoardCell::clear()
+T sokoengine::game::BoardCell::has_box() const
+T sokoengine::game::BoardCell::has_goal() const
+T sokoengine::game::BoardCell::has_piece() const
+T sokoengine::game::BoardCell::has_pusher() const
+T sokoengine::game::BoardCell::is_border_element() const
+T sokoengine::game::BoardCell::is_empty_floor() const
+T sokoengine::game::BoardCell::is_in_playable_area() const
+T sokoengine::game::BoardCell::is_wall() const
+T sokoengine::game::BoardCell::operator!=(char) const
+T sokoengine::game::BoardCell::operator==(char) const
+T sokoengine::game::BoardCell::operator!=(sokoengine::game::BoardCell const&) const
+T sokoengine::game::BoardCell::operator==(sokoengine::game::BoardCell const&) const
+T sokoengine::game::BoardCell::put_box()
+T sokoengine::game::BoardCell::put_goal()
+T sokoengine::game::BoardCell::put_pusher()
+T sokoengine::game::BoardCell::remove_box()
+T sokoengine::game::BoardCell::remove_goal()
+T sokoengine::game::BoardCell::remove_pusher()
+T sokoengine::game::BoardCell::repr[abi:cxx11]() const
+T sokoengine::game::BoardCell::set_has_box(bool)
+T sokoengine::game::BoardCell::set_has_goal(bool)
+T sokoengine::game::BoardCell::set_has_pusher(bool)
+T sokoengine::game::BoardCell::set_is_in_playable_area(bool)
+T sokoengine::game::BoardCell::set_is_wall(bool)
+T sokoengine::game::BoardCell::str() const
+T sokoengine::game::BoardCell::to_str(bool) const
+T sokoengine::game::BoardGraph::all_neighbors(unsigned int) const
+T sokoengine::game::BoardGraph::~BoardGraph()
+T sokoengine::game::BoardGraph::~BoardGraph()
+T sokoengine::game::BoardGraph::~BoardGraph()
+T sokoengine::game::BoardGraph::BoardGraph(sokoengine::game::BoardGraph&&)
+T sokoengine::game::BoardGraph::BoardGraph(sokoengine::game::BoardGraph&&)
+T sokoengine::game::BoardGraph::BoardGraph(sokoengine::game::BoardGraph const&)
+T sokoengine::game::BoardGraph::BoardGraph(sokoengine::game::BoardGraph const&)
+T sokoengine::game::BoardGraph::BoardGraph(sokoengine::io::Puzzle const&)
+T sokoengine::game::BoardGraph::BoardGraph(sokoengine::io::Puzzle const&)
+T sokoengine::game::BoardGraph::board_height() const
+T sokoengine::game::BoardGraph::board_width() const
+T sokoengine::game::BoardGraph::cell_at(unsigned int)
+T sokoengine::game::BoardGraph::cell_at(unsigned int) const
+T sokoengine::game::BoardGraph::cell_orientation(unsigned int) const
+T sokoengine::game::BoardGraph::cell(unsigned int)
+T sokoengine::game::BoardGraph::cell(unsigned int) const
+T sokoengine::game::BoardGraph::contains(unsigned int) const
+T sokoengine::game::BoardGraph::dijkstra_path(unsigned int, unsigned int) const
+T sokoengine::game::BoardGraph::edges_count() const
+T sokoengine::game::BoardGraph::find_jump_path(unsigned int, unsigned int) const
+T sokoengine::game::BoardGraph::find_move_path(unsigned int, unsigned int) const
+T sokoengine::game::BoardGraph::mark_play_area()
+T sokoengine::game::BoardGraph::neighbor_at(unsigned int, sokoengine::Direction const&) const
+T sokoengine::game::BoardGraph::neighbor(unsigned int, sokoengine::Direction const&) const
+T sokoengine::game::BoardGraph::normalized_pusher_position(unsigned int, std::vector<unsigned int, std::allocator<unsigned int> > const&) const
+T sokoengine::game::BoardGraph::operator=(sokoengine::game::BoardGraph&&)
+T sokoengine::game::BoardGraph::operator=(sokoengine::game::BoardGraph const&)
+T sokoengine::game::BoardGraph::operator[](unsigned int)
+T sokoengine::game::BoardGraph::operator[](unsigned int) const
+T sokoengine::game::BoardGraph::out_edges(unsigned int) const
+T sokoengine::game::BoardGraph::path_destination(unsigned int, std::vector<sokoengine::Direction, std::allocator<sokoengine::Direction> > const&) const
+T sokoengine::game::BoardGraph::positions_path_to_directions_path(std::vector<unsigned int, std::allocator<unsigned int> > const&) const
+T sokoengine::game::BoardGraph::positions_reachable_by_pusher(unsigned int, std::vector<unsigned int, std::allocator<unsigned int> > const&) const
+T sokoengine::game::BoardGraph::shortest_path(unsigned int, unsigned int) const
+T sokoengine::game::BoardGraph::size() const
+T sokoengine::game::BoardGraph::str[abi:cxx11]() const
+T sokoengine::game::BoardGraph::tessellation() const
+T sokoengine::game::BoardGraph::to_board_str[abi:cxx11](bool, bool) const
+T sokoengine::game::BoardGraph::wall_neighbor_directions(unsigned int) const
+T sokoengine::game::BoardGraph::wall_neighbors(unsigned int) const
+T sokoengine::game::BoardManager::board() const
+T sokoengine::game::BoardManager::~BoardManager()
+T sokoengine::game::BoardManager::~BoardManager()
+T sokoengine::game::BoardManager::~BoardManager()
+T sokoengine::game::BoardManager::BoardManager(sokoengine::game::BoardGraph&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::BoardManager::BoardManager(sokoengine::game::BoardGraph&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::BoardManager::BoardManager(sokoengine::game::BoardManager&&)
+T sokoengine::game::BoardManager::BoardManager(sokoengine::game::BoardManager&&)
+T sokoengine::game::BoardManager::boxes_count() const
+T sokoengine::game::BoardManager::boxes_ids() const
+T sokoengine::game::BoardManager::boxes_positions() const
+T sokoengine::game::BoardManager::box_id_on(unsigned int) const
+T sokoengine::game::BoardManager::box_moved(unsigned int, unsigned int)
+T sokoengine::game::BoardManager::boxorder[abi:cxx11]() const
+T sokoengine::game::BoardManager::box_plus_id(unsigned short) const
+T sokoengine::game::BoardManager::box_position(unsigned short) const
+T sokoengine::game::BoardManager::disable_sokoban_plus()
+T sokoengine::game::BoardManager::enable_sokoban_plus()
+T sokoengine::game::BoardManager::goal_id_on(unsigned int) const
+T sokoengine::game::BoardManager::goalorder[abi:cxx11]() const
+T sokoengine::game::BoardManager::goal_plus_id(unsigned short) const
+T sokoengine::game::BoardManager::goal_position(unsigned short) const
+T sokoengine::game::BoardManager::goals_count() const
+T sokoengine::game::BoardManager::goals_ids() const
+T sokoengine::game::BoardManager::goals_positions() const
+T sokoengine::game::BoardManager::has_box_on(unsigned int) const
+T sokoengine::game::BoardManager::has_box(unsigned short) const
+T sokoengine::game::BoardManager::has_goal_on(unsigned int) const
+T sokoengine::game::BoardManager::has_goal(unsigned short) const
+T sokoengine::game::BoardManager::has_pusher_on(unsigned int) const
+T sokoengine::game::BoardManager::has_pusher(unsigned short) const
+T sokoengine::game::BoardManager::is_playable() const
+T sokoengine::game::BoardManager::is_sokoban_plus_enabled() const
+T sokoengine::game::BoardManager::is_sokoban_plus_valid() const
+T sokoengine::game::BoardManager::is_solved() const
+T sokoengine::game::BoardManager::move_box_from(unsigned int, unsigned int)
+T sokoengine::game::BoardManager::move_box(unsigned short, unsigned int)
+T sokoengine::game::BoardManager::move_pusher_from(unsigned int, unsigned int)
+T sokoengine::game::BoardManager::move_pusher(unsigned short, unsigned int)
+T sokoengine::game::BoardManager::operator=(sokoengine::game::BoardManager&&)
+T sokoengine::game::BoardManager::operator!=(sokoengine::game::BoardManager const&) const
+T sokoengine::game::BoardManager::operator==(sokoengine::game::BoardManager const&) const
+T sokoengine::game::BoardManager::pusher_id_on(unsigned int) const
+T sokoengine::game::BoardManager::pusher_moved(unsigned int, unsigned int)
+T sokoengine::game::BoardManager::pusher_position(unsigned short) const
+T sokoengine::game::BoardManager::pushers_count() const
+T sokoengine::game::BoardManager::pushers_ids() const
+T sokoengine::game::BoardManager::pushers_positions() const
+T sokoengine::game::BoardManager::set_boxorder(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::BoardManager::set_goalorder(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::BoardManager::solutions() const
+T sokoengine::game::BoardManager::state() const
+T sokoengine::game::BoardManager::str[abi:cxx11]() const
+T sokoengine::game::BoardManager::switch_boxes_and_goals()
+T sokoengine::game::BoardManager::walls_positions() const
+T sokoengine::game::BoardState::~BoardState()
+T sokoengine::game::BoardState::~BoardState()
+T sokoengine::game::BoardState::BoardState(sokoengine::game::BoardState&&)
+T sokoengine::game::BoardState::BoardState(sokoengine::game::BoardState&&)
+T sokoengine::game::BoardState::BoardState(sokoengine::game::BoardState const&)
+T sokoengine::game::BoardState::BoardState(sokoengine::game::BoardState const&)
+T sokoengine::game::BoardState::BoardState(std::vector<unsigned int, std::allocator<unsigned int> > const&, std::vector<unsigned int, std::allocator<unsigned int> > const&, unsigned long)
+T sokoengine::game::BoardState::BoardState(std::vector<unsigned int, std::allocator<unsigned int> > const&, std::vector<unsigned int, std::allocator<unsigned int> > const&, unsigned long)
+T sokoengine::game::BoardState::boxes_positions()
+T sokoengine::game::BoardState::boxes_positions() const
+T sokoengine::game::BoardState::operator=(sokoengine::game::BoardState&&)
+T sokoengine::game::BoardState::operator=(sokoengine::game::BoardState const&)
+T sokoengine::game::BoardState::operator!=(sokoengine::game::BoardState const&) const
+T sokoengine::game::BoardState::operator==(sokoengine::game::BoardState const&) const
+T sokoengine::game::BoardState::pushers_positions()
+T sokoengine::game::BoardState::pushers_positions() const
+T sokoengine::game::BoardState::repr[abi:cxx11]() const
+T sokoengine::game::BoardState::str[abi:cxx11]() const
+T sokoengine::game::BoardState::zobrist_hash()
+T sokoengine::game::BoardState::zobrist_hash() const
+T sokoengine::game::BoxGoalSwitchError::~BoxGoalSwitchError()
+T sokoengine::game::BoxGoalSwitchError::~BoxGoalSwitchError()
+T sokoengine::game::BoxGoalSwitchError::~BoxGoalSwitchError()
+T sokoengine::game::BoxGoalSwitchError::BoxGoalSwitchError(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::BoxGoalSwitchError::BoxGoalSwitchError(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::CellAlreadyOccupiedError::~CellAlreadyOccupiedError()
+T sokoengine::game::CellAlreadyOccupiedError::~CellAlreadyOccupiedError()
+T sokoengine::game::CellAlreadyOccupiedError::~CellAlreadyOccupiedError()
+T sokoengine::game::CellAlreadyOccupiedError::CellAlreadyOccupiedError(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::CellAlreadyOccupiedError::CellAlreadyOccupiedError(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::Edge::Edge(unsigned int, unsigned int, sokoengine::Direction)
+T sokoengine::game::Edge::Edge(unsigned int, unsigned int, sokoengine::Direction)
+T sokoengine::game::Edge::operator!=(sokoengine::game::Edge const&) const
+T sokoengine::game::Edge::operator==(sokoengine::game::Edge const&) const
+T sokoengine::game::Edge::repr[abi:cxx11]() const
+T sokoengine::game::Edge::str[abi:cxx11]() const
+T sokoengine::game::HashedBoardManager::box_moved(unsigned int, unsigned int)
+T sokoengine::game::HashedBoardManager::disable_sokoban_plus()
+T sokoengine::game::HashedBoardManager::enable_sokoban_plus()
+T sokoengine::game::HashedBoardManager::external_state_hash(sokoengine::game::BoardState&) const
+T sokoengine::game::HashedBoardManager::~HashedBoardManager()
+T sokoengine::game::HashedBoardManager::~HashedBoardManager()
+T sokoengine::game::HashedBoardManager::~HashedBoardManager()
+T sokoengine::game::HashedBoardManager::HashedBoardManager(sokoengine::game::BoardGraph&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::HashedBoardManager::HashedBoardManager(sokoengine::game::BoardGraph&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::HashedBoardManager::HashedBoardManager(sokoengine::game::HashedBoardManager&&)
+T sokoengine::game::HashedBoardManager::HashedBoardManager(sokoengine::game::HashedBoardManager&&)
+T sokoengine::game::HashedBoardManager::initial_state_hash() const
+T sokoengine::game::HashedBoardManager::is_solved() const
+T sokoengine::game::HashedBoardManager::operator=(sokoengine::game::HashedBoardManager&&)
+T sokoengine::game::HashedBoardManager::operator!=(sokoengine::game::HashedBoardManager const&) const
+T sokoengine::game::HashedBoardManager::operator==(sokoengine::game::HashedBoardManager const&) const
+T sokoengine::game::HashedBoardManager::pusher_moved(unsigned int, unsigned int)
+T sokoengine::game::HashedBoardManager::set_boxorder(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::HashedBoardManager::set_goalorder(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::HashedBoardManager::solutions_hashes() const
+T sokoengine::game::HashedBoardManager::state() const
+T sokoengine::game::HashedBoardManager::state_hash() const
+T sokoengine::game::HashedBoardManager::str[abi:cxx11]() const
+T sokoengine::game::IllegalMoveError::~IllegalMoveError()
+T sokoengine::game::IllegalMoveError::~IllegalMoveError()
+T sokoengine::game::IllegalMoveError::~IllegalMoveError()
+T sokoengine::game::IllegalMoveError::IllegalMoveError(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::IllegalMoveError::IllegalMoveError(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::InvalidPositionError::~InvalidPositionError()
+T sokoengine::game::InvalidPositionError::~InvalidPositionError()
+T sokoengine::game::InvalidPositionError::~InvalidPositionError()
+T sokoengine::game::InvalidPositionError::InvalidPositionError(long)
+T sokoengine::game::InvalidPositionError::InvalidPositionError(long)
+T sokoengine::game::Mover::board() const
+T sokoengine::game::Mover::board_manager() const
+T sokoengine::game::Mover::initial_board() const
+T sokoengine::game::Mover::jump(unsigned int)
+T sokoengine::game::Mover::last_move() const
+T sokoengine::game::Mover::~Mover()
+T sokoengine::game::Mover::~Mover()
+T sokoengine::game::Mover::~Mover()
+T sokoengine::game::Mover::Mover(sokoengine::game::BoardGraph&, sokoengine::game::SolvingMode)
+T sokoengine::game::Mover::Mover(sokoengine::game::BoardGraph&, sokoengine::game::SolvingMode)
+T sokoengine::game::Mover::Mover(sokoengine::game::Mover&&)
+T sokoengine::game::Mover::Mover(sokoengine::game::Mover&&)
+T sokoengine::game::Mover::move(sokoengine::Direction const&)
+T sokoengine::game::Mover::operator=(sokoengine::game::Mover&&)
+T sokoengine::game::Mover::pulls_boxes() const
+T sokoengine::game::Mover::selected_pusher() const
+T sokoengine::game::Mover::select_pusher(unsigned short)
+T sokoengine::game::Mover::set_last_move(std::vector<sokoengine::game::PusherStep, std::allocator<sokoengine::game::PusherStep> > const&)
+T sokoengine::game::Mover::set_pulls_boxes(bool)
+T sokoengine::game::Mover::solving_mode() const
+T sokoengine::game::Mover::undo_last_move()
+T sokoengine::game::NonPlayableBoardError::~NonPlayableBoardError()
+T sokoengine::game::NonPlayableBoardError::~NonPlayableBoardError()
+T sokoengine::game::NonPlayableBoardError::~NonPlayableBoardError()
+T sokoengine::game::NonPlayableBoardError::NonPlayableBoardError()
+T sokoengine::game::NonPlayableBoardError::NonPlayableBoardError()
+T sokoengine::game::PieceNotFoundError::~PieceNotFoundError()
+T sokoengine::game::PieceNotFoundError::~PieceNotFoundError()
+T sokoengine::game::PieceNotFoundError::~PieceNotFoundError()
+T sokoengine::game::PieceNotFoundError::PieceNotFoundError(sokoengine::game::Selectors, long)
+T sokoengine::game::PieceNotFoundError::PieceNotFoundError(sokoengine::game::Selectors, long)
+T sokoengine::game::PieceNotFoundError::PieceNotFoundError(sokoengine::game::Selectors, long, char)
+T sokoengine::game::PieceNotFoundError::PieceNotFoundError(sokoengine::game::Selectors, long, char)
+T sokoengine::game::PusherStep::direction() const
+T sokoengine::game::PusherStep::is_current_pos() const
+T sokoengine::game::PusherStep::is_jump() const
+T sokoengine::game::PusherStep::is_move() const
+T sokoengine::game::PusherStep::is_pusher_selection() const
+T sokoengine::game::PusherStep::is_push_or_pull() const
+T sokoengine::game::PusherStep::moved_box_id() const
+T sokoengine::game::PusherStep::operator!=(sokoengine::game::PusherStep const&) const
+T sokoengine::game::PusherStep::operator==(sokoengine::game::PusherStep const&) const
+T sokoengine::game::PusherStep::pusher_id() const
+T sokoengine::game::PusherStep::PusherStep(sokoengine::Direction const&, unsigned short, bool, bool, unsigned short, bool)
+T sokoengine::game::PusherStep::PusherStep(sokoengine::Direction const&, unsigned short, bool, bool, unsigned short, bool)
+T sokoengine::game::PusherStep::repr[abi:cxx11]() const
+T sokoengine::game::PusherStep::set_direction(sokoengine::Direction const&)
+T sokoengine::game::PusherStep::set_is_current_pos(bool)
+T sokoengine::game::PusherStep::set_is_jump(bool)
+T sokoengine::game::PusherStep::set_is_pusher_selection(bool)
+T sokoengine::game::PusherStep::set_moved_box_id(unsigned short)
+T sokoengine::game::PusherStep::set_pusher_id(unsigned short)
+T sokoengine::game::PusherStep::str[abi:cxx11]() const
+T sokoengine::game::SokobanPlus::boxorder[abi:cxx11]() const
+T sokoengine::game::SokobanPlus::box_plus_id(unsigned short) const
+T sokoengine::game::SokobanPlusDataError::~SokobanPlusDataError()
+T sokoengine::game::SokobanPlusDataError::~SokobanPlusDataError()
+T sokoengine::game::SokobanPlusDataError::~SokobanPlusDataError()
+T sokoengine::game::SokobanPlusDataError::SokobanPlusDataError(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::SokobanPlusDataError::SokobanPlusDataError(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::SokobanPlus::disable()
+T sokoengine::game::SokobanPlus::enable()
+T sokoengine::game::SokobanPlus::errors[abi:cxx11]() const
+T sokoengine::game::SokobanPlus::goalorder[abi:cxx11]() const
+T sokoengine::game::SokobanPlus::goal_plus_id(unsigned short) const
+T sokoengine::game::SokobanPlus::is_enabled() const
+T sokoengine::game::SokobanPlus::is_validated() const
+T sokoengine::game::SokobanPlus::is_valid() const
+T sokoengine::game::SokobanPlus::operator=(sokoengine::game::SokobanPlus&&)
+T sokoengine::game::SokobanPlus::operator=(sokoengine::game::SokobanPlus const&)
+T sokoengine::game::SokobanPlus::operator!=(sokoengine::game::SokobanPlus const&) const
+T sokoengine::game::SokobanPlus::operator==(sokoengine::game::SokobanPlus const&) const
+T sokoengine::game::SokobanPlus::pieces_count() const
+T sokoengine::game::SokobanPlus::set_boxorder(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::SokobanPlus::set_goalorder(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::SokobanPlus::set_pieces_count(unsigned short)
+T sokoengine::game::SokobanPlus::~SokobanPlus()
+T sokoengine::game::SokobanPlus::~SokobanPlus()
+T sokoengine::game::SokobanPlus::~SokobanPlus()
+T sokoengine::game::SokobanPlus::SokobanPlus(sokoengine::game::SokobanPlus&&)
+T sokoengine::game::SokobanPlus::SokobanPlus(sokoengine::game::SokobanPlus&&)
+T sokoengine::game::SokobanPlus::SokobanPlus(sokoengine::game::SokobanPlus const&)
+T sokoengine::game::SokobanPlus::SokobanPlus(sokoengine::game::SokobanPlus const&)
+T sokoengine::game::SokobanPlus::SokobanPlus(unsigned short, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::game::SokobanPlus::SokobanPlus(unsigned short, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Collection::author[abi:cxx11]()
+T sokoengine::io::Collection::author[abi:cxx11]() const
+T sokoengine::io::Collection::~Collection()
+T sokoengine::io::Collection::~Collection()
+T sokoengine::io::Collection::~Collection()
+T sokoengine::io::Collection::Collection(sokoengine::io::Collection&&)
+T sokoengine::io::Collection::Collection(sokoengine::io::Collection&&)
+T sokoengine::io::Collection::Collection(sokoengine::io::Collection const&)
+T sokoengine::io::Collection::Collection(sokoengine::io::Collection const&)
+T sokoengine::io::Collection::Collection(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Collection::Collection(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Collection::created_at[abi:cxx11]()
+T sokoengine::io::Collection::created_at[abi:cxx11]() const
+T sokoengine::io::Collection::dumps[abi:cxx11]() const
+T sokoengine::io::Collection::dump(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const
+T sokoengine::io::Collection::dump(std::filesystem::__cxx11::path const&) const
+T sokoengine::io::Collection::dump(std::ostream&) const
+T sokoengine::io::Collection::loads(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, sokoengine::Tessellation)
+T sokoengine::io::Collection::load(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, sokoengine::Tessellation)
+T sokoengine::io::Collection::load(std::filesystem::__cxx11::path const&, sokoengine::Tessellation)
+T sokoengine::io::Collection::load(std::istream&, sokoengine::Tessellation)
+T sokoengine::io::Collection::notes[abi:cxx11]()
+T sokoengine::io::Collection::notes[abi:cxx11]() const
+T sokoengine::io::Collection::operator=(sokoengine::io::Collection&&)
+T sokoengine::io::Collection::operator=(sokoengine::io::Collection const&)
+T sokoengine::io::Collection::puzzles()
+T sokoengine::io::Collection::puzzles() const
+T sokoengine::io::Collection::title[abi:cxx11]()
+T sokoengine::io::Collection::title[abi:cxx11]() const
+T sokoengine::io::Collection::updated_at[abi:cxx11]()
+T sokoengine::io::Collection::updated_at[abi:cxx11]() const
+T sokoengine::io::Puzzle::add_column_left()
+T sokoengine::io::Puzzle::add_column_right()
+T sokoengine::io::Puzzle::add_row_bottom()
+T sokoengine::io::Puzzle::add_row_top()
+T sokoengine::io::Puzzle::at(unsigned int) const
+T sokoengine::io::Puzzle::author[abi:cxx11]()
+T sokoengine::io::Puzzle::author[abi:cxx11]() const
+T sokoengine::io::Puzzle::board[abi:cxx11]() const
+T sokoengine::io::Puzzle::boxes_count() const
+T sokoengine::io::Puzzle::boxorder[abi:cxx11]()
+T sokoengine::io::Puzzle::boxorder[abi:cxx11]() const
+T sokoengine::io::Puzzle::cell_orientation(unsigned int) const
+T sokoengine::io::Puzzle::goalorder[abi:cxx11]()
+T sokoengine::io::Puzzle::goalorder[abi:cxx11]() const
+T sokoengine::io::Puzzle::goals_count() const
+T sokoengine::io::Puzzle::has_sokoban_plus() const
+T sokoengine::io::Puzzle::height() const
+T sokoengine::io::Puzzle::internal_board[abi:cxx11]() const
+T sokoengine::io::Puzzle::notes[abi:cxx11]()
+T sokoengine::io::Puzzle::notes[abi:cxx11]() const
+T sokoengine::io::Puzzle::operator=(sokoengine::io::Puzzle&&)
+T sokoengine::io::Puzzle::operator=(sokoengine::io::Puzzle const&)
+T sokoengine::io::Puzzle::operator[](unsigned int) const
+T sokoengine::io::Puzzle::pushers_count() const
+T sokoengine::io::Puzzle::~Puzzle()
+T sokoengine::io::Puzzle::~Puzzle()
+T sokoengine::io::Puzzle::~Puzzle()
+T sokoengine::io::Puzzle::Puzzle(sokoengine::io::Puzzle&&)
+T sokoengine::io::Puzzle::Puzzle(sokoengine::io::Puzzle&&)
+T sokoengine::io::Puzzle::Puzzle(sokoengine::io::Puzzle const&)
+T sokoengine::io::Puzzle::Puzzle(sokoengine::io::Puzzle const&)
+T sokoengine::io::Puzzle::Puzzle(sokoengine::Tessellation const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Puzzle::Puzzle(sokoengine::Tessellation const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Puzzle::Puzzle(sokoengine::Tessellation const&, unsigned int, unsigned int)
+T sokoengine::io::Puzzle::Puzzle(sokoengine::Tessellation const&, unsigned int, unsigned int)
+T sokoengine::io::Puzzle::remove_column_left()
+T sokoengine::io::Puzzle::remove_column_right()
+T sokoengine::io::Puzzle::remove_row_bottom()
+T sokoengine::io::Puzzle::remove_row_top()
+T sokoengine::io::Puzzle::repr[abi:cxx11]() const
+T sokoengine::io::Puzzle::resize_and_center(unsigned int, unsigned int)
+T sokoengine::io::Puzzle::resize(unsigned int, unsigned int)
+T sokoengine::io::Puzzle::reverse_columns()
+T sokoengine::io::Puzzle::reverse_rows()
+T sokoengine::io::Puzzle::set_at(unsigned int, char)
+T sokoengine::io::Puzzle::set_board(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Puzzle::set(unsigned int, char)
+T sokoengine::io::Puzzle::size() const
+T sokoengine::io::Puzzle::snapshots()
+T sokoengine::io::Puzzle::snapshots() const
+T sokoengine::io::Puzzle::str[abi:cxx11]() const
+T sokoengine::io::Puzzle::tessellation() const
+T sokoengine::io::Puzzle::title[abi:cxx11]()
+T sokoengine::io::Puzzle::title[abi:cxx11]() const
+T sokoengine::io::Puzzle::to_board_str[abi:cxx11](bool, bool) const
+T sokoengine::io::Puzzle::trim()
+T sokoengine::io::Puzzle::trim_bottom()
+T sokoengine::io::Puzzle::trim_left()
+T sokoengine::io::Puzzle::trim_right()
+T sokoengine::io::Puzzle::trim_top()
+T sokoengine::io::Puzzle::width() const
+T sokoengine::io::Rle::ast_json(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Rle::decode(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Rle::encode(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Snapshot::ast_json(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Snapshot::is_reverse() const
+T sokoengine::io::Snapshot::jumps_count() const
+T sokoengine::io::Snapshot::moves_count() const
+T sokoengine::io::Snapshot::moves_data[abi:cxx11]() const
+T sokoengine::io::Snapshot::notes[abi:cxx11]()
+T sokoengine::io::Snapshot::notes[abi:cxx11]() const
+T sokoengine::io::Snapshot::operator=(sokoengine::io::Snapshot&&)
+T sokoengine::io::Snapshot::operator=(sokoengine::io::Snapshot const&)
+T sokoengine::io::Snapshot::pusher_steps() const
+T sokoengine::io::Snapshot::pushes_count() const
+T sokoengine::io::Snapshot::repr[abi:cxx11]() const
+T sokoengine::io::Snapshot::set_moves_data(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Snapshot::set_pusher_steps(std::vector<sokoengine::game::PusherStep, std::allocator<sokoengine::game::PusherStep> > const&)
+T sokoengine::io::Snapshot::~Snapshot()
+T sokoengine::io::Snapshot::~Snapshot()
+T sokoengine::io::Snapshot::~Snapshot()
+T sokoengine::io::Snapshot::Snapshot(sokoengine::io::Snapshot&&)
+T sokoengine::io::Snapshot::Snapshot(sokoengine::io::Snapshot&&)
+T sokoengine::io::Snapshot::Snapshot(sokoengine::io::Snapshot const&)
+T sokoengine::io::Snapshot::Snapshot(sokoengine::io::Snapshot const&)
+T sokoengine::io::Snapshot::Snapshot(sokoengine::Tessellation const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Snapshot::Snapshot(sokoengine::Tessellation const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+T sokoengine::io::Snapshot::solver[abi:cxx11]()
+T sokoengine::io::Snapshot::solver[abi:cxx11]() const
+T sokoengine::io::Snapshot::str[abi:cxx11]() const
+T sokoengine::io::Snapshot::tessellation() const
+T sokoengine::io::Snapshot::title[abi:cxx11]()
+T sokoengine::io::Snapshot::title[abi:cxx11]() const
+T sokoengine::io::Snapshot::to_str[abi:cxx11](bool) const
+T sokoengine::run_benchmarks(double)
+U __cxa_allocate_exception
+U __cxa_atexit
+U __cxa_begin_catch
+U __cxa_demangle
+U __cxa_end_catch
+U __cxa_free_exception
+U __cxa_pure_virtual
+U __cxa_rethrow
+U __cxa_throw
+U __cxa_throw_bad_array_new_length
+U free
+U __gcc_personality_v0
+U __gxx_personality_v0
+U isspace
+U memcmp
+U memcpy
+U memmove
+U memset
+U operator delete(void*)
+U operator delete[](void*)
+U operator delete(void*, unsigned long)
+U operator new(unsigned long)
+U operator new[](unsigned long)
+U __stack_chk_fail
+U std::basic_filebuf<char, std::char_traits<char> >::~basic_filebuf()
+U std::basic_filebuf<char, std::char_traits<char> >::basic_filebuf()
+U std::basic_filebuf<char, std::char_traits<char> >::close()
+U std::basic_filebuf<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode)
+U std::__basic_file<char>::~__basic_file()
+U std::basic_ifstream<char, std::char_traits<char> >::~basic_ifstream()
+U std::basic_ios<char, std::char_traits<char> >::clear(std::_Ios_Iostate)
+U std::basic_ios<char, std::char_traits<char> >::init(std::basic_streambuf<char, std::char_traits<char> >*)
+U std::basic_istream<char, std::char_traits<char> >& std::getline<char, std::char_traits<char>, std::allocator<char> >(std::basic_istream<char, std::char_traits<char> >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, char)
+U std::basic_ofstream<char, std::char_traits<char> >::~basic_ofstream()
+U std::basic_ostream<char, std::char_traits<char> >& std::endl<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&)
+U std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)
+U std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)
+U std::chrono::_V2::system_clock::now()
+U std::cout
+U std::ctype<char> const& std::use_facet<std::ctype<char> >(std::locale const&)
+U std::ctype<char>::_M_widen_init() const
+U std::__cxx11::basic_istringstream<char, std::char_traits<char>, std::allocator<char> >::~basic_istringstream()
+U std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator<char> >::~basic_ostringstream()
+U std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator<char> >::basic_ostringstream()
+U std::__cxx11::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >::_M_sync(char*, unsigned long, unsigned long)
+U std::__cxx11::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >::str() const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::compare(char const*) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::compare(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::find_first_not_of(char, unsigned long) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::find_first_of(char const*, unsigned long, unsigned long) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_assign(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct(unsigned long, char)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_create(unsigned long&, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_erase(unsigned long, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace_aux(unsigned long, unsigned long, unsigned long, char)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace(unsigned long, unsigned long, char const*, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::push_back(char)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::swap(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&)
+U std::__cxx11::basic_stringstream<char, std::char_traits<char>, std::allocator<char> >::~basic_stringstream()
+U std::__cxx11::basic_stringstream<char, std::char_traits<char>, std::allocator<char> >::basic_stringstream()
+U std::__detail::_List_node_base::_M_hook(std::__detail::_List_node_base*)
+U std::__detail::_List_node_base::_M_transfer(std::__detail::_List_node_base*, std::__detail::_List_node_base*)
+U std::__detail::_Prime_rehash_policy::_M_need_rehash(unsigned long, unsigned long, unsigned long) const
+U std::exception::~exception()
+U std::invalid_argument::~invalid_argument()
+U std::invalid_argument::~invalid_argument()
+U std::invalid_argument::invalid_argument(char const*)
+U std::invalid_argument::invalid_argument(char const*)
+U std::invalid_argument::invalid_argument(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::invalid_argument::invalid_argument(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::ios_base::Init::~Init()
+U std::ios_base::Init::Init()
+U std::ios_base::~ios_base()
+U std::ios_base::ios_base()
+U std::istream::seekg(long, std::_Ios_Seekdir)
+U std::locale::~locale()
+U std::locale::locale()
+U std::locale::locale(std::locale const&)
+U std::logic_error::logic_error(std::logic_error const&)
+U std::logic_error::what() const
+U std::ostream::flush()
+U std::ostream::put(char)
+U std::ostream& std::ostream::_M_insert<double>(double)
+U std::ostream& std::ostream::_M_insert<unsigned long>(unsigned long)
+U std::out_of_range::~out_of_range()
+U std::out_of_range::~out_of_range()
+U std::out_of_range::out_of_range(char const*)
+U std::out_of_range::out_of_range(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::out_of_range::out_of_range(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::range_error::~range_error()
+U std::range_error::range_error(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::_Rb_tree_decrement(std::_Rb_tree_node_base*)
+U std::_Rb_tree_increment(std::_Rb_tree_node_base*)
+U std::_Rb_tree_increment(std::_Rb_tree_node_base const*)
+U std::_Rb_tree_insert_and_rebalance(bool, std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::_Rb_tree_node_base&)
+U std::runtime_error::~runtime_error()
+U std::runtime_error::~runtime_error()
+U std::runtime_error::runtime_error(char const*)
+U std::runtime_error::runtime_error(char const*)
+U std::runtime_error::runtime_error(std::runtime_error const&)
+U std::runtime_error::what() const
+U std::__throw_bad_alloc()
+U std::__throw_bad_cast()
+U std::__throw_bad_function_call()
+U std::__throw_length_error(char const*)
+U std::__throw_logic_error(char const*)
+U std::__throw_out_of_range(char const*)
+U std::__throw_out_of_range_fmt(char const*, ...)
+U strcmp
+U strlen
+U typeinfo for std::exception
+U typeinfo for std::invalid_argument
+U typeinfo for std::out_of_range
+U typeinfo for std::range_error
+U typeinfo for std::runtime_error
+U _Unwind_Resume
+U vsnprintf
+U __vsnprintf_chk
+U vtable for __cxxabiv1::__class_type_info
+U vtable for __cxxabiv1::__si_class_type_info
+U vtable for __cxxabiv1::__vmi_class_type_info
+U vtable for std::basic_filebuf<char, std::char_traits<char> >
+U vtable for std::basic_ifstream<char, std::char_traits<char> >
+U vtable for std::basic_ios<char, std::char_traits<char> >
+U vtable for std::basic_ofstream<char, std::char_traits<char> >
+U vtable for std::basic_streambuf<char, std::char_traits<char> >
+U vtable for std::__cxx11::basic_istringstream<char, std::char_traits<char>, std::allocator<char> >
+U vtable for std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator<char> >
+U vtable for std::__cxx11::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >
+U vtable for std::out_of_range
+U VTT for std::basic_ifstream<char, std::char_traits<char> >
+U VTT for std::basic_ofstream<char, std::char_traits<char> >
+U VTT for std::__cxx11::basic_istringstream<char, std::char_traits<char>, std::allocator<char> >
+U VTT for std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator<char> >
+w __cxa_finalize
+w __gmon_start__
+w _ITM_deregisterTMCloneTable
+w _ITM_registerTMCloneTable

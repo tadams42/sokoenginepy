@@ -2,17 +2,7 @@
 # Python native extension - sokoenginepyext
 # ..............................................................................
 
-find_package(Python3 COMPONENTS Interpreter Development)
-
 if(Python3_FOUND)
-    find_package(
-        pybind11
-        CONFIG
-        PATHS
-        "${PYBIND11_CMAKE_DIR}" # Injected by pip when doing `pip install`
-        "${Python3_SITELIB}/pybind11/share/cmake/pybind11"
-    )
-
     if(pybind11_FOUND)
         pybind11_add_module(sokoenginepyext
             export_board_cell.cpp

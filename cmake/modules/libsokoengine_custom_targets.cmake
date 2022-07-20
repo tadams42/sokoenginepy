@@ -4,12 +4,48 @@
 add_custom_target(
     dist
     COMMAND git archive -7 --format=tar.gz --prefix=libsokoengine-${PROJECT_VERSION}/ --output=${CMAKE_BINARY_DIR}/libsokoengine-${PROJECT_VERSION}.tar.gz HEAD
-    BYPRODUCTS
-    ${CMAKE_BINARY_DIR}/libsokoengine-${PROJECT_VERSION}.tar.gz
+    BYPRODUCTS ${CMAKE_BINARY_DIR}/libsokoengine-${PROJECT_VERSION}.tar.gz
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMAND_EXPAND_LISTS
     COMMENT "Generating distribution tarball..."
 )
+
+# .......................................................................................
+# `make symbols` and `make subols_pyext` targets
+# .......................................................................................
+
+# WARNING: This is wrong for multi-config generators because they don't use
+# and typically don't even set CMAKE_BUILD_TYPE
+if(
+    NM_FOUND AND CUT_FOUND AND SORT_FOUND
+    AND(
+    CMAKE_BUILD_TYPE STREQUAL Release
+    OR CMAKE_BUILD_TYPE STREQUAL MinSizeRel
+    OR CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo
+    )
+)
+    add_custom_target(
+        symbols
+        COMMAND ${CMAKE_SOURCE_DIR}/bin/symbols.sh $<TARGET_FILE:sokoengine> "${CMAKE_SOURCE_DIR}/docs/internal/symbols_libsokoengine"
+        BYPRODUCTS "${CMAKE_SOURCE_DIR}/docs/internal/symbols_libsokoengine"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMAND_EXPAND_LISTS
+        COMMENT "Generating library symbols list..."
+    )
+    add_dependencies(symbols sokoengine)
+
+    if(Python3_FOUND AND pybind11_FOUND)
+        add_custom_target(
+            symbols_pyext
+            COMMAND ${CMAKE_SOURCE_DIR}/bin/symbols.sh $<TARGET_FILE:sokoenginepyext> "${CMAKE_SOURCE_DIR}/docs/internal/symbols_sokoenginepyext"
+            BYPRODUCTS "${CMAKE_SOURCE_DIR}/docs/internal/symbols_sokoenginepyext"
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND_EXPAND_LISTS
+            COMMENT "Generating Python extension symbols list..."
+        )
+        add_dependencies(symbols_pyext sokoenginepyext)
+    endif()
+endif()
 
 # .......................................................................................
 # make "valgrind_" targets

@@ -1,0 +1,375 @@
+D typeinfo for boost::bad_function_call
+D typeinfo for boost::bad_graph
+D typeinfo for boost::detail::sp_counted_base
+D typeinfo for boost::exception
+D typeinfo for boost::exception_detail::clone_base
+D typeinfo for boost::negative_edge
+D typeinfo for boost::spirit::x3::expectation_failure<__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >
+D typeinfo for boost::wrapexcept<boost::bad_function_call>
+D typeinfo for boost::wrapexcept<boost::negative_edge>
+D typeinfo for boost::wrapexcept<boost::spirit::x3::expectation_failure<__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >
+D typeinfo for boost::wrapexcept<std::out_of_range>
+D typeinfo for pybind11::builtin_exception
+D typeinfo for pybind11::cast_error
+D typeinfo for pybind11::error_already_set
+D typeinfo for pybind11::reference_cast_error
+D typeinfo for pybind11::type_error
+D typeinfo for pybind11::value_error
+D typeinfo for sokoengine::CellOrientation
+D typeinfo for sokoengine::Direction
+D typeinfo for sokoengine::game::SolvingMode
+D typeinfo for sokoengine::Tessellation
+D typeinfo for std::bad_variant_access
+D typeinfo for std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+D typeinfo for std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > (std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+D typeinfo for std::_Mutex_base<(__gnu_cxx::_Lock_policy)2>
+D typeinfo for std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>
+D vtable for pybind11::error_already_set
+R std::piecewise_construct
+R typeinfo name for boost::bad_function_call
+R typeinfo name for boost::bad_graph
+R typeinfo name for boost::detail::sp_counted_base
+R typeinfo name for boost::exception
+R typeinfo name for boost::exception_detail::clone_base
+R typeinfo name for boost::negative_edge
+R typeinfo name for boost::spirit::x3::expectation_failure<__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >
+R typeinfo name for boost::wrapexcept<boost::bad_function_call>
+R typeinfo name for boost::wrapexcept<boost::negative_edge>
+R typeinfo name for boost::wrapexcept<boost::spirit::x3::expectation_failure<__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >
+R typeinfo name for boost::wrapexcept<std::out_of_range>
+R typeinfo name for pybind11::builtin_exception
+R typeinfo name for pybind11::cast_error
+R typeinfo name for pybind11::error_already_set
+R typeinfo name for pybind11::reference_cast_error
+R typeinfo name for pybind11::type_error
+R typeinfo name for pybind11::value_error
+R typeinfo name for sokoengine::CellOrientation
+R typeinfo name for sokoengine::Direction
+R typeinfo name for sokoengine::game::SolvingMode
+R typeinfo name for sokoengine::Tessellation
+R typeinfo name for std::bad_variant_access
+R typeinfo name for std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+R typeinfo name for std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > (std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+R typeinfo name for std::_Mutex_base<(__gnu_cxx::_Lock_policy)2>
+R typeinfo name for std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>
+T pybind11::error_already_set::m_fetched_error_deleter(pybind11::detail::error_fetch_and_normalize*)
+T PyInit_sokoenginepyext
+U __cxa_allocate_exception
+U __cxa_atexit
+U __cxa_begin_catch
+U __cxa_demangle
+U __cxa_end_catch
+U __cxa_free_exception
+U __cxa_guard_abort
+U __cxa_guard_acquire
+U __cxa_guard_release
+U __cxa_pure_virtual
+U __cxa_rethrow
+U __cxa_throw
+U __cxa_throw_bad_array_new_length
+U __dynamic_cast
+U free
+U __gcc_personality_v0
+U __gxx_personality_v0
+U isspace
+U memcmp
+U memcpy
+U memmove
+U memset
+U operator delete(void*)
+U operator delete[](void*)
+U operator delete(void*, unsigned long)
+U operator delete(void*, unsigned long, std::align_val_t)
+U operator new(unsigned long)
+U operator new[](unsigned long)
+U operator new(unsigned long, std::align_val_t)
+U PyBaseObject_Type
+U PyBuffer_Release
+U PyByteArray_AsString
+U PyByteArray_Size
+U PyByteArray_Type
+U PyBytes_AsString
+U PyBytes_AsStringAndSize
+U PyBytes_Size
+U PyCapsule_GetContext
+U PyCapsule_GetName
+U PyCapsule_GetPointer
+U PyCapsule_New
+U PyCapsule_SetContext
+U PyCapsule_SetPointer
+U PyCapsule_Type
+U PyCFunction_Type
+U PyCMethod_New
+U _Py_Dealloc
+U PyDict_Contains
+U PyDict_Copy
+U PyDict_DelItemString
+U PyDict_GetItemWithError
+U PyDict_New
+U PyDict_Next
+U PyDict_Size
+U PyDict_Type
+U PyErr_Clear
+U PyErr_Fetch
+U PyErr_Format
+U PyErr_NewException
+U PyErr_NormalizeException
+U PyErr_Occurred
+U PyErr_Restore
+U PyErr_SetString
+U PyErr_WriteUnraisable
+U PyEval_AcquireThread
+U PyEval_GetBuiltins
+U PyEval_SaveThread
+U PyExc_BufferError
+U PyException_SetCause
+U PyException_SetContext
+U PyException_SetTraceback
+U PyExc_ImportError
+U PyExc_IndexError
+U PyExc_KeyError
+U PyExc_MemoryError
+U PyExc_OverflowError
+U PyExc_RuntimeError
+U PyExc_SystemError
+U PyExc_TypeError
+U PyExc_ValueError
+U _Py_FalseStruct
+U PyFloat_Type
+U PyFrame_GetBack
+U PyFrame_GetCode
+U PyFrame_GetLineNumber
+U Py_GetVersion
+U PyGILState_Ensure
+U PyGILState_GetThisThreadState
+U PyGILState_Release
+U PyIndex_Check
+U PyInstanceMethod_New
+U PyInstanceMethod_Type
+U PyIter_Next
+U PyList_Append
+U PyList_GetItem
+U PyList_New
+U PyList_Size
+U PyLong_AsLong
+U PyLong_AsUnsignedLong
+U PyLong_FromLong
+U PyLong_FromSize_t
+U PyLong_FromSsize_t
+U PyMem_Calloc
+U PyMem_Free
+U PyMethod_Type
+U PyModule_Create2
+U PyModule_Type
+U _Py_NoneStruct
+U _Py_NotImplementedStruct
+U PyNumber_And
+U PyNumber_Check
+U PyNumber_Invert
+U PyNumber_Long
+U PyNumber_Or
+U PyNumber_Xor
+U PyObject_CallFunctionObjArgs
+U PyObject_CallObject
+U PyObject_ClearWeakRefs
+U PyObject_GetAttrString
+U _PyObject_GetDictPtr
+U PyObject_GetItem
+U PyObject_GetIter
+U PyObject_HasAttrString
+U PyObject_IsInstance
+U PyObject_Malloc
+U PyObject_Repr
+U PyObject_RichCompareBool
+U PyObject_SetAttr
+U PyObject_SetAttrString
+U PyObject_SetItem
+U PyObject_Str
+U PyOS_FSPath
+U PyProperty_Type
+U PySequence_Check
+U PySequence_GetItem
+U PySequence_Size
+U PySequence_Tuple
+U PySet_Add
+U PySet_New
+U PyStaticMethod_New
+U PyStaticMethod_Type
+U PyThreadState_Clear
+U PyThreadState_DeleteCurrent
+U PyThreadState_Get
+U PyThreadState_New
+U _PyThreadState_UncheckedGet
+U PyThread_tss_alloc
+U PyThread_tss_create
+U PyThread_tss_get
+U PyThread_tss_set
+U _Py_TrueStruct
+U PyTuple_GetItem
+U PyTuple_New
+U PyTuple_SetItem
+U PyTuple_Size
+U PyType_IsSubtype
+U _PyType_Lookup
+U PyType_Ready
+U PyType_Type
+U PyUnicode_AsUTF8AndSize
+U PyUnicode_AsUTF8String
+U PyUnicode_DecodeLatin1
+U PyUnicode_DecodeUTF8
+U PyUnicode_FromFormat
+U PyUnicode_FromString
+U PyUnicode_FromStringAndSize
+U PyUnicode_FSConverter
+U PyWeakref_NewRef
+U __stack_chk_fail
+U std::bad_alloc::~bad_alloc()
+U std::basic_filebuf<char, std::char_traits<char> >::~basic_filebuf()
+U std::basic_filebuf<char, std::char_traits<char> >::basic_filebuf()
+U std::basic_filebuf<char, std::char_traits<char> >::close()
+U std::basic_filebuf<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode)
+U std::__basic_file<char>::~__basic_file()
+U std::basic_ifstream<char, std::char_traits<char> >::~basic_ifstream()
+U std::basic_ios<char, std::char_traits<char> >::clear(std::_Ios_Iostate)
+U std::basic_ios<char, std::char_traits<char> >::init(std::basic_streambuf<char, std::char_traits<char> >*)
+U std::basic_istream<char, std::char_traits<char> >& std::getline<char, std::char_traits<char>, std::allocator<char> >(std::basic_istream<char, std::char_traits<char> >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, char)
+U std::basic_ofstream<char, std::char_traits<char> >::~basic_ofstream()
+U std::basic_ostream<char, std::char_traits<char> >& std::endl<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&)
+U std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)
+U std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)
+U std::chrono::_V2::system_clock::now()
+U std::cout
+U std::ctype<char> const& std::use_facet<std::ctype<char> >(std::locale const&)
+U std::ctype<char>::_M_widen_init() const
+U std::current_exception()
+U std::__cxx11::basic_istringstream<char, std::char_traits<char>, std::allocator<char> >::~basic_istringstream()
+U std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator<char> >::~basic_ostringstream()
+U std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator<char> >::basic_ostringstream()
+U std::__cxx11::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >::_M_sync(char*, unsigned long, unsigned long)
+U std::__cxx11::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >::str() const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::compare(char const*) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::compare(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::find(char const*, unsigned long, unsigned long) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::find(char, unsigned long) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::find_first_not_of(char, unsigned long) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::find_first_of(char const*, unsigned long, unsigned long) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_assign(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct(unsigned long, char)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_create(unsigned long&, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_erase(unsigned long, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace_aux(unsigned long, unsigned long, unsigned long, char)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace(unsigned long, unsigned long, char const*, unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::push_back(char)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::rfind(char const*, unsigned long, unsigned long) const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::swap(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&)
+U std::__cxx11::basic_stringstream<char, std::char_traits<char>, std::allocator<char> >::~basic_stringstream()
+U std::__cxx11::basic_stringstream<char, std::char_traits<char>, std::allocator<char> >::basic_stringstream()
+U std::__detail::_List_node_base::_M_hook(std::__detail::_List_node_base*)
+U std::__detail::_List_node_base::_M_transfer(std::__detail::_List_node_base*, std::__detail::_List_node_base*)
+U std::__detail::_Prime_rehash_policy::_M_need_rehash(unsigned long, unsigned long, unsigned long) const
+U std::exception::~exception()
+U std::__exception_ptr::exception_ptr::~exception_ptr()
+U std::__exception_ptr::exception_ptr::exception_ptr(std::__exception_ptr::exception_ptr const&)
+U std::__exception_ptr::exception_ptr::swap(std::__exception_ptr::exception_ptr&)
+U std::__exception_ptr::operator!=(std::__exception_ptr::exception_ptr const&, std::__exception_ptr::exception_ptr const&)
+U std::filesystem::__cxx11::path::_List::_Impl_deleter::operator()(std::filesystem::__cxx11::path::_List::_Impl*) const
+U std::filesystem::__cxx11::path::_List::_List()
+U std::filesystem::__cxx11::path::_M_split_cmpts()
+U std::_Hash_bytes(void const*, unsigned long, unsigned long)
+U std::invalid_argument::~invalid_argument()
+U std::invalid_argument::~invalid_argument()
+U std::invalid_argument::invalid_argument(char const*)
+U std::invalid_argument::invalid_argument(char const*)
+U std::invalid_argument::invalid_argument(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::invalid_argument::invalid_argument(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::ios_base::Init::~Init()
+U std::ios_base::Init::Init()
+U std::ios_base::~ios_base()
+U std::ios_base::ios_base()
+U std::istream::seekg(long, std::_Ios_Seekdir)
+U std::locale::~locale()
+U std::locale::locale()
+U std::locale::locale(std::locale const&)
+U std::logic_error::logic_error(std::logic_error const&)
+U std::logic_error::what() const
+U std::ostream::flush()
+U std::ostream::put(char)
+U std::ostream& std::ostream::_M_insert<unsigned long>(unsigned long)
+U std::out_of_range::~out_of_range()
+U std::out_of_range::~out_of_range()
+U std::out_of_range::out_of_range(char const*)
+U std::out_of_range::out_of_range(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::out_of_range::out_of_range(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::range_error::~range_error()
+U std::range_error::range_error(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::_Rb_tree_decrement(std::_Rb_tree_node_base*)
+U std::_Rb_tree_increment(std::_Rb_tree_node_base*)
+U std::_Rb_tree_increment(std::_Rb_tree_node_base const*)
+U std::_Rb_tree_insert_and_rebalance(bool, std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::_Rb_tree_node_base&)
+U std::rethrow_exception(std::__exception_ptr::exception_ptr)
+U std::runtime_error::~runtime_error()
+U std::runtime_error::~runtime_error()
+U std::runtime_error::runtime_error(char const*)
+U std::runtime_error::runtime_error(char const*)
+U std::runtime_error::runtime_error(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::runtime_error::runtime_error(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::runtime_error::runtime_error(std::runtime_error const&)
+U std::runtime_error::what() const
+U std::terminate()
+U std::__throw_bad_alloc()
+U std::__throw_bad_cast()
+U std::__throw_bad_function_call()
+U std::__throw_length_error(char const*)
+U std::__throw_logic_error(char const*)
+U std::__throw_out_of_range(char const*)
+U std::__throw_out_of_range_fmt(char const*, ...)
+U strcmp
+U strdup
+U strlen
+U typeinfo for __cxxabiv1::__forced_unwind
+U typeinfo for std::bad_alloc
+U typeinfo for std::domain_error
+U typeinfo for std::exception
+U typeinfo for std::invalid_argument
+U typeinfo for std::length_error
+U typeinfo for std::nested_exception
+U typeinfo for std::out_of_range
+U typeinfo for std::overflow_error
+U typeinfo for std::range_error
+U typeinfo for std::runtime_error
+U _Unwind_Resume
+U vsnprintf
+U __vsnprintf_chk
+U vtable for __cxxabiv1::__class_type_info
+U vtable for __cxxabiv1::__enum_type_info
+U vtable for __cxxabiv1::__function_type_info
+U vtable for __cxxabiv1::__pointer_type_info
+U vtable for __cxxabiv1::__si_class_type_info
+U vtable for __cxxabiv1::__vmi_class_type_info
+U vtable for std::bad_alloc
+U vtable for std::basic_filebuf<char, std::char_traits<char> >
+U vtable for std::basic_ifstream<char, std::char_traits<char> >
+U vtable for std::basic_ios<char, std::char_traits<char> >
+U vtable for std::basic_ofstream<char, std::char_traits<char> >
+U vtable for std::basic_streambuf<char, std::char_traits<char> >
+U vtable for std::__cxx11::basic_istringstream<char, std::char_traits<char>, std::allocator<char> >
+U vtable for std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator<char> >
+U vtable for std::__cxx11::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >
+U vtable for std::out_of_range
+U VTT for std::basic_ifstream<char, std::char_traits<char> >
+U VTT for std::basic_ofstream<char, std::char_traits<char> >
+U VTT for std::__cxx11::basic_istringstream<char, std::char_traits<char>, std::allocator<char> >
+U VTT for std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator<char> >
+w __cxa_finalize
+w __gmon_start__
+w _ITM_deregisterTMCloneTable
+w _ITM_registerTMCloneTable
+w __pthread_key_create
