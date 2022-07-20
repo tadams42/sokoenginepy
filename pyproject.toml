@@ -30,7 +30,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Games/Entertainment :: Puzzle Games",
 ]
-dependencies = ["arrow", "networkx > 2.5", "lark >= 1.1.2"]
+dependencies = ["arrow", "networkx > 2.5", "lark >= 1.1.2", "shapely", "pillow"]
 
 [project.urls]
 Homepage = "https://github.com/tadams42/sokoenginepy"

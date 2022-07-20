@@ -7,6 +7,12 @@
     "boost-algorithm",
     "boost-bimap",
     "boost-graph",
-    "boost-spirit"
+    "boost-spirit",
+    "boost-gil",
+    "libpng",
+    "zlib",
+    "boost-geometry",
+    "boost-polygon",
+    "cli11"
   ]
 }

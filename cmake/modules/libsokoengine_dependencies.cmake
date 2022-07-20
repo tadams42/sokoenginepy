@@ -34,4 +34,9 @@ add_definitions(-DBOOST_BIMAP_DISABLE_SERIALIZATION)
 
 # find_package(Boost 1.65.0 CONFIG REQUIRED)
 find_package(Boost 1.71.0 REQUIRED)
+
 find_package(cppitertools CONFIG REQUIRED)
+
+find_package(PNG REQUIRED)
+
+find_package(CLI11 CONFIG REQUIRED)

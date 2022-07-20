@@ -132,6 +132,9 @@ target_link_libraries(sokoengine_obj_hidden PUBLIC cppitertools::cppitertools)
 target_link_libraries(sokoengine_obj PUBLIC Boost::boost)
 target_link_libraries(sokoengine_obj_hidden PUBLIC Boost::boost)
 
+target_link_libraries(sokoengine_obj PUBLIC PNG::PNG)
+target_link_libraries(sokoengine_obj_hidden PUBLIC PNG::PNG)
+
 set_target_properties(sokoengine_obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(sokoengine_obj_hidden PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
