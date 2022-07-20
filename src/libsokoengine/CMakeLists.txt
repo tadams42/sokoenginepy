@@ -22,6 +22,9 @@ set(INSTALL_HEADERS
     io/puzzle.hpp
     io/rle.hpp
     io/snapshot.hpp
+
+    skins/skin.hpp
+    skins/image.hpp
 )
 
 set(SELF_SOURCES
@@ -83,6 +86,15 @@ set(SELF_SOURCES
     io/trioban_io.hpp
 
     benchmarks.cpp
+
+    skins/geometry.hpp
+    skins/geometry.cpp
+    skins/skin.cpp
+    skins/image.cpp
+    skins/image_impl.hpp
+    skins/image_impl.cpp
+    skins/common_skins_format.hpp
+    skins/common_skins_format.cpp
 )
 
 set(SELF_INCLUDE_DIRS
@@ -90,6 +102,7 @@ set(SELF_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/game
     ${CMAKE_CURRENT_SOURCE_DIR}/io
+    ${CMAKE_CURRENT_SOURCE_DIR}/skins
 )
 
 # ..............................................................................
