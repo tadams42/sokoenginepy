@@ -71,6 +71,11 @@ if(DOXYGEN_FOUND)
         "${CMAKE_SOURCE_DIR}/docs/skin_format"
     )
 
+    set(
+        DOXYGEN_HTML_EXTRA_FILES
+        "${CMAKE_SOURCE_DIR}/docs/skin_format/YASC_Skin_Tutorial_1_02.pdf"
+    )
+
     set(DOXYGEN_VERBATIM_HEADERS "NO")
     set(DOXYGEN_GENERATE_TREEVIEW "YES")
     set(DOXYGEN_GENERATE_LATEX "NO")
@@ -94,6 +99,7 @@ if(DOXYGEN_FOUND)
         "${CMAKE_SOURCE_DIR}/README.md"
         "${CMAKE_SOURCE_DIR}/docs/tutorial.md"
         "${CMAKE_SOURCE_DIR}/CHANGELOG.md"
+        "${CMAKE_SOURCE_DIR}/docs/common_skins_format.md"
         "${PAGES_DOX}"
     )
 endif(DOXYGEN_FOUND)

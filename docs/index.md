@@ -11,6 +11,7 @@ INSTALL
 tutorial
 api_py
 sok_file_format
+common_skins_format
 CHANGELOG
 license
 ```
