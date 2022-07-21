@@ -75,47 +75,64 @@ def ext_only_members():
     }
 
 
+@pytest.fixture(scope="session")
+def is_running_on_CI():
+    return bool(
+        os.environ.get("TRAVIS", None) is not None
+        or os.environ.get("GITHUB_ACTIONS", None) is not None
+    )
+
+
+@pytest.fixture(scope="session")
+def is_CI_job_CPP():
+    return is_trueish(os.environ.get("SOKOENGINEPY_EXPECT_CPP", None))
+
+
+@pytest.fixture(scope="session")
+def is_CPP_built_locally():
+    src_dir = os.path.abspath(os.path.join(getsourcefile(lambda: 0), "..", "..", "src"))
+    ext_built = glob.glob(os.path.join(src_dir, "sokoenginepyext*.so"))
+    return bool(ext_built)
+
+
+@pytest.fixture(scope="session")
+def should_be_using_CPP(is_running_on_CI, is_CI_job_CPP, is_CPP_built_locally):
+    if is_running_on_CI:
+        return is_CI_job_CPP
+    else:
+        return is_CPP_built_locally
+
+
+@pytest.fixture(scope="session")
+def is_using_CPP():
+    return "sokoenginepyext" in sokoenginepy.PusherStep.__module__
+
+
 class DescribeNativeCppExtension:
-    def it_is_build_and_loaded_if_environment_required_it(self, is_using_native):
-        running_on_ci = (
-            os.environ.get("TRAVIS", None) is not None
-            or os.environ.get("GITHUB_ACTIONS", None) is not None
-        )
+    def test_CI_is_correctly_configured(
+        self, is_running_on_CI, is_CI_job_CPP, is_using_CPP
+    ):
+        if not is_running_on_CI:
+            return
 
-        ci_job_name = os.environ.get("TRAVIS_JOB_NAME", None) or os.environ.get(
-            "GITHUB_JOB", None
-        )
-
-        is_CI_cpp_job = ci_job_name and any(
-            ["with C++ extension" in ci_job_name, "with_cpp_extension" in ci_job_name]
-        )
-
-        if running_on_ci:
-            if is_CI_cpp_job:
-                assert not is_trueish(
-                    os.environ.get("SOKOENGINEPYEXT_SKIP", None)
-                ), f"SOKOENGINEPYEXT_SKIP should be false-ish or not set (for job {ci_job_name})"
-                assert is_using_native
-
-            else:
-                assert is_trueish(os.environ.get("SOKOENGINEPYEXT_SKIP", None))
-                assert not is_using_native
-
+        if is_CI_job_CPP:
+            assert is_using_CPP
         else:
-            src_dir = os.path.abspath(
-                os.path.join(getsourcefile(lambda: 0), "..", "..", "src")
-            )
-            ext_built = glob.glob(os.path.join(src_dir, "sokoenginepyext*.so"))
+            assert not is_using_CPP
 
-            if ext_built:
-                assert is_using_native
-            else:
-                assert not is_using_native
+    def it_is_build_and_loaded_if_environment_required_it(
+        self, is_using_CPP, should_be_using_CPP
+    ):
+        if should_be_using_CPP:
+            assert is_using_CPP
+
+        if not should_be_using_CPP:
+            assert not is_using_CPP
 
     def it_is_correctly_imported_if_built(
-        self, is_using_native, ext_members, ext_only_members
+        self, is_using_CPP, ext_members, ext_only_members
     ):
-        if not is_using_native:
+        if not is_using_CPP:
             return
 
         for member in ext_members:
@@ -130,8 +147,8 @@ class DescribeNativeCppExtension:
                 sokoenginepyext, member
             ), f"C++ extension should export {member}. Did you change sokoenginepyext code?"
 
-    def it_is_not_imported_if_not_built(self, is_using_native, ext_members):
-        if is_using_native:
+    def it_is_not_imported_if_not_built(self, is_using_CPP, ext_members):
+        if is_using_CPP:
             return
 
         for member in ext_members:

@@ -7,33 +7,73 @@
   },
   "configurePresets": [
     {
-      "name": "_debug",
-      "description": "Base preset for debug configurations.",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
+      "name": "debug",
+      "description": "Debug build with gcc and make on Linux. Simplest to set up dev env on modern Linux.",
+      "inherits": ["_gcc", "_make", "_debug"],
+      "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
-      "name": "_debug_clang",
-      "hidden": true,
-      "description": "Base preset for debug configurations with Clang compiler. Without this, debugging from VSCode doesn't show symbols, only addresses. See https://code.visualstudio.com/docs/cpp/faq-cpp#_how-do-i-enable-debug-symbols",
-      "inherits": ["_debug"],
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS_DEBUG": "--debug -fstandalone-debug"
-      }
+      "name": "release",
+      "description": "Release build with gcc and ninja on Linux",
+      "inherits": ["_gcc", "_ninja", "_release"],
+      "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
-      "name": "_release",
-      "description": "Base preset for release configurations.",
+      "name": "vscode",
+      "description": "Default preset for vscode CMakeTools extension on Linux",
+      "inherits": ["_debug", "_clang", "_clang_debug", "_ninja"],
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "vscode_win",
+      "description": "Default preset for vscode CMakeTools extension on Windows",
+      "inherits": ["_debug", "_nmake"],
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "visual_studio",
+      "description": "Generate Visual Studio 17 2022 solution.",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "docs",
+      "description": "Builds only Doxygen docs",
+      "environment": {
+        "SOKOENGINE_ONLY_DOCS": "1",
+        "CMAKE_TOOLCHAIN_FILE": ""
+      },
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "nmake_debug",
+      "description": "Command line build on Windows - debug",
+      "inherits": ["_nmake", "_debug"],
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "nmake_release",
+      "description": "Command line build on Windows - release",
+      "inherits": ["_nmake", "_release"],
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "_make",
+      "generator": "Unix Makefiles",
+      "hidden": true
+    },
+    {
+      "name": "_nmake",
       "hidden": true,
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-      }
+      "generator": "NMake Makefiles"
+    },
+    {
+      "name": "_ninja",
+      "hidden": true,
+      "generator": "Ninja"
     },
     {
       "name": "_gcc",
-      "description": "Base preset for compiling with gcc.",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_C_COMPILER": "/usr/bin/gcc",
@@ -42,7 +82,6 @@
     },
     {
       "name": "_clang",
-      "description": "Base preset for compiling with Clang.",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_C_COMPILER": "/usr/bin/clang",
@@ -50,46 +89,27 @@
       }
     },
     {
-      "name": "_make",
-      "description": "Base preset for Make generator.",
+      "name": "_clang_debug",
       "hidden": true,
-      "generator": "Unix Makefiles"
-    },
-    {
-      "name": "_ninja",
-      "description": "Base preset for Ninja generator.",
-      "hidden": true,
-      "generator": "Ninja"
-    },
-    {
-      "name": "debug",
-      "description": "Generate debug build with gcc and make",
-      "inherits": ["_gcc", "_debug", "_make"],
+      "description": "VSCode debugger needs this to show symbols instead of just addresses. See https://code.visualstudio.com/docs/cpp/faq-cpp#_how-do-i-enable-debug-symbols",
       "cacheVariables": {
+        "CMAKE_CXX_FLAGS_DEBUG": "--debug -fstandalone-debug"
+      }
+    },
+    {
+      "name": "_debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/dev_installs/${presetName}"
-      },
-      "binaryDir": "${sourceDir}/build/${presetName}"
+      }
     },
     {
-      "name": "release",
-      "description": "Generate release build with gcc and ninja",
-      "inherits": ["_gcc", "_release", "_ninja"],
-      "binaryDir": "${sourceDir}/build/${presetName}"
-    },
-    {
-      "name": "docs",
-      "description": "Build only Doxygen docs",
-      "environment": {
-        "SOKOENGINE_ONLY_DOCS": "1",
-        "CMAKE_TOOLCHAIN_FILE": ""
-      },
-      "binaryDir": "${sourceDir}/build/docs"
-    },
-    {
-      "name": "vscode",
-      "description": "Generate VSCode debug build with clang and ninja",
-      "inherits": ["_clang", "_debug_clang", "_ninja"],
-      "binaryDir": "${sourceDir}/build/${presetName}"
+      "name": "_release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
     }
   ]
 }

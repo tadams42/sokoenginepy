@@ -324,7 +324,9 @@ Edges BoardGraph::out_edges(position_t src) const {
   tie(e_i, e_iend) = boost::out_edges(src, m_impl->m_graph);
   for (; e_i != e_iend; ++e_i) {
     retv.emplace_back(
-      src, boost::target(*e_i, m_impl->m_graph), m_impl->m_graph[*e_i].direction
+      src,
+      static_cast<position_t>(boost::target(*e_i, m_impl->m_graph)),
+      m_impl->m_graph[*e_i].direction
       // , m_impl->m_graph[*e_i].weight
     );
   }

@@ -228,7 +228,7 @@ void SokobanPlus::set_boxorder(const string &rv) {
 }
 
 string SokobanPlus::goalorder() const {
-  if (is_enabled() and is_valid()) {
+  if (is_enabled() && is_valid()) {
     Strings tmp;
     for (const auto &id : m_impl->m_goal_plus_ids) {
       tmp.push_back(to_string(id.second));

@@ -1,4 +1,4 @@
-name: update-doxygen-docs
+name: docs-doxygen
 
 on:
   push:
@@ -11,8 +11,8 @@ on:
 
 
 jobs:
-  deploy:
-    name: Build Doxygen and deploy to gh-pages
+  doxygen:
+    name: Doxygen docs
     runs-on: ubuntu-20.04
     permissions:
       contents: write

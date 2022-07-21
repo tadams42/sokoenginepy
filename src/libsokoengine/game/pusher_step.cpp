@@ -30,7 +30,7 @@ PusherStep::PusherStep(
   , m_pusher_jumped(is_jump)
   , m_is_current_pos(is_current_pos)
   , m_direction(direction_pack(direction)) {
-  bool box_moved = moved_box_id != Config::NO_ID or moved_box_id >= Config::DEFAULT_ID;
+  bool box_moved = moved_box_id != Config::NO_ID || moved_box_id >= Config::DEFAULT_ID;
 
   if (box_moved && is_pusher_selection && is_jump)
     throw invalid_argument(

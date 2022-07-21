@@ -1,19 +1,27 @@
-find_program(GIT_FOUND git REQUIRED)
-find_program(GZIP_FOUND gzip REQUIRED)
+find_program(GIT_FOUND git)
+find_program(GZIP_FOUND gzip)
 find_program(NM_FOUND nm)
 find_program(CUT_FOUND nm)
 find_program(SORT_FOUND nm)
+find_program(VALGRIND_FOUND valgrind)
 
 find_package(Python3 COMPONENTS Interpreter Development)
 
 if(Python3_FOUND)
-	find_package(
-		pybind11
-		CONFIG
-		PATHS
-		"${PYBIND11_CMAKE_DIR}" # Injected by pip when doing `pip install`
-		"${Python3_SITELIB}/pybind11/share/cmake/pybind11"
-	)
+    file(TO_CMAKE_PATH "${Python3_SITELIB}" NORMALIZED_SITELIB_DIR)
+
+    if(PYBIND11_CMAKE_DIR)
+        # Injected by pip when doing `pip install`
+        file(TO_CMAKE_PATH "${PYBIND11_CMAKE_DIR}" NORMALIZED_PYBIND11_DIR)
+    endif()
+
+    find_package(
+        pybind11
+        CONFIG
+        PATHS
+        "${NORMALIZED_PYBIND11_DIR}"
+        "${NORMALIZED_SITELIB_DIR}/pybind11/share/cmake/pybind11"
+    )
 endif()
 
 # cmake --help-module FindBoost

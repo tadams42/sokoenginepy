@@ -1,14 +1,16 @@
 # .......................................................................................
 # `make dist` target
 # .......................................................................................
-add_custom_target(
-    dist
-    COMMAND git archive -7 --format=tar.gz --prefix=libsokoengine-${PROJECT_VERSION}/ --output=${CMAKE_BINARY_DIR}/libsokoengine-${PROJECT_VERSION}.tar.gz HEAD
-    BYPRODUCTS ${CMAKE_BINARY_DIR}/libsokoengine-${PROJECT_VERSION}.tar.gz
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMAND_EXPAND_LISTS
-    COMMENT "Generating distribution tarball..."
-)
+if(GIT_FOUND AND GZIP_FOUND)
+    add_custom_target(
+        dist
+        COMMAND git archive -7 --format=tar.gz --prefix=libsokoengine-${PROJECT_VERSION}/ --output=${CMAKE_BINARY_DIR}/libsokoengine-${PROJECT_VERSION}.tar.gz HEAD
+        BYPRODUCTS ${CMAKE_BINARY_DIR}/libsokoengine-${PROJECT_VERSION}.tar.gz
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMAND_EXPAND_LISTS
+        COMMENT "Generating distribution tarball..."
+    )
+endif()
 
 # .......................................................................................
 # `make symbols` and `make subols_pyext` targets
@@ -55,15 +57,15 @@ endif()
 # This file can later be analyzed via ie. KCacheGrind gui.
 #
 # add_executable(mytarget mysource.cpp)
-# add_valgrind_profile_dump_target(mytarget)
+# add_callgrind_target(mytarget)
 #
 # 2. Builds executable and runs it under memcheck
 #
 # add_executable(mytarget mysource.cpp)
-# add_valgrind_memory_check_target(mytarget)
+# add_memcheck_target(mytarget)
 # .......................................................................................
-function(add_valgrind_profile_dump_target for_target_name)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+function(add_callgrind_target for_target_name)
+    if(VALGRIND_FOUND)
         set(dump_file "${CMAKE_BINARY_DIR}/${for_target_name}_dump.pid")
         set(valgrind_args
             --dump-line=yes
@@ -72,7 +74,7 @@ function(add_valgrind_profile_dump_target for_target_name)
             --collect-jumps=yes
             --callgrind-out-file="${dump_file}"
         )
-        set(valgrind_target_name "valgrind_profile_${for_target_name}")
+        set(valgrind_target_name "callgrind_${for_target_name}")
 
         # get_target_property(binary_location ${for_target_name} LOCATION)
         # add_custom_target(${valgrind_target_name} COMMAND valgrind ${valgrind_args} ${binary_location})
@@ -82,13 +84,16 @@ function(add_valgrind_profile_dump_target for_target_name)
         )
         add_dependencies(${valgrind_target_name} ${for_target_name})
         set_target_properties(
-            ${valgrind_target_name} PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1
+            ${valgrind_target_name}
+            PROPERTIES
+            EXCLUDE_FROM_ALL 1
+            EXCLUDE_FROM_DEFAULT_BUILD 1
         )
     endif()
-endfunction(add_valgrind_profile_dump_target)
+endfunction(add_callgrind_target)
 
-function(add_valgrind_memory_check_target for_target_name)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+function(add_memcheck_target for_target_name)
+    if(VALGRIND_FOUND)
         set(valgrind_args
             --num-callers=50
             --leak-check=full
@@ -103,7 +108,7 @@ function(add_valgrind_memory_check_target for_target_name)
             # --log-file="${CMAKE_BINARY_DIR}/valgrind_memcheck.log"
             # --suppressions="${CMAKE_SOURCE_DIR}/.libsokoengine.supp"
         )
-        set(valgrind_target_name "valgrind_check_${for_target_name}")
+        set(valgrind_target_name "memcheck_${for_target_name}")
 
         # get_target_property(binary_location ${for_target_name} LOCATION)
         # add_custom_target(${valgrind_target_name} COMMAND G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind ${valgrind_args} ${binary_location})
@@ -115,4 +120,4 @@ function(add_valgrind_memory_check_target for_target_name)
         set_target_properties(${valgrind_target_name}
             PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
     endif()
-endfunction(add_valgrind_memory_check_target)
+endfunction(add_memcheck_target)

@@ -2,10 +2,16 @@ name: Codacy Security Scan
 
 on:
   push:
-    branches: [ "development", "master"]
+    branches:
+      - development
+      - master
+
     paths-ignore:
       - '**/*.md'
       - '**/*.txt'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.json'
 
 jobs:
   codacy-security-scan:
