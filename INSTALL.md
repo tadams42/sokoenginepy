@@ -230,31 +230,41 @@ managed via `vcpkg`, then Python version would've been pinned to whatever `vcpkg
 defines making it impossible to build ie. Python wheels for different Python versions
 from the same source tree.
 
-## Building on windblows
+## Building on windows
 
-1. Install system tools
+1. Install:
 
    - Visual Studio Community edition for C++ or Microsoft C++ build toolchain
    - cmake
    - Python 3
    - git
 
-   All tools must be set up so that they are in `PATH` (usually, installer has an
-   check box for this).
+2. open `x64 Native Tools Command Prompt`
 
-   Open `x64 Native Tools Command Prompt` or set up command line environment via
-   one of Visual Studio `.bat` files. For details see [Use the Microsoft C++
-   toolset from the command
-   line](https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170)
+3. setup `vcpkg`
 
-2. PyPA build
-
-   ```cmd
-   cd  C:\Users\vagrant\dev\vcpkg
-   vcpkg\bootstrap-vcpkg.bat
+   ```sh
+   cd  C:\Users\vagrant\dev
+   git clone https://github.com/Microsoft/vcpkg.git
+   cd vcpkg
+   bootstrap-vcpkg.bat
    vcpkg integrate install
-   cd  C:\Users\vagrant\dev\sokoenginepy
    set CMAKE_TOOLCHAIN_FILE=C:/Users/vagrant/dev/vcpkg/scripts/buildsystems/vcpkg.cmake
+   ```
+
+4. get `sokoenginepy`
+
+   ```sh
+   cd  C:\Users\vagrant\dev
+   git clone https://github.com/tadams42/sokoenginepy.git
+   cd sokoenginepy
+   ```
+
+After that, choose one of following build scenarios:
+
+1. PyPA build...
+
+   ```sh
    set SOKOENGINEPYEXT_SKIP=0
    set SOKOENGINEPYEXT_DEBUG=1
    python -m venv .venv
@@ -264,9 +274,42 @@ from the same source tree.
    python -m build
    ```
 
-2. pip install from source
+2. ...or pip build editable
 
-Works only with `pip install cmake`
+   ```sh
+   set SOKOENGINEPYEXT_SKIP=0
+   set SOKOENGINEPYEXT_DEBUG=1
+   python -m venv .venv
+   .venv\Scripts\activate.bat
+   python -m pip install --upgrade pip
+   pip install -U wheel
 
-- doesn't work with global cmake
-- doesn't work wit `cmake` set up in `pyproject.toml` build requirements
+   # This is curious one - pip is unable to find globally installed cmake; reason unknown
+   # We need to install cmake directly into Python environment
+   pip install cmake
+
+   # and finally
+   pip install -e .[dev]
+   ```
+
+3. ...or build directly via cmake for VSCode / Visual Studio
+
+   ```sh
+   set CMAKE_TOOLCHAIN_FILE=C:/Users/vagrant/dev/vcpkg/scripts/buildsystems/vcpkg.cmake
+   python -m venv .venv
+   .venv\Scripts\activate.bat
+   python -m pip install --upgrade pip
+   pip install -U wheel
+
+   cmake --preset visual_studio
+   # or
+   # cmake --preset vscode_win
+   ```
+
+   Open `build/visual_studio` or `build/vscode_win` in appropriate tool and enjoy.
+
+   Build from command line:
+
+   ```sh
+   cmake --build build/visual_studio --config Debug --target sokoengine sokoenginepyext
+   ```
