@@ -1,1 +1,1 @@
-from .misc import fake, is_using_native, resources_root
+from .misc import fake, resources_root

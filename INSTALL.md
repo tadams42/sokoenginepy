@@ -229,3 +229,44 @@ C++ extension should be build in requested Python virtual environment. If `pytho
 managed via `vcpkg`, then Python version would've been pinned to whatever `vcpkg`
 defines making it impossible to build ie. Python wheels for different Python versions
 from the same source tree.
+
+## Building on windblows
+
+1. Install system tools
+
+   - Visual Studio Community edition for C++ or Microsoft C++ build toolchain
+   - cmake
+   - Python 3
+   - git
+
+   All tools must be set up so that they are in `PATH` (usually, installer has an
+   check box for this).
+
+   Open `x64 Native Tools Command Prompt` or set up command line environment via
+   one of Visual Studio `.bat` files. For details see [Use the Microsoft C++
+   toolset from the command
+   line](https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170)
+
+2. PyPA build
+
+   ```cmd
+   cd  C:\Users\vagrant\dev\vcpkg
+   vcpkg\bootstrap-vcpkg.bat
+   vcpkg integrate install
+   cd  C:\Users\vagrant\dev\sokoenginepy
+   set CMAKE_TOOLCHAIN_FILE=C:/Users/vagrant/dev/vcpkg/scripts/buildsystems/vcpkg.cmake
+   set SOKOENGINEPYEXT_SKIP=0
+   set SOKOENGINEPYEXT_DEBUG=1
+   python -m venv .venv
+   .venv\Scripts\activate.bat
+   python -m pip install --upgrade pip
+   pip install -U wheel build
+   python -m build
+   ```
+
+2. pip install from source
+
+Works only with `pip install cmake`
+
+- doesn't work with global cmake
+- doesn't work wit `cmake` set up in `pyproject.toml` build requirements

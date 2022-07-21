@@ -1,0 +1,108 @@
+name: build-PyPA
+
+on:
+  push:
+    branches:
+      # Usually we want to be 100% sure build is not broken when we create release/x.y.z
+      # branch. Other times it just isn't worth the wait.
+      - "release/**"
+      # - "feature/windblows_build"
+
+jobs:
+
+  pypa_no_cpp:
+    name: "PyPA build, no C++"
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      SOKOENGINEPYEXT_SKIP: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: src/sokoenginepy/game/sokoban_plus.py
+
+      - name: ensure latest pip
+        run: python -m pip install --upgrade pip
+
+      - name: install build utilities
+        run: pip install build wheel twine check-manifest
+
+      - name: check manifest
+        run: check-manifest
+
+      - name: build sdist and wheel
+        run: python -m build
+
+      - name: check sdist
+        run: twine check dist/*.tar.gz
+
+      - name: check wheel
+        run: twine check dist/*.whl
+
+      - name: upload sdist and wheel
+        uses: actions/upload-artifact@v3
+        with:
+          name: sdist-wheel-${{ matrix.python-version }}
+          path: dist/
+          retention-days: 5
+
+
+  pypa_with_cpp:
+    name: "PyPA build - with C++"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup vcpkg
+        uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+          vcpkgGitCommitId: "4826ede84084395b0f87476e48ff6d4070eba0e4"
+          appendedCacheKey: "pypa_with_cpp_${{ matrix.python-version }}"
+
+      - name: set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: src/sokoenginepy/game/board_cell.py
+
+      - name: ensure latest pip
+        run: python -m pip install --upgrade pip
+
+      - name: install build utilities
+        run: pip install build wheel twine check-manifest
+
+      - name: check manifest
+        run: check-manifest
+
+      - name: build sdist and wheel
+        env:
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        run: python -m build
+
+      - name: check sdist
+        run: twine check dist/*.tar.gz
+
+      - name: check wheel
+        run: twine check dist/*.whl
+
+      - name: upload sdist and wheel
+        uses: actions/upload-artifact@v3
+        with:
+          name: sdist-wheel-cpp-${{ matrix.python-version }}
+          path: dist/
+          retention-days: 5

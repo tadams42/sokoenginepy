@@ -41,19 +41,19 @@ Documentation = "https://sokoenginepy.readthedocs.io/en/latest/"
 dev = [
     "black",
     "bump2version",
-    "ipython",
-    "isort",
-    "pytest-spec",
-    "twine",
     "check-manifest",
     "coverage",
     "factory-boy",
     "faker",
-    "pytest >= 3.0.0",
+    "ipython",
+    "isort",
     "myst-parser",
+    "pyexcel-ods3",
+    "pytest >= 3.0.0",
+    "pytest-spec",
     "sphinx >= 1.4",
     "sphinx_rtd_theme",
-    "pyexcel-ods3",
+    "twine",
 ]
 docs = ["myst-parser", "sphinx >= 1.4", "sphinx_rtd_theme"]
 tests = [
@@ -63,7 +63,6 @@ tests = [
     "faker",
     "pytest >= 3.0.0",
     "pytest-spec",
-    "coverage",
 ]
 
 [tool.setuptools]
