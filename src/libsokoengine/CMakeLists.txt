@@ -281,8 +281,8 @@ file(WRITE
 add_executable(benchmarks EXCLUDE_FROM_ALL "${CMAKE_BINARY_DIR}/benchmarks.cpp")
 target_link_libraries(benchmarks PUBLIC sokoengine)
 
-# add_valgrind_profile_dump_target(benchmarks)
-# add_valgrind_memory_check_target(benchmarks)
+# add_callgrind_target(benchmarks)
+# add_memcheck_target(benchmarks)
 set_target_properties(benchmarks
     PROPERTIES
     EXCLUDE_FROM_DEFAULT_BUILD 1

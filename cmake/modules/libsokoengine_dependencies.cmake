@@ -1,8 +1,9 @@
-find_program(GIT_FOUND git REQUIRED)
-find_program(GZIP_FOUND gzip REQUIRED)
+find_program(GIT_FOUND git)
+find_program(GZIP_FOUND gzip)
 find_program(NM_FOUND nm)
 find_program(CUT_FOUND nm)
 find_program(SORT_FOUND nm)
+find_program(VALGRIND_FOUND valgrind)
 
 find_package(Python3 COMPONENTS Interpreter Development)
 
