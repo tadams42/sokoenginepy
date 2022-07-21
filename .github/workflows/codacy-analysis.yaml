@@ -3,8 +3,12 @@ name: Codacy Security Scan
 on:
   push:
     branches:
-      - development
-      - master
+      # - "master"
+      # - "development"
+
+      # There is some kind of limit on number of codacy runs (15)
+      # Switching it off for now
+      - "non_existing"
 
     paths-ignore:
       - '**/*.md'
