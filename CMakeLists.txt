@@ -6,7 +6,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 # Allow initializing cmake without searching for dependencies
 # This is useful on CI when the only step we need to perform is building Doxygen docs.
-if(NOT DEFINED ENV{SOKOENGINE_ONLY_DOCS})
+if(DEFINED ENV{SOKOENGINE_ONLY_DOCS})
+    set(LIBSOKOENGINE_DOCS_ONLY "ON" CACHE STRING "Configured to build only docs." FORCE)
+else()
+    set(LIBSOKOENGINE_DOCS_ONLY "OFF" CACHE STRING "Configured to build only docs." FORCE)
+endif()
+
+if(NOT LIBSOKOENGINE_DOCS_ONLY)
     include(libsokoengine_global_features)
     include(libsokoengine_dependencies)
     include(libsokoengine_custom_targets)
