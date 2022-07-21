@@ -1,3 +1,6 @@
+# Tests cmake builds on "release/" branches. Last check before release branch is
+# merged into master.
+
 name: build-PyPA
 
 on:

@@ -1,0 +1,85 @@
+name:  "Microsoft C++ Code Analysis"
+
+env:
+  # Path to the CMake build directory.
+  build: '${{ github.workspace }}/build'
+  config: 'Debug'
+
+on:
+  push:
+    branches:
+      - development
+      - master
+
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.json'
+
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup vcpkg
+        uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+          vcpkgGitCommitId: "4826ede84084395b0f87476e48ff6d4070eba0e4"
+          appendedCacheKey: "ms_cpp_analysis"
+
+      - name: set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+          cache: 'pip'
+          cache-dependency-path: pyproject.toml
+
+      - name: ensure latest pip
+        run: python -m pip install --upgrade pip
+
+      - name: install wheel
+        run: pip install wheel
+
+      - name: install pybind11
+        run: pip install pybind11
+
+      - name: Configure CMake
+        env:
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        run: cmake -B ${{ env.build }} -DCMAKE_BUILD_TYPE=${{ env.config }} --preset visual_studio
+
+      # Build is not required unless generated source files are used
+      # - name: Build CMake
+      #   run: cmake --build ${{ env.build }} --config ${{ env.config }} --target sokoengine sokoenginepyext
+
+      - name: Run MSVC Code Analysis
+        uses: microsoft/msvc-code-analysis-action@v0.1.0
+        # Provide a unique ID to access the sarif output path
+        id: run-analysis
+        with:
+          cmakeBuildDirectory: ${{ env.build }}
+          buildConfiguration: ${{ env.config }}
+          # Ruleset file that will determine what checks will be run
+          ruleset: NativeRecommendedRules.ruleset
+          # Paths to ignore analysis of CMake targets and includes
+          # ignoredPaths: ${{ github.workspace }}/dependencies;${{ github.workspace }}/test
+
+      # Upload SARIF file to GitHub Code Scanning Alerts
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: ${{ steps.run-analysis.outputs.sarif }}
+
+      # Upload SARIF file as an Artifact to download and view
+      - name: Upload SARIF as an Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: sarif-file
+          path: ${{ steps.run-analysis.outputs.sarif }}

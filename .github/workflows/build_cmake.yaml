@@ -1,3 +1,6 @@
+# Tests cmake builds on "release/" branches. Last check before release branch is
+# merged into master.
+
 name: build-cmake
 
 on:
@@ -11,7 +14,7 @@ on:
 jobs:
 
   # Builds only C++ sources and only using cmake.
-  # Tests if cmake toolchain is flexible enough to build either only libsokoengine (it
+  # Tests if cmake toolchain is flexible enough to build either only libsokoengine (if
   # there is no pybind11 and Python) or both, libsokoengine and sokoenginepyext.
 
   cmake_build:
