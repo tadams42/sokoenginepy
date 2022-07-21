@@ -6,6 +6,7 @@ on:
       # Usually we want to be 100% sure build is not broken when we create release/x.y.z
       # branch. Other times it just isn't worth the wait.
       - "release/**"
+      - "feature/windblows_build"
 
 jobs:
 
@@ -75,6 +76,6 @@ jobs:
       - name: upload sdist and wheel
         uses: actions/upload-artifact@v3
         with:
-          name: sdist-wheel-${{ matrix.python-version }}-${{ matrix.os }}-${{ !contains(matrix.cpp, 'without') }}
+          name: sdist-wheels
           path: dist/
           retention-days: 5

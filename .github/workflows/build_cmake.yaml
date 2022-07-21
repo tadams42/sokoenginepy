@@ -1,0 +1,136 @@
+name: build-cmake
+
+on:
+  push:
+    branches:
+      # Usually we want to be 100% sure build is not broken when we create release/x.y.z
+      # branch. Other times it just isn't worth the wait.
+      - "release/**"
+      - "feature/windblows_build"
+
+jobs:
+
+  # Builds only C++ sources and only using cmake.
+  # Tests if cmake toolchain is flexible enough to build either only libsokoengine (it
+  # there is no pybind11 and Python) or both, libsokoengine and sokoenginepyext.
+
+  cmake_build:
+    name: cmake build
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
+        os: [ubuntu-latest, windows-latest]
+        py: ['with Py', 'without Py']
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup vcpkg
+        uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+          vcpkgGitCommitId: "4826ede84084395b0f87476e48ff6d4070eba0e4"
+          appendedCacheKey: "cmake_build_${{ matrix.python-version }}${{ matrix.os }}"
+
+      - name: set up Python ${{ matrix.python-version }}
+        if: ${{ matrix.py == 'with Py' }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: pyproject.toml
+
+      - name: ensure latest pip
+        if: ${{ matrix.py == 'with Py' }}
+        run: python -m pip install --upgrade pip
+
+      - name: install pybind11
+        if: ${{ matrix.py == 'with Py' }}
+        run: pip install pybind11
+
+      #---------------------------------------------------------------------------------
+      # Build on Linux
+      #---------------------------------------------------------------------------------
+      - name: install build utilities
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: sudo apt install -y cmake ninja-build
+
+      - name: configure
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        env:
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        run: cmake -DCMAKE_INSTALL_PREFIX=build/installed --preset release
+
+      - name: make (with Py)
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.py == 'with Py' }}
+        working-directory: build/release
+        run: cmake --build . --target sokoengine sokoenginepyext dist
+
+      - name: make (without Py)
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.py == 'without Py' }}
+        working-directory: build/release
+        run: cmake --build . --target sokoengine
+
+      - name: make install
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        working-directory: build/release
+        run: cmake --install .
+
+      - name: upload source tarball
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.py == 'with Py' && matrix.python-version == '3.10'}}
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist_tarball
+          path: build/release/libsokoengine-*.tar.gz
+          retention-days: 5
+
+      - name: upload Linux binaries
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.py == 'with Py' && matrix.python-version == '3.10'}}
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux_cmake_installed
+          path: build/installed
+          retention-days: 5
+
+      #---------------------------------------------------------------------------------
+      # Build on Windblows
+      #---------------------------------------------------------------------------------
+      - name: configure
+        if: ${{ matrix.os == 'windows-latest' }}
+        env:
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        run: cmake -DCMAKE_INSTALL_PREFIX=build/installed --preset visual_studio
+
+      - name: make (with Py)
+        if: ${{ matrix.os == 'windows-latest' && matrix.py == 'with Py' }}
+        working-directory: build/visual_studio
+        run: cmake --build . --config RelWithDebInfo --target sokoengine sokoenginepyext
+
+      - name: make (without Py)
+        if: ${{ matrix.os == 'windows-latest' && matrix.py == 'without Py' }}
+        working-directory: build/visual_studio
+        run: cmake --build . --config RelWithDebInfo --target sokoengine
+
+      - name: make install
+        if: ${{ matrix.os == 'windows-latest' }}
+        working-directory: build/visual_studio
+        run: cmake --install . --config RelWithDebInfo
+
+      - name: upload windows binaries
+        if: ${{ matrix.os == 'windows-latest' && matrix.py == 'with Py' && matrix.python-version == '3.10'}}
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows_cmake_installed
+          path: build/installed
+          retention-days: 5
+
+      - name: upload windows build artifacts
+        if: ${{ matrix.os == 'windows-latest' && matrix.py == 'with Py' && matrix.python-version == '3.10'}}
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows_build_artifacts
+          path: |
+            build/visual_studio/src/libsokoengine/RelWithDebInfo
+            build/visual_studio/src/sokoenginepyext/RelWithDebInfo
+          retention-days: 5
