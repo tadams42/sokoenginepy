@@ -8,7 +8,7 @@ on:
       - "master"
       # No tests are needed or possible on this branch
       - "gh-pages"
-      - "feature/windblows_build"
+
 
 jobs:
 
