@@ -15,7 +15,7 @@ prune .vscode
 prune .benchmarks
 prune .venv
 
-include bin/encode_SOK_format_specification.py bin/mover_profiling.py
+include bin/encode_SOK_format_specification.py bin/mover_profiling.py bin/symbols.sh
 include .bumpversion.cfg
 include .clang-format
 include .gitignore
