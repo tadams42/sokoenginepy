@@ -8,6 +8,14 @@
 
 namespace sokoengine {
 
+namespace io {
+class Puzzle;
+} // namespace io
+
+namespace game {
+class BoardGraph;
+} // namespace game
+
 ///
 /// Working with board skin images.
 ///
@@ -191,7 +199,7 @@ public:
   /// CellOrientation::TRIANGLE_DOWN` this method will return polygon with 4 points
   /// defining equilateral triangle with side length equal to tile_width().
   ///
-  polygon_t tile_polygon(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  polygon_t tile_polygon(CellOrientation orientation) const;
 
   ///
   /// Position of top left corner of (processed and cropped) tile image for purposes of
@@ -210,118 +218,125 @@ public:
   /// Empty skin doesn't have any image data but is able to give correct info on tile
   /// sizes, cell orientations and tile polygons.
   ///
-  /// Methods returning tile images will return empty images.
+  /// Methods returning tile images will return empty images if skin is empty.
   ///
   bool is_empty() const;
 
   ///
   /// Cropped and processed tile image for board floor.
   ///
-  const Image &floor(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const Image &floor(CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile image for board floor in non-playable area of board.
   ///
-  const Image &
-  non_playable_floor(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const Image &non_playable_floor(CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile image for goal.
   ///
-  const Image &goal(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const Image &goal(CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile image for non-directional pusher (on floor).
   ///
-  const Image &pusher(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const Image &pusher(CellOrientation orientation) const;
 
   ///
-  /// Cropped and processed tile image for  non-directional pusher on goal.
+  /// Tries to find image for pusher looking at given @param looking_at.
   ///
-  const Image &
-  pusher_on_goal(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  /// If there is no such image, returns regular pusher image.
+  ///
+  const Image &pusher(Direction looking_at, CellOrientation orientation) const;
+
+  ///
+  /// Cropped and processed tile image for non-directional pusher on goal.
+  ///
+  const Image &pusher_on_goal(CellOrientation orientation) const;
+
+  ///
+  /// Tries to find image for pusher looking at given @param looking_at.
+  ///
+  /// If there is no such image, returns regular pusher on goal image.
+  ///
+  const Image &pusher_on_goal(Direction looking_at, CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile image for box (on floor).
   ///
-  const Image &box(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const Image &box(CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile image for box on goal.
   ///
-  const Image &
-  box_on_goal(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const Image &box_on_goal(CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile image for non-directional wall.
   ///
-  const Image &wall(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const Image &wall(CellOrientation orientation) const;
+
+  ///
+  /// Tries to find directional wall that has neighbors in all directions specified by
+  /// @param neighbor_walls. If there is no such directional wall, returns regular,
+  /// non directional wall.
+  ///
+  const Image &
+  wall(const Directions &neighbor_walls, CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile image for wall cap in skins that use directional
   /// walls.
   ///
-  const Image &wall_cap(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const Image &wall_cap(CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile images for directional pusher.
   /// Each image represents pusher looking in Direction.
   ///
-  const directional_pushers_t &
-  directional_pushers(CellOrientation orientation = CellOrientation::DEFAULT) const;
-
-  const Image &pusher(
-    Direction looking_at, CellOrientation orientation = CellOrientation::DEFAULT
-  ) const;
+  const directional_pushers_t &directional_pushers(CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile images for directional pusher.
   /// Each image represents pusher looking in Direction.
   ///
-  const directional_pushers_t &directional_pushers_on_goal(
-    CellOrientation orientation = CellOrientation::DEFAULT
-  ) const;
-
-  const Image &pusher_on_goal(
-    Direction looking_at, CellOrientation orientation = CellOrientation::DEFAULT
+  const directional_pushers_t &directional_pushers_on_goal(CellOrientation orientation
   ) const;
 
   ///
   /// Cropped and processed tile image for directional goal.
   /// Each image represents wall having neighbor walls in given Directions.
   ///
-  const directional_walls_t &
-  directional_walls(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const directional_walls_t &directional_walls(CellOrientation orientation) const;
 
   ///
   /// Animated pusher tiles.
   ///
-  const animation_frames_t &
-  animated_pusher(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const animation_frames_t &animated_pusher(CellOrientation orientation) const;
 
   ///
   /// Animated pusher on goal tiles.
   ///
-  const animation_frames_t &
-  animated_pusher_on_goal(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const animation_frames_t &animated_pusher_on_goal(CellOrientation orientation) const;
 
   ///
   /// Animated box tiles.
   ///
-  const animation_frames_t &
-  animated_box(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const animation_frames_t &animated_box(CellOrientation orientation) const;
 
   ///
   /// Animated box on goal tiles.
   ///
-  const animation_frames_t &
-  animated_box_on_goal(CellOrientation orientation = CellOrientation::DEFAULT) const;
+  const animation_frames_t &animated_box_on_goal(CellOrientation orientation) const;
 
   ///
   /// Saves all, original and processed, tiles into `dir`.
   /// For debugging purposes.
   ///
   void dump_tiles(const std::string &dir) const;
+
+  Image render_board(const io::Puzzle &puzzle) const;
+  Image render_board(const game::BoardGraph &board) const;
 
 private:
   class PIMPL;

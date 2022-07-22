@@ -38,7 +38,7 @@ static constexpr auto alpha_tag = gil::alpha_t();
 ImageImpl::ImageImpl()
   : ImageImpl(0, 0) {}
 
-ImageImpl::ImageImpl(uint16_t width, uint16_t height)
+ImageImpl::ImageImpl(uint32_t width, uint32_t height)
   : m_img(width, height) {}
 
 void ImageImpl::swap(ImageImpl &img) { m_img.swap(img.m_img); }
@@ -51,9 +51,9 @@ ImageImpl::ImageImpl(ImageImpl &&rv)                 = default;
 ImageImpl &ImageImpl::operator=(ImageImpl &&rv)      = default;
 ImageImpl::~ImageImpl()                              = default;
 
-int ImageImpl::width() const { return m_img.width(); }
+uint32_t ImageImpl::width() const { return m_img.width(); }
 
-int ImageImpl::height() const { return m_img.height(); }
+uint32_t ImageImpl::height() const { return m_img.height(); }
 
 void ImageImpl::load(const string &path) {
   bool maybe_png = boost::ends_with(boost::to_lower_copy(path), ".png");
@@ -168,17 +168,18 @@ void ImageImpl::subtract(const ImageImpl &bottom) {
     );
   }
 
-  // auto non_fuzzy_eq = [](const rgba8_pixel_t &lv, const rgba8_pixel_t &rv, int delta)
+  // auto non_fuzzy_eq = [](const rgba8_pixel_t &lv, const rgba8_pixel_t &rv, uint32_t
+  // delta)
   // {
   //   return (get_color(lv, red_tag) == get_color(rv, red_tag))
   //       && (get_color(lv, blue_tag) == get_color(rv, blue_tag))
   //       && (get_color(lv, green_tag) == get_color(rv, green_tag));
   // };
 
-  auto fuzzy_eq = [](const rgba8_pixel_t &lv, const rgba8_pixel_t &rv, int delta) {
-    auto component_in_range = [&](int s, int d) {
-      int low = d > delta ? d - delta : 0;
-      int hi  = d + delta >= 255 ? 255 : d + delta;
+  auto fuzzy_eq = [](const rgba8_pixel_t &lv, const rgba8_pixel_t &rv, uint32_t delta) {
+    auto component_in_range = [&](uint32_t s, uint32_t d) {
+      uint32_t low = d > delta ? d - delta : 0;
+      uint32_t hi  = d + delta >= 255 ? 255 : d + delta;
       return s >= low && s <= hi;
     };
 
@@ -193,11 +194,11 @@ void ImageImpl::subtract(const ImageImpl &bottom) {
   // auto eq = non_fuzzy_eq;
   auto eq = fuzzy_eq;
 
-  for (int y = 0; y < h; ++y) {
+  for (uint32_t y = 0; y < h; ++y) {
     boost::gil::rgba8_ptr_t  top_it    = top_v.row_begin(y);
     boost::gil::rgba8c_ptr_t bottom_it = bottom_v.row_begin(y);
 
-    for (int x = 0; x < w; ++x) {
+    for (uint32_t x = 0; x < w; ++x) {
       rgba8_pixel_t       &p1 = top_it[x];
       const rgba8_pixel_t &p2 = bottom_it[x];
 
@@ -245,9 +246,9 @@ void ImageImpl::set_outer_pixels_transparent(const polygon_t &polygon) {
   // polygon_t, uint32_t>();
   // auto strategy = boost::geometry::strategy::within::cartesian_point_box();
 
-  for (int y = 0; y < h; ++y) {
+  for (uint32_t y = 0; y < h; ++y) {
     boost::gil::rgba8_ptr_t it = img_v.row_begin(y);
-    for (int x = 0; x < w; ++x) {
+    for (uint32_t x = 0; x < w; ++x) {
       if (!boost::geometry::covered_by(pointf_t(x, y), polygon, strategy)) {
         get_color(it[x], alpha_tag) = 0;
       }
@@ -255,7 +256,7 @@ void ImageImpl::set_outer_pixels_transparent(const polygon_t &polygon) {
   }
 }
 
-pixel_t ImageImpl::pixel(size_t x, size_t y) const {
+pixel_t ImageImpl::pixel(uint32_t x, uint32_t y) const {
   rgba8_pixel_t pixel = *(gil::const_view(m_img).at(x, y));
   return pixel_t(
     get_color(pixel, red_tag),
@@ -263,6 +264,44 @@ pixel_t ImageImpl::pixel(size_t x, size_t y) const {
     get_color(pixel, blue_tag),
     get_color(pixel, alpha_tag)
   );
+}
+
+void ImageImpl::copy(const ImageImpl &src, const point_t &top_left) {
+  gil::copy_pixels(
+    gil::const_view(src.m_img),
+    gil::subimage_view(
+      gil::view(m_img), top_left.x(), top_left.y(), src.width(), src.height()
+    )
+  );
+}
+
+void ImageImpl::copy(const Image &src, const point_t &top_left) {
+  copy(*src.m_impl, top_left);
+}
+
+void ImageImpl::overlay(const ImageImpl &src, const point_t &top_left) {
+  auto top_v    = gil::const_view(src.m_img);
+  auto bottom_v = gil::subimage_view(
+    gil::view(m_img), top_left.x(), top_left.y(), src.width(), src.height()
+  );
+
+  auto w = src.m_img.width();
+  auto h = src.m_img.height();
+
+  for (int y = 0; y < h; ++y) {
+    boost::gil::rgba8c_ptr_t top_it    = top_v.row_begin(y);
+    boost::gil::rgba8_ptr_t  bottom_it = bottom_v.row_begin(y);
+
+    for (int x = 0; x < w; ++x) {
+      // should actually be multiplied, but this is good enough for our needs
+      if (get_color(top_it[x], alpha_tag) == 255)
+        bottom_it[x] = top_it[x];
+    }
+  }
+}
+
+void ImageImpl::overlay(const Image &src, const point_t &top_left) {
+  overlay(*src.m_impl, top_left);
 }
 
 } // namespace implementation

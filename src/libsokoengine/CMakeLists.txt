@@ -314,7 +314,7 @@ set_target_properties(benchmarks
 # skindump utility
 # ..................
 add_executable(skindump skindump.cpp)
-target_link_libraries(skindump PRIVATE sokoengine_obj)
+target_link_libraries(skindump PRIVATE sokoengine)
 target_link_libraries(skindump PRIVATE CLI11::CLI11)
 
 # add_valgrind_profile_dump_target(playground)

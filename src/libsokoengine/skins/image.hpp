@@ -24,7 +24,6 @@ struct LIBSOKOENGINE_API pixel_t {
 ///
 /// Read only, 8 bit, RGBA image.
 ///
-/// - image loading from PNG and BMP formats
 /// - read-only access to individual pixels
 /// - image saving into PNG
 ///
@@ -42,10 +41,10 @@ public:
 
   void swap(Image &img);
 
-  size_t  width() const;
-  size_t  height() const;
-  pixel_t pixel(size_t x, size_t y) const;
-  bool    is_empty() const;
+  uint32_t width() const;
+  uint32_t height() const;
+  pixel_t  pixel(uint32_t x, uint32_t y) const;
+  bool     is_empty() const;
 
   ///
   /// Saves image to @a path

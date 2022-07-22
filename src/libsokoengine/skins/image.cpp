@@ -28,11 +28,11 @@ void Image::save(const std::string &path) const { m_impl->save(path); }
 
 void Image::save(std::ostream &dest) const { m_impl->save(dest); }
 
-size_t Image::width() const { return m_impl->width(); }
+uint32_t Image::width() const { return m_impl->width(); }
 
-size_t Image::height() const { return m_impl->height(); }
+uint32_t Image::height() const { return m_impl->height(); }
 
-pixel_t Image::pixel(size_t x, size_t y) const { return m_impl->pixel(x, y); }
+pixel_t Image::pixel(uint32_t x, uint32_t y) const { return m_impl->pixel(x, y); }
 
 void Image::swap(Image &img) { m_impl.swap(img.m_impl); }
 

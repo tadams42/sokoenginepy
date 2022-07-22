@@ -1,9 +1,13 @@
 #include "skin.hpp"
 
+#include "board_cell.hpp"
+#include "board_graph.hpp"
 #include "common_skins_format.hpp"
 #include "geometry.hpp"
 #include "image.hpp"
 #include "image_impl.hpp"
+#include "puzzle.hpp"
+#include "tessellation.hpp"
 
 #include <boost/algorithm/string.hpp>
 
@@ -477,60 +481,82 @@ Skin::point_t Skin::tile_position(
 bool Skin::is_empty() const { return m_impl->is_empty(); }
 
 vector<CellOrientation> Skin::cell_orientations() const {
-  return m_impl->m_format->cell_orientations();
+  vector<CellOrientation> retv;
+  for (const auto &[k, v] : m_impl->m_tilesets) {
+    retv.push_back(k);
+  }
+  return retv;
 }
 
 const Image &Skin::floor(CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).floor;
 }
 
 const Image &Skin::non_playable_floor(CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).non_playable_floor;
 }
 
 const Image &Skin::goal(CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).goal;
 }
 
 const Image &Skin::pusher(CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).pusher;
 }
 
+const Image &Skin::pusher(Direction looking_at, CellOrientation orientation) const {
+  const auto &tileset = m_impl->m_tilesets.at(orientation);
+
+  auto found = tileset.directional_pushers.find(looking_at);
+  if (found != tileset.directional_pushers.cend()) {
+    return tileset.directional_pushers.at(looking_at);
+  } else {
+    return tileset.pusher;
+  }
+}
+
 const Image &Skin::pusher_on_goal(CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).pusher_on_goal;
 }
 
+const Image &
+Skin::pusher_on_goal(Direction looking_at, CellOrientation orientation) const {
+  const auto &tileset = m_impl->m_tilesets.at(orientation);
+
+  auto found = tileset.directional_pushers_on_goal.find(looking_at);
+  if (found != tileset.directional_pushers_on_goal.cend()) {
+    return tileset.directional_pushers_on_goal.at(looking_at);
+  } else {
+    return tileset.pusher_on_goal;
+  }
+}
+
 const Image &Skin::box(CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).box;
 }
 
 const Image &Skin::box_on_goal(CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).box_on_goal;
 }
 
 const Image &Skin::wall(CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).wall;
 }
 
+const Image &
+Skin::wall(const Directions &neighbor_walls, CellOrientation orientation) const {
+  const auto &tileset = m_impl->m_tilesets.at(orientation);
+
+  for (const auto &candidate : tileset.directional_walls) {
+    if (candidate.first == neighbor_walls) {
+      return candidate.second;
+    }
+  }
+
+  return tileset.wall;
+}
+
 const Image &Skin::wall_cap(CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).wall_cap;
 }
 
@@ -539,22 +565,9 @@ const Skin::directional_pushers_t &Skin::directional_pushers(CellOrientation ori
   return m_impl->m_tilesets.at(orientation).directional_pushers;
 }
 
-const Image &Skin::pusher(Direction looking_at, CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
-  return m_impl->m_tilesets.at(orientation).directional_pushers.at(looking_at);
-}
-
 const Skin::directional_pushers_t &
 Skin::directional_pushers_on_goal(CellOrientation orientation) const {
   return m_impl->m_tilesets.at(orientation).directional_pushers_on_goal;
-}
-
-const Image &
-Skin::pusher_on_goal(Direction looking_at, CellOrientation orientation) const {
-  if (is_empty())
-    return m_impl->m_empty_image;
-  return m_impl->m_tilesets.at(orientation).directional_pushers_on_goal.at(looking_at);
 }
 
 const Skin::directional_walls_t &Skin::directional_walls(CellOrientation orientation
@@ -732,6 +745,60 @@ void Skin::dump_tiles(const std::string &dir) const {
       save(m_impl->m_original_tiles[r][c], src_tile_path(r, c));
     }
   }
+}
+
+Image Skin::render_board(const io::Puzzle &puzzle) const {
+  BoardGraph g(puzzle);
+  return render_board(g);
+}
+
+Image Skin::render_board(const game::BoardGraph &board) const {
+  uint16_t w = static_cast<uint16_t>(board.board_width());
+  uint16_t h = static_cast<uint16_t>(board.board_height());
+
+  ImageImpl retv(w * tile_width(), h * tile_height());
+
+  const_cast<BoardGraph &>(board).mark_play_area();
+
+  for (size_t row = 0; row < h; ++row) {
+    for (size_t col = 0; col < w; ++col) {
+      position_t       pos         = index_1d(col, row, w);
+      point_t          corner      = tile_position(pos, w, h);
+      CellOrientation  orientation = board.cell_orientation(pos);
+      const BoardCell &cell        = board[pos];
+      const Image     *selected    = nullptr;
+
+      implementation::point_t top_left(corner.first, corner.second);
+
+      if (cell.is_wall()) {
+        selected = &wall(board.wall_neighbor_directions(pos), orientation);
+      } else if (!cell.is_in_playable_area()) {
+        selected = &non_playable_floor(orientation);
+      } else if (cell.has_goal()) {
+        selected = &goal(orientation);
+      } else {
+        selected = &floor(orientation);
+      }
+      retv.copy(*selected, top_left);
+      selected = nullptr;
+
+      if (cell.has_box() && cell.has_goal()) {
+        selected = &box_on_goal(orientation);
+      } else if (cell.has_pusher() && cell.has_goal()) {
+        selected = &pusher_on_goal(orientation);
+      } else if (cell.has_pusher()) {
+        selected = &pusher(orientation);
+      } else if (cell.has_box()) {
+        selected = &box(orientation);
+      }
+      if (selected)
+        retv.overlay(*selected, top_left);
+    }
+  }
+
+  Image img;
+  retv.swap(img);
+  return img;
 }
 
 } // namespace skins
