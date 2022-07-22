@@ -15,6 +15,22 @@ HexobanCommonSkinsFormat::~HexobanCommonSkinsFormat() = default;
 OctobanCommonSkinsFormat::~OctobanCommonSkinsFormat() = default;
 TriobanCommonSkinsFormat::~TriobanCommonSkinsFormat() = default;
 
+std::unique_ptr<CommonSkinsFormat> SokobanCommonSkinsFormat::clone() const {
+  return std::make_unique<SokobanCommonSkinsFormat>();
+}
+
+std::unique_ptr<CommonSkinsFormat> HexobanCommonSkinsFormat::clone() const {
+  return std::make_unique<HexobanCommonSkinsFormat>();
+}
+
+std::unique_ptr<CommonSkinsFormat> OctobanCommonSkinsFormat::clone() const {
+  return std::make_unique<OctobanCommonSkinsFormat>();
+}
+
+std::unique_ptr<CommonSkinsFormat> TriobanCommonSkinsFormat::clone() const {
+  return std::make_unique<TriobanCommonSkinsFormat>();
+}
+
 tile_sizes_t CommonSkinsFormat::guess_tile_sizes(
   uint16_t img_width,
   uint16_t img_height,
@@ -140,13 +156,21 @@ tile_sizes_t CommonSkinsFormat::guess_tile_sizes(
   retv.columns_count        = cols_count;
   retv.rows_count           = rows_count;
 
-  auto box =
-    bounding_rect(tile_polygon(col_width, col_height, CellOrientation::DEFAULT))
-      .to_aligned_rect();
-  retv.tile_height = box.height();
-  retv.tile_width  = box.width();
-
   return retv;
+}
+
+std::vector<CellOrientation> CommonSkinsFormat::cell_orientations() const {
+  return std::vector<CellOrientation>{CellOrientation::DEFAULT};
+}
+
+std::vector<CellOrientation> TriobanCommonSkinsFormat::cell_orientations() const {
+  return std::vector<CellOrientation>{
+    CellOrientation::DEFAULT, CellOrientation::TRIANGLE_DOWN};
+}
+
+std::vector<CellOrientation> OctobanCommonSkinsFormat::cell_orientations() const {
+  return std::vector<CellOrientation>{
+    CellOrientation::DEFAULT, CellOrientation::OCTAGON};
 }
 
 map<CellOrientation, tile_map_t>

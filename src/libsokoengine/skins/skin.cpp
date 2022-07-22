@@ -7,6 +7,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+using sokoengine::implementation::bounding_rect;
 using sokoengine::implementation::CommonSkinsFormat;
 using sokoengine::implementation::HexobanCommonSkinsFormat;
 using sokoengine::implementation::ImageImpl;
@@ -67,19 +68,22 @@ public:
   Tessellation                  m_tessellation;
   unique_ptr<CommonSkinsFormat> m_format;
 
-  string  m_path;
-  uint8_t m_rows_count_hint, m_cols_count_hint;
+  string m_path;
 
-  uint16_t m_original_tile_height;
-  uint16_t m_original_tile_width;
-  uint16_t m_tile_width;
-  uint16_t m_tile_height;
-  uint16_t m_rows_count;
-  uint16_t m_columns_count;
+  uint8_t  m_rows_count_hint      = 0;
+  uint8_t  m_cols_count_hint      = 0;
+  uint16_t m_original_tile_width  = 0;
+  uint16_t m_original_tile_height = 0;
+  uint16_t m_tile_width           = 0;
+  uint16_t m_tile_height          = 0;
+  uint16_t m_rows_count           = 0;
+  uint16_t m_columns_count        = 0;
 
   tiles_matrix_t                                  m_original_tiles;
   map<CellOrientation, implementation::polygon_t> m_polygons;
   map<CellOrientation, tileset_t>                 m_tilesets;
+
+  Image m_empty_image;
 
   PIMPL(
     Tessellation  tessellation,
@@ -127,12 +131,72 @@ public:
     apply_tiles(raw_tiles);
   }
 
-  PIMPL(const PIMPL &)            = delete;
-  PIMPL &operator=(const PIMPL &) = delete;
-  PIMPL(PIMPL &&)                 = default;
-  PIMPL &operator=(PIMPL &&)      = default;
-  ~PIMPL()                        = default;
+  PIMPL(
+    Tessellation tessellation,
+    uint16_t     original_tile_width,
+    uint16_t     original_tile_height
+  )
+    : m_tessellation(tessellation)
+    , m_original_tile_width(original_tile_width)
+    , m_original_tile_height(original_tile_height) {
+    init_format();
+    init_tile_sizes();
 
+    for (auto orientation : m_format->cell_orientations()) {
+      m_polygons.try_emplace(
+        orientation,
+        m_format->tile_polygon(
+          m_original_tile_width, m_original_tile_height, orientation
+        )
+      );
+    }
+  }
+
+  PIMPL(const PIMPL &rv)
+    : m_tessellation(rv.m_tessellation)
+    , m_format(rv.m_format->clone())
+    , m_path(rv.m_path)
+    , m_rows_count_hint(rv.m_rows_count_hint)
+    , m_cols_count_hint(rv.m_cols_count_hint)
+    , m_original_tile_width(rv.m_original_tile_width)
+    , m_original_tile_height(rv.m_original_tile_height)
+    , m_tile_width(rv.m_tile_width)
+    , m_tile_height(rv.m_tile_height)
+    , m_rows_count(rv.m_rows_count)
+    , m_columns_count(rv.m_columns_count)
+    , m_original_tiles(rv.m_original_tiles)
+    , m_polygons(rv.m_polygons)
+    , m_tilesets(rv.m_tilesets) {}
+
+  PIMPL &operator=(const PIMPL &rv) {
+    if (this != &rv) {
+      m_tessellation         = rv.m_tessellation;
+      m_format               = rv.m_format->clone();
+      m_path                 = rv.m_path;
+      m_rows_count_hint      = rv.m_rows_count_hint;
+      m_cols_count_hint      = rv.m_cols_count_hint;
+      m_original_tile_width  = rv.m_original_tile_width;
+      m_original_tile_height = rv.m_original_tile_height;
+      m_tile_width           = rv.m_tile_width;
+      m_tile_height          = rv.m_tile_height;
+      m_rows_count           = rv.m_rows_count;
+      m_columns_count        = rv.m_columns_count;
+      m_original_tiles       = rv.m_original_tiles;
+      m_polygons             = rv.m_polygons;
+      m_tilesets             = rv.m_tilesets;
+    }
+    return *this;
+  }
+
+  PIMPL(PIMPL &&)            = default;
+  PIMPL &operator=(PIMPL &&) = default;
+  ~PIMPL()                   = default;
+
+  bool is_empty() const {
+    return m_original_tiles.size() == 0 || m_tilesets.size() == 0;
+  }
+
+private:
   void apply_tiles(raw_tiles_t &from) {
     auto raw_tiles = m_format->categorize_tiles(from);
 
@@ -270,10 +334,9 @@ public:
     );
     m_original_tile_width  = sizes.original_tile_width;
     m_original_tile_height = sizes.original_tile_height;
-    m_tile_width           = sizes.tile_width;
-    m_tile_height          = sizes.tile_height;
     m_rows_count           = sizes.rows_count;
     m_columns_count        = sizes.columns_count;
+    init_tile_sizes();
 
     for (size_t row = 0; row < m_rows_count; ++row) {
       into.emplace_back(m_columns_count);
@@ -289,6 +352,17 @@ public:
         row_data[column] = from.subimage(tile_rect);
       }
     }
+  }
+
+  void init_tile_sizes() {
+    auto box = bounding_rect(m_format->tile_polygon(
+                               m_original_tile_width,
+                               m_original_tile_height,
+                               CellOrientation::DEFAULT
+                             ))
+                 .to_aligned_rect();
+    m_tile_height = box.height();
+    m_tile_width  = box.width();
   }
 
   void init_format() {
@@ -339,6 +413,23 @@ Skin::Skin(
     tessellation, src, format, rows_count_hint, columns_count_hint
   )) {}
 
+Skin::Skin(
+  Tessellation tessellation, uint16_t original_tile_width, uint16_t original_tile_height
+)
+  : m_impl(
+    std::make_unique<PIMPL>(tessellation, original_tile_width, original_tile_height)
+  ) {}
+
+Skin::Skin(const Skin &rv)
+  : m_impl(std::make_unique<PIMPL>(*rv.m_impl)) {}
+
+Skin &Skin::operator=(const Skin &rv) {
+  if (this != &rv) {
+    m_impl = std::make_unique<PIMPL>(*rv.m_impl);
+  };
+  return *this;
+}
+
 Skin::Skin(Skin &&)            = default;
 Skin &Skin::operator=(Skin &&) = default;
 Skin::~Skin()                  = default;
@@ -383,47 +474,63 @@ Skin::point_t Skin::tile_position(
   return std::make_pair(p.x(), p.y());
 }
 
+bool Skin::is_empty() const { return m_impl->is_empty(); }
+
 vector<CellOrientation> Skin::cell_orientations() const {
-  vector<CellOrientation> retv;
-  for (const auto &[key, value] : m_impl->m_tilesets) {
-    retv.push_back(key);
-  }
-  return retv;
+  return m_impl->m_format->cell_orientations();
 }
 
 const Image &Skin::floor(CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).floor;
 }
 
 const Image &Skin::non_playable_floor(CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).non_playable_floor;
 }
 
 const Image &Skin::goal(CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).goal;
 }
 
 const Image &Skin::pusher(CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).pusher;
 }
 
 const Image &Skin::pusher_on_goal(CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).pusher_on_goal;
 }
 
 const Image &Skin::box(CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).box;
 }
 
 const Image &Skin::box_on_goal(CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).box_on_goal;
 }
 
 const Image &Skin::wall(CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).wall;
 }
 
 const Image &Skin::wall_cap(CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).wall_cap;
 }
 
@@ -433,6 +540,8 @@ const Skin::directional_pushers_t &Skin::directional_pushers(CellOrientation ori
 }
 
 const Image &Skin::pusher(Direction looking_at, CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).directional_pushers.at(looking_at);
 }
 
@@ -443,6 +552,8 @@ Skin::directional_pushers_on_goal(CellOrientation orientation) const {
 
 const Image &
 Skin::pusher_on_goal(Direction looking_at, CellOrientation orientation) const {
+  if (is_empty())
+    return m_impl->m_empty_image;
   return m_impl->m_tilesets.at(orientation).directional_pushers_on_goal.at(looking_at);
 }
 

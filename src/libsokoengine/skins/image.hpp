@@ -31,7 +31,6 @@ struct LIBSOKOENGINE_API pixel_t {
 /// It is simple and limited in features by design. Intended to be used as image data
 /// storage for small images of Sokoban skins.
 ///
-///
 class LIBSOKOENGINE_API Image {
 public:
   Image();

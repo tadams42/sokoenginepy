@@ -114,8 +114,21 @@ public:
     uint8_t       rows_count_hint    = 0,
     uint8_t       columns_count_hint = 0
   );
-  Skin(const Skin &)            = delete;
-  Skin &operator=(const Skin &) = delete;
+
+  ///
+  /// Constructs empty skin.
+  ///
+  /// Empty skin doesn't have any image data but is able to give correct info on tile
+  /// sizes, cell orientations and tile polygons.
+  ///
+  Skin(
+    Tessellation tessellation,
+    uint16_t     original_tile_width,
+    uint16_t     original_tile_height
+  );
+
+  Skin(const Skin &);
+  Skin &operator=(const Skin &);
   Skin(Skin &&);
   Skin &operator=(Skin &&);
   ~Skin();
@@ -192,6 +205,14 @@ public:
   /// All cell orientations for which this skin has tile images.
   ///
   std::vector<CellOrientation> cell_orientations() const;
+
+  ///
+  /// Empty skin doesn't have any image data but is able to give correct info on tile
+  /// sizes, cell orientations and tile polygons.
+  ///
+  /// Methods returning tile images will return empty images.
+  ///
+  bool is_empty() const;
 
   ///
   /// Cropped and processed tile image for board floor.

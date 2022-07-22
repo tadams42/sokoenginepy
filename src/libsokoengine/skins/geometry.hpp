@@ -2,8 +2,8 @@
 #define GEOMETRY_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
 #include "sokoengine_config.hpp"
-#include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 
 namespace sokoengine {
 namespace implementation {
