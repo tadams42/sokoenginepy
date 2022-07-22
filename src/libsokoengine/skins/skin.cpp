@@ -16,6 +16,7 @@ using sokoengine::implementation::SokobanCommonSkinsFormat;
 using sokoengine::implementation::tile_map_t;
 using sokoengine::implementation::tile_sizes_t;
 using sokoengine::implementation::TriobanCommonSkinsFormat;
+using std::istream;
 using std::map;
 using std::string;
 using std::unique_ptr;
@@ -91,8 +92,38 @@ public:
     , m_rows_count_hint(rows_count_hint)
     , m_cols_count_hint(columns_count_hint) {
     init_format();
+
     raw_tiles_t raw_tiles;
-    slice_tiles(raw_tiles);
+
+    {
+      ImageImpl img;
+      img.load(m_path);
+      slice_tiles(img, raw_tiles);
+    }
+
+    apply_tiles(raw_tiles);
+  }
+
+  PIMPL(
+    Tessellation tessellation,
+    istream     &src,
+    ImageFormats format,
+    uint8_t      rows_count_hint,
+    uint8_t      columns_count_hint
+  )
+    : m_tessellation(tessellation)
+    , m_rows_count_hint(rows_count_hint)
+    , m_cols_count_hint(columns_count_hint) {
+    init_format();
+
+    raw_tiles_t raw_tiles;
+
+    {
+      ImageImpl img;
+      img.load(src, format);
+      slice_tiles(img, raw_tiles);
+    }
+
     apply_tiles(raw_tiles);
   }
 
@@ -233,11 +264,9 @@ public:
     }
   }
 
-  void slice_tiles(raw_tiles_t &into) {
-    ImageImpl img;
-    img.load(m_path);
+  void slice_tiles(ImageImpl &from, raw_tiles_t &into) {
     tile_sizes_t sizes = m_format->guess_tile_sizes(
-      img.width(), img.height(), m_rows_count_hint, m_cols_count_hint
+      from.width(), from.height(), m_rows_count_hint, m_cols_count_hint
     );
     m_original_tile_width  = sizes.original_tile_width;
     m_original_tile_height = sizes.original_tile_height;
@@ -257,7 +286,7 @@ public:
           m_original_tile_width,
           m_original_tile_height
         );
-        row_data[column] = img.subimage(tile_rect);
+        row_data[column] = from.subimage(tile_rect);
       }
     }
   }
@@ -298,6 +327,17 @@ Skin::Skin(
   : m_impl(
     std::make_unique<PIMPL>(tessellation, path, rows_count_hint, columns_count_hint)
   ) {}
+
+Skin::Skin(
+  Tessellation tessellation,
+  istream     &src,
+  ImageFormats format,
+  uint8_t      rows_count_hint,
+  uint8_t      columns_count_hint
+)
+  : m_impl(std::make_unique<PIMPL>(
+    tessellation, src, format, rows_count_hint, columns_count_hint
+  )) {}
 
 Skin::Skin(Skin &&)            = default;
 Skin &Skin::operator=(Skin &&) = default;

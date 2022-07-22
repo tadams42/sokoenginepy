@@ -1,6 +1,7 @@
 #ifndef IMAGE_BACKEND_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define IMAGE_BACKEND_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
+#include "game_config.hpp"
 #include "geometry.hpp"
 
 #include <boost/gil/image.hpp>
@@ -44,7 +45,14 @@ public:
   ///
   void load(const std::string &path);
 
-  void load(const std::istream &stream);
+  ///
+  /// Loads .png or .bmp image from @a src.
+  ///
+  /// @throws std::invalid_argument if @a src can't be loaded for any reason:
+  ///   - file doesn't contain correct image format (only PNG and BMP are supported)
+  ///   -...
+  ///
+  void load(std::istream &src, ImageFormats format);
 
   ///
   /// Saves image to @a path
@@ -52,6 +60,13 @@ public:
   /// Saving format is always PNG, regardless of file name in @a path.
   ///
   void save(const std::string &path) const;
+
+  ///
+  /// Saves image to @a dest
+  ///
+  /// Saving format is always PNG.
+  ///
+  void save(std::ostream &dest) const;
 
   ///
   /// Copies this image pixels that are inside of @a rect into new image.

@@ -7,6 +7,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <fstream>
+#include <sstream>
 
 namespace sokoengine {
 namespace io {

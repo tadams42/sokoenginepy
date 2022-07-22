@@ -3,13 +3,18 @@
 #include "image.hpp"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/geometry/strategies/default_strategy.hpp>
 #include <boost/gil/extension/io/bmp.hpp>
 #include <boost/gil/extension/io/png.hpp>
 #include <boost/gil/pixel.hpp>
 #include <boost/gil/rgba.hpp>
+#include <fstream>
 
-#include <boost/geometry/strategies/default_strategy.hpp>
-
+using std::ifstream;
+using std::ios;
+using std::istream;
+using std::ofstream;
+using std::ostream;
 using std::string;
 
 namespace gil       = boost::gil;
@@ -46,41 +51,65 @@ int ImageImpl::width() const { return m_img.width(); }
 
 int ImageImpl::height() const { return m_img.height(); }
 
-void ImageImpl::load(const std::string &path) {
+void ImageImpl::load(const string &path) {
   bool maybe_png = boost::ends_with(boost::to_lower_copy(path), ".png");
   bool maybe_bmp = boost::ends_with(boost::to_lower_copy(path), ".bmp");
 
-  if (!maybe_bmp and !maybe_png) {
+  if (!maybe_bmp && !maybe_png) {
     throw std::invalid_argument("Only supports loading PNG and BMP images!");
   }
 
-  try {
-    if (maybe_png) {
-      m_img = image_t();
+  ifstream src(path, ios::binary);
 
-      gil::image_read_settings<gil::png_tag> png_settings;
-      png_settings._read_transparency_data   = true;
-      png_settings._read_background          = true;
-      png_settings._read_physical_resolution = true;
-
-      gil::read_and_convert_image(path, m_img, png_settings);
-    } else if (maybe_bmp) {
-      m_img = image_t();
-
-      gil::image_read_settings<gil::bmp_tag> bmp_settings;
-      gil::read_and_convert_image(path, m_img, bmp_settings);
-    }
-  } catch (std::ios_base::failure &e) {
-    throw std::invalid_argument(
-      "Failed loading image " + path
-      + ". Check file permissions and also note that only PNG and BMP images are "
-      + "supported. (" + e.what() + ")"
-    );
+  if (maybe_png) {
+    load(src, ImageFormats::PNG);
+  } else if (maybe_bmp) {
+    load(src, ImageFormats::PNG);
   }
 }
 
-void ImageImpl::save(const std::string &path) const {
-  gil::write_view(path, gil::const_view(m_img), gil::png_tag{});
+void ImageImpl::load(istream &src, ImageFormats format) {
+  bool found = false;
+
+  gil::image_read_settings<gil::png_tag> png_settings;
+  gil::image_read_settings<gil::bmp_tag> bmp_settings;
+
+  try {
+    switch (format) {
+      case ImageFormats::PNG:
+        png_settings._read_transparency_data   = true;
+        png_settings._read_background          = true;
+        png_settings._read_physical_resolution = true;
+        m_img                                  = image_t();
+        gil::read_and_convert_image(src, m_img, png_settings);
+        found = true;
+        break;
+      case ImageFormats::BMP:
+        m_img = image_t();
+        gil::read_and_convert_image(src, m_img, bmp_settings);
+        found = true;
+        break;
+        // Don't use default: to get compiler warning
+    }
+  } catch (ios::failure &e) {
+    throw std::invalid_argument(
+      string("Failed loading image. Check file permissions and also note that ")
+      + "only PNG and BMP images are supported. (" + e.what() + ")"
+    );
+  }
+
+  if (!found) {
+    throw std::invalid_argument("Unknown image format!");
+  }
+}
+
+void ImageImpl::save(const string &path) const {
+  ofstream dest(path, ios::binary);
+  save(dest);
+}
+
+void ImageImpl::save(ostream &dest) const {
+  gil::write_view(dest, gil::const_view(m_img), gil::png_tag{});
 }
 
 ImageImpl ImageImpl::subimage(const rect_t &rect) const {

@@ -3,6 +3,7 @@
 
 #include "cell_orientation.hpp"
 #include "direction.hpp"
+#include "game_config.hpp"
 #include "tessellation.hpp"
 
 namespace sokoengine {
@@ -91,6 +92,27 @@ public:
     const std::string &path,
     uint8_t            rows_count_hint    = 0,
     uint8_t            columns_count_hint = 0
+  );
+
+  ///
+  /// Loads skin image from input stream.
+  ///
+  /// Expects skin to be in "Common skins format.". Supports only BMP and PNG files.
+  ///
+  /// Guesses number of tile rows and columns. To override this guesswork, use @a
+  /// rows_count_hint and/or @a columns_count_hint.
+  ///
+  /// @throws std::invalid_argument if @a path can't be loaded for any reason:
+  ///   - file doesn't exist / can't be read
+  ///   - file doesn't contain correct image format (only PNG and BMP are supported)
+  ///   -...
+  ///
+  Skin(
+    Tessellation  tessellation,
+    std::istream &src,
+    ImageFormats  format             = ImageFormats::PNG,
+    uint8_t       rows_count_hint    = 0,
+    uint8_t       columns_count_hint = 0
   );
   Skin(const Skin &)            = delete;
   Skin &operator=(const Skin &) = delete;

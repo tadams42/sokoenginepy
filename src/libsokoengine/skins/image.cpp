@@ -26,6 +26,8 @@ Image::~Image()                     = default;
 
 void Image::save(const std::string &path) const { m_impl->save(path); }
 
+void Image::save(std::ostream &dest) const { m_impl->save(dest); }
+
 size_t Image::width() const { return m_impl->width(); }
 
 size_t Image::height() const { return m_impl->height(); }

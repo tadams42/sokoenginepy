@@ -55,6 +55,13 @@ public:
   ///
   void save(const std::string &path) const;
 
+  ///
+  /// Saves image to @a dest
+  ///
+  /// Format is always PNG.
+  ///
+  void save(std::ostream &dest) const;
+
 private:
   std::unique_ptr<implementation::ImageImpl> m_impl;
   friend class implementation::ImageImpl;
