@@ -3,6 +3,11 @@
 #include "image.hpp"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/geometry/algorithms/covered_by.hpp>
+#include <boost/geometry/algorithms/within.hpp>
+#include <boost/geometry/strategies/cartesian/point_in_poly_crossings_multiply.hpp>
+#include <boost/geometry/strategies/cartesian/point_in_poly_franklin.hpp>
+#include <boost/geometry/strategies/cartesian/point_in_poly_winding.hpp>
 #include <boost/geometry/strategies/default_strategy.hpp>
 #include <boost/gil/extension/io/bmp.hpp>
 #include <boost/gil/extension/io/png.hpp>
@@ -25,11 +30,10 @@ using gil::get_color;
 namespace sokoengine {
 namespace implementation {
 
-static constexpr auto red_tag      = gil::red_t();
-static constexpr auto green_tag    = gil::green_t();
-static constexpr auto blue_tag     = gil::blue_t();
-static constexpr auto alpha_tag    = gil::alpha_t();
-static constexpr auto strategy_tag = boost::geometry::default_strategy();
+static constexpr auto red_tag   = gil::red_t();
+static constexpr auto green_tag = gil::green_t();
+static constexpr auto blue_tag  = gil::blue_t();
+static constexpr auto alpha_tag = gil::alpha_t();
 
 ImageImpl::ImageImpl()
   : ImageImpl(0, 0) {}
@@ -64,42 +68,39 @@ void ImageImpl::load(const string &path) {
   if (maybe_png) {
     load(src, ImageFormats::PNG);
   } else if (maybe_bmp) {
-    load(src, ImageFormats::PNG);
+    load(src, ImageFormats::BMP);
   }
 }
 
 void ImageImpl::load(istream &src, ImageFormats format) {
-  bool found = false;
+  if (format != ImageFormats::PNG && format != ImageFormats::BMP) {
+    throw std::invalid_argument("Only BMP and PNG format images are supported!");
+  }
 
   gil::image_read_settings<gil::png_tag> png_settings;
+  png_settings._read_transparency_data   = true;
+  png_settings._read_background          = true;
+  png_settings._read_physical_resolution = true;
+
   gil::image_read_settings<gil::bmp_tag> bmp_settings;
+
+  m_img = image_t();
 
   try {
     switch (format) {
       case ImageFormats::PNG:
-        png_settings._read_transparency_data   = true;
-        png_settings._read_background          = true;
-        png_settings._read_physical_resolution = true;
-        m_img                                  = image_t();
         gil::read_and_convert_image(src, m_img, png_settings);
-        found = true;
         break;
       case ImageFormats::BMP:
-        m_img = image_t();
+      default:
         gil::read_and_convert_image(src, m_img, bmp_settings);
-        found = true;
         break;
-        // Don't use default: to get compiler warning
     }
   } catch (ios::failure &e) {
     throw std::invalid_argument(
       string("Failed loading image. Check file permissions and also note that ")
       + "only PNG and BMP images are supported. (" + e.what() + ")"
     );
-  }
-
-  if (!found) {
-    throw std::invalid_argument("Unknown image format!");
   }
 }
 
@@ -237,10 +238,17 @@ void ImageImpl::set_outer_pixels_transparent(const polygon_t &polygon) {
   auto w     = img_v.width();
   auto h     = img_v.height();
 
+  // auto strategy = boost::geometry::default_strategy();
+  auto strategy =
+    boost::geometry::strategy::within::franklin<point_t, polygon_t, uint64_t>();
+  // auto strategy = boost::geometry::strategy::within::crossings_multiply<point_t,
+  // polygon_t, uint32_t>();
+  // auto strategy = boost::geometry::strategy::within::cartesian_point_box();
+
   for (int y = 0; y < h; ++y) {
     boost::gil::rgba8_ptr_t it = img_v.row_begin(y);
     for (int x = 0; x < w; ++x) {
-      if (!boost::geometry::within(pointf_t(x, y), polygon, strategy_tag)) {
+      if (!boost::geometry::covered_by(pointf_t(x, y), polygon, strategy)) {
         get_color(it[x], alpha_tag) = 0;
       }
     }
