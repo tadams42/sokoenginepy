@@ -5,7 +5,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::implementation::Strings;
+using sokoengine::implementation::strings_t;
 using std::make_unique;
 using std::string;
 using std::to_string;
@@ -15,14 +15,14 @@ namespace game {
 
 class LIBSOKOENGINE_LOCAL BoardState::PIMPL {
 public:
-  Positions     m_pushers_positions;
-  Positions     m_boxes_positions;
+  positions_t   m_pushers_positions;
+  positions_t   m_boxes_positions;
   zobrist_key_t m_zobrist_hash = BoardState::NO_HASH;
 
   PIMPL(
-    const Positions &pushers_positions,
-    const Positions &boxes_positions,
-    zobrist_key_t    zobrist_hash
+    const positions_t &pushers_positions,
+    const positions_t &boxes_positions,
+    zobrist_key_t      zobrist_hash
   )
     : m_pushers_positions(pushers_positions)
     , m_boxes_positions(boxes_positions)
@@ -35,9 +35,9 @@ public:
 }; // BoardState::PIMPL
 
 BoardState::BoardState(
-  const Positions &pushers_positions,
-  const Positions &boxes_positions,
-  zobrist_key_t    zobrist_hash
+  const positions_t &pushers_positions,
+  const positions_t &boxes_positions,
+  zobrist_key_t      zobrist_hash
 )
   : m_impl(make_unique<PIMPL>(pushers_positions, boxes_positions, zobrist_hash)) {}
 
@@ -65,17 +65,17 @@ bool BoardState::operator==(const BoardState &rv) const {
 
 bool BoardState::operator!=(const BoardState &rv) const { return !(*this == rv); }
 
-const Positions &BoardState::pushers_positions() const {
+const positions_t &BoardState::pushers_positions() const {
   return m_impl->m_pushers_positions;
 }
 
-Positions &BoardState::pushers_positions() { return m_impl->m_pushers_positions; }
+positions_t &BoardState::pushers_positions() { return m_impl->m_pushers_positions; }
 
-const Positions &BoardState::boxes_positions() const {
+const positions_t &BoardState::boxes_positions() const {
   return m_impl->m_boxes_positions;
 }
 
-Positions &BoardState::boxes_positions() { return m_impl->m_boxes_positions; }
+positions_t &BoardState::boxes_positions() { return m_impl->m_boxes_positions; }
 
 zobrist_key_t BoardState::zobrist_hash() const { return m_impl->m_zobrist_hash; }
 
@@ -84,8 +84,8 @@ zobrist_key_t &BoardState::zobrist_hash() { return m_impl->m_zobrist_hash; }
 string BoardState::str() const { return repr(); }
 
 string BoardState::repr() const {
-  auto converter = [&](const Positions &v) {
-    Strings retv;
+  auto converter = [&](const positions_t &v) {
+    strings_t retv;
     for (auto position : v)
       retv.push_back(to_string(position));
     return retv;

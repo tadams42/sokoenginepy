@@ -75,12 +75,11 @@ class Image;
 class LIBSOKOENGINE_API Skin {
 public:
   typedef std::vector<std::vector<Image>> tiles_t;
-  typedef std::map<Direction, Image>      directional_pushers_t;
-  typedef std::pair<Directions, Image>    directional_wall_t;
-  typedef std::vector<directional_wall_t> directional_walls_t;
   typedef std::vector<Image>              animation_frames_t;
   typedef std::pair<double, double>       point_t;
   typedef std::vector<point_t>            polygon_t;
+  typedef std::set<directions_t>          directional_walls_directions_t;
+  typedef std::set<Direction>             directional_pusher_directions_t;
 
   ///
   /// Loads skin image from file.
@@ -251,7 +250,7 @@ public:
   ///
   /// All CellOrientation for tessellation of this Skin.
   ///
-  CellOrientations cell_orientations() const;
+  cell_orientations_t cell_orientations() const;
 
   ///
   /// Empty skin doesn't have any image data but is able to give correct info on tile
@@ -319,7 +318,7 @@ public:
   /// wall.
   ///
   const Image &
-  wall(const Directions &neighbor_walls, CellOrientation orientation) const;
+  wall(const directions_t &neighbor_walls, CellOrientation orientation) const;
 
   ///
   /// Cropped and processed tile image for wall cap in skins that use directional
@@ -328,23 +327,23 @@ public:
   const Image &wall_cap(CellOrientation orientation) const;
 
   ///
-  /// Cropped and processed tile images for directional pusher.
-  /// Each image represents pusher looking in Direction.
+  /// All directions for which this skin has directional pusher image.
   ///
-  const directional_pushers_t &directional_pushers(CellOrientation orientation) const;
-
-  ///
-  /// Cropped and processed tile images for directional pusher.
-  /// Each image represents pusher looking in Direction.
-  ///
-  const directional_pushers_t &directional_pushers_on_goal(CellOrientation orientation
+  const directional_pusher_directions_t directional_pushers(CellOrientation orientation
   ) const;
 
   ///
-  /// Cropped and processed tile image for directional goal.
-  /// Each image represents wall having neighbor walls in given Directions.
+  /// All directions for which this skin has directional pusher on goal image.
   ///
-  const directional_walls_t &directional_walls(CellOrientation orientation) const;
+  const directional_pusher_directions_t
+  directional_pushers_on_goal(CellOrientation orientation) const;
+
+  ///
+  /// All directions combinations for which this skin has directional wall image.
+  /// Each image represents wall having neighbor walls in given directions_t.
+  ///
+  const directional_walls_directions_t directional_walls(CellOrientation orientation
+  ) const;
 
   ///
   /// Animated pusher tiles.

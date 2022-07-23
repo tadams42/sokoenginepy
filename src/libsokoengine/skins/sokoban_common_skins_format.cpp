@@ -130,81 +130,81 @@ void SokobanCommonSkinsFormat::generate_directional_walls(
 ) {
   ImageImpl tmp;
 
-  auto push_back = [&](const Directions &dirs) {
+  auto push_back = [&](const directions_t &dirs) {
     tile_map.directional_walls.emplace_back();
     tile_map.directional_walls.back().first = dirs;
     tmp.swap(tile_map.directional_walls.back().second);
   };
 
   tmp = isolated_wall;
-  push_back(Directions());
+  push_back(directions_t());
 
   tmp = lr_wall;
-  push_back(Directions({Direction::LEFT, Direction::RIGHT}));
+  push_back(directions_t({Direction::LEFT, Direction::RIGHT}));
 
   tmp = ud_wall;
-  push_back(Directions({Direction::UP, Direction::DOWN}));
+  push_back(directions_t({Direction::UP, Direction::DOWN}));
 
   tmp = lurd_wall;
   push_back(
-    Directions({Direction::LEFT, Direction::RIGHT, Direction::UP, Direction::DOWN})
+    directions_t({Direction::LEFT, Direction::RIGHT, Direction::UP, Direction::DOWN})
   );
 
   tmp = isolated_wall;
   tmp.replace(ud_wall, down_half(tmp));
-  push_back(Directions{Direction::DOWN});
+  push_back(directions_t{Direction::DOWN});
 
   tmp = isolated_wall;
   tmp.replace(ud_wall, up_half(tmp));
-  push_back(Directions{Direction::UP});
+  push_back(directions_t{Direction::UP});
 
   tmp = isolated_wall;
   tmp.replace(lr_wall, right_half(tmp));
-  push_back(Directions{Direction::RIGHT});
+  push_back(directions_t{Direction::RIGHT});
 
   tmp = isolated_wall;
   tmp.replace(ud_wall, down_half(tmp));
   tmp.replace(lr_wall, right_half(tmp));
   tmp.replace(lurd_wall, right_bottom_quarter(tmp));
-  push_back(Directions{Direction::RIGHT, Direction::DOWN});
+  push_back(directions_t{Direction::RIGHT, Direction::DOWN});
 
   tmp = isolated_wall;
   tmp.replace(lr_wall, right_half(tmp));
   tmp.replace(ud_wall, up_half(tmp));
   tmp.replace(lurd_wall, right_top_quarter(tmp));
-  push_back(Directions{Direction::RIGHT, Direction::UP});
+  push_back(directions_t{Direction::RIGHT, Direction::UP});
 
   tmp = lurd_wall;
   tmp.replace(ud_wall, left_half(tmp));
-  push_back(Directions{Direction::RIGHT, Direction::UP, Direction::DOWN});
+  push_back(directions_t{Direction::RIGHT, Direction::UP, Direction::DOWN});
 
   tmp = isolated_wall;
   tmp.replace(lr_wall, left_half(tmp));
-  push_back(Directions{Direction::LEFT});
+  push_back(directions_t{Direction::LEFT});
 
   tmp = isolated_wall;
   tmp.replace(lr_wall, left_half(tmp));
   tmp.replace(ud_wall, down_half(tmp));
   tmp.replace(lurd_wall, left_bottom_quarter(tmp));
-  push_back(Directions{Direction::LEFT, Direction::DOWN});
+  push_back(directions_t{Direction::LEFT, Direction::DOWN});
 
   tmp = isolated_wall;
   tmp.replace(lr_wall, left_half(tmp));
   tmp.replace(ud_wall, up_half(tmp));
   tmp.replace(lurd_wall, left_top_quarter(tmp));
-  push_back(Directions{Direction::LEFT, Direction::UP});
+  push_back(directions_t{Direction::LEFT, Direction::UP});
 
   tmp = lurd_wall;
   tmp.replace(ud_wall, right_half(tmp));
-  push_back(Directions{Direction::LEFT, Direction::UP, Direction::DOWN});
+  push_back(directions_t{Direction::LEFT, Direction::UP, Direction::DOWN});
 
   tmp = lurd_wall;
   tmp.replace(lr_wall, up_half(tmp));
-  push_back(Directions{Direction::LEFT, Direction::RIGHT, Direction::DOWN});
+  push_back(directions_t{Direction::LEFT, Direction::RIGHT, Direction::DOWN});
 
   tmp = lurd_wall;
   tmp.replace(lr_wall, down_half(tmp));
-  push_back(Directions{Direction::LEFT, Direction::RIGHT, Direction::UP});
+  push_back(directions_t{Direction::LEFT, Direction::RIGHT, Direction::UP});
 }
 
 rect_t SokobanCommonSkinsFormat::left_half(const ImageImpl &src) {

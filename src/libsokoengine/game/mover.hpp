@@ -58,7 +58,7 @@ public:
 ///
 /// Ordered sequence of PusherStep.
 ///
-typedef std::vector<PusherStep> PusherSteps;
+typedef std::vector<PusherStep> pusher_steps_t;
 
 ///
 /// Implements game rules (on-board movement). Supports forward and reverse game
@@ -178,7 +178,7 @@ public:
   ///   BoardGraph board(puzzle);
   ///   Mover mover(board);
   ///
-  ///   PusherSteps last_move {PusherStep(Direction::UP),
+  ///   pusher_steps_t last_move {PusherStep(Direction::UP),
   ///   PusherStep(Direction::RIGHT)}; mover.set_last_move(last_move);
   ///   mover.undo_last_move();
   ///
@@ -212,8 +212,8 @@ public:
   /// performed (it doesn't keep whole history of movement, only the last performed
   /// move).
   ///
-  virtual const PusherSteps &last_move() const;
-  void                       set_last_move(const PusherSteps &rv);
+  virtual const pusher_steps_t &last_move() const;
+  void                          set_last_move(const pusher_steps_t &rv);
 
   ///
   /// Takes sequence of moves stored in last_move() and tries to undo it.
@@ -242,7 +242,7 @@ private:
 using game::IllegalMoveError;
 using game::Mover;
 using game::NonPlayableBoardError;
-using game::PusherSteps;
+using game::pusher_steps_t;
 using game::SolvingMode;
 
 } // namespace sokoengine

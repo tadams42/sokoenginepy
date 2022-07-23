@@ -8,7 +8,7 @@ namespace sokoengine {
 
 namespace game {
 class PusherStep;
-typedef std::vector<PusherStep> PusherSteps;
+typedef std::vector<PusherStep> pusher_steps_t;
 } // namespace game
 
 namespace io {
@@ -68,10 +68,10 @@ public:
   std::string str() const;
   std::string repr() const;
 
-  const std::string &moves_data() const;
-  void               set_moves_data(const std::string &rv);
-  game::PusherSteps  pusher_steps() const;
-  void               set_pusher_steps(const game::PusherSteps &rv);
+  const std::string   &moves_data() const;
+  void                 set_moves_data(const std::string &rv);
+  game::pusher_steps_t pusher_steps() const;
+  void                 set_pusher_steps(const game::pusher_steps_t &rv);
 
   size_t pushes_count() const;
   size_t moves_count() const;
@@ -85,7 +85,7 @@ private:
 
 } // namespace io
 
-using game::PusherSteps;
+using game::pusher_steps_t;
 using io::Snapshot;
 
 } // namespace sokoengine

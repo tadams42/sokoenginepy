@@ -12,7 +12,7 @@ class Puzzle;
 ///
 /// Default type for sequence of Puzzle
 ///
-typedef std::vector<Puzzle> Puzzles;
+typedef std::vector<Puzzle> puzzles_t;
 
 ///
 /// Collection of one or more game puzzles.
@@ -42,8 +42,8 @@ public:
   std::string       &updated_at();
   const std::string &notes() const;
   std::string       &notes();
-  const Puzzles     &puzzles() const;
-  Puzzles           &puzzles();
+  const puzzles_t     &puzzles() const;
+  puzzles_t           &puzzles();
 
   ///
   /// Loads collection from `path`.
@@ -133,7 +133,7 @@ private:
 } // namespace io
 
 using io::Collection;
-using io::Puzzles;
+using io::puzzles_t;
 
 } // namespace sokoengine
 

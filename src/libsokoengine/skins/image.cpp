@@ -36,9 +36,7 @@ pixel_t Image::pixel(uint32_t x, uint32_t y) const { return m_impl->pixel(x, y);
 
 void Image::swap(Image &img) { m_impl.swap(img.m_impl); }
 
-bool Image::is_empty() const {
-  return m_impl->m_img.height() <= 0 || m_impl->m_img.width() <= 0;
-}
+bool Image::is_empty() const { return m_impl->height() <= 0 || m_impl->width() <= 0; }
 
 } // namespace skins
 } // namespace sokoengine

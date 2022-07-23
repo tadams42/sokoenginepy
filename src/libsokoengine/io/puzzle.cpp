@@ -20,7 +20,7 @@ using sokoengine::implementation::PuzzleParser;
 using sokoengine::implementation::PuzzlePrinter;
 using sokoengine::implementation::PuzzleResizer;
 using sokoengine::implementation::SokobanIo;
-using sokoengine::implementation::Strings;
+using sokoengine::implementation::strings_t;
 using sokoengine::implementation::TessellationImpl;
 using sokoengine::implementation::TriobanIo;
 using std::invalid_argument;
@@ -37,7 +37,7 @@ public:
   string    m_boxorder;
   string    m_goalorder;
   string    m_notes;
-  Snapshots m_snapshots;
+  snapshots_t m_snapshots;
 
   board_size_t   m_width      = 0;
   board_size_t   m_height     = 0;
@@ -111,7 +111,7 @@ public:
 
   void reparse() {
     if (!is_blank(m_original_board)) {
-      Strings board_rows = m_parser->parse(m_original_board);
+      strings_t board_rows = m_parser->parse(m_original_board);
       _copy(m_parsed_board, m_width, m_height, board_rows);
     } else {
       m_height = 0;
@@ -171,9 +171,9 @@ const string &Puzzle::notes() const { return m_impl->m_notes; }
 
 string &Puzzle::notes() { return m_impl->m_notes; }
 
-const Snapshots &Puzzle::snapshots() const { return m_impl->m_snapshots; }
+const snapshots_t &Puzzle::snapshots() const { return m_impl->m_snapshots; }
 
-Snapshots &Puzzle::snapshots() { return m_impl->m_snapshots; }
+snapshots_t &Puzzle::snapshots() { return m_impl->m_snapshots; }
 
 Tessellation Puzzle::tessellation() const { return m_impl->m_tessellation; }
 
@@ -238,8 +238,8 @@ string Puzzle::str() const { return to_board_str(false); }
 string Puzzle::repr() const {
   string klass_name = "Puzzle";
 
-  Strings board_lines;
-  string  tmp = to_board_str(true);
+  strings_t board_lines;
+  string    tmp = to_board_str(true);
   boost::split(board_lines, tmp, boost::is_any_of("\n"));
 
   for (string &line : board_lines)

@@ -6,7 +6,7 @@ using sokoengine::BoardState;
 using sokoengine::HashedBoardManager;
 using sokoengine::piece_id_t;
 using sokoengine::position_t;
-using sokoengine::Positions;
+using sokoengine::positions_t;
 using sokoengine::Selectors;
 using sokoengine::zobrist_key_t;
 using std::string;
@@ -14,9 +14,9 @@ using std::string;
 void export_board_manager(py::module &m) {
   py::class_<BoardState>(m, "BoardState")
     .def(
-      py::init<const Positions &, const Positions &, zobrist_key_t>(),
-      py::arg("pushers_positions") = Positions(),
-      py::arg("boxes_positions")   = Positions(),
+      py::init<const positions_t &, const positions_t &, zobrist_key_t>(),
+      py::arg("pushers_positions") = positions_t(),
+      py::arg("boxes_positions")   = positions_t(),
       py::arg("zobrist_hash")      = BoardState::NO_HASH
     )
 
@@ -31,7 +31,7 @@ void export_board_manager(py::module &m) {
       [](const BoardState &self) {
         return self.pushers_positions();
       },
-      [](BoardState &self, const Positions &rv) {
+      [](BoardState &self, const positions_t &rv) {
         self.pushers_positions() = rv;
       }
     )
@@ -41,7 +41,7 @@ void export_board_manager(py::module &m) {
       [](const BoardState &self) {
         return self.boxes_positions();
       },
-      [](BoardState &self, const Positions &rv) {
+      [](BoardState &self, const positions_t &rv) {
         self.boxes_positions() = rv;
       }
     )

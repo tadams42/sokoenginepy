@@ -1,5 +1,7 @@
 #include "trioban_common_skins_format.hpp"
 
+#include <cmath>
+
 namespace sokoengine {
 namespace implementation {
 

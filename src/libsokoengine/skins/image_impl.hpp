@@ -4,8 +4,6 @@
 #include "game_config.hpp"
 #include "geometry.hpp"
 
-#include <boost/gil/image.hpp>
-
 namespace sokoengine {
 
 namespace skins {
@@ -17,8 +15,6 @@ namespace implementation {
 
 class LIBSOKOENGINE_LOCAL ImageImpl {
 public:
-  typedef boost::gil::rgba8_image_t           image_t;
-  image_t                                     m_img;
   typedef std::vector<std::vector<ImageImpl>> tiles_t;
 
   ImageImpl();
@@ -124,6 +120,10 @@ public:
   void set_outer_pixels_transparent(const polygon_t &p);
 
   skins::pixel_t pixel(uint32_t x, uint32_t y) const;
+
+private:
+  class PIMPL;
+  std::unique_ptr<PIMPL> m_impl;
 };
 
 } // namespace implementation

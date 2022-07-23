@@ -18,7 +18,7 @@ enum class LIBSOKOENGINE_API CellOrientation : int {
 ///
 /// Default type for set of CellOrientation
 ///
-typedef std::set<CellOrientation> CellOrientations;
+typedef std::set<CellOrientation> cell_orientations_t;
 
 } // namespace sokoengine
 

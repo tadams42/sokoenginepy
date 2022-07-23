@@ -11,7 +11,7 @@
 
 using sokoengine::implementation::Characters;
 using sokoengine::implementation::is_blank;
-using sokoengine::implementation::Strings;
+using sokoengine::implementation::strings_t;
 using sokoengine::implementation::TessellationImpl;
 using std::invalid_argument;
 using std::make_unique;
@@ -122,7 +122,7 @@ namespace sokoengine {
     string Snapshot::to_str(bool rle_encode) const {
       m_impl->reparse_if_not_parsed();
 
-      Strings lines;
+      strings_t lines;
       for (const auto &part_variant : m_impl->m_parsed_moves) {
         std::visit(
           [&lines](auto &part) {
@@ -171,17 +171,17 @@ namespace sokoengine {
       m_impl->m_was_parsed = false;
     }
 
-    PusherSteps Snapshot::pusher_steps() const {
+    pusher_steps_t Snapshot::pusher_steps() const {
       m_impl->reparse_if_not_parsed();
 
-      PusherSteps             retv;
+      pusher_steps_t          retv;
       const TessellationImpl &tessellation =
         TessellationImpl::instance(m_impl->m_tessellation);
 
       for (const auto &part_variant : m_impl->m_parsed_moves) {
         std::visit(
           [&retv, &tessellation](auto &part) {
-            PusherSteps part_steps = part.pusher_steps(tessellation);
+            pusher_steps_t part_steps = part.pusher_steps(tessellation);
             retv.insert(retv.end(), part_steps.cbegin(), part_steps.cend());
           },
           part_variant
@@ -191,7 +191,7 @@ namespace sokoengine {
       return retv;
     }
 
-    void Snapshot::set_pusher_steps(const PusherSteps &rv) {
+    void Snapshot::set_pusher_steps(const pusher_steps_t &rv) {
       size_t i    = 0;
       size_t iend = rv.size();
 

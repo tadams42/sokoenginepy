@@ -170,12 +170,12 @@ public:
     }
   }
 
-  Positions reachables(
-    position_t root, const Positions &excluded, IsObstacleFunctor is_obstacle
+  positions_t reachables(
+    position_t root, const positions_t &excluded, IsObstacleFunctor is_obstacle
   ) const {
-    Positions reachables;
+    positions_t reachables;
 
-    auto is_excluded = [&](const Positions &lp, position_t lv) {
+    auto is_excluded = [&](const positions_t &lp, position_t lv) {
       return any_of(lp.cbegin(), lp.cend(), [&lv](position_t rv) {
         return lv == rv;
       });
@@ -184,8 +184,8 @@ public:
     vector<bool> visited(vertices_count(), false);
     visited[root] = true;
 
-    typedef deque<position_t> PositionsQueue;
-    PositionsQueue            to_inspect;
+    typedef deque<position_t> positions_queue_t;
+    positions_queue_t         to_inspect;
     to_inspect.push_back(root);
 
     while (!to_inspect.empty()) {
@@ -315,10 +315,10 @@ board_size_t BoardGraph::board_width() const { return m_impl->m_board_width; }
 
 board_size_t BoardGraph::board_height() const { return m_impl->m_board_height; }
 
-Edges BoardGraph::out_edges(position_t src) const {
+edges_t BoardGraph::out_edges(position_t src) const {
   m_impl->is_valid_or_throw(src);
 
-  Edges retv;
+  edges_t retv;
 
   out_edge_iterator_t e_i, e_iend;
   tie(e_i, e_iend) = boost::out_edges(src, m_impl->m_graph);
@@ -354,10 +354,10 @@ BoardGraph::neighbor_at(position_t from_position, const Direction &direction) co
   return neighbor(from_position, direction);
 }
 
-Positions BoardGraph::wall_neighbors(position_t from_position) const {
+positions_t BoardGraph::wall_neighbors(position_t from_position) const {
   m_impl->is_valid_or_throw(from_position);
 
-  Positions retv;
+  positions_t retv;
 
   auto index = boost::get(boost::vertex_index, m_impl->m_graph);
 
@@ -373,10 +373,10 @@ Positions BoardGraph::wall_neighbors(position_t from_position) const {
   return retv;
 }
 
-Directions BoardGraph::wall_neighbor_directions(position_t src) const {
+directions_t BoardGraph::wall_neighbor_directions(position_t src) const {
   m_impl->is_valid_or_throw(src);
 
-  Directions retv;
+  directions_t retv;
 
   out_edge_iterator_t e_i, e_iend;
   tie(e_i, e_iend) = boost::out_edges(src, m_impl->m_graph);
@@ -390,10 +390,10 @@ Directions BoardGraph::wall_neighbor_directions(position_t src) const {
   return retv;
 }
 
-Positions BoardGraph::all_neighbors(position_t from_position) const {
+positions_t BoardGraph::all_neighbors(position_t from_position) const {
   m_impl->is_valid_or_throw(from_position);
 
-  Positions retv;
+  positions_t retv;
 
   out_edge_iterator_t e_i, e_iend;
   tie(e_i, e_iend) = boost::out_edges(from_position, m_impl->m_graph);
@@ -406,7 +406,7 @@ Positions BoardGraph::all_neighbors(position_t from_position) const {
   return retv;
 }
 
-Positions
+positions_t
 BoardGraph::shortest_path(position_t start_position, position_t end_position) const {
   m_impl->is_valid_or_throw(start_position);
   m_impl->is_valid_or_throw(end_position);
@@ -428,7 +428,7 @@ BoardGraph::shortest_path(position_t start_position, position_t end_position) co
   );
 
   // Backtracking to source
-  Positions path;
+  positions_t path;
   // Start by setting 'u' to the destination node's predecessor
   predecessors_map[start] = start;
   vertex_descriptor_t u   = predecessors_map[end];
@@ -446,7 +446,7 @@ BoardGraph::shortest_path(position_t start_position, position_t end_position) co
   return path;
 }
 
-Positions
+positions_t
 BoardGraph::dijkstra_path(position_t start_position, position_t end_position) const {
   m_impl->is_valid_or_throw(start_position);
   m_impl->is_valid_or_throw(end_position);
@@ -476,7 +476,7 @@ BoardGraph::dijkstra_path(position_t start_position, position_t end_position) co
   );
 
   // Backtracking to source
-  Positions path;
+  positions_t path;
   // Start by setting 'u' to the destination node's predecessor
   predecessors_map[start] = start;
   vertex_descriptor_t u   = predecessors_map[end];
@@ -494,11 +494,11 @@ BoardGraph::dijkstra_path(position_t start_position, position_t end_position) co
   return path;
 }
 
-Positions
+positions_t
 BoardGraph::find_move_path(position_t start_position, position_t end_position) const {
-  Positions path = dijkstra_path(start_position, end_position);
+  positions_t path = dijkstra_path(start_position, end_position);
 
-  Positions retv;
+  positions_t retv;
 
   auto i   = path.cbegin();
   auto end = path.cend();
@@ -516,23 +516,23 @@ BoardGraph::find_move_path(position_t start_position, position_t end_position) c
   }
 
   if (retv != path)
-    return Positions();
+    return positions_t();
   return path;
 }
 
-Positions
+positions_t
 BoardGraph::find_jump_path(position_t start_position, position_t end_position) const {
   return shortest_path(start_position, end_position);
 }
 
-Directions BoardGraph::positions_path_to_directions_path(const Positions &positions_path
-) const {
+directions_t
+BoardGraph::positions_path_to_directions_path(const positions_t &positions_path) const {
   position_t src_vertex_index = 0;
 
   if (positions_path.size() > 0)
     m_impl->is_valid_or_throw(positions_path[src_vertex_index]);
 
-  Directions retv;
+  directions_t retv;
 
   if (positions_path.size() <= 1)
     return retv;
@@ -559,7 +559,7 @@ Directions BoardGraph::positions_path_to_directions_path(const Positions &positi
 }
 
 position_t BoardGraph::path_destination(
-  position_t start_position, const Directions &directions_path
+  position_t start_position, const directions_t &directions_path
 ) const {
   m_impl->is_valid_or_throw(start_position);
 
@@ -575,8 +575,8 @@ position_t BoardGraph::path_destination(
   return retv;
 }
 
-Positions BoardGraph::positions_reachable_by_pusher(
-  position_t pusher_position, const Positions &excluded_positions
+positions_t BoardGraph::positions_reachable_by_pusher(
+  position_t pusher_position, const positions_t &excluded_positions
 ) const {
   m_impl->is_valid_or_throw(pusher_position);
 
@@ -588,9 +588,9 @@ Positions BoardGraph::positions_reachable_by_pusher(
 }
 
 position_t BoardGraph::normalized_pusher_position(
-  position_t pusher_position, const Positions &excluded_positions
+  position_t pusher_position, const positions_t &excluded_positions
 ) const {
-  Positions reachables_pos =
+  positions_t reachables_pos =
     positions_reachable_by_pusher(pusher_position, excluded_positions);
   if (reachables_pos.size() > 0)
     return *min_element(reachables_pos.cbegin(), reachables_pos.cend());
@@ -598,7 +598,7 @@ position_t BoardGraph::normalized_pusher_position(
 }
 
 void BoardGraph::mark_play_area() {
-  Positions    piece_positions;
+  positions_t  piece_positions;
   board_size_t vertice_count = m_impl->vertices_count();
 
   for (position_t i = 0; i < vertice_count; ++i) {
@@ -615,7 +615,7 @@ void BoardGraph::mark_play_area() {
   };
 
   for (auto piece_position : piece_positions) {
-    Positions reachables_pos =
+    positions_t reachables_pos =
       m_impl->reachables(piece_position, piece_positions, is_obstacle);
     for (auto reachable_position : reachables_pos) {
       cell(reachable_position).set_is_in_playable_area(true);

@@ -13,7 +13,7 @@ namespace implementation {
 ///
 bool LIBSOKOENGINE_LOCAL is_blank(const std::string &line);
 
-typedef std::vector<std::string> Strings;
+typedef std::vector<std::string> strings_t;
 
 class LIBSOKOENGINE_LOCAL Characters {
 public:

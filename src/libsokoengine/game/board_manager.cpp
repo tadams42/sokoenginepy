@@ -14,7 +14,7 @@
 #include <boost/bimap.hpp>
 #include <boost/bimap/set_of.hpp>
 
-using sokoengine::implementation::Strings;
+using sokoengine::implementation::strings_t;
 using std::deque;
 using std::invalid_argument;
 using std::make_pair;
@@ -33,7 +33,7 @@ namespace implementation {
 
 LIBSOKOENGINE_LOCAL string to_str(const BoardManager::positions_by_id_t &m) {
   auto converter = [&]() {
-    Strings retv;
+    strings_t retv;
     for (auto p : m) {
       retv.push_back(to_string(p.first) + ": " + to_string(p.second));
     }
@@ -89,7 +89,7 @@ public:
   ids_to_positions_map_t m_pushers;
   ids_to_positions_map_t m_boxes;
   ids_to_positions_map_t m_goals;
-  Positions              m_walls;
+  positions_t            m_walls;
 
   BoardGraph &m_board;
   SokobanPlus m_plus;
@@ -149,8 +149,8 @@ public:
            : m_goals.right.find(on_position) != m_goals.right.end();
   }
 
-  piece_ids_vector_t pieces_ids(const Selectors &which) const {
-    piece_ids_vector_t retv;
+  piece_ids_t pieces_ids(const Selectors &which) const {
+    piece_ids_t retv;
 
     switch (which) {
       case Selectors::PUSHERS:
@@ -284,7 +284,7 @@ const BoardGraph &BoardManager::board() const { return m_impl->m_board; }
 
 board_size_t BoardManager::pushers_count() const { return m_impl->m_pushers.size(); }
 
-BoardManager::piece_ids_vector_t BoardManager::pushers_ids() const {
+BoardManager::piece_ids_t BoardManager::pushers_ids() const {
   return m_impl->pieces_ids(Selectors::PUSHERS);
 }
 
@@ -337,7 +337,7 @@ void BoardManager::move_pusher(piece_id_t pusher_id, position_t to_new_position)
 
 board_size_t BoardManager::boxes_count() const { return m_impl->m_boxes.size(); }
 
-BoardManager::piece_ids_vector_t BoardManager::boxes_ids() const {
+BoardManager::piece_ids_t BoardManager::boxes_ids() const {
   return m_impl->pieces_ids(Selectors::BOXES);
 }
 
@@ -388,7 +388,7 @@ void BoardManager::move_box(piece_id_t box_id, position_t to_new_position) {
 
 board_size_t BoardManager::goals_count() const { return m_impl->m_goals.size(); }
 
-BoardManager::piece_ids_vector_t BoardManager::goals_ids() const {
+BoardManager::piece_ids_t BoardManager::goals_ids() const {
   return m_impl->pieces_ids(Selectors::GOALS);
 }
 
@@ -412,7 +412,7 @@ bool BoardManager::has_goal_on(position_t position) const {
   return m_impl->has_piece_on_position(position, Selectors::GOALS);
 }
 
-const Positions &BoardManager::walls_positions() const { return m_impl->m_walls; }
+const positions_t &BoardManager::walls_positions() const { return m_impl->m_walls; }
 
 piece_id_t BoardManager::box_plus_id(piece_id_t box_id) const {
   return m_impl->m_plus.box_plus_id(box_id);
@@ -476,7 +476,7 @@ BoardManager::solutions_vector_t BoardManager::solutions() const {
 
   do {
     if (is_valid_solution(g_positions)) {
-      retv.push_back(BoardState(Positions(), g_positions));
+      retv.push_back(BoardState(positions_t(), g_positions));
     }
   } while (next_permutation(g_positions.begin(), g_positions.end()));
 
@@ -542,9 +542,9 @@ bool BoardManager::is_playable() const {
 }
 
 string BoardManager::str() const {
-  auto converter = [](const Positions &positions) {
-    size_t  max_members = 5;
-    Strings tmp;
+  auto converter = [](const positions_t &positions) {
+    size_t    max_members = 5;
+    strings_t tmp;
     for (size_t i = 0; i < min(positions.size(), max_members); ++i) {
       tmp.push_back(to_string(positions[i]));
     }
@@ -569,7 +569,7 @@ BoardState BoardManager::state() const {
   sort(p_ids.begin(), p_ids.end());
   sort(b_ids.begin(), b_ids.end());
 
-  Positions pushers, boxes;
+  positions_t pushers, boxes;
 
   for (auto pid : p_ids)
     pushers.push_back(pusher_position(pid));

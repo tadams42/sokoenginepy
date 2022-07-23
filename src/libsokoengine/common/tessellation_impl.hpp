@@ -42,7 +42,7 @@ public:
   ///
   /// Directions that are valid in context of this tessellation.
   ///
-  virtual const Directions &legal_directions() const = 0;
+  virtual const directions_t &legal_directions() const = 0;
 
   ///
   /// Calculates neighbor position in given direction.
@@ -96,7 +96,7 @@ public:
   ///
   /// All CellOrientation that this tessellation uses.
   ///
-  virtual CellOrientations cell_orientations() const;
+  virtual cell_orientations_t cell_orientations() const;
 };
 
 } // namespace implementation

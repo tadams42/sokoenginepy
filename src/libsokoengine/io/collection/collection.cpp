@@ -32,7 +32,7 @@ public:
   string  m_created_at;
   string  m_updated_at;
   string  m_notes;
-  Puzzles m_puzzles;
+  puzzles_t m_puzzles;
 
   PIMPL(
     const string &title,
@@ -94,9 +94,9 @@ const string &Collection::notes() const { return m_impl->m_notes; }
 
 string &Collection::notes() { return m_impl->m_notes; }
 
-const Puzzles &Collection::puzzles() const { return m_impl->m_puzzles; }
+const puzzles_t &Collection::puzzles() const { return m_impl->m_puzzles; }
 
-Puzzles &Collection::puzzles() { return m_impl->m_puzzles; }
+puzzles_t &Collection::puzzles() { return m_impl->m_puzzles; }
 
 void Collection::load(const path &p, Tessellation tessellation_hint) {
   load(p.string(), tessellation_hint);

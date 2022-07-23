@@ -3,7 +3,7 @@
 #include <sstream>
 
 using sokoengine::Collection;
-using sokoengine::Puzzles;
+using sokoengine::puzzles_t;
 using sokoengine::Tessellation;
 using std::istream;
 using std::istringstream;
@@ -82,7 +82,7 @@ void export_io_collection(py::module &m) {
     [](const Collection &self) {
       return self.puzzles();
     },
-    [](Collection &self, const Puzzles &rv) {
+    [](Collection &self, const puzzles_t &rv) {
       self.puzzles() = rv;
     }
   );

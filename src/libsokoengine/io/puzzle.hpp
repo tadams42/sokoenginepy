@@ -16,7 +16,7 @@ class Snapshot;
 ///
 /// Default type for sequence of Snapshot
 ///
-typedef std::vector<Snapshot> Snapshots;
+typedef std::vector<Snapshot> snapshots_t;
 
 ///
 /// Game board and accompanying metadata.
@@ -92,12 +92,12 @@ public:
   ///
   /// Collection of Snapshot related to this puzzle.
   ///
-  const Snapshots &snapshots() const;
+  const snapshots_t &snapshots() const;
 
   ///
   /// Collection of Snapshot related to this puzzle.
   ///
-  Snapshots &snapshots();
+  snapshots_t &snapshots();
 
   ///
   /// Formatted output of parsed and validated board.
@@ -154,7 +154,7 @@ private:
 } // namespace io
 
 using io::Puzzle;
-using io::Snapshots;
+using io::snapshots_t;
 
 } // namespace sokoengine
 

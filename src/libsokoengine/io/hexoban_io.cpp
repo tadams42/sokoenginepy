@@ -6,7 +6,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::implementation::Strings;
+using sokoengine::implementation::strings_t;
 using std::invalid_argument;
 using std::make_tuple;
 using std::make_unique;
@@ -43,7 +43,7 @@ public:
   constexpr inline HexobanPuzzleParser()
     : PuzzleParser() {}
 
-  virtual Strings parse(const string &board) const override;
+  virtual strings_t parse(const string &board) const override;
 };
 
 class LIBSOKOENGINE_LOCAL HexobanPuzzlePrinter : public PuzzlePrinter {
@@ -71,7 +71,8 @@ const PuzzleParser &HexobanIo::parser() { return HEX_PARSER; }
 const PuzzlePrinter &HexobanIo::printer() { return HEX_PRINTER; }
 
 class LIBSOKOENGINE_LOCAL HexobanTextConverter {
-  typedef tuple<Strings, board_size_t, board_size_t, int8_t, int8_t> preparse_results_t;
+  typedef tuple<strings_t, board_size_t, board_size_t, int8_t, int8_t>
+    preparse_results_t;
   typedef tuple<char, board_size_t, board_size_t, int8_t, int8_t>
                             text_cell_position_data_t;
   typedef tuple<bool, bool> text_cell_position_status_t;
@@ -85,7 +86,7 @@ public:
   ) {
     char floor = use_visible_floor ? Characters::VISIBLE_FLOOR : Characters::FLOOR;
 
-    Strings retv_list;
+    strings_t retv_list;
     for (position_t row = 0; row < height; row++) {
       string line;
       if (row % 2 != 0) {
@@ -111,7 +112,7 @@ public:
     return boost::join(retv_list, "\n");
   }
 
-  bool is_type1(const Strings &list) const {
+  bool is_type1(const strings_t &list) const {
     position_t rmnf = find_rightmost_non_floor(list);
     if (rmnf != Config::NO_POS) {
       board_size_t y = index_y(rmnf, PuzzleParser::calculate_width(list));
@@ -120,19 +121,19 @@ public:
     return false;
   }
 
-  pair<Strings, bool> convert_to_internal(const string &board) const {
-    Strings      parsed;
+  pair<strings_t, bool> convert_to_internal(const string &board) const {
+    strings_t    parsed;
     board_size_t height, width;
     int8_t       even_row_x_parity, odd_row_x_parity;
 
     tie(parsed, width, height, even_row_x_parity, odd_row_x_parity) =
       preparse_board(board);
 
-    Strings internal_list;
+    strings_t internal_list;
 
     // Handle empty board
     if (width == 0 || height == 0) {
-      return make_pair(Strings(), true);
+      return make_pair(strings_t(), true);
     } else if (even_row_x_parity < 0 || odd_row_x_parity < 0) {
       for (board_size_t i = 0; i < height; i++) {
         internal_list.push_back(string(width / 2, Characters::VISIBLE_FLOOR));
@@ -165,33 +166,33 @@ public:
     return make_pair(internal_list, layout_ok);
   }
 
-  void add_column_left(Strings &list) const {
+  void add_column_left(strings_t &list) const {
     for (string &line : list)
       line.insert(line.cbegin(), Characters::VISIBLE_FLOOR);
   }
 
-  void add_column_right(Strings &list) const {
+  void add_column_right(strings_t &list) const {
     for (string &line : list)
       line.append(1, Characters::VISIBLE_FLOOR);
   }
 
-  void add_row_top(Strings &list) const {
+  void add_row_top(strings_t &list) const {
     list.insert(list.begin(), string(list.front().size(), Characters::VISIBLE_FLOOR));
   }
 
-  void remove_column_right(Strings &list) const {
+  void remove_column_right(strings_t &list) const {
     for (string &line : list)
       line.pop_back();
   }
 
-  void reverse_columns(Strings &list) const {
+  void reverse_columns(strings_t &list) const {
     for (string &line : list)
       reverse(line.begin(), line.end());
   }
 
-  void remove_row_top(Strings &list) const { list.erase(list.begin()); }
+  void remove_row_top(strings_t &list) const { list.erase(list.begin()); }
 
-  void remove_row_bottom(Strings &list) const { list.pop_back(); }
+  void remove_row_bottom(strings_t &list) const { list.pop_back(); }
 
 private:
   text_cell_position_status_t
@@ -243,7 +244,7 @@ private:
   }
 
   preparse_results_t preparse_board(const string &board) const {
-    Strings      parsed;
+    strings_t    parsed;
     board_size_t height = 0, width = 0;
 
     parsed                   = PuzzleParser::cleaned_board_lines(board);
@@ -283,8 +284,8 @@ private:
     return make_tuple(parsed, width, height, even_row_x_parity, odd_row_x_parity);
   }
 
-  position_t find_first_non_floor(const Strings &list) const {
-    Strings      normalized = HexobanPuzzleParser::normalize_width(list);
+  position_t find_first_non_floor(const strings_t &list) const {
+    strings_t    normalized = HexobanPuzzleParser::normalize_width(list);
     board_size_t height     = normalized.size();
     board_size_t width      = height > 0 ? normalized.front().size() : 0;
     if (height == 0 || width == 0)
@@ -308,9 +309,9 @@ private:
     }
   }
 
-  position_t find_rightmost_non_floor(const Strings &strings) const {
+  position_t find_rightmost_non_floor(const strings_t &strings) const {
     auto rightmost_finder =
-      [](const Strings &strings, int8_t row_parity) -> position_t {
+      [](const strings_t &strings, int8_t row_parity) -> position_t {
       position_t   retv       = Config::NO_POS;
       bool         cell_found = false;
       board_size_t height     = strings.size();
@@ -333,7 +334,7 @@ private:
       return retv;
     };
 
-    Strings      normalized = HexobanPuzzleParser::normalize_width(strings);
+    strings_t    normalized = HexobanPuzzleParser::normalize_width(strings);
     board_size_t height     = normalized.size();
     board_size_t width      = height > 0 ? normalized.front().size() : 0;
     if (height == 0 || width == 0) {
@@ -361,7 +362,7 @@ private:
     }
   }
 
-  bool is_type2(const Strings &strings) const { return !is_type1(strings); }
+  bool is_type2(const strings_t &strings) const { return !is_type1(strings); }
 };
 
 void HexobanPuzzleResizer::reverse_columns(
@@ -369,7 +370,7 @@ void HexobanPuzzleResizer::reverse_columns(
 ) const {
   HexobanTextConverter converter;
 
-  Strings printed_board;
+  strings_t printed_board;
   boost::split(
     printed_board,
     converter.convert_to_string(parsed_board, width, height, true),
@@ -384,7 +385,7 @@ void HexobanPuzzleResizer::reverse_columns(
   converter.reverse_columns(printed_board);
   converter.remove_column_right(printed_board);
 
-  Strings new_parsed_board =
+  strings_t new_parsed_board =
     converter.convert_to_internal(boost::join(printed_board, "\n")).first;
   _copy(parsed_board, width, height, new_parsed_board);
 }
@@ -394,7 +395,7 @@ void HexobanPuzzleResizer::add_row_top(
 ) const {
   HexobanTextConverter converter;
 
-  Strings printed_board;
+  strings_t printed_board;
   boost::split(
     printed_board,
     converter.convert_to_string(parsed_board, width, height, true),
@@ -403,7 +404,7 @@ void HexobanPuzzleResizer::add_row_top(
 
   converter.add_row_top(printed_board);
 
-  Strings new_parsed_board =
+  strings_t new_parsed_board =
     converter.convert_to_internal(boost::join(printed_board, "\n")).first;
   _copy(parsed_board, width, height, new_parsed_board);
 }
@@ -413,7 +414,7 @@ void HexobanPuzzleResizer::remove_row_top(
 ) const {
   HexobanTextConverter converter;
 
-  Strings printed_board;
+  strings_t printed_board;
   boost::split(
     printed_board,
     converter.convert_to_string(parsed_board, width, height, true),
@@ -422,7 +423,7 @@ void HexobanPuzzleResizer::remove_row_top(
 
   converter.remove_row_top(printed_board);
 
-  Strings new_parsed_board =
+  strings_t new_parsed_board =
     converter.convert_to_internal(boost::join(printed_board, "\n")).first;
   _copy(parsed_board, width, height, new_parsed_board);
 }
@@ -432,7 +433,7 @@ void HexobanPuzzleResizer::remove_row_bottom(
 ) const {
   HexobanTextConverter converter;
 
-  Strings printed_board;
+  strings_t printed_board;
   boost::split(
     printed_board,
     converter.convert_to_string(parsed_board, width, height, true),
@@ -441,12 +442,12 @@ void HexobanPuzzleResizer::remove_row_bottom(
 
   converter.remove_row_bottom(printed_board);
 
-  Strings new_parsed_board =
+  strings_t new_parsed_board =
     converter.convert_to_internal(boost::join(printed_board, "\n")).first;
   _copy(parsed_board, width, height, new_parsed_board);
 }
 
-Strings HexobanPuzzleParser::parse(const string &board) const {
+strings_t HexobanPuzzleParser::parse(const string &board) const {
   auto result = HexobanTextConverter().convert_to_internal(board);
 
   if (result.second)

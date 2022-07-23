@@ -2,8 +2,8 @@
 
 using sokoengine::BoardGraph;
 using sokoengine::Mover;
+using sokoengine::pusher_steps_t;
 using sokoengine::PusherStep;
-using sokoengine::PusherSteps;
 using sokoengine::Selectors;
 using sokoengine::SolvingMode;
 

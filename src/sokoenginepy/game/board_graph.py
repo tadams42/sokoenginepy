@@ -29,8 +29,8 @@ from .board_cell import BoardCell
 # (1, 0, {'direction': Direction.LEFT})
 _InternalEdge = Tuple[int, int, Dict[str, Union[Direction, int]]]
 BoardCellOrStr = Union[BoardCell, str]
-Positions = List[int]
-Directions = List[Direction]
+PositionsT = List[int]
+DirectionsT = List[Direction]
 
 
 @dataclass
@@ -196,7 +196,7 @@ class BoardGraph:
 
         return Config.NO_POS
 
-    def wall_neighbors(self, src: int) -> Positions:
+    def wall_neighbors(self, src: int) -> PositionsT:
         """
         Raises:
             IndexError: ``src`` off board
@@ -206,7 +206,7 @@ class BoardGraph:
 
         return []
 
-    def wall_neighbor_directions(self, src: int) -> Directions:
+    def wall_neighbor_directions(self, src: int) -> DirectionsT:
         retv = []
 
         if self[src]:
@@ -216,7 +216,7 @@ class BoardGraph:
 
         return retv
 
-    def all_neighbors(self, src: int) -> Positions:
+    def all_neighbors(self, src: int) -> PositionsT:
         """
         Raises:
             IndexError: ``src`` off board
@@ -227,7 +227,7 @@ class BoardGraph:
 
         return []
 
-    def shortest_path(self, src: int, dst: int) -> Positions:
+    def shortest_path(self, src: int, dst: int) -> PositionsT:
         """
         Calculates shortest path between two positions with all positions having equal
         weight.
@@ -248,7 +248,7 @@ class BoardGraph:
 
         return []
 
-    def dijkstra_path(self, src: int, dst: int) -> Positions:
+    def dijkstra_path(self, src: int, dst: int) -> PositionsT:
         """
         Calculates shortest path between two positions not passing through board
         obstacles (walls, boxes, other pushers, etc...).
@@ -268,7 +268,7 @@ class BoardGraph:
 
         return []
 
-    def find_jump_path(self, src: int, dst: int) -> Positions:
+    def find_jump_path(self, src: int, dst: int) -> PositionsT:
         """
         Finds list of positions through which pusher must pass when jumping
 
@@ -277,7 +277,7 @@ class BoardGraph:
         """
         return self.shortest_path(src, dst)
 
-    def find_move_path(self, src: int, dst: int) -> Positions:
+    def find_move_path(self, src: int, dst: int) -> PositionsT:
         """
         Finds list of positions through which pusher must pass when moving without
         pushing boxes
@@ -297,7 +297,7 @@ class BoardGraph:
             return []
         return path
 
-    def positions_path_to_directions_path(self, positions: Positions) -> Directions:
+    def positions_path_to_directions_path(self, positions: PositionsT) -> DirectionsT:
         """
         Converts path expressed as positions to one expressed as :class:`.Direction`.
 
@@ -347,8 +347,8 @@ class BoardGraph:
                 self[reachable_position].is_in_playable_area = True
 
     def positions_reachable_by_pusher(
-        self, pusher_position: int, excluded_positions: Optional[Positions] = None
-    ) -> Positions:
+        self, pusher_position: int, excluded_positions: Optional[PositionsT] = None
+    ) -> PositionsT:
         """
         Finds all positions that are reachable by pusher standing on
         ``pusher_position``.
@@ -366,7 +366,7 @@ class BoardGraph:
         )
 
     def normalized_pusher_position(
-        self, pusher_position: int, excluded_positions: Optional[Positions] = None
+        self, pusher_position: int, excluded_positions: Optional[PositionsT] = None
     ) -> int:
         """
         Finds top-left position reachable by pusher without pushing any boxes.
@@ -384,7 +384,7 @@ class BoardGraph:
             return min(reachables)
         return pusher_position
 
-    def path_destination(self, src: int, directions: Directions) -> int:
+    def path_destination(self, src: int, directions: DirectionsT) -> int:
         """
         Given movement path ``directions``, calculates position at the end of tha
         movement.
@@ -465,7 +465,7 @@ class BoardGraph:
     def _reachables(
         self,
         root: int,
-        excluded_positions: Optional[Positions] = None,
+        excluded_positions: Optional[PositionsT] = None,
         is_obstacle_cb: Optional[Callable[[int], bool]] = None,
         add_animation_frame_cb: Optional[_AnimationFrameCallback] = None,
     ) -> List[int]:

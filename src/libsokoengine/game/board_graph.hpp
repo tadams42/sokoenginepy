@@ -42,7 +42,7 @@ public:
   std::string repr() const;
 };
 
-typedef std::vector<Edge> Edges;
+typedef std::vector<Edge> edges_t;
 
 ///
 /// Board graph implementation (using Boost::Graph under the hood).
@@ -114,7 +114,7 @@ public:
   ///
   /// @throws InvalidPositionError when `src` is off board
   ///
-  Edges out_edges(position_t src) const;
+  edges_t out_edges(position_t src) const;
 
   ///
   /// Neighbor position in `direction`.
@@ -137,17 +137,17 @@ public:
   ///
   /// @throws InvalidPositionError when `src` is off board
   ///
-  Positions wall_neighbors(position_t src) const;
+  positions_t wall_neighbors(position_t src) const;
 
   ///
   /// @throws InvalidPositionError when `src` is off board
   ///
-  Directions wall_neighbor_directions(position_t src) const;
+  directions_t wall_neighbor_directions(position_t src) const;
 
   ///
   /// @throws InvalidPositionError when `src` is off board
   ///
-  Positions all_neighbors(position_t src) const;
+  positions_t all_neighbors(position_t src) const;
 
   ///
   /// Calculates shortest path between two positions with all positions having equal
@@ -155,7 +155,7 @@ public:
   ///
   /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
-  Positions shortest_path(position_t src, position_t dst) const;
+  positions_t shortest_path(position_t src, position_t dst) const;
 
   ///
   /// Calculates shortest path between two positions not passing through board
@@ -163,7 +163,7 @@ public:
   ///
   /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
-  Positions dijkstra_path(position_t src, position_t dst) const;
+  positions_t dijkstra_path(position_t src, position_t dst) const;
 
   ///
   /// Finds list of positions through which pusher must pass when moving without
@@ -171,21 +171,21 @@ public:
   ///
   /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
-  Positions find_move_path(position_t src, position_t dst) const;
+  positions_t find_move_path(position_t src, position_t dst) const;
 
   ///
   /// Finds list of positions through which pusher must pass when jumping
   ///
   /// @throws InvalidPositionError when `src` or `dst` are off board
   ///
-  Positions find_jump_path(position_t src, position_t dst) const;
+  positions_t find_jump_path(position_t src, position_t dst) const;
 
   ///
   /// Converts path expressed as positions to one expressed as :class:`.Direction`.
   ///
   /// @throws InvalidPositionError Any position in `positions` is off board
   ///
-  Directions positions_path_to_directions_path(const Positions &positions) const;
+  directions_t positions_path_to_directions_path(const positions_t &positions) const;
 
   ///
   /// Given movement path `directions`, calculates target position at the end of that
@@ -196,7 +196,7 @@ public:
   ///
   /// @throws InvalidPositionError when `src` is off board
   ///
-  position_t path_destination(position_t src, const Directions &directions) const;
+  position_t path_destination(position_t src, const directions_t &directions) const;
 
   ///
   /// Finds all positions that are reachable by pusher standing on `pusher_position`.
@@ -208,8 +208,8 @@ public:
   ///         any position in `excluded_positions` is off board; it simply ignores
   ///         those
   ///
-  Positions positions_reachable_by_pusher(
-    position_t pusher_position, const Positions &excluded_positions = Positions()
+  positions_t positions_reachable_by_pusher(
+    position_t pusher_position, const positions_t &excluded_positions = positions_t()
   ) const;
 
   ///
@@ -223,7 +223,7 @@ public:
   ///         those
   ///
   position_t normalized_pusher_position(
-    position_t pusher_position, const Positions &excluded_positions = Positions()
+    position_t pusher_position, const positions_t &excluded_positions = positions_t()
   ) const;
 
   ///
@@ -239,10 +239,10 @@ private:
 
 } // namespace game
 
-using game::InvalidPositionError;
-using game::Edge;
-using game::Edges;
 using game::BoardGraph;
+using game::Edge;
+using game::edges_t;
+using game::InvalidPositionError;
 
 } // namespace sokoengine
 

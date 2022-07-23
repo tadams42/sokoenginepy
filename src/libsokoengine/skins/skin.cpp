@@ -25,6 +25,9 @@ namespace fs = std::filesystem;
 namespace sokoengine {
 namespace skins {
 
+typedef std::map<Direction, Image>    directional_pushers_t;
+typedef std::map<directions_t, Image> directional_walls_t;
+
 //
 // All tile images for single cell orientation.
 //
@@ -50,9 +53,9 @@ struct LIBSOKOENGINE_LOCAL tileset_t {
   Image wall;
   Image wall_cap;
 
-  Skin::directional_pushers_t directional_pushers;
-  Skin::directional_pushers_t directional_pushers_on_goal;
-  Skin::directional_walls_t   directional_walls;
+  directional_pushers_t directional_pushers;
+  directional_pushers_t directional_pushers_on_goal;
+  directional_walls_t   directional_walls;
 
   Skin::animation_frames_t animated_pusher;
   Skin::animation_frames_t animated_pusher_on_goal;
@@ -249,8 +252,8 @@ private:
     }
 
     for (const auto &dir_wall : tile_map.directional_walls) {
-      into.directional_walls.emplace_back(dir_wall.first, Image());
-      crop(dir_wall.second, into.directional_walls.back().second);
+      into.directional_walls.try_emplace(dir_wall.first);
+      crop(dir_wall.second, into.directional_walls.at(dir_wall.first));
     }
 
     if (tile_map.animated_pusher_row > 0) {
@@ -371,7 +374,7 @@ bool Skin::is_empty() const {
   return m_impl->m_original_tiles.size() == 0 || m_impl->m_tilesets.size() == 0;
 }
 
-CellOrientations Skin::cell_orientations() const {
+cell_orientations_t Skin::cell_orientations() const {
   return TessellationImpl::instance(m_impl->m_tessellation).cell_orientations();
 }
 
@@ -431,12 +434,12 @@ const Image &Skin::wall(CellOrientation orientation) const {
 }
 
 const Image &
-Skin::wall(const Directions &neighbor_walls, CellOrientation orientation) const {
+Skin::wall(const directions_t &neighbor_walls, CellOrientation orientation) const {
   const auto &tileset = m_impl->m_tilesets.at(orientation);
 
-  for (const auto &candidate : tileset.directional_walls) {
-    if (candidate.first == neighbor_walls) {
-      return candidate.second;
+  for (const auto &[directions, img] : tileset.directional_walls) {
+    if (directions == neighbor_walls) {
+      return img;
     }
   }
 
@@ -447,19 +450,43 @@ const Image &Skin::wall_cap(CellOrientation orientation) const {
   return m_impl->m_tilesets.at(orientation).wall_cap;
 }
 
-const Skin::directional_pushers_t &Skin::directional_pushers(CellOrientation orientation
-) const {
-  return m_impl->m_tilesets.at(orientation).directional_pushers;
+const Skin::directional_pusher_directions_t
+Skin::directional_pushers(CellOrientation orientation) const {
+  directional_pusher_directions_t retv;
+
+  const tileset_t &tileset = m_impl->m_tilesets.at(orientation);
+
+  for (const auto &[direction, img] : tileset.directional_pushers) {
+    retv.insert(direction);
+  }
+
+  return retv;
 }
 
-const Skin::directional_pushers_t &
+const Skin::directional_pusher_directions_t
 Skin::directional_pushers_on_goal(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).directional_pushers_on_goal;
+  directional_pusher_directions_t retv;
+
+  const tileset_t &tileset = m_impl->m_tilesets.at(orientation);
+
+  for (const auto &[direction, img] : tileset.directional_pushers_on_goal) {
+    retv.insert(direction);
+  }
+
+  return retv;
 }
 
-const Skin::directional_walls_t &Skin::directional_walls(CellOrientation orientation
-) const {
-  return m_impl->m_tilesets.at(orientation).directional_walls;
+const Skin::directional_walls_directions_t
+Skin::directional_walls(CellOrientation orientation) const {
+  directional_walls_directions_t retv;
+
+  const tileset_t &tileset = m_impl->m_tilesets.at(orientation);
+
+  for (const auto &[directions, img] : tileset.directional_walls) {
+    retv.insert(directions);
+  }
+
+  return retv;
 }
 
 const Skin::animation_frames_t &Skin::animated_pusher(CellOrientation orientation
@@ -538,7 +565,7 @@ void Skin::dump_tiles(const std::string &dir) const {
       .string();
   };
 
-  auto directional_wall_path = [&](const Directions &dirs, CellOrientation co) {
+  auto directional_wall_path = [&](const directions_t &dirs, CellOrientation co) {
     std::vector<string> l;
     for (auto d : dirs) {
       l.push_back(direction_to_str(d));
@@ -590,8 +617,9 @@ void Skin::dump_tiles(const std::string &dir) const {
 
     if (tileset.directional_walls.size() > 0)
       fs::create_directories(directional_walls);
-    for (const auto &dirwall : tileset.directional_walls) {
-      save(dirwall.second, directional_wall_path(dirwall.first, o));
+
+    for (const auto &[directions, img] : tileset.directional_walls) {
+      save(img, directional_wall_path(directions, o));
     }
 
     if(

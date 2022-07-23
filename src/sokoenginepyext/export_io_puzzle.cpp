@@ -3,9 +3,9 @@
 using sokoengine::board_size_t;
 using sokoengine::CellOrientation;
 using sokoengine::position_t;
-using sokoengine::Tessellation;
 using sokoengine::Puzzle;
-using sokoengine::Snapshots;
+using sokoengine::snapshots_t;
+using sokoengine::Tessellation;
 using std::make_unique;
 using std::string;
 
@@ -111,7 +111,7 @@ void export_io_puzzle(py::module &m) {
     [](const Puzzle &self) {
       return self.snapshots();
     },
-    [](Puzzle &self, const Snapshots &rv) {
+    [](Puzzle &self, const snapshots_t &rv) {
       self.snapshots() = rv;
     }
   );

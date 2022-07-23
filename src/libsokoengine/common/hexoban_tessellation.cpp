@@ -10,7 +10,7 @@ using std::string;
 namespace sokoengine {
 namespace implementation {
 
-static const Directions HEX_LEGAL_DIRECTIONS = {
+static const directions_t HEX_LEGAL_DIRECTIONS = {
   Direction::LEFT,
   Direction::RIGHT,
   Direction::NORTH_EAST,
@@ -18,7 +18,7 @@ static const Directions HEX_LEGAL_DIRECTIONS = {
   Direction::SOUTH_EAST,
   Direction::SOUTH_WEST};
 
-const Directions &HexobanTessellation::legal_directions() const {
+const directions_t &HexobanTessellation::legal_directions() const {
   return HEX_LEGAL_DIRECTIONS;
 }
 

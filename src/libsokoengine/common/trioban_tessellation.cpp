@@ -10,7 +10,7 @@ using std::string;
 namespace sokoengine {
 namespace implementation {
 
-static const Directions TRI_LEGAL_DIRECTIONS = {
+static const directions_t TRI_LEGAL_DIRECTIONS = {
   Direction::LEFT,
   Direction::RIGHT,
   Direction::NORTH_EAST,
@@ -18,7 +18,7 @@ static const Directions TRI_LEGAL_DIRECTIONS = {
   Direction::SOUTH_EAST,
   Direction::SOUTH_WEST};
 
-const Directions &TriobanTessellation::legal_directions() const {
+const directions_t &TriobanTessellation::legal_directions() const {
   return TRI_LEGAL_DIRECTIONS;
 }
 
@@ -166,8 +166,8 @@ CellOrientation TriobanTessellation::cell_orientation(
 
 GraphType TriobanTessellation::graph_type() const { return GraphType::DIRECTED_MULTI; }
 
-CellOrientations TriobanTessellation::cell_orientations() const {
-  return CellOrientations{CellOrientation::DEFAULT, CellOrientation::TRIANGLE_DOWN};
+cell_orientations_t TriobanTessellation::cell_orientations() const {
+  return cell_orientations_t{CellOrientation::DEFAULT, CellOrientation::TRIANGLE_DOWN};
 }
 
 } // namespace implementation

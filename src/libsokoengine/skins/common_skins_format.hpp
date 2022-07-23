@@ -24,9 +24,9 @@ struct LIBSOKOENGINE_LOCAL tile_map_t {
   std::map<Direction, point_t> directional_pushers;
   std::map<Direction, point_t> directional_pushers_on_goal;
 
-  typedef std::pair<Directions, ImageImpl> directional_wall_t;
-  typedef std::vector<directional_wall_t>  directional_walls_t;
-  directional_walls_t                      directional_walls;
+  typedef std::pair<directions_t, ImageImpl> directional_wall_t;
+  typedef std::vector<directional_wall_t>    directional_walls_t;
+  directional_walls_t                        directional_walls;
 
   int animated_pusher_row         = -1;
   int animated_pusher_on_goal_row = -1;

@@ -67,8 +67,8 @@ CellOrientation TessellationImpl::cell_orientation(
   return CellOrientation::DEFAULT;
 }
 
-CellOrientations TessellationImpl::cell_orientations() const {
-  return CellOrientations{CellOrientation::DEFAULT};
+cell_orientations_t TessellationImpl::cell_orientations() const {
+  return cell_orientations_t{CellOrientation::DEFAULT};
 }
 
 } // namespace implementation
