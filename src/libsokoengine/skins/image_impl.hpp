@@ -17,11 +17,13 @@ namespace implementation {
 
 class LIBSOKOENGINE_LOCAL ImageImpl {
 public:
-  typedef boost::gil::rgba8_image_t image_t;
-  image_t                           m_img;
+  typedef boost::gil::rgba8_image_t           image_t;
+  image_t                                     m_img;
+  typedef std::vector<std::vector<ImageImpl>> tiles_t;
 
   ImageImpl();
   ImageImpl(uint32_t width, uint32_t height);
+  ImageImpl(uint32_t width, uint32_t height, const skins::pixel_t &fill);
 
   ImageImpl(const ImageImpl &rv);
   ImageImpl &operator=(const ImageImpl &rv);
@@ -43,7 +45,7 @@ public:
   //   - file doesn't contain correct image format (only PNG and BMP are supported)
   //   -...
   //
-  void load(const std::string &path);
+  static ImageImpl load(const std::string &path);
 
   //
   // Loads .png or .bmp image from @a src.
@@ -52,7 +54,7 @@ public:
   //   - file doesn't contain correct image format (only PNG and BMP are supported)
   //   -...
   //
-  void load(std::istream &src, ImageFormats format);
+  static ImageImpl load(std::istream &src, ImageFormats format);
 
   //
   // Saves image to @a path
@@ -67,6 +69,8 @@ public:
   // Saving format is always PNG.
   //
   void save(std::ostream &dest) const;
+
+  tiles_t slice(uint16_t columns, uint16_t rows) const;
 
   //
   // Copies this image pixels that are inside of @a rect into new image.

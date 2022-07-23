@@ -3,13 +3,12 @@
 
 #include "cell_orientation.hpp"
 #include "direction.hpp"
-#include "geometry.hpp"
+#include "image_impl.hpp"
 #include "numeric_types.hpp"
+#include "tessellation.hpp"
 
 namespace sokoengine {
 namespace implementation {
-
-class ImageImpl;
 
 struct LIBSOKOENGINE_LOCAL tile_map_t {
   point_t floor;
@@ -35,150 +34,53 @@ struct LIBSOKOENGINE_LOCAL tile_map_t {
   int animated_box_on_goal_row    = -1;
 };
 
-struct LIBSOKOENGINE_LOCAL tile_sizes_t {
-  // Sizes of each original, unprocessed tile image.
-  uint16_t original_tile_height;
-  uint16_t original_tile_width;
-
-  // Number of tile rows and columns in source image.
-  uint16_t rows_count;
-  uint16_t columns_count;
-};
-
-typedef std::vector<std::vector<ImageImpl>>   raw_tiles_t;
 typedef std::map<CellOrientation, tile_map_t> tile_maps_t;
 
 class LIBSOKOENGINE_LOCAL CommonSkinsFormat {
 public:
-  virtual ~CommonSkinsFormat()                             = 0;
-  virtual std::unique_ptr<CommonSkinsFormat> clone() const = 0;
+  CommonSkinsFormat(CommonSkinsFormat &)                                    = delete;
+  CommonSkinsFormat                         &operator=(CommonSkinsFormat &) = delete;
+  virtual std::unique_ptr<CommonSkinsFormat> clone() const                  = 0;
+  virtual ~CommonSkinsFormat()                                              = 0;
 
-  virtual tile_sizes_t guess_tile_sizes(
-    uint16_t img_width,
-    uint16_t img_height,
-    uint8_t  rows_count_hint,
-    uint8_t  columns_count_hint
-  ) const;
-  virtual tile_maps_t categorize_tiles(const raw_tiles_t &src) const = 0;
-  virtual polygon_t   tile_polygon(
-      uint16_t        original_tile_width,
-      uint16_t        original_tile_height,
-      CellOrientation orientation
-    ) const = 0;
-  virtual pointf_t tile_position(
-    uint16_t     original_tile_width,
-    uint16_t     original_tile_height,
-    position_t   board_position,
-    board_size_t width,
-    board_size_t height
-  ) const = 0;
-  virtual std::vector<CellOrientation> cell_orientations() const;
-};
+  static std::unique_ptr<CommonSkinsFormat> instance(
+    Tessellation tessellation, uint8_t rows_count_hint, uint8_t columns_count_hint
+  );
 
-class LIBSOKOENGINE_LOCAL SokobanCommonSkinsFormat : public CommonSkinsFormat {
-public:
-  virtual std::unique_ptr<CommonSkinsFormat> clone() const override;
-  virtual ~SokobanCommonSkinsFormat();
+  void     set_image(uint32_t img_width, uint32_t img_heigh);
+  uint32_t img_width() const;
+  uint32_t img_height() const;
+  uint16_t columns_width() const;
+  uint16_t rows_height() const;
+  uint16_t tile_width() const;
+  uint16_t tile_height() const;
+  uint8_t  rows_count() const;
+  uint8_t  columns_count() const;
 
-  virtual tile_maps_t categorize_tiles(const raw_tiles_t &src) const override;
+  virtual tile_maps_t categorize_tiles(const ImageImpl::tiles_t &src) const = 0;
+  virtual polygon_t   tile_polygon(CellOrientation orientation) const       = 0;
+  virtual pointf_t    tile_position(
+       position_t board_position, board_size_t width, board_size_t height
+     ) const = 0;
+  virtual point_t
+  canvas_size(board_size_t board_width, board_size_t board_height) const;
 
-  virtual polygon_t tile_polygon(
-    uint16_t        original_tile_width,
-    uint16_t        original_tile_height,
-    CellOrientation orientation
-  ) const override;
-  virtual pointf_t tile_position(
-    uint16_t     original_tile_width,
-    uint16_t     original_tile_height,
-    position_t   board_position,
-    board_size_t width,
-    board_size_t height
-  ) const override;
+protected:
+  CommonSkinsFormat(uint8_t rows_count_hint, uint8_t columns_count_hint);
+
+  uint32_t m_img_width       = 0;
+  uint32_t m_img_height      = 0;
+  uint8_t  m_rows_count_hint = 0;
+  uint8_t  m_cols_count_hint = 0;
+  uint16_t m_columns_width   = 0;
+  uint16_t m_rows_height     = 0;
+  uint16_t m_tile_width      = 0;
+  uint16_t m_tile_height     = 0;
+  uint8_t  m_rows_count      = 0;
+  uint8_t  m_columns_count   = 0;
 
 private:
-  static void generate_directional_walls(
-    tile_map_t      &tile_map,
-    const ImageImpl &isolated_wall,
-    const ImageImpl &lr_wall,
-    const ImageImpl &ud_wall,
-    const ImageImpl &lurd_wall
-  );
-  static rect_t left_half(const ImageImpl &src);
-  static rect_t right_half(const ImageImpl &src);
-  static rect_t up_half(const ImageImpl &src);
-  static rect_t down_half(const ImageImpl &src);
-  static rect_t left_top_quarter(const ImageImpl &src);
-  static rect_t right_top_quarter(const ImageImpl &src);
-  static rect_t left_bottom_quarter(const ImageImpl &src);
-  static rect_t right_bottom_quarter(const ImageImpl &src);
-};
-
-class LIBSOKOENGINE_LOCAL HexobanCommonSkinsFormat : public CommonSkinsFormat {
-public:
-  virtual std::unique_ptr<CommonSkinsFormat> clone() const override;
-  virtual ~HexobanCommonSkinsFormat();
-
-  virtual tile_maps_t categorize_tiles(const raw_tiles_t &src) const override;
-  virtual polygon_t   tile_polygon(
-      uint16_t        original_tile_width,
-      uint16_t        original_tile_height,
-      CellOrientation orientation
-    ) const override;
-  virtual pointf_t tile_position(
-    uint16_t     original_tile_width,
-    uint16_t     original_tile_height,
-    position_t   board_position,
-    board_size_t width,
-    board_size_t height
-  ) const override;
-};
-
-class LIBSOKOENGINE_LOCAL TriobanCommonSkinsFormat : public CommonSkinsFormat {
-public:
-  virtual std::unique_ptr<CommonSkinsFormat> clone() const override;
-  virtual ~TriobanCommonSkinsFormat();
-
-  virtual tile_sizes_t guess_tile_sizes(
-    uint16_t img_width,
-    uint16_t img_height,
-    uint8_t  rows_count_hint,
-    uint8_t  columns_count_hint
-  ) const override;
-  virtual tile_maps_t categorize_tiles(const raw_tiles_t &src) const override;
-  virtual polygon_t   tile_polygon(
-      uint16_t        original_tile_width,
-      uint16_t        original_tile_height,
-      CellOrientation orientation
-    ) const override;
-  virtual pointf_t tile_position(
-    uint16_t     original_tile_width,
-    uint16_t     original_tile_height,
-    position_t   board_position,
-    board_size_t width,
-    board_size_t height
-  ) const override;
-  virtual std::vector<CellOrientation> cell_orientations() const override;
-};
-
-class LIBSOKOENGINE_LOCAL OctobanCommonSkinsFormat : public CommonSkinsFormat {
-public:
-  virtual std::unique_ptr<CommonSkinsFormat> clone() const override;
-  virtual ~OctobanCommonSkinsFormat();
-
-  virtual tile_maps_t categorize_tiles(const raw_tiles_t &src) const override;
-  virtual polygon_t   tile_polygon(
-      uint16_t        original_tile_width,
-      uint16_t        original_tile_height,
-      CellOrientation orientation
-    ) const override;
-  virtual pointf_t tile_position(
-    uint16_t     original_tile_width,
-    uint16_t     original_tile_height,
-    position_t   board_position,
-    board_size_t width,
-    board_size_t height
-  ) const override;
-  virtual std::vector<CellOrientation> cell_orientations() const override;
+  void guess_tile_sizes();
 };
 
 } // namespace implementation

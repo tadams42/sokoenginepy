@@ -67,5 +67,9 @@ CellOrientation TessellationImpl::cell_orientation(
   return CellOrientation::DEFAULT;
 }
 
+CellOrientations TessellationImpl::cell_orientations() const {
+  return CellOrientations{CellOrientation::DEFAULT};
+}
+
 } // namespace implementation
 } // namespace sokoengine

@@ -14,11 +14,9 @@ struct IsTessellationValidator : public CLI::Validator {
 };
 
 Tessellation from_str(const string &str);
-void         dump_tiles(
-          const Skin &skin, const fs::path &skin_file, const fs::path &output_dir
-        );
+void dump_tiles(Tessellation t, const fs::path &skin_file, const fs::path &output_dir);
 void render_board(
-  const Skin     &skin,
+  const fs::path &skin_file,
   const fs::path &collection_path,
   uint16_t        puzzle_index,
   const fs::path &rendered_board_path
@@ -84,21 +82,17 @@ int main(int argc, char **argv) {
 
   CLI11_PARSE(app, argc, argv);
 
-  Tessellation t = from_str(tessellation_s);
-  Skin         skin(from_str(tessellation_s), skin_file.string());
-
   if (dump_tiles_sub->parsed()) {
-    dump_tiles(skin, skin_file, output_dir);
+    dump_tiles(from_str(tessellation_s), skin_file, output_dir);
   } else if (render_board_sub->parsed()) {
-    render_board(skin, collection_path, puzzle_index, rendered_board_path);
+    render_board(skin_file, collection_path, puzzle_index, rendered_board_path);
   }
 
   return 0;
 }
 
-void dump_tiles(
-  const Skin &skin, const fs::path &skin_file, const fs::path &output_dir
-) {
+void dump_tiles(Tessellation t, const fs::path &skin_file, const fs::path &output_dir) {
+  Skin     skin(t, skin_file.string());
   fs::path tmp = skin_file.filename();
   tmp.replace_extension("");
   fs::path output_dir2 = output_dir / tmp;
@@ -107,7 +101,7 @@ void dump_tiles(
 }
 
 void render_board(
-  const Skin     &skin,
+  const fs::path &skin_file,
   const fs::path &collection_path,
   uint16_t        puzzle_index,
   const fs::path &rendered_board_path
@@ -119,8 +113,11 @@ void render_board(
          << "!" << endl;
     return;
   }
-  const Puzzle puzzle      = collection.puzzles()[puzzle_index];
-  Image        board_image = skin.render_board(puzzle);
+  const Puzzle puzzle = collection.puzzles()[puzzle_index];
+
+  Skin  skin(puzzle.tessellation(), skin_file.string());
+  Image board_image = skin.render_board(puzzle);
+
   board_image.save(rendered_board_path.string());
 }
 

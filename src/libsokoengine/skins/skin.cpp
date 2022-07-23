@@ -3,24 +3,17 @@
 #include "board_cell.hpp"
 #include "board_graph.hpp"
 #include "common_skins_format.hpp"
-#include "geometry.hpp"
 #include "image.hpp"
-#include "image_impl.hpp"
 #include "puzzle.hpp"
-#include "tessellation.hpp"
+#include "tessellation_impl.hpp"
 
 #include <boost/algorithm/string.hpp>
 
 using sokoengine::implementation::bounding_rect;
 using sokoengine::implementation::CommonSkinsFormat;
-using sokoengine::implementation::HexobanCommonSkinsFormat;
 using sokoengine::implementation::ImageImpl;
-using sokoengine::implementation::OctobanCommonSkinsFormat;
-using sokoengine::implementation::raw_tiles_t;
-using sokoengine::implementation::SokobanCommonSkinsFormat;
+using sokoengine::implementation::TessellationImpl;
 using sokoengine::implementation::tile_map_t;
-using sokoengine::implementation::tile_sizes_t;
-using sokoengine::implementation::TriobanCommonSkinsFormat;
 using std::istream;
 using std::map;
 using std::string;
@@ -74,20 +67,10 @@ public:
 
   string m_path;
 
-  uint8_t  m_rows_count_hint      = 0;
-  uint8_t  m_cols_count_hint      = 0;
-  uint16_t m_original_tile_width  = 0;
-  uint16_t m_original_tile_height = 0;
-  uint16_t m_tile_width           = 0;
-  uint16_t m_tile_height          = 0;
-  uint16_t m_rows_count           = 0;
-  uint16_t m_columns_count        = 0;
-
-  tiles_matrix_t                                  m_original_tiles;
-  map<CellOrientation, implementation::polygon_t> m_polygons;
+  tiles_t                                         m_original_tiles;
+  Image                                           m_empty_image;
   map<CellOrientation, tileset_t>                 m_tilesets;
-
-  Image m_empty_image;
+  map<CellOrientation, implementation::polygon_t> m_polygons;
 
   PIMPL(
     Tessellation  tessellation,
@@ -95,21 +78,8 @@ public:
     uint16_t      rows_count_hint,
     uint16_t      columns_count_hint
   )
-    : m_tessellation(tessellation)
-    , m_path(path)
-    , m_rows_count_hint(rows_count_hint)
-    , m_cols_count_hint(columns_count_hint) {
-    init_format();
-
-    raw_tiles_t raw_tiles;
-
-    {
-      ImageImpl img;
-      img.load(m_path);
-      slice_tiles(img, raw_tiles);
-    }
-
-    apply_tiles(raw_tiles);
+    : PIMPL(tessellation, ImageImpl::load(path), rows_count_hint, columns_count_hint) {
+    m_path = path;
   }
 
   PIMPL(
@@ -119,40 +89,25 @@ public:
     uint8_t      rows_count_hint,
     uint8_t      columns_count_hint
   )
-    : m_tessellation(tessellation)
-    , m_rows_count_hint(rows_count_hint)
-    , m_cols_count_hint(columns_count_hint) {
-    init_format();
-
-    raw_tiles_t raw_tiles;
-
-    {
-      ImageImpl img;
-      img.load(src, format);
-      slice_tiles(img, raw_tiles);
-    }
-
-    apply_tiles(raw_tiles);
-  }
+    : PIMPL(
+      tessellation, ImageImpl::load(src, format), rows_count_hint, columns_count_hint
+    ) {}
 
   PIMPL(
     Tessellation tessellation,
-    uint16_t     original_tile_width,
-    uint16_t     original_tile_height
+    uint32_t     image_width,
+    uint32_t     image_height,
+    uint8_t      rows_count_hint,
+    uint8_t      columns_count_hint
   )
     : m_tessellation(tessellation)
-    , m_original_tile_width(original_tile_width)
-    , m_original_tile_height(original_tile_height) {
-    init_format();
-    init_tile_sizes();
-
-    for (auto orientation : m_format->cell_orientations()) {
-      m_polygons.try_emplace(
-        orientation,
-        m_format->tile_polygon(
-          m_original_tile_width, m_original_tile_height, orientation
-        )
-      );
+    , m_format(
+        CommonSkinsFormat::instance(tessellation, rows_count_hint, columns_count_hint)
+      ) {
+    m_format->set_image(image_width, image_height);
+    const TessellationImpl &tess_obj = TessellationImpl::instance(m_tessellation);
+    for (auto orientation : tess_obj.cell_orientations()) {
+      m_polygons.try_emplace(orientation, m_format->tile_polygon(orientation));
     }
   }
 
@@ -160,34 +115,18 @@ public:
     : m_tessellation(rv.m_tessellation)
     , m_format(rv.m_format->clone())
     , m_path(rv.m_path)
-    , m_rows_count_hint(rv.m_rows_count_hint)
-    , m_cols_count_hint(rv.m_cols_count_hint)
-    , m_original_tile_width(rv.m_original_tile_width)
-    , m_original_tile_height(rv.m_original_tile_height)
-    , m_tile_width(rv.m_tile_width)
-    , m_tile_height(rv.m_tile_height)
-    , m_rows_count(rv.m_rows_count)
-    , m_columns_count(rv.m_columns_count)
     , m_original_tiles(rv.m_original_tiles)
-    , m_polygons(rv.m_polygons)
-    , m_tilesets(rv.m_tilesets) {}
+    , m_tilesets(rv.m_tilesets)
+    , m_polygons(rv.m_polygons) {}
 
   PIMPL &operator=(const PIMPL &rv) {
     if (this != &rv) {
-      m_tessellation         = rv.m_tessellation;
-      m_format               = rv.m_format->clone();
-      m_path                 = rv.m_path;
-      m_rows_count_hint      = rv.m_rows_count_hint;
-      m_cols_count_hint      = rv.m_cols_count_hint;
-      m_original_tile_width  = rv.m_original_tile_width;
-      m_original_tile_height = rv.m_original_tile_height;
-      m_tile_width           = rv.m_tile_width;
-      m_tile_height          = rv.m_tile_height;
-      m_rows_count           = rv.m_rows_count;
-      m_columns_count        = rv.m_columns_count;
-      m_original_tiles       = rv.m_original_tiles;
-      m_polygons             = rv.m_polygons;
-      m_tilesets             = rv.m_tilesets;
+      m_tessellation   = rv.m_tessellation;
+      m_format         = rv.m_format->clone();
+      m_path           = rv.m_path;
+      m_original_tiles = rv.m_original_tiles;
+      m_polygons       = rv.m_polygons;
+      m_tilesets       = rv.m_tilesets;
     }
     return *this;
   }
@@ -196,39 +135,50 @@ public:
   PIMPL &operator=(PIMPL &&) = default;
   ~PIMPL()                   = default;
 
-  bool is_empty() const {
-    return m_original_tiles.size() == 0 || m_tilesets.size() == 0;
-  }
-
 private:
-  void apply_tiles(raw_tiles_t &from) {
-    auto raw_tiles = m_format->categorize_tiles(from);
+  PIMPL(
+    Tessellation     tessellation,
+    const ImageImpl &from,
+    uint8_t          rows_count_hint,
+    uint8_t          columns_count_hint
+  )
+    : m_tessellation(tessellation)
+    , m_format(
+        CommonSkinsFormat::instance(tessellation, rows_count_hint, columns_count_hint)
+      ) {
+    m_format->set_image(from.width(), from.height());
 
-    for (const auto &[orientation, tile_map] : raw_tiles) {
-      m_polygons.try_emplace(
-        orientation,
-        m_format->tile_polygon(
-          m_original_tile_width, m_original_tile_height, orientation
-        )
-      );
+    auto rows_c = m_format->rows_count();
+    auto cols_c = m_format->columns_count();
+
+    ImageImpl::tiles_t raw_tiles = from.slice(cols_c, rows_c);
+
+    const TessellationImpl &tess_obj = TessellationImpl::instance(m_tessellation);
+    for (auto orientation : tess_obj.cell_orientations()) {
+      m_polygons.try_emplace(orientation, m_format->tile_polygon(orientation));
+    }
+
+    auto tile_maps = m_format->categorize_tiles(raw_tiles);
+
+    for (const auto &[orientation, tile_map] : tile_maps) {
       m_tilesets.try_emplace(orientation);
 
       const implementation::polygon_t &polygon      = m_polygons.at(orientation);
       tileset_t                       &dest_tileset = m_tilesets.at(orientation);
 
-      apply_tileset(from, raw_tiles.at(orientation), dest_tileset, polygon);
+      apply_tileset(raw_tiles, tile_maps.at(orientation), dest_tileset, polygon);
     }
 
-    m_original_tiles = tiles_matrix_t(m_rows_count, vector<Image>(m_columns_count));
-    for (size_t row = 0; row < m_rows_count; ++row) {
-      for (size_t column = 0; column < m_columns_count; ++column) {
-        from[row][column].swap(m_original_tiles[row][column]);
+    m_original_tiles = tiles_t(rows_c, vector<Image>(cols_c));
+    for (size_t row = 0; row < rows_c; ++row) {
+      for (size_t column = 0; column < cols_c; ++column) {
+        raw_tiles[row][column].swap(m_original_tiles[row][column]);
       }
     }
   }
 
-  void apply_tileset(
-    const raw_tiles_t              &from,
+  static void apply_tileset(
+    const ImageImpl::tiles_t       &from,
     const tile_map_t               &tile_map,
     tileset_t                      &into,
     const implementation::polygon_t polygon
@@ -331,69 +281,6 @@ private:
       }
     }
   }
-
-  void slice_tiles(ImageImpl &from, raw_tiles_t &into) {
-    tile_sizes_t sizes = m_format->guess_tile_sizes(
-      from.width(), from.height(), m_rows_count_hint, m_cols_count_hint
-    );
-    m_original_tile_width  = sizes.original_tile_width;
-    m_original_tile_height = sizes.original_tile_height;
-    m_rows_count           = sizes.rows_count;
-    m_columns_count        = sizes.columns_count;
-    init_tile_sizes();
-
-    for (size_t row = 0; row < m_rows_count; ++row) {
-      into.emplace_back(m_columns_count);
-      vector<ImageImpl> &row_data = into.back();
-
-      for (size_t column = 0; column < m_columns_count; ++column) {
-        implementation::rect_t tile_rect(
-          column * m_original_tile_width,
-          row * m_original_tile_height,
-          m_original_tile_width,
-          m_original_tile_height
-        );
-        row_data[column] = from.subimage(tile_rect);
-      }
-    }
-  }
-
-  void init_tile_sizes() {
-    auto box = bounding_rect(m_format->tile_polygon(
-                               m_original_tile_width,
-                               m_original_tile_height,
-                               CellOrientation::DEFAULT
-                             ))
-                 .to_aligned_rect();
-    m_tile_height = box.height();
-    m_tile_width  = box.width();
-  }
-
-  void init_format() {
-    bool found = false;
-    switch (m_tessellation) {
-      case Tessellation::SOKOBAN:
-        m_format = std::make_unique<SokobanCommonSkinsFormat>();
-        found    = true;
-        break;
-      case Tessellation::HEXOBAN:
-        m_format = std::make_unique<HexobanCommonSkinsFormat>();
-        found    = true;
-        break;
-      case Tessellation::TRIOBAN:
-        m_format = std::make_unique<TriobanCommonSkinsFormat>();
-        found    = true;
-        break;
-      case Tessellation::OCTOBAN:
-        m_format = std::make_unique<OctobanCommonSkinsFormat>();
-        found    = true;
-        break;
-        // Don't use default so we get compiler warning
-    };
-    if (!found) {
-      throw std::invalid_argument("Unknown tessellation!");
-    }
-  }
 };
 
 Skin::Skin(
@@ -418,11 +305,15 @@ Skin::Skin(
   )) {}
 
 Skin::Skin(
-  Tessellation tessellation, uint16_t original_tile_width, uint16_t original_tile_height
+  Tessellation tessellation,
+  uint32_t     image_width,
+  uint32_t     image_height,
+  uint8_t      rows_count_hint,
+  uint8_t      columns_count_hint
 )
-  : m_impl(
-    std::make_unique<PIMPL>(tessellation, original_tile_width, original_tile_height)
-  ) {}
+  : m_impl(std::make_unique<PIMPL>(
+    tessellation, image_width, image_height, rows_count_hint, columns_count_hint
+  )) {}
 
 Skin::Skin(const Skin &rv)
   : m_impl(std::make_unique<PIMPL>(*rv.m_impl)) {}
@@ -440,19 +331,23 @@ Skin::~Skin()                  = default;
 
 const string &Skin::path() const { return m_impl->m_path; }
 
-uint16_t Skin::rows_count() const { return m_impl->m_rows_count; }
+uint32_t Skin::img_width() const { return m_impl->m_format->img_width(); }
 
-uint16_t Skin::columns_count() const { return m_impl->m_columns_count; }
+uint32_t Skin::img_height() const { return m_impl->m_format->img_height(); }
 
-uint16_t Skin::original_tile_width() const { return m_impl->m_original_tile_width; }
+uint16_t Skin::rows_count() const { return m_impl->m_format->rows_count(); }
 
-uint16_t Skin::original_tile_height() const { return m_impl->m_original_tile_height; }
+uint16_t Skin::columns_count() const { return m_impl->m_format->columns_count(); }
 
-const Skin::tiles_matrix_t &Skin::tiles() const { return m_impl->m_original_tiles; }
+uint16_t Skin::original_tile_width() const { return m_impl->m_format->columns_width(); }
 
-uint16_t Skin::tile_width() const { return m_impl->m_tile_width; }
+uint16_t Skin::original_tile_height() const { return m_impl->m_format->rows_height(); }
 
-uint16_t Skin::tile_height() const { return m_impl->m_tile_width; }
+const Skin::tiles_t &Skin::tiles() const { return m_impl->m_original_tiles; }
+
+uint16_t Skin::tile_width() const { return m_impl->m_format->tile_width(); }
+
+uint16_t Skin::tile_height() const { return m_impl->m_format->tile_height(); }
 
 Skin::polygon_t Skin::tile_polygon(CellOrientation orientation) const {
   const implementation::polygon_t &p = m_impl->m_polygons.at(orientation);
@@ -468,24 +363,16 @@ Skin::polygon_t Skin::tile_polygon(CellOrientation orientation) const {
 Skin::point_t Skin::tile_position(
   position_t board_position, board_size_t width, board_size_t height
 ) const {
-  auto p = m_impl->m_format->tile_position(
-    m_impl->m_original_tile_width,
-    m_impl->m_original_tile_height,
-    board_position,
-    width,
-    height
-  );
+  auto p = m_impl->m_format->tile_position(board_position, width, height);
   return std::make_pair(p.x(), p.y());
 }
 
-bool Skin::is_empty() const { return m_impl->is_empty(); }
+bool Skin::is_empty() const {
+  return m_impl->m_original_tiles.size() == 0 || m_impl->m_tilesets.size() == 0;
+}
 
-vector<CellOrientation> Skin::cell_orientations() const {
-  vector<CellOrientation> retv;
-  for (const auto &[k, v] : m_impl->m_tilesets) {
-    retv.push_back(k);
-  }
-  return retv;
+CellOrientations Skin::cell_orientations() const {
+  return TessellationImpl::instance(m_impl->m_tessellation).cell_orientations();
 }
 
 const Image &Skin::floor(CellOrientation orientation) const {
@@ -680,9 +567,7 @@ void Skin::dump_tiles(const std::string &dir) const {
     }
   };
 
-  for (CellOrientation o : cell_orientations()) {
-    const auto &tileset = m_impl->m_tilesets.at(o);
-
+  for (const auto &[o, tileset] : m_impl->m_tilesets) {
     save(tileset.floor, tile_path("floor", o));
     save(tileset.non_playable_floor, tile_path("non_playable_floor", o));
     save(tileset.goal, tile_path("goal", o));
@@ -756,14 +641,16 @@ Image Skin::render_board(const game::BoardGraph &board) const {
   uint16_t w = static_cast<uint16_t>(board.board_width());
   uint16_t h = static_cast<uint16_t>(board.board_height());
 
-  ImageImpl retv(w * tile_width(), h * tile_height());
+  auto      canvas_size = m_impl->m_format->canvas_size(w, h);
+  ImageImpl retv(canvas_size.x(), canvas_size.y(), pixel_t(255, 255, 255));
 
   const_cast<BoardGraph &>(board).mark_play_area();
 
   for (size_t row = 0; row < h; ++row) {
     for (size_t col = 0; col < w; ++col) {
-      position_t       pos         = index_1d(col, row, w);
-      point_t          corner      = tile_position(pos, w, h);
+      position_t pos    = index_1d(col, row, w);
+      point_t    corner = tile_position(pos, w, h);
+
       CellOrientation  orientation = board.cell_orientation(pos);
       const BoardCell &cell        = board[pos];
       const Image     *selected    = nullptr;
@@ -779,7 +666,7 @@ Image Skin::render_board(const game::BoardGraph &board) const {
       } else {
         selected = &floor(orientation);
       }
-      retv.copy(*selected, top_left);
+      retv.overlay(*selected, top_left);
       selected = nullptr;
 
       if (cell.has_box() && cell.has_goal()) {

@@ -21,6 +21,7 @@ using std::istream;
 using std::ofstream;
 using std::ostream;
 using std::string;
+using std::vector;
 
 namespace gil       = boost::gil;
 using image_t       = gil::rgba8_image_t;
@@ -41,6 +42,13 @@ ImageImpl::ImageImpl()
 ImageImpl::ImageImpl(uint32_t width, uint32_t height)
   : m_img(width, height) {}
 
+ImageImpl::ImageImpl(uint32_t width, uint32_t height, const pixel_t &fill)
+  : ImageImpl(width, height) {
+  auto          view = gil::view(m_img);
+  rgba8_pixel_t gil_fill(fill.r, fill.g, fill.b, 255);
+  gil::fill_pixels(view, gil_fill);
+}
+
 void ImageImpl::swap(ImageImpl &img) { m_img.swap(img.m_img); }
 
 void ImageImpl::swap(Image &img) { swap(*img.m_impl); }
@@ -55,27 +63,27 @@ uint32_t ImageImpl::width() const { return m_img.width(); }
 
 uint32_t ImageImpl::height() const { return m_img.height(); }
 
-void ImageImpl::load(const string &path) {
+ImageImpl ImageImpl::load(const string &path) {
   bool maybe_png = boost::ends_with(boost::to_lower_copy(path), ".png");
   bool maybe_bmp = boost::ends_with(boost::to_lower_copy(path), ".bmp");
 
-  if (!maybe_bmp && !maybe_png) {
-    throw std::invalid_argument("Only supports loading PNG and BMP images!");
-  }
-
-  ifstream src(path, ios::binary);
-
   if (maybe_png) {
-    load(src, ImageFormats::PNG);
+    ifstream src(path, ios::binary);
+    return load(src, ImageFormats::PNG);
   } else if (maybe_bmp) {
-    load(src, ImageFormats::BMP);
+    ifstream src(path, ios::binary);
+    return load(src, ImageFormats::BMP);
+  } else {
+    throw std::invalid_argument("Only supports loading PNG and BMP images!");
   }
 }
 
-void ImageImpl::load(istream &src, ImageFormats format) {
+ImageImpl ImageImpl::load(istream &src, ImageFormats format) {
   if (format != ImageFormats::PNG && format != ImageFormats::BMP) {
     throw std::invalid_argument("Only BMP and PNG format images are supported!");
   }
+
+  ImageImpl retv;
 
   gil::image_read_settings<gil::png_tag> png_settings;
   png_settings._read_transparency_data   = true;
@@ -84,16 +92,16 @@ void ImageImpl::load(istream &src, ImageFormats format) {
 
   gil::image_read_settings<gil::bmp_tag> bmp_settings;
 
-  m_img = image_t();
+  retv.m_img = image_t();
 
   try {
     switch (format) {
       case ImageFormats::PNG:
-        gil::read_and_convert_image(src, m_img, png_settings);
+        gil::read_and_convert_image(src, retv.m_img, png_settings);
         break;
       case ImageFormats::BMP:
       default:
-        gil::read_and_convert_image(src, m_img, bmp_settings);
+        gil::read_and_convert_image(src, retv.m_img, bmp_settings);
         break;
     }
   } catch (ios::failure &e) {
@@ -102,6 +110,8 @@ void ImageImpl::load(istream &src, ImageFormats format) {
       + "only PNG and BMP images are supported. (" + e.what() + ")"
     );
   }
+
+  return retv;
 }
 
 void ImageImpl::save(const string &path) const {
@@ -111,6 +121,26 @@ void ImageImpl::save(const string &path) const {
 
 void ImageImpl::save(ostream &dest) const {
   gil::write_view(dest, gil::const_view(m_img), gil::png_tag{});
+}
+
+ImageImpl::tiles_t ImageImpl::slice(uint16_t columns_count, uint16_t rows_count) const {
+  tiles_t retv(rows_count, vector<ImageImpl>(columns_count));
+
+  size_t columns_width = m_img.width() / columns_count;
+  size_t rows_height   = m_img.height() / rows_count;
+
+  for (size_t row = 0; row < rows_count; ++row) {
+    vector<ImageImpl> &row_data = retv[row];
+
+    for (size_t column = 0; column < columns_count; ++column) {
+      implementation::rect_t tile_rect(
+        column * columns_width, row * rows_height, columns_width, rows_height
+      );
+      row_data[column] = subimage(tile_rect);
+    }
+  }
+
+  return retv;
 }
 
 ImageImpl ImageImpl::subimage(const rect_t &rect) const {
@@ -240,8 +270,12 @@ void ImageImpl::set_outer_pixels_transparent(const polygon_t &polygon) {
   auto h     = img_v.height();
 
   // auto strategy = boost::geometry::default_strategy();
-  auto strategy =
-    boost::geometry::strategy::within::franklin<point_t, polygon_t, uint64_t>();
+  // auto strategy = boost::geometry::strategy::covered_by::cartesian_box_box();
+  // auto strategy =
+  // boost::geometry::strategy::covered_by::cartesian_point_box_by_side();
+
+  // auto strategy =
+  //   boost::geometry::strategy::within::franklin<point_t, polygon_t, uint64_t>();
   // auto strategy = boost::geometry::strategy::within::crossings_multiply<point_t,
   // polygon_t, uint32_t>();
   // auto strategy = boost::geometry::strategy::within::cartesian_point_box();
@@ -249,7 +283,7 @@ void ImageImpl::set_outer_pixels_transparent(const polygon_t &polygon) {
   for (uint32_t y = 0; y < h; ++y) {
     boost::gil::rgba8_ptr_t it = img_v.row_begin(y);
     for (uint32_t x = 0; x < w; ++x) {
-      if (!boost::geometry::covered_by(pointf_t(x, y), polygon, strategy)) {
+      if (!boost::geometry::covered_by(pointf_t(x, y), polygon)) {
         get_color(it[x], alpha_tag) = 0;
       }
     }

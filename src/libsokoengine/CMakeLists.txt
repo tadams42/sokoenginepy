@@ -87,14 +87,22 @@ set(SELF_SOURCES
 
     benchmarks.cpp
 
-    skins/geometry.hpp
     skins/geometry.cpp
-    skins/skin.cpp
-    skins/image.cpp
-    skins/image_impl.hpp
+    skins/geometry.hpp
     skins/image_impl.cpp
+    skins/image_impl.hpp
+    skins/image.cpp
+    skins/skin.cpp
     skins/common_skins_format.hpp
     skins/common_skins_format.cpp
+    skins/sokoban_common_skins_format.hpp
+    skins/sokoban_common_skins_format.cpp
+    skins/trioban_common_skins_format.hpp
+    skins/trioban_common_skins_format.cpp
+    skins/hexoban_common_skins_format.hpp
+    skins/hexoban_common_skins_format.cpp
+    skins/octoban_common_skins_format.hpp
+    skins/octoban_common_skins_format.cpp
 )
 
 set(SELF_INCLUDE_DIRS
@@ -314,8 +322,7 @@ set_target_properties(benchmarks
 # skindump utility
 # ..................
 add_executable(skindump skindump.cpp)
-target_link_libraries(skindump PRIVATE sokoengine)
-target_link_libraries(skindump PRIVATE CLI11::CLI11)
+target_link_libraries(skindump PRIVATE sokoengine CLI11::CLI11)
 
 # add_valgrind_profile_dump_target(playground)
 set_target_properties(

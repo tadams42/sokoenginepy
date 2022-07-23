@@ -171,5 +171,10 @@ CellOrientation OctobanTessellation::cell_orientation(
                                          : CellOrientation::DEFAULT;
 }
 
+
+CellOrientations OctobanTessellation::cell_orientations() const {
+  return CellOrientations{CellOrientation::DEFAULT, CellOrientation::OCTAGON};
+}
+
 } // namespace implementation
 } // namespace sokoengine

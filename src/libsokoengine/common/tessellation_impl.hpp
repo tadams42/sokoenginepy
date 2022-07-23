@@ -92,6 +92,11 @@ public:
   ///
   virtual CellOrientation
   cell_orientation(position_t position, board_size_t width, board_size_t height) const;
+
+  ///
+  /// All CellOrientation that this tessellation uses.
+  ///
+  virtual CellOrientations cell_orientations() const;
 };
 
 } // namespace implementation

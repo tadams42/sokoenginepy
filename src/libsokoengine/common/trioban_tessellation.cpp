@@ -166,5 +166,9 @@ CellOrientation TriobanTessellation::cell_orientation(
 
 GraphType TriobanTessellation::graph_type() const { return GraphType::DIRECTED_MULTI; }
 
+CellOrientations TriobanTessellation::cell_orientations() const {
+  return CellOrientations{CellOrientation::DEFAULT, CellOrientation::TRIANGLE_DOWN};
+}
+
 } // namespace implementation
 } // namespace sokoengine

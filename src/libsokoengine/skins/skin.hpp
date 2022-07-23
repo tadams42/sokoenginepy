@@ -74,7 +74,7 @@ class Image;
 ///
 class LIBSOKOENGINE_API Skin {
 public:
-  typedef std::vector<std::vector<Image>> tiles_matrix_t;
+  typedef std::vector<std::vector<Image>> tiles_t;
   typedef std::map<Direction, Image>      directional_pushers_t;
   typedef std::pair<Directions, Image>    directional_wall_t;
   typedef std::vector<directional_wall_t> directional_walls_t;
@@ -129,10 +129,42 @@ public:
   /// Empty skin doesn't have any image data but is able to give correct info on tile
   /// sizes, cell orientations and tile polygons.
   ///
+  /// Empty skins are useful in following scenario:
+  ///
+  ///   1. application loads skin and consumes tile images:
+  ///
+  ///      ```cpp
+  ///      Skin tmp (Tessellation::SOKOBAN, "path/to/file.png");
+  ///      convert_skin_images_to_internal_format(tmp);
+  ///      ```
+  ///
+  ///   2. application creates "empty skin" from loaded one
+  ///
+  ///      ```cpp
+  ///      this->empty_skin = Skin(
+  ///        Tessellation::SOKOBAN, tmp.img_width(), tmp.img_height()
+  ///      );
+  ///      ```
+  ///
+  /// `tmp` in above example can be destructed, freeing (somewhat substantial amount of)
+  /// memory. `this->empty_skin` can be used just as `tmp` would've been used. ie.
+  ///
+  /// ```cpp
+  /// this->empty_skin.tile_polygon();
+  /// ```
+  ///
+  /// will still produce correct result.
+  ///
+  /// `empty_skin` will have much smaller memory footprint at the cost of not having
+  /// actual tile images (ie. calling `empty_skin.floor(CellOrientation::DEFAULT)` will
+  /// throw).
+  ///
   Skin(
     Tessellation tessellation,
-    uint16_t     original_tile_width,
-    uint16_t     original_tile_height
+    uint32_t     image_width,
+    uint32_t     image_height,
+    uint8_t      rows_count_hint    = 0,
+    uint8_t      columns_count_hint = 0
   );
 
   Skin(const Skin &);
@@ -142,62 +174,69 @@ public:
   ~Skin();
 
   ///
-  /// Source file path.
+  /// Source file path, if known when Skin was constructed.
   ///
   const std::string &path() const;
 
   ///
-  /// Number of tile rows in image.
+  /// Source image width.
+  ///
+  uint32_t img_width() const;
+
+  ///
+  /// Source image height.
+  ///
+  uint32_t img_height() const;
+
+  ///
+  /// Calculated number of tile rows in source image.
   ///
   uint16_t rows_count() const;
 
   ///
-  /// Number of tile columns in image.
+  /// Calculated number of tile columns in source image.
   ///
   uint16_t columns_count() const;
 
   ///
-  /// Size of each original, unprocessed tile image.
+  /// Width of each original, unprocessed tile in source image.
   ///
   uint16_t original_tile_width() const;
 
   ///
-  /// Size of each original, unprocessed tile image.
+  /// Height of each original, unprocessed tile in source image.
   ///
   uint16_t original_tile_height() const;
 
   ///
   /// Original, unprocessed tile images extracted from source image.
   ///
-  const tiles_matrix_t &tiles() const;
+  const tiles_t &tiles() const;
 
   ///
-  /// Size of processed and cropped tile image.
+  /// Width of each processed and cropped tile image.
   ///
-  /// @note This doesn't have to be equal to original_tile_size() but is same for each
-  /// processed tile (ie. floor(), pusher(), box()...).
+  ///   tile_width <= original_tile_width
   ///
   uint16_t tile_width() const;
 
   ///
-  /// Size of processed and cropped tile image.
+  /// Height of each processed and cropped tile image.
   ///
-  /// @note This doesn't have to be equal to original_tile_size() but is same for each
-  /// processed tile (ie. floor(), pusher(), box()...).
+  ///   tile_height <= original_tile_height
   ///
   uint16_t tile_height() const;
 
   ///
   /// polygon_t for this skin and cell orientation.
   ///
-  /// Bounding box of this polygon is always `tile_width() * tile_height()`.
-  ///
-  /// polygon_t is always closed: `polygon.front() == polygon.back()`.
+  /// - bounding box is `tile_width() x tile_height()`.
+  /// - it is closed: `polygon.front() == polygon.back()`.
   ///
   /// This polygon precisely traces tile shape for given Tessellation and
   /// CellOrientation. For example, in Trioban tessellation with `orientation ==
   /// CellOrientation::TRIANGLE_DOWN` this method will return polygon with 4 points
-  /// defining equilateral triangle with side length equal to tile_width().
+  /// defining equilateral triangle where side length is equal to tile_width().
   ///
   polygon_t tile_polygon(CellOrientation orientation) const;
 
@@ -210,15 +249,13 @@ public:
   ) const;
 
   ///
-  /// All cell orientations for which this skin has tile images.
+  /// All CellOrientation for tessellation of this Skin.
   ///
-  std::vector<CellOrientation> cell_orientations() const;
+  CellOrientations cell_orientations() const;
 
   ///
   /// Empty skin doesn't have any image data but is able to give correct info on tile
   /// sizes, cell orientations and tile polygons.
-  ///
-  /// Methods returning tile images will return empty images if skin is empty.
   ///
   bool is_empty() const;
 
@@ -243,7 +280,7 @@ public:
   const Image &pusher(CellOrientation orientation) const;
 
   ///
-  /// Tries to find image for pusher looking at given @param looking_at.
+  /// Tries to find image for pusher looking at given direction.
   ///
   /// If there is no such image, returns regular pusher image.
   ///
@@ -255,7 +292,7 @@ public:
   const Image &pusher_on_goal(CellOrientation orientation) const;
 
   ///
-  /// Tries to find image for pusher looking at given @param looking_at.
+  /// Tries to find image for pusher looking at given direction.
   ///
   /// If there is no such image, returns regular pusher on goal image.
   ///
@@ -278,8 +315,8 @@ public:
 
   ///
   /// Tries to find directional wall that has neighbors in all directions specified by
-  /// @param neighbor_walls. If there is no such directional wall, returns regular,
-  /// non directional wall.
+  /// `neighbor_walls`. If there is no such directional wall, returns non directional
+  /// wall.
   ///
   const Image &
   wall(const Directions &neighbor_walls, CellOrientation orientation) const;
@@ -335,7 +372,14 @@ public:
   ///
   void dump_tiles(const std::string &dir) const;
 
+  ///
+  /// Renders image of board using skin tiles.
+  ///
   Image render_board(const io::Puzzle &puzzle) const;
+
+  ///
+  /// Renders image of board using skin tiles.
+  ///
   Image render_board(const game::BoardGraph &board) const;
 
 private:
