@@ -181,9 +181,9 @@ public:
   positions_t find_jump_path(position_t src, position_t dst) const;
 
   ///
-  /// Converts path expressed as positions to one expressed as :class:`.Direction`.
+  /// Converts path expressed as sequence of positions to sequence for directions.
   ///
-  /// @throws InvalidPositionError Any position in `positions` is off board
+  /// @throws InvalidPositionError Any position in `positions` is off board.
   ///
   directions_t positions_path_to_directions_path(const positions_t &positions) const;
 

@@ -73,6 +73,10 @@ uint8_t CommonSkinsFormat::rows_count() const { return m_rows_count; }
 
 uint8_t CommonSkinsFormat::columns_count() const { return m_columns_count; }
 
+uint8_t CommonSkinsFormat::rows_count_hint() const { return m_rows_count_hint; }
+
+uint8_t CommonSkinsFormat::columns_count_hint() const { return m_cols_count_hint; }
+
 void CommonSkinsFormat ::set_image(uint32_t img_width_, uint32_t img_height_) {
   m_img_width  = img_width_;
   m_img_height = img_height_;

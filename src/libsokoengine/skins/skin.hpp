@@ -122,55 +122,31 @@ public:
     uint8_t       columns_count_hint = 0
   );
 
-  ///
-  /// Constructs empty skin.
-  ///
-  /// Empty skin doesn't have any image data but is able to give correct info on tile
-  /// sizes, tile shapes and tile polygons.
-  ///
-  /// Empty skins are useful in following scenario:
-  ///
-  ///   1. application loads skin and consumes tile images:
-  ///
-  ///      ```cpp
-  ///      Skin tmp (Tessellation::SOKOBAN, "path/to/file.png");
-  ///      convert_skin_images_to_internal_format(tmp);
-  ///      ```
-  ///
-  ///   2. application creates "empty skin" from loaded one
-  ///
-  ///      ```cpp
-  ///      this->empty_skin = Skin(
-  ///        Tessellation::SOKOBAN, tmp.img_width(), tmp.img_height()
-  ///      );
-  ///      ```
-  ///
-  /// `tmp` in above example can be destructed, freeing (somewhat substantial amount of)
-  /// memory. `this->empty_skin` can be used just as `tmp` would've been used. ie.
-  ///
-  /// ```cpp
-  /// this->empty_skin.tile_polygon();
-  /// ```
-  ///
-  /// will still produce correct result.
-  ///
-  /// `empty_skin` will have much smaller memory footprint at the cost of not having
-  /// actual tile images (ie. calling `empty_skin.floor(TileShape::DEFAULT)` will
-  /// throw).
-  ///
-  Skin(
-    Tessellation tessellation,
-    uint32_t     image_width,
-    uint32_t     image_height,
-    uint8_t      rows_count_hint    = 0,
-    uint8_t      columns_count_hint = 0
-  );
-
   Skin(const Skin &);
   Skin &operator=(const Skin &);
   Skin(Skin &&);
   Skin &operator=(Skin &&);
   ~Skin();
+
+  ///
+  /// Creates copy of this skin without image data.
+  ///
+  /// This is useful in scenarios where image data had been converted into client's own
+  /// image representation and instance of Skin is needed only for calculating tile
+  /// positions and polygons. In that situation, creating a stripped copy saves memory
+  /// but retains other useful capabilities (querying for ie. tile_position or
+  /// tile_polygon).
+  ///
+  /// @warning Since stripped copy no longer contains images, querying it for image data
+  /// (calling ie. `skin.box_on_goal(TileShape::DEFAULT))` will throw.
+  ///
+  std::unique_ptr<Skin> stripped_copy() const;
+
+  ///
+  /// Empty skin doesn't have any image data but is able to give correct info on tile
+  /// sizes, tile shapes and tile polygons.
+  ///
+  bool is_empty() const;
 
   ///
   /// Source file path, if known when Skin was constructed.
@@ -251,12 +227,6 @@ public:
   /// All TileShape for tessellation of this Skin.
   ///
   tile_shapes_t tile_shapes() const;
-
-  ///
-  /// Empty skin doesn't have any image data but is able to give correct info on tile
-  /// sizes, tile shapes and tile polygons.
-  ///
-  bool is_empty() const;
 
   ///
   /// Cropped and processed tile image for board floor.
@@ -381,6 +351,8 @@ public:
 private:
   class PIMPL;
   std::unique_ptr<PIMPL> m_impl;
+
+  Skin(Tessellation tessellation);
 };
 
 } // namespace skins

@@ -25,8 +25,9 @@ namespace fs = std::filesystem;
 namespace sokoengine {
 namespace skins {
 
-typedef std::map<Direction, Image>    directional_pushers_t;
-typedef std::map<directions_t, Image> directional_walls_t;
+typedef std::map<Direction, Image>                directional_pushers_t;
+typedef std::map<directions_t, Image>             directional_walls_t;
+typedef map<TileShape, implementation::polygon_t> polygons_t;
 
 //
 // All tile images for single tile shape.
@@ -63,6 +64,8 @@ struct LIBSOKOENGINE_LOCAL tileset_t {
   Skin::animation_frames_t animated_box_on_goal;
 };
 
+typedef map<TileShape, tileset_t> tilesets_t;
+
 class LIBSOKOENGINE_LOCAL Skin::PIMPL {
 public:
   Tessellation                  m_tessellation;
@@ -70,10 +73,10 @@ public:
 
   string m_path;
 
-  tiles_t                                   m_original_tiles;
-  Image                                     m_empty_image;
-  map<TileShape, tileset_t>                 m_tilesets;
-  map<TileShape, implementation::polygon_t> m_polygons;
+  tiles_t    m_original_tiles;
+  Image      m_empty_image;
+  tilesets_t m_tilesets;
+  polygons_t m_polygons;
 
   PIMPL(
     Tessellation  tessellation,
@@ -97,22 +100,13 @@ public:
     ) {}
 
   PIMPL(
-    Tessellation tessellation,
-    uint32_t     image_width,
-    uint32_t     image_height,
-    uint8_t      rows_count_hint,
-    uint8_t      columns_count_hint
+    Tessellation             tessellation,
+    const CommonSkinsFormat &format,
+    const polygons_t        &polygons
   )
     : m_tessellation(tessellation)
-    , m_format(
-        CommonSkinsFormat::instance(tessellation, rows_count_hint, columns_count_hint)
-      ) {
-    m_format->set_image(image_width, image_height);
-    const TessellationImpl &tess_obj = TessellationImpl::instance(m_tessellation);
-    for (auto shape : tess_obj.tile_shapes()) {
-      m_polygons.try_emplace(shape, m_format->tile_polygon(shape));
-    }
-  }
+    , m_format(format.clone())
+    , m_polygons(polygons) {}
 
   PIMPL(const PIMPL &rv)
     : m_tessellation(rv.m_tessellation)
@@ -137,6 +131,10 @@ public:
   PIMPL(PIMPL &&)            = default;
   PIMPL &operator=(PIMPL &&) = default;
   ~PIMPL()                   = default;
+
+  unique_ptr<PIMPL> stripped_copy() const {
+    return std::make_unique<PIMPL>(m_tessellation, *m_format, m_polygons);
+  }
 
 private:
   PIMPL(
@@ -307,16 +305,7 @@ Skin::Skin(
     tessellation, src, format, rows_count_hint, columns_count_hint
   )) {}
 
-Skin::Skin(
-  Tessellation tessellation,
-  uint32_t     image_width,
-  uint32_t     image_height,
-  uint8_t      rows_count_hint,
-  uint8_t      columns_count_hint
-)
-  : m_impl(std::make_unique<PIMPL>(
-    tessellation, image_width, image_height, rows_count_hint, columns_count_hint
-  )) {}
+Skin::Skin(Tessellation tessellation) {}
 
 Skin::Skin(const Skin &rv)
   : m_impl(std::make_unique<PIMPL>(*rv.m_impl)) {}
@@ -331,6 +320,12 @@ Skin &Skin::operator=(const Skin &rv) {
 Skin::Skin(Skin &&)            = default;
 Skin &Skin::operator=(Skin &&) = default;
 Skin::~Skin()                  = default;
+
+unique_ptr<Skin> Skin::stripped_copy() const {
+  unique_ptr<Skin> retv(new Skin(m_impl->m_tessellation));
+  retv->m_impl = m_impl->stripped_copy();
+  return retv;
+}
 
 const string &Skin::path() const { return m_impl->m_path; }
 

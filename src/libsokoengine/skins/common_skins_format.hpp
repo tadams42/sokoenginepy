@@ -56,6 +56,8 @@ public:
   uint16_t tile_height() const;
   uint8_t  rows_count() const;
   uint8_t  columns_count() const;
+  uint8_t  rows_count_hint() const;
+  uint8_t  columns_count_hint() const;
 
   virtual tile_maps_t categorize_tiles(const ImageImpl::tiles_t &src) const = 0;
   virtual polygon_t   tile_polygon(TileShape shape) const                   = 0;

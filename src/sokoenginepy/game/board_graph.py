@@ -2,26 +2,17 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass
-from typing import (
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Union,
-)
+from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import networkx as nx
 
 from ..common import (
-    TileShape,
     Config,
     Direction,
     GraphType,
     Tessellation,
     TessellationImpl,
+    TileShape,
 )
 from ..io import Puzzle
 from .board_cell import BoardCell
@@ -299,10 +290,11 @@ class BoardGraph:
 
     def positions_path_to_directions_path(self, positions: PositionsT) -> DirectionsT:
         """
-        Converts path expressed as positions to one expressed as :class:`.Direction`.
+        Converts path expressed as sequence of positions to one expressed as sequence of
+        :class:`.Direction`.
 
         Raises:
-            IndexError: Any of positions in ``positions`` off board
+            IndexError: Any position in ``positions`` is off board.
         """
 
         if positions:
