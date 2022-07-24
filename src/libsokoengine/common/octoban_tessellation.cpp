@@ -34,7 +34,7 @@ position_t OctobanTessellation::neighbor_position(
 
   // clang-format off
   if (
-    cell_orientation(position, width, height) != CellOrientation::OCTAGON
+    tile_shape(position, width, height) != TileShape::OCTAGON
     && (
       direction == Direction::NORTH_EAST
       || direction == Direction::NORTH_WEST
@@ -162,18 +162,18 @@ char OctobanTessellation::pusher_step_to_char(const PusherStep &rv) const {
   }
 }
 
-CellOrientation OctobanTessellation::cell_orientation(
+TileShape OctobanTessellation::tile_shape(
   position_t pos, board_size_t width, board_size_t height
 ) const {
   position_t column = index_column(pos, width);
   position_t row    = index_row(pos, width);
-  return ((column + (row % 2)) % 2 == 0) ? CellOrientation::OCTAGON
-                                         : CellOrientation::DEFAULT;
+  return ((column + (row % 2)) % 2 == 0) ? TileShape::OCTAGON
+                                         : TileShape::DEFAULT;
 }
 
 
-cell_orientations_t OctobanTessellation::cell_orientations() const {
-  return cell_orientations_t{CellOrientation::DEFAULT, CellOrientation::OCTAGON};
+tile_shapes_t OctobanTessellation::tile_shapes() const {
+  return tile_shapes_t{TileShape::DEFAULT, TileShape::OCTAGON};
 }
 
 } // namespace implementation

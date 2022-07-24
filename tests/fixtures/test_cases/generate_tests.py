@@ -60,7 +60,7 @@ class SpecGenerator:
         s = """
         from sokoenginepy import (
             BoardGraph,
-            CellOrientation,
+            TileShape,
             Config,
             Direction,
             Puzzle,
@@ -73,13 +73,13 @@ class SpecGenerator:
         trio = """
         def triangle_points_down(board_graph, position):
             return (
-                board_graph.cell_orientation(position) == CellOrientation.TRIANGLE_DOWN
+                board_graph.tile_shape(position) == TileShape.TRIANGLE_DOWN
             )
         """
 
         octo = """
         def is_octagon(board_graph, position):
-            return board_graph.cell_orientation(position) == CellOrientation.OCTAGON
+            return board_graph.tile_shape(position) == TileShape.OCTAGON
         """
 
         if tessellation == "trioban":

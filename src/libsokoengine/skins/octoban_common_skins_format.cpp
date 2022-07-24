@@ -23,10 +23,10 @@ tile_maps_t OctobanCommonSkinsFormat::categorize_tiles(const ImageImpl::tiles_t 
     .categorize_tiles(src);
 }
 
-polygon_t OctobanCommonSkinsFormat::tile_polygon(CellOrientation orientation) const {
+polygon_t OctobanCommonSkinsFormat::tile_polygon(TileShape shape) const {
   // TODO
   return SokobanCommonSkinsFormat(m_rows_count_hint, m_cols_count_hint)
-    .tile_polygon(orientation);
+    .tile_polygon(shape);
 }
 
 pointf_t OctobanCommonSkinsFormat::tile_position(

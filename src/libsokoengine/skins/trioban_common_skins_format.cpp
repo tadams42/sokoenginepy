@@ -45,10 +45,10 @@ tile_maps_t TriobanCommonSkinsFormat::categorize_tiles(const ImageImpl::tiles_t 
   }
 
   tile_maps_t retv;
-  retv.try_emplace(CellOrientation::DEFAULT);
-  tile_map_t &map_default = retv.at(CellOrientation::DEFAULT);
-  retv.try_emplace(CellOrientation::TRIANGLE_DOWN);
-  tile_map_t &map_down = retv.at(CellOrientation::TRIANGLE_DOWN);
+  retv.try_emplace(TileShape::DEFAULT);
+  tile_map_t &map_default = retv.at(TileShape::DEFAULT);
+  retv.try_emplace(TileShape::TRIANGLE_DOWN);
+  tile_map_t &map_down = retv.at(TileShape::TRIANGLE_DOWN);
 
   map_default.floor          = point_t(0, 0);
   map_default.pusher         = point_t(1, 0);
@@ -89,7 +89,7 @@ tile_maps_t TriobanCommonSkinsFormat::categorize_tiles(const ImageImpl::tiles_t 
   return retv;
 }
 
-polygon_t TriobanCommonSkinsFormat::tile_polygon(CellOrientation orientation) const {
+polygon_t TriobanCommonSkinsFormat::tile_polygon(TileShape shape) const {
   // Trioban tile image in skin image is placed into bounding rectangle such that:
   //
   // - width of bounding rectangle is equal to width of triangle
@@ -99,7 +99,7 @@ polygon_t TriobanCommonSkinsFormat::tile_polygon(CellOrientation orientation) co
   double a = m_columns_width; // Triangle side length
   double h = a * sqrt(3) / 2; // Triangle height
 
-  if (orientation == CellOrientation::DEFAULT) {
+  if (shape == TileShape::DEFAULT) {
     return polygon_t{
       {
        {0, h},

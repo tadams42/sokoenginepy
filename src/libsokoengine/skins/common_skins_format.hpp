@@ -1,11 +1,11 @@
 #ifndef COMMON_SKINS_FORMAT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define COMMON_SKINS_FORMAT_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "cell_orientation.hpp"
 #include "direction.hpp"
 #include "image_impl.hpp"
 #include "numeric_types.hpp"
 #include "tessellation.hpp"
+#include "tile_shape.hpp"
 
 namespace sokoengine {
 namespace implementation {
@@ -34,7 +34,7 @@ struct LIBSOKOENGINE_LOCAL tile_map_t {
   int animated_box_on_goal_row    = -1;
 };
 
-typedef std::map<CellOrientation, tile_map_t> tile_maps_t;
+typedef std::map<TileShape, tile_map_t> tile_maps_t;
 
 class LIBSOKOENGINE_LOCAL CommonSkinsFormat {
 public:
@@ -58,7 +58,7 @@ public:
   uint8_t  columns_count() const;
 
   virtual tile_maps_t categorize_tiles(const ImageImpl::tiles_t &src) const = 0;
-  virtual polygon_t   tile_polygon(CellOrientation orientation) const       = 0;
+  virtual polygon_t   tile_polygon(TileShape shape) const                   = 0;
   virtual pointf_t    tile_position(
        position_t board_position, board_size_t width, board_size_t height
      ) const = 0;

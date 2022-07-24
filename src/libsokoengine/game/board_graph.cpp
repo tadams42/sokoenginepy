@@ -286,9 +286,9 @@ BoardCell &BoardGraph::operator[](position_t position) {
 
 Tessellation BoardGraph::tessellation() const { return m_impl->m_tessellation; }
 
-CellOrientation BoardGraph::cell_orientation(position_t position) const {
+TileShape BoardGraph::tile_shape(position_t position) const {
   return TessellationImpl::instance(m_impl->m_tessellation)
-    .cell_orientation(position, m_impl->m_board_width, m_impl->m_board_height);
+    .tile_shape(position, m_impl->m_board_width, m_impl->m_board_height);
 }
 
 string BoardGraph::to_board_str(bool use_visible_floor, bool rle_encode) const {

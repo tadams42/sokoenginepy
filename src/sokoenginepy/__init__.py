@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 __version__ = "1.0.3"
 
 if TYPE_CHECKING:
-    from .common import CellOrientation, Config, Direction, Tessellation
+    from .common import TileShape, Config, Direction, Tessellation
     from .game import (
         BoardCell,
         BoardGraph,
@@ -32,7 +32,7 @@ else:
             BoardState,
             BoxGoalSwitchError,
             CellAlreadyOccupiedError,
-            CellOrientation,
+            TileShape,
             Collection,
             Config,
             Direction,
@@ -53,7 +53,7 @@ else:
 
     except ImportError:
         from .common import (
-            CellOrientation,
+            TileShape,
             Config,
             Direction,
             Tessellation,

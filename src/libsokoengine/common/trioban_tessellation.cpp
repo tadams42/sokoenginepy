@@ -32,8 +32,7 @@ position_t TriobanTessellation::neighbor_position(
     return Config::NO_POS;
   position_t row = index_y(position, width), column = index_x(position, width);
   int8_t     dy, dx;
-  bool       tpd =
-    cell_orientation(position, width, height) == CellOrientation::TRIANGLE_DOWN;
+  bool       tpd = tile_shape(position, width, height) == TileShape::TRIANGLE_DOWN;
 
   switch (direction) {
     case Direction::LEFT:
@@ -155,19 +154,18 @@ char TriobanTessellation::pusher_step_to_char(const PusherStep &rv) const {
   }
 }
 
-CellOrientation TriobanTessellation::cell_orientation(
+TileShape TriobanTessellation::tile_shape(
   position_t pos, board_size_t width, board_size_t height
 ) const {
   position_t column = index_column(pos, width);
   position_t row    = index_row(pos, width);
-  return (column + (row % 2)) % 2 == 0 ? CellOrientation::TRIANGLE_DOWN
-                                       : CellOrientation::DEFAULT;
+  return (column + (row % 2)) % 2 == 0 ? TileShape::TRIANGLE_DOWN : TileShape::DEFAULT;
 }
 
 GraphType TriobanTessellation::graph_type() const { return GraphType::DIRECTED_MULTI; }
 
-cell_orientations_t TriobanTessellation::cell_orientations() const {
-  return cell_orientations_t{CellOrientation::DEFAULT, CellOrientation::TRIANGLE_DOWN};
+tile_shapes_t TriobanTessellation::tile_shapes() const {
+  return tile_shapes_t{TileShape::DEFAULT, TileShape::TRIANGLE_DOWN};
 }
 
 } // namespace implementation

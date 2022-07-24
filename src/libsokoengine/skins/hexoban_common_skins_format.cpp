@@ -42,8 +42,8 @@ tile_maps_t HexobanCommonSkinsFormat::categorize_tiles(const ImageImpl::tiles_t 
   }
 
   tile_maps_t retv;
-  retv.try_emplace(CellOrientation::DEFAULT);
-  tile_map_t &image_map = retv.at(CellOrientation::DEFAULT);
+  retv.try_emplace(TileShape::DEFAULT);
+  tile_map_t &image_map = retv.at(TileShape::DEFAULT);
 
   image_map.floor          = point_t(0, 0);
   image_map.goal           = point_t(0, 1);
@@ -71,7 +71,7 @@ tile_maps_t HexobanCommonSkinsFormat::categorize_tiles(const ImageImpl::tiles_t 
   return retv;
 }
 
-polygon_t HexobanCommonSkinsFormat::tile_polygon(CellOrientation orientation) const {
+polygon_t HexobanCommonSkinsFormat::tile_polygon(TileShape shape) const {
   // double w = original_tile_width;
   double h = m_rows_height;
 
@@ -104,7 +104,7 @@ pointf_t HexobanCommonSkinsFormat::tile_position(
   position_t x = index_x(board_position, width);
   position_t y = index_y(board_position, width);
 
-  polygon_t polygon = tile_polygon(CellOrientation::DEFAULT);
+  polygon_t polygon = tile_polygon(TileShape::DEFAULT);
   rectf_t   rect    = bounding_rect(polygon);
 
   double w = rect.width();

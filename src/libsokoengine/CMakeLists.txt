@@ -3,7 +3,7 @@ set(INSTALL_HEADERS
     sokoengine.hpp
     benchmarks.hpp
 
-    common/cell_orientation.hpp
+    common/tile_shape.hpp
     common/direction.hpp
     common/game_config.hpp
     common/numeric_types.hpp

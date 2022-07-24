@@ -1,6 +1,6 @@
 from sokoenginepy import (
     BoardGraph,
-    CellOrientation,
+    TileShape,
     Config,
     Direction,
     Puzzle,
@@ -10,7 +10,7 @@ from sokoenginepy import (
 )
 
 def is_octagon(board_graph, position):
-    return board_graph.cell_orientation(position) == CellOrientation.OCTAGON
+    return board_graph.tile_shape(position) == TileShape.OCTAGON
 
 
 class DescribeOctobanBoardGraph:

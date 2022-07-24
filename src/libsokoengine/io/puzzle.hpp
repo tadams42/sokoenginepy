@@ -2,8 +2,8 @@
 #define PUZZLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 /// @file
 
-#include "cell_orientation.hpp"
 #include "tessellation.hpp"
+#include "tile_shape.hpp"
 
 namespace sokoengine {
 ///
@@ -78,8 +78,8 @@ public:
 
   bool has_sokoban_plus() const;
 
-  Tessellation    tessellation() const;
-  CellOrientation cell_orientation(position_t position) const;
+  Tessellation tessellation() const;
+  TileShape    tile_shape(position_t position) const;
 
   char at(position_t position) const;
   void set_at(position_t position, char c);

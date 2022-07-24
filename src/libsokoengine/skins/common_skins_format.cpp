@@ -211,7 +211,7 @@ void CommonSkinsFormat::guess_tile_sizes() {
   m_columns_count = numeric_cast<uint8_t>(cols_count);
 
   auto processed_tile =
-    bounding_rect(tile_polygon(CellOrientation::DEFAULT)).to_aligned_rect();
+    bounding_rect(tile_polygon(TileShape::DEFAULT)).to_aligned_rect();
   m_tile_width  = numeric_cast<uint16_t>(processed_tile.width());
   m_tile_height = numeric_cast<uint16_t>(processed_tile.height());
 }

@@ -61,14 +61,14 @@ const TessellationImpl &TessellationImpl::instance(const Tessellation &tessellat
 
 GraphType TessellationImpl::graph_type() const { return GraphType::DIRECTED; }
 
-CellOrientation TessellationImpl::cell_orientation(
+TileShape TessellationImpl::tile_shape(
   position_t position, board_size_t width, board_size_t height
 ) const {
-  return CellOrientation::DEFAULT;
+  return TileShape::DEFAULT;
 }
 
-cell_orientations_t TessellationImpl::cell_orientations() const {
-  return cell_orientations_t{CellOrientation::DEFAULT};
+tile_shapes_t TessellationImpl::tile_shapes() const {
+  return tile_shapes_t{TileShape::DEFAULT};
 }
 
 } // namespace implementation

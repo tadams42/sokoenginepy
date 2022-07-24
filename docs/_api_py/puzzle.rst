@@ -1,7 +1,7 @@
 Puzzle
 ======
 
-.. autoclass:: sokoenginepy.CellOrientation
+.. autoclass:: sokoenginepy.TileShape
     :members:
     :undoc-members:
 

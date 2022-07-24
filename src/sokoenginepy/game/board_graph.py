@@ -16,7 +16,7 @@ from typing import (
 import networkx as nx
 
 from ..common import (
-    CellOrientation,
+    TileShape,
     Config,
     Direction,
     GraphType,
@@ -122,8 +122,8 @@ class BoardGraph:
     def tessellation(self) -> Tessellation:
         return self._tessellation
 
-    def cell_orientation(self, position: int) -> CellOrientation:
-        return TessellationImpl.instance(self._tessellation).cell_orientation(
+    def tile_shape(self, position: int) -> TileShape:
+        return TessellationImpl.instance(self._tessellation).tile_shape(
             position, self.board_width, self.board_height
         )
 

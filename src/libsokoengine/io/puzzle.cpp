@@ -32,11 +32,11 @@ namespace io {
 
 class LIBSOKOENGINE_LOCAL Puzzle::PIMPL {
 public:
-  string    m_title;
-  string    m_author;
-  string    m_boxorder;
-  string    m_goalorder;
-  string    m_notes;
+  string      m_title;
+  string      m_author;
+  string      m_boxorder;
+  string      m_goalorder;
+  string      m_notes;
   snapshots_t m_snapshots;
 
   board_size_t   m_width      = 0;
@@ -177,9 +177,9 @@ snapshots_t &Puzzle::snapshots() { return m_impl->m_snapshots; }
 
 Tessellation Puzzle::tessellation() const { return m_impl->m_tessellation; }
 
-CellOrientation Puzzle::cell_orientation(position_t position) const {
+TileShape Puzzle::tile_shape(position_t position) const {
   return TessellationImpl::instance(m_impl->m_tessellation)
-    .cell_orientation(position, width(), height());
+    .tile_shape(position, width(), height());
 }
 
 char Puzzle::at(position_t position) const {

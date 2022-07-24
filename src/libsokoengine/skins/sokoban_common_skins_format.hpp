@@ -15,7 +15,7 @@ public:
 
   virtual std::unique_ptr<CommonSkinsFormat> clone() const override;
   virtual tile_maps_t categorize_tiles(const ImageImpl::tiles_t &src) const override;
-  virtual polygon_t   tile_polygon(CellOrientation orientation) const override;
+  virtual polygon_t   tile_polygon(TileShape shape) const override;
   virtual pointf_t    tile_position(
        position_t board_position, board_size_t width, board_size_t height
      ) const override;

@@ -1,10 +1,10 @@
 #ifndef SKIN_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define SKIN_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "cell_orientation.hpp"
 #include "direction.hpp"
 #include "game_config.hpp"
 #include "tessellation.hpp"
+#include "tile_shape.hpp"
 
 namespace sokoengine {
 
@@ -126,7 +126,7 @@ public:
   /// Constructs empty skin.
   ///
   /// Empty skin doesn't have any image data but is able to give correct info on tile
-  /// sizes, cell orientations and tile polygons.
+  /// sizes, tile shapes and tile polygons.
   ///
   /// Empty skins are useful in following scenario:
   ///
@@ -155,7 +155,7 @@ public:
   /// will still produce correct result.
   ///
   /// `empty_skin` will have much smaller memory footprint at the cost of not having
-  /// actual tile images (ie. calling `empty_skin.floor(CellOrientation::DEFAULT)` will
+  /// actual tile images (ie. calling `empty_skin.floor(TileShape::DEFAULT)` will
   /// throw).
   ///
   Skin(
@@ -227,17 +227,17 @@ public:
   uint16_t tile_height() const;
 
   ///
-  /// polygon_t for this skin and cell orientation.
+  /// polygon_t for this skin and tile shape.
   ///
   /// - bounding box is `tile_width() x tile_height()`.
   /// - it is closed: `polygon.front() == polygon.back()`.
   ///
   /// This polygon precisely traces tile shape for given Tessellation and
-  /// CellOrientation. For example, in Trioban tessellation with `orientation ==
-  /// CellOrientation::TRIANGLE_DOWN` this method will return polygon with 4 points
+  /// TileShape. For example, in Trioban tessellation with `shape ==
+  /// TileShape::TRIANGLE_DOWN` this method will return polygon with 4 points
   /// defining equilateral triangle where side length is equal to tile_width().
   ///
-  polygon_t tile_polygon(CellOrientation orientation) const;
+  polygon_t tile_polygon(TileShape shape) const;
 
   ///
   /// Position of top left corner of (processed and cropped) tile image for purposes of
@@ -248,122 +248,119 @@ public:
   ) const;
 
   ///
-  /// All CellOrientation for tessellation of this Skin.
+  /// All TileShape for tessellation of this Skin.
   ///
-  cell_orientations_t cell_orientations() const;
+  tile_shapes_t tile_shapes() const;
 
   ///
   /// Empty skin doesn't have any image data but is able to give correct info on tile
-  /// sizes, cell orientations and tile polygons.
+  /// sizes, tile shapes and tile polygons.
   ///
   bool is_empty() const;
 
   ///
   /// Cropped and processed tile image for board floor.
   ///
-  const Image &floor(CellOrientation orientation) const;
+  const Image &floor(TileShape shape) const;
 
   ///
   /// Cropped and processed tile image for board floor in non-playable area of board.
   ///
-  const Image &non_playable_floor(CellOrientation orientation) const;
+  const Image &non_playable_floor(TileShape shape) const;
 
   ///
   /// Cropped and processed tile image for goal.
   ///
-  const Image &goal(CellOrientation orientation) const;
+  const Image &goal(TileShape shape) const;
 
   ///
   /// Cropped and processed tile image for non-directional pusher (on floor).
   ///
-  const Image &pusher(CellOrientation orientation) const;
+  const Image &pusher(TileShape shape) const;
 
   ///
   /// Tries to find image for pusher looking at given direction.
   ///
   /// If there is no such image, returns regular pusher image.
   ///
-  const Image &pusher(Direction looking_at, CellOrientation orientation) const;
+  const Image &pusher(Direction looking_at, TileShape shape) const;
 
   ///
   /// Cropped and processed tile image for non-directional pusher on goal.
   ///
-  const Image &pusher_on_goal(CellOrientation orientation) const;
+  const Image &pusher_on_goal(TileShape shape) const;
 
   ///
   /// Tries to find image for pusher looking at given direction.
   ///
   /// If there is no such image, returns regular pusher on goal image.
   ///
-  const Image &pusher_on_goal(Direction looking_at, CellOrientation orientation) const;
+  const Image &pusher_on_goal(Direction looking_at, TileShape shape) const;
 
   ///
   /// Cropped and processed tile image for box (on floor).
   ///
-  const Image &box(CellOrientation orientation) const;
+  const Image &box(TileShape shape) const;
 
   ///
   /// Cropped and processed tile image for box on goal.
   ///
-  const Image &box_on_goal(CellOrientation orientation) const;
+  const Image &box_on_goal(TileShape shape) const;
 
   ///
   /// Cropped and processed tile image for non-directional wall.
   ///
-  const Image &wall(CellOrientation orientation) const;
+  const Image &wall(TileShape shape) const;
 
   ///
   /// Tries to find directional wall that has neighbors in all directions specified by
   /// `neighbor_walls`. If there is no such directional wall, returns non directional
   /// wall.
   ///
-  const Image &
-  wall(const directions_t &neighbor_walls, CellOrientation orientation) const;
+  const Image &wall(const directions_t &neighbor_walls, TileShape shape) const;
 
   ///
   /// Cropped and processed tile image for wall cap in skins that use directional
   /// walls.
   ///
-  const Image &wall_cap(CellOrientation orientation) const;
+  const Image &wall_cap(TileShape shape) const;
 
   ///
   /// All directions for which this skin has directional pusher image.
   ///
-  const directional_pusher_directions_t directional_pushers(CellOrientation orientation
-  ) const;
+  const directional_pusher_directions_t directional_pushers(TileShape shape) const;
 
   ///
   /// All directions for which this skin has directional pusher on goal image.
   ///
-  const directional_pusher_directions_t
-  directional_pushers_on_goal(CellOrientation orientation) const;
+  const directional_pusher_directions_t directional_pushers_on_goal(TileShape shape
+  ) const;
 
   ///
   /// All directions combinations for which this skin has directional wall image.
   /// Each image represents wall having neighbor walls in given directions_t.
   ///
-  const directional_walls_directions_t directional_walls(CellOrientation orientation
-  ) const;
+  const directional_walls_directions_t directional_walls(TileShape shape) const;
 
   ///
   /// Animated pusher tiles.
   ///
-  const animation_frames_t &animated_pusher(CellOrientation orientation) const;
+  const animation_frames_t &animated_pusher(TileShape shape) const;
 
   ///
   /// Animated pusher on goal tiles.
   ///
-  const animation_frames_t &animated_pusher_on_goal(CellOrientation orientation) const;
+  const animation_frames_t &animated_pusher_on_goal(TileShape shape) const;
 
   ///
   /// Animated box tiles.
   ///
-  const animation_frames_t &animated_box(CellOrientation orientation) const;
+  const animation_frames_t &animated_box(TileShape shape) const;
 
   ///
   /// Animated box on goal tiles.
   ///
-  const animation_frames_t &animated_box_on_goal(CellOrientation orientation) const;
+  const animation_frames_t &animated_box_on_goal(TileShape shape) const;
 
   ///
   /// Saves all, original and processed, tiles into `dir`.

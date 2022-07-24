@@ -40,8 +40,8 @@ tile_maps_t SokobanCommonSkinsFormat::categorize_tiles(const ImageImpl::tiles_t 
   }
 
   tile_maps_t retv;
-  retv.try_emplace(CellOrientation::DEFAULT);
-  tile_map_t &image_map = retv.at(CellOrientation::DEFAULT);
+  retv.try_emplace(TileShape::DEFAULT);
+  tile_map_t &image_map = retv.at(TileShape::DEFAULT);
 
   image_map.floor          = point_t(0, 0);
   image_map.goal           = point_t(0, 1);
@@ -98,7 +98,7 @@ tile_maps_t SokobanCommonSkinsFormat::categorize_tiles(const ImageImpl::tiles_t 
   return retv;
 }
 
-polygon_t SokobanCommonSkinsFormat::tile_polygon(CellOrientation orientation) const {
+polygon_t SokobanCommonSkinsFormat::tile_polygon(TileShape shape) const {
   double w = m_columns_width;
   double h = m_rows_height;
   return polygon_t{

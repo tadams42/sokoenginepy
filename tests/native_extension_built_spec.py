@@ -29,7 +29,7 @@ def ext_members():
         "BoardState",
         "BoxGoalSwitchError",
         "CellAlreadyOccupiedError",
-        "CellOrientation",
+        "TileShape",
         "Collection",
         "Config",
         "Direction",

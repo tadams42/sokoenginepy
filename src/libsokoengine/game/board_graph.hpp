@@ -2,10 +2,10 @@
 #define BOARD_GRAPH_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 /// @file
 
-#include "cell_orientation.hpp"
 #include "direction.hpp"
 #include "game_config.hpp"
 #include "tessellation.hpp"
+#include "tile_shape.hpp"
 
 namespace sokoengine {
 
@@ -89,8 +89,8 @@ public:
   ///
   BoardCell &operator[](position_t position);
 
-  Tessellation    tessellation() const;
-  CellOrientation cell_orientation(position_t position) const;
+  Tessellation tessellation() const;
+  TileShape    tile_shape(position_t position) const;
 
   ///
   /// Formatted string representation of board.

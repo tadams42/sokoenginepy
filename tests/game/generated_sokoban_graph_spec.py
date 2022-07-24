@@ -1,6 +1,6 @@
 from sokoenginepy import (
     BoardGraph,
-    CellOrientation,
+    TileShape,
     Config,
     Direction,
     Puzzle,

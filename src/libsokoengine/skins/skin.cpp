@@ -29,7 +29,7 @@ typedef std::map<Direction, Image>    directional_pushers_t;
 typedef std::map<directions_t, Image> directional_walls_t;
 
 //
-// All tile images for single cell orientation.
+// All tile images for single tile shape.
 //
 // In Trioban, we need two pusher on goal images: one for situation when pusher is on
 // triangle pointing up, and another for triangle pointing down. Similarly for other
@@ -37,10 +37,10 @@ typedef std::map<directions_t, Image> directional_walls_t;
 // pointing up" and other for "triangle pointing down". Octoban would have one set for
 // "square" tiles and other for "octagon" tiles.
 //
-// In Sokoban and Hexoban tessellations, we only have one possible cell orientation and
+// In Sokoban and Hexoban tessellations, we only have one possible tile shape and
 // thus need single set of tile images.
 //
-// tileset_t represents set of board tiles for one CellOrientation.
+// tileset_t represents set of board tiles for one TileShape.
 //
 struct LIBSOKOENGINE_LOCAL tileset_t {
   Image floor;
@@ -70,10 +70,10 @@ public:
 
   string m_path;
 
-  tiles_t                                         m_original_tiles;
-  Image                                           m_empty_image;
-  map<CellOrientation, tileset_t>                 m_tilesets;
-  map<CellOrientation, implementation::polygon_t> m_polygons;
+  tiles_t                                   m_original_tiles;
+  Image                                     m_empty_image;
+  map<TileShape, tileset_t>                 m_tilesets;
+  map<TileShape, implementation::polygon_t> m_polygons;
 
   PIMPL(
     Tessellation  tessellation,
@@ -109,8 +109,8 @@ public:
       ) {
     m_format->set_image(image_width, image_height);
     const TessellationImpl &tess_obj = TessellationImpl::instance(m_tessellation);
-    for (auto orientation : tess_obj.cell_orientations()) {
-      m_polygons.try_emplace(orientation, m_format->tile_polygon(orientation));
+    for (auto shape : tess_obj.tile_shapes()) {
+      m_polygons.try_emplace(shape, m_format->tile_polygon(shape));
     }
   }
 
@@ -157,19 +157,19 @@ private:
     ImageImpl::tiles_t raw_tiles = from.slice(cols_c, rows_c);
 
     const TessellationImpl &tess_obj = TessellationImpl::instance(m_tessellation);
-    for (auto orientation : tess_obj.cell_orientations()) {
-      m_polygons.try_emplace(orientation, m_format->tile_polygon(orientation));
+    for (auto shape : tess_obj.tile_shapes()) {
+      m_polygons.try_emplace(shape, m_format->tile_polygon(shape));
     }
 
     auto tile_maps = m_format->categorize_tiles(raw_tiles);
 
-    for (const auto &[orientation, tile_map] : tile_maps) {
-      m_tilesets.try_emplace(orientation);
+    for (const auto &[shape, tile_map] : tile_maps) {
+      m_tilesets.try_emplace(shape);
 
-      const implementation::polygon_t &polygon      = m_polygons.at(orientation);
-      tileset_t                       &dest_tileset = m_tilesets.at(orientation);
+      const implementation::polygon_t &polygon      = m_polygons.at(shape);
+      tileset_t                       &dest_tileset = m_tilesets.at(shape);
 
-      apply_tileset(raw_tiles, tile_maps.at(orientation), dest_tileset, polygon);
+      apply_tileset(raw_tiles, tile_maps.at(shape), dest_tileset, polygon);
     }
 
     m_original_tiles = tiles_t(rows_c, vector<Image>(cols_c));
@@ -352,8 +352,8 @@ uint16_t Skin::tile_width() const { return m_impl->m_format->tile_width(); }
 
 uint16_t Skin::tile_height() const { return m_impl->m_format->tile_height(); }
 
-Skin::polygon_t Skin::tile_polygon(CellOrientation orientation) const {
-  const implementation::polygon_t &p = m_impl->m_polygons.at(orientation);
+Skin::polygon_t Skin::tile_polygon(TileShape shape) const {
+  const implementation::polygon_t &p = m_impl->m_polygons.at(shape);
 
   Skin::polygon_t retv;
   for (const auto &pnt : p.outer()) {
@@ -374,28 +374,28 @@ bool Skin::is_empty() const {
   return m_impl->m_original_tiles.size() == 0 || m_impl->m_tilesets.size() == 0;
 }
 
-cell_orientations_t Skin::cell_orientations() const {
-  return TessellationImpl::instance(m_impl->m_tessellation).cell_orientations();
+tile_shapes_t Skin::tile_shapes() const {
+  return TessellationImpl::instance(m_impl->m_tessellation).tile_shapes();
 }
 
-const Image &Skin::floor(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).floor;
+const Image &Skin::floor(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).floor;
 }
 
-const Image &Skin::non_playable_floor(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).non_playable_floor;
+const Image &Skin::non_playable_floor(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).non_playable_floor;
 }
 
-const Image &Skin::goal(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).goal;
+const Image &Skin::goal(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).goal;
 }
 
-const Image &Skin::pusher(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).pusher;
+const Image &Skin::pusher(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).pusher;
 }
 
-const Image &Skin::pusher(Direction looking_at, CellOrientation orientation) const {
-  const auto &tileset = m_impl->m_tilesets.at(orientation);
+const Image &Skin::pusher(Direction looking_at, TileShape shape) const {
+  const auto &tileset = m_impl->m_tilesets.at(shape);
 
   auto found = tileset.directional_pushers.find(looking_at);
   if (found != tileset.directional_pushers.cend()) {
@@ -405,13 +405,12 @@ const Image &Skin::pusher(Direction looking_at, CellOrientation orientation) con
   }
 }
 
-const Image &Skin::pusher_on_goal(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).pusher_on_goal;
+const Image &Skin::pusher_on_goal(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).pusher_on_goal;
 }
 
-const Image &
-Skin::pusher_on_goal(Direction looking_at, CellOrientation orientation) const {
-  const auto &tileset = m_impl->m_tilesets.at(orientation);
+const Image &Skin::pusher_on_goal(Direction looking_at, TileShape shape) const {
+  const auto &tileset = m_impl->m_tilesets.at(shape);
 
   auto found = tileset.directional_pushers_on_goal.find(looking_at);
   if (found != tileset.directional_pushers_on_goal.cend()) {
@@ -421,21 +420,20 @@ Skin::pusher_on_goal(Direction looking_at, CellOrientation orientation) const {
   }
 }
 
-const Image &Skin::box(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).box;
+const Image &Skin::box(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).box;
 }
 
-const Image &Skin::box_on_goal(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).box_on_goal;
+const Image &Skin::box_on_goal(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).box_on_goal;
 }
 
-const Image &Skin::wall(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).wall;
+const Image &Skin::wall(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).wall;
 }
 
-const Image &
-Skin::wall(const directions_t &neighbor_walls, CellOrientation orientation) const {
-  const auto &tileset = m_impl->m_tilesets.at(orientation);
+const Image &Skin::wall(const directions_t &neighbor_walls, TileShape shape) const {
+  const auto &tileset = m_impl->m_tilesets.at(shape);
 
   for (const auto &[directions, img] : tileset.directional_walls) {
     if (directions == neighbor_walls) {
@@ -446,15 +444,15 @@ Skin::wall(const directions_t &neighbor_walls, CellOrientation orientation) cons
   return tileset.wall;
 }
 
-const Image &Skin::wall_cap(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).wall_cap;
+const Image &Skin::wall_cap(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).wall_cap;
 }
 
-const Skin::directional_pusher_directions_t
-Skin::directional_pushers(CellOrientation orientation) const {
+const Skin::directional_pusher_directions_t Skin::directional_pushers(TileShape shape
+) const {
   directional_pusher_directions_t retv;
 
-  const tileset_t &tileset = m_impl->m_tilesets.at(orientation);
+  const tileset_t &tileset = m_impl->m_tilesets.at(shape);
 
   for (const auto &[direction, img] : tileset.directional_pushers) {
     retv.insert(direction);
@@ -464,10 +462,10 @@ Skin::directional_pushers(CellOrientation orientation) const {
 }
 
 const Skin::directional_pusher_directions_t
-Skin::directional_pushers_on_goal(CellOrientation orientation) const {
+Skin::directional_pushers_on_goal(TileShape shape) const {
   directional_pusher_directions_t retv;
 
-  const tileset_t &tileset = m_impl->m_tilesets.at(orientation);
+  const tileset_t &tileset = m_impl->m_tilesets.at(shape);
 
   for (const auto &[direction, img] : tileset.directional_pushers_on_goal) {
     retv.insert(direction);
@@ -476,11 +474,11 @@ Skin::directional_pushers_on_goal(CellOrientation orientation) const {
   return retv;
 }
 
-const Skin::directional_walls_directions_t
-Skin::directional_walls(CellOrientation orientation) const {
+const Skin::directional_walls_directions_t Skin::directional_walls(TileShape shape
+) const {
   directional_walls_directions_t retv;
 
-  const tileset_t &tileset = m_impl->m_tilesets.at(orientation);
+  const tileset_t &tileset = m_impl->m_tilesets.at(shape);
 
   for (const auto &[directions, img] : tileset.directional_walls) {
     retv.insert(directions);
@@ -489,23 +487,20 @@ Skin::directional_walls(CellOrientation orientation) const {
   return retv;
 }
 
-const Skin::animation_frames_t &Skin::animated_pusher(CellOrientation orientation
-) const {
-  return m_impl->m_tilesets.at(orientation).animated_pusher;
+const Skin::animation_frames_t &Skin::animated_pusher(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).animated_pusher;
 }
 
-const Skin::animation_frames_t &
-Skin::animated_pusher_on_goal(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).animated_pusher_on_goal;
+const Skin::animation_frames_t &Skin::animated_pusher_on_goal(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).animated_pusher_on_goal;
 }
 
-const Skin::animation_frames_t &Skin::animated_box(CellOrientation orientation) const {
-  return m_impl->m_tilesets.at(orientation).animated_box;
+const Skin::animation_frames_t &Skin::animated_box(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).animated_box;
 }
 
-const Skin::animation_frames_t &Skin::animated_box_on_goal(CellOrientation orientation
-) const {
-  return m_impl->m_tilesets.at(orientation).animated_box_on_goal;
+const Skin::animation_frames_t &Skin::animated_box_on_goal(TileShape shape) const {
+  return m_impl->m_tilesets.at(shape).animated_box_on_goal;
 }
 
 void Skin::dump_tiles(const std::string &dir) const {
@@ -539,40 +534,36 @@ void Skin::dump_tiles(const std::string &dir) const {
     throw std::invalid_argument("Unhandled Direction!");
   };
 
-  auto orientation_to_str = [](CellOrientation o) {
+  auto shape_to_str = [](TileShape o) {
     switch (o) {
-      case CellOrientation::DEFAULT:
+      case TileShape::DEFAULT:
         return string("DEFAULT");
-      case CellOrientation::OCTAGON:
+      case TileShape::OCTAGON:
         return string("OCTAGON");
-      case CellOrientation::TRIANGLE_DOWN:
+      case TileShape::TRIANGLE_DOWN:
         return string("TRIANGLE_DOWN");
     }
-    throw std::invalid_argument("Unhandled CellOrientation!");
+    throw std::invalid_argument("Unhandled TileShape!");
   };
 
-  auto tile_path = [&](const string &tile, CellOrientation co) {
-    return (dir_path / (orientation_to_str(co) + "_" + tile + ".png")).string();
+  auto tile_path = [&](const string &tile, TileShape co) {
+    return (dir_path / (shape_to_str(co) + "_" + tile + ".png")).string();
     ;
   };
 
-  auto directional_pusher_path = [&](
-                                   Direction d, CellOrientation co, const string &tile
-                                 ) {
+  auto directional_pusher_path = [&](Direction d, TileShape co, const string &tile) {
     return (directional_pushers
-            / (orientation_to_str(co) + "_" + direction_to_str(d) + "_" + tile + ".png")
-    )
+            / (shape_to_str(co) + "_" + direction_to_str(d) + "_" + tile + ".png"))
       .string();
   };
 
-  auto directional_wall_path = [&](const directions_t &dirs, CellOrientation co) {
+  auto directional_wall_path = [&](const directions_t &dirs, TileShape co) {
     std::vector<string> l;
     for (auto d : dirs) {
       l.push_back(direction_to_str(d));
     }
 
-    return (directional_walls
-            / (orientation_to_str(co) + "_" + boost::join(l, "-") + ".png"))
+    return (directional_walls / (shape_to_str(co) + "_" + boost::join(l, "-") + ".png"))
       .string();
   };
 
@@ -581,10 +572,9 @@ void Skin::dump_tiles(const std::string &dir) const {
       .string();
   };
 
-  auto animation_path = [&](CellOrientation co, const string &tile, int idx) {
+  auto animation_path = [&](TileShape co, const string &tile, int idx) {
     return (animations
-            / (orientation_to_str(co) + "_" + tile + "_" + std::to_string(idx) + ".png")
-    )
+            / (shape_to_str(co) + "_" + tile + "_" + std::to_string(idx) + ".png"))
       .string();
   };
 
@@ -679,32 +669,32 @@ Image Skin::render_board(const game::BoardGraph &board) const {
       position_t pos    = index_1d(col, row, w);
       point_t    corner = tile_position(pos, w, h);
 
-      CellOrientation  orientation = board.cell_orientation(pos);
-      const BoardCell &cell        = board[pos];
-      const Image     *selected    = nullptr;
+      TileShape        shape    = board.tile_shape(pos);
+      const BoardCell &cell     = board[pos];
+      const Image     *selected = nullptr;
 
       implementation::point_t top_left(corner.first, corner.second);
 
       if (cell.is_wall()) {
-        selected = &wall(board.wall_neighbor_directions(pos), orientation);
+        selected = &wall(board.wall_neighbor_directions(pos), shape);
       } else if (!cell.is_in_playable_area()) {
-        selected = &non_playable_floor(orientation);
+        selected = &non_playable_floor(shape);
       } else if (cell.has_goal()) {
-        selected = &goal(orientation);
+        selected = &goal(shape);
       } else {
-        selected = &floor(orientation);
+        selected = &floor(shape);
       }
       retv.overlay(*selected, top_left);
       selected = nullptr;
 
       if (cell.has_box() && cell.has_goal()) {
-        selected = &box_on_goal(orientation);
+        selected = &box_on_goal(shape);
       } else if (cell.has_pusher() && cell.has_goal()) {
-        selected = &pusher_on_goal(orientation);
+        selected = &pusher_on_goal(shape);
       } else if (cell.has_pusher()) {
-        selected = &pusher(orientation);
+        selected = &pusher(shape);
       } else if (cell.has_box()) {
-        selected = &box(orientation);
+        selected = &box(shape);
       }
       if (selected)
         retv.overlay(*selected, top_left);

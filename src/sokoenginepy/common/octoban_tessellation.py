@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Final, Tuple
 
-from .cell_orientation import CellOrientation
+from .tile_shape import TileShape
 from .characters import Characters
 from .config import Config
 from .direction import Direction
@@ -59,9 +59,9 @@ class OctobanTessellation(TessellationImpl):
     def neighbor_position(
         self, position: int, direction: Direction, board_width: int, board_height: int
     ) -> int:
-        if self.cell_orientation(
+        if self.tile_shape(
             position, board_width, board_height
-        ) != CellOrientation.OCTAGON and direction in (
+        ) != TileShape.OCTAGON and direction in (
             Direction.NORTH_EAST,
             Direction.NORTH_WEST,
             Direction.SOUTH_EAST,
@@ -86,9 +86,9 @@ class OctobanTessellation(TessellationImpl):
 
         return Config.NO_POS
 
-    def cell_orientation(
+    def tile_shape(
         self, position: int, board_width: int, board_height: int
-    ) -> CellOrientation:
+    ) -> TileShape:
         if position < 0:
             raise IndexError(f"Position {position} is invalid value!")
 
@@ -100,8 +100,4 @@ class OctobanTessellation(TessellationImpl):
 
         row = index_row(position, board_width)
         column = index_column(position, board_width)
-        return (
-            CellOrientation.OCTAGON
-            if (column + (row % 2)) % 2 == 0
-            else CellOrientation.DEFAULT
-        )
+        return TileShape.OCTAGON if (column + (row % 2)) % 2 == 0 else TileShape.DEFAULT
