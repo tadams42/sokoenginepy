@@ -22,17 +22,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: install build utilities
+      - name: "📦 install build utilities"
         run: sudo apt install -y cmake doxygen graphviz
 
       - name: configure
         run: cmake --preset docs
 
-      - name: make
+      - name: make docs
         working-directory: ./build/docs
         run: make docs
 
-      - name: deploy
+      - name: "📦 deploy"
         uses: peaceiris/actions-gh-pages@v3
         # If you're changing the branch from main, also change the `main` in
         # `refs/heads/main` below accordingly.

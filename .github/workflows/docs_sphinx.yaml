@@ -21,21 +21,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: set up Python 3.9
+      - name: "📦 set up 🐍 3.10"
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: "3.10"
           cache: 'pip'
           cache-dependency-path: pyproject.toml
-
-      - name: ensure latest pip
+      - name: "📦 ensure latest pip"
         run: python -m pip install --upgrade pip
-
-      - name: install wheel
+      - name: "📦 install wheel"
         run: pip install wheel
-
-      - name: install docs environment
+      - name: "📦 install docs environment"
         run: pip install .[docs]
 
       - name: build Sphinx documentation

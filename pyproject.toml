@@ -53,9 +53,18 @@ dev = [
     "pytest-spec",
     "sphinx >= 1.4",
     "sphinx_rtd_theme",
+    "sphinx_rtd_theme",
+    "sphinx-copybutton",
+    "furo",
     "twine",
 ]
-docs = ["myst-parser", "sphinx >= 1.4", "sphinx_rtd_theme"]
+docs = [
+    "myst-parser",
+    "sphinx >= 1.4",
+    "sphinx_rtd_theme",
+    "furo",
+    "sphinx-copybutton",
+]
 tests = [
     "check-manifest",
     "coverage",
