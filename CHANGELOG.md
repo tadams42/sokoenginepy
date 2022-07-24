@@ -1,30 +1,27 @@
 # Changelog
 
-## 2.0.0 (unreleased)
+## 2.0.0.dev (unreleased)
 
-- breaking change: removed `is_blank()`
-- breaking change: removed all parsing methods from `Puzzle` and `Snapshot`
-  - parsing in now fully private implementation detail handled by constructors of these
-    classes
-  - example of removed methods: `Puzzle.is_pusher(c)`, `Snapshot.is_snapshot(str)`, ...
+### New features
+
+- implemented support for "Common Skins Format" images
+  - WIP: missing Python API and docs
 - refactor: it is no longer required to use sub `io` and `game` packages/namespaces:
   everything is now available in `sokoenginepy`
+
+### Breaking changes
+
+- renames `CellOrientation` --> `TileShape`
+- removed `is_blank()`
+- removed all parsing methods from `Puzzle` and `Snapshot` (ie. `Puzzle.is_pusher(c)`,
+  `Snapshot.is_snapshot(str)`, ...)
+  - parsing in now private implementation detail handled transparently
 - removed: `GraphType`
-- breaking change: collapsed many types to base type. This was done because all types
-  had to be parametrized by Tessellation anyway so having rich inheritance tree was just
-  cluttering API. Concretely, these types have changed or removed:
-  - `SokobanPuzzle(...)` --> `Puzzle(Tessellation.SOKOBAN, ...)`
-  - `HexobanPuzzle(...)` --> `Puzzle(Tessellation.HEXOBAN, ...)`
-  - `TriobanPuzzle(...)` --> `Puzzle(Tessellation.TRIOBAN, ...)`
-  - `OctobanPuzzle(...)` --> `Puzzle(Tessellation.OCTOBAN, ...)`
-  - `SokobanSnapshot(...)` --> `Snapshot(Tessellation.SOKOBAN, ...)`
-  - `HexobanSnapshot(...)` --> `Snapshot(Tessellation.HEXOBAN, ...)`
-  - `TriobanSnapshot(...)` --> `Snapshot(Tessellation.TRIOBAN, ...)`
-  - `OctobanSnapshot(...)` --> `Snapshot(Tessellation.OCTOBAN, ...)`
-  - `SokobanTessellation(...)` --> no longer available
-  - `HexobanTessellation(...)` --> no longer available
-  - `TriobanTessellation(...)` --> no longer available
-  - `OctobanTessellation(...)` --> no longer available
+- collapsed many types to base type
+  - ie. `SokobanPuzzle(...)` becomes `Puzzle(Tessellation.SOKOBAN, ...)`,
+    `SokobanSnapshot(...)` becomes `Snapshot(Tessellation.SOKOBAN, ...)`, etc...
+  - all types had to be parametrized by `Tessellation` anyway so removing big
+    inheritance tree from API made everything more manageable
 
 ## 1.0.3 (2022-07-10)
 

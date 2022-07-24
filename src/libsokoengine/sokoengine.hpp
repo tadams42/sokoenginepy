@@ -15,6 +15,9 @@
 #include "pusher_step.hpp"
 #include "sokoban_plus.hpp"
 
+#include "image.hpp"
+#include "skin.hpp"
+
 #include "benchmarks.hpp"
 
 #endif // HEADER_GUARD

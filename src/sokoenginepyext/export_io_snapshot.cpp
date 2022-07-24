@@ -1,6 +1,6 @@
 #include "sokoenginepyext.hpp"
 
-using sokoengine::PusherSteps;
+using sokoengine::pusher_steps_t;
 using sokoengine::Snapshot;
 using sokoengine::Tessellation;
 using std::string;
@@ -60,7 +60,7 @@ void export_io_snapshot(py::module &m) {
     [](const Snapshot &self) {
       return self.pusher_steps();
     },
-    [](Snapshot &self, const PusherSteps &rv) {
+    [](Snapshot &self, const pusher_steps_t &rv) {
       self.set_pusher_steps(rv);
     }
   );

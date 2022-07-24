@@ -7,7 +7,7 @@ import pytest
 from sokoenginepy import (
     BoardCell,
     BoardGraph,
-    CellOrientation,
+    TileShape,
     Config,
     Direction,
     Edge,
@@ -229,9 +229,9 @@ class DescribeBoardGraph:
     def it_provides_underlying_tessellation(self, board_graph):
         assert board_graph.tessellation == Tessellation.SOKOBAN
 
-    class describe_cell_orientation:
-        def it_calculates_cell_orientation(self, board_graph):
-            assert board_graph.cell_orientation(42) == CellOrientation.DEFAULT
+    class describe_tile_shape:
+        def it_calculates_tile_shape(self, board_graph):
+            assert board_graph.tile_shape(42) == TileShape.DEFAULT
 
         def it_raises_on_invalid_position(self):
             for puzzle in [
@@ -242,7 +242,7 @@ class DescribeBoardGraph:
             ]:
                 board_graph = BoardGraph(puzzle)
                 with pytest.raises(IndexError):
-                    board_graph.cell_orientation(-1)
+                    board_graph.tile_shape(-1)
 
     def it_provides_number_of_graph_edges(self, board_graph):
         assert board_graph.edges_count == 776

@@ -9,7 +9,7 @@
 #include <charconv>
 
 using sokoengine::implementation::is_blank;
-using sokoengine::implementation::Strings;
+using sokoengine::implementation::strings_t;
 using std::errc;
 using std::from_chars;
 using std::invalid_argument;
@@ -40,7 +40,7 @@ public:
   piece_id_t m_pieces_count = 0;
   bool       m_enabled      = false;
   bool       m_validated    = false;
-  Strings    m_errors;
+  strings_t  m_errors;
 
   piece_id_t get_plus_id(piece_id_t for_id, const IdsMap &from_where) const {
     if (m_enabled)
@@ -66,7 +66,7 @@ public:
   IdsMap parse_and_clean_ids_string(const string &ids_str) const {
     string ids_str_trimmed = rstrip_default_plus_ids(ids_str);
 
-    Strings ids_str_splitted;
+    strings_t ids_str_splitted;
     boost::split(
       ids_str_splitted, ids_str_trimmed, boost::is_space(), boost::token_compress_on
     );
@@ -209,7 +209,7 @@ void SokobanPlus::set_pieces_count(piece_id_t rv) {
 
 string SokobanPlus::boxorder() const {
   if (is_enabled() && is_valid()) {
-    Strings tmp;
+    strings_t tmp;
     for (const auto &id : m_impl->m_box_plus_ids) {
       tmp.push_back(to_string(id.second));
     }
@@ -229,7 +229,7 @@ void SokobanPlus::set_boxorder(const string &rv) {
 
 string SokobanPlus::goalorder() const {
   if (is_enabled() && is_valid()) {
-    Strings tmp;
+    strings_t tmp;
     for (const auto &id : m_impl->m_goal_plus_ids) {
       tmp.push_back(to_string(id.second));
     }

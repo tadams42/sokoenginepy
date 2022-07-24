@@ -5,6 +5,9 @@
 #include "numeric_types.hpp"
 
 namespace sokoengine {
+
+enum class ImageFormats : uint8_t { BMP = 1, PNG = 2 };
+
 ///
 /// Various constants used across game namespace. Since they are needed by many
 /// modules it made more sense to place them here in their own class, than into one or

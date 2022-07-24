@@ -6,6 +6,7 @@
 #include <deque>
 #include <iomanip>
 #include <numeric>
+#include <sstream>
 
 using sokoengine::BoardGraph;
 using sokoengine::BoardManager;

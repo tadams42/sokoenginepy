@@ -1,19 +1,19 @@
 #include "sokoenginepyext.hpp"
 
 using sokoengine::board_size_t;
-using sokoengine::CellOrientation;
 using sokoengine::position_t;
-using sokoengine::Tessellation;
 using sokoengine::Puzzle;
-using sokoengine::Snapshots;
+using sokoengine::snapshots_t;
+using sokoengine::Tessellation;
+using sokoengine::TileShape;
 using std::make_unique;
 using std::string;
 
 void export_io_puzzle(py::module &m) {
-  py::enum_<CellOrientation>(m, "CellOrientation")
-    .value("DEFAULT", CellOrientation::DEFAULT)
-    .value("TRIANGLE_DOWN", CellOrientation::TRIANGLE_DOWN)
-    .value("OCTAGON", CellOrientation::OCTAGON);
+  py::enum_<TileShape>(m, "TileShape")
+    .value("DEFAULT", TileShape::DEFAULT)
+    .value("TRIANGLE_DOWN", TileShape::TRIANGLE_DOWN)
+    .value("OCTAGON", TileShape::OCTAGON);
 
   auto pyPuzzle = py::class_<Puzzle>(m, "Puzzle", py::is_final());
 
@@ -111,7 +111,7 @@ void export_io_puzzle(py::module &m) {
     [](const Puzzle &self) {
       return self.snapshots();
     },
-    [](Puzzle &self, const Snapshots &rv) {
+    [](Puzzle &self, const snapshots_t &rv) {
       self.snapshots() = rv;
     }
   );
@@ -120,9 +120,9 @@ void export_io_puzzle(py::module &m) {
   pyPuzzle.def_property_readonly("has_sokoban_plus", &Puzzle::has_sokoban_plus);
 
   pyPuzzle.def(
-    "cell_orientation",
+    "tile_shape",
     [](const Puzzle &self, py_int_t position) {
-      return self.cell_orientation(position_or_throw(position));
+      return self.tile_shape(position_or_throw(position));
     },
     py::arg("position")
   );

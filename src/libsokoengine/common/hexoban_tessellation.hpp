@@ -11,13 +11,13 @@ public:
   constexpr inline HexobanTessellation()
     : TessellationImpl() {}
 
-  virtual const Directions &legal_directions() const override;
-  virtual position_t        neighbor_position(
-           position_t       position,
-           const Direction &direction,
-           board_size_t     width,
-           board_size_t     height
-         ) const override;
+  virtual const directions_t &legal_directions() const override;
+  virtual position_t          neighbor_position(
+             position_t       position,
+             const Direction &direction,
+             board_size_t     width,
+             board_size_t     height
+           ) const override;
   virtual game::PusherStep char_to_pusher_step(char input_chr) const override;
   virtual char pusher_step_to_char(const game::PusherStep &pusher_step) const override;
 };

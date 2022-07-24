@@ -2,8 +2,8 @@
 #define PUZZLE_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 /// @file
 
-#include "cell_orientation.hpp"
 #include "tessellation.hpp"
+#include "tile_shape.hpp"
 
 namespace sokoengine {
 ///
@@ -16,7 +16,7 @@ class Snapshot;
 ///
 /// Default type for sequence of Snapshot
 ///
-typedef std::vector<Snapshot> Snapshots;
+typedef std::vector<Snapshot> snapshots_t;
 
 ///
 /// Game board and accompanying metadata.
@@ -78,8 +78,8 @@ public:
 
   bool has_sokoban_plus() const;
 
-  Tessellation    tessellation() const;
-  CellOrientation cell_orientation(position_t position) const;
+  Tessellation tessellation() const;
+  TileShape    tile_shape(position_t position) const;
 
   char at(position_t position) const;
   void set_at(position_t position, char c);
@@ -92,12 +92,12 @@ public:
   ///
   /// Collection of Snapshot related to this puzzle.
   ///
-  const Snapshots &snapshots() const;
+  const snapshots_t &snapshots() const;
 
   ///
   /// Collection of Snapshot related to this puzzle.
   ///
-  Snapshots &snapshots();
+  snapshots_t &snapshots();
 
   ///
   /// Formatted output of parsed and validated board.
@@ -154,7 +154,7 @@ private:
 } // namespace io
 
 using io::Puzzle;
-using io::Snapshots;
+using io::snapshots_t;
 
 } // namespace sokoengine
 

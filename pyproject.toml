@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sokoenginepy"
-version = "1.0.3"
+version = "2.0.0.dev"
 description = "Sokoban and variants game utilities"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -30,7 +30,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Games/Entertainment :: Puzzle Games",
 ]
-dependencies = ["arrow", "networkx > 2.5", "lark >= 1.1.2"]
+dependencies = ["arrow", "networkx > 2.5", "lark >= 1.1.2", "shapely", "pillow"]
 
 [project.urls]
 Homepage = "https://github.com/tadams42/sokoenginepy"
@@ -45,17 +45,25 @@ dev = [
     "coverage",
     "factory-boy",
     "faker",
+    "furo",
     "ipython",
     "isort",
     "myst-parser",
     "pyexcel-ods3",
     "pytest >= 3.0.0",
     "pytest-spec",
-    "sphinx >= 1.4",
+    "sphinx < 5.1.0",
     "sphinx_rtd_theme",
+    "sphinx-copybutton",
     "twine",
 ]
-docs = ["myst-parser", "sphinx >= 1.4", "sphinx_rtd_theme"]
+docs = [
+    "furo",
+    "myst-parser",
+    "sphinx < 5.1.0",
+    "sphinx_rtd_theme",
+    "sphinx-copybutton",
+]
 tests = [
     "check-manifest",
     "coverage",

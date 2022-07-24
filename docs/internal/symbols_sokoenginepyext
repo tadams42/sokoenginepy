@@ -15,10 +15,10 @@ D typeinfo for pybind11::error_already_set
 D typeinfo for pybind11::reference_cast_error
 D typeinfo for pybind11::type_error
 D typeinfo for pybind11::value_error
-D typeinfo for sokoengine::CellOrientation
 D typeinfo for sokoengine::Direction
 D typeinfo for sokoengine::game::SolvingMode
 D typeinfo for sokoengine::Tessellation
+D typeinfo for sokoengine::TileShape
 D typeinfo for std::bad_variant_access
 D typeinfo for std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
 D typeinfo for std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > (std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
@@ -43,10 +43,10 @@ R typeinfo name for pybind11::error_already_set
 R typeinfo name for pybind11::reference_cast_error
 R typeinfo name for pybind11::type_error
 R typeinfo name for pybind11::value_error
-R typeinfo name for sokoengine::CellOrientation
 R typeinfo name for sokoengine::Direction
 R typeinfo name for sokoengine::game::SolvingMode
 R typeinfo name for sokoengine::Tessellation
+R typeinfo name for sokoengine::TileShape
 R typeinfo name for std::bad_variant_access
 R typeinfo name for std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
 R typeinfo name for std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > (std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
@@ -54,6 +54,7 @@ R typeinfo name for std::_Mutex_base<(__gnu_cxx::_Lock_policy)2>
 R typeinfo name for std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>
 T pybind11::error_already_set::m_fetched_error_deleter(pybind11::detail::error_fetch_and_normalize*)
 T PyInit_sokoenginepyext
+U abort
 U __cxa_allocate_exception
 U __cxa_atexit
 U __cxa_begin_catch
@@ -68,14 +69,29 @@ U __cxa_rethrow
 U __cxa_throw
 U __cxa_throw_bad_array_new_length
 U __dynamic_cast
+U __errno_location
+U fclose
+U ferror
+U fflush
+U fopen
+U __fprintf_chk
+U fputc
+U fread
 U free
+U frexp
+U fwrite
 U __gcc_personality_v0
+U gmtime
 U __gxx_personality_v0
 U isspace
+U __longjmp_chk
+U malloc
 U memcmp
 U memcpy
+U __memcpy_chk
 U memmove
 U memset
+U modf
 U operator delete(void*)
 U operator delete[](void*)
 U operator delete(void*, unsigned long)
@@ -83,6 +99,7 @@ U operator delete(void*, unsigned long, std::align_val_t)
 U operator new(unsigned long)
 U operator new[](unsigned long)
 U operator new(unsigned long, std::align_val_t)
+U pow
 U PyBaseObject_Type
 U PyBuffer_Release
 U PyByteArray_AsString
@@ -222,6 +239,8 @@ U PyUnicode_FromString
 U PyUnicode_FromStringAndSize
 U PyUnicode_FSConverter
 U PyWeakref_NewRef
+U remove
+U _setjmp
 U __stack_chk_fail
 U std::bad_alloc::~bad_alloc()
 U std::basic_filebuf<char, std::char_traits<char> >::~basic_filebuf()
@@ -275,6 +294,7 @@ U std::__cxx11::basic_stringstream<char, std::char_traits<char>, std::allocator<
 U std::__detail::_List_node_base::_M_hook(std::__detail::_List_node_base*)
 U std::__detail::_List_node_base::_M_transfer(std::__detail::_List_node_base*, std::__detail::_List_node_base*)
 U std::__detail::_Prime_rehash_policy::_M_need_rehash(unsigned long, unsigned long, unsigned long) const
+U stderr
 U std::exception::~exception()
 U std::__exception_ptr::exception_ptr::~exception_ptr()
 U std::__exception_ptr::exception_ptr::exception_ptr(std::__exception_ptr::exception_ptr const&)
@@ -333,7 +353,9 @@ U std::__throw_out_of_range(char const*)
 U std::__throw_out_of_range_fmt(char const*, ...)
 U strcmp
 U strdup
+U strerror
 U strlen
+U strtod
 U typeinfo for __cxxabiv1::__forced_unwind
 U typeinfo for std::bad_alloc
 U typeinfo for std::domain_error

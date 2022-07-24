@@ -22,7 +22,7 @@ typedef uint32_t position_t;
 ///
 /// Ordered collection of board positions usually describing continuous board path.
 ///
-typedef std::vector<position_t> Positions;
+typedef std::vector<position_t> positions_t;
 
 ///
 /// Piece ID and Sokoban+ ID type.

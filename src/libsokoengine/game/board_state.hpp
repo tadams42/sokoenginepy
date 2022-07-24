@@ -22,9 +22,9 @@ public:
   static constexpr zobrist_key_t NO_HASH = 0;
 
   BoardState(
-    const Positions &pushers_positions = Positions(),
-    const Positions &boxes_positions   = Positions(),
-    zobrist_key_t    zobrist_hash      = NO_HASH
+    const positions_t &pushers_positions = positions_t(),
+    const positions_t &boxes_positions   = positions_t(),
+    zobrist_key_t      zobrist_hash      = NO_HASH
   );
   BoardState(const BoardState &rv);
   BoardState(BoardState &&rv);
@@ -38,14 +38,14 @@ public:
   ///
   /// Positions of pushers sorted by pusher ID.
   ///
-  const Positions &pushers_positions() const;
-  Positions       &pushers_positions();
+  const positions_t &pushers_positions() const;
+  positions_t       &pushers_positions();
 
   ///
   /// Positions of boxes sorted by pusher ID.
   ///
-  const Positions &boxes_positions() const;
-  Positions       &boxes_positions();
+  const positions_t &boxes_positions() const;
+  positions_t       &boxes_positions();
 
   ///
   /// Zobrist hash of state.

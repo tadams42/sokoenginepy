@@ -1,16 +1,16 @@
 #include "sokoenginepyext.hpp"
 
-using sokoengine::Config;
-using sokoengine::Direction;
-using sokoengine::Directions;
-using sokoengine::position_t;
-using sokoengine::Positions;
-using sokoengine::Tessellation;
 using sokoengine::BoardCell;
 using sokoengine::BoardGraph;
+using sokoengine::Config;
+using sokoengine::Direction;
+using sokoengine::directions_t;
 using sokoengine::Edge;
-using sokoengine::Edges;
+using sokoengine::edges_t;
+using sokoengine::position_t;
+using sokoengine::positions_t;
 using sokoengine::Puzzle;
+using sokoengine::Tessellation;
 
 void export_board_graph(py::module &m) {
   py::enum_<Tessellation>(m, "Tessellation")
@@ -116,9 +116,9 @@ void export_board_graph(py::module &m) {
     .def_property_readonly("tessellation", &BoardGraph::tessellation)
 
     .def(
-      "cell_orientation",
+      "tile_shape",
       [](const BoardGraph &self, py_int_t position) {
-        return self.cell_orientation(position_or_throw(position));
+        return self.tile_shape(position_or_throw(position));
       },
       py::arg("position")
     )
@@ -252,7 +252,7 @@ void export_board_graph(py::module &m) {
 
     .def(
       "path_destination",
-      [](const BoardGraph &self, py_int_t src, const Directions &directions) {
+      [](const BoardGraph &self, py_int_t src, const directions_t &directions) {
         return self.path_destination(position_or_throw(src), directions);
       },
       py::arg("src"),

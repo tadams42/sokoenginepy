@@ -25,6 +25,7 @@ if(Python3_FOUND)
             EXCLUDE_FROM_DEFAULT_BUILD 1
             EXCLUDE_FROM_ALL 1
         )
+        add_symbols_export(sokoenginepyext)
 
     else(pybind11_FOUND)
         message(

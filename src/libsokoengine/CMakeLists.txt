@@ -3,7 +3,7 @@ set(INSTALL_HEADERS
     sokoengine.hpp
     benchmarks.hpp
 
-    common/cell_orientation.hpp
+    common/tile_shape.hpp
     common/direction.hpp
     common/game_config.hpp
     common/numeric_types.hpp
@@ -22,6 +22,9 @@ set(INSTALL_HEADERS
     io/puzzle.hpp
     io/rle.hpp
     io/snapshot.hpp
+
+    skins/skin.hpp
+    skins/image.hpp
 )
 
 set(SELF_SOURCES
@@ -83,6 +86,23 @@ set(SELF_SOURCES
     io/trioban_io.hpp
 
     benchmarks.cpp
+
+    skins/geometry.cpp
+    skins/geometry.hpp
+    skins/image_impl.cpp
+    skins/image_impl.hpp
+    skins/image.cpp
+    skins/skin.cpp
+    skins/common_skins_format.hpp
+    skins/common_skins_format.cpp
+    skins/sokoban_common_skins_format.hpp
+    skins/sokoban_common_skins_format.cpp
+    skins/trioban_common_skins_format.hpp
+    skins/trioban_common_skins_format.cpp
+    skins/hexoban_common_skins_format.hpp
+    skins/hexoban_common_skins_format.cpp
+    skins/octoban_common_skins_format.hpp
+    skins/octoban_common_skins_format.cpp
 )
 
 set(SELF_INCLUDE_DIRS
@@ -90,21 +110,36 @@ set(SELF_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/game
     ${CMAKE_CURRENT_SOURCE_DIR}/io
+    ${CMAKE_CURRENT_SOURCE_DIR}/skins
 )
 
 # ..............................................................................
 # sokoengine OBJECT library with all sybmbols hidden
 #
-# This object library doesn't define "LIBSOKOENGINE_DLL" so all symbols in it
-# will get default visibility. Later it sets compile option "-fvisibility=hidden"
-# with net result of all symbols in this object library being hidden.
+# This object library doesn't define "LIBSOKOENGINE_DLL" so all symbols in it will get
+# default visibility. In combination with compile option "-fvisibility=hidden" net
+# result is that all symbols in this object library are hidden
 # ..............................................................................
 add_library(sokoengine_obj_hidden OBJECT ${INSTALL_HEADERS} ${SELF_SOURCES})
-set_target_properties(sokoengine_obj_hidden
-    PROPERTIES
+target_include_directories(sokoengine_obj_hidden PUBLIC ${SELF_INCLUDE_DIRS})
+target_link_libraries(sokoengine_obj_hidden PUBLIC
+    cppitertools::cppitertools
+    Boost::boost
+    PNG::PNG
+)
+set_target_properties(sokoengine_obj_hidden PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
     EXCLUDE_FROM_DEFAULT_BUILD 1
     EXCLUDE_FROM_ALL 1
 )
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    target_link_options(sokoengine_obj_hidden PUBLIC "-Wl,--exclude-libs,ALL")
+    target_compile_options(sokoengine_obj_hidden PUBLIC
+        -fvisibility=hidden
+        -fvisibility-inlines-hidden
+    )
+endif()
 
 # ..............................................................................
 # sokoengine OBJECT library with some sybmbols visible
@@ -114,39 +149,28 @@ set_target_properties(sokoengine_obj_hidden
 # "-fvisibility=hidden" compile option.
 # ..............................................................................
 add_library(sokoengine_obj OBJECT ${INSTALL_HEADERS} ${SELF_SOURCES})
+target_include_directories(sokoengine_obj PUBLIC ${SELF_INCLUDE_DIRS})
+target_link_libraries(sokoengine_obj PUBLIC
+    cppitertools::cppitertools
+    Boost::boost
+    PNG::PNG
+)
 target_compile_definitions(sokoengine_obj PUBLIC
     LIBSOKOENGINE_DLL
     PRIVATE
     LIBSOKOENGINE_DLL_EXPORTS
 )
-
-# ..............................................................................
-# options common to both sokoengine OBJECT libraries
-# ..............................................................................
-target_include_directories(sokoengine_obj PUBLIC ${SELF_INCLUDE_DIRS})
-target_include_directories(sokoengine_obj_hidden PUBLIC ${SELF_INCLUDE_DIRS})
-
-target_link_libraries(sokoengine_obj PUBLIC cppitertools::cppitertools)
-target_link_libraries(sokoengine_obj_hidden PUBLIC cppitertools::cppitertools)
-
-target_link_libraries(sokoengine_obj PUBLIC Boost::boost)
-target_link_libraries(sokoengine_obj_hidden PUBLIC Boost::boost)
-
-set_target_properties(sokoengine_obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
-set_target_properties(sokoengine_obj_hidden PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(sokoengine_obj PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    target_link_options(sokoengine_obj PUBLIC "-Wl,--exclude-libs,ALL")
     target_compile_options(sokoengine_obj
         PUBLIC
         -fvisibility=hidden
         -fvisibility-inlines-hidden
-    )
-    target_compile_options(sokoengine_obj_hidden
-        PUBLIC
-        -fvisibility=hidden
-        -fvisibility-inlines-hidden
-    )
-    target_compile_options(sokoengine_obj PRIVATE
+        PRIVATE
         $<$<CONFIG:Debug>: -Wall -Wextra -Wpedantic>
         -Wno-overloaded-virtual
         -Wno-unused-parameter
@@ -157,15 +181,13 @@ endif()
 # sokoengine library
 # ..............................................................................
 add_library(sokoengine SHARED sokoengine.hpp)
-
 target_link_libraries(sokoengine PRIVATE sokoengine_obj)
-
+target_link_options(sokoengine PRIVATE "-Wl,--exclude-libs,ALL")
 target_include_directories(sokoengine
     PUBLIC
     "$<BUILD_INTERFACE:${SELF_INCLUDE_DIRS}>"
     "$<INSTALL_INTERFACE:include/sokoengine>"
 )
-
 set_target_properties(sokoengine
     PROPERTIES
     VERSION ${PROJECT_VERSION}
@@ -175,9 +197,10 @@ set_target_properties(sokoengine
 
 # generate_export_header(sokoengine)
 set_property(TARGET sokoengine
-    PROPERTY INTERFACE_sokoengine_MAJOR_VERSION 3)
+    PROPERTY INTERFACE_sokoengine_MAJOR_VERSION ${PROJECT_VERSION_MAJOR})
 set_property(TARGET sokoengine
     APPEND PROPERTY COMPATIBLE_INTERFACE_STRING sokoengine_MAJOR_VERSION)
+add_symbols_export(sokoengine)
 
 # ..............................................................................
 # install
@@ -274,6 +297,10 @@ export(
 # ..............................................................................
 # Development utilities
 # ..............................................................................
+
+# ..................
+# benchmarks utility
+# ..................
 file(WRITE
     "${CMAKE_BINARY_DIR}/benchmarks.cpp"
     "#include <sokoengine.hpp>\n\nint main() { return sokoengine::run_benchmarks(); }\n"
@@ -284,6 +311,21 @@ target_link_libraries(benchmarks PUBLIC sokoengine)
 # add_callgrind_target(benchmarks)
 # add_memcheck_target(benchmarks)
 set_target_properties(benchmarks
+    PROPERTIES
+    EXCLUDE_FROM_DEFAULT_BUILD 1
+    EXCLUDE_FROM_ALL 1
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
+
+# ..................
+# skindump utility
+# ..................
+add_executable(skindump skindump.cpp)
+target_link_libraries(skindump PRIVATE sokoengine CLI11::CLI11)
+
+# add_valgrind_profile_dump_target(playground)
+set_target_properties(
+    skindump
     PROPERTIES
     EXCLUDE_FROM_DEFAULT_BUILD 1
     EXCLUDE_FROM_ALL 1

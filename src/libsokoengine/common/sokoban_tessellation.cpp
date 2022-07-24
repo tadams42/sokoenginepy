@@ -10,10 +10,10 @@ using std::string;
 namespace sokoengine {
 namespace implementation {
 
-static const Directions SOK_LEGAL_DIRECTIONS = {
+static const directions_t SOK_LEGAL_DIRECTIONS = {
   Direction::LEFT, Direction::RIGHT, Direction::UP, Direction::DOWN};
 
-const Directions &SokobanTessellation::legal_directions() const {
+const directions_t &SokobanTessellation::legal_directions() const {
   return SOK_LEGAL_DIRECTIONS;
 }
 

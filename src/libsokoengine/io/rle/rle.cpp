@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <sstream>
 
 namespace sokoengine {
   namespace io {

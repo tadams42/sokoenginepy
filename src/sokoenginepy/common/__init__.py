@@ -2,7 +2,7 @@
 Common functionality.
 """
 
-from .cell_orientation import CellOrientation
+from .tile_shape import TileShape
 from .characters import Characters, is_blank
 from .config import Config
 from .direction import Direction

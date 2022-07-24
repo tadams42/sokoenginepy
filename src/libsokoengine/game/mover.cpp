@@ -40,7 +40,7 @@ public:
   bool               m_pulls_boxes     = true;
   piece_id_t         m_selected_pusher = Config::DEFAULT_ID;
   size_t             m_pull_count      = 0;
-  PusherSteps        m_last_move;
+  pusher_steps_t     m_last_move;
 
   PIMPL(BoardGraph &board, SolvingMode mode)
     : m_initial_board(board)
@@ -214,8 +214,8 @@ public:
   }
 
   void undo_last_move() {
-    PusherSteps new_last_moves;
-    PusherSteps old_last_moves = m_last_move;
+    pusher_steps_t new_last_moves;
+    pusher_steps_t old_last_moves = m_last_move;
 
     int jump_key          = 0;
     int pusher_change_key = 1;
@@ -243,13 +243,13 @@ public:
           );
         }
       } else if (gb.first == jump_key) {
-        PusherSteps tmp(gb.second.begin(), gb.second.end());
+        pusher_steps_t tmp(gb.second.begin(), gb.second.end());
         undo_jump(tmp);
         new_last_moves.insert(
           new_last_moves.end(), m_last_move.begin(), m_last_move.end()
         );
       } else {
-        PusherSteps tmp(gb.second.begin(), gb.second.end());
+        pusher_steps_t tmp(gb.second.begin(), gb.second.end());
         undo_pusher_selection(tmp);
         new_last_moves.insert(
           new_last_moves.end(), m_last_move.begin(), m_last_move.end()
@@ -279,8 +279,8 @@ public:
     }
   }
 
-  void undo_jump(const PusherSteps &jump_moves) {
-    Directions path;
+  void undo_jump(const pusher_steps_t &jump_moves) {
+    directions_t path;
     for (const PusherStep &am : jump_moves)
       path.push_back(opposite(am.direction()));
     position_t old_position = m_manager.pusher_position(m_selected_pusher);
@@ -288,8 +288,8 @@ public:
     jump(new_position);
   }
 
-  void undo_pusher_selection(const PusherSteps &selection_moves) {
-    Directions path;
+  void undo_pusher_selection(const pusher_steps_t &selection_moves) {
+    directions_t path;
     for (const PusherStep &am : selection_moves)
       path.push_back(opposite(am.direction()));
     position_t old_position = m_manager.pusher_position(m_selected_pusher);
@@ -337,9 +337,9 @@ void Mover::move(const Direction &direction) {
 
 void Mover::undo_last_move() { m_impl->undo_last_move(); }
 
-const PusherSteps &Mover::last_move() const { return m_impl->m_last_move; }
+const pusher_steps_t &Mover::last_move() const { return m_impl->m_last_move; }
 
-void Mover::set_last_move(const PusherSteps &rv) { m_impl->m_last_move = rv; }
+void Mover::set_last_move(const pusher_steps_t &rv) { m_impl->m_last_move = rv; }
 
 bool Mover::pulls_boxes() const { return m_impl->m_pulls_boxes; }
 

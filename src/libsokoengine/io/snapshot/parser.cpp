@@ -6,6 +6,8 @@
 #include "json_printer.hpp"
 #include "snapshot_config.hpp"
 
+#include <sstream>
+
 using std::endl;
 using std::ostream;
 using std::ostringstream;

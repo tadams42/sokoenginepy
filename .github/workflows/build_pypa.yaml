@@ -14,46 +14,41 @@ on:
 jobs:
 
   pypa_build:
-    name: PyPA build
     strategy:
       matrix:
         python-version: ["3.9", "3.10"]
         os: [ubuntu-latest, windows-latest]
-        cpp: ['with C++', 'without C++']
+        cpp-on: ['🟢', '🔴']
     runs-on: ${{ matrix.os }}
+    name: "${{ matrix.os }} 🔹 🐍 ${{ matrix.python-version }} 🔹 C++ ${{ matrix.cpp-on }}"
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: setup vcpkg
-        if: ${{ matrix.cpp == 'with C++' }}
+      - name: "📦 setup vcpkg"
+        if: ${{ matrix.cpp-on == '🟢' }}
         uses: lukka/run-vcpkg@v10
         with:
           vcpkgDirectory: "${{ github.workspace }}/vcpkg"
           vcpkgGitCommitId: "4826ede84084395b0f87476e48ff6d4070eba0e4"
           appendedCacheKey: "pypa_build_${{ matrix.python-version }}${{ matrix.os }}"
-
-      - name: set up Python ${{ matrix.python-version }}
+      - name: "📦 set up 🐍 ${{ matrix.python-version }}"
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: pyproject.toml
-
-      - name: ensure latest pip
+      - name: "📦 ensure latest pip"
         run: python -m pip install --upgrade pip
-
-      - name: install build utilities
+      - name: "📦 install build utilities"
         run: pip install build wheel twine check-manifest
-
       - name: check manifest
         run: check-manifest
 
       #---------------------------------------------------------------------------------
       # build without C++ extension
       #---------------------------------------------------------------------------------
-      - name: build sdist and wheel (without C++)
-        if: ${{ matrix.cpp == 'without C++' }}
+      - name: "📦 build sdist and wheel 🔹 C++ 🔴"
+        if: ${{ matrix.cpp-on == '🔴' }}
         env:
           SOKOENGINEPYEXT_SKIP: true
         run: python -m build
@@ -61,8 +56,8 @@ jobs:
       #---------------------------------------------------------------------------------
       # build with C++ extension
       #---------------------------------------------------------------------------------
-      - name: build sdist and wheel (with C++)
-        if: ${{ matrix.cpp == 'with C++' }}
+      - name: "📦 build sdist and wheel 🔹 C++ 🟢"
+        if: ${{ matrix.cpp-on == '🟢' }}
         env:
           CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
         run: python -m build
@@ -72,10 +67,8 @@ jobs:
       #---------------------------------------------------------------------------------
       - name: check sdist
         run: twine check dist/*.tar.gz
-
       - name: check wheel
         run: twine check dist/*.whl
-
       - name: upload sdist and wheel
         uses: actions/upload-artifact@v3
         with:

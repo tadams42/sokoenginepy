@@ -13,41 +13,35 @@ if(GIT_FOUND AND GZIP_FOUND)
 endif()
 
 # .......................................................................................
-# `make symbols` and `make subols_pyext` targets
+# `make symbols_TARGET_NAME`
+# Used for release builds to manually inspect what symbols are exported from binaries
+# and make sure we didn't export too much.
+# Linker symbols management is performed automatically via LIBSOKOENGINE_DLL macro and
+# -fvisibility-hidden. This is just to check if we'd messed up something when changing
+# compiler and linker options.
 # .......................................................................................
-
-# WARNING: This is wrong for multi-config generators because they don't use
-# and typically don't even set CMAKE_BUILD_TYPE
-if(
-    NM_FOUND AND CUT_FOUND AND SORT_FOUND
-    AND(
-    CMAKE_BUILD_TYPE STREQUAL Release
-    OR CMAKE_BUILD_TYPE STREQUAL MinSizeRel
-    OR CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo
+function(add_symbols_export for_target_name)
+    # WARNING: This is wrong for multi-config generators because they don't use
+    # and typically don't even set CMAKE_BUILD_TYPE
+    if(
+        NM_FOUND AND CUT_FOUND AND SORT_FOUND
+        AND(
+        CMAKE_BUILD_TYPE STREQUAL Release
+        OR CMAKE_BUILD_TYPE STREQUAL MinSizeRel
+        OR CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo
+        )
     )
-)
-    add_custom_target(
-        symbols
-        COMMAND ${CMAKE_SOURCE_DIR}/bin/symbols.sh $<TARGET_FILE:sokoengine> "${CMAKE_SOURCE_DIR}/docs/internal/symbols_libsokoengine"
-        BYPRODUCTS "${CMAKE_SOURCE_DIR}/docs/internal/symbols_libsokoengine"
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND_EXPAND_LISTS
-        COMMENT "Generating library symbols list..."
-    )
-    add_dependencies(symbols sokoengine)
-
-    if(Python3_FOUND AND pybind11_FOUND)
         add_custom_target(
-            symbols_pyext
-            COMMAND ${CMAKE_SOURCE_DIR}/bin/symbols.sh $<TARGET_FILE:sokoenginepyext> "${CMAKE_SOURCE_DIR}/docs/internal/symbols_sokoenginepyext"
-            BYPRODUCTS "${CMAKE_SOURCE_DIR}/docs/internal/symbols_sokoenginepyext"
+            symbols_${for_target_name}
+            COMMAND nm -CD "$<TARGET_FILE:${for_target_name}>" | cut -c "18-" | sort > "${CMAKE_SOURCE_DIR}/docs/internal/symbols_${for_target_name}"
+            BYPRODUCTS "${CMAKE_SOURCE_DIR}/docs/internal/symbols_${for_target_name}"
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMAND_EXPAND_LISTS
-            COMMENT "Generating Python extension symbols list..."
+            COMMENT "Generating symbols list for ${for_target_name}.."
         )
-        add_dependencies(symbols_pyext sokoenginepyext)
+        add_dependencies(symbols_${for_target_name} ${for_target_name})
     endif()
-endif()
+endfunction(add_symbols_export)
 
 # .......................................................................................
 # make "valgrind_" targets

@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 from typing import TYPE_CHECKING, ClassVar, Dict, Tuple, Union
 
-from .cell_orientation import CellOrientation
+from .tile_shape import TileShape
 from .config import Config
 from .direction import Direction
 from .graph_type import GraphType
@@ -127,10 +127,10 @@ class TessellationImpl(metaclass=ABCMeta):
             moved_box_id=Config.NO_ID if not box_moved else Config.DEFAULT_ID,
         )
 
-    def cell_orientation(
+    def tile_shape(
         self, position: int, board_width: int, board_height: int
-    ) -> CellOrientation:
-        """Calculates board cell orientation for given coordinate."""
+    ) -> TileShape:
+        """Calculates board tile shape for given coordinate."""
         if position < 0:
             raise IndexError(f"Position {position} is invalid value!")
 
@@ -140,4 +140,4 @@ class TessellationImpl(metaclass=ABCMeta):
         if board_height < 0:
             raise ValueError(f"Board height {board_height} is invalid value!")
 
-        return CellOrientation.DEFAULT
+        return TileShape.DEFAULT

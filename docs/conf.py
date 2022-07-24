@@ -36,7 +36,7 @@ copyright = (
     + ", Tomislav Adamic"
 )
 author = "Tomislav Adamic"
-version = release = "1.0.3"
+version = release = "2.0.0.dev"
 
 
 # -- General configuration ---------------------------------------------------
@@ -52,6 +52,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "myst_parser",
+    "sphinx_copybutton"
     # "breathe",
 ]
 
@@ -92,12 +93,12 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
+# if not on_rtd:  # only import and set the theme if we're building docs locally
+#     html_theme = "sphinx_rtd_theme"
+#     import sphinx_rtd_theme
+#     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
-    html_theme = "sphinx_rtd_theme"
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-
+html_theme = "furo"
 
 # -- Extension configuration -------------------------------------------------
 

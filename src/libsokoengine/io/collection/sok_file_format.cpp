@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::implementation::Strings;
+using sokoengine::implementation::strings_t;
 using std::endl;
 using std::ios_base;
 using std::istream;
@@ -21,10 +21,10 @@ namespace sokoengine {
 namespace implementation {
 
 struct LIBSOKOENGINE_LOCAL SnapshotData {
-  string  moves_data;
-  string  title;
-  string  solver;
-  Strings notes;
+  string    moves_data;
+  string    title;
+  string    solver;
+  strings_t notes;
 };
 
 typedef vector<SnapshotData> SnapshotsData;
@@ -36,7 +36,7 @@ struct LIBSOKOENGINE_LOCAL PuzzleData {
   string        author;
   string        boxorder;
   string        goalorder;
-  Strings       notes;
+  strings_t     notes;
   SnapshotsData snapshots;
 };
 
@@ -47,7 +47,7 @@ struct LIBSOKOENGINE_LOCAL CollectionData {
   string       author;
   string       created_at;
   string       updated_at;
-  Strings      notes;
+  strings_t    notes;
   Tessellation header_tessellation_hint        = Tessellation::SOKOBAN;
   bool         was_tessellation_hint_in_header = false;
   PuzzlesData  puzzles;
@@ -84,11 +84,11 @@ public:
     }
   }
 
-  static Strings
-  extract_collection_attributes(CollectionData &dest, const Strings &notes) {
-    Strings remaining_lines;
-    string  tessellation;
-    bool    tessellation_found = false;
+  static strings_t
+  extract_collection_attributes(CollectionData &dest, const strings_t &notes) {
+    strings_t remaining_lines;
+    string    tessellation;
+    bool      tessellation_found = false;
 
     for (const string &line : notes) {
       bool   was_tagged = is_raw_file_notes_line(line);
@@ -151,17 +151,17 @@ public:
     return remaining_lines;
   }
 
-  static Strings extract_puzzle_attributes(
-    PuzzleData    &dest,
-    const Strings &notes,
-    bool           has_tessellation_header,
-    Tessellation   collection_header_tessellation_hint,
-    bool           has_supplied_tessellation,
-    Tessellation   supplied_tessellation
+  static strings_t extract_puzzle_attributes(
+    PuzzleData      &dest,
+    const strings_t &notes,
+    bool             has_tessellation_header,
+    Tessellation     collection_header_tessellation_hint,
+    bool             has_supplied_tessellation,
+    Tessellation     supplied_tessellation
   ) {
-    Strings remaining_lines;
-    string  tessellation;
-    bool    tessellation_found = false;
+    strings_t remaining_lines;
+    string    tessellation;
+    bool      tessellation_found = false;
 
     for (const string &line : notes) {
       bool   was_tagged = false;
@@ -220,8 +220,9 @@ public:
     return remaining_lines;
   }
 
-  static Strings extract_snapshot_attributes(SnapshotData &dest, const Strings &notes) {
-    Strings remaining_lines;
+  static strings_t
+  extract_snapshot_attributes(SnapshotData &dest, const strings_t &notes) {
+    strings_t remaining_lines;
 
     for (const string &line : notes) {
       bool   was_tagged = false;
@@ -358,8 +359,8 @@ private:
   }
 
   void split_input() {
-    string  line;
-    Strings lines;
+    string    line;
+    strings_t lines;
     while (getline(m_src, line)) {
       lines.push_back(line + '\n');
     }
@@ -369,7 +370,7 @@ private:
         return Characters::is_board(line);
       });
 
-    Strings remaining_lines;
+    strings_t remaining_lines;
     if (first_board_line != lines.cend()) {
       std::copy(lines.cbegin(), first_board_line, std::back_inserter(m_data.notes));
       std::copy(first_board_line, lines.cend(), std::back_inserter(remaining_lines));
@@ -382,7 +383,7 @@ private:
     split_snapshot_chunks();
   }
 
-  void split_puzzle_chunks(Strings &remaining_lines) {
+  void split_puzzle_chunks(strings_t &remaining_lines) {
     while (remaining_lines.size() > 0) {
       m_data.puzzles.push_back(PuzzleData());
       PuzzleData &puzzle = m_data.puzzles.back();
@@ -396,7 +397,7 @@ private:
       );
 
       if (first_note_line != remaining_lines.cend()) {
-        Strings board;
+        strings_t board;
         std::copy(remaining_lines.cbegin(), first_note_line, std::back_inserter(board));
         puzzle.board = boost::join(board, "");
         remaining_lines.erase(remaining_lines.cbegin(), first_note_line);
@@ -428,7 +429,7 @@ private:
 
   void split_snapshot_chunks() {
     for (PuzzleData &puzzle : m_data.puzzles) {
-      Strings remaining_lines;
+      strings_t remaining_lines;
       remaining_lines.swap(puzzle.notes);
 
       auto first_moves_line = std::find_if(
@@ -462,7 +463,7 @@ private:
         );
 
         if (first_note_line != remaining_lines.cend()) {
-          Strings moves_lines;
+          strings_t moves_lines;
           std::copy(
             remaining_lines.cbegin(), first_note_line, std::back_inserter(moves_lines)
           );
@@ -503,7 +504,7 @@ private:
     }
   }
 
-  Strings &notes_before_puzzle(size_t puzzle_index) {
+  strings_t &notes_before_puzzle(size_t puzzle_index) {
     if (puzzle_index == 0) {
       return m_data.notes;
     }
@@ -514,7 +515,7 @@ private:
     return previous_puzzle.notes;
   }
 
-  Strings &notes_before_snapshot(size_t puzzle_index, size_t snapshot_index) {
+  strings_t &notes_before_snapshot(size_t puzzle_index, size_t snapshot_index) {
     PuzzleData &puzzle = m_data.puzzles[puzzle_index];
     if (snapshot_index == 0) {
       return puzzle.notes;
@@ -522,7 +523,7 @@ private:
     return puzzle.snapshots[snapshot_index - 1].notes;
   }
 
-  string get_and_remove_title_line(Strings &notes) {
+  string get_and_remove_title_line(strings_t &notes) {
     // :: Titles                                                 ::
     // ::   A title line is the last non-blank text line before  ::
     // ::   a board, a saved game, or a solution, provided the   ::
@@ -538,9 +539,9 @@ private:
     // auto b = notes.rbegin();
     // auto e = notes.rend();
     // auto f = [](const string &s) { return !is_blank(s); };
-    // Strings::const_reverse_iterator candidate = find_if(b, e, f);
+    // strings_t::const_reverse_iterator candidate = find_if(b, e, f);
 
-    Strings::const_reverse_iterator candidate =
+    strings_t::const_reverse_iterator candidate =
       find_if(notes.rbegin(), notes.rend(), [](const string &s) {
         return !is_blank(s);
       });
@@ -549,10 +550,10 @@ private:
       return "";
     }
 
-    Strings::const_reverse_iterator preceding_line = candidate;
+    strings_t::const_reverse_iterator preceding_line = candidate;
     if (preceding_line != notes.rend())
       ++preceding_line;
-    Strings::const_reverse_iterator following_line = candidate;
+    strings_t::const_reverse_iterator following_line = candidate;
     if (following_line != notes.rbegin())
       --following_line;
 
@@ -574,20 +575,20 @@ private:
     for (size_t puzzle_index = 0; puzzle_index < m_data.puzzles.size();
          puzzle_index++) {
       PuzzleData &puzzle   = m_data.puzzles[puzzle_index];
-      Strings    &notes_bp = notes_before_puzzle(puzzle_index);
+      strings_t  &notes_bp = notes_before_puzzle(puzzle_index);
       puzzle.title         = get_and_remove_title_line(notes_bp);
 
       for (size_t snapshot_index = 0; snapshot_index < puzzle.snapshots.size();
            snapshot_index++) {
         SnapshotData &snapshot = puzzle.snapshots[snapshot_index];
-        Strings      &notes_bs = notes_before_snapshot(puzzle_index, snapshot_index);
+        strings_t    &notes_bs = notes_before_snapshot(puzzle_index, snapshot_index);
         snapshot.title         = get_and_remove_title_line(notes_bs);
       }
     }
   }
 
   void parse_notes() {
-    Strings remaining_lines =
+    strings_t remaining_lines =
       SOKTags::extract_collection_attributes(m_data, m_data.notes);
     m_data.notes.swap(cleanup_whitespace(remaining_lines));
 
@@ -610,8 +611,8 @@ private:
     }
   }
 
-  Strings &cleanup_whitespace(Strings &notes) {
-    Strings::iterator tit;
+  strings_t &cleanup_whitespace(strings_t &notes) {
+    strings_t::iterator tit;
     tit = unique(notes.begin(), notes.end(), [](const string &l, const string &r) {
       return is_blank(l) && is_blank(r);
     });

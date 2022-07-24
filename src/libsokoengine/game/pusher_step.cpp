@@ -8,7 +8,7 @@
 using sokoengine::implementation::direction_pack;
 using sokoengine::implementation::direction_unpack;
 using sokoengine::implementation::is_blank;
-using sokoengine::implementation::Strings;
+using sokoengine::implementation::strings_t;
 using sokoengine::implementation::to_str;
 using std::invalid_argument;
 using std::runtime_error;
@@ -84,7 +84,7 @@ string PusherStep::repr() const {
   if (m_is_current_pos)
     curr_pos = "is_current_pos=True";
 
-  Strings args;
+  strings_t args;
   args.push_back(to_str(direction()));
   if (!is_blank(s_box_id))
     args.push_back(s_box_id);

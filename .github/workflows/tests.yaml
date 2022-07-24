@@ -13,71 +13,63 @@ on:
 jobs:
 
   run_tests:
-    name: tests
     strategy:
       matrix:
         python-version: ["3.9", "3.10"]
         os: [ubuntu-latest, windows-latest]
-        cpp: ['with C++', 'without C++']
+        cpp-on: ['🟢', '🔴']
     runs-on: ${{ matrix.os }}
+    name: "${{ matrix.os }} 🔹 🐍 ${{ matrix.python-version }} 🔹 C++ ${{ matrix.cpp-on }}"
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: setup vcpkg
-        if: ${{ matrix.cpp == 'with C++' }}
+      - name: "📦 setup vcpkg"
+        if: ${{ matrix.cpp-on == '🟢' }}
         uses: lukka/run-vcpkg@v10
         with:
           vcpkgDirectory: "${{ github.workspace }}/vcpkg"
           vcpkgGitCommitId: "4826ede84084395b0f87476e48ff6d4070eba0e4"
           appendedCacheKey: "tests_${{ matrix.python-version }}${{ matrix.os }}"
-
-      - name: set up Python ${{ matrix.python-version }}
+      - name: "📦 set up 🐍 ${{ matrix.python-version }}"
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: pyproject.toml
-
-      - name: ensure latest pip
+      - name: "📦 ensure latest pip"
         run: python -m pip install --upgrade pip
-
-      - name: install wheel
+      - name: "📦 install wheel"
         run: pip install wheel
 
       #---------------------------------------------------------------------------------
-      # Tests without C++ extension
+      # install ourselves
+      # TODO: pip install fails on Windows, vcpkg is not able to find globally installed cmake
       #---------------------------------------------------------------------------------
-      - name: install sokoenginepy (without C++)
-        if: ${{ matrix.cpp == 'without C++' }}
+      - name: "🪟 🔹 📦 install bundled cmake 🔹 C++ 🟢"
+        if: ${{ matrix.cpp-on == '🟢' && matrix.os == 'windows-latest'}}
+        run: pip install cmake
+      - name: "install sokoenginepy 🔹 C++ 🔴"
+        if: ${{ matrix.cpp-on == '🔴' }}
         env:
           SOKOENGINEPYEXT_SKIP: true
         run: pip install .[tests]
-
-      - name: run tests (without C++)
-        # TODO: tests are currently broken on Windows
-        if: ${{ matrix.cpp == 'without C++' && matrix.os != 'windows-latest' }}
-        env:
-          SOKOENGINEPY_EXPECT_CPP: false
-        run: pytest
-
-      #---------------------------------------------------------------------------------
-      # Tests with enabled C++ extension
-      #---------------------------------------------------------------------------------
-      # TODO: pip install fails on Windows, vcpkg is not able to find globally installed cmake
-      - name: install bundled cmake
-        if: ${{ matrix.cpp == 'with C++' && matrix.os == 'windows-latest'}}
-        run: pip install cmake
-
-      - name: install sokoenginepy (with C++)
-        if: ${{ matrix.cpp == 'with C++' }}
+      - name: "install sokoenginepy 🔹 C++ 🟢"
+        if: ${{ matrix.cpp-on == '🟢' }}
         env:
           CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
         run: pip -v install .[tests]
 
-      - name: run tests (with C++)
-        # TODO: tests are currently broken on Windows
-        if: ${{ matrix.cpp == 'with C++' && matrix.os != 'windows-latest' }}
+      #---------------------------------------------------------------------------------
+      # run tests
+      # TODO: tests are currently broken on Windows
+      #---------------------------------------------------------------------------------
+      - name: "run tests 🔹 C++ 🔴"
+        if: ${{ matrix.cpp-on == '🔴' && matrix.os != 'windows-latest' }}
+        env:
+          SOKOENGINEPY_EXPECT_CPP: false
+        run: pytest
+      - name: "run tests 🔹 C++ 🟢"
+        if: ${{ matrix.cpp-on == '🟢' && matrix.os != 'windows-latest' }}
         env:
           SOKOENGINEPY_EXPECT_CPP: true
         run: pytest
@@ -86,24 +78,20 @@ jobs:
       # Tests coverage
       #---------------------------------------------------------------------------------
       # We need coverage data only from single tests run.
-      - name: run tests with coverage
-        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp == 'without C++'}}
+      - name: "🐧 🔹 run tests with coverage 🔹 🐍 3.9 🔹 C++ 🔴 "
+        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp-on == '🔴'}}
         run: coverage run -m pytest
-
-      - name: generate coverage xml
-        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp == 'without C++'}}
+      - name: "🐧 🔹 generate coverage xml 🔹 🐍 3.9 🔹 C++ 🔴 "
+        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp-on == '🔴'}}
         run: coverage xml
-
-      - name: generate coverage report
-        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp == 'without C++'}}
+      - name: "🐧 🔹 generate coverage report 🔹 🐍 3.9 🔹 C++ 🔴 "
+        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp-on == '🔴'}}
         run: coverage report
-
-      - name: upload coverage to codecov.io
-        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp == 'without C++'}}
+      - name: "🐧 🔹 upload coverage to codecov.io 🔹 🐍 3.9 🔹 C++ 🔴 "
+        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp-on == '🔴'}}
         uses: codecov/codecov-action@v3
-
-      - name: upload coverage to Codacy
-        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp == 'without C++'}}
+      - name: "🐧 🔹 upload coverage to Codacy 🔹 🐍 3.9 🔹 C++ 🔴 "
+        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && matrix.cpp-on == '🔴'}}
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           project-token: ${{ secrets.codacy_api_token }}

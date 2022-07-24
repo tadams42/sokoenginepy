@@ -13,7 +13,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-using sokoengine::implementation::Strings;
+using sokoengine::implementation::strings_t;
 using std::find;
 using std::make_unique;
 using std::map;
@@ -45,9 +45,9 @@ public:
     string indent(add_indent, ' ');
 
     auto converter = [&]() {
-      Strings retv;
+      strings_t retv;
 
-      Strings tmp;
+      strings_t tmp;
       for (auto id : v) {
         tmp.push_back(to_string(id));
         if (tmp.size() == 5) {
@@ -68,7 +68,7 @@ public:
   static string to_str(const map<piece_id_t, hash_vector_t> &m, int add_indent = 0) {
     string indent(add_indent, ' ');
     auto   converter = [&]() {
-      Strings retv;
+      strings_t retv;
       for (auto p : m) {
         retv.push_back(
           indent + "    " + to_string(p.first) + ": " + to_str(p.second, 4 + add_indent)

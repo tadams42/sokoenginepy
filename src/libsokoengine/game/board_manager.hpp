@@ -151,7 +151,7 @@ public:
   ///
   /// Collection of piece IDs
   ///
-  typedef std::vector<piece_id_t> piece_ids_vector_t;
+  typedef std::vector<piece_id_t> piece_ids_t;
   ///
   /// Mapping between piece's ID and its position
   ///
@@ -161,8 +161,8 @@ public:
   // Pushers
   // --------------------------------------------------------------------------
 
-  board_size_t       pushers_count() const;
-  piece_ids_vector_t pushers_ids() const;
+  board_size_t pushers_count() const;
+  piece_ids_t  pushers_ids() const;
   ///
   /// Mapping of pushers' IDs to the corresponding board positions, ie.
   ///
@@ -213,8 +213,8 @@ public:
   // Boxes
   // --------------------------------------------------------------------------
 
-  board_size_t       boxes_count() const;
-  piece_ids_vector_t boxes_ids() const;
+  board_size_t boxes_count() const;
+  piece_ids_t  boxes_ids() const;
   ///
   /// Mapping of boxes' IDs to the corresponding board positions, ie.
   ///
@@ -254,8 +254,8 @@ public:
   // Goals
   // --------------------------------------------------------------------------
 
-  board_size_t       goals_count() const;
-  piece_ids_vector_t goals_ids() const;
+  board_size_t goals_count() const;
+  piece_ids_t  goals_ids() const;
   ///
   /// Mapping of goals' IDs to the corresponding board positions, ie.
   ///
@@ -366,8 +366,8 @@ public:
   // Board state
   // --------------------------------------------------------------------------
 
-  const BoardGraph &board() const;
-  const Positions  &walls_positions() const;
+  const BoardGraph  &board() const;
+  const positions_t &walls_positions() const;
 
   ///
   /// All boxes configurations that are solution to board.
@@ -429,11 +429,11 @@ private:
 
 } // namespace game
 
-using game::CellAlreadyOccupiedError;
-using game::BoxGoalSwitchError;
-using game::Selectors;
-using game::PieceNotFoundError;
 using game::BoardManager;
+using game::BoxGoalSwitchError;
+using game::CellAlreadyOccupiedError;
+using game::PieceNotFoundError;
+using game::Selectors;
 
 } // namespace sokoengine
 

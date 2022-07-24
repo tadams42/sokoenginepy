@@ -1,9 +1,9 @@
 #ifndef TESSELLATION_IMPL_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 #define TESSELLATION_IMPL_0FEA723A_C86F_6753_04ABD475F6FCA5FB
 
-#include "cell_orientation.hpp"
 #include "direction.hpp"
 #include "tessellation.hpp"
+#include "tile_shape.hpp"
 
 namespace sokoengine {
 
@@ -42,7 +42,7 @@ public:
   ///
   /// Directions that are valid in context of this tessellation.
   ///
-  virtual const Directions &legal_directions() const = 0;
+  virtual const directions_t &legal_directions() const = 0;
 
   ///
   /// Calculates neighbor position in given direction.
@@ -88,10 +88,15 @@ public:
   virtual GraphType graph_type() const;
 
   ///
-  /// Calculates board cell orientation for given coordinate.
+  /// Calculates board tile shape for given coordinate.
   ///
-  virtual CellOrientation
-  cell_orientation(position_t position, board_size_t width, board_size_t height) const;
+  virtual TileShape
+  tile_shape(position_t position, board_size_t width, board_size_t height) const;
+
+  ///
+  /// All TileShape that this tessellation uses.
+  ///
+  virtual tile_shapes_t tile_shapes() const;
 };
 
 } // namespace implementation

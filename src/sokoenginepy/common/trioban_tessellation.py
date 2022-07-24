@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Final, Mapping, Tuple
 
-from .cell_orientation import CellOrientation
+from .tile_shape import TileShape
 from .characters import Characters
 from .config import Config
 from .direction import Direction
@@ -48,8 +48,8 @@ class TriobanTessellation(TessellationImpl):
         self, position: int, direction: Direction, board_width: int, board_height: int
     ) -> int:
         triangle_points_down = (
-            self.cell_orientation(position, board_width, board_height)
-            == CellOrientation.TRIANGLE_DOWN
+            self.tile_shape(position, board_width, board_height)
+            == TileShape.TRIANGLE_DOWN
         )
         row = index_row(position, board_width)
         column = index_column(position, board_width)
@@ -102,9 +102,9 @@ class TriobanTessellation(TessellationImpl):
 
         return Config.NO_POS
 
-    def cell_orientation(
+    def tile_shape(
         self, position: int, board_width: int, board_height: int
-    ) -> CellOrientation:
+    ) -> TileShape:
         if position < 0:
             raise IndexError(f"Position {position} is invalid value!")
 
@@ -117,7 +117,7 @@ class TriobanTessellation(TessellationImpl):
         row = index_row(position, board_width)
         column = index_column(position, board_width)
         return (
-            CellOrientation.TRIANGLE_DOWN
+            TileShape.TRIANGLE_DOWN
             if (column + (row % 2)) % 2 == 0
-            else CellOrientation.DEFAULT
+            else TileShape.DEFAULT
         )

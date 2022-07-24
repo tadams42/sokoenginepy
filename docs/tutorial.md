@@ -1,5 +1,22 @@
 # Tutorial
 
+⚠️ Tutorial is written in Python, but code is simple enough to be easily followed  by
+C++ crowd. Replace
+
+```py
+from sokoenginepy import ...
+```
+
+with
+
+```cpp
+#include <sokoengine.hpp>
+```
+
+and remaining of code will look very similar. Both APIs, Python and C++, share exact
+same names of classes and methods. For detailed API docs (after reading tutorial) see
+[Doxygen documentation] and [Read the Docs]
+
 ## Game tessellation
 
 `sokoenginepy` implements four game variants: Sokoban, Hexoban, Trioban and Octoban.
@@ -325,3 +342,5 @@ collection.dump("~/sokoban/collections/some_other_file.sok")
 [SokobanYASC]: https://sourceforge.net/projects/sokobanyasc/
 [Wikipedia-Sokoban rules]: https://en.wikipedia.org/wiki/Sokoban#Rules
 [Zobrist hashing]: https://en.wikipedia.org/wiki/Zobrist_hashing
+[Doxygen documentation]: http://tadams42.github.io/sokoenginepy/
+[Read the Docs]: https://sokoenginepy.readthedocs.io/en/latest/

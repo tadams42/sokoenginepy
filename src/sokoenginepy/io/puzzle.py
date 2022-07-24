@@ -6,7 +6,7 @@ from operator import add
 from typing import Final, List, Optional
 
 from ..common import (
-    CellOrientation,
+    TileShape,
     Characters,
     Tessellation,
     TessellationImpl,
@@ -120,9 +120,9 @@ class Puzzle:
 
         return self._tessellation_obj_val
 
-    def cell_orientation(self, pos: int) -> CellOrientation:
+    def tile_shape(self, pos: int) -> TileShape:
         self._reparse_if_not_parsed()
-        return self._tessellation_obj.cell_orientation(pos, self.width, self.height)
+        return self._tessellation_obj.tile_shape(pos, self.width, self.height)
 
     def __getitem__(self, position: int) -> str:
         if position < 0:

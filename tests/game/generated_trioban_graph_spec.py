@@ -1,6 +1,6 @@
 from sokoenginepy import (
     BoardGraph,
-    CellOrientation,
+    TileShape,
     Config,
     Direction,
     Puzzle,
@@ -11,7 +11,7 @@ from sokoenginepy import (
 
 def triangle_points_down(board_graph, position):
     return (
-        board_graph.cell_orientation(position) == CellOrientation.TRIANGLE_DOWN
+        board_graph.tile_shape(position) == TileShape.TRIANGLE_DOWN
     )
 
 

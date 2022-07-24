@@ -17,119 +17,122 @@ jobs:
   # Tests if cmake toolchain is flexible enough to build either only libsokoengine (if
   # there is no pybind11 and Python) or both, libsokoengine and sokoenginepyext.
 
-  cmake_build:
-    name: cmake build
+  cmake_build_linux:
     strategy:
       matrix:
-        python-version: ["3.9", "3.10"]
-        os: [ubuntu-latest, windows-latest]
-        py: ['with Py', 'without Py']
-    runs-on: ${{ matrix.os }}
+        python-version: ['3.9', '3.10']
+        py-on: ['🟢', '🔴']
+    runs-on: 'ubuntu-latest'
+    name: "🐧 🔹 🐍 ${{ matrix.python-version }} 🔹 Py ${{ matrix.py-on }}"
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: setup vcpkg
+      - name: "📦 setup vcpkg"
         uses: lukka/run-vcpkg@v10
         with:
           vcpkgDirectory: "${{ github.workspace }}/vcpkg"
           vcpkgGitCommitId: "4826ede84084395b0f87476e48ff6d4070eba0e4"
-          appendedCacheKey: "cmake_build_${{ matrix.python-version }}${{ matrix.os }}"
-
-      - name: set up Python ${{ matrix.python-version }}
-        if: ${{ matrix.py == 'with Py' }}
+          appendedCacheKey: "cmake_build_linux_${{ matrix.python-version }}"
+      - name: "📦 set up 🐍 ${{ matrix.python-version }}"
+        if: ${{ matrix.py-on == '🟢' }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: pyproject.toml
-
-      - name: ensure latest pip
-        if: ${{ matrix.py == 'with Py' }}
+      - name: "📦 ensure latest pip"
+        if: ${{ matrix.py-on == '🟢' }}
         run: python -m pip install --upgrade pip
-
-      - name: install pybind11
-        if: ${{ matrix.py == 'with Py' }}
+      - name: "📦 install pybind11"
+        if: ${{ matrix.py-on == '🟢' }}
         run: pip install pybind11
-
-      #---------------------------------------------------------------------------------
-      # Build on Linux
-      #---------------------------------------------------------------------------------
-      - name: install build utilities
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+      - name: "📦 install build utilities"
         run: sudo apt install -y cmake ninja-build
-
-      - name: configure
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+      - name: "🐧 configure"
         env:
           CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
         run: cmake -DCMAKE_INSTALL_PREFIX=build/installed --preset release
-
-      - name: make (with Py)
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.py == 'with Py' }}
+      - name: "🐧 make with 🐍"
+        if: ${{ matrix.py-on == '🟢' }}
         working-directory: build/release
         run: cmake --build . --target sokoengine sokoenginepyext dist
-
-      - name: make (without Py)
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.py == 'without Py' }}
+      - name: "🐧 make without 🐍"
+        if: ${{ matrix.py-on == '🔴' }}
         working-directory: build/release
         run: cmake --build . --target sokoengine
-
-      - name: make install
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+      - name: "🐧 make install"
         working-directory: build/release
         run: cmake --install .
-
-      - name: upload source tarball
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.py == 'with Py' && matrix.python-version == '3.10'}}
+      - name: "🐧 upload source tarball for 🐍 3.10"
+        if: ${{ matrix.py-on == '🟢' && matrix.python-version == '3.10'}}
         uses: actions/upload-artifact@v3
         with:
           name: dist_tarball
           path: build/release/libsokoengine-*.tar.gz
           retention-days: 5
-
-      - name: upload Linux binaries
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.py == 'with Py' && matrix.python-version == '3.10'}}
+      - name: "🐧 upload Linux binaries for 🐍 3.10"
+        if: ${{ matrix.py-on == '🟢' && matrix.python-version == '3.10'}}
         uses: actions/upload-artifact@v3
         with:
           name: linux_cmake_installed
           path: build/installed
           retention-days: 5
 
-      #---------------------------------------------------------------------------------
-      # Build on Windblows
-      #---------------------------------------------------------------------------------
-      - name: configure
-        if: ${{ matrix.os == 'windows-latest' }}
+
+
+  cmake_build_windows:
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        py-on: ['🟢', '🔴']
+    runs-on: 'windows-latest'
+    name: "🪟 🔹 🐍 ${{ matrix.python-version }} 🔹 Py ${{ matrix.py-on }}"
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: "📦 setup vcpkg"
+        uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+          vcpkgGitCommitId: "4826ede84084395b0f87476e48ff6d4070eba0e4"
+          appendedCacheKey: "cmake_build_windows${{ matrix.python-version }}"
+      - name: "📦 set up 🐍 ${{ matrix.python-version }}"
+        if: ${{ matrix.py-on == '🟢' }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: pyproject.toml
+      - name: "📦 ensure latest pip"
+        if: ${{ matrix.py-on == '🟢' }}
+        run: python -m pip install --upgrade pip
+      - name: "📦 install pybind11"
+        if: ${{ matrix.py-on == '🟢' }}
+        run: pip install pybind11
+      - name: "🪟 configure"
         env:
           CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
         run: cmake -DCMAKE_INSTALL_PREFIX=build/installed --preset visual_studio
-
-      - name: make (with Py)
-        if: ${{ matrix.os == 'windows-latest' && matrix.py == 'with Py' }}
+      - name: "🪟 make with 🐍"
+        if: ${{ matrix.py-on == '🟢' }}
         working-directory: build/visual_studio
         run: cmake --build . --config RelWithDebInfo --target sokoengine sokoenginepyext
-
-      - name: make (without Py)
-        if: ${{ matrix.os == 'windows-latest' && matrix.py == 'without Py' }}
+      - name: "🪟 make without 🐍"
+        if: ${{ matrix.py-on == '🔴' }}
         working-directory: build/visual_studio
         run: cmake --build . --config RelWithDebInfo --target sokoengine
-
-      - name: make install
-        if: ${{ matrix.os == 'windows-latest' }}
+      - name: "🪟 make install"
         working-directory: build/visual_studio
         run: cmake --install . --config RelWithDebInfo
-
-      - name: upload windows binaries
-        if: ${{ matrix.os == 'windows-latest' && matrix.py == 'with Py' && matrix.python-version == '3.10'}}
+      - name: "🪟 upload windows binaries for 🐍 3.10"
+        if: ${{ matrix.py-on == '🟢' && matrix.python-version == '3.10'}}
         uses: actions/upload-artifact@v3
         with:
           name: windows_cmake_installed
           path: build/installed
           retention-days: 5
-
-      - name: upload windows build artifacts
-        if: ${{ matrix.os == 'windows-latest' && matrix.py == 'with Py' && matrix.python-version == '3.10'}}
+      - name: "🪟 upload windows build artifacts for 🐍 3.10"
+        if: ${{ matrix.py-on == '🟢' && matrix.python-version == '3.10'}}
         uses: actions/upload-artifact@v3
         with:
           name: windows_build_artifacts

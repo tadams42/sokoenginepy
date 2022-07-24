@@ -25,6 +25,8 @@ D typeinfo for sokoengine::io::Collection
 D typeinfo for sokoengine::io::Puzzle
 D typeinfo for sokoengine::io::Snapshot
 D typeinfo for std::bad_variant_access
+D typeinfo for std::_Mutex_base<(__gnu_cxx::_Lock_policy)2>
+D typeinfo for std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>
 D vtable for sokoengine::game::BoardGraph
 D vtable for sokoengine::game::BoardManager
 D vtable for sokoengine::game::BoxGoalSwitchError
@@ -68,6 +70,8 @@ R typeinfo name for sokoengine::io::Collection
 R typeinfo name for sokoengine::io::Puzzle
 R typeinfo name for sokoengine::io::Snapshot
 R typeinfo name for std::bad_variant_access
+R typeinfo name for std::_Mutex_base<(__gnu_cxx::_Lock_policy)2>
+R typeinfo name for std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>
 T sokoengine::game::BoardCell::BoardCell(char)
 T sokoengine::game::BoardCell::BoardCell(char)
 T sokoengine::game::BoardCell::can_put_pusher_or_box() const
@@ -112,7 +116,6 @@ T sokoengine::game::BoardGraph::board_height() const
 T sokoengine::game::BoardGraph::board_width() const
 T sokoengine::game::BoardGraph::cell_at(unsigned int)
 T sokoengine::game::BoardGraph::cell_at(unsigned int) const
-T sokoengine::game::BoardGraph::cell_orientation(unsigned int) const
 T sokoengine::game::BoardGraph::cell(unsigned int)
 T sokoengine::game::BoardGraph::cell(unsigned int) const
 T sokoengine::game::BoardGraph::contains(unsigned int) const
@@ -136,6 +139,7 @@ T sokoengine::game::BoardGraph::shortest_path(unsigned int, unsigned int) const
 T sokoengine::game::BoardGraph::size() const
 T sokoengine::game::BoardGraph::str[abi:cxx11]() const
 T sokoengine::game::BoardGraph::tessellation() const
+T sokoengine::game::BoardGraph::tile_shape(unsigned int) const
 T sokoengine::game::BoardGraph::to_board_str[abi:cxx11](bool, bool) const
 T sokoengine::game::BoardGraph::wall_neighbor_directions(unsigned int) const
 T sokoengine::game::BoardGraph::wall_neighbors(unsigned int) const
@@ -390,7 +394,6 @@ T sokoengine::io::Puzzle::board[abi:cxx11]() const
 T sokoengine::io::Puzzle::boxes_count() const
 T sokoengine::io::Puzzle::boxorder[abi:cxx11]()
 T sokoengine::io::Puzzle::boxorder[abi:cxx11]() const
-T sokoengine::io::Puzzle::cell_orientation(unsigned int) const
 T sokoengine::io::Puzzle::goalorder[abi:cxx11]()
 T sokoengine::io::Puzzle::goalorder[abi:cxx11]() const
 T sokoengine::io::Puzzle::goals_count() const
@@ -431,6 +434,7 @@ T sokoengine::io::Puzzle::snapshots()
 T sokoengine::io::Puzzle::snapshots() const
 T sokoengine::io::Puzzle::str[abi:cxx11]() const
 T sokoengine::io::Puzzle::tessellation() const
+T sokoengine::io::Puzzle::tile_shape(unsigned int) const
 T sokoengine::io::Puzzle::title[abi:cxx11]()
 T sokoengine::io::Puzzle::title[abi:cxx11]() const
 T sokoengine::io::Puzzle::to_board_str[abi:cxx11](bool, bool) const
@@ -474,6 +478,75 @@ T sokoengine::io::Snapshot::title[abi:cxx11]()
 T sokoengine::io::Snapshot::title[abi:cxx11]() const
 T sokoengine::io::Snapshot::to_str[abi:cxx11](bool) const
 T sokoengine::run_benchmarks(double)
+T sokoengine::skins::Image::height() const
+T sokoengine::skins::Image::~Image()
+T sokoengine::skins::Image::~Image()
+T sokoengine::skins::Image::Image()
+T sokoengine::skins::Image::Image()
+T sokoengine::skins::Image::Image(sokoengine::skins::Image&&)
+T sokoengine::skins::Image::Image(sokoengine::skins::Image&&)
+T sokoengine::skins::Image::Image(sokoengine::skins::Image const&)
+T sokoengine::skins::Image::Image(sokoengine::skins::Image const&)
+T sokoengine::skins::Image::is_empty() const
+T sokoengine::skins::Image::operator=(sokoengine::skins::Image&&)
+T sokoengine::skins::Image::operator=(sokoengine::skins::Image const&)
+T sokoengine::skins::Image::pixel(unsigned int, unsigned int) const
+T sokoengine::skins::Image::save(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const
+T sokoengine::skins::Image::save(std::ostream&) const
+T sokoengine::skins::Image::swap(sokoengine::skins::Image&)
+T sokoengine::skins::Image::width() const
+T sokoengine::skins::Skin::animated_box_on_goal(sokoengine::TileShape) const
+T sokoengine::skins::Skin::animated_box(sokoengine::TileShape) const
+T sokoengine::skins::Skin::animated_pusher_on_goal(sokoengine::TileShape) const
+T sokoengine::skins::Skin::animated_pusher(sokoengine::TileShape) const
+T sokoengine::skins::Skin::box_on_goal(sokoengine::TileShape) const
+T sokoengine::skins::Skin::box(sokoengine::TileShape) const
+T sokoengine::skins::Skin::columns_count() const
+T sokoengine::skins::Skin::directional_pushers_on_goal(sokoengine::TileShape) const
+T sokoengine::skins::Skin::directional_pushers(sokoengine::TileShape) const
+T sokoengine::skins::Skin::directional_walls(sokoengine::TileShape) const
+T sokoengine::skins::Skin::dump_tiles(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const
+T sokoengine::skins::Skin::floor(sokoengine::TileShape) const
+T sokoengine::skins::Skin::goal(sokoengine::TileShape) const
+T sokoengine::skins::Skin::img_height() const
+T sokoengine::skins::Skin::img_width() const
+T sokoengine::skins::Skin::is_empty() const
+T sokoengine::skins::Skin::non_playable_floor(sokoengine::TileShape) const
+T sokoengine::skins::Skin::operator=(sokoengine::skins::Skin&&)
+T sokoengine::skins::Skin::operator=(sokoengine::skins::Skin const&)
+T sokoengine::skins::Skin::original_tile_height() const
+T sokoengine::skins::Skin::original_tile_width() const
+T sokoengine::skins::Skin::path[abi:cxx11]() const
+T sokoengine::skins::Skin::pusher_on_goal(sokoengine::Direction, sokoengine::TileShape) const
+T sokoengine::skins::Skin::pusher_on_goal(sokoengine::TileShape) const
+T sokoengine::skins::Skin::pusher(sokoengine::Direction, sokoengine::TileShape) const
+T sokoengine::skins::Skin::pusher(sokoengine::TileShape) const
+T sokoengine::skins::Skin::render_board(sokoengine::game::BoardGraph const&) const
+T sokoengine::skins::Skin::render_board(sokoengine::io::Puzzle const&) const
+T sokoengine::skins::Skin::rows_count() const
+T sokoengine::skins::Skin::~Skin()
+T sokoengine::skins::Skin::~Skin()
+T sokoengine::skins::Skin::Skin(sokoengine::skins::Skin&&)
+T sokoengine::skins::Skin::Skin(sokoengine::skins::Skin&&)
+T sokoengine::skins::Skin::Skin(sokoengine::skins::Skin const&)
+T sokoengine::skins::Skin::Skin(sokoengine::skins::Skin const&)
+T sokoengine::skins::Skin::Skin(sokoengine::Tessellation)
+T sokoengine::skins::Skin::Skin(sokoengine::Tessellation)
+T sokoengine::skins::Skin::Skin(sokoengine::Tessellation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned char, unsigned char)
+T sokoengine::skins::Skin::Skin(sokoengine::Tessellation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned char, unsigned char)
+T sokoengine::skins::Skin::Skin(sokoengine::Tessellation, std::istream&, sokoengine::ImageFormats, unsigned char, unsigned char)
+T sokoengine::skins::Skin::Skin(sokoengine::Tessellation, std::istream&, sokoengine::ImageFormats, unsigned char, unsigned char)
+T sokoengine::skins::Skin::stripped_copy() const
+T sokoengine::skins::Skin::tile_height() const
+T sokoengine::skins::Skin::tile_polygon(sokoengine::TileShape) const
+T sokoengine::skins::Skin::tile_position(unsigned int, unsigned int, unsigned int) const
+T sokoengine::skins::Skin::tiles() const
+T sokoengine::skins::Skin::tile_shapes() const
+T sokoengine::skins::Skin::tile_width() const
+T sokoengine::skins::Skin::wall_cap(sokoengine::TileShape) const
+T sokoengine::skins::Skin::wall(sokoengine::TileShape) const
+T sokoengine::skins::Skin::wall(std::vector<sokoengine::Direction, std::allocator<sokoengine::Direction> > const&, sokoengine::TileShape) const
+U abort
 U __cxa_allocate_exception
 U __cxa_atexit
 U __cxa_begin_catch
@@ -484,26 +557,47 @@ U __cxa_pure_virtual
 U __cxa_rethrow
 U __cxa_throw
 U __cxa_throw_bad_array_new_length
+U __errno_location
+U fclose
+U ferror
+U fflush
+U fopen
+U __fprintf_chk
+U fputc
+U fread
 U free
+U frexp
+U fwrite
 U __gcc_personality_v0
+U gmtime
 U __gxx_personality_v0
 U isspace
+U ldiv
+U __longjmp_chk
+U malloc
 U memcmp
 U memcpy
+U __memcpy_chk
 U memmove
 U memset
+U modf
 U operator delete(void*)
 U operator delete[](void*)
 U operator delete(void*, unsigned long)
 U operator new(unsigned long)
 U operator new[](unsigned long)
+U pow
+U remove
+U _setjmp
 U __stack_chk_fail
+U std::bad_cast::~bad_cast()
 U std::basic_filebuf<char, std::char_traits<char> >::~basic_filebuf()
 U std::basic_filebuf<char, std::char_traits<char> >::basic_filebuf()
 U std::basic_filebuf<char, std::char_traits<char> >::close()
 U std::basic_filebuf<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode)
 U std::__basic_file<char>::~__basic_file()
 U std::basic_ifstream<char, std::char_traits<char> >::~basic_ifstream()
+U std::basic_ifstream<char, std::char_traits<char> >::basic_ifstream(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::_Ios_Openmode)
 U std::basic_ios<char, std::char_traits<char> >::clear(std::_Ios_Iostate)
 U std::basic_ios<char, std::char_traits<char> >::init(std::basic_streambuf<char, std::char_traits<char> >*)
 U std::basic_istream<char, std::char_traits<char> >& std::getline<char, std::char_traits<char>, std::allocator<char> >(std::basic_istream<char, std::char_traits<char> >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, char)
@@ -520,6 +614,7 @@ U std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator
 U std::__cxx11::basic_ostringstream<char, std::char_traits<char>, std::allocator<char> >::basic_ostringstream()
 U std::__cxx11::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >::_M_sync(char*, unsigned long, unsigned long)
 U std::__cxx11::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >::str() const
+U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)
 U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*)
 U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()
 U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::compare(char const*) const
@@ -543,17 +638,29 @@ U std::__cxx11::basic_stringstream<char, std::char_traits<char>, std::allocator<
 U std::__detail::_List_node_base::_M_hook(std::__detail::_List_node_base*)
 U std::__detail::_List_node_base::_M_transfer(std::__detail::_List_node_base*, std::__detail::_List_node_base*)
 U std::__detail::_Prime_rehash_policy::_M_need_rehash(unsigned long, unsigned long, unsigned long) const
+U stderr
 U std::exception::~exception()
+U std::filesystem::create_directories(std::filesystem::__cxx11::path const&)
+U std::filesystem::__cxx11::path::_List::_Impl_deleter::operator()(std::filesystem::__cxx11::path::_List::_Impl*) const
+U std::filesystem::__cxx11::path::_List::_List()
+U std::filesystem::__cxx11::path::_List::_List(std::filesystem::__cxx11::path::_List const&)
+U std::filesystem::__cxx11::path::_M_split_cmpts()
+U std::filesystem::__cxx11::path::operator/=(std::filesystem::__cxx11::path const&)
 U std::invalid_argument::~invalid_argument()
 U std::invalid_argument::~invalid_argument()
 U std::invalid_argument::invalid_argument(char const*)
 U std::invalid_argument::invalid_argument(char const*)
 U std::invalid_argument::invalid_argument(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
 U std::invalid_argument::invalid_argument(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+U std::ios_base::failure[abi:cxx11]::~failure()
+U std::ios_base::failure[abi:cxx11]::failure(char const*, std::error_code const&)
 U std::ios_base::Init::~Init()
 U std::ios_base::Init::Init()
 U std::ios_base::~ios_base()
 U std::ios_base::ios_base()
+U std::iostream_category()
+U std::istream::peek()
+U std::istream::readsome(char*, long)
 U std::istream::seekg(long, std::_Ios_Seekdir)
 U std::locale::~locale()
 U std::locale::locale()
@@ -564,6 +671,7 @@ U std::ostream::flush()
 U std::ostream::put(char)
 U std::ostream& std::ostream::_M_insert<double>(double)
 U std::ostream& std::ostream::_M_insert<unsigned long>(unsigned long)
+U std::ostream::write(char const*, long)
 U std::out_of_range::~out_of_range()
 U std::out_of_range::~out_of_range()
 U std::out_of_range::out_of_range(char const*)
@@ -589,9 +697,13 @@ U std::__throw_logic_error(char const*)
 U std::__throw_out_of_range(char const*)
 U std::__throw_out_of_range_fmt(char const*, ...)
 U strcmp
+U strerror
 U strlen
+U strtod
+U typeinfo for std::bad_cast
 U typeinfo for std::exception
 U typeinfo for std::invalid_argument
+U typeinfo for std::ios_base::failure[abi:cxx11]
 U typeinfo for std::out_of_range
 U typeinfo for std::range_error
 U typeinfo for std::runtime_error
@@ -618,3 +730,4 @@ w __cxa_finalize
 w __gmon_start__
 w _ITM_deregisterTMCloneTable
 w _ITM_registerTMCloneTable
+w __pthread_key_create

@@ -21,9 +21,9 @@ enum class LIBSOKOENGINE_API Direction : uint8_t {
 };
 
 ///
-/// Ordered collection of Directions usually describing continuous board path.
+/// Ordered collection of Direction usually describing continuous board path.
 ///
-typedef std::vector<Direction> Directions;
+typedef std::vector<Direction> directions_t;
 
 namespace implementation {
 
