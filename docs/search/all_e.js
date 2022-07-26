@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['pages_5flicense_2edox_128',['pages_license.dox',['../pages__license_8dox.html',1,'']]],
+  ['pages_5fsok_5fformat_2edox_129',['pages_sok_format.dox',['../pages__sok__format_8dox.html',1,'']]],
+  ['path_130',['path',['../classsokoengine_1_1skins_1_1Skin.html#ada05c04a326b380a2fea2391de1ee8d3',1,'sokoengine::skins::Skin']]],
+  ['path_5fdestination_131',['path_destination',['../classsokoengine_1_1game_1_1BoardGraph.html#a73ce7e19a552a08839c24ce91ffb0ead',1,'sokoengine::game::BoardGraph']]],
+  ['piece_5fid_5ft_132',['piece_id_t',['../namespacesokoengine.html#ab2306b75523b76ef9eecf0d8327f702d',1,'sokoengine']]],
+  ['piece_5fids_5ft_133',['piece_ids_t',['../classsokoengine_1_1game_1_1BoardManager.html#ac81bfe272cdc3d5649907f721d378a51',1,'sokoengine::game::BoardManager']]],
+  ['piecenotfounderror_134',['PieceNotFoundError',['../classsokoengine_1_1game_1_1PieceNotFoundError.html',1,'sokoengine::game']]],
+  ['pixel_5ft_135',['pixel_t',['../structsokoengine_1_1skins_1_1pixel__t.html',1,'sokoengine::skins']]],
+  ['position_5ft_136',['position_t',['../namespacesokoengine.html#acb80d43ef8336aef2d8bab954beab3b6',1,'sokoengine']]],
+  ['positions_5fby_5fid_5ft_137',['positions_by_id_t',['../classsokoengine_1_1game_1_1BoardManager.html#abc647799fb7817acbd78bf7a7b298c5e',1,'sokoengine::game::BoardManager']]],
+  ['positions_5fpath_5fto_5fdirections_5fpath_138',['positions_path_to_directions_path',['../classsokoengine_1_1game_1_1BoardGraph.html#a2f0c579ee106f0c4b153a58baa5697d2',1,'sokoengine::game::BoardGraph']]],
+  ['positions_5freachable_5fby_5fpusher_139',['positions_reachable_by_pusher',['../classsokoengine_1_1game_1_1BoardGraph.html#a48e68063345e2b02d5d727152d2f1b99',1,'sokoengine::game::BoardGraph']]],
+  ['positions_5ft_140',['positions_t',['../namespacesokoengine.html#ad796332fadd400566a05c7d69e44fb0b',1,'sokoengine']]],
+  ['pusher_141',['pusher',['../classsokoengine_1_1skins_1_1Skin.html#aa504b9b89675a3bc16e6beab4aa9d980',1,'sokoengine::skins::Skin::pusher(TileShape shape) const'],['../classsokoengine_1_1skins_1_1Skin.html#a66d6f24e84ebcb7cc11662e0c60c4ee6',1,'sokoengine::skins::Skin::pusher(Direction looking_at, TileShape shape) const']]],
+  ['pusher_5fid_142',['pusher_id',['../classsokoengine_1_1game_1_1PusherStep.html#a0ce4530f1291072f27878293e897f047',1,'sokoengine::game::PusherStep']]],
+  ['pusher_5fid_5fon_143',['pusher_id_on',['../classsokoengine_1_1game_1_1BoardManager.html#ada06f4548d23a8c587511c886ad91120',1,'sokoengine::game::BoardManager']]],
+  ['pusher_5fon_5fgoal_144',['pusher_on_goal',['../classsokoengine_1_1skins_1_1Skin.html#a51e4d329cc020dee30fc36e05c742f8b',1,'sokoengine::skins::Skin::pusher_on_goal(TileShape shape) const'],['../classsokoengine_1_1skins_1_1Skin.html#a628c21dc1c209c65ccfb15ef55b39931',1,'sokoengine::skins::Skin::pusher_on_goal(Direction looking_at, TileShape shape) const']]],
+  ['pusher_5fposition_145',['pusher_position',['../classsokoengine_1_1game_1_1BoardManager.html#a48870216006b03172a7cacf2555d8476',1,'sokoengine::game::BoardManager']]],
+  ['pusher_5fstep_2ehpp_146',['pusher_step.hpp',['../pusher__step_8hpp.html',1,'']]],
+  ['pusher_5fsteps_5ft_147',['pusher_steps_t',['../namespacesokoengine_1_1game.html#ae08fcc8b5a3aadcf9eb7427948227c41',1,'sokoengine::game']]],
+  ['pushers_5fpositions_148',['pushers_positions',['../classsokoengine_1_1game_1_1BoardManager.html#a18292340e6da018ca43acdf99fbf90f7',1,'sokoengine::game::BoardManager::pushers_positions()'],['../classsokoengine_1_1game_1_1BoardState.html#aec8858f8bc4935a13b507cb09d236e3f',1,'sokoengine::game::BoardState::pushers_positions()']]],
+  ['pusherstep_149',['PusherStep',['../classsokoengine_1_1game_1_1PusherStep.html',1,'sokoengine::game::PusherStep'],['../classsokoengine_1_1game_1_1PusherStep.html#a956dbaf56c750bcc8dcdb85745e6bab4',1,'sokoengine::game::PusherStep::PusherStep()']]],
+  ['puzzle_150',['Puzzle',['../classsokoengine_1_1io_1_1Puzzle.html',1,'sokoengine::io::Puzzle'],['../classsokoengine_1_1io_1_1Puzzle.html#a0b8fd5e38440b9b1fa96ceb9f9b3ce9c',1,'sokoengine::io::Puzzle::Puzzle(const Tessellation &amp;tessellation, board_size_t width=0, board_size_t height=0)'],['../classsokoengine_1_1io_1_1Puzzle.html#acb8e2ba99638cba8815110c6bf1726d8',1,'sokoengine::io::Puzzle::Puzzle(const Tessellation &amp;tessellation, const std::string &amp;board=&quot;&quot;)']]],
+  ['puzzle_2ehpp_151',['puzzle.hpp',['../puzzle_8hpp.html',1,'']]],
+  ['puzzles_5ft_152',['puzzles_t',['../namespacesokoengine_1_1io.html#a0173db7fd6a45e1ea46835ea37c7926a',1,'sokoengine::io']]]
+];

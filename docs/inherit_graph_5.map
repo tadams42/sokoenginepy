@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title="STL class." alt="" coords="5,306,120,333"/>
+<area shape="rect" id="node2" title="STL class." alt="" coords="168,306,287,333"/>
+<area shape="rect" id="node3" title="STL class." alt="" coords="335,209,499,235"/>
+<area shape="rect" id="node10" title="STL class." alt="" coords="349,331,484,358"/>
+<area shape="rect" id="node4" href="$classsokoengine_1_1game_1_1BoxGoalSwitchError.html" title=" " alt="" coords="560,5,764,47"/>
+<area shape="rect" id="node5" href="$classsokoengine_1_1game_1_1CellAlreadyOccupiedError.html" title=" " alt="" coords="550,71,774,112"/>
+<area shape="rect" id="node6" href="$classsokoengine_1_1game_1_1IllegalMoveError.html" title=" " alt="" coords="567,136,757,177"/>
+<area shape="rect" id="node7" href="$classsokoengine_1_1game_1_1NonPlayableBoardError.html" title=" " alt="" coords="547,201,777,243"/>
+<area shape="rect" id="node8" href="$classsokoengine_1_1game_1_1PieceNotFoundError.html" title=" " alt="" coords="559,267,765,308"/>
+<area shape="rect" id="node9" href="$classsokoengine_1_1game_1_1SokobanPlusDataError.html" title=" " alt="" coords="560,332,764,373"/>
+<area shape="rect" id="node11" href="$classsokoengine_1_1game_1_1InvalidPositionError.html" title=" " alt="" coords="565,397,759,439"/>
+</map>

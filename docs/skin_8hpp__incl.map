@@ -1,0 +1,8 @@
+<map id="skin.hpp" name="skin.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="241,5,319,32"/>
+<area shape="rect" id="node2" href="$direction_8hpp.html" title=" " alt="" coords="5,80,112,107"/>
+<area shape="rect" id="node3" href="$game__config_8hpp.html" title=" " alt="" coords="136,80,269,107"/>
+<area shape="rect" id="node5" href="$tessellation_8hpp.html" title=" " alt="" coords="294,80,421,107"/>
+<area shape="rect" id="node6" href="$tile__shape_8hpp.html" title=" " alt="" coords="445,80,563,107"/>
+<area shape="rect" id="node4" href="$numeric__types_8hpp.html" title=" " alt="" coords="207,155,353,181"/>
+</map>
